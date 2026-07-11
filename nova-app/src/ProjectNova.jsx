@@ -116844,6 +116844,9 @@ const UI = {
   qz_intro: ["計算・誤り選択・状況判断に加え、統計数値(Key numbers)・高度専門用語(Expertise)・最新動向(2024–2026)まで15テーマ。選択肢は毎回シャッフルし、正解が最長になる偏りも是正済み。テーマか難易度のボタンを押すとその場で開始します。各問に難易度★を表示。", "15 themes — from calculation, error-spotting and judgment to key statistics (Key numbers), advanced terminology (Expertise), and the latest trends (2024–2026). Options are shuffled each time and length bias is corrected. Tap a theme or difficulty to start. Each question shows a difficulty ★."],
   qz_theme: ["テーマ（押すと開始）", "Theme (tap to start)"],
   qz_diff: ["難易度（押すと開始）", "Difficulty (tap to start)"],
+  qz_order: ["出題順", "Question order"],
+  qz_order_fixed: ["固定", "Fixed"],
+  qz_order_random: ["ランダム順", "Random"],
   qz_all: ["すべて", "All"],
   qz_d1: ["★☆☆ 基礎", "★☆☆ Basic"],
   qz_d2: ["★★☆ 標準", "★★☆ Standard"],
@@ -125280,6 +125283,7 @@ function McqView() {
   const [cat, setCat] = useState(ALL);
   const [diff, setDiff] = useState(0); // 0=すべて,1,2,3
   const [order, setOrder] = useState(null);
+  const [orderMode, setOrderMode] = useState("random"); // "fixed" | "random"
   const [pos, setPos] = useState(0);
   const [answers, setAnswers] = useState({}); // pos -> 選んだ表示インデックス
   const [showResult, setShowResult] = useState(false);
@@ -125404,16 +125408,18 @@ function McqView() {
     }
   }, [curQi, lang, showOrig]);
 
+  // orderMode: "fixed"なら出現順のまま、"random"なら決定的シャッフル
+  const applyOrder = (indices) => (orderMode === "fixed" ? indices.slice() : seededShuffle(indices, Date.now() % 100000));
   // 指定条件で即開始（ボタン押下で発火）
   const startWith = (c, dv) => {
     const idx = MCQS.map((m, i) => i).filter((i) =>
       (c === ALL || MCQS[i].cat === c) && (dv === 0 || MCQS[i].d === dv));
     if (idx.length === 0) return;
-    setOrder(seededShuffle(idx, Date.now() % 100000));
+    setOrder(applyOrder(idx));
     setPos(0); setAnswers({}); setShowResult(false);
   };
   const start = (indices) => {
-    setOrder(seededShuffle(indices, Date.now() % 100000));
+    setOrder(applyOrder(indices));
     setPos(0); setAnswers({}); setShowResult(false);
   };
   // 辞書からのジャンプ: その用語を含む問題だけでクイズを開始 / 学習ホームからのSRS復習開始
@@ -125567,7 +125573,18 @@ function McqView() {
             </div>
           );
         })()}
-        <div style={{ fontSize: 11, color: C.gold, marginBottom: 6 }}>{t(lang, "qz_theme")}</div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, flexWrap: "wrap", gap: 8 }}>
+          <div style={{ fontSize: 11, color: C.gold }}>{t(lang, "qz_theme")}</div>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <span style={{ fontSize: 10.5, color: C.dim }}>{t(lang, "qz_order")}</span>
+            <button className="gh-btn" onClick={() => setOrderMode("fixed")} style={{ fontSize: 11, padding: "3px 10px", ...(orderMode === "fixed" ? { borderColor: C.gold, color: C.gold, fontWeight: 700 } : {}) }}>
+              {t(lang, "qz_order_fixed")}
+            </button>
+            <button className="gh-btn" onClick={() => setOrderMode("random")} style={{ fontSize: 11, padding: "3px 10px", ...(orderMode === "random" ? { borderColor: C.gold, color: C.gold, fontWeight: 700 } : {}) }}>
+              {t(lang, "qz_order_random")}
+            </button>
+          </div>
+        </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
           {cats.map((c) => {
             const n = poolCount(c, diff);
@@ -125663,7 +125680,15 @@ function McqView() {
 
   return (
     <Card>
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 10 }}>
+      <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
+        <span style={{ fontSize: 10.5, color: C.dim }}>{t(lang, "qz_order")}</span>
+        <button className="gh-btn" onClick={() => setOrderMode("fixed")} style={{ fontSize: 11, padding: "3px 10px", ...(orderMode === "fixed" ? { borderColor: C.gold, color: C.gold, fontWeight: 700 } : {}) }}>
+          {t(lang, "qz_order_fixed")}
+        </button>
+        <button className="gh-btn" onClick={() => setOrderMode("random")} style={{ fontSize: 11, padding: "3px 10px", ...(orderMode === "random" ? { borderColor: C.gold, color: C.gold, fontWeight: 700 } : {}) }}>
+          {t(lang, "qz_order_random")}
+        </button>
+        <span style={{ width: 1, alignSelf: "stretch", background: C.line, margin: "0 2px" }} />
         <button className="gh-btn" onClick={() => setOrder(null)} style={{ fontSize: 12 }}>{t(lang, "qz_theme_sel")}</button>
       </div>
       {termFilter && (
