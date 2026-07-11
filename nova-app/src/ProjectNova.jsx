@@ -125663,6 +125663,9 @@ function McqView() {
 
   return (
     <Card>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 10 }}>
+        <button className="gh-btn" onClick={() => setOrder(null)} style={{ fontSize: 12 }}>{t(lang, "qz_theme_sel")}</button>
+      </div>
       {termFilter && (
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, padding: "6px 10px", background: C.surface2, border: `1px solid ${C.gold}`, borderRadius: 6, fontSize: 11.5 }}>
           <span style={{ color: C.gold }}>{t(lang, "qz_filtered")}<b style={{ color: C.text }}>{termFilter}</b></span>
@@ -125733,11 +125736,10 @@ function McqView() {
       <div style={{ display: "flex", gap: 8, marginTop: 12, alignItems: "center" }}>
         <button className="gh-btn" onClick={goPrev} disabled={pos === 0}
                 style={pos === 0 ? { opacity: 0.4 } : {}}>{t(lang, "qz_prev")}</button>
+        <span style={{ flex: 1 }} />
         <button className="gh-btn gh-btn-primary" onClick={goNext}>
           {pos + 1 >= order.length ? t(lang, "qz_seeresult") : t(lang, "qz_next")}
         </button>
-        <span style={{ flex: 1 }} />
-        <button className="gh-btn" onClick={() => setOrder(null)} style={{ fontSize: 12 }}>{t(lang, "qz_theme_sel")}</button>
       </div>
     </Card>
   );
