@@ -37,6 +37,16 @@ npm run preview      # ビルド結果をローカル確認
 保持されます。ポリフィルが無いと（try/catch されているのでアプリは落ちませんが）状態が
 毎回消えてしまいます。
 
+## 単一 HTML ファイルとして書き出す（ターミナル不要で配布したいとき）
+`vite-plugin-singlefile` により、すべてを 1 つの HTML に埋め込んだファイルを生成できます。
+生成された HTML は、ダブルクリックするだけでブラウザで開けます（Node.js もサーバーも不要）。
+
+```bash
+npm run build          # dist/index.html が単一ファイルとして出力される
+```
+
+`dist/index.html` をリネームして配布すれば、受け取った人はダブルクリックで開くだけで使えます。
+
 ## 静的ホスティング（任意）
 `npm run build` で生成される `dist/` は、Netlify / Vercel / GitHub Pages などに
 そのまま配置できます（SPA なので特別なサーバー設定は不要）。
