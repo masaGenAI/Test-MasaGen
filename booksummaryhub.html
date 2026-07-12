@@ -383,14 +383,32 @@
 
   /* ---------- QUIZ ---------- */
   .quiz-intro{font-size:12.5px;color:var(--muted);margin:0 0 18px;line-height:1.7;}
-  .quiz-q{
-    margin:0 0 16px;padding:18px 18px 16px;border-radius:12px;
+  /* one-question-at-a-time quiz box */
+  .quiz-box{
+    padding:18px 18px 16px;border-radius:14px;
     background:var(--bg);border:1px solid var(--hairline);
+    display:flex;flex-direction:column;
   }
-  .quiz-q:last-child{margin-bottom:0;}
+  .quiz-order{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+  .quiz-order-label{font-size:11px;letter-spacing:.08em;color:var(--muted);font-weight:600;}
+  .quiz-seg{display:inline-flex;border:1px solid var(--hairline);border-radius:100px;padding:2px;background:rgba(11,31,63,0.03);}
+  .quiz-seg .seg-btn{
+    font-family:inherit;font-size:12px;font-weight:600;color:var(--muted);
+    border:none;background:none;cursor:pointer;padding:5px 13px;border-radius:100px;
+    transition:background .15s ease,color .15s ease;
+  }
+  .quiz-seg .seg-btn.active{background:var(--navy-mid);color:#fff;}
+  .quiz-head{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:14px;font-size:12px;color:var(--muted);font-weight:500;
+  }
+  .quiz-counter{font-family:'Fraunces',serif;font-size:14px;color:var(--navy-mid);font-weight:600;}
+  .quiz-score{font-size:12px;}
+  .quiz-score b{color:var(--navy-mid);font-family:'Fraunces',serif;font-size:14px;}
+  .quiz-stage{min-height:210px;display:flex;flex-direction:column;justify-content:flex-start;}
   .quiz-q-text{
     display:flex;gap:9px;align-items:baseline;
-    font-size:14px;font-weight:600;color:var(--ink);margin:0 0 14px;line-height:1.65;
+    font-size:14.5px;font-weight:600;color:var(--ink);margin:0 0 14px;line-height:1.65;
   }
   .quiz-q-text .quiz-num{
     font-family:'Fraunces',serif;font-size:13px;color:var(--sky);font-weight:600;
@@ -425,11 +443,33 @@
     font-size:13px;line-height:1.75;color:var(--ink);
   }
   .quiz-explain b{color:var(--navy-mid);}
-  .quiz-progress{
-    margin-top:20px;padding-top:16px;border-top:1px solid var(--hairline);
-    font-size:13px;color:var(--muted);text-align:center;font-weight:500;
+  /* nav row: 戻る（左下）/ 次へ（右下）を枠内に固定 */
+  .quiz-nav{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-top:18px;padding-top:15px;border-top:1px solid var(--hairline);
   }
-  .quiz-progress b{color:var(--navy-mid);font-family:'Fraunces',serif;font-size:15px;}
+  .quiz-nav button{
+    font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;
+    padding:9px 18px;border-radius:100px;border:1px solid var(--hairline);
+    background:#fff;color:var(--navy-mid);
+    transition:background .15s ease,border-color .15s ease,opacity .15s ease;
+  }
+  .quiz-nav button:hover:not(:disabled){border-color:var(--sky);background:rgba(76,143,214,0.05);}
+  .quiz-nav button:disabled{opacity:.4;cursor:not-allowed;}
+  .quiz-next.ready{background:var(--navy-mid);color:#fff;border-color:var(--navy-mid);}
+  .quiz-next.ready:hover:not(:disabled){background:var(--navy-deep);}
+  .quiz-next.done{background:#2E9E6B;border-color:#2E9E6B;color:#fff;}
+  /* result summary */
+  .quiz-summary{text-align:center;padding:26px 10px 10px;}
+  .quiz-summary-score{font-family:'Fraunces',serif;font-size:15px;color:var(--muted);margin:0 0 6px;}
+  .quiz-summary-score b{font-size:40px;color:var(--navy-deep);display:block;line-height:1.1;margin-bottom:4px;}
+  .quiz-summary-sub{font-size:13.5px;color:var(--ink);line-height:1.7;margin:0 0 20px;}
+  .quiz-retry{
+    font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;
+    padding:9px 22px;border-radius:100px;border:1px solid var(--sky-light);
+    background:rgba(76,143,214,0.08);color:var(--navy-mid);
+  }
+  .quiz-retry:hover{background:rgba(76,143,214,0.15);}
 </style>
 </head>
 <body>
@@ -4925,6 +4965,20 @@ const THEME_SYNTHESIS = {
 };
 
 /* ============================================================
+   QUIZ DATA
+   BOOK_QUIZ[bookId]      : その要約（本）の4択クイズ5問（固定順・易→難）
+   THEME_QUIZ_BOOKS[catId]: テーマクイズを構成する本idの並び（各本5問 → テーマ計50問）
+   テーマクイズは固定（難易度順）/ランダムを切り替え可能。
+   ※ AI・DX を先行実装。他テーマは THEME_SYNTHESIS.quiz（暫定5問）を使用。
+============================================================ */
+const BOOK_QUIZ = {
+  /* __AI_DX_BOOK_QUIZ__ */
+};
+const THEME_QUIZ_BOOKS = {
+  /* __THEME_QUIZ_BOOKS__ */
+};
+
+/* ============================================================
    HELPERS
 ============================================================ */
 function lerpColor(a, b, t){
@@ -5022,19 +5076,11 @@ function synthesisHTML(cat){
       <p class="synth-point-head"><span class="num">${String(i+1).padStart(2,'0')}</span>${p.h}</p>
       <p class="synth-point-body">${p.b}</p>
     </li>`).join('');
-  const total = (s.quiz || []).length;
-  const quiz = (s.quiz || []).map((q, qi) => {
-    const choices = q.choices.map((c, ci) => `
-      <button class="quiz-choice" data-correct="${ci === q.answer}">
-        <span class="opt">${'ABCD'[ci]}</span><span class="txt">${c}</span><span class="mark"></span>
-      </button>`).join('');
-    return `
-      <div class="quiz-q" data-answered="false">
-        <p class="quiz-q-text"><span class="quiz-num">Q${qi+1}.</span>${q.q}</p>
-        <div class="quiz-choices">${choices}</div>
-        <div class="quiz-explain" style="display:none"><b>正解：${'ABCD'[q.answer]}</b> — ${q.explanation}</div>
-      </div>`;
-  }).join('');
+  const qs = themeQuizQuestions(cat.id);
+  const quizBlock = qs.length ? `
+      <div class="synth-block-title">理解度チェック（テーマ${qs.length}問クイズ）</div>
+      <p class="quiz-intro">1問ずつ出題されます。選択肢を選ぶと正誤と解説が表示され、「次へ」で進みます。出題順は「固定（易→難）」と「ランダム」を切り替えられます。</p>
+      <div class="quiz-mount" id="quizmount-theme-${cat.id}"></div>` : '';
   return `
     <div class="theme-synth">
       <p class="synth-eyebrow">Theme Digest ・ テーマ総括</p>
@@ -5050,51 +5096,192 @@ function synthesisHTML(cat){
         <p class="label">実務への示唆</p>
         <p>${s.insight}</p>
       </div>
-
-      <div class="synth-block-title">理解度チェック（4択クイズ・${total}問）</div>
-      <p class="quiz-intro">選択肢をクリックすると、正誤の判定と解説が表示されます。</p>
-      <div class="quiz" id="quiz-${cat.id}">
-        ${quiz}
-        <div class="quiz-progress" id="quiz-progress-${cat.id}">正解 <b>0</b> / ${total}</div>
-      </div>
+      ${quizBlock}
     </div>`;
 }
 
-function wireQuiz(catId){
-  const root = document.getElementById('quiz-' + catId);
-  if(!root) return;
-  const total = root.querySelectorAll('.quiz-q').length;
-  let correct = 0, answered = 0;
-  root.querySelectorAll('.quiz-q').forEach(qEl => {
-    const choices = qEl.querySelectorAll('.quiz-choice');
-    choices.forEach(btn => {
-      btn.addEventListener('click', () => {
-        if(qEl.getAttribute('data-answered') === 'true') return;
-        qEl.setAttribute('data-answered', 'true');
-        const isCorrect = btn.getAttribute('data-correct') === 'true';
-        choices.forEach(b => {
-          b.disabled = true;
-          if(b.getAttribute('data-correct') === 'true'){
-            b.classList.add('correct');
-            b.querySelector('.mark').textContent = '正解';
-          }
+/* ---- クイズ出題ソース ---- */
+function themeQuizQuestions(themeId){
+  const order = THEME_QUIZ_BOOKS[themeId];
+  if(order && order.length){
+    const out = [];
+    order.forEach(bid => { (BOOK_QUIZ[bid] || []).forEach(q => out.push(q)); });
+    if(out.length) return out;
+  }
+  const s = THEME_SYNTHESIS[themeId];
+  return (s && s.quiz) ? s.quiz.map((q, i) => Object.assign({ level: q.level || (i+1) }, q)) : [];
+}
+
+/* ---- 出題順（固定＝難易度順 / ランダム＝シャッフル） ---- */
+function buildQuizSequence(questions, order){
+  const idx = questions.map((_, i) => i);
+  if(order === 'random'){
+    for(let i = idx.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      const t = idx[i]; idx[i] = idx[j]; idx[j] = t;
+    }
+  } else {
+    idx.sort((a, b) => ((questions[a].level || 2) - (questions[b].level || 2)) || (a - b));
+  }
+  return idx;
+}
+
+function quizResultComment(score, total){
+  const r = total ? score / total : 0;
+  if(r >= 0.9) return "見事な理解度です。要点をしっかり押さえられています。";
+  if(r >= 0.7) return "よく理解できています。取りこぼした問題の解説を振り返ってみましょう。";
+  if(r >= 0.5) return "半分以上正解。解説を読み返すと定着が深まります。";
+  return "まずは解説を丁寧に確認し、もう一度挑戦してみましょう。";
+}
+
+/* ---- 1問ずつ出題するクイズエンジン ---- */
+function mountQuiz(mountEl, questions, opts){
+  opts = opts || {};
+  const total = questions.length;
+  let order = opts.defaultOrder || 'fixed';
+  let seq = buildQuizSequence(questions, order);
+  let pos = 0;
+  const answered = {}; // 元問index -> 選択index
+
+  mountEl.innerHTML = `
+    <div class="quiz-box">
+      ${opts.orderToggle ? `
+      <div class="quiz-order">
+        <span class="quiz-order-label">出題順</span>
+        <div class="quiz-seg">
+          <button class="seg-btn active" data-order="fixed">固定（易→難）</button>
+          <button class="seg-btn" data-order="random">ランダム</button>
+        </div>
+      </div>` : ''}
+      <div class="quiz-head">
+        <span class="quiz-counter"></span>
+        <span class="quiz-score"></span>
+      </div>
+      <div class="quiz-stage"></div>
+      <div class="quiz-nav">
+        <button class="quiz-prev" type="button">← 戻る</button>
+        <button class="quiz-next" type="button">次へ →</button>
+      </div>
+    </div>`;
+
+  const stage   = mountEl.querySelector('.quiz-stage');
+  const counter = mountEl.querySelector('.quiz-counter');
+  const scoreEl = mountEl.querySelector('.quiz-score');
+  const prevBtn = mountEl.querySelector('.quiz-prev');
+  const nextBtn = mountEl.querySelector('.quiz-next');
+
+  const scoreOf = () => Object.keys(answered).reduce((n, k) => n + (answered[k] === questions[k].answer ? 1 : 0), 0);
+  const answeredCount = () => Object.keys(answered).length;
+
+  function updateNav(){
+    prevBtn.disabled = (pos === 0);
+    const qIdx = seq[pos];
+    const isAnswered = answered[qIdx] !== undefined;
+    nextBtn.disabled = !isAnswered; // 回答するまで次へ進めない
+    nextBtn.classList.toggle('ready', isAnswered && pos < total - 1);
+    if(pos === total - 1){
+      nextBtn.textContent = '結果を見る';
+      nextBtn.classList.toggle('done', isAnswered);
+    } else {
+      nextBtn.textContent = '次へ →';
+      nextBtn.classList.remove('done');
+    }
+  }
+
+  function renderQ(){
+    const qIdx = seq[pos];
+    const q = questions[qIdx];
+    const chosen = answered[qIdx];
+    const isAnswered = chosen !== undefined;
+    counter.textContent = `Q ${pos + 1} / ${total}`;
+    scoreEl.innerHTML = `正解 <b>${scoreOf()}</b>${answeredCount() ? ' / ' + answeredCount() + '問回答' : ''}`;
+    const choicesHTML = q.choices.map((c, ci) => {
+      let cls = 'quiz-choice';
+      let mark = '';
+      if(isAnswered){
+        if(ci === q.answer){ cls += ' correct'; mark = '正解'; }
+        else if(ci === chosen){ cls += ' wrong'; mark = '×'; }
+      }
+      return `<button class="${cls}" type="button" data-ci="${ci}" ${isAnswered ? 'disabled' : ''}>
+        <span class="opt">${'ABCD'[ci]}</span><span class="txt">${c}</span><span class="mark">${mark}</span>
+      </button>`;
+    }).join('');
+    stage.innerHTML = `
+      <p class="quiz-q-text"><span class="quiz-num">Q${pos + 1}.</span>${q.q}</p>
+      <div class="quiz-choices">${choicesHTML}</div>
+      <div class="quiz-explain" ${isAnswered ? '' : 'style="display:none"'}><b>正解：${'ABCD'[q.answer]}</b> — ${q.explanation}</div>`;
+    if(!isAnswered){
+      stage.querySelectorAll('.quiz-choice').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if(answered[qIdx] !== undefined) return;
+          answered[qIdx] = parseInt(btn.getAttribute('data-ci'), 10);
+          renderQ();
         });
-        if(!isCorrect){
-          btn.classList.add('wrong');
-          btn.querySelector('.mark').textContent = '×';
-        }
-        const ex = qEl.querySelector('.quiz-explain');
-        if(ex) ex.style.display = 'block';
-        answered++;
-        if(isCorrect) correct++;
-        const prog = document.getElementById('quiz-progress-' + catId);
-        if(prog){
-          prog.innerHTML = `正解 <b>${correct}</b> / ${total}` +
-            (answered === total ? '　・　全問回答しました' : '');
-        }
+      });
+    }
+    updateNav();
+  }
+
+  function showSummary(){
+    const sc = scoreOf();
+    counter.textContent = '完了';
+    scoreEl.innerHTML = `正解 <b>${sc}</b> / ${total}`;
+    stage.innerHTML = `
+      <div class="quiz-summary">
+        <p class="quiz-summary-score"><b>${sc}</b>／ ${total} 問正解</p>
+        <p class="quiz-summary-sub">${quizResultComment(sc, total)}</p>
+        <button class="quiz-retry" type="button">もう一度挑戦</button>
+      </div>`;
+    prevBtn.disabled = false;
+    nextBtn.disabled = true;
+    nextBtn.classList.remove('ready', 'done');
+    stage.querySelector('.quiz-retry').addEventListener('click', () => {
+      Object.keys(answered).forEach(k => delete answered[k]);
+      seq = buildQuizSequence(questions, order);
+      pos = 0;
+      renderQ();
+    });
+  }
+
+  prevBtn.addEventListener('click', () => {
+    if(pos > 0){ pos--; renderQ(); }
+  });
+  nextBtn.addEventListener('click', () => {
+    if(answered[seq[pos]] === undefined) return;
+    if(pos < total - 1){ pos++; renderQ(); }
+    else showSummary();
+  });
+
+  if(opts.orderToggle){
+    mountEl.querySelectorAll('.seg-btn').forEach(b => {
+      b.addEventListener('click', () => {
+        const o = b.getAttribute('data-order');
+        if(o === order) return;
+        order = o;
+        mountEl.querySelectorAll('.seg-btn').forEach(x => x.classList.toggle('active', x === b));
+        Object.keys(answered).forEach(k => delete answered[k]);
+        seq = buildQuizSequence(questions, order);
+        pos = 0;
+        renderQ();
       });
     });
-  });
+  }
+
+  renderQ();
+}
+
+function mountThemeQuiz(themeId){
+  const el = document.getElementById('quizmount-theme-' + themeId);
+  if(!el) return;
+  const qs = themeQuizQuestions(themeId);
+  if(qs.length) mountQuiz(el, qs, { orderToggle:true, defaultOrder:'fixed' });
+}
+
+function mountBookQuiz(bookId){
+  const el = document.getElementById('quizmount-book-' + bookId);
+  if(!el) return;
+  const qs = BOOK_QUIZ[bookId];
+  if(qs && qs.length) mountQuiz(el, qs, { orderToggle:false, defaultOrder:'fixed' });
 }
 
 function openCategory(cat, color){
@@ -5135,7 +5322,7 @@ function openCategory(cat, color){
 
   viewStack.push(viewId);
   showView(viewId);
-  wireQuiz(cat.id);
+  mountThemeQuiz(cat.id);
 
   if(cat.children && cat.children.length){
     const subList = document.getElementById(`list-${viewId}-sub`);
@@ -5247,10 +5434,16 @@ function openBook(book, color, crumbs){
       <p>${book.takeaway}</p>
     </div>` : ''}
 
+    ${(BOOK_QUIZ[book.id] && BOOK_QUIZ[book.id].length) ? `
+    <div class="book-section-title">理解度チェック（${BOOK_QUIZ[book.id].length}問クイズ）</div>
+    <p class="quiz-intro">この要約から${BOOK_QUIZ[book.id].length}問。1問ずつ出題され、「次へ」で進みます。</p>
+    <div class="quiz-mount" id="quizmount-book-${book.id}"></div>` : ''}
+
     <p class="source-note">※ 本要約はClaudeが書籍情報および要約サービス(Flier等)のレビューを参照し、独自にまとめた個人利用向けのノートです。原著・原要約の著作権はそれぞれの著者・出版社・要約サービス提供者に帰属します。</p>
   `;
   viewStack.push(viewId);
   showView(viewId);
+  mountBookQuiz(book.id);
 }
 
 function emptyStateHTML(){
