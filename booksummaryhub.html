@@ -173,6 +173,15 @@
     margin-bottom:36px;
   }
   .back-btn:hover{color:var(--navy-mid);}
+  .back-btn-bottom{
+    margin:40px 0 0;
+    padding:11px 20px;
+    border:1px solid var(--hairline);
+    border-radius:100px;
+    color:var(--navy-mid);
+    font-weight:600;
+  }
+  .back-btn-bottom:hover{border-color:var(--sky);background:rgba(76,143,214,0.05);}
   .detail-eyebrow{
     display:flex;
     align-items:center;
@@ -406,6 +415,15 @@
   .quiz-score{font-size:12px;}
   .quiz-score b{color:var(--navy-mid);font-family:'Fraunces',serif;font-size:14px;}
   .quiz-stage{min-height:210px;display:flex;flex-direction:column;justify-content:flex-start;}
+  .quiz-source{
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+    font-size:12px;color:var(--navy-mid);font-weight:600;margin:0 0 10px;line-height:1.5;
+  }
+  .quiz-source-label{
+    font-size:10px;letter-spacing:.08em;color:var(--sky);font-weight:700;
+    border:1px solid var(--sky-light);border-radius:100px;padding:2px 8px;
+    background:rgba(76,143,214,0.07);white-space:nowrap;
+  }
   .quiz-q-text{
     display:flex;gap:9px;align-items:baseline;
     font-size:14.5px;font-weight:600;color:var(--ink);margin:0 0 14px;line-height:1.65;
@@ -5050,11 +5068,15 @@ const QUIZ_SOURCE = {
 };
 /* 派生: BOOK_QUIZ[bookId] = 質問配列 / THEME_QUIZ_BOOKS[themeId] = 本idの並び */
 const BOOK_QUIZ = {};
+const BOOK_QUIZ_TITLE = {};
 const THEME_QUIZ_BOOKS = {};
 Object.keys(QUIZ_SOURCE).forEach(themeId => {
   const src = QUIZ_SOURCE[themeId];
   THEME_QUIZ_BOOKS[themeId] = src.themeBookOrder || [];
-  Object.keys(src.bookQuiz || {}).forEach(bid => { BOOK_QUIZ[bid] = src.bookQuiz[bid].quiz; });
+  Object.keys(src.bookQuiz || {}).forEach(bid => {
+    BOOK_QUIZ[bid] = src.bookQuiz[bid].quiz;
+    BOOK_QUIZ_TITLE[bid] = src.bookQuiz[bid].title;
+  });
 });
 
 /* ============================================================
@@ -5147,6 +5169,14 @@ function bookRowHTML(book, color){
   `;
 }
 
+function backBtnBottomHTML(label){
+  return `
+    <button class="back-btn back-btn-bottom" onclick="goBack()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+      ${label}
+    </button>`;
+}
+
 function synthesisHTML(cat){
   const s = THEME_SYNTHESIS[cat.id];
   if(!s) return '';
@@ -5158,7 +5188,7 @@ function synthesisHTML(cat){
   const qs = themeQuizQuestions(cat.id);
   const quizBlock = qs.length ? `
       <div class="synth-block-title">理解度チェック（テーマ${qs.length}問クイズ）</div>
-      <p class="quiz-intro">1問ずつ出題されます。選択肢を選ぶと正誤と解説が表示され、「次へ」で進みます。出題順は「固定（易→難）」と「ランダム」を切り替えられます。</p>
+      <p class="quiz-intro">1問ずつ出題されます。選択肢を選ぶと正誤と解説が表示され、「次へ」で進みます。出題順は「固定」と「ランダム」を切り替えられます。</p>
       <div class="quiz-mount" id="quizmount-theme-${cat.id}"></div>` : '';
   return `
     <div class="theme-synth">
@@ -5184,14 +5214,17 @@ function themeQuizQuestions(themeId){
   const order = THEME_QUIZ_BOOKS[themeId];
   if(order && order.length){
     const out = [];
-    order.forEach(bid => { (BOOK_QUIZ[bid] || []).forEach(q => out.push(q)); });
+    order.forEach(bid => {
+      const bt = BOOK_QUIZ_TITLE[bid] || '';
+      (BOOK_QUIZ[bid] || []).forEach(q => out.push(Object.assign({ book: bt }, q)));
+    });
     if(out.length) return out;
   }
   const s = THEME_SYNTHESIS[themeId];
-  return (s && s.quiz) ? s.quiz.map((q, i) => Object.assign({ level: q.level || (i+1) }, q)) : [];
+  return (s && s.quiz) ? s.quiz.slice() : [];
 }
 
-/* ---- 出題順（固定＝難易度順 / ランダム＝シャッフル） ---- */
+/* ---- 出題順（固定＝収録順 / ランダム＝シャッフル） ---- */
 function buildQuizSequence(questions, order){
   const idx = questions.map((_, i) => i);
   if(order === 'random'){
@@ -5199,8 +5232,6 @@ function buildQuizSequence(questions, order){
       const j = Math.floor(Math.random() * (i + 1));
       const t = idx[i]; idx[i] = idx[j]; idx[j] = t;
     }
-  } else {
-    idx.sort((a, b) => ((questions[a].level || 2) - (questions[b].level || 2)) || (a - b));
   }
   return idx;
 }
@@ -5228,7 +5259,7 @@ function mountQuiz(mountEl, questions, opts){
       <div class="quiz-order">
         <span class="quiz-order-label">出題順</span>
         <div class="quiz-seg">
-          <button class="seg-btn active" data-order="fixed">固定（易→難）</button>
+          <button class="seg-btn active" data-order="fixed">固定</button>
           <button class="seg-btn" data-order="random">ランダム</button>
         </div>
       </div>` : ''}
@@ -5256,7 +5287,7 @@ function mountQuiz(mountEl, questions, opts){
     prevBtn.disabled = (pos === 0);
     const qIdx = seq[pos];
     const isAnswered = answered[qIdx] !== undefined;
-    nextBtn.disabled = !isAnswered; // 回答するまで次へ進めない
+    nextBtn.disabled = false; // 次へは常に押せる（未回答でもスキップ可）
     nextBtn.classList.toggle('ready', isAnswered && pos < total - 1);
     if(pos === total - 1){
       nextBtn.textContent = '結果を見る';
@@ -5286,6 +5317,7 @@ function mountQuiz(mountEl, questions, opts){
       </button>`;
     }).join('');
     stage.innerHTML = `
+      ${q.book ? `<p class="quiz-source"><span class="quiz-source-label">出典</span>『${q.book}』</p>` : ''}
       <p class="quiz-q-text"><span class="quiz-num">Q${pos + 1}.</span>${q.q}</p>
       <div class="quiz-choices">${choicesHTML}</div>
       <div class="quiz-explain" ${isAnswered ? '' : 'style="display:none"'}><b>正解：${'ABCD'[q.answer]}</b> — ${q.explanation}</div>`;
@@ -5326,7 +5358,6 @@ function mountQuiz(mountEl, questions, opts){
     if(pos > 0){ pos--; renderQ(); }
   });
   nextBtn.addEventListener('click', () => {
-    if(answered[seq[pos]] === undefined) return;
     if(pos < total - 1){ pos++; renderQ(); }
     else showSummary();
   });
@@ -5397,6 +5428,7 @@ function openCategory(cat, color){
     <p class="detail-sub">${cat.sub} ・ ${countBooks(cat)} 冊収録</p>
     ${synthesisHTML(cat)}
     ${bodyHTML}
+    ${backBtnBottomHTML('INDEX')}
   `;
 
   viewStack.push(viewId);
@@ -5449,6 +5481,7 @@ function openSubcategory(cat, sub, color){
     <h2>${sub.title}</h2>
     <p class="detail-sub">${cat.title} ${sub.sub ? '・ '+sub.sub : ''} ・ ${sub.books.length} 冊収録</p>
     ${sub.books.length ? `<div class="index-list" id="list-${viewId}"></div>` : emptyStateHTML()}
+    ${backBtnBottomHTML(cat.title)}
   `;
   viewStack.push(viewId);
   showView(viewId);
@@ -5519,6 +5552,7 @@ function openBook(book, color, crumbs){
     <div class="quiz-mount" id="quizmount-book-${book.id}"></div>` : ''}
 
     <p class="source-note">※ 本要約はClaudeが書籍情報および要約サービス(Flier等)のレビューを参照し、独自にまとめた個人利用向けのノートです。原著・原要約の著作権はそれぞれの著者・出版社・要約サービス提供者に帰属します。</p>
+    ${backBtnBottomHTML(parentLabel)}
   `;
   viewStack.push(viewId);
   showView(viewId);
