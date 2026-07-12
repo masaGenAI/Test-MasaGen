@@ -152319,6 +152319,78 @@ const BookSummaryModule = (function () {
     { id: "productivity", title: "生産性・自己成長", sub: "生産性・自己成長" },
   ];
 
+  // 各セクションの書籍データ（flier 要約 PDF から抽出）。セクション未収録は空配列（→ empty-state）。
+  const BSH_BOOKS = {
+    "ai_dx": [
+      {
+        "id": "biz_org",
+        "title": "生成ＡＩ時代を勝ち抜く事業・組織のつくり方",
+        "author": "梶谷健人",
+        "publisher": "日経BP",
+        "tagline": "生成AIで新規事業・組織をどう作るか。事業者目線の実践書。",
+        "overview": "生成ＡＩへの注目が集まる中、関連書籍が次々と発刊されている。その多くは生成ＡＩについての概要を記したものや、「ChatGPTのプロンプトの書き方」といった実用書が大半だ。しかし、「生成ＡＩを利用した事業やプロダクト、サービスをつくるにはどうしたらいいか」という事業者目線の本は、ほとんどないのではないだろうか。本書は、生成ＡＩを使った新規ビジネスのつくり方、既存事業への取り入れ方、そして組織のつくり方など、経営層や事業リーダーが今まさに知りたいことが詰まった一冊だ。それらとともに、生成ＡＩを利用した業務活用テクニックにも触れている。いくら「生成ＡＩがすごい」と世間で騒がれていても、自社の業務や事業に取り入れる速度は組織によって様々だ。例えば「ＤＸ（デジタルトランスフォーメーション）が必要だ」とわかっていても、既存のやり方を続ける方がラクなため、なかなかＤＸが進まないというのはよくある例の１つだ。それと同様に「会社のトップの理解がない」ことで、生成ＡＩの導入に踏み切れない企業も少なくないだろう。本書ではそれを打破する具体的なアクションについても説明している。要約では、生成ＡＩを使った事業づくりのポイントや、生成ＡＩがもたらす社会・業界変化、組織変革のステップなどを中心にまとめた。本書を「生成ＡＩ時代のビジネスづくり」の教科書として、フルに活用いただきたい。",
+        "points": [
+          "生成ＡＩの登場によって、歴史的な転換が急速に訪れている。今後は個人も企業も、生成ＡＩの活用レベルが大きな差を生み出す時代になる。",
+          "生成ＡＩ領域で成功する事業・プロダクトをつくるには、「意義」のデザインと「意味」のデザインがカギとなる。",
+          "２０４０～２０４５年の社会では、ＡＩは「人間の脳の新しいレイヤー的存在」になるだろう。生成AIはさらに進化し、１００倍、1０００倍規模の業務効率化も夢ではない。",
+          "これからは「生成ＡＩネイティブ」な組織のみが生き残る。将来を見据えて組織をアップデートしていくことが、これからの組織運営に必要だ。"
+        ]
+      },
+      {
+        "id": "cybersec",
+        "title": "先読み！サイバーセキュリティ",
+        "author": "岩佐晃也、酒井麻里子",
+        "publisher": "インプレス",
+        "tagline": "AI時代に必須のサイバーセキュリティ入門。中小企業も標的に。",
+        "overview": "近年、名だたる組織・企業のサイバー被害が立て続けに報じられている。それらのニュースを他人事だと思っている人に、本書を読んでもらいたい。本書によると、ＡＩはサイバー攻撃の手法をより効率的に、より複雑にしたため、本来であれば「割に合わない」はずの中小企業でさえ、サイバー攻撃の対象になりつつあるという。もはやインターネットを使う者ならばサイバー攻撃への対策は必要不可欠と言って差し支えないはずだ。とはいえ「サイバーセキュリティ対策を講じよう」と思い立っても、何をすればいいかわからない人が大半だろう。本書はそうした人にとって優秀な入門書となってくれる。サイバーセキュリティの世界でいま何が起きているのかをわかりやすく解説したうえで、何ができるか、何をすべきかを丁寧に教えてくれる。またそこからもっと専門的な知識がほしい人にとっても、有用なガイドとなる内容だ。サイバーセキュリティに関する基礎的な知識、そして現状把握、それを足掛かりにした専門的な知識への誘導と、本書には三拍子が完璧に揃っている。一般常識レベルのサイバーセキュリティ知識を押さえたい人から、社員にわかりやすくサイバーセキュリティ対策の重要性を伝えたい社内ＩＴ担当者まで、幅広くさまざまな読者のニーズに応えてくれる一冊である。",
+        "points": [
+          "サイバーセキュリティの三要素は「機密性」「完全性」「可用性」だ。",
+          "サイバー攻撃の手法のうち、最も一般的なのは、外部からコンピューターに侵入して問題を引き起こす「マルウェア」だ。また近年では、データを利用できない状態にして「身代金」を要求する「ランサムウェア」の被害が増えている。",
+          "業務用ＰＣやスマホをフリーＷｉ-Ｆｉにつなぐのは危険だ。入力した情報が盗まれる恐れがある。自分で用意したモバイルＷｉ-Ｆｉルーターを使ったり、スマホからテザリングで接続したりしよう。"
+        ]
+      },
+      {
+        "id": "responsible_ai",
+        "title": "責任あるAI",
+        "author": "保科学世、鈴木博和",
+        "publisher": "東洋経済新報社",
+        "tagline": "AIを公平・透明に使う「責任あるAI」という方法論。",
+        "overview": "ＡＩというと、音声入力アシスタントや翻訳ソフト、自動運転などが思い浮かぶ。日常生活にもすっかり溶け込み、誰しもＡＩと無縁ではいられなくなった。本書は、そんな身近な技術であるＡＩと、社会への影響について深く考えさせてくれる一冊だ。要約者が特に興味を引かれたのは、「データそのものにすでにかかっているバイアス」を取り除こうとするプロセスだ。ＡＩは与えられたデータから学習し、新しい結果を出力する。生のデータには、性別や人種などによって現状ある社会格差の構造が含まれてしまう。すると、ＡＩから出力された結果は、社会格差の再生産につながりかねないものになってしまうのだという。ＡＩの判断は完全でなく、倫理的でないこともある。生のデータに含まれるバイアスを取り除こうとするプロセスは大変興味深い。ＡＩが意思決定を補助してくれるというと、人間の判断は不要になるように聞こえるかもしれない。しかし、本書に書かれていることはその真逆だ。ＡＩにデータを与え、学習させ、出力の妥当性を判断するのは人間だ。ＡＩが倫理的であるためには、人間の側に高い倫理観が求められるということである。本書によれば、ＡＩを用いることは日本の成長にとって喫緊の課題である。「ＡＩと関わる仕事」に就く人は増える一方だろう。現在直接ＡＩに関わる仕事をしている人だけでなく、ＡＩ社会に生きる多くのビジネスパーソンにとって、知るべきことがつまっている一冊だ。",
+        "points": [
+          "企業活動ではさまざまな意思決定が行われるが、人間は思考のくせにより、バイアスのかかった判断をしてしまいやすい。そこで「ＡＩ支援による意思決定」が助けになる。",
+          "「人間の前提」によるＡＩ開発がきちんと行われ、それを示すことで社会に対して「公平性」や「透明性」を担保していくのが「責任あるＡＩ」と呼ばれる方法論である。",
+          "ＡＩが社会に与える影響に関して問題意識が高まるにつれ、ＡＩの倫理的な利活用を求める声も多くなっている。ＡＩに携わる企業はこれに応える必要がある。"
+        ]
+      },
+      {
+        "id": "image_gen_ai",
+        "title": "先読み！IT×ビジネス講座　画像生成AI",
+        "author": "深津貴之、水野祐、酒井麻里子",
+        "publisher": "インプレス",
+        "tagline": "画像生成AIの可能性・コツ・法的留意点を対話形式で解説。",
+        "overview": "世界の注目を集めている人工知能。なかでも注目度の大きい「生成ＡＩ」について、初心者でも全体像とポイントがスッと理解できるよう解説してくれたのが本書だ。画像生成ＡＩでは、どんな画像を生成したいかを表現したテキスト（プロンプト）を指定することで、気軽かつ自由に画像を生成することができる。これまでクリエイターなど特殊なスキルを持つ人々しか生み出せなかった作品を、誰もがより身近に創造できるようになる可能性が高まっている。一方で、先端的な技術であるがゆえに、法律やルールが未整備な部分も多く、活用にあたっては著作権侵害にならないか留意が必要だ。本書では、画像生成ＡＩの持つ可能性やイメージした画像をうまく生成させるコツ、ＡＩを効果的に活用するためのアドバイスについては、インタラクションデザイナーである深津貴之氏が解説する。そして、ＡＩに関する法律問題については、弁護士の水野祐氏が教えてくれる。聞き手はＩＴライター酒井麻里子氏で、初心者の目線に合わせた質問をもとにした対話形式をとっている。そのため、これから画像生成ＡＩを利用する読者も安心してポイントをつかめるだろう。通読すれば、画像生成ＡＩの活用例や注意点について一通りイメージできるはずだ。ＡＩとの協働の道を探りたい方に、本書をおすすめしたい。",
+        "points": [
+          "画像生成ＡＩは一般ユーザーに公開され、自然言語で画像が生成できるようになったことにより、急速に注目を集めた。",
+          "画像生成ＡＩは複数の人やモノを描写したり、細部を正確に描写することが苦手だ。しかし、頭の中のイメージを簡単に可視化できるため、全人類の表現力をワンランク上げる可能性を秘めている。",
+          "画像生成ＡＩに関する法律はグレーな部分も多い。著作権の侵害にならないように留意が必要だ。"
+        ]
+      },
+      {
+        "id": "task_speed",
+        "title": "面倒な仕事が一瞬で片付く　生成AIタスク爆速大全",
+        "author": "宮崎学",
+        "publisher": "かんき出版",
+        "tagline": "部門別プロンプト例で仕事を爆速化する生成AI活用大全。",
+        "overview": "生成ＡＩをすでに仕事で活用している人、あるいは「生成ＡＩがないと仕事がはかどらない」と感じている人にとって、待望の書籍が登場した。本書はその名のとおり、生成ＡＩでタスクを爆速化させるノウハウが詰まった一冊である。検索機能の代替やメール文・議事録の作成、ファクトチェックといった汎用的なタスクに使っている人は多いだろう。しかし本書の特筆すべき点は、会社の部門別に、専門業務を効率化するためのプロンプト例が紹介されているところにある。たとえば人事部門における、「面接の想定質問リストの作成」。人事は通年で忙しく、採用面接ではいつも似たような質問をしてしまう……そんな悩みを抱えているかもしれない。だが生成ＡＩを使えば、候補者の経歴と自社のカルチャーを照らし合わせ、個別の質問リストを瞬時に作成してくれる。本書では人事のほか、経営企画、マーケティング、セールス、広報、財務・経理、生産・開発など、幅広い部門に言及しているが、本要約では人事とセールスに絞って紹介する。前半では、すべての業務の土台となる「良いプロンプトの作成法」に解説を割いた。というのも、生成ＡＩ活用の基本は「的確な指示を出せたかどうか」にあり、ここを押さえておけば、基本的にどんな業務にも応用できるからだ。万能で、何でも答えてくれるように見える生成ＡＩだが、出力の精度を決めるのはあくまで使う側、つまり「あなた」である。ゴールを明確にイメージし、それを言葉にしてＡＩに伝え、対話を重ねていく。その地道な積み重ねこそが、仕事の爆速化につながるのである。",
+        "points": [
+          "生成ＡＩから精度の高い回答を引き出すには、指示文（プロンプト）を使いこなすことが何より重要だ。指示が雑だと、回答も曖昧になってしまう。",
+          "プロンプトを設計する際は、フォーマット（記入様式）、インストラクション（指示命令）、パラメータ（条件設定）、フィードバック（受け答え）の４つを意識しよう。",
+          "業務で使用するときは、業務フローを分解して指示を出そう。また、求める成果物を明瞭にイメージし、対話を繰り返して回答の精度を高めていくことが大切だ。"
+        ]
+      }
+    ]
+  };
+
   const BSH_NAVY = "0B1F3F";
   const BSH_SKY = "9BC8EE";
 
@@ -152379,23 +152451,91 @@ const BookSummaryModule = (function () {
     .bsh-empty-state svg{ width:36px;height:36px; stroke:var(--bsh-sky); fill:none; stroke-width:1.3; margin-bottom:18px; }
     .bsh-empty-state p{ font-size:14px; color:var(--bsh-muted); line-height:1.8; max-width:38ch; margin:0 auto; }
     .bsh-footer-note{ margin-top:56px; padding-top:20px; border-top:1px solid var(--bsh-hairline); font-size:11.5px; color:var(--bsh-muted); display:flex; justify-content:space-between; }
+    /* ---- book list (section detail) ---- */
+    .bsh-book-list{ border-top:1px solid var(--bsh-hairline); }
+    .bsh-book-row{ display:grid; grid-template-columns: 3px minmax(0,1fr) 18px; column-gap:16px; align-items:center; width:100%; text-align:left; background:none; border:none; border-bottom:1px solid var(--bsh-hairline); padding:16px 4px; cursor:pointer; font-family:inherit; transition:padding-left .18s ease, background .18s ease; }
+    .bsh-book-row:hover{ padding-left:10px; background:linear-gradient(90deg, rgba(76,143,214,0.05), transparent 65%); }
+    .bsh-book-spine{ width:3px; height:40px; border-radius:2px; opacity:.85; }
+    .bsh-book-title{ font-family:'Fraunces',Georgia,'Hiragino Mincho ProN',serif; font-size:16px; font-weight:600; color:var(--bsh-navy-deep); margin:0 0 3px; line-height:1.35; }
+    .bsh-book-tag{ font-size:12.5px; color:var(--bsh-muted); line-height:1.55; margin:0 0 4px; }
+    .bsh-book-byline{ font-size:11px; color:var(--bsh-sky); letter-spacing:.02em; }
+    .bsh-book-chevron{ color:var(--bsh-muted); align-self:center; transition:transform .18s ease; }
+    .bsh-book-row:hover .bsh-book-chevron{ transform:translateX(3px); color:var(--bsh-sky); }
+    /* ---- book detail ---- */
+    .bsh-bd-meta{ font-size:12px; color:var(--bsh-muted); margin:0 0 30px; letter-spacing:.02em; }
+    .bsh-bd-section-label{ font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--bsh-sky); font-weight:600; margin:36px 0 10px; }
+    .bsh-bd-overview{ font-size:14px; line-height:1.95; color:var(--bsh-ink); margin:0; }
+    .bsh-bd-points{ list-style:none; padding:0; margin:6px 0 0; }
+    .bsh-bd-point{ position:relative; padding:14px 0 14px 30px; border-bottom:1px solid var(--bsh-hairline); font-size:13.5px; line-height:1.85; color:var(--bsh-ink); }
+    .bsh-bd-point:last-child{ border-bottom:none; }
+    .bsh-bd-point::before{ content:''; position:absolute; left:2px; top:20px; width:7px; height:7px; border-radius:2px; background:var(--bsh-sky); }
+    .bsh-bd-count{ display:inline-block; margin-left:8px; font-size:11px; color:var(--bsh-muted); font-weight:400; letter-spacing:0; }
   `;
 
   function BookSummaryModule() {
     const [active, setActive] = useState(null);
+    const [activeBook, setActiveBook] = useState(null);
 
     const goDetail = (id) => {
       setActive(id);
+      setActiveBook(null);
       try {
         window.storage?.set?.("book-hub:last-section", id, false);
       } catch (e) {}
     };
 
+    // ---- 書籍詳細ビュー（セクション → 書籍） ----
+    if (active && activeBook) {
+      const s = BSH_SECTIONS.find((x) => x.id === active);
+      const idx = BSH_SECTIONS.findIndex((x) => x.id === active);
+      const t = idx / (BSH_SECTIONS.length - 1);
+      const color = bshLerpColor(BSH_NAVY, BSH_SKY, t);
+      const book = (BSH_BOOKS[active] || []).find((b) => b.id === activeBook);
+      if (book) {
+        return (
+          <div className="bsh-root">
+            <style>{BSH_CSS}</style>
+            <div className="bsh-app">
+              <button className="bsh-back-btn" onClick={() => setActiveBook(null)}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 6l-6 6 6 6" />
+                </svg>
+                {s.title}
+              </button>
+              <div className="bsh-detail-eyebrow">
+                <div className="bsh-detail-icon" style={{ background: color }}>
+                  <svg viewBox="0 0 24 24" dangerouslySetInnerHTML={{ __html: BSH_ICONS[s.id] }} />
+                </div>
+              </div>
+              <h2>{book.title}</h2>
+              <p className="bsh-bd-meta">
+                {book.author}
+                {book.publisher ? `　｜　${book.publisher}` : ""}
+              </p>
+              <p className="bsh-bd-overview">{book.overview}</p>
+              <div className="bsh-bd-section-label">
+                要点<span className="bsh-bd-count">{book.points.length}</span>
+              </div>
+              <ul className="bsh-bd-points">
+                {book.points.map((p, i) => (
+                  <li key={i} className="bsh-bd-point">
+                    {p}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        );
+      }
+    }
+
+    // ---- セクション詳細ビュー（書籍一覧 or 空状態） ----
     if (active) {
       const s = BSH_SECTIONS.find((x) => x.id === active);
       const idx = BSH_SECTIONS.findIndex((x) => x.id === active);
       const t = idx / (BSH_SECTIONS.length - 1);
       const color = bshLerpColor(BSH_NAVY, BSH_SKY, t);
+      const books = BSH_BOOKS[active] || [];
       return (
         <div className="bsh-root">
           <style>{BSH_CSS}</style>
@@ -152412,20 +152552,44 @@ const BookSummaryModule = (function () {
               </div>
             </div>
             <h2>{s.title}</h2>
-            <p className="bsh-detail-sub">{s.sub}</p>
-            <div className="bsh-empty-state">
-              <svg
-                viewBox="0 0 24 24"
-                style={{ margin: "0 auto 18px", display: "block" }}
-                dangerouslySetInnerHTML={{
-                  __html:
-                    '<path d="M4 5.5h11a2.5 2.5 0 0 1 2.5 2.5v5a2.5 2.5 0 0 1-2.5 2.5H10l-4 3v-3H6a2 2 0 0 1-2-2v-8Z"/>',
-                }}
-              />
-              <p>
-                このセクションにはまだ書籍が登録されていません。詳細な構造(要約フォーマット、タブ構成など)をご指示いただき次第、ここに追加していきます。
-              </p>
-            </div>
+            <p className="bsh-detail-sub">
+              {s.sub}
+              {books.length ? `　—　${books.length}冊` : ""}
+            </p>
+            {books.length ? (
+              <div className="bsh-book-list">
+                {books.map((b) => (
+                  <button key={b.id} className="bsh-book-row" onClick={() => setActiveBook(b.id)}>
+                    <div className="bsh-book-spine" style={{ background: color }}></div>
+                    <div style={{ minWidth: 0 }}>
+                      <p className="bsh-book-title">{b.title}</p>
+                      <p className="bsh-book-tag">{b.tagline}</p>
+                      <span className="bsh-book-byline">
+                        {b.author}
+                        {b.publisher ? `　｜　${b.publisher}` : ""}
+                      </span>
+                    </div>
+                    <svg className="bsh-book-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9 6l6 6-6 6" />
+                    </svg>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="bsh-empty-state">
+                <svg
+                  viewBox="0 0 24 24"
+                  style={{ margin: "0 auto 18px", display: "block" }}
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      '<path d="M4 5.5h11a2.5 2.5 0 0 1 2.5 2.5v5a2.5 2.5 0 0 1-2.5 2.5H10l-4 3v-3H6a2 2 0 0 1-2-2v-8Z"/>',
+                  }}
+                />
+                <p>
+                  このセクションにはまだ書籍が登録されていません。要約PDFをお預かりし次第、順次追加していきます。
+                </p>
+              </div>
+            )}
           </div>
         </div>
       );
@@ -152456,7 +152620,9 @@ const BookSummaryModule = (function () {
                     <p className="bsh-row-title">{s.title}</p>
                     <p className="bsh-row-sub">{s.sub}</p>
                   </div>
-                  <span className="bsh-row-meta">Coming soon</span>
+                  <span className="bsh-row-meta">
+                    {(BSH_BOOKS[s.id] || []).length ? `${(BSH_BOOKS[s.id] || []).length} 冊` : "Coming soon"}
+                  </span>
                   <svg
                     className="bsh-chevron"
                     width="16"
@@ -152477,7 +152643,7 @@ const BookSummaryModule = (function () {
 
           <div className="bsh-footer-note">
             <span>10 SECTIONS</span>
-            <span>v0.1 — SHELL</span>
+            <span>v0.2 — AI・DX 5冊</span>
           </div>
         </div>
       </div>
