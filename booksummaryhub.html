@@ -689,6 +689,30 @@
     padding:6px 14px;border-radius:100px;border:1px solid var(--sky);background:none;color:var(--navy-mid);
   }
   .dash-weak-btn:hover{background:rgba(76,143,214,0.12);}
+
+  /* ---- 並べ替えコントロール ---- */
+  .cat-controls{display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .list-controls{display:flex;align-items:center;gap:10px;margin:2px 0 14px;}
+  .lc-label{font-size:12px;color:var(--muted);font-weight:600;}
+  .sort-select{
+    font-family:inherit;font-size:12px;font-weight:600;color:var(--navy-mid);cursor:pointer;
+    padding:6px 26px 6px 12px;border:1px solid var(--hairline);border-radius:100px;background:var(--paper);
+    -webkit-appearance:none;appearance:none;outline:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+    background-repeat:no-repeat;background-position:right 10px center;
+  }
+  .sort-select:hover{border-color:var(--sky);}
+
+  /* ---- タグ一覧（クラウド） ---- */
+  .tag-cloud{display:flex;flex-wrap:wrap;gap:9px;margin-top:6px;}
+  .tag-cloud-chip{
+    display:inline-flex;align-items:center;gap:8px;font-family:inherit;font-size:13.5px;cursor:pointer;
+    padding:8px 9px 8px 15px;border-radius:100px;border:1px solid var(--sky-light);
+    background:rgba(76,143,214,0.08);color:var(--navy-mid);font-weight:600;
+    transition:border-color .15s ease, transform .15s ease, background .15s ease;
+  }
+  .tag-cloud-chip:hover{border-color:var(--sky);transform:translateY(-1px);background:rgba(76,143,214,0.14);}
+  .tcc-count{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 5px;border-radius:100px;background:var(--paper);color:var(--muted);font-size:11.5px;}
 </style>
 </head>
 <body>
@@ -5983,6 +6007,8 @@ function resolveRoute(hash){
   if(key === 'book'){ if(BOOK_INDEX[parts[1]]) openBookById(parts[1]); else showView('view-root'); return; }
   if(key === 'review'){ startReview(); return; }
   if(key === 'memos'){ openMemoList(); return; }
+  if(key === 'tags'){ openTagIndex(); return; }
+  if(key === 'tag'){ if(parts[1]) openTagResults(decodeURIComponent(parts[1])); else openTagIndex(); return; }
   showView('view-root');
 }
 
@@ -6159,6 +6185,7 @@ function renderDashboard(){
   const qt = quizTotals();
   const wrong = wrongKeys().length;
   const memoN = memoBooks().length;
+  const tagN = tagIndex().length;
   const weak = weakestTheme();
   el.innerHTML =
     '<div class="dash-row">' +
@@ -6171,6 +6198,7 @@ function renderDashboard(){
     '<div class="dash-actions">' +
       '<button class="dash-btn primary" ' + (wrong ? '' : 'disabled') + ' onclick="startReview()">間違えた問題を復習' + (wrong ? '（' + wrong + '問）' : '') + '</button>' +
       '<button class="dash-btn" ' + (memoN ? '' : 'disabled') + ' onclick="openMemoList()">メモ一覧' + (memoN ? '（' + memoN + '件）' : '') + '</button>' +
+      '<button class="dash-btn" ' + (tagN ? '' : 'disabled') + ' onclick="openTagIndex()">タグ' + (tagN ? '（' + tagN + '種）' : '') + '</button>' +
       '<button class="dash-btn" onclick="exportData()">エクスポート</button>' +
       '<button class="dash-btn" onclick="document.getElementById(\'importFile\').click()">インポート</button>' +
       '<input type="file" id="importFile" accept="application/json,.json" style="display:none" onchange="importData(event)">' +
@@ -6370,6 +6398,84 @@ function openMemoList(){
     backBtnBottomHTML('INDEX');
   showView(viewId);
   pushRoute(viewId, 'memos');
+}
+
+/* ---- タグ絞り込み ---- */
+function tagIndex(){
+  const m = {};
+  Object.keys(TAGS).forEach(id => (TAGS[id] || []).forEach(t => { m[t] = (m[t] || 0) + 1; }));
+  return Object.keys(m).map(t => ({tag:t, count:m[t]})).sort((a,b) => b.count - a.count || a.tag.localeCompare(b.tag, 'ja'));
+}
+function booksWithTag(tag){ return ALL_BOOK_IDS.filter(id => getTags(id).indexOf(tag) !== -1); }
+function goTag(enc){ openTagResults(decodeURIComponent(enc)); }
+function openTagIndex(){
+  const viewId = 'view-tags';
+  const el = ensureView(viewId);
+  const idx = tagIndex();
+  const body = idx.length
+    ? '<div class="tag-cloud">' + idx.map(t => '<button class="tag-cloud-chip" onclick="goTag(\'' + encodeURIComponent(t.tag) + '\')">' + escapeHTML(t.tag) + '<span class="tcc-count">' + t.count + '</span></button>').join('') + '</div>'
+    : '<p class="search-empty">まだタグはありません。要約の詳細ページの「自分の記録」でタグを付けると、ここに一覧表示されます。</p>';
+  el.innerHTML =
+    '<button class="back-btn" onclick="goBack()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>INDEX</button>' +
+    '<div class="detail-eyebrow"><div class="detail-icon" style="background:#4C8FD6"><svg viewBox="0 0 24 24">' + (ICONS.book || '') + '</svg></div></div>' +
+    '<h2>タグ</h2><p class="detail-sub">' + idx.length + ' 種類のタグ</p>' + body +
+    backBtnBottomHTML('INDEX');
+  showView(viewId);
+  pushRoute(viewId, 'tags');
+}
+const tagViewIds = {}; let tagViewSeq = 0;
+function tagViewId(tag){ if(!(tag in tagViewIds)) tagViewIds[tag] = 'view-tag-' + (tagViewSeq++); return tagViewIds[tag]; }
+function openTagResults(tag){
+  const viewId = tagViewId(tag);
+  const el = ensureView(viewId);
+  const ids = booksWithTag(tag);
+  const listId = 'list-' + viewId;
+  el.innerHTML =
+    '<button class="back-btn" onclick="goBack()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>タグ</button>' +
+    '<div class="detail-eyebrow"><div class="detail-icon" style="background:#4C8FD6"><svg viewBox="0 0 24 24">' + (ICONS.book || '') + '</svg></div></div>' +
+    '<h2>#' + escapeHTML(tag) + '</h2><p class="detail-sub">このタグの要約 ' + ids.length + ' 冊</p>' +
+    (ids.length > 1 ? '<div class="list-controls"><span class="lc-label">並べ替え</span>' + sortSelectHTML(listId) + '</div>' : '') +
+    '<div class="index-list" id="' + listId + '"></div>' +
+    backBtnBottomHTML('タグ');
+  showView(viewId);
+  pushRoute(viewId, 'tag/' + encodeURIComponent(tag));
+  const list = document.getElementById(listId);
+  ids.forEach((id, i) => {
+    const e = BOOK_INDEX[id];
+    const row = document.createElement('button');
+    row.className = 'index-row';
+    row.dataset.bookId = id; row.dataset.order = i;
+    if(isChecked(id)) row.classList.add('row-done');
+    row.innerHTML = bookRowHTML(e.book, e.color);
+    row.addEventListener('click', () => openBookById(id));
+    list.appendChild(row);
+  });
+}
+
+/* ---- 並べ替え ---- */
+function sortSelectHTML(listId){
+  return '<select class="sort-select" aria-label="並べ替え" onchange="sortRows(document.getElementById(\'' + listId + '\'), this.value)">' +
+    '<option value="order">収録順</option>' +
+    '<option value="rating">★評価が高い順</option>' +
+    '<option value="unread">未読を先に</option>' +
+    '<option value="read">既読を先に</option>' +
+    '<option value="year">刊行が新しい順</option>' +
+    '</select>';
+}
+function sortRows(container, mode){
+  if(!container) return;
+  const rows = Array.prototype.slice.call(container.querySelectorAll('.index-row'));
+  const ord = r => parseInt(r.dataset.order || '0', 10);
+  const yr = r => { const e = BOOK_INDEX[r.dataset.bookId]; return e ? (parseInt((e.book.year || '').replace(/\D/g, ''), 10) || 0) : 0; };
+  rows.sort((a, b) => {
+    const ia = a.dataset.bookId, ib = b.dataset.bookId;
+    if(mode === 'rating'){ const d = getRating(ib) - getRating(ia); if(d) return d; return ord(a) - ord(b); }
+    if(mode === 'unread'){ const d = (isChecked(ia)?1:0) - (isChecked(ib)?1:0); if(d) return d; return ord(a) - ord(b); }
+    if(mode === 'read'){ const d = (isChecked(ib)?1:0) - (isChecked(ia)?1:0); if(d) return d; return ord(a) - ord(b); }
+    if(mode === 'year'){ const d = yr(b) - yr(a); if(d) return d; return ord(a) - ord(b); }
+    return ord(a) - ord(b);
+  });
+  rows.forEach(r => container.appendChild(r));
 }
 
 function renderRoot(){
@@ -6679,10 +6785,19 @@ function openCategory(cat, color){
     <div class="cat-progress" data-cat="${cat.id}">
       <div class="cat-progress-top">
         <span class="cat-progress-label"></span>
-        <div class="cat-filter" role="group" aria-label="既読フィルタ">
-          <button class="catf-btn active" data-filter="all" onclick="setCatFilter('${viewId}', this)">すべて</button>
-          <button class="catf-btn" data-filter="unread" onclick="setCatFilter('${viewId}', this)">未読</button>
-          <button class="catf-btn" data-filter="read" onclick="setCatFilter('${viewId}', this)">既読</button>
+        <div class="cat-controls">
+          <select class="sort-select" aria-label="並べ替え" onchange="sortRows(document.getElementById('list-${viewId}-books'), this.value)">
+            <option value="order">収録順</option>
+            <option value="rating">★評価が高い順</option>
+            <option value="unread">未読を先に</option>
+            <option value="read">既読を先に</option>
+            <option value="year">刊行が新しい順</option>
+          </select>
+          <div class="cat-filter" role="group" aria-label="既読フィルタ">
+            <button class="catf-btn active" data-filter="all" onclick="setCatFilter('${viewId}', this)">すべて</button>
+            <button class="catf-btn" data-filter="unread" onclick="setCatFilter('${viewId}', this)">未読</button>
+            <button class="catf-btn" data-filter="read" onclick="setCatFilter('${viewId}', this)">既読</button>
+          </div>
         </div>
       </div>
       <div class="cat-progress-bar"><div class="cat-progress-fill"></div></div>
@@ -6732,10 +6847,11 @@ function openCategory(cat, color){
   }
   if(cat.books && cat.books.length){
     const bookList = document.getElementById(`list-${viewId}-books`);
-    cat.books.forEach(book => {
+    cat.books.forEach((book, i) => {
       const row = document.createElement('button');
       row.className = 'index-row';
       row.dataset.bookId = book.id;
+      row.dataset.order = i;
       if(isChecked(book.id)) row.classList.add('row-done');
       row.innerHTML = bookRowHTML(book, color);
       row.addEventListener('click', () => openBook(book, color, [cat.title]));
@@ -6757,6 +6873,7 @@ function openSubcategory(cat, sub, color){
     </div>
     <h2>${sub.title}</h2>
     <p class="detail-sub">${cat.title} ${sub.sub ? '・ '+sub.sub : ''} ・ ${sub.books.length} 冊収録</p>
+    ${sub.books.length > 1 ? `<div class="list-controls"><span class="lc-label">並べ替え</span>${sortSelectHTML('list-'+viewId)}</div>` : ''}
     ${sub.books.length ? `<div class="index-list" id="list-${viewId}"></div>` : emptyStateHTML()}
     ${backBtnBottomHTML(cat.title)}
   `;
@@ -6765,10 +6882,11 @@ function openSubcategory(cat, sub, color){
 
   if(sub.books.length){
     const list = document.getElementById(`list-${viewId}`);
-    sub.books.forEach(book => {
+    sub.books.forEach((book, i) => {
       const row = document.createElement('button');
       row.className = 'index-row';
       row.dataset.bookId = book.id;
+      row.dataset.order = i;
       if(isChecked(book.id)) row.classList.add('row-done');
       row.innerHTML = bookRowHTML(book, color);
       row.addEventListener('click', () => openBook(book, color, [cat.title, sub.title]));
