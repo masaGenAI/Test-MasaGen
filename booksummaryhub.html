@@ -571,6 +571,7 @@
   .search-count{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:8px 4px 4px;}
   .search-empty{font-size:13.5px;color:var(--muted);padding:14px 6px;margin:0;}
   .search-row{max-width:none;}
+  .search-memo{color:var(--sky) !important;font-style:italic;}
 
   /* ---- マイ進捗ダッシュボード ---- */
   .dash-panel{margin:22px 0 4px;}
@@ -660,7 +661,7 @@
 
     <div class="search-wrap">
       <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-      <input id="globalSearch" type="search" autocomplete="off" placeholder="書名・著者・キーワードで検索（全書籍）">
+      <input id="globalSearch" type="search" autocomplete="off" placeholder="書名・著者・メモ・キーワードで検索（全書籍）">
       <button id="searchClear" type="button" aria-label="クリア">×</button>
     </div>
     <div id="searchResults" class="search-results"></div>
@@ -6033,26 +6034,43 @@ function searchBooks(query){
   const res = [];
   for(const id of ALL_BOOK_IDS){
     const e = BOOK_INDEX[id]; const b = e.book;
-    const hay = normStr([b.title, b.author, b.oneLiner, b.overview, e.crumbs.join('')].join(' '));
+    const hay = normStr([b.title, b.author, b.oneLiner, b.overview, e.crumbs.join(''), getMemo(id)].join(' '));
     if(terms.every(t => hay.indexOf(t) !== -1)) res.push(id);
     if(res.length >= 60) break;
   }
   return res;
 }
+function memoSnippet(id, terms){
+  const memo = getMemo(id); if(!memo) return '';
+  const low = memo.toLowerCase();
+  let pos = -1;
+  for(const t of terms){ const i = low.indexOf(t); if(i !== -1 && (pos === -1 || i < pos)) pos = i; }
+  const start = pos > 18 ? pos - 18 : 0;
+  let snip = memo.slice(start, start + 72).replace(/\s+/g, ' ').trim();
+  if(start > 0) snip = '…' + snip;
+  if(start + 72 < memo.length) snip = snip + '…';
+  return snip;
+}
 function renderSearchResults(query){
   const box = document.getElementById('searchResults');
   const ids = searchBooks(query);
   if(!query.trim()){ box.classList.remove('open'); box.innerHTML = ''; return; }
+  const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean).map(normStr);
   box.classList.add('open');
   if(!ids.length){ box.innerHTML = '<p class="search-empty">「' + escapeHTML(query) + '」に一致する要約は見つかりませんでした。</p>'; return; }
   box.innerHTML = '<p class="search-count">' + ids.length + ' 件' + (ids.length>=60 ? '以上' : '') + '</p>' +
     ids.map(id => {
       const e = BOOK_INDEX[id]; const b = e.book; const on = isChecked(id);
+      const nmemo = normStr(getMemo(id));
+      const memoHit = hasMemo(id) && terms.some(t => nmemo.indexOf(t) !== -1);
+      const subLine = memoHit
+        ? '<p class="row-sub search-memo">✎ ' + escapeHTML(memoSnippet(id, terms)) + '</p>'
+        : '<p class="row-sub">' + escapeHTML([b.author, e.crumbs[0]].filter(Boolean).join(' ・ ')) + '</p>';
       return '<button class="search-row index-row' + (on?' row-done':'') + '" data-book-id="' + id + '" onclick="openBookById(\'' + id + '\')">' +
         '<span class="row-check ' + (on?'on':'') + '" role="button" aria-label="チェック" aria-pressed="' + on + '" onclick="onRowCheckClick(event,\'' + id + '\')"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>' +
         '<div class="spine" style="background:' + e.color + '"></div>' +
         '<div class="icon-wrap" style="color:' + e.color + '"><svg viewBox="0 0 24 24">' + ICONS.book + '</svg></div>' +
-        '<div class="row-text"><p class="row-title">' + escapeHTML(b.title) + '<span class="row-memo ' + (hasMemo(id)?'on':'') + '" title="メモあり">✎</span></p><p class="row-sub">' + escapeHTML([b.author, e.crumbs[0]].filter(Boolean).join(' ・ ')) + '</p></div>' +
+        '<div class="row-text"><p class="row-title">' + escapeHTML(b.title) + '<span class="row-memo ' + (hasMemo(id)?'on':'') + '" title="メモあり">✎</span></p>' + subLine + '</div>' +
         '<span class="row-meta filled">' + escapeHTML(b.year || '') + '</span>' +
         '<svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>' +
         '</button>';
