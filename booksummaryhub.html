@@ -523,6 +523,74 @@
     background:rgba(76,143,214,0.08);color:var(--navy-mid);
   }
   .quiz-retry:hover{background:rgba(76,143,214,0.15);}
+
+  /* ---- 横断検索 ---- */
+  .search-wrap{position:relative;margin:22px 0 0;}
+  .search-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--muted);pointer-events:none;}
+  #globalSearch{
+    width:100%;box-sizing:border-box;
+    padding:13px 40px 13px 42px;
+    font-family:inherit;font-size:14.5px;color:var(--ink);
+    border:1.5px solid var(--hairline);border-radius:100px;
+    background:var(--paper, #fff);outline:none;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  #globalSearch::placeholder{color:var(--muted);}
+  #globalSearch:focus{border-color:var(--sky);box-shadow:0 0 0 3px rgba(76,143,214,0.12);}
+  #globalSearch::-webkit-search-cancel-button{-webkit-appearance:none;}
+  #searchClear{
+    position:absolute;right:10px;top:50%;transform:translateY(-50%);
+    width:26px;height:26px;border-radius:50%;border:none;background:none;
+    color:var(--muted);font-size:19px;line-height:1;cursor:pointer;display:none;
+  }
+  #searchClear.show{display:block;}
+  #searchClear:hover{background:var(--hairline);color:var(--ink);}
+  .search-results{display:none;margin-top:10px;}
+  .search-results.open{display:block;border:1px solid var(--hairline);border-radius:14px;padding:6px 12px;background:var(--paper, #fff);}
+  .search-count{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:8px 4px 4px;}
+  .search-empty{font-size:13.5px;color:var(--muted);padding:14px 6px;margin:0;}
+  .search-row{max-width:none;}
+
+  /* ---- マイ進捗ダッシュボード ---- */
+  .dash-panel{margin:22px 0 4px;}
+  .dash-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .dash-stat{
+    border:1px solid var(--hairline);border-radius:14px;padding:14px 16px;
+    background:var(--paper, #fff);display:flex;flex-direction:column;gap:3px;
+  }
+  .dash-num{font-family:'Fraunces',serif;font-size:26px;font-weight:600;color:var(--navy-deep);line-height:1.1;}
+  .dash-den{font-size:14px;color:var(--muted);font-weight:500;margin-left:2px;}
+  .dash-lab{font-size:11.5px;color:var(--muted);letter-spacing:.02em;}
+  .dash-bar{height:5px;border-radius:4px;background:var(--hairline);margin-top:7px;overflow:hidden;}
+  .dash-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#3f9d6c,#5bbd8a);transition:width .3s ease;}
+  .dash-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+  .dash-btn{
+    font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;
+    padding:9px 16px;border-radius:100px;border:1px solid var(--hairline);
+    background:var(--paper, #fff);color:var(--navy-mid);
+    transition:border-color .15s ease,background .15s ease,opacity .15s ease;
+  }
+  .dash-btn:hover:not(:disabled){border-color:var(--sky);background:rgba(76,143,214,0.05);}
+  .dash-btn:disabled{opacity:.45;cursor:not-allowed;}
+  .dash-btn.primary{background:#3f9d6c;border-color:#3f9d6c;color:#fff;}
+  .dash-btn.primary:hover:not(:disabled){background:#348a5d;border-color:#348a5d;}
+  @media(max-width:560px){ .dash-row{grid-template-columns:1fr;} }
+
+  /* ---- テーマ内 既読プログレス＆フィルタ ---- */
+  .cat-progress{margin:6px 0 20px;}
+  .cat-progress-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px;}
+  .cat-progress-label{font-size:12.5px;color:var(--muted);font-weight:600;}
+  .cat-progress-bar{height:6px;border-radius:4px;background:var(--hairline);overflow:hidden;}
+  .cat-progress-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#3f9d6c,#5bbd8a);width:0;transition:width .3s ease;}
+  .cat-filter{display:inline-flex;border:1px solid var(--hairline);border-radius:100px;overflow:hidden;}
+  .catf-btn{
+    font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;
+    padding:6px 14px;border:none;background:none;color:var(--muted);
+  }
+  .catf-btn.active{background:var(--navy-mid);color:#fff;}
+  .catf-btn:not(.active):hover{background:rgba(76,143,214,0.08);color:var(--navy-mid);}
+  .index-list.filter-unread .index-row.row-done{display:none;}
+  .index-list.filter-read .index-row:not(.row-done){display:none;}
 </style>
 </head>
 <body>
@@ -533,6 +601,15 @@
     <p class="eyebrow">Reading Intelligence Hub</p>
     <h1>Book Summary 統合戦略ハブ</h1>
     <p class="subtitle">10の知の書架。ビジネス・技術・人文の重要書籍を、要点と実務への応用に落とし込んで蓄積していく統合ダッシュボードです。</p>
+
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="globalSearch" type="search" autocomplete="off" placeholder="書名・著者・キーワードで検索（全書籍）">
+      <button id="searchClear" type="button" aria-label="クリア">×</button>
+    </div>
+    <div id="searchResults" class="search-results"></div>
+
+    <div class="dash-panel" id="dashPanel"></div>
 
     <div class="index-header-eyebrow"><span>INDEX</span></div>
     <div class="index-list" id="rootList"></div>
@@ -5745,6 +5822,8 @@ Object.keys(QUIZ_SOURCE).forEach(themeId => {
   Object.keys(src.bookQuiz || {}).forEach(bid => {
     BOOK_QUIZ[bid] = src.bookQuiz[bid].quiz;
     BOOK_QUIZ_TITLE[bid] = src.bookQuiz[bid].title;
+    // 各問に安定キーを付与（成績記録・復習用）。テーマクイズのコピーにも引き継がれる
+    (BOOK_QUIZ[bid] || []).forEach((q, i) => { q._bid = bid; q._qi = i; q._key = bid + '#' + i; });
   });
 });
 
@@ -5814,9 +5893,198 @@ function toggleChecked(id){
   if(CHECKED[id]) delete CHECKED[id]; else CHECKED[id] = 1;
   saveChecked();
   applyCheckedUI(id);
+  if(typeof refreshProgressUI === 'function') refreshProgressUI();
 }
 function onRowCheckClick(ev, id){ ev.stopPropagation(); ev.preventDefault(); toggleChecked(id); }
 function onDetailCheckClick(id){ toggleChecked(id); }
+
+/* ============================================================
+   書籍インデックス / 進捗 / 検索 / クイズ成績 / エクスポート
+============================================================ */
+const BOOK_INDEX = {};        // id -> {book, color, crumbs, catId}
+const ALL_BOOK_IDS = [];
+function catColor(i){ return lerpColor(NAVY, SKY, DATA.length > 1 ? i/(DATA.length-1) : 0); }
+function buildBookIndex(){
+  DATA.forEach((cat, i) => {
+    const color = catColor(i);
+    (cat.books || []).forEach(b => { BOOK_INDEX[b.id] = {book:b, color, crumbs:[cat.title], catId:cat.id}; ALL_BOOK_IDS.push(b.id); });
+    (cat.children || []).forEach(sub => (sub.books || []).forEach(b => {
+      BOOK_INDEX[b.id] = {book:b, color, crumbs:[cat.title, sub.title], catId:cat.id}; ALL_BOOK_IDS.push(b.id);
+    }));
+  });
+}
+function openBookById(id){ const e = BOOK_INDEX[id]; if(e) openBook(e.book, e.color, e.crumbs); }
+function catBookIds(cat){
+  const ids = []; (cat.books || []).forEach(b => ids.push(b.id));
+  (cat.children || []).forEach(s => (s.books || []).forEach(b => ids.push(b.id)));
+  return ids;
+}
+
+/* ---- クイズ成績（localStorage 永続化） ---- */
+const QUIZ_KEY = 'booksummaryhub:quiz:v1';
+function loadQuiz(){ try{ const o = JSON.parse(localStorage.getItem(QUIZ_KEY) || '{}') || {}; o.q = o.q || {}; o.wrong = o.wrong || {}; o.theme = o.theme || {}; return o; }catch(e){ return {q:{}, wrong:{}, theme:{}}; } }
+let QUIZDATA = loadQuiz();
+function saveQuiz(){ try{ localStorage.setItem(QUIZ_KEY, JSON.stringify(QUIZDATA)); }catch(e){} }
+function recordAnswer(q, correct){
+  if(!q || !q._key) return;
+  const rec = QUIZDATA.q[q._key] || (QUIZDATA.q[q._key] = {seen:0, correct:0});
+  rec.seen++;
+  if(correct){ rec.correct++; delete QUIZDATA.wrong[q._key]; } else { QUIZDATA.wrong[q._key] = 1; }
+  saveQuiz();
+}
+function recordThemeResult(themeId, score, total){
+  if(!themeId) return;
+  const t = QUIZDATA.theme[themeId] || (QUIZDATA.theme[themeId] = {plays:0, best:0, last:0, total:total});
+  t.plays++; t.last = score; t.total = total; if(score > t.best) t.best = score;
+  saveQuiz();
+}
+function quizTotals(){
+  let seen = 0, correct = 0;
+  Object.keys(QUIZDATA.q).forEach(k => { seen += QUIZDATA.q[k].seen; correct += QUIZDATA.q[k].correct; });
+  return {seen, correct, acc: seen ? Math.round(correct/seen*100) : 0};
+}
+function wrongKeys(){ return Object.keys(QUIZDATA.wrong); }
+function wrongQuestions(){
+  return wrongKeys().map(k => {
+    const bid = k.slice(0, k.lastIndexOf('#'));
+    const qi = parseInt(k.slice(k.lastIndexOf('#')+1), 10);
+    const arr = BOOK_QUIZ[bid]; const q = arr && arr[qi];
+    if(!q) return null;
+    return Object.assign({ book: BOOK_QUIZ_TITLE[bid] || '' }, q);
+  }).filter(Boolean);
+}
+
+/* ---- 進捗UIの再描画 ---- */
+function refreshProgressUI(){
+  renderDashboard();
+  document.querySelectorAll('.cat-progress[data-cat]').forEach(el => updateCatProgress(el.getAttribute('data-cat')));
+}
+function updateCatProgress(catId){
+  const cat = DATA.find(c => c.id === catId); if(!cat) return;
+  const ids = catBookIds(cat); const done = ids.filter(isChecked).length;
+  const pct = ids.length ? Math.round(done/ids.length*100) : 0;
+  document.querySelectorAll('.cat-progress[data-cat="' + catId + '"]').forEach(el => {
+    const fill = el.querySelector('.cat-progress-fill'); if(fill) fill.style.width = pct + '%';
+    const lab = el.querySelector('.cat-progress-label'); if(lab) lab.textContent = '既読 ' + done + ' / ' + ids.length + ' 冊（' + pct + '%）';
+  });
+}
+
+/* ---- 横断検索 ---- */
+function normStr(s){ return (s || '').toString().toLowerCase().replace(/\s+/g, '').replace(/　/g, ''); }
+function searchBooks(query){
+  const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean).map(normStr);
+  if(!terms.length) return [];
+  const res = [];
+  for(const id of ALL_BOOK_IDS){
+    const e = BOOK_INDEX[id]; const b = e.book;
+    const hay = normStr([b.title, b.author, b.oneLiner, b.overview, e.crumbs.join('')].join(' '));
+    if(terms.every(t => hay.indexOf(t) !== -1)) res.push(id);
+    if(res.length >= 60) break;
+  }
+  return res;
+}
+function renderSearchResults(query){
+  const box = document.getElementById('searchResults');
+  const ids = searchBooks(query);
+  if(!query.trim()){ box.classList.remove('open'); box.innerHTML = ''; return; }
+  box.classList.add('open');
+  if(!ids.length){ box.innerHTML = '<p class="search-empty">「' + escapeHTML(query) + '」に一致する要約は見つかりませんでした。</p>'; return; }
+  box.innerHTML = '<p class="search-count">' + ids.length + ' 件' + (ids.length>=60 ? '以上' : '') + '</p>' +
+    ids.map(id => {
+      const e = BOOK_INDEX[id]; const b = e.book; const on = isChecked(id);
+      return '<button class="search-row index-row' + (on?' row-done':'') + '" data-book-id="' + id + '" onclick="openBookById(\'' + id + '\')">' +
+        '<span class="row-check ' + (on?'on':'') + '" role="button" aria-label="チェック" aria-pressed="' + on + '" onclick="onRowCheckClick(event,\'' + id + '\')"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>' +
+        '<div class="spine" style="background:' + e.color + '"></div>' +
+        '<div class="icon-wrap" style="color:' + e.color + '"><svg viewBox="0 0 24 24">' + ICONS.book + '</svg></div>' +
+        '<div class="row-text"><p class="row-title">' + escapeHTML(b.title) + '</p><p class="row-sub">' + escapeHTML([b.author, e.crumbs[0]].filter(Boolean).join(' ・ ')) + '</p></div>' +
+        '<span class="row-meta filled">' + escapeHTML(b.year || '') + '</span>' +
+        '<svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>' +
+        '</button>';
+    }).join('');
+}
+function escapeHTML(s){ return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ---- マイ進捗ダッシュボード ---- */
+function renderDashboard(){
+  const el = document.getElementById('dashPanel'); if(!el) return;
+  const done = ALL_BOOK_IDS.filter(isChecked).length;
+  const totalBooks = ALL_BOOK_IDS.length;
+  const pct = totalBooks ? Math.round(done/totalBooks*100) : 0;
+  const qt = quizTotals();
+  const wrong = wrongKeys().length;
+  el.innerHTML =
+    '<div class="dash-row">' +
+      '<div class="dash-stat"><span class="dash-num">' + done + '<span class="dash-den">/' + totalBooks + '</span></span><span class="dash-lab">既読の要約</span>' +
+        '<div class="dash-bar"><div class="dash-bar-fill" style="width:' + pct + '%"></div></div></div>' +
+      '<div class="dash-stat"><span class="dash-num">' + (qt.seen ? qt.acc + '<span class="dash-den">%</span>' : '—') + '</span><span class="dash-lab">クイズ正答率' + (qt.seen ? '（' + qt.seen + '問）' : '') + '</span></div>' +
+      '<div class="dash-stat"><span class="dash-num">' + wrong + '</span><span class="dash-lab">復習待ちの問題</span></div>' +
+    '</div>' +
+    '<div class="dash-actions">' +
+      '<button class="dash-btn primary" ' + (wrong ? '' : 'disabled') + ' onclick="startReview()">間違えた問題を復習' + (wrong ? '（' + wrong + '問）' : '') + '</button>' +
+      '<button class="dash-btn" onclick="exportData()">エクスポート</button>' +
+      '<button class="dash-btn" onclick="document.getElementById(\'importFile\').click()">インポート</button>' +
+      '<input type="file" id="importFile" accept="application/json,.json" style="display:none" onchange="importData(event)">' +
+    '</div>';
+}
+
+/* ---- 復習モード ---- */
+function startReview(){
+  const qs = wrongQuestions();
+  if(!qs.length) return;
+  const viewId = 'view-review';
+  const el = ensureView(viewId);
+  el.innerHTML =
+    '<button class="back-btn" onclick="goBack()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>INDEX</button>' +
+    '<div class="detail-eyebrow"><div class="detail-icon" style="background:#3f9d6c"><svg viewBox="0 0 24 24">' + (ICONS.book || '') + '</svg></div></div>' +
+    '<h2>間違えた問題の復習</h2>' +
+    '<p class="detail-sub">これまで不正解だった ' + qs.length + ' 問。正解するとリストから外れます。</p>' +
+    '<div class="quiz-mount" id="quizmount-review"></div>' +
+    backBtnBottomHTML('INDEX');
+  viewStack.push(viewId);
+  showView(viewId);
+  mountQuiz(document.getElementById('quizmount-review'), qs, { orderToggle:false, defaultOrder:'random', isReview:true });
+}
+
+/* ---- エクスポート / インポート ---- */
+function exportData(){
+  const payload = { app:'booksummaryhub', v:1, exportedAt:new Date().toISOString(), checked:CHECKED, quiz:QUIZDATA };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const stamp = new Date().toISOString().slice(0,10);
+  a.href = url; a.download = 'booksummaryhub-progress-' + stamp + '.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+function importData(ev){
+  const file = ev.target.files && ev.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const data = JSON.parse(reader.result);
+      const chk = data.checked || {};
+      const qz = data.quiz || {};
+      let addC = 0;
+      Object.keys(chk).forEach(id => { if(!CHECKED[id]){ CHECKED[id] = 1; addC++; } });
+      if(qz.q){ Object.keys(qz.q).forEach(k => {
+        const src = qz.q[k]; const dst = QUIZDATA.q[k] || (QUIZDATA.q[k] = {seen:0, correct:0});
+        dst.seen = Math.max(dst.seen, src.seen||0); dst.correct = Math.max(dst.correct, src.correct||0);
+      }); }
+      if(qz.wrong){ Object.keys(qz.wrong).forEach(k => { QUIZDATA.wrong[k] = 1; }); }
+      if(qz.theme){ Object.keys(qz.theme).forEach(t => {
+        const src = qz.theme[t]; const dst = QUIZDATA.theme[t] || (QUIZDATA.theme[t] = {plays:0, best:0, last:0, total:src.total||0});
+        dst.plays += src.plays||0; dst.best = Math.max(dst.best, src.best||0); dst.last = src.last||dst.last; dst.total = src.total||dst.total;
+      }); }
+      saveChecked(); saveQuiz();
+      ALL_BOOK_IDS.forEach(id => { if(isChecked(id)) applyCheckedUI(id); });
+      refreshProgressUI();
+      alert('インポート完了：既読 ' + addC + ' 件を追加し、クイズ成績を統合しました。');
+    }catch(e){ alert('インポートに失敗しました。ファイル形式をご確認ください。'); }
+    ev.target.value = '';
+  };
+  reader.readAsText(file);
+}
 
 function renderRoot(){
   const list = document.getElementById('rootList');
@@ -6027,6 +6295,7 @@ function mountQuiz(mountEl, questions, opts){
         btn.addEventListener('click', () => {
           if(answered[qIdx] !== undefined) return;
           answered[qIdx] = parseInt(btn.getAttribute('data-ci'), 10);
+          if(typeof recordAnswer === 'function') recordAnswer(questions[qIdx], answered[qIdx] === questions[qIdx].answer);
           renderQ();
         });
       });
@@ -6036,6 +6305,8 @@ function mountQuiz(mountEl, questions, opts){
 
   function showSummary(){
     const sc = scoreOf();
+    if(opts.themeId && typeof recordThemeResult === 'function') recordThemeResult(opts.themeId, sc, total);
+    if(typeof refreshProgressUI === 'function') refreshProgressUI();
     counter.textContent = '完了';
     scoreEl.innerHTML = `正解 <b>${sc}</b> / ${total}`;
     stage.innerHTML = `
@@ -6085,7 +6356,7 @@ function mountThemeQuiz(themeId){
   const el = document.getElementById('quizmount-theme-' + themeId);
   if(!el) return;
   const qs = themeQuizQuestions(themeId);
-  if(qs.length) mountQuiz(el, qs, { orderToggle:true, defaultOrder:'fixed' });
+  if(qs.length) mountQuiz(el, qs, { orderToggle:true, defaultOrder:'fixed', themeId:themeId });
 }
 
 function mountBookQuiz(bookId){
@@ -6117,6 +6388,20 @@ function openCategory(cat, color){
     // nothing extra needed; children rows themselves show "Coming soon"
   }
 
+  const hasFlatBooks = cat.books && cat.books.length;
+  const progressHTML = hasFlatBooks ? `
+    <div class="cat-progress" data-cat="${cat.id}">
+      <div class="cat-progress-top">
+        <span class="cat-progress-label"></span>
+        <div class="cat-filter" role="group" aria-label="既読フィルタ">
+          <button class="catf-btn active" data-filter="all" onclick="setCatFilter('${viewId}', this)">すべて</button>
+          <button class="catf-btn" data-filter="unread" onclick="setCatFilter('${viewId}', this)">未読</button>
+          <button class="catf-btn" data-filter="read" onclick="setCatFilter('${viewId}', this)">既読</button>
+        </div>
+      </div>
+      <div class="cat-progress-bar"><div class="cat-progress-fill"></div></div>
+    </div>` : '';
+
   el.innerHTML = `
     <button class="back-btn" onclick="goBack()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
@@ -6128,6 +6413,7 @@ function openCategory(cat, color){
     <h2>${cat.title}</h2>
     <p class="detail-sub">${cat.sub} ・ ${countBooks(cat)} 冊収録</p>
     ${synthesisHTML(cat)}
+    ${progressHTML}
     ${bodyHTML}
     ${backBtnBottomHTML('INDEX')}
   `;
@@ -6135,6 +6421,7 @@ function openCategory(cat, color){
   viewStack.push(viewId);
   showView(viewId);
   mountThemeQuiz(cat.id);
+  updateCatProgress(cat.id);
 
   if(cat.children && cat.children.length){
     const subList = document.getElementById(`list-${viewId}-sub`);
@@ -6279,11 +6566,33 @@ function emptyStateHTML(){
   `;
 }
 
+function setCatFilter(viewId, btn){
+  const wrap = btn.closest('.cat-filter');
+  wrap.querySelectorAll('.catf-btn').forEach(b => b.classList.toggle('active', b === btn));
+  const list = document.getElementById('list-' + viewId + '-books');
+  if(!list) return;
+  list.classList.remove('filter-unread', 'filter-read');
+  const f = btn.getAttribute('data-filter');
+  if(f === 'unread') list.classList.add('filter-unread');
+  else if(f === 'read') list.classList.add('filter-read');
+}
+
 /* ============================================================
    INIT
 ============================================================ */
+buildBookIndex();
 viewStack = ['view-root'];
 renderRoot();
+renderDashboard();
+(function initSearch(){
+  const input = document.getElementById('globalSearch');
+  const clear = document.getElementById('searchClear');
+  if(input){
+    input.addEventListener('input', () => { renderSearchResults(input.value); clear.classList.toggle('show', !!input.value); });
+    input.addEventListener('keydown', e => { if(e.key === 'Escape'){ input.value = ''; renderSearchResults(''); clear.classList.remove('show'); } });
+  }
+  if(clear){ clear.addEventListener('click', () => { input.value = ''; renderSearchResults(''); clear.classList.remove('show'); input.focus(); }); }
+})();
 </script>
 </body>
 </html>
