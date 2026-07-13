@@ -644,6 +644,51 @@
   .memo-status.saved{color:#3f9d6c;}
   .row-memo{display:none;margin-left:7px;color:var(--sky);font-size:12px;vertical-align:middle;}
   .row-memo.on{display:inline;}
+
+  /* ---- 自分の記録（評価・タグ） ---- */
+  .record-row{display:flex;align-items:flex-start;gap:12px;margin:0 0 12px;}
+  .record-label{font-size:12px;color:var(--muted);font-weight:600;padding-top:5px;min-width:34px;flex:none;}
+  .stars{display:inline-flex;gap:2px;}
+  .star{background:none;border:none;cursor:pointer;font-size:22px;line-height:1;color:var(--hairline);padding:0 1px;transition:color .1s ease,transform .1s ease;}
+  .star:hover{transform:scale(1.12);}
+  .star.on{color:#f2b134;}
+  .tag-box{flex:1;min-width:0;}
+  .tag-list{display:flex;flex-wrap:wrap;gap:6px;}
+  .tag-list:not(:empty){margin-bottom:8px;}
+  .tag-chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--navy-mid);background:rgba(76,143,214,0.10);border:1px solid var(--sky-light);border-radius:100px;padding:3px 6px 3px 11px;}
+  .tag-x{background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;line-height:1;padding:0 2px;}
+  .tag-x:hover{color:var(--ink);}
+  .tag-input{font-family:inherit;font-size:13px;color:var(--ink);padding:8px 12px;border:1.5px solid var(--hairline);border-radius:100px;background:var(--paper);outline:none;max-width:240px;width:100%;box-sizing:border-box;}
+  .tag-input:focus{border-color:var(--sky);}
+  .quiz-stat{font-size:12.5px;color:var(--muted);margin:-6px 0 12px;}
+  .quiz-stat b{color:var(--navy-mid);}
+
+  /* ---- メモ一覧 ---- */
+  .memo-list{display:flex;flex-direction:column;gap:12px;margin-top:8px;}
+  .memo-card{
+    text-align:left;font-family:inherit;cursor:pointer;width:100%;
+    border:1px solid var(--hairline);border-radius:14px;padding:15px 17px;background:var(--paper);
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .memo-card:hover{border-color:var(--sky);transform:translateY(-1px);}
+  .memo-card-title{font-family:'Fraunces',serif;font-size:16px;font-weight:600;color:var(--ink);margin:0 0 7px;}
+  .memo-card-title .mc-mark{color:var(--sky);margin-right:7px;}
+  .memo-card-body{font-size:13.5px;line-height:1.65;color:var(--ink);margin:0 0 7px;white-space:pre-wrap;overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;}
+  .memo-card-crumb{font-size:11.5px;color:var(--muted);margin:0;}
+
+  /* ---- ダッシュボード：苦手テーマ ---- */
+  .dash-weak{
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    margin-top:12px;padding:11px 15px;border-radius:12px;
+    border:1px solid var(--sky-light);background:rgba(76,143,214,0.07);
+    font-size:13px;color:var(--ink);
+  }
+  .dash-weak b{color:var(--navy-mid);}
+  .dash-weak-btn{
+    margin-left:auto;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;
+    padding:6px 14px;border-radius:100px;border:1px solid var(--sky);background:none;color:var(--navy-mid);
+  }
+  .dash-weak-btn:hover{background:rgba(76,143,214,0.12);}
 </style>
 </head>
 <body>
@@ -5906,8 +5951,9 @@ function totalBookCount(){
   return DATA.reduce((sum, cat) => sum + countBooks(cat), 0);
 }
 
-/* view stack: array of {viewId, renderFn} so back() always knows the parent */
+/* view stack + URLハッシュルーティング（直リンク・ブラウザ戻る対応） */
 let viewStack = [];
+let SUPPRESS_PUSH = false;
 
 function showView(id){
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -5915,11 +5961,37 @@ function showView(id){
   if(el) el.classList.add('active');
 }
 
-function goBack(){
-  viewStack.pop();
-  const prev = viewStack[viewStack.length - 1];
-  if(!prev){ showView('view-root'); return; }
-  showView(prev);
+/* 各openXの描画後に呼ぶ：スタック積み＋URL反映（ルーティング復元時はpushしない） */
+function pushRoute(viewId, route){
+  viewStack.push(viewId);
+  if(!SUPPRESS_PUSH){
+    history.pushState({viewId:viewId, route:route}, '', '#/' + route);
+    window.scrollTo(0, 0);
+  }
+}
+
+function goBack(){ history.back(); }
+
+/* ハッシュ → 対応ビューを描画（ルーティング用） */
+function resolveRoute(hash){
+  const h = (hash || '').replace(/^#\/?/, '');
+  const parts = h.split('/').filter(Boolean);
+  if(!parts.length){ showView('view-root'); return; }
+  const key = parts[0];
+  if(key === 'cat'){ const cat = DATA.find(c => c.id === parts[1]); if(cat){ openCategory(cat, catColor(DATA.indexOf(cat))); } else showView('view-root'); return; }
+  if(key === 'sub'){ const cat = DATA.find(c => c.id === parts[1]); const sub = cat && (cat.children || []).find(s => s.id === parts[2]); if(cat && sub){ openSubcategory(cat, sub, catColor(DATA.indexOf(cat))); } else showView('view-root'); return; }
+  if(key === 'book'){ if(BOOK_INDEX[parts[1]]) openBookById(parts[1]); else showView('view-root'); return; }
+  if(key === 'review'){ startReview(); return; }
+  if(key === 'memos'){ openMemoList(); return; }
+  showView('view-root');
+}
+
+function onPopState(e){
+  const st = e.state;
+  if(!st || st.viewId === 'view-root' || !st.route){ viewStack.length = 1; showView('view-root'); return; }
+  const idx = viewStack.lastIndexOf(st.viewId);
+  if(idx !== -1){ viewStack.length = idx + 1; showView(st.viewId); }
+  else { SUPPRESS_PUSH = true; resolveRoute('#/' + st.route); SUPPRESS_PUSH = false; }
 }
 
 /* ============================================================
@@ -6034,7 +6106,7 @@ function searchBooks(query){
   const res = [];
   for(const id of ALL_BOOK_IDS){
     const e = BOOK_INDEX[id]; const b = e.book;
-    const hay = normStr([b.title, b.author, b.oneLiner, b.overview, e.crumbs.join(''), getMemo(id)].join(' '));
+    const hay = normStr([b.title, b.author, b.oneLiner, b.overview, e.crumbs.join(''), getMemo(id), getTags(id).join(' ')].join(' '));
     if(terms.every(t => hay.indexOf(t) !== -1)) res.push(id);
     if(res.length >= 60) break;
   }
@@ -6086,6 +6158,8 @@ function renderDashboard(){
   const pct = totalBooks ? Math.round(done/totalBooks*100) : 0;
   const qt = quizTotals();
   const wrong = wrongKeys().length;
+  const memoN = memoBooks().length;
+  const weak = weakestTheme();
   el.innerHTML =
     '<div class="dash-row">' +
       '<div class="dash-stat"><span class="dash-num">' + done + '<span class="dash-den">/' + totalBooks + '</span></span><span class="dash-lab">既読の要約</span>' +
@@ -6093,8 +6167,10 @@ function renderDashboard(){
       '<div class="dash-stat"><span class="dash-num">' + (qt.seen ? qt.acc + '<span class="dash-den">%</span>' : '—') + '</span><span class="dash-lab">クイズ正答率' + (qt.seen ? '（' + qt.seen + '問）' : '') + '</span></div>' +
       '<div class="dash-stat"><span class="dash-num">' + wrong + '</span><span class="dash-lab">復習待ちの問題</span></div>' +
     '</div>' +
+    (weak ? '<div class="dash-weak">苦手テーマ：<b>' + escapeHTML(weak.title) + '</b>（正答率 ' + weak.acc + '%・' + weak.seen + '問）<button class="dash-weak-btn" onclick="openCategory(DATA.find(c=>c.id===\'' + weak.catId + '\'), catColor(DATA.findIndex(c=>c.id===\'' + weak.catId + '\')))">開く</button></div>' : '') +
     '<div class="dash-actions">' +
       '<button class="dash-btn primary" ' + (wrong ? '' : 'disabled') + ' onclick="startReview()">間違えた問題を復習' + (wrong ? '（' + wrong + '問）' : '') + '</button>' +
+      '<button class="dash-btn" ' + (memoN ? '' : 'disabled') + ' onclick="openMemoList()">メモ一覧' + (memoN ? '（' + memoN + '件）' : '') + '</button>' +
       '<button class="dash-btn" onclick="exportData()">エクスポート</button>' +
       '<button class="dash-btn" onclick="document.getElementById(\'importFile\').click()">インポート</button>' +
       '<input type="file" id="importFile" accept="application/json,.json" style="display:none" onchange="importData(event)">' +
@@ -6114,14 +6190,14 @@ function startReview(){
     '<p class="detail-sub">これまで不正解だった ' + qs.length + ' 問。正解するとリストから外れます。</p>' +
     '<div class="quiz-mount" id="quizmount-review"></div>' +
     backBtnBottomHTML('INDEX');
-  viewStack.push(viewId);
   showView(viewId);
+  pushRoute(viewId, 'review');
   mountQuiz(document.getElementById('quizmount-review'), qs, { orderToggle:false, defaultOrder:'random', isReview:true });
 }
 
 /* ---- エクスポート / インポート ---- */
 function exportData(){
-  const payload = { app:'booksummaryhub', v:1, exportedAt:new Date().toISOString(), checked:CHECKED, quiz:QUIZDATA, memos:MEMOS };
+  const payload = { app:'booksummaryhub', v:1, exportedAt:new Date().toISOString(), checked:CHECKED, quiz:QUIZDATA, memos:MEMOS, ratings:RATINGS, tags:TAGS };
   const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -6158,7 +6234,15 @@ function importData(ev){
         const src = qz.theme[t]; const dst = QUIZDATA.theme[t] || (QUIZDATA.theme[t] = {plays:0, best:0, last:0, total:src.total||0});
         dst.plays += src.plays||0; dst.best = Math.max(dst.best, src.best||0); dst.last = src.last||dst.last; dst.total = src.total||dst.total;
       }); }
-      saveChecked(); saveQuiz(); saveMemos();
+      const rt = data.ratings || {};
+      Object.keys(rt).forEach(id => { if(!RATINGS[id] && rt[id]) RATINGS[id] = rt[id]; });
+      const tg = data.tags || {};
+      Object.keys(tg).forEach(id => {
+        const merged = (getTags(id) || []).slice();
+        (tg[id] || []).forEach(t => { if(t && merged.indexOf(t) === -1) merged.push(t); });
+        if(merged.length) TAGS[id] = merged;
+      });
+      saveChecked(); saveQuiz(); saveMemos(); saveRatings(); saveTags();
       ALL_BOOK_IDS.forEach(id => { if(isChecked(id)) applyCheckedUI(id); if(hasMemo(id)) applyMemoUI(id); });
       refreshProgressUI();
       alert('インポート完了：既読 ' + addC + ' 件、メモ ' + addM + ' 件を追加し、クイズ成績を統合しました。');
@@ -6201,6 +6285,91 @@ function onMemoInput(id, ta){
     setMemo(id, ta.value);
     if(st){ st.textContent = '保存しました ✓'; st.classList.add('saved'); }
   }, 400);
+}
+function memoBooks(){ return ALL_BOOK_IDS.filter(hasMemo); }
+
+/* ---- ★評価（localStorage 永続化） ---- */
+const RATE_KEY = 'booksummaryhub:ratings:v1';
+function loadRatings(){ try{ return JSON.parse(localStorage.getItem(RATE_KEY) || '{}') || {}; }catch(e){ return {}; } }
+let RATINGS = loadRatings();
+function saveRatings(){ try{ localStorage.setItem(RATE_KEY, JSON.stringify(RATINGS)); }catch(e){} }
+function getRating(id){ return RATINGS[id] || 0; }
+function setRating(id, n){
+  n = Math.max(0, Math.min(5, n | 0));
+  if(getRating(id) === n) n = 0; // 同じ星を再クリックで解除
+  if(n) RATINGS[id] = n; else delete RATINGS[id];
+  saveRatings(); renderStars(id);
+}
+function starsHTML(id){
+  const cur = getRating(id);
+  let s = '';
+  for(let i = 1; i <= 5; i++){ s += '<button type="button" class="star' + (i <= cur ? ' on' : '') + '" data-n="' + i + '" aria-label="' + i + '点" onclick="setRating(\'' + id + '\',' + i + ')">★</button>'; }
+  return s;
+}
+function renderStars(id){
+  const wrap = document.getElementById('stars-' + id);
+  if(wrap) wrap.innerHTML = starsHTML(id);
+}
+
+/* ---- タグ（localStorage 永続化） ---- */
+const TAG_KEY = 'booksummaryhub:tags:v1';
+function loadTags(){ try{ return JSON.parse(localStorage.getItem(TAG_KEY) || '{}') || {}; }catch(e){ return {}; } }
+let TAGS = loadTags();
+function saveTags(){ try{ localStorage.setItem(TAG_KEY, JSON.stringify(TAGS)); }catch(e){} }
+function getTags(id){ return TAGS[id] || []; }
+function setTags(id, arr){ arr = arr.filter(Boolean); if(arr.length) TAGS[id] = arr; else delete TAGS[id]; saveTags(); }
+function tagsHTML(id){
+  return getTags(id).map(t => '<span class="tag-chip">' + escapeHTML(t) + '<button type="button" class="tag-x" aria-label="削除" onclick="removeTag(\'' + id + '\',\'' + escapeAttr(t) + '\')">×</button></span>').join('');
+}
+function renderTags(id){ const w = document.getElementById('tags-' + id); if(w) w.innerHTML = tagsHTML(id); }
+function addTagFromInput(id, inp){
+  const val = (inp.value || '').trim();
+  if(val){ (val.split(/[,、\s]+/).filter(Boolean)).forEach(t => { const arr = getTags(id).slice(); if(!arr.includes(t)){ arr.push(t); setTags(id, arr); } }); renderTags(id); }
+  inp.value = '';
+}
+function onTagKey(ev, id, inp){ if(ev.key === 'Enter'){ ev.preventDefault(); addTagFromInput(id, inp); } }
+function removeTag(id, t){ setTags(id, getTags(id).filter(x => x !== t)); renderTags(id); }
+function escapeAttr(s){ return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ---- 本別クイズ成績 / 苦手テーマ ---- */
+function bookQuizStats(bid){
+  const arr = BOOK_QUIZ[bid] || [];
+  let seen = 0, correct = 0, answered = 0;
+  arr.forEach((q, i) => { const r = QUIZDATA.q[bid + '#' + i]; if(r){ seen += r.seen; correct += r.correct; if(r.seen > 0) answered++; } });
+  return { questions: arr.length, answered, seen, correct, acc: seen ? Math.round(correct/seen*100) : null };
+}
+function themeAccuracy(){
+  const agg = {};
+  Object.keys(QUIZDATA.q).forEach(k => {
+    const bid = k.slice(0, k.lastIndexOf('#')); const e = BOOK_INDEX[bid]; if(!e) return;
+    const a = agg[e.catId] || (agg[e.catId] = {seen:0, correct:0});
+    a.seen += QUIZDATA.q[k].seen; a.correct += QUIZDATA.q[k].correct;
+  });
+  return Object.keys(agg).map(cid => { const cat = DATA.find(c => c.id === cid); return {catId:cid, title:cat?cat.title:cid, seen:agg[cid].seen, correct:agg[cid].correct, acc: agg[cid].seen ? Math.round(agg[cid].correct/agg[cid].seen*100) : 0}; });
+}
+function weakestTheme(){ const arr = themeAccuracy().filter(t => t.seen >= 3); if(!arr.length) return null; arr.sort((a,b) => a.acc - b.acc || b.seen - a.seen); return arr[0]; }
+
+/* ---- メモ一覧ページ ---- */
+function openMemoList(){
+  const viewId = 'view-memos';
+  const el = ensureView(viewId);
+  const ids = memoBooks();
+  const cards = ids.length ? ids.map(id => {
+    const e = BOOK_INDEX[id]; const b = e.book;
+    return '<button class="memo-card" onclick="openBookById(\'' + id + '\')">' +
+      '<p class="memo-card-title"><span class="mc-mark">✎</span>' + escapeHTML(b.title) + '</p>' +
+      '<p class="memo-card-body">' + escapeHTML(getMemo(id)) + '</p>' +
+      '<p class="memo-card-crumb">' + escapeHTML(e.crumbs.join(' / ')) + (getRating(id) ? ' ・ ' + '★'.repeat(getRating(id)) : '') + '</p>' +
+      '</button>';
+  }).join('') : '<p class="search-empty">まだメモはありません。要約の詳細ページでメモを書くと、ここに一覧表示されます。</p>';
+  el.innerHTML =
+    '<button class="back-btn" onclick="goBack()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>INDEX</button>' +
+    '<div class="detail-eyebrow"><div class="detail-icon" style="background:#4C8FD6"><svg viewBox="0 0 24 24">' + (ICONS.book || '') + '</svg></div></div>' +
+    '<h2>メモ一覧</h2><p class="detail-sub">' + ids.length + ' 件のメモ</p>' +
+    '<div class="memo-list">' + cards + '</div>' +
+    backBtnBottomHTML('INDEX');
+  showView(viewId);
+  pushRoute(viewId, 'memos');
 }
 
 function renderRoot(){
@@ -6535,8 +6704,8 @@ function openCategory(cat, color){
     ${backBtnBottomHTML('INDEX')}
   `;
 
-  viewStack.push(viewId);
   showView(viewId);
+  pushRoute(viewId, 'cat/' + cat.id);
   mountThemeQuiz(cat.id);
   updateCatProgress(cat.id);
 
@@ -6591,8 +6760,8 @@ function openSubcategory(cat, sub, color){
     ${sub.books.length ? `<div class="index-list" id="list-${viewId}"></div>` : emptyStateHTML()}
     ${backBtnBottomHTML(cat.title)}
   `;
-  viewStack.push(viewId);
   showView(viewId);
+  pushRoute(viewId, 'sub/' + cat.id + '/' + sub.id);
 
   if(sub.books.length){
     const list = document.getElementById(`list-${viewId}`);
@@ -6661,20 +6830,32 @@ function openBook(book, color, crumbs){
       <p>${book.takeaway}</p>
     </div>` : ''}
 
-    <div class="book-section-title">自分メモ</div>
+    <div class="book-section-title">自分の記録</div>
+    <div class="record-row">
+      <span class="record-label">評価</span>
+      <div class="stars" id="stars-${book.id}">${starsHTML(book.id)}</div>
+    </div>
+    <div class="record-row">
+      <span class="record-label">タグ</span>
+      <div class="tag-box">
+        <div class="tag-list" id="tags-${book.id}">${tagsHTML(book.id)}</div>
+        <input type="text" class="tag-input" placeholder="タグを追加してEnter" onkeydown="onTagKey(event,'${book.id}',this)">
+      </div>
+    </div>
     <textarea id="memo-${book.id}" class="memo-area" placeholder="この本の気づき・実務での活用アイデアなどを書き留めましょう（自動保存・この端末内に保存されます）" oninput="onMemoInput('${book.id}', this)">${escapeHTML(getMemo(book.id))}</textarea>
     <p class="memo-status ${hasMemo(book.id)?'saved':''}" id="memo-status-${book.id}">${hasMemo(book.id)?'保存済み':''}</p>
 
     ${(BOOK_QUIZ[book.id] && BOOK_QUIZ[book.id].length) ? `
     <div class="book-section-title">理解度チェック（${BOOK_QUIZ[book.id].length}問クイズ）</div>
     <p class="quiz-intro">この要約から${BOOK_QUIZ[book.id].length}問。1問ずつ出題され、「次へ」で進みます。</p>
+    ${(function(){ const s = bookQuizStats(book.id); return s.answered ? `<p class="quiz-stat">これまでの成績：${s.answered}/${s.questions}問に解答 ・ 正答率 <b>${s.acc}%</b></p>` : ''; })()}
     <div class="quiz-mount" id="quizmount-book-${book.id}"></div>` : ''}
 
     <p class="source-note">※ 本要約はClaudeが書籍情報および要約サービス(Flier等)のレビューを参照し、独自にまとめた個人利用向けのノートです。原著・原要約の著作権はそれぞれの著者・出版社・要約サービス提供者に帰属します。</p>
     ${backBtnBottomHTML(parentLabel)}
   `;
-  viewStack.push(viewId);
   showView(viewId);
+  pushRoute(viewId, 'book/' + book.id);
   mountBookQuiz(book.id);
 }
 
@@ -6701,10 +6882,14 @@ function setCatFilter(viewId, btn){
 /* ============================================================
    INIT
 ============================================================ */
+const INITIAL_HASH = location.hash;
 buildBookIndex();
 viewStack = ['view-root'];
 renderRoot();
 renderDashboard();
+history.replaceState({viewId:'view-root', route:''}, '', '#/');
+if(INITIAL_HASH && INITIAL_HASH !== '#/' && INITIAL_HASH !== '#'){ resolveRoute(INITIAL_HASH); }
+setTimeout(() => window.addEventListener('popstate', onPopState), 0);
 (function initSearch(){
   const input = document.getElementById('globalSearch');
   const clear = document.getElementById('searchClear');
