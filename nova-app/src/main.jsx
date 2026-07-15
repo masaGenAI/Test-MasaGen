@@ -94,6 +94,7 @@ function collectProgress() {
 function BackupBar() {
   const [msg, setMsg] = useState("");
   const [showBackup, setShowBackup] = useState(false);
+  const [hovered, setHovered] = useState(false);
 
   const flash = (m) => {
     setMsg(m);
@@ -175,17 +176,23 @@ function BackupBar() {
     boxShadow: "0 1px 3px rgba(11,31,63,0.10)",
   };
 
+  const expanded = showBackup || hovered;
   return (
     <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
         position: "fixed",
-        right: 14,
-        bottom: 14,
+        left: 12,
+        bottom: 12,
         zIndex: 2147483000,
         display: "flex",
         flexDirection: "column",
-        alignItems: "flex-end",
+        alignItems: "flex-start",
         gap: 6,
+        // 普段は半透明の小さなアイコンのみ。ホバー/展開時だけくっきり表示して邪魔にならないように。
+        opacity: expanded || msg ? 1 : 0.35,
+        transition: "opacity .18s ease",
       }}
     >
       {msg ? (
@@ -196,7 +203,7 @@ function BackupBar() {
             fontSize: 12,
             padding: "6px 11px",
             borderRadius: 7,
-            maxWidth: 260,
+            maxWidth: 240,
             lineHeight: 1.5,
             boxShadow: "0 2px 8px rgba(11,31,63,0.25)",
           }}
@@ -204,44 +211,62 @@ function BackupBar() {
           {msg}
         </div>
       ) : null}
-      {/* バックアップ(書き出し/読み込み) は明示的に開いたときだけ表示（押すとファイルDL） */}
-      {showBackup ? (
-        <div style={{ display: "flex", gap: 6 }}>
-          <button style={btn} onClick={exportProgress} title="学習の進捗をファイルに書き出します（バックアップ用）">
-            ⬇ ファイルに書き出し
-          </button>
-          <button style={btn} onClick={importProgress} title="書き出した進捗ファイルを読み込みます">
-            ⬆ 読み込み
-          </button>
+
+      {/* 展開時のみ: 自動保存の説明＋バックアップ操作（書き出しは押したときだけDL） */}
+      {expanded ? (
+        <div
+          style={{
+            background: "#fff",
+            border: "1px solid #e4e7ec",
+            borderRadius: 10,
+            padding: "10px 12px",
+            boxShadow: "0 4px 14px rgba(11,31,63,0.14)",
+            maxWidth: 250,
+          }}
+        >
+          <div style={{ fontSize: 12, fontWeight: 600, color: LS_OK ? "#166534" : "#b45309", marginBottom: 8, lineHeight: 1.5 }}>
+            {LS_OK ? "✓ 進捗はこの端末に自動保存されています" : "⚠ このブラウザは自動保存オフ。バックアップ推奨"}
+          </div>
+          {showBackup ? (
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              <button style={btn} onClick={exportProgress} title="学習の進捗をファイルに書き出します（バックアップ用）">
+                ⬇ ファイルに書き出し
+              </button>
+              <button style={btn} onClick={importProgress} title="書き出した進捗ファイルを読み込みます">
+                ⬆ 読み込み
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowBackup(true)}
+              style={{ ...btn, fontSize: 11.5, padding: "5px 10px", color: "#64748b", fontWeight: 500 }}
+            >
+              バックアップ（任意）
+            </button>
+          )}
         </div>
       ) : null}
 
-      {/* 通常時は「自動保存」インジケータのみ。クリックでバックアップ操作を開閉 */}
+      {/* 常時: 小さなアイコンのみ（クリックでバックアップ操作を固定表示） */}
       <button
         onClick={() => setShowBackup((v) => !v)}
-        title={
-          LS_OK
-            ? "進捗はこの端末に自動保存されています。クリックでバックアップ書き出し/読み込み"
-            : "このブラウザは自動保存が無効です。クリックしてファイルにバックアップしてください"
-        }
+        title={LS_OK ? "進捗は自動保存されています" : "自動保存オフ。クリックしてバックアップ"}
+        aria-label="進捗の保存状態"
         style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 7,
+          width: 30,
+          height: 30,
+          borderRadius: "50%",
           border: "1px solid " + (LS_OK ? "#cfe3d6" : "#f0d9a8"),
-          background: LS_OK ? "rgba(22,163,74,0.06)" : "rgba(180,83,9,0.06)",
+          background: LS_OK ? "rgba(22,163,74,0.10)" : "rgba(180,83,9,0.12)",
           color: LS_OK ? "#166534" : "#b45309",
-          borderRadius: 100,
-          padding: "6px 12px",
-          fontSize: 12,
-          fontWeight: 600,
+          fontSize: 14,
+          lineHeight: 1,
           cursor: "pointer",
-          fontFamily: "'Inter',-apple-system,'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif",
-          boxShadow: "0 1px 3px rgba(11,31,63,0.08)",
+          boxShadow: "0 1px 3px rgba(11,31,63,0.10)",
+          padding: 0,
         }}
       >
-        {LS_OK ? "✓ 進捗は自動保存されています" : "⚠ 自動保存オフ（バックアップ推奨）"}
-        <span style={{ opacity: 0.6, fontSize: 11 }}>{showBackup ? "▲ 閉じる" : "▾ バックアップ"}</span>
+        {LS_OK ? "✓" : "⚠"}
       </button>
     </div>
   );
