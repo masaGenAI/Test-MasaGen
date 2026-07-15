@@ -1,0 +1,39 @@
+{
+  "title": "Anything Memo トラッカー",
+  "source": "Cowork artifact: Anything Memo Tracker",
+  "capturedFrom": "0679c7cc-anythingmemotracker.pdf",
+  "stats": { "memoTotal": 18, "genreCount": 5, "withDetail": 18 },
+  "palette": {
+    "headerGradient": ["#ebefff", "#f1eafe"],
+    "accent": "#2f6bff",
+    "activeChip": "#1f2430",
+    "background": "#f8fafc"
+  },
+  "genres": [
+    { "key": "ai", "emoji": "🤖", "name": "AI/生成AI", "fill": "#f1eafe", "text": "#9333ea", "count": 7 },
+    { "key": "cloud", "emoji": "☁️", "name": "クラウド/インフラ", "fill": "#eaf0ff", "text": "#2f6bff", "count": 4 },
+    { "key": "dev", "emoji": "🔧", "name": "開発/DevOps", "fill": "#e6f6ee", "text": "#15803d", "count": 3 },
+    { "key": "biz", "emoji": "📈", "name": "ビジネス/マーケ", "fill": "#fde8d7", "text": "#d9480f", "count": 3 },
+    { "key": "data", "emoji": "📊", "name": "データ/分析", "fill": "#e2f5fa", "text": "#0891b2", "count": 1 }
+  ],
+  "memos": [
+    { "topic": "TCO（総所有コスト）", "genre": "biz", "date": "2026-06-13", "note": "導入から廃棄までのライフサイクル全体でかかる総費用。初期費用＋運用・保守・人件費・廃棄まで含めて比較する考え方。" },
+    { "topic": "Kubernetes（K8s）", "genre": "cloud", "date": "2026-06-13", "note": "コンテナ化アプリのデプロイ・スケーリング・管理を自動化するOSS基盤。自動スケール・自己修復・ロールバックが強み。" },
+    { "topic": "データの民主化", "genre": "data", "date": "2026-06-13", "note": "社員全員がデータにアクセス・活用できる環境を整えること。「専門家だけのデータ」を誰もが使える状態に。AIの民主化のデータ版。" },
+    { "topic": "疎結合（Loose Coupling）", "genre": "dev", "date": "2026-06-13", "note": "コンポーネント同士の依存を最小化し独立性を高める設計原則。変更に強く、独立した開発・デプロイ・スケールがしやすい。" },
+    { "topic": "AIの民主化", "genre": "ai", "date": "2026-06-13", "note": "AIが「専門家だけのもの」から「誰でも使えるもの」へ開かれた状態。ノーコード・生成AIが加速。利便とリスクが両立。" },
+    { "topic": "DAP（デジタルアダプションプラットフォーム）", "genre": "biz", "date": "2026-06-13", "note": "ソフトの画面にガイドを重ねて表示し、ユーザーの「使いこなし（定着）」を促すツール。WalkMe・Pendo・Whatfixが代表。" },
+    { "topic": "CAC（顧客獲得コスト）", "genre": "biz", "date": "2026-06-13", "note": "新規顧客1人の獲得にかかった営業・マーケ費用。CAC=費用合計÷新規獲得顧客数。LTV÷CAC≧3が目安。" },
+    { "topic": "主要なPython AI/MLライブラリ（6選）", "genre": "ai", "date": "2026-06-13", "note": "NumPy(土台)→Pandas(データ)→Matplotlib(可視化)→scikit-learn(古典ML)→TensorFlow/PyTorch(深層学習)の層で把握。" },
+    { "topic": "AI開発に使われるプログラミング言語", "genre": "ai", "date": "2026-06-13", "note": "事実上の標準はPython（豊富なライブラリ＋書きやすさ）。用途に応じてR・Julia・C++・Java/Scala・JSが補完。" },
+    { "topic": "Harness Engineering（エージェントハーネス設計）", "genre": "ai", "date": "2026-06-13", "note": "AIエージェントの性能はモデル本体だけでなく「周り（ハーネス）」の設計で決まる。その足場を意図的に設計する分野。" },
+    { "topic": "代表的なLLMの種類と特徴", "genre": "ai", "date": "2026-06-13", "note": "開発元別の系列で把握：GPT(汎用/連携)・Claude(長文/コード/安全)・Gemini(マルチモーダル/長文脈)・Llama(オープン/自社運用)。用途で選ぶ時代。" },
+    { "topic": "ビジネスで生成AIを活用する際の意識点", "genre": "ai", "date": "2026-06-13", "note": "①情報セキュリティ ②著作権 ③ハルシネーション対策 ④目的設定と効果測定 ⑤組織・人の対応 ⑥活用の3方向性。" },
+    { "topic": "CI/CD（継続的インテグレーション／デリバリー）", "genre": "dev", "date": "2026-06-13", "note": "コード変更の統合・テスト・リリースを自動化。CI=頻繁な統合と自動テスト、CD=デプロイ自動化。品質と速度を両立。" },
+    { "topic": "IDE（統合開発環境）", "genre": "dev", "date": "2026-06-13", "note": "エディタ・ビルド・デバッグ・テスト等を一つに統合した開発環境。代表例：VS Code、IntelliJ IDEA、Xcode。" },
+    { "topic": "AWS Cloud Adoption Framework (CAF)", "genre": "cloud", "date": "2026-06-13", "note": "クラウド導入を6パースペクティブ（Business/People/Governance/Platform/Security/Operations）で整理する組織向けフレームワーク。" },
+    { "topic": "クラウドの種類", "genre": "cloud", "date": "2026-06-13", "note": "提供範囲＝IaaS/PaaS/SaaS、利用形態＝パブリック/プライベート/ハイブリッドの2軸で分類。" },
+    { "topic": "クラウドのシェアと役割", "genre": "cloud", "date": "2026-06-13", "note": "Synergy Q4 2025: AWS 28% / Azure 21% / Google 14%（上位3社 約63%）。役割＝即時調達・スケール・CapEx→OpEx・DX/AIの土台。" },
+    { "topic": "Claude Skills（Agent Skills）", "genre": "ai", "date": "2026-06-03", "note": "再利用可能な手順＋資源をフォルダ単位でまとめ、必要時にロードしてClaudeを専門家化する仕組み。導入時は中身を監査。" }
+  ]
+}
