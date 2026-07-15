@@ -183,12 +183,12 @@ function BackupBar() {
       onMouseLeave={() => setHovered(false)}
       style={{
         position: "fixed",
-        left: 12,
+        right: 12,
         bottom: 12,
         zIndex: 2147483000,
         display: "flex",
         flexDirection: "column",
-        alignItems: "flex-start",
+        alignItems: "flex-end",
         gap: 6,
         // 普段は半透明の小さなアイコンのみ。ホバー/展開時だけくっきり表示して邪魔にならないように。
         opacity: expanded || msg ? 1 : 0.35,
