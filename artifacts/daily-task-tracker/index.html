@@ -4,316 +4,150 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>デイリータスク トラッカー</title>
-<style>
-  :root {
-    --bg: #f8fafc; --card: #ffffff; --border: #e2e8f0; --text: #1e293b;
-    --muted: #64748b;
-    --navy: #1e3a8a;      /* 進捗バー・ヒートマップ記録済み（遅/済） */
-    --accent: #2563eb;    /* アクティブタブ・リンク */
-    --cowork: #1d4ed8;    /* Cowork task 見出し（青） */
-    --others: #6d28d9;    /* Others 見出し（紫） */
-    --green: #16a34a;     /* 完了ボタン */
-    --slate: #94a3b8;     /* ヒートマップ未着手 */
-    --tabbar: #e2e8f0;    /* タブバー地 */
-    --grouprow: #f1f5f9;  /* ヒートマップ グループ行 */
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; font-family: -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", "Noto Sans JP", Meiryo, sans-serif;
-    background: var(--bg); color: var(--text); line-height: 1.5;
-  }
-  .wrap { max-width: 1100px; margin: 0 auto; padding: 20px 16px 60px; }
-  header h1 { font-size: 1.5rem; margin: 0 0 4px; }
-  header p.lead { color: var(--muted); font-size: .85rem; margin: 0 0 16px; }
-  .banner {
-    background: #eff4ff; border: 1px solid #c7d7fe; color: #1e40af;
-    border-radius: 8px; padding: 8px 12px; font-size: .8rem; margin-bottom: 16px;
-  }
-  /* pill タブ（元アプリ再現） */
-  .tabs { display: inline-flex; gap: 4px; background: var(--tabbar); padding: 4px; border-radius: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-  .tab {
-    background: none; border: none; padding: 8px 18px; font-size: .9rem; cursor: pointer;
-    color: var(--muted); border-radius: 8px; font-weight: 700;
-  }
-  .tab.active { background: var(--card); color: var(--accent); box-shadow: 0 1px 3px rgba(15,23,42,.12); }
-  .monthnav { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-  .monthnav button { border: 1px solid var(--border); background: var(--card); border-radius: 6px; width: 32px; height: 32px; cursor: pointer; color: var(--muted); }
-  .monthnav .label { font-weight: 700; font-size: 1.05rem; }
-  .group-title { font-size: .8rem; letter-spacing: .02em; margin: 20px 0 10px; font-weight: 700; }
-  .group-title.cowork { color: var(--cowork); }
-  .group-title.others { color: var(--others); }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
-  .task-card {
-    background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; cursor: pointer;
-    transition: transform .08s, box-shadow .08s;
-  }
-  .task-card:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(15,23,42,.08); }
-  .task-card .name { font-weight: 700; font-size: .92rem; display: flex; justify-content: space-between; gap: 8px; }
-  .task-card .frac { color: var(--muted); font-weight: 600; font-size: .82rem; }
-  .bar { height: 6px; background: var(--border); border-radius: 3px; margin: 10px 0 8px; overflow: hidden; }
-  .bar > span { display: block; height: 100%; background: var(--navy); }
-  .counts { font-size: .75rem; display: flex; gap: 10px; }
-  .counts .c-done { color: #334155; font-weight: 700; }
-  .counts .c-late { color: var(--slate); font-weight: 600; }
-  .stamp { display: inline-block; margin-top: 8px; font-size: .72rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
-  .stamp.on { background: #e0e7ff; color: var(--navy); }
-  .stamp.off { background: #eef2f6; color: var(--muted); }
-
-  /* legend */
-  .legend { display: flex; flex-wrap: wrap; gap: 12px; margin: 18px 0; font-size: .75rem; color: var(--muted); }
-  .legend span { display: inline-flex; align-items: center; gap: 5px; }
-  .dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
-  .dot.done { background: var(--navy); box-shadow: inset 0 0 0 1.5px #fff, inset 0 0 0 2.5px var(--navy); }
-  .dot.late { background: var(--navy); }
-  .dot.pending { background: var(--slate); }
-  .dot.none { background: #eef2f6; border: 1px solid var(--border); }
-
-  /* heatmap（角丸タイル・元アプリ再現） */
-  .hm-wrap { overflow-x: auto; }
-  table.hm { border-collapse: separate; border-spacing: 4px; font-size: .7rem; }
-  table.hm th.rowh { text-align: left; padding: 4px 8px; white-space: nowrap; position: sticky; left: 0; background: var(--bg); z-index: 1; font-weight: 700; }
-  table.hm th.colh { padding: 4px 3px; color: var(--muted); font-weight: 700; min-width: 26px; }
-  table.hm td { width: 26px; height: 26px; cursor: pointer; text-align: center; border-radius: 6px; color: #fff; }
-  td.done, td.late { background: var(--navy); }
-  td.done { box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 3px var(--navy); }
-  td.pending { background: var(--slate); }
-  td.none { background: transparent; color: var(--slate); cursor: default; }
-  td.done::after { content: "済"; } td.late::after { content: "遅"; }
-  td.pending::after { content: "未"; } td.none::after { content: "–"; }
-  .grouprow td { background: var(--grouprow); font-weight: 700; text-align: left; padding: 4px 8px; border-radius: 6px; }
-  .grouprow td.cowork { color: var(--cowork); } .grouprow td.others { color: var(--others); }
-
-  /* calendar */
-  .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-  .cal .cell { background: var(--card); border: 1px solid var(--border); border-radius: 8px; min-height: 68px; padding: 6px; font-size: .72rem; }
-  .cal .cell.empty { background: transparent; border: none; }
-  .cal .dow { text-align: center; font-weight: 700; color: var(--muted); font-size: .75rem; padding: 4px 0; }
-  .cal .daynum { font-weight: 700; color: var(--muted); }
-  .cal .cell.today { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
-  .cal .pips { display: flex; flex-wrap: wrap; gap: 2px; margin-top: 4px; }
-  .cal .pip { width: 8px; height: 8px; border-radius: 2px; }
-  .cal .pip.done { background: var(--navy); } .cal .pip.late { background: #6366f1; } .cal .pip.pending { background: var(--slate); }
-
-  /* checklist */
-  .check-list { display: flex; flex-direction: column; gap: 8px; }
-  .check-row { display: flex; align-items: center; gap: 12px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; }
-  .check-row .cname { font-weight: 700; flex: 1; }
-  .check-row .day { color: var(--muted); font-size: .8rem; }
-  .btn { border: 1px solid var(--border); background: var(--card); border-radius: 6px; padding: 6px 12px; font-size: .8rem; cursor: pointer; font-weight: 700; }
-  .btn.done { background: var(--green); color: #fff; border-color: var(--green); }
-  footer { margin-top: 30px; font-size: .75rem; color: var(--muted); }
-  .reset { background: none; border: none; color: var(--accent); cursor: pointer; text-decoration: underline; font-size: .75rem; }
-</style>
 </head>
-<body>
-<div class="wrap">
-  <header>
-    <h1 id="title">デイリータスク トラッカー</h1>
-    <p class="lead">ダッシュボードで押印（完了/取消）、カレンダー／ヒートマップで俯瞰。押印状態はブラウザ内（localStorage）に保存されます。</p>
-  </header>
-  <div class="banner">
-    このアプリは Cowork のアーティファクトを Code 側に移設した<strong>単体版</strong>です。元アプリにあった <strong>Notion 双方向同期・Cowork チャット連携は無効</strong>で、押印はローカル保存のみです。
-  </div>
+<body style="margin:0">
+<style>
+#dtt{--bg:#f8fafc;--card:#fff;--border:#e2e8f0;--text:#1e293b;--muted:#64748b;--navy:#1e3a8a;--accent:#2563eb;--cowork:#1d4ed8;--others:#6d28d9;--green:#16a34a;--slate:#94a3b8;--tabbar:#e2e8f0;--grouprow:#f1f5f9;background:var(--bg);color:var(--text);font-family:-apple-system,"Segoe UI","Hiragino Kaku Gothic ProN","Noto Sans JP",Meiryo,sans-serif;line-height:1.5;min-height:100vh;}
+#dtt *{box-sizing:border-box;}
+#dtt .wrap{max-width:1100px;margin:0 auto;padding:24px 18px 60px;}
+#dtt h1{font-size:1.5rem;margin:0 0 4px;}
+#dtt p.lead{color:var(--muted);font-size:.85rem;margin:0 0 16px;}
+#dtt .banner{background:#eff4ff;border:1px solid #c7d7fe;color:#1e40af;border-radius:8px;padding:8px 12px;font-size:.8rem;margin-bottom:16px;}
+#dtt .tabs{display:inline-flex;gap:4px;background:var(--tabbar);padding:4px;border-radius:10px;margin-bottom:16px;flex-wrap:wrap;}
+#dtt .tab{background:none;border:none;padding:8px 18px;font-size:.9rem;cursor:pointer;color:var(--muted);border-radius:8px;font-weight:700;font-family:inherit;}
+#dtt .tab.active{background:var(--card);color:var(--accent);box-shadow:0 1px 3px rgba(15,23,42,.12);}
+#dtt .monthnav{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+#dtt .monthnav .label{font-weight:700;font-size:1.05rem;}
+#dtt .group-title{font-size:.8rem;margin:20px 0 10px;font-weight:700;display:flex;align-items:center;gap:8px;}
+#dtt .group-title.cowork{color:var(--cowork);}#dtt .group-title.others{color:var(--others);}
+#dtt .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;}
+#dtt .task-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;}
+#dtt .task-card .name{font-weight:700;font-size:.92rem;display:flex;justify-content:space-between;gap:8px;align-items:flex-start;}
+#dtt .frac{color:var(--muted);font-weight:600;font-size:.82rem;font-variant-numeric:tabular-nums;}
+#dtt .bar{height:6px;background:var(--border);border-radius:3px;margin:10px 0 8px;overflow:hidden;}
+#dtt .bar>span{display:block;height:100%;background:var(--navy);}
+#dtt .counts{font-size:.75rem;display:flex;gap:10px;font-variant-numeric:tabular-nums;}
+#dtt .c-done{color:#334155;font-weight:700;}#dtt .c-late{color:var(--slate);font-weight:600;}
+#dtt .cardfoot{display:flex;justify-content:space-between;align-items:center;margin-top:8px;}
+#dtt .stamp{display:inline-block;font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:999px;cursor:pointer;border:none;font-family:inherit;}
+#dtt .stamp.on{background:#e0e7ff;color:var(--navy);}#dtt .stamp.off{background:#eef2f6;color:var(--muted);}
+#dtt .legend{display:flex;flex-wrap:wrap;gap:12px;margin:18px 0;font-size:.75rem;color:var(--muted);}
+#dtt .legend span{display:inline-flex;align-items:center;gap:5px;}
+#dtt .dot{width:12px;height:12px;border-radius:3px;display:inline-block;}
+#dtt .dot.done{background:var(--navy);box-shadow:inset 0 0 0 1.5px #fff,inset 0 0 0 2.5px var(--navy);}
+#dtt .dot.late{background:var(--navy);}#dtt .dot.pending{background:var(--slate);}#dtt .dot.none{background:#eef2f6;border:1px solid var(--border);}
+#dtt .hm-wrap{overflow-x:auto;}
+#dtt table.hm{border-collapse:separate;border-spacing:4px;font-size:.7rem;}
+#dtt table.hm th.rowh{text-align:left;padding:4px 8px;white-space:nowrap;position:sticky;left:0;background:var(--bg);z-index:1;font-weight:700;}
+#dtt table.hm th.colh{padding:4px 3px;color:var(--muted);font-weight:700;min-width:26px;font-variant-numeric:tabular-nums;}
+#dtt table.hm td{width:26px;height:26px;cursor:pointer;text-align:center;border-radius:6px;color:#fff;}
+#dtt td.done,#dtt td.late{background:var(--navy);}
+#dtt td.done{box-shadow:inset 0 0 0 2px #fff,inset 0 0 0 3px var(--navy);}
+#dtt td.pending{background:var(--slate);}
+#dtt td.none{background:transparent;color:var(--slate);cursor:default;}
+#dtt td.done::after{content:"済";}#dtt td.late::after{content:"遅";}#dtt td.pending::after{content:"未";}#dtt td.none::after{content:"–";}
+#dtt .grouprow td{background:var(--grouprow);font-weight:700;text-align:left;padding:4px 8px;border-radius:6px;}
+#dtt .grouprow td.cowork{color:var(--cowork);}#dtt .grouprow td.others{color:var(--others);}
+#dtt .check-list{display:flex;flex-direction:column;gap:8px;}
+#dtt .check-row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 14px;}
+#dtt .check-row .cname{font-weight:700;flex:1;}#dtt .check-row .day{color:var(--muted);font-size:.8rem;}
+#dtt .btn{border:1px solid var(--border);background:var(--card);border-radius:6px;padding:6px 12px;font-size:.8rem;cursor:pointer;font-weight:700;font-family:inherit;}
+#dtt .btn.done{background:var(--green);color:#fff;border-color:var(--green);}
+#dtt footer{margin-top:30px;font-size:.75rem;color:var(--muted);}
+#dtt [hidden]{display:none;}
 
-  <div class="tabs">
-    <button class="tab active" data-tab="dashboard">ダッシュボード</button>
-    <button class="tab" data-tab="calendar">カレンダー</button>
-    <button class="tab" data-tab="heatmap">ヒートマップ</button>
-    <button class="tab" data-tab="checklist">チェック項目</button>
-  </div>
-
-  <div class="monthnav">
-    <button id="prevM">‹</button>
-    <span class="label" id="monthLabel"></span>
-    <button id="nextM">›</button>
-    <span style="color:var(--muted);font-size:.8rem;margin-left:8px" id="dayBadge"></span>
-  </div>
-
-  <div class="legend">
-    <span><i class="dot done"></i>済 / 完了</span>
-    <span><i class="dot late"></i>遅延</span>
-    <span><i class="dot pending"></i>未着手 / 未</span>
-    <span><i class="dot none"></i>未開始</span>
-  </div>
-
-  <section id="dashboard" class="pane"></section>
-  <section id="calendar" class="pane" hidden></section>
-  <section id="heatmap" class="pane" hidden></section>
-  <section id="checklist" class="pane" hidden></section>
-
-  <footer>
-    元データ: <code>data.json</code>（Cowork「Daily Task Tracker」PDFより抽出）·
-    <button class="reset" id="resetBtn">押印をリセット</button>
-  </footer>
+#dtt .editbar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px;}
+#dtt .ebtn{border:1px solid var(--border);background:var(--card);border-radius:8px;padding:8px 12px;font-size:.8rem;font-weight:700;cursor:pointer;color:var(--text);font-family:inherit;}
+#dtt .ebtn.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+#dtt .ebtn:hover{filter:brightness(.97);}
+#dtt .form{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:16px;display:none;}
+#dtt .form.open{display:block;}
+#dtt .form h3{margin:0 0 12px;font-size:.9rem;}
+#dtt .fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:12px;}
+#dtt .field label{display:block;font-size:.72rem;color:var(--muted);margin-bottom:4px;font-weight:700;}
+#dtt .field input,#dtt .field select,#dtt .field textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:.82rem;font-family:inherit;background:#fff;color:var(--text);}
+#dtt .field textarea{min-height:64px;resize:vertical;}
+#dtt .field input:focus,#dtt .field select:focus,#dtt .field textarea:focus{outline:2px solid var(--accent);outline-offset:1px;}
+#dtt .factions{display:flex;gap:8px;}
+#dtt .rowbtns{display:inline-flex;gap:6px;}
+#dtt .ib{border:1px solid var(--border);background:var(--card);border-radius:6px;padding:2px 8px;font-size:.72rem;cursor:pointer;color:var(--muted);font-family:inherit;}
+#dtt .ib:hover{color:var(--text);}
+</style>
+<div id="dtt"><div class="wrap">
+<header><h1>デイリータスク トラッカー</h1>
+<p class="lead">ダッシュボードで押印（完了/取消）、カレンダー／ヒートマップで俯瞰。タスクの追加・編集も可能。入力はブラウザ内（localStorage）に保存されます。</p></header>
+<div class="banner">Cowork のアーティファクトを Code 側に移設した<strong>編集可能な単体版</strong>です。元の <strong>Notion 同期・Cowork 連携は無効</strong>で、変更はローカル保存されます（JSONで書き出し／読み込み可）。</div>
+<div class="editbar">
+<button class="ebtn primary" id="dttAdd">＋ タスク追加</button>
+<button class="ebtn" id="dttExport">⬇ JSONエクスポート</button>
+<button class="ebtn" id="dttImport">⬆ JSONインポート</button>
+<button class="ebtn" id="dttReset">↺ 初期データに戻す</button>
 </div>
-
+<div class="form" id="dttForm"><h3 id="dttFormTitle">タスクを追加</h3>
+<div class="fgrid">
+<div class="field"><label>タスク名</label><input id="fName" placeholder="例: New quiz"></div>
+<div class="field"><label>グループ</label><select id="fGroup"><option value="Cowork task">Cowork task</option><option value="Others">Others</option></select></div>
+<div class="field"><label>合計(分母)</label><input id="fTotal" type="number" min="1" value="31"></div>
+<div class="field"><label>完了数</label><input id="fDone" type="number" min="0" value="0"></div>
+<div class="field"><label>遅延数</label><input id="fLate" type="number" min="0" value="0"></div>
+</div>
+<div class="factions"><button class="ebtn primary" id="fSave">保存</button><button class="ebtn" id="fCancel">キャンセル</button></div></div>
+<div class="tabs">
+<button class="tab active" data-tab="dashboard">ダッシュボード</button>
+<button class="tab" data-tab="calendar">カレンダー</button>
+<button class="tab" data-tab="heatmap">ヒートマップ</button>
+<button class="tab" data-tab="checklist">チェック項目</button>
+</div>
+<div class="monthnav"><span class="label" id="monthLabel"></span><span style="color:var(--muted);font-size:.8rem" id="dayBadge"></span></div>
+<div class="legend"><span><i class="dot done"></i>済 / 完了</span><span><i class="dot late"></i>遅延</span><span><i class="dot pending"></i>未着手 / 未</span><span><i class="dot none"></i>未開始</span></div>
+<section id="dashboard" class="pane"></section>
+<section id="calendar" class="pane" hidden></section>
+<section id="heatmap" class="pane" hidden></section>
+<section id="checklist" class="pane" hidden></section>
+<footer>元データ: Cowork「Daily Task Tracker」PDFより抽出。編集内容はこのブラウザに保存されます。</footer>
+</div></div>
 <script>
-/* ---- 埋め込みデータ（file:// で直接開けるよう data.json をインライン化） ---- */
-const DATA = {
-  title: "デイリータスク トラッカー",
-  month: "2026-07",
-  day: 45,
-  groups: [
-    { name: "Cowork task", type: "auto", tasks: [
-      { id:"thinking-frame", name:"Thinking Frame quiz", total:45, done:21, late:23 },
-      { id:"genai", name:"GenAI quiz", total:45, done:21, late:23 },
-      { id:"strategicfde", name:"StrategicFDE", total:32, done:1, late:30 },
-      { id:"c-gab", name:"C-GAB", total:32, done:1, late:30 },
-      { id:"bk-grade3", name:"BK Grade3", total:32, done:1, late:30 },
-      { id:"biz-ent-yt", name:"Biz-Ent YT", total:32, done:1, late:30 },
-      { id:"megatech-prep", name:"Megatech-Prep", total:32, done:0, late:31 },
-      { id:"side-job", name:"Side job", total:32, done:1, late:30 },
-      { id:"biz-skills", name:"Biz skills", total:32, done:0, late:31 },
-      { id:"note-yt", name:"note×YT", total:32, done:3, late:28 },
-      { id:"ai-dev-quiz", name:"AI dev quiz", total:32, done:1, late:30 },
-      { id:"ling-onto", name:"Ling/Onto quiz", total:28, done:2, late:25 }
-    ]},
-    { name: "Others", type: "manual", tasks: [
-      { id:"english-elza", name:"English (ELZA)", total:31, done:0, late:0 },
-      { id:"languages", name:"Languages", total:31, done:0, late:0 },
-      { id:"reading", name:"Reading", total:31, done:0, late:0 },
-      { id:"e-learning", name:"E-learning", total:31, done:0, late:0 },
-      { id:"certification", name:"Certification", total:31, done:0, late:0 },
-      { id:"hand-skills", name:"Hand-skills", total:31, done:0, late:0 },
-      { id:"gfs", name:"GFS", total:31, done:0, late:0 },
-      { id:"selfcare", name:"Selfcare", total:31, done:0, late:0 },
-      { id:"journaling", name:"Journaling", total:31, done:0, late:0 }
-    ]}
-  ]
-};
-const DATES = Array.from({length:15}, (_,i)=>`2026-07-${String(i+1).padStart(2,'0')}`);
-const BASE_HEATMAP = {};
-DATA.groups.forEach(g => g.tasks.forEach(t => {
-  BASE_HEATMAP[t.id] = DATES.map((d,i) => {
-    if (g.type === "manual") return "pending";
-    if (i === 14) return "pending";               // 7/15 未着手
-    if (t.id === "note-yt" && (i===7 || i===11)) return "done"; // 7/8, 7/12 済
-    return "late";
-  });
-}));
+(function(){
 
-/* ---- ローカル押印ストア ---- */
-const LS_KEY = "daily-task-tracker.stamps.v1";
-function loadStamps(){ try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch { return {}; } }
-function saveStamps(s){ localStorage.setItem(LS_KEY, JSON.stringify(s)); }
-let stamps = loadStamps();          // { "taskId|date": "done" }
-function cellStatus(taskId, dateIdx){
-  const key = taskId + "|" + DATES[dateIdx];
-  if (key in stamps) return stamps[key];
-  return BASE_HEATMAP[taskId][dateIdx];
-}
-function toggleCell(taskId, dateIdx){
-  const key = taskId + "|" + DATES[dateIdx];
-  const cur = cellStatus(taskId, dateIdx);
-  stamps[key] = (cur === "done") ? (BASE_HEATMAP[taskId][dateIdx] === "done" ? "late" : BASE_HEATMAP[taskId][dateIdx]) : "done";
-  saveStamps(stamps); renderAll();
-}
-
-/* ---- レンダリング ---- */
-const allTasks = DATA.groups.flatMap(g => g.tasks.map(t => ({...t, group:g.name, type:g.type})));
-function liveDone(t){
-  let d = 0;
-  BASE_HEATMAP[t.id].forEach((_,i)=>{ if (cellStatus(t.id,i)==="done") d++; });
-  const baseDoneInWindow = BASE_HEATMAP[t.id].filter(s=>s==="done").length;
-  return t.done - baseDoneInWindow + d;
-}
-
-function renderDashboard(){
-  const el = document.getElementById("dashboard");
-  el.innerHTML = DATA.groups.map(g => `
-    <div class="group-title ${g.type==="auto"?"cowork":"others"}">${g.name}${g.type==="auto"?" · 自動生成":" · 手動記録"}</div>
-    <div class="grid">
-      ${g.tasks.map(t => {
-        const done = liveDone(t);
-        const pct = t.total ? Math.round(done/t.total*100) : 0;
-        const todayStatus = cellStatus(t.id, 14);
-        return `<div class="task-card" data-toggle="${t.id}">
-          <div class="name"><span>${t.name}</span><span class="frac">${done}/${t.total}</span></div>
-          <div class="bar"><span style="width:${pct}%"></span></div>
-          <div class="counts"><span class="c-done">完了 ${done}</span><span class="c-late">遅延 ${t.late}</span></div>
-          <span class="stamp ${todayStatus==="done"?"on":"off"}">${todayStatus==="done"?"✓ 今日 完了":"今日 押印する"}</span>
-        </div>`;
-      }).join("")}
-    </div>`).join("");
-  el.querySelectorAll("[data-toggle]").forEach(c =>
-    c.addEventListener("click", () => toggleCell(c.dataset.toggle, 14)));
-}
-
-function renderHeatmap(){
-  const el = document.getElementById("heatmap");
-  const head = `<tr><th class="rowh">タスク \\ 日付</th>${DATES.map(d=>`<th class="colh">${d.slice(5).replace('-','/')}</th>`).join("")}</tr>`;
-  const body = DATA.groups.map(g => {
-    const cls = g.type==="auto"?"cowork":"others";
-    const grp = `<tr class="grouprow"><td class="${cls}">${g.name}</td><td colspan="${DATES.length}"></td></tr>`;
-    const rows = g.tasks.map(t => `<tr><th class="rowh">${t.name}</th>${
-      DATES.map((_,i)=>{ const s=cellStatus(t.id,i); return `<td class="${s}" data-t="${t.id}" data-i="${i}"></td>`; }).join("")
-    }</tr>`).join("");
-    return grp + rows;
-  }).join("");
-  el.innerHTML = `<div class="hm-wrap"><table class="hm">${head}${body}</table></div>`;
-  el.querySelectorAll("td[data-t]").forEach(td =>
-    td.addEventListener("click", ()=> toggleCell(td.dataset.t, +td.dataset.i)));
-}
-
-function renderCalendar(){
-  const el = document.getElementById("calendar");
-  const dows = ["日","月","火","水","木","金","土"];
-  const firstDow = new Date(2026,6,1).getDay();
-  const daysInMonth = 31;
-  let cells = dows.map(d=>`<div class="dow">${d}</div>`).join("");
-  for (let i=0;i<firstDow;i++) cells += `<div class="cell empty"></div>`;
-  for (let day=1; day<=daysInMonth; day++){
-    const idx = day-1;
-    let pips = "";
-    if (idx < DATES.length){
-      const statuses = allTasks.map(t => cellStatus(t.id, idx));
-      const done = statuses.filter(s=>s==="done").length;
-      const late = statuses.filter(s=>s==="late").length;
-      const pend = statuses.filter(s=>s==="pending").length;
-      pips = `<div class="pips">`+
-        (done?`<span class="pip done" title="完了 ${done}"></span>`:"")+
-        (late?`<span class="pip late" title="遅延 ${late}"></span>`:"")+
-        (pend?`<span class="pip pending" title="未 ${pend}"></span>`:"")+`</div>`;
-    }
-    const today = day===15 ? " today" : "";
-    cells += `<div class="cell${today}"><div class="daynum">${day}</div>${pips}</div>`;
-  }
-  el.innerHTML = `<div class="cal">${cells}</div>`;
-}
-
-function renderChecklist(){
-  const el = document.getElementById("checklist");
-  el.innerHTML = `<div class="group-title cowork">✅ 今日（Day ${DATA.day}）解いた問題をタップで完了にする</div>
-    <div class="check-list">${
-      DATA.groups[0].tasks.map(t => {
-        const on = cellStatus(t.id,14)==="done";
-        return `<div class="check-row">
-          <span class="cname">${t.name}</span>
-          <span class="day">Day ${DATA.day} · ${on?"完了":"未着手"}</span>
-          <button class="btn ${on?"done":""}" data-check="${t.id}">${on?"✓ 完了":"✓ 完了にする"}</button>
-        </div>`;
-      }).join("")
-    }</div>`;
-  el.querySelectorAll("[data-check]").forEach(b =>
-    b.addEventListener("click", ()=> toggleCell(b.dataset.check, 14)));
-}
-
-function renderAll(){ renderDashboard(); renderHeatmap(); renderCalendar(); renderChecklist(); }
-
-/* ---- タブ切替・ヘッダ ---- */
-document.querySelectorAll(".tab").forEach(tab => tab.addEventListener("click", () => {
-  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-  tab.classList.add("active");
-  document.querySelectorAll(".pane").forEach(p=>p.hidden = (p.id !== tab.dataset.tab));
-}));
-document.getElementById("monthLabel").textContent = "2026年 7月";
-document.getElementById("dayBadge").textContent = `Day ${DATA.day} · 表示範囲 7/1–7/15`;
-document.getElementById("prevM").addEventListener("click", ()=>alert("この単体版は 2026年7月 のスナップショットのみ収録しています。"));
-document.getElementById("nextM").addEventListener("click", ()=>alert("この単体版は 2026年7月 のスナップショットのみ収録しています。"));
-document.getElementById("resetBtn").addEventListener("click", ()=>{
-  if(confirm("ローカルの押印をすべてリセットしますか？")){ stamps={}; saveStamps(stamps); renderAll(); }
-});
+function _exportJSON(fname,obj){var blob=new Blob([JSON.stringify(obj,null,2)],{type:"application/json"});var url=URL.createObjectURL(blob);var a=document.createElement("a");a.href=url;a.download=fname;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1000);}
+function _importJSON(cb){var inp=document.createElement("input");inp.type="file";inp.accept=".json,application/json";inp.onchange=function(){var f=inp.files&&inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{cb(JSON.parse(r.result));}catch(e){alert("JSONの読み込みに失敗しました: "+e.message);}};r.readAsText(f);};inp.click();}
+function _uid(){return "x"+Date.now().toString(36)+Math.floor(Math.random()*1e6).toString(36);}
+const BASE={"day": 45, "dates": ["2026-07-01", "2026-07-02", "2026-07-03", "2026-07-04", "2026-07-05", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-11", "2026-07-12", "2026-07-13", "2026-07-14", "2026-07-15"], "groups": [{"name": "Cowork task", "type": "auto", "tasks": [{"id": "thinking-frame", "name": "Thinking Frame quiz", "total": 45, "done": 21, "late": 23, "cells": ["late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "pending"]}, {"id": "genai", "name": "GenAI quiz", "total": 45, "done": 21, "late": 23, "cells": ["late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "pending"]}, {"id": "strategicfde", "name": "StrategicFDE", "total": 32, "done": 1, "late": 30, "cells": ["late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "pending"]}, {"id": "c-gab", "name": "C-GAB", "total": 32, "done": 1, "late": 30, "cells": ["late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "pending"]}, {"id": "bk-grade3", "name": "BK Grade3", "total": 32, "done": 1, "late": 30, "cells": ["late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "pending"]}, {"id": "biz-ent-yt", "name": "Biz-Ent YT", "total": 32, "done": 1, "late": 30, "cells": ["late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "pending"]}, {"id": "megatech-prep", "name": "Megatech-Prep", "total": 32, "done": 0, "late": 31, "cells": ["late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "pending"]}, {"id": "side-job", "name": "Side job", "total": 32, "done": 1, "late": 30, "cells": ["late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "pending"]}, {"id": "biz-skills", "name": "Biz skills", "total": 32, "done": 0, "late": 31, "cells": ["late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "pending"]}, {"id": "note-yt", "name": "note×YT", "total": 32, "done": 3, "late": 28, "cells": ["late", "late", "late", "late", "late", "late", "late", "done", "late", "late", "late", "done", "late", "late", "pending"]}, {"id": "ai-dev-quiz", "name": "AI dev quiz", "total": 32, "done": 1, "late": 30, "cells": ["late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "pending"]}, {"id": "ling-onto", "name": "Ling/Onto quiz", "total": 28, "done": 2, "late": 25, "cells": ["late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "late", "pending"]}]}, {"name": "Others", "type": "manual", "tasks": [{"id": "english-elza", "name": "English (ELZA)", "total": 31, "done": 0, "late": 0, "cells": ["pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending"]}, {"id": "languages", "name": "Languages", "total": 31, "done": 0, "late": 0, "cells": ["pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending"]}, {"id": "reading", "name": "Reading", "total": 31, "done": 0, "late": 0, "cells": ["pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending"]}, {"id": "e-learning", "name": "E-learning", "total": 31, "done": 0, "late": 0, "cells": ["pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending"]}, {"id": "certification", "name": "Certification", "total": 31, "done": 0, "late": 0, "cells": ["pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending"]}, {"id": "hand-skills", "name": "Hand-skills", "total": 31, "done": 0, "late": 0, "cells": ["pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending"]}, {"id": "gfs", "name": "GFS", "total": 31, "done": 0, "late": 0, "cells": ["pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending"]}, {"id": "selfcare", "name": "Selfcare", "total": 31, "done": 0, "late": 0, "cells": ["pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending"]}, {"id": "journaling", "name": "Journaling", "total": 31, "done": 0, "late": 0, "cells": ["pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending"]}]}]};
+const LS="daily-task-tracker.data.v2";
+function clone(o){return JSON.parse(JSON.stringify(o));}
+function load(){try{var s=JSON.parse(localStorage.getItem(LS));if(s&&s.groups)return s;}catch(e){}return clone(BASE);}
+function save(){try{localStorage.setItem(LS,JSON.stringify(D));}catch(e){}}
+var D=load();
+var DATES=D.dates,TODAY=DATES.length-1;
+var $=function(id){return document.getElementById(id);};
+function allTasks(){return D.groups.flatMap(function(g){return g.tasks.map(function(t){return Object.assign({group:g.name,type:g.type},t);});});}
+function liveDone(t){return t.done+((t.cells[TODAY]==="done")?1:0);}
+function toggleCell(gid,tid,i){var t=findTask(tid);if(!t)return;var cur=t.cells[i];t.cells[i]=(cur==="done")?"pending":"done";save();renderAll();}
+function findTask(tid){for(var gi=0;gi<D.groups.length;gi++){var g=D.groups[gi];for(var ti=0;ti<g.tasks.length;ti++){if(g.tasks[ti].id===tid)return g.tasks[ti];}}return null;}
+function renderDashboard(){$("dashboard").innerHTML=D.groups.map(function(g){return '<div class="group-title '+(g.type==="auto"?"cowork":"others")+'">'+g.name+(g.type==="auto"?" · 自動生成":" · 手動記録")+'</div><div class="grid">'+g.tasks.map(function(t){var done=liveDone(t);var pct=t.total?Math.round(done/t.total*100):0;var on=t.cells[TODAY]==="done";return '<div class="task-card"><div class="name"><span>'+esc(t.name)+'</span><span class="frac">'+done+"/"+t.total+'</span></div><div class="bar"><span style="width:'+pct+'%"></span></div><div class="counts"><span class="c-done">完了 '+done+'</span><span class="c-late">遅延 '+t.late+'</span></div><div class="cardfoot"><button class="stamp '+(on?"on":"off")+'" data-toggle="'+t.id+'">'+(on?"✓ 今日 完了":"今日 押印する")+'</button><span class="rowbtns"><button class="ib" data-edit="'+t.id+'">✎</button><button class="ib" data-del="'+t.id+'">✕</button></span></div></div>';}).join("")+"</div>";}).join("");
+$("dashboard").querySelectorAll("[data-toggle]").forEach(function(b){b.onclick=function(){toggleCell(null,b.dataset.toggle,TODAY);};});
+$("dashboard").querySelectorAll("[data-edit]").forEach(function(b){b.onclick=function(){openEdit(b.dataset.edit);};});
+$("dashboard").querySelectorAll("[data-del]").forEach(function(b){b.onclick=function(){delTask(b.dataset.del);};});}
+function renderHeatmap(){var head='<tr><th class="rowh">タスク \\ 日付</th>'+DATES.map(function(d){return '<th class="colh">'+d.slice(5).replace("-","/")+"</th>";}).join("")+"</tr>";var body=D.groups.map(function(g){var cls=g.type==="auto"?"cowork":"others";var grp='<tr class="grouprow"><td class="'+cls+'">'+g.name+'</td><td colspan="'+DATES.length+'"></td></tr>';var rows=g.tasks.map(function(t){return '<tr><th class="rowh">'+esc(t.name)+"</th>"+t.cells.map(function(s,i){return '<td class="'+s+'" data-t="'+t.id+'" data-i="'+i+'"></td>';}).join("")+"</tr>";}).join("");return grp+rows;}).join("");$("heatmap").innerHTML='<div class="hm-wrap"><table class="hm">'+head+body+"</table></div>";$("heatmap").querySelectorAll("td[data-t]").forEach(function(td){td.onclick=function(){toggleCell(null,td.dataset.t,+td.dataset.i);};});}
+function renderCalendar(){var dows=["日","月","火","水","木","金","土"];var firstDow=new Date(2026,6,1).getDay();var cellsH=dows.map(function(d){return '<div class="dow">'+d+"</div>";}).join("");for(var i=0;i<firstDow;i++)cellsH+='<div class="cell empty"></div>';var A=allTasks();for(var day=1;day<=31;day++){var idx=day-1;var pips="";if(idx<DATES.length){var s=A.map(function(t){return t.cells[idx];});var dn=s.filter(function(x){return x==="done";}).length,lt=s.filter(function(x){return x==="late";}).length,pd=s.filter(function(x){return x==="pending";}).length;pips='<div class="pips">'+(dn?'<span class="pip done"></span>':"")+(lt?'<span class="pip late"></span>':"")+(pd?'<span class="pip pending"></span>':"")+"</div>";}cellsH+='<div class="cell'+(day===15?" today":"")+'"><div class="daynum">'+day+"</div>"+pips+"</div>";}$("calendar").innerHTML='<div class="cal">'+cellsH+"</div>";}
+function renderChecklist(){var g=D.groups[0];$("checklist").innerHTML='<div class="group-title cowork">✅ 今日（Day '+D.day+'）解いた問題をタップで完了にする</div><div class="check-list">'+g.tasks.map(function(t){var on=t.cells[TODAY]==="done";return '<div class="check-row"><span class="cname">'+esc(t.name)+'</span><span class="day">Day '+D.day+" · "+(on?"完了":"未着手")+'</span><button class="btn '+(on?"done":"")+'" data-check="'+t.id+'">'+(on?"✓ 完了":"✓ 完了にする")+"</button></div>";}).join("")+"</div>";$("checklist").querySelectorAll("[data-check]").forEach(function(b){b.onclick=function(){toggleCell(null,b.dataset.check,TODAY);};});}
+function esc(t){return String(t).replace(/[&<>]/g,function(m){return{"&":"&amp;","<":"&lt;",">":"&gt;"}[m];});}
+function renderAll(){renderDashboard();renderHeatmap();renderCalendar();renderChecklist();}
+// form
+var editing=null;
+function openAdd(){editing=null;$("dttFormTitle").textContent="タスクを追加";$("fName").value="";$("fGroup").value="Cowork task";$("fTotal").value="31";$("fDone").value="0";$("fLate").value="0";$("dttForm").classList.add("open");}
+function openEdit(tid){var t=findTask(tid);if(!t)return;editing=tid;$("dttFormTitle").textContent="タスクを編集";$("fName").value=t.name;var grp=D.groups.find(function(g){return g.tasks.indexOf(t)>=0;});$("fGroup").value=grp.name;$("fTotal").value=t.total;$("fDone").value=t.done;$("fLate").value=t.late;$("dttForm").classList.add("open");}
+function closeForm(){$("dttForm").classList.remove("open");}
+function saveForm(){var name=$("fName").value.trim();if(!name){alert("タスク名を入力してください");return;}var total=Math.max(1,+$("fTotal").value||1),done=Math.max(0,+$("fDone").value||0),late=Math.max(0,+$("fLate").value||0);var gname=$("fGroup").value;if(editing){var t=findTask(editing);t.name=name;t.total=total;t.done=done;t.late=late;var curg=D.groups.find(function(g){return g.tasks.indexOf(t)>=0;});if(curg.name!==gname){curg.tasks=curg.tasks.filter(function(x){return x!==t;});D.groups.find(function(g){return g.name===gname;}).tasks.push(t);}}else{var g=D.groups.find(function(x){return x.name===gname;});g.tasks.push({id:_uid(),name:name,total:total,done:done,late:late,cells:DATES.map(function(){return "pending";})});}save();closeForm();renderAll();}
+function delTask(tid){var t=findTask(tid);if(!t)return;if(!confirm("「"+t.name+"」を削除しますか？"))return;D.groups.forEach(function(g){g.tasks=g.tasks.filter(function(x){return x.id!==tid;});});save();renderAll();}
+document.querySelectorAll("#dtt .tab").forEach(function(tab){tab.onclick=function(){document.querySelectorAll("#dtt .tab").forEach(function(t){t.classList.remove("active");});tab.classList.add("active");document.querySelectorAll("#dtt .pane").forEach(function(p){p.hidden=(p.id!==tab.dataset.tab);});};});
+$("monthLabel").textContent="2026年 7月";$("dayBadge").textContent="Day "+D.day+" · 表示範囲 7/1–7/"+DATES.length;
+$("dttAdd").onclick=openAdd;$("fSave").onclick=saveForm;$("fCancel").onclick=closeForm;
+$("dttExport").onclick=function(){_exportJSON("daily-task-tracker-data.json",D);};
+$("dttImport").onclick=function(){_importJSON(function(obj){if(!obj.groups){alert("形式が不正です");return;}D=obj;DATES=D.dates;TODAY=DATES.length-1;save();renderAll();});};
+$("dttReset").onclick=function(){if(confirm("編集内容を破棄して初期データに戻しますか？")){D=clone(BASE);DATES=D.dates;TODAY=DATES.length-1;save();renderAll();}};
 renderAll();
+})();
 </script>
 </body>
 </html>
