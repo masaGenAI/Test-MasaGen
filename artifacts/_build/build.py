@@ -341,7 +341,12 @@ refreshGenreOptions(); render();
 def main() -> None:
     entries = load_entries()
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(build_html(entries), encoding="utf-8")
+    full = build_html(entries)
+    OUT.write_text(full, encoding="utf-8")
+
+    # Artifact 公開用の本文のみ版（doctype/html/head/body を除去。Artifact 側で包まれる）
+    body = full[full.index("<style>") : full.rindex("</script>") + len("</script>")]
+    (BUILD_DIR / "publish.html").write_text(body + "\n", encoding="utf-8")
 
     by_cat = Counter(e["cat"] for e in entries)
     done = Counter(e["cat"] for e in entries if e["status"] in DONE)
