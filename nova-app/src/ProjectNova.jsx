@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback, useContext, createContext } from "react";
 import { Waves, Clock3, Users, Brain, Cpu, BookOpen, Layers, ChevronRight, ArrowLeft, Check, Circle, X, Star, Sun, Moon, Globe, RotateCcw } from "lucide-react";
+// 完成版 Book-Summary ハブ（971冊・検索・クイズ・メモ付き）を素の文字列として取り込み、
+// 実行時に Blob URL 化して iframe に読み込む（単一ファイルでもスクリプトが実行される）。
+import BOOK_SUMMARY_HTML from "../public/booksummaryhub.html?raw";
 
 /* ============================================================
  * Project-Nova : 統合戦略ポータル
@@ -152297,15 +152300,24 @@ function QuizPanel({lang,t,voiceURI}){
 // srcDoc の iframe は親ページと同一オリジンで動くため localStorage を共有し、進捗も残る。
 const BookSummaryModule = (function () {
   function BookSummaryModule() {
-    // 完成版 Book-Summary ハブ（独自テーマ/検索/クイズ/メモ/localStorage永続化/履歴ナビ）は
-    // public/booksummaryhub.html として別ファイルで配置し、実URLの iframe src で読み込む。
-    // srcDoc だと「親のロード後に注入」する形になり大容量インラインスクリプトが実行されず、
-    // さらに不透明オリジンで history API が例外を投げるため、実URL(src)方式が確実。
-    // 同一オリジン配信（dev/ホスティング）なら localStorage 共有・履歴も完全に機能する。
+    // 完成版 Book-Summary ハブ（971冊・検索・クイズ・メモ・ダークモード・履歴ナビ）を、
+    // 実行時に Blob URL 化して iframe で読み込む。これにより単一HTMLファイルのままでも
+    // 大容量インラインスクリプトが確実に実行され、履歴ナビ(#/route)も正しく動作する。
+    // ※ file:// でダブルクリック起動時、Blob は不透明オリジンのため Book-Summary の
+    //    進捗保存(localStorage)はセッション内のみ。恒久保存したい場合は http(s) 配信推奨。
+    const ref = useRef(null);
+    useEffect(() => {
+      const iframe = ref.current;
+      if (!iframe) return;
+      const blob = new Blob([BOOK_SUMMARY_HTML], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      iframe.src = url;
+      return () => URL.revokeObjectURL(url);
+    }, []);
     return (
       <iframe
+        ref={ref}
         title="Book Summary 統合戦略ハブ"
-        src="booksummaryhub.html"
         style={{ width: "100%", height: "calc(100vh - 46px)", border: "none", display: "block" }}
       />
     );
