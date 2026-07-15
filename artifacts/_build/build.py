@@ -216,6 +216,8 @@ a.name:hover {{ text-decoration:underline; }}
 .st.done::before {{ background:var(--done); }}
 .st.wip::before {{ background:var(--wip); }}
 .st.todo::before {{ background:var(--todo); }}
+tr.is-done td {{ opacity:.5; }}
+tr.is-done a.name {{ color:var(--sub); }}
 .foot {{ text-align:center; color:var(--sub); font-size:.75rem; margin-top:22px; }}
 </style>
 </head>
@@ -306,7 +308,8 @@ function render(){{
     const nameCell = e.url
       ? `<a class="name" href="${{esc(e.url)}}" target="_blank" rel="noopener">${{esc(e.name)}}</a>`
       : `<span class="name plain">${{esc(e.name)}}</span>`;
-    html+=`<tr><td class="no">${{n}}</td>`+
+    const cls = stClass(e.status)==="done" ? ' class="is-done"' : '';
+    html+=`<tr${{cls}}><td class="no">${{n}}</td>`+
       `<td><span class="badge">${{esc(e.cat)}}</span></td>`+
       `<td class="prov">${{esc(e.prov||"—")}}</td>`+
       `<td>${{nameCell}}</td>`+
