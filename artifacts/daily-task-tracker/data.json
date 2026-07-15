@@ -1,0 +1,81 @@
+{
+  "title": "デイリータスク トラッカー",
+  "source": "Cowork artifact: Daily Task Tracker",
+  "capturedFrom": "24223ac6-dailytasktracker.pdf",
+  "month": "2026-07",
+  "day": 45,
+  "legend": {
+    "done": "済 / 完了",
+    "late": "遅延",
+    "pending": "未着手 / 未",
+    "none": "未開始"
+  },
+  "groups": [
+    {
+      "name": "Cowork task",
+      "type": "auto",
+      "note": "自動生成（元アプリではNotionから取得）",
+      "tasks": [
+        { "id": "thinking-frame", "name": "Thinking Frame quiz", "short": "T", "total": 45, "done": 21, "late": 23 },
+        { "id": "genai", "name": "GenAI quiz", "short": "G", "total": 45, "done": 21, "late": 23 },
+        { "id": "strategicfde", "name": "StrategicFDE", "short": "C", "total": 32, "done": 1, "late": 30 },
+        { "id": "c-gab", "name": "C-GAB", "short": "A", "total": 32, "done": 1, "late": 30 },
+        { "id": "bk-grade3", "name": "BK Grade3", "short": "B", "total": 32, "done": 1, "late": 30 },
+        { "id": "biz-ent-yt", "name": "Biz-Ent YT", "short": "BE", "total": 32, "done": 1, "late": 30 },
+        { "id": "megatech-prep", "name": "Megatech-Prep", "short": "MT", "total": 32, "done": 0, "late": 31 },
+        { "id": "side-job", "name": "Side job", "short": "SJ", "total": 32, "done": 1, "late": 30 },
+        { "id": "biz-skills", "name": "Biz skills", "short": "BS", "total": 32, "done": 0, "late": 31 },
+        { "id": "note-yt", "name": "note×YT", "short": "NY", "total": 32, "done": 3, "late": 28 },
+        { "id": "ai-dev-quiz", "name": "AI dev quiz", "short": "AD", "total": 32, "done": 1, "late": 30 },
+        { "id": "ling-onto", "name": "Ling/Onto quiz", "short": "LO", "total": 28, "done": 2, "late": 25 }
+      ]
+    },
+    {
+      "name": "Others",
+      "type": "manual",
+      "note": "手動記録",
+      "tasks": [
+        { "id": "english-elza", "name": "English (ELZA)", "short": "E", "total": 31, "done": 0, "late": 0 },
+        { "id": "languages", "name": "Languages", "short": "L", "total": 31, "done": 0, "late": 0 },
+        { "id": "reading", "name": "Reading", "short": "R", "total": 31, "done": 0, "late": 0 },
+        { "id": "e-learning", "name": "E-learning", "short": "EL", "total": 31, "done": 0, "late": 0 },
+        { "id": "certification", "name": "Certification", "short": "CT", "total": 31, "done": 0, "late": 0 },
+        { "id": "hand-skills", "name": "Hand-skills", "short": "H", "total": 31, "done": 0, "late": 0 },
+        { "id": "gfs", "name": "GFS", "short": "GF", "total": 31, "done": 0, "late": 0 },
+        { "id": "selfcare", "name": "Selfcare", "short": "S", "total": 31, "done": 0, "late": 0 },
+        { "id": "journaling", "name": "Journaling", "short": "J", "total": 31, "done": 0, "late": 0 }
+      ]
+    }
+  ],
+  "heatmap": {
+    "dates": [
+      "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-04", "2026-07-05",
+      "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10",
+      "2026-07-11", "2026-07-12", "2026-07-13", "2026-07-14", "2026-07-15"
+    ],
+    "legend": { "済": "done", "遅": "late", "未": "pending", "–": "none" },
+    "cells": {
+      "thinking-frame": ["late","late","late","late","late","late","late","late","late","late","late","late","late","late","pending"],
+      "genai":          ["late","late","late","late","late","late","late","late","late","late","late","late","late","late","pending"],
+      "strategicfde":   ["late","late","late","late","late","late","late","late","late","late","late","late","late","late","pending"],
+      "c-gab":          ["late","late","late","late","late","late","late","late","late","late","late","late","late","late","pending"],
+      "bk-grade3":      ["late","late","late","late","late","late","late","late","late","late","late","late","late","late","pending"],
+      "biz-ent-yt":     ["late","late","late","late","late","late","late","late","late","late","late","late","late","late","pending"],
+      "megatech-prep":  ["late","late","late","late","late","late","late","late","late","late","late","late","late","late","pending"],
+      "side-job":       ["late","late","late","late","late","late","late","late","late","late","late","late","late","late","pending"],
+      "biz-skills":     ["late","late","late","late","late","late","late","late","late","late","late","late","late","late","pending"],
+      "note-yt":        ["late","late","late","late","late","late","late","done","late","late","late","done","late","late","pending"],
+      "ai-dev-quiz":    ["late","late","late","late","late","late","late","late","late","late","late","late","late","late","pending"],
+      "ling-onto":      ["late","late","late","late","late","late","late","late","late","late","late","late","late","late","pending"],
+      "english-elza":   ["pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending"],
+      "languages":      ["pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending"],
+      "reading":        ["pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending"],
+      "e-learning":     ["pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending"],
+      "certification":  ["pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending"],
+      "hand-skills":    ["pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending"],
+      "gfs":            ["pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending"],
+      "selfcare":       ["pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending"],
+      "journaling":     ["pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending","pending"]
+    }
+  }
+}
