@@ -1,0 +1,53 @@
+{
+  "title": "デイリータスク トラッカー",
+  "description": "ダッシュボードで押印（完了/取消）、カレンダー／ヒートマップで俯瞰。各タスクの問題はCoworkのチャットで開けます。Notionと双方向同期。",
+  "month": "2026-07",
+  "today": "2026-07-15",
+  "dayNumber": 45,
+  "notionUrl": "https://app.notion.com/p/37300274f9f181458feafc20622b3e98",
+  "legend": [
+    { "key": "done", "label": "完了", "mark": "済" },
+    { "key": "delayed", "label": "遅延", "mark": "遅" },
+    { "key": "todo", "label": "未着手", "mark": "未" },
+    { "key": "future", "label": "未開始", "mark": "–" }
+  ],
+  "groups": [
+    {
+      "name": "Cowork task",
+      "kind": "auto",
+      "kindLabel": "自動生成",
+      "dailyDefault": "delayed",
+      "tasks": [
+        { "key": "T",  "name": "Thinking Frame quiz", "done": 21, "total": 45, "delayed": 23, "overrides": {} },
+        { "key": "G",  "name": "GenAI quiz",           "done": 21, "total": 45, "delayed": 23, "overrides": {} },
+        { "key": "C",  "name": "StrategicFDE",         "done": 1,  "total": 32, "delayed": 30, "overrides": {} },
+        { "key": "A",  "name": "C-GAB",                "done": 1,  "total": 32, "delayed": 30, "overrides": {} },
+        { "key": "B",  "name": "BK Grade3",            "done": 1,  "total": 32, "delayed": 30, "overrides": {} },
+        { "key": "BE", "name": "Biz-Ent YT",           "done": 1,  "total": 32, "delayed": 30, "overrides": {} },
+        { "key": "MT", "name": "Megatech-Prep",        "done": 0,  "total": 32, "delayed": 31, "overrides": {} },
+        { "key": "SJ", "name": "Side job",             "done": 1,  "total": 32, "delayed": 30, "overrides": {} },
+        { "key": "BS", "name": "Biz skills",           "done": 0,  "total": 32, "delayed": 31, "overrides": {} },
+        { "key": "NY", "name": "note×YT",              "done": 3,  "total": 32, "delayed": 28, "overrides": { "2026-07-08": "done", "2026-07-12": "done" } },
+        { "key": "AD", "name": "AI dev quiz",          "done": 1,  "total": 32, "delayed": 30, "overrides": {} },
+        { "key": "LO", "name": "Ling/Onto quiz",       "done": 2,  "total": 28, "delayed": 25, "overrides": {} }
+      ]
+    },
+    {
+      "name": "Others",
+      "kind": "manual",
+      "kindLabel": "手動記録",
+      "dailyDefault": "todo",
+      "tasks": [
+        { "key": "E",  "name": "English (ELZA)", "done": 0, "total": 31, "delayed": 0, "overrides": {} },
+        { "key": "L",  "name": "Languages",      "done": 0, "total": 31, "delayed": 0, "overrides": {} },
+        { "key": "R",  "name": "Reading",        "done": 0, "total": 31, "delayed": 0, "overrides": {} },
+        { "key": "EL", "name": "E-learning",     "done": 0, "total": 31, "delayed": 0, "overrides": {} },
+        { "key": "CT", "name": "Certification",  "done": 0, "total": 31, "delayed": 0, "overrides": {} },
+        { "key": "H",  "name": "Hand-skills",    "done": 0, "total": 31, "delayed": 0, "overrides": {} },
+        { "key": "GF", "name": "GFS",            "done": 0, "total": 31, "delayed": 0, "overrides": {} },
+        { "key": "S",  "name": "Selfcare",       "done": 0, "total": 31, "delayed": 0, "overrides": {} },
+        { "key": "J",  "name": "Journaling",     "done": 0, "total": 31, "delayed": 0, "overrides": {} }
+      ]
+    }
+  ]
+}
