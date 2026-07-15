@@ -53,9 +53,14 @@ Book-Summary は 7MB 超の巨大な単一HTML（独自スクリプト多数）�
 
 ### 進捗の保存について
 - 本体（Finance 等）の進捗＝右下「進捗を保存 / 復元」＋ localStorage で保存。
-- Book-Summary の進捗（既読・クイズ・メモ）：**http(s) 配信なら自動保存**。
-  file:// でダブルクリック起動の場合、Blob が不透明オリジンのためセッション内のみ。
-  恒久保存したいときは下記ホスティングを推奨。
+- Book-Summary の進捗（既読・クイズ・メモ・テーマ）＝**親ページへのブリッジで永続化**。
+  Blob(不透明オリジン)の iframe は localStorage 自体が使用不可のため、iframe 内の
+  `window.localStorage` をメモリ実装に差し替え、書き込みを `postMessage` で親へ転送し、
+  親が自身の localStorage（`bsh:store:v1`）に保存する。開くときは親のスナップショットを
+  HTML 先頭に seed 注入して復元。これにより **ダブルクリック起動(file://)でも進捗が残る**。
+  さらに親の localStorage は右下「進捗を保存/復元」のバックアップ対象にも含まれる。
+- Safari 等 file:// で localStorage をそもそも許可しないブラウザでは、右下の
+  「進捗を保存」でファイルにバックアップするか、下記ホスティングを利用する。
 
 ### 一番おすすめ: ホスティング
 `dist/index.html` を Netlify / Vercel / GitHub Pages に置くと URL ひとつで全機能が動き、
