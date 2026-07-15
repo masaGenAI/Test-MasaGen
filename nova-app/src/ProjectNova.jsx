@@ -125286,7 +125286,7 @@ function McqView() {
   const [cat, setCat] = useState(ALL);
   const [diff, setDiff] = useState(0); // 0=すべて,1,2,3
   const [order, setOrder] = useState(null);
-  const [orderMode, setOrderMode] = useState("random"); // "fixed" | "random"
+  const [orderMode, setOrderMode] = useState("fixed"); // "fixed" | "random"（既定は固定順）
   const [pos, setPos] = useState(0);
   const [answers, setAnswers] = useState({}); // pos -> 選んだ表示インデックス
   const [showResult, setShowResult] = useState(false);
@@ -127037,7 +127037,7 @@ function Quiz({ counts, progress, recordAnswer }) {
       pool = BANK.map((q, i) => ({ q, i })).filter((x) => x.q.d === c).map((x) => x.i);
     }
     const seed = Date.now() % 233280;
-    let ord = shuffle(pool, seed);
+    let ord = pool.slice(); // 既定は固定順（収録順）
     if (c === MIX) ord = ord.slice(0, 30); // ミックスは30問
     setCat(c); setOrder(ord); setIdx(0); setSel(null); setAnswered({});
     setReviewMode(false); setSessionCorrect(0); setSessionWrong(0);
@@ -146381,7 +146381,7 @@ function Quiz({ onAnswer, t, questions }) {
 
   const pool = useMemo(() => {
     const idxs = filter === "ALL" ? questions.map((_, i) => i) : questions.map((_, i) => i).filter(i => questions[i].d === filter);
-    return shuffle(idxs);
+    return idxs; // 既定は固定順（収録順）
   }, [filter, questions]);
 
   useEffect(() => { setPos(0); setHistory({}); setStats({ c: 0, a: 0 }); }, [pool]);
@@ -148208,7 +148208,7 @@ function Review({ lang, t, onAnswer }) {
           </div>
         </div>
         {list.length > 0 && (
-          <button onClick={() => { setOrder(shuffle(keys)); setPos(0); setSel(null); setSessionSalt(Math.floor(Math.random() * 100000)); setPhase("run"); }}
+          <button onClick={() => { setOrder(keys); setPos(0); setSel(null); setSessionSalt(Math.floor(Math.random() * 100000)); setPhase("run"); }}
             style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
             {t.reviewStart}
           </button>
@@ -149738,7 +149738,7 @@ function Review({ review, onAnswer, removeFromReview, clearReview, askConfirm, l
   const [sel, setSel] = useState(null);
 
   const validIds = review.filter(id => BANK_BY_ID[id]);
-  const start = () => { setOrder(shuffle(validIds)); setPos(0); setSel(null); setPhase("run"); };
+  const start = () => { setOrder(validIds); setPos(0); setSel(null); setPhase("run"); };
 
   if (phase === "home") {
     return (
