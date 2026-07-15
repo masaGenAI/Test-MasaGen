@@ -10,6 +10,7 @@
 | 🗂️ Anything Memo | このスレッド（現行） | `claude/cowork-artifacts-to-code-t2qrw6` | [anything-memo-tracker.md](anything-memo-tracker.md) |
 | 📋 Daily Task | 別チャットへ | `claude/daily-task-tracker` | [daily-task-tracker.md](daily-task-tracker.md) |
 | 📘 Learning | 別チャットへ | `claude/learning-tracker` | [learning-tracker.md](learning-tracker.md) |
+| 🧭 トラッカー・ハブ（入口ページ） | 別チャットへ（新規作成） | `claude/hub-page` | [hub-page.md](hub-page.md) |
 
 > トラッカーごとにフォルダが独立しているため、別ブランチで並行運用しても衝突しません。
 
