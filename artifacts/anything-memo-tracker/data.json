@@ -3,9 +3,9 @@
   "source": "Cowork artifact: Anything Memo Tracker",
   "capturedFrom": "0679c7cc-anythingmemotracker.pdf",
   "stats": {
-    "memoTotal": 19,
+    "memoTotal": 20,
     "genreCount": 5,
-    "withDetail": 19
+    "withDetail": 20
   },
   "palette": {
     "headerGradient": [
@@ -23,7 +23,7 @@
       "name": "AI/生成AI",
       "fill": "#f1eafe",
       "text": "#9333ea",
-      "count": 8
+      "count": 9
     },
     {
       "key": "cloud",
@@ -59,6 +59,12 @@
     }
   ],
   "memos": [
+    {
+      "topic": "MMR（Maximal Marginal Relevance）",
+      "genre": "ai",
+      "date": "2026-07-15",
+      "note": "検索/RAGで結果を選ぶ再ランク手法。クエリとの関連度と、既に選んだ文書との非類似度を両立させて選択。λで関連性と多様性のバランスを調整し、重複を減らして多様な文脈をLLMへ渡す。"
+    },
     {
       "topic": "MCP（Model Context Protocol）",
       "genre": "ai",
