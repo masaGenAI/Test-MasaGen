@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>🧭 トラッカー・ハブ</title>
+<style>
+  :root {
+    --ground: #f6f8fc;
+    --surface: #ffffff;
+    --surface-2: #f0f3fa;
+    --ink: #141a29;
+    --muted: #5a6478;
+    --hairline: #e4e8f1;
+    --shadow: 0 1px 2px rgba(20, 26, 41, .04), 0 8px 24px rgba(20, 26, 41, .06);
+    --shadow-hover: 0 2px 4px rgba(20, 26, 41, .06), 0 16px 40px rgba(20, 26, 41, .12);
+    --radius: 16px;
+    --c-memo: #2f6fed;
+    --c-road: #0e9b83;
+    --c-daily: #e5820b;
+    --font: ui-sans-serif, -apple-system, "Hiragino Kaku Gothic ProN", "Hiragino Sans",
+            "Noto Sans JP", "Yu Gothic UI", Meiryo, system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #0e1320;
+      --surface: #161c2b;
+      --surface-2: #1d2434;
+      --ink: #e8ecf6;
+      --muted: #97a1b6;
+      --hairline: #2a3245;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .35);
+      --shadow-hover: 0 2px 4px rgba(0, 0, 0, .35), 0 16px 40px rgba(0, 0, 0, .5);
+      --c-memo: #5a8dfb;
+      --c-road: #2bbda2;
+      --c-daily: #f59d3d;
+    }
+  }
+  :root[data-theme="light"] {
+    --ground: #f6f8fc; --surface: #ffffff; --surface-2: #f0f3fa;
+    --ink: #141a29; --muted: #5a6478; --hairline: #e4e8f1;
+    --shadow: 0 1px 2px rgba(20, 26, 41, .04), 0 8px 24px rgba(20, 26, 41, .06);
+    --shadow-hover: 0 2px 4px rgba(20, 26, 41, .06), 0 16px 40px rgba(20, 26, 41, .12);
+    --c-memo: #2f6fed; --c-road: #0e9b83; --c-daily: #e5820b;
+  }
+  :root[data-theme="dark"] {
+    --ground: #0e1320; --surface: #161c2b; --surface-2: #1d2434;
+    --ink: #e8ecf6; --muted: #97a1b6; --hairline: #2a3245;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .35);
+    --shadow-hover: 0 2px 4px rgba(0, 0, 0, .35), 0 16px 40px rgba(0, 0, 0, .5);
+    --c-memo: #5a8dfb; --c-road: #2bbda2; --c-daily: #f59d3d;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: var(--font);
+    background: var(--ground);
+    color: var(--ink);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: clamp(28px, 6vw, 64px) clamp(18px, 5vw, 40px) 56px;
+  }
+
+  /* Header */
+  header { margin-bottom: clamp(28px, 5vw, 44px); }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--muted);
+    padding: 6px 12px; border: 1px solid var(--hairline);
+    border-radius: 999px; background: var(--surface);
+  }
+  h1 {
+    font-size: clamp(28px, 5.5vw, 40px);
+    line-height: 1.15; margin: 18px 0 10px;
+    letter-spacing: -.02em; text-wrap: balance;
+  }
+  h1 .compass { font-size: .9em; }
+  .lede {
+    margin: 0; max-width: 60ch;
+    color: var(--muted); font-size: clamp(15px, 2.2vw, 17px);
+  }
+  .summary {
+    display: flex; flex-wrap: wrap; gap: 20px 28px;
+    margin-top: 22px; padding-top: 20px;
+    border-top: 1px solid var(--hairline);
+  }
+  .stat { display: flex; flex-direction: column; gap: 2px; }
+  .stat b {
+    font-size: 22px; font-weight: 700; letter-spacing: -.01em;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat span {
+    font-size: 12px; color: var(--muted);
+    letter-spacing: .04em;
+  }
+
+  /* Cards */
+  .grid {
+    display: grid; gap: 18px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+  .card {
+    --accent: var(--c-memo);
+    position: relative; display: flex; flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    padding: 22px 22px 20px;
+    box-shadow: var(--shadow);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .card::before {
+    content: ""; position: absolute; inset: 0 0 auto 0; height: 3px;
+    border-radius: var(--radius) var(--radius) 0 0;
+    background: var(--accent); opacity: .9;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--hairline));
+  }
+  .card.memo { --accent: var(--c-memo); }
+  .card.road { --accent: var(--c-road); }
+  .card.daily { --accent: var(--c-daily); }
+
+  .card-top { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+  .glyph {
+    flex: none; width: 48px; height: 48px; border-radius: 12px;
+    display: grid; place-items: center; font-size: 26px; line-height: 1;
+    background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+    border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--hairline));
+  }
+  .card h2 {
+    font-size: 17px; margin: 3px 0 0; line-height: 1.3;
+    letter-spacing: -.01em; text-wrap: balance;
+  }
+  .chip {
+    align-self: flex-start; margin-top: 8px;
+    display: inline-flex; align-items: baseline; gap: 5px;
+    padding: 4px 11px; border-radius: 999px; font-size: 13px; font-weight: 600;
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    font-variant-numeric: tabular-nums;
+  }
+  .chip .n { font-size: 15px; }
+  .chip .lbl { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: .03em; }
+  .chip.status { color: var(--muted); background: var(--surface-2); }
+  .chip.status::before {
+    content: ""; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--accent); align-self: center;
+  }
+  .desc {
+    margin: 14px 0 20px; color: var(--muted);
+    font-size: 14px; line-height: 1.6; flex: 1 1 auto;
+  }
+  .open {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    width: 100%; padding: 11px 16px;
+    font: inherit; font-size: 14px; font-weight: 600;
+    color: #fff; text-decoration: none;
+    background: var(--accent); border: 1px solid transparent;
+    border-radius: 10px; cursor: pointer;
+    transition: filter .15s ease, transform .1s ease;
+  }
+  .open:hover { filter: brightness(1.07); }
+  .open:active { transform: translateY(1px); }
+  .open:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .open .arrow { font-size: 15px; transition: transform .15s ease; }
+  .open:hover .arrow { transform: translate(2px, -2px); }
+
+  footer {
+    margin-top: 34px; padding-top: 20px;
+    border-top: 1px solid var(--hairline);
+    color: var(--muted); font-size: 12.5px; line-height: 1.7;
+  }
+  footer code {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11.5px; background: var(--surface-2);
+    padding: 1px 5px; border-radius: 5px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card, .open, .open .arrow { transition: none; }
+    .card:hover { transform: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <span class="eyebrow">🧭 Tracker Hub</span>
+      <h1><span class="compass">🧭</span> トラッカー・ハブ</h1>
+      <p class="lede">3つのトラッカーの入口ページ。各カードの「開く」から、それぞれの Artifact を新しいタブで開きます。</p>
+      <div class="summary">
+        <div class="stat"><b>3</b><span>トラッカー</span></div>
+        <div class="stat"><b>18</b><span>メモ（Anything Memo）</span></div>
+        <div class="stat"><b>464</b><span>タスク記録（デイリー）</span></div>
+      </div>
+    </header>
+
+    <main class="grid">
+      <!-- Anything Memo -->
+      <article class="card memo">
+        <div class="card-top">
+          <div class="glyph" aria-hidden="true">📝</div>
+          <div>
+            <h2>Anything Memo トラッカー</h2>
+            <span class="chip"><span class="n">18</span><span class="lbl">件</span></span>
+          </div>
+        </div>
+        <p class="desc">キーワードから調べ済みノートをつくり、ジャンル横断で一カ所に蓄積するメモ帳。</p>
+        <a class="open" href="https://claude.ai/code/artifact/f15068bb-832d-4b96-beee-0256a9c4b9f1"
+           target="_blank" rel="noopener noreferrer">
+          開く <span class="arrow" aria-hidden="true">↗</span>
+        </a>
+      </article>
+
+      <!-- 学習ロードマップ -->
+      <article class="card road">
+        <div class="card-top">
+          <div class="glyph" aria-hidden="true">🗺️</div>
+          <div>
+            <h2>学習ロードマップ トラッカー</h2>
+            <span class="chip status">進行中</span>
+          </div>
+        </div>
+        <p class="desc">学習の到達度とこれからの道のりを、ロードマップとして可視化するトラッカー。</p>
+        <a class="open" href="https://claude.ai/code/artifact/5ea42e83-20dc-48b0-8eb7-f656df28ff99"
+           target="_blank" rel="noopener noreferrer">
+          開く <span class="arrow" aria-hidden="true">↗</span>
+        </a>
+      </article>
+
+      <!-- デイリータスク -->
+      <article class="card daily">
+        <div class="card-top">
+          <div class="glyph" aria-hidden="true">📅</div>
+          <div>
+            <h2>デイリータスク トラッカー</h2>
+            <span class="chip"><span class="n">464</span><span class="lbl">件</span></span>
+          </div>
+        </div>
+        <p class="desc">毎朝のクイズや note / YouTube ダイジェストの進捗と学習ログをまとめるハブ。</p>
+        <a class="open" href="https://claude.ai/code/artifact/078507ba-a147-4ce6-84b5-ca7a82d9fed4"
+           target="_blank" rel="noopener noreferrer">
+          開く <span class="arrow" aria-hidden="true">↗</span>
+        </a>
+      </article>
+    </main>
+
+    <footer>
+      件数の出典：Anything Memo=Notion「Anything memo」全件（18）、デイリータスク=Notion「Scheduled task tracker」DB実測（464）。
+      学習ロードマップは確定ソース未取得のため「進行中」表示。正確な件数が分かれば差し替えます。
+    </footer>
+  </div>
+</body>
+</html>
