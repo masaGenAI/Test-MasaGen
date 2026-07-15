@@ -37,15 +37,29 @@ npm run preview      # ビルド結果をローカル確認
 保持されます。ポリフィルが無いと（try/catch されているのでアプリは落ちませんが）状態が
 毎回消えてしまいます。
 
-## 単一 HTML ファイルとして書き出す（ターミナル不要で配布したいとき）
-`vite-plugin-singlefile` により、すべてを 1 つの HTML に埋め込んだファイルを生成できます。
-生成された HTML は、ダブルクリックするだけでブラウザで開けます（Node.js もサーバーも不要）。
-
+## ビルド成果物（配布用）
 ```bash
-npm run build          # dist/index.html が単一ファイルとして出力される
+npm run build
 ```
+`dist/` に次の2ファイルが出力されます。**この2つは必ず同じフォルダに一緒に置いてください。**
 
-`dist/index.html` をリネームして配布すれば、受け取った人はダブルクリックで開くだけで使えます。
+- `index.html` — 本体（Finance / MegaTech / Consulting などのハブを内蔵した単一ファイル）
+- `booksummaryhub.html` — Book-Summary ハブ（971冊・検索・クイズ・メモ付きの完成版）
+
+### なぜ Book-Summary だけ別ファイルなのか
+Book-Summary は 7MB 超の巨大な単一HTML（独自スクリプト多数）で、これを本体に「埋め込み(srcDoc)」
+すると、ブラウザがロード後に注入された大容量インラインスクリプトを実行しない制約に当たる。
+そこで実URLの `<iframe src="booksummaryhub.html">` で読み込む方式にしている。これにより
+スクリプト実行・履歴ナビ・localStorage 永続化がすべて正しく機能する。
+
+### ダブルクリックで使う場合
+`index.html`（`ProjectNova.html` にリネーム可）と `booksummaryhub.html` を**同じフォルダ**に置き、
+本体をダブルクリックする。Book-Summary 以外のハブは本体だけでも動くが、Book-Summary を開くには
+隣に `booksummaryhub.html` が必要。
+
+### 一番おすすめ: ホスティング
+`dist/` の中身をそのまま Netlify / Vercel / GitHub Pages に置くと、URL ひとつで全機能が動く
+（file:// の制約がなく、進捗の自動保存も全ブラウザで確実に効く）。
 
 ## 静的ホスティング（任意）
 `npm run build` で生成される `dist/` は、Netlify / Vercel / GitHub Pages などに
