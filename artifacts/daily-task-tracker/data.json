@@ -5,10 +5,20 @@
   "month": "2026-07",
   "day": 45,
   "legend": {
-    "done": "済 / 完了",
-    "late": "遅延",
-    "pending": "未着手 / 未",
-    "none": "未開始"
+    "done": "済 / 完了（濃紺・白リング #1e3a8a）",
+    "late": "遅延（濃紺 #1e3a8a）",
+    "pending": "未着手 / 未（スレート #94a3b8）",
+    "none": "未開始（淡色）"
+  },
+  "palette": {
+    "progressBar": "#1e3a8a",
+    "coworkLabel": "#1d4ed8",
+    "othersLabel": "#6d28d9",
+    "heatmapRecorded": "#1e3a8a",
+    "heatmapPending": "#94a3b8",
+    "doneButton": "#16a34a",
+    "accent": "#2563eb",
+    "background": "#f8fafc"
   },
   "groups": [
     {

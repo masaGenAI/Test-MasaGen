@@ -6,12 +6,16 @@
 <title>デイリータスク トラッカー</title>
 <style>
   :root {
-    --bg: #f6f7f9; --card: #ffffff; --border: #e3e6ea; --text: #1f2933;
-    --muted: #7b8794; --accent: #4f6ef2;
-    --done: #22a06b; --done-bg: #e3f5ec;
-    --late: #e8833a; --late-bg: #fdeede;
-    --pending: #cbd2d9; --pending-bg: #f0f2f4;
-    --none: #eef0f2;
+    --bg: #f8fafc; --card: #ffffff; --border: #e2e8f0; --text: #1e293b;
+    --muted: #64748b;
+    --navy: #1e3a8a;      /* 進捗バー・ヒートマップ記録済み（遅/済） */
+    --accent: #2563eb;    /* アクティブタブ・リンク */
+    --cowork: #1d4ed8;    /* Cowork task 見出し（青） */
+    --others: #6d28d9;    /* Others 見出し（紫） */
+    --green: #16a34a;     /* 完了ボタン */
+    --slate: #94a3b8;     /* ヒートマップ未着手 */
+    --tabbar: #e2e8f0;    /* タブバー地 */
+    --grouprow: #f1f5f9;  /* ヒートマップ グループ行 */
   }
   * { box-sizing: border-box; }
   body {
@@ -22,55 +26,62 @@
   header h1 { font-size: 1.5rem; margin: 0 0 4px; }
   header p.lead { color: var(--muted); font-size: .85rem; margin: 0 0 16px; }
   .banner {
-    background: var(--done-bg); border: 1px solid #bfe6d3; color: #14663f;
+    background: #eff4ff; border: 1px solid #c7d7fe; color: #1e40af;
     border-radius: 8px; padding: 8px 12px; font-size: .8rem; margin-bottom: 16px;
   }
-  .tabs { display: flex; gap: 4px; flex-wrap: wrap; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+  /* pill タブ（元アプリ再現） */
+  .tabs { display: inline-flex; gap: 4px; background: var(--tabbar); padding: 4px; border-radius: 10px; margin-bottom: 20px; flex-wrap: wrap; }
   .tab {
-    background: none; border: none; padding: 10px 16px; font-size: .9rem; cursor: pointer;
-    color: var(--muted); border-bottom: 2px solid transparent; font-weight: 600;
+    background: none; border: none; padding: 8px 18px; font-size: .9rem; cursor: pointer;
+    color: var(--muted); border-radius: 8px; font-weight: 700;
   }
-  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab.active { background: var(--card); color: var(--accent); box-shadow: 0 1px 3px rgba(15,23,42,.12); }
   .monthnav { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-  .monthnav button { border: 1px solid var(--border); background: var(--card); border-radius: 6px; width: 32px; height: 32px; cursor: pointer; }
+  .monthnav button { border: 1px solid var(--border); background: var(--card); border-radius: 6px; width: 32px; height: 32px; cursor: pointer; color: var(--muted); }
   .monthnav .label { font-weight: 700; font-size: 1.05rem; }
-  .group-title { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 20px 0 10px; font-weight: 700; }
+  .group-title { font-size: .8rem; letter-spacing: .02em; margin: 20px 0 10px; font-weight: 700; }
+  .group-title.cowork { color: var(--cowork); }
+  .group-title.others { color: var(--others); }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
   .task-card {
     background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; cursor: pointer;
     transition: transform .08s, box-shadow .08s;
   }
-  .task-card:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(0,0,0,.06); }
+  .task-card:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(15,23,42,.08); }
   .task-card .name { font-weight: 700; font-size: .92rem; display: flex; justify-content: space-between; gap: 8px; }
   .task-card .frac { color: var(--muted); font-weight: 600; font-size: .82rem; }
-  .bar { height: 6px; background: var(--pending-bg); border-radius: 3px; margin: 10px 0 8px; overflow: hidden; }
-  .bar > span { display: block; height: 100%; background: var(--done); }
-  .counts { font-size: .75rem; color: var(--muted); display: flex; gap: 10px; }
-  .counts .c-done { color: var(--done); font-weight: 700; }
-  .counts .c-late { color: var(--late); font-weight: 700; }
+  .bar { height: 6px; background: var(--border); border-radius: 3px; margin: 10px 0 8px; overflow: hidden; }
+  .bar > span { display: block; height: 100%; background: var(--navy); }
+  .counts { font-size: .75rem; display: flex; gap: 10px; }
+  .counts .c-done { color: #334155; font-weight: 700; }
+  .counts .c-late { color: var(--slate); font-weight: 600; }
   .stamp { display: inline-block; margin-top: 8px; font-size: .72rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
-  .stamp.on { background: var(--done-bg); color: var(--done); }
-  .stamp.off { background: var(--pending-bg); color: var(--muted); }
+  .stamp.on { background: #e0e7ff; color: var(--navy); }
+  .stamp.off { background: #eef2f6; color: var(--muted); }
 
   /* legend */
   .legend { display: flex; flex-wrap: wrap; gap: 12px; margin: 18px 0; font-size: .75rem; color: var(--muted); }
   .legend span { display: inline-flex; align-items: center; gap: 5px; }
   .dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
-  .dot.done { background: var(--done); } .dot.late { background: var(--late); }
-  .dot.pending { background: var(--pending); } .dot.none { background: var(--none); border: 1px solid var(--border); }
+  .dot.done { background: var(--navy); box-shadow: inset 0 0 0 1.5px #fff, inset 0 0 0 2.5px var(--navy); }
+  .dot.late { background: var(--navy); }
+  .dot.pending { background: var(--slate); }
+  .dot.none { background: #eef2f6; border: 1px solid var(--border); }
 
-  /* heatmap */
+  /* heatmap（角丸タイル・元アプリ再現） */
   .hm-wrap { overflow-x: auto; }
-  table.hm { border-collapse: collapse; font-size: .7rem; }
-  table.hm th, table.hm td { border: 1px solid var(--border); padding: 0; text-align: center; }
-  table.hm th.rowh { text-align: left; padding: 4px 8px; white-space: nowrap; position: sticky; left: 0; background: var(--card); z-index: 1; font-weight: 600; }
-  table.hm th.colh { padding: 4px 3px; color: var(--muted); font-weight: 600; min-width: 26px; }
-  table.hm td { width: 26px; height: 26px; cursor: pointer; }
-  td.done { background: var(--done); } td.late { background: var(--late); }
-  td.pending { background: var(--pending-bg); } td.none { background: var(--none); }
-  td.done::after { content: "済"; color: #fff; } td.late::after { content: "遅"; color: #fff; }
-  td.pending::after { content: "未"; color: var(--muted); } td.none::after { content: "–"; color: var(--muted); }
-  .grouprow td { background: #eef1f8; font-weight: 700; text-align: left; padding: 4px 8px; color: var(--accent); }
+  table.hm { border-collapse: separate; border-spacing: 4px; font-size: .7rem; }
+  table.hm th.rowh { text-align: left; padding: 4px 8px; white-space: nowrap; position: sticky; left: 0; background: var(--bg); z-index: 1; font-weight: 700; }
+  table.hm th.colh { padding: 4px 3px; color: var(--muted); font-weight: 700; min-width: 26px; }
+  table.hm td { width: 26px; height: 26px; cursor: pointer; text-align: center; border-radius: 6px; color: #fff; }
+  td.done, td.late { background: var(--navy); }
+  td.done { box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 3px var(--navy); }
+  td.pending { background: var(--slate); }
+  td.none { background: transparent; color: var(--slate); cursor: default; }
+  td.done::after { content: "済"; } td.late::after { content: "遅"; }
+  td.pending::after { content: "未"; } td.none::after { content: "–"; }
+  .grouprow td { background: var(--grouprow); font-weight: 700; text-align: left; padding: 4px 8px; border-radius: 6px; }
+  .grouprow td.cowork { color: var(--cowork); } .grouprow td.others { color: var(--others); }
 
   /* calendar */
   .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
@@ -81,15 +92,15 @@
   .cal .cell.today { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
   .cal .pips { display: flex; flex-wrap: wrap; gap: 2px; margin-top: 4px; }
   .cal .pip { width: 8px; height: 8px; border-radius: 2px; }
-  .cal .pip.done { background: var(--done); } .cal .pip.late { background: var(--late); } .cal .pip.pending { background: var(--pending); }
+  .cal .pip.done { background: var(--navy); } .cal .pip.late { background: #6366f1; } .cal .pip.pending { background: var(--slate); }
 
   /* checklist */
   .check-list { display: flex; flex-direction: column; gap: 8px; }
   .check-row { display: flex; align-items: center; gap: 12px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; }
   .check-row .cname { font-weight: 700; flex: 1; }
   .check-row .day { color: var(--muted); font-size: .8rem; }
-  .btn { border: 1px solid var(--border); background: var(--card); border-radius: 6px; padding: 6px 12px; font-size: .8rem; cursor: pointer; font-weight: 600; }
-  .btn.done { background: var(--done); color: #fff; border-color: var(--done); }
+  .btn { border: 1px solid var(--border); background: var(--card); border-radius: 6px; padding: 6px 12px; font-size: .8rem; cursor: pointer; font-weight: 700; }
+  .btn.done { background: var(--green); color: #fff; border-color: var(--green); }
   footer { margin-top: 30px; font-size: .75rem; color: var(--muted); }
   .reset { background: none; border: none; color: var(--accent); cursor: pointer; text-decoration: underline; font-size: .75rem; }
 </style>
@@ -201,7 +212,6 @@ function toggleCell(taskId, dateIdx){
 /* ---- レンダリング ---- */
 const allTasks = DATA.groups.flatMap(g => g.tasks.map(t => ({...t, group:g.name, type:g.type})));
 function liveDone(t){
-  // ベース done 数 + 当月押印で done になった分の増減を反映
   let d = 0;
   BASE_HEATMAP[t.id].forEach((_,i)=>{ if (cellStatus(t.id,i)==="done") d++; });
   const baseDoneInWindow = BASE_HEATMAP[t.id].filter(s=>s==="done").length;
@@ -211,7 +221,7 @@ function liveDone(t){
 function renderDashboard(){
   const el = document.getElementById("dashboard");
   el.innerHTML = DATA.groups.map(g => `
-    <div class="group-title">${g.name}${g.type==="auto"?" · 自動生成":" · 手動記録"}</div>
+    <div class="group-title ${g.type==="auto"?"cowork":"others"}">${g.name}${g.type==="auto"?" · 自動生成":" · 手動記録"}</div>
     <div class="grid">
       ${g.tasks.map(t => {
         const done = liveDone(t);
@@ -233,7 +243,8 @@ function renderHeatmap(){
   const el = document.getElementById("heatmap");
   const head = `<tr><th class="rowh">タスク \\ 日付</th>${DATES.map(d=>`<th class="colh">${d.slice(5).replace('-','/')}</th>`).join("")}</tr>`;
   const body = DATA.groups.map(g => {
-    const grp = `<tr class="grouprow"><td>${g.name}</td><td colspan="${DATES.length}"></td></tr>`;
+    const cls = g.type==="auto"?"cowork":"others";
+    const grp = `<tr class="grouprow"><td class="${cls}">${g.name}</td><td colspan="${DATES.length}"></td></tr>`;
     const rows = g.tasks.map(t => `<tr><th class="rowh">${t.name}</th>${
       DATES.map((_,i)=>{ const s=cellStatus(t.id,i); return `<td class="${s}" data-t="${t.id}" data-i="${i}"></td>`; }).join("")
     }</tr>`).join("");
@@ -272,7 +283,7 @@ function renderCalendar(){
 
 function renderChecklist(){
   const el = document.getElementById("checklist");
-  el.innerHTML = `<div class="group-title">✅ 今日（Day ${DATA.day}）解いた問題をタップで完了にする</div>
+  el.innerHTML = `<div class="group-title cowork">✅ 今日（Day ${DATA.day}）解いた問題をタップで完了にする</div>
     <div class="check-list">${
       DATA.groups[0].tasks.map(t => {
         const on = cellStatus(t.id,14)==="done";
