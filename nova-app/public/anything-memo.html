@@ -55,11 +55,24 @@
 #amt .rowbtns{display:inline-flex;gap:6px;}
 #amt .ib{border:1px solid var(--border);background:var(--card);border-radius:6px;padding:2px 8px;font-size:.72rem;cursor:pointer;color:var(--muted);font-family:inherit;}
 #amt .ib:hover{color:var(--text);}
+#amt .research{background:linear-gradient(120deg,#f6f8ff,#faf6ff);border:1px solid #e2e6f5;border-radius:12px;padding:12px 14px;margin-bottom:14px;}
+#amt .research .rrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+#amt .research .rin{flex:1;min-width:220px;border:1px solid var(--border);border-radius:9px;padding:9px 12px;font-size:.85rem;font-family:inherit;background:#fff;}
+#amt .research .rin:focus{outline:2px solid var(--accent);outline-offset:1px;}
+#amt .research .rbtn{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 14px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;}
+#amt .research .rbtn[disabled]{opacity:.6;cursor:progress;}
+#amt .research .rlabel{font-size:.74rem;font-weight:700;color:#5b6072;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+#amt .research .rstatus{font-size:.74rem;color:var(--muted);margin-top:8px;min-height:1em;}
+#amt .research .rhint{font-size:.68rem;color:#8a90a0;margin-top:4px;}
 </style>
 <div id="amt"><div class="wrap">
 <div class="hero"><h1>🗂️ Anything Memo トラッカー</h1><p>キーワードから作った「調べ済みノート」を追跡。メモの追加・編集ができ、データはブラウザ内に保存されます。</p></div>
 <div class="banner">Cowork のアーティファクトを Code 側に移設した<strong>編集可能な単体版</strong>です。追加・編集・削除はローカル保存され、JSONで書き出し／読み込みできます。</div>
 <div class="editbar"><button class="ebtn primary" id="amtAdd">＋ メモ追加</button><button class="ebtn" id="amtExport">⬇ JSONエクスポート</button><button class="ebtn" id="amtImport">⬆ JSONインポート</button><button class="ebtn" id="amtReset">↺ 初期データに戻す</button></div>
+<div class="research"><div class="rlabel">🔎 キーワードから調べて追加（Chrome内蔵AI / Gemini Nano）</div>
+<div class="rrow"><input class="rin" id="amtKw" placeholder="単語を入力（例: RAG、ゼロトラスト、LoRA）"><button class="rbtn" id="amtResearch">調べて追加</button></div>
+<div class="rstatus" id="amtRStatus"></div>
+<div class="rhint">端末内AIで要約・ジャンル分類します（APIキー・ネット送信なし）。Web検索は行わないため内容は要確認。未対応ブラウザでは手入力フォームに切替＆調査プロンプトをコピーします。</div></div>
 <div class="form" id="amtForm"><h3 id="amtFormTitle">メモを追加</h3>
 <div class="fgrid">
 <div class="field" style="grid-column:1/-1"><label>トピック</label><input id="aTopic" placeholder="例: RAG（検索拡張生成）"></div>
@@ -108,6 +121,40 @@ $("amtAdd").onclick=openAdd;$("aSave").onclick=saveForm;$("aCancel").onclick=clo
 $("amtExport").onclick=function(){_exportJSON("anything-memo-tracker-data.json",D);};
 $("amtImport").onclick=function(){_importJSON(function(obj){if(!obj.memos){alert("形式が不正です");return;}D=obj;save();renderAll();});};
 $("amtReset").onclick=function(){if(confirm("編集内容を破棄して初期データに戻しますか？")){D=clone(BASE);save();renderAll();}};
+// ---- Chrome内蔵AI（Prompt API / Gemini Nano）でキーワード調査して追加 ----
+function _today(){try{return new Date().toISOString().slice(0,10);}catch(e){return "2026-07-15";}}
+function _getLM(){return (typeof self!=="undefined"&&self.LanguageModel)||(window.ai&&window.ai.languageModel)||(typeof LanguageModel!=="undefined"?LanguageModel:null);}
+function _parseJSON(t){try{return JSON.parse(t);}catch(e){}var m=t&&t.match(/\{[\s\S]*\}/);if(m){try{return JSON.parse(m[0]);}catch(e){}}return null;}
+function _genreGuide(){return D.genres.map(function(g){return g.key+"="+g.name;}).join(" / ");}
+function _researchPromptText(kw){return "次の用語を日本語で1〜2文に要約し、ジャンルを1つ選んでJSONのみで出力してください。\n用語:「"+kw+"」\nジャンルのキー: "+_genreGuide()+"\n出力形式: {\"note\":\"要約\",\"genre\":\"キー\"}";}
+function _fallback(kw,msg){var st=$("amtRStatus");try{if(navigator.clipboard&&navigator.clipboard.writeText){var pr=navigator.clipboard.writeText(_researchPromptText(kw));if(pr&&pr.catch)pr.catch(function(){});}}catch(e){}openAdd();$("aTopic").value=kw;st.innerHTML=(msg||"")+" 手入力フォームを開き、調査プロンプトをクリップボードにコピーしました（このチャットや他のLLMに貼れます）。";}
+async function researchAndAdd(){
+  var kw=$("amtKw").value.trim(); var st=$("amtRStatus"); var btn=$("amtResearch");
+  if(!kw){$("amtKw").focus();return;}
+  var LM=_getLM();
+  if(!LM){_fallback(kw,"このブラウザは Chrome内蔵AI（Gemini Nano）に未対応です。");return;}
+  btn.disabled=true; var oldtxt=btn.textContent; btn.textContent="調査中…";
+  try{
+    st.textContent="内蔵AIの利用可否を確認中…";
+    var avail=await LM.availability({languages:["ja","en"]});
+    if(avail==="unavailable"){btn.disabled=false;btn.textContent=oldtxt;_fallback(kw,"この端末では内蔵AIを利用できません。");return;}
+    st.textContent=(avail==="available")?"端末内AIで生成中…":"モデルを準備中（初回はダウンロードに数分かかります）…";
+    var session=await LM.create({initialPrompts:[{role:"system",content:"あなたは技術・ビジネス用語を日本語で簡潔に説明するアシスタントです。必ずJSONのみを出力し、noteは1〜2文の日本語要約、genreは指定キーから1つ選びます。"}],monitor:function(m){m.addEventListener("downloadprogress",function(e){st.textContent="モデルをダウンロード中… "+Math.round((e.loaded||0)*100)+"%";});}});
+    var raw=await session.prompt(_researchPromptText(kw));
+    if(session.destroy)session.destroy();
+    var rec=_parseJSON(raw);
+    if(!rec||!rec.note){btn.disabled=false;btn.textContent=oldtxt;_fallback(kw,"生成結果を解釈できませんでした。");return;}
+    var genre=rec.genre; if(!D.genres.some(function(g){return g.key===genre;}))genre="ai";
+    D.memos.unshift({id:_uid(),topic:kw,genre:genre,date:_today(),note:String(rec.note).trim()});
+    save();renderAll();
+    st.innerHTML="✓ 追加しました（端末内AI・<strong>要確認</strong>）: "+kw+"　→ カードの ✎ で修正できます。";
+    $("amtKw").value="";
+  }catch(e){_fallback(kw,"生成に失敗しました（"+(e&&e.message||e)+"）。");}
+  btn.disabled=false; btn.textContent=oldtxt;
+}
+$("amtResearch").onclick=researchAndAdd;
+$("amtKw").addEventListener("keydown",function(e){if(e.key==="Enter")researchAndAdd();});
+(function(){var LM=_getLM();if(!LM){$("amtRStatus").textContent="※ このブラウザは Chrome内蔵AI 未対応です。ボタンを押すと手入力フォーム＋調査プロンプトのコピーに切り替わります。";}})();
 fillGenreSelect();renderAll();
 })();
 </script>
