@@ -69,10 +69,10 @@
 <div class="hero"><h1>🗂️ Anything Memo トラッカー</h1><p>キーワードから作った「調べ済みノート」を追跡。メモの追加・編集ができ、データはブラウザ内に保存されます。</p></div>
 <div class="banner">Cowork のアーティファクトを Code 側に移設した<strong>編集可能な単体版</strong>です。追加・編集・削除はローカル保存され、JSONで書き出し／読み込みできます。</div>
 <div class="editbar"><button class="ebtn primary" id="amtAdd">＋ メモ追加</button><button class="ebtn" id="amtExport">⬇ JSONエクスポート</button><button class="ebtn" id="amtImport">⬆ JSONインポート</button><button class="ebtn" id="amtReset">↺ 初期データに戻す</button></div>
-<div class="research"><div class="rlabel">🔎 キーワードから調べて追加（Chrome内蔵AI / Gemini Nano）</div>
-<div class="rrow"><input class="rin" id="amtKw" placeholder="単語を入力（例: RAG、ゼロトラスト、LoRA）"><button class="rbtn" id="amtResearch">調べて追加</button></div>
+<div class="research"><div class="rlabel">🔎 キーワードから調べて追加（Claude in Chrome / Chrome内蔵AI）</div>
+<div class="rrow"><input class="rin" id="amtKw" placeholder="単語を入力（例: RAG、ゼロトラスト、LoRA）"><button class="rbtn" id="amtClaude">🤖 Claudeで調べて追加</button><button class="rbtn" id="amtResearch" style="background:#5b6072">端末内AIで追加</button></div>
 <div class="rstatus" id="amtRStatus"></div>
-<div class="rhint">端末内AIで要約・ジャンル分類します（APIキー・ネット送信なし）。Web検索は行わないため内容は要確認。未対応ブラウザでは手入力フォームに切替＆調査プロンプトをコピーします。</div></div>
+<div class="rhint"><b>Claude in Chrome</b>: キーワードを入れて「🤖 Claudeで調べて追加」を押すと、追加フォームを開き、右のClaudeへの指示をコピーします。右のサイドバーに貼る（または「このページに◯◯を調べて追加して」と頼む）と、Claudeがこのページへ直接追加します。<br><b>端末内AI（Gemini Nano）</b>: 対応ブラウザでは「端末内AIで追加」がその場で要約・分類して追加（APIキー・ネット送信なし・要確認）。</div></div>
 <div class="form" id="amtForm"><h3 id="amtFormTitle">メモを追加</h3>
 <div class="fgrid">
 <div class="field" style="grid-column:1/-1"><label>トピック</label><input id="aTopic" placeholder="例: RAG（検索拡張生成）"></div>
@@ -153,8 +153,42 @@ async function researchAndAdd(){
   btn.disabled=false; btn.textContent=oldtxt;
 }
 $("amtResearch").onclick=researchAndAdd;
-$("amtKw").addEventListener("keydown",function(e){if(e.key==="Enter")researchAndAdd();});
-(function(){var LM=_getLM();if(!LM){$("amtRStatus").textContent="※ このブラウザは Chrome内蔵AI 未対応です。ボタンを押すと手入力フォーム＋調査プロンプトのコピーに切り替わります。";}})();
+// ---- Claude in Chrome 連携 ----
+// このページを見て操作できる Claude in Chrome 向けに、確実に追加できる指示を用意する。
+function _claudePromptText(kw){
+  return "このページ（Anything Memo トラッカー）に用語「"+kw+"」を調べて追加してください。\n"+
+    "1) 日本語で1〜2文に要約する\n"+
+    "2) ジャンルを次から1つ選ぶ: "+_genreGuide()+"\n"+
+    "3) 追加する。方法A（推奨・確実）: このページで次を実行\n"+
+    "   window.amtAgent.add({topic:\""+kw+"\", genre:\"<選んだキー>\", note:\"<要約>\"})\n"+
+    "   方法B: 開いている『メモを追加』フォームに トピック="+kw+"・ジャンル・メモ を入力し『保存』を押す。";
+}
+function researchViaClaude(){
+  var kw=$("amtKw").value.trim(); if(!kw){$("amtKw").focus();return;}
+  openAdd(); $("aTopic").value=kw;
+  var copied=false;
+  try{ if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(_claudePromptText(kw)); copied=true; } }catch(e){}
+  $("amtRStatus").innerHTML="🤖 右の <b>Claude</b>（Claude in Chrome）に「このページに『"+esc(kw)+"』を調べて追加して」と頼んでください。"+(copied?"指示はクリップボードにもコピー済みです。":"")+" 追加フォームを開いてあります（Claudeが入力→保存、または window.amtAgent.add を実行します）。";
+}
+$("amtClaude").onclick=researchViaClaude;
+$("amtKw").addEventListener("keydown",function(e){if(e.key==="Enter")researchViaClaude();});
+// ---- 外部AIエージェント（Claude in Chrome 等）連携API ----
+// 使い方: window.amtAgent.add({topic, genre, note, date?}) でメモを追加（topic重複はスキップ）。
+//         window.amtAgent.genres で選べるジャンル、window.amtAgent.list() で既存メモ一覧。
+window.amtAgent={
+  genres:function(){return D.genres.map(function(g){return {key:g.key,name:g.name};});},
+  list:function(){return D.memos.map(function(m){return {topic:m.topic,genre:m.genre,date:m.date,note:m.note};});},
+  has:function(topic){return D.memos.some(function(m){return m.topic===topic;});},
+  add:function(o){
+    if(!o||!o.topic) return {ok:false,error:"topic is required"};
+    var genre=o.genre; if(!D.genres.some(function(g){return g.key===genre;})) genre="ai";
+    if(D.memos.some(function(m){return m.topic===o.topic;})) return {ok:false,error:"duplicate",topic:o.topic};
+    D.memos.unshift({id:_uid(),topic:String(o.topic),genre:genre,date:o.date||_today(),note:String(o.note||"").trim()});
+    save();renderAll();
+    return {ok:true,topic:o.topic,genre:genre};
+  }
+};
+(function(){var LM=_getLM();if(!LM){$("amtRStatus").textContent="🤖 このブラウザは端末内AI(Gemini Nano)未対応です。「Claudeで調べて追加」を使うか、右の Claude in Chrome に「このページに◯◯を調べて追加して」と頼んでください。";}})();
 fillGenreSelect();renderAll();
 })();
 </script>
