@@ -5,6 +5,8 @@ import { Waves, Clock3, Users, Brain, Cpu, BookOpen, Layers, ChevronRight, Arrow
 import BOOK_SUMMARY_HTML from "../public/booksummaryhub.html?raw";
 // 学習ロードマップ トラッカー（資格/Tools/講座/書籍/Udemy の一元管理・自動保存つき表アプリ）
 import LEARNING_TRACKER_HTML from "../public/learning-tracker.html?raw";
+// Anything Memo トラッカー（調べ済みノートの一覧・検索・ジャンル別・自動保存）
+import ANYTHING_MEMO_HTML from "../public/anything-memo.html?raw";
 
 /* ============================================================
  * Project-Nova : 統合戦略ポータル
@@ -152454,6 +152456,73 @@ const LearningTrackerModule = (function () {
   }
   return LearningTrackerModule;
 })();
+// ================= AnythingMemoModule (source: anything-memo.html, Blob-embedded) =================
+const AnythingMemoModule = (function () {
+  const AMT_STORE_KEY = "amt:store:v1";
+  function AnythingMemoModule() {
+    // Anything Memo トラッカーを Blob URL 化して iframe で読み込む。
+    // localStorage をメモリ実装に差し替え、書き込みを postMessage で親へ転送 → 親が永続化。
+    const ref = useRef(null);
+    useEffect(() => {
+      const iframe = ref.current;
+      if (!iframe) return;
+      let mirror = {};
+      try {
+        mirror = JSON.parse(window.localStorage.getItem(AMT_STORE_KEY) || "{}") || {};
+      } catch (e) {
+        mirror = {};
+      }
+      const seedJson = JSON.stringify(mirror).replace(/</g, "\\u003c");
+      const bridge =
+        "<script>(function(){try{" +
+        "var mem=" +
+        seedJson +
+        ";" +
+        "function post(op,k,v){try{parent.postMessage({__amt:1,op:op,k:k,v:v},'*');}catch(e){}}" +
+        "var fake={" +
+        "getItem:function(k){return Object.prototype.hasOwnProperty.call(mem,k)?String(mem[k]):null;}," +
+        "setItem:function(k,v){mem[k]=String(v);post('set',String(k),String(v));}," +
+        "removeItem:function(k){delete mem[k];post('rm',String(k));}," +
+        "clear:function(){mem={};post('clr');}," +
+        "key:function(i){var ks=Object.keys(mem);return i>=0&&i<ks.length?ks[i]:null;}" +
+        "};" +
+        "Object.defineProperty(fake,'length',{get:function(){return Object.keys(mem).length;}});" +
+        "try{Object.defineProperty(window,'localStorage',{configurable:true,get:function(){return fake;}});}catch(e){}" +
+        "}catch(e){}})();<" +
+        "/script>";
+      const html = ANYTHING_MEMO_HTML.replace("<head>", "<head>" + bridge);
+      const onMsg = (ev) => {
+        const d = ev.data;
+        if (!d || d.__amt !== 1) return;
+        try {
+          let m = JSON.parse(window.localStorage.getItem(AMT_STORE_KEY) || "{}") || {};
+          if (d.op === "set") m[d.k] = d.v;
+          else if (d.op === "rm") delete m[d.k];
+          else if (d.op === "clr") m = {};
+          window.localStorage.setItem(AMT_STORE_KEY, JSON.stringify(m));
+        } catch (e) {
+          /* ignore */
+        }
+      };
+      window.addEventListener("message", onMsg);
+      const blob = new Blob([html], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      iframe.src = url;
+      return () => {
+        window.removeEventListener("message", onMsg);
+        URL.revokeObjectURL(url);
+      };
+    }, []);
+    return (
+      <iframe
+        ref={ref}
+        title="Anything Memo トラッカー"
+        style={{ width: "100%", height: "calc(100vh - 46px)", border: "none", display: "block" }}
+      />
+    );
+  }
+  return AnythingMemoModule;
+})();
 // ================= LinguisticsHubModule (source: linguistics-hub.jsx) =================
 const LinguisticsHubModule = (function () {
 
@@ -158046,6 +158115,7 @@ const NOVA = {
   linguisticshub: "#2A5C87",
   booksummary: "#173D63",
   tracker: "#4f46e5",
+  amt: "#2f6bff",
 };
 
 const NOVA_SERIF = '"Fraunces", Georgia, "Hiragino Mincho ProN", serif';
@@ -158166,6 +158236,15 @@ function IconTracker({ color, size }) {
     </svg>
   );
 }
+function IconMemo({ color, size }) {
+  return (
+    <svg viewBox="0 0 40 40" width={size} height={size} fill="none">
+      <path d="M10 7h14l6 6v20a1 1 0 0 1-1 1H10a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Z" stroke={color} strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M24 7v6h6" stroke={color} strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M14 20h12M14 25h12M14 30h8" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 const NOVA_STATIONS = [
   {
@@ -158239,6 +158318,15 @@ const NOVA_STATIONS = [
     en: "Learning Tracker",
     tagJa: "進捗トラッカー",
     tagEn: "Progress tracker",
+  },
+  {
+    id: "anythingmemo",
+    accent: NOVA.amt,
+    Icon: IconMemo,
+    ja: "Anything Memo",
+    en: "Anything Memo",
+    tagJa: "調べ済みノート",
+    tagEn: "Knowledge notes",
   },
 ];
 
@@ -158415,6 +158503,7 @@ function ProjectNova() {
   else if (active === "languagehub") hubEl = <LanguageHubModule />;
   else if (active === "booksummary") hubEl = <BookSummaryModule />;
   else if (active === "tracker") hubEl = <LearningTrackerModule />;
+  else if (active === "anythingmemo") hubEl = <AnythingMemoModule />;
   else if (active === "linguisticshub") hubEl = <LinguisticsHubModule />;
 
   let content;
