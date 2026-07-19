@@ -1,0 +1,525 @@
+<title>スライド要素図鑑 — 何を・どう見せるかの引き出し</title>
+<style>
+  :root{
+    --paper:#FBF9F5; --paper-2:#F3EFE7; --card:#FFFFFF;
+    --ink:#33312B; --ink-soft:#5F5B51; --ink-faint:#8B857A;
+    --line:#E4DDD0; --line-strong:#CDC3B1;
+    --accent:#E5732B; --accent-ink:#B4531A; --accent-wash:#FBEADD;
+    --good:#3F6B5E; --good-wash:#E2ECE7;
+    --shadow:0 1px 2px rgba(51,49,43,.05),0 10px 30px -16px rgba(51,49,43,.24);
+    --mincho:"Hiragino Mincho ProN","Yu Mincho",YuMincho,"Noto Serif JP","Songti SC",serif;
+    --gothic:"Hiragino Kaku Gothic ProN","Yu Gothic",YuGothic,"Noto Sans JP",Meiryo,system-ui,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --paper:#1A1815; --paper-2:#211E1A; --card:#242019;
+      --ink:#EDE7DA; --ink-soft:#BDB4A3; --ink-faint:#8A8271;
+      --line:#37322A; --line-strong:#4E463A;
+      --accent:#F0854A; --accent-ink:#F6A375; --accent-wash:#3A2417;
+      --good:#7FB6A4; --good-wash:#20302B;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 34px -18px rgba(0,0,0,.75);
+    }
+  }
+  :root[data-theme="light"]{
+    --paper:#FBF9F5; --paper-2:#F3EFE7; --card:#FFFFFF;
+    --ink:#33312B; --ink-soft:#5F5B51; --ink-faint:#8B857A;
+    --line:#E4DDD0; --line-strong:#CDC3B1;
+    --accent:#E5732B; --accent-ink:#B4531A; --accent-wash:#FBEADD;
+    --good:#3F6B5E; --good-wash:#E2ECE7;
+    --shadow:0 1px 2px rgba(51,49,43,.05),0 10px 30px -16px rgba(51,49,43,.24);
+  }
+  :root[data-theme="dark"]{
+    --paper:#1A1815; --paper-2:#211E1A; --card:#242019;
+    --ink:#EDE7DA; --ink-soft:#BDB4A3; --ink-faint:#8A8271;
+    --line:#37322A; --line-strong:#4E463A;
+    --accent:#F0854A; --accent-ink:#F6A375; --accent-wash:#3A2417;
+    --good:#7FB6A4; --good-wash:#20302B;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 34px -18px rgba(0,0,0,.75);
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--gothic);line-height:1.7;
+    font-feature-settings:"palt" 1;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+  section{scroll-margin-top:76px}
+
+  .bar{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--paper) 86%,transparent);
+    backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
+  .bar-in{max-width:1140px;margin:0 auto;padding:11px 24px;display:flex;align-items:center;gap:18px}
+  .brand{font-family:var(--mincho);font-weight:600;letter-spacing:.02em;font-size:16px;white-space:nowrap}
+  .brand b{color:var(--accent)}
+  .navlinks{display:flex;gap:2px;margin-left:auto;flex-wrap:wrap}
+  .navlinks a{font-size:12.5px;color:var(--ink-soft);text-decoration:none;padding:6px 9px;border-radius:6px}
+  .navlinks a:hover{color:var(--ink);background:var(--paper-2)}
+  .theme-btn{border:1px solid var(--line-strong);background:var(--card);color:var(--ink-soft);
+    border-radius:7px;width:34px;height:32px;cursor:pointer;font-size:14px;flex:none}
+  .theme-btn:hover{color:var(--accent);border-color:var(--accent)}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  @media(max-width:860px){.navlinks{display:none}}
+
+  .hero{padding:70px 0 40px}
+  .eyebrow{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--accent-ink);font-weight:700}
+  .hero h1{font-family:var(--mincho);font-weight:600;font-size:clamp(32px,5.4vw,54px);line-height:1.2;margin:16px 0 0;text-wrap:balance}
+  .hero h1 .mark{position:relative;white-space:nowrap;color:var(--accent-ink)}
+  .hero h1 .mark::after{content:"";position:absolute;left:-2px;right:-2px;bottom:3px;height:.4em;z-index:-1;background:var(--accent-wash);transform:rotate(-.6deg)}
+  .lead{font-size:clamp(15px,1.8vw,17.5px);color:var(--ink-soft);max-width:64ch;margin:20px 0 0}
+  .lead b{color:var(--ink);font-weight:600;box-shadow:inset 0 -.5em 0 var(--accent-wash)}
+  .src{margin-top:24px;font-size:11.5px;color:var(--ink-faint);border-left:2px solid var(--line-strong);padding-left:12px;max-width:70ch}
+
+  .band{background:var(--paper-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .pad{padding:58px 0}
+  .kicker{font-size:11.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--accent-ink);font-weight:700}
+  h2.sec{font-family:var(--mincho);font-weight:600;font-size:clamp(22px,3.2vw,31px);margin:11px 0 0;text-wrap:balance}
+  .sec-note{color:var(--ink-soft);font-size:14.5px;margin:11px 0 0;max-width:66ch}
+  .sub{font-family:var(--mincho);font-size:16px;font-weight:600;margin:30px 0 12px;display:flex;align-items:center;gap:10px}
+  .sub::before{content:"";width:7px;height:7px;background:var(--accent);border-radius:2px;transform:rotate(45deg);flex:none}
+  .sub small{font-family:var(--gothic);font-weight:400;font-size:12px;color:var(--ink-faint);margin-left:2px}
+
+  /* design map — 4 layers */
+  .map{margin-top:30px;display:grid;gap:12px}
+  .layer{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:16px 20px;box-shadow:var(--shadow);
+    display:grid;grid-template-columns:132px 1fr;gap:20px;align-items:center;position:relative}
+  .layer .ln{display:flex;flex-direction:column;gap:3px}
+  .layer .ln b{font-family:var(--mono);font-size:11px;color:var(--accent-ink);font-weight:700}
+  .layer .ln strong{font-family:var(--mincho);font-size:17px;font-weight:600}
+  .layer .ln span{font-size:11.5px;color:var(--ink-faint)}
+  .layer .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .layer .arw{position:absolute;left:64px;bottom:-13px;z-index:2;color:var(--line-strong)}
+  .layer:last-child .arw{display:none}
+  @media(max-width:640px){.layer{grid-template-columns:1fr;gap:10px}.layer .arw{left:50%}}
+  .tag{font-size:11.5px;background:var(--paper-2);border:1px solid var(--line);color:var(--ink-soft);border-radius:20px;padding:3px 11px;white-space:nowrap}
+  .tag.a{background:var(--accent-wash);border-color:transparent;color:var(--accent-ink);font-weight:600}
+  .tag.g{background:var(--good-wash);border-color:transparent;color:var(--good);font-weight:600}
+
+  /* composition columns */
+  .cols{margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:820px){.cols{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:520px){.cols{grid-template-columns:1fr}}
+  .col{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}
+  .col h4{font-family:var(--mincho);font-size:15px;margin:0 0 10px;font-weight:600;display:flex;align-items:baseline;gap:8px}
+  .col h4 .no{font-family:var(--mono);font-size:11px;color:var(--accent-ink);font-weight:700}
+  .col ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+  .col li{font-size:12px;color:var(--ink-soft);background:var(--paper-2);border-radius:6px;padding:4px 9px}
+
+  /* pattern gallery */
+  .gal{margin-top:16px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:960px){.gal{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:680px){.gal{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:420px){.gal{grid-template-columns:1fr}}
+  .pat{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);
+    transition:transform .18s,border-color .18s}
+  .pat:hover{transform:translateY(-3px);border-color:var(--line-strong)}
+  .thumb{display:block;width:100%;height:auto;aspect-ratio:132/80;background:var(--paper-2);border-bottom:1px solid var(--line)}
+  .pat .cap{padding:11px 13px 13px}
+  .pat .cap b{font-family:var(--mincho);font-size:14px;font-weight:600;display:block}
+  .pat .cap span{font-size:11.5px;color:var(--ink-faint);display:block;margin-top:3px;line-height:1.55}
+  .pat .rb{font-family:var(--mono);font-size:9.5px;color:var(--accent-ink);letter-spacing:.04em;margin-top:7px;display:inline-block;
+    background:var(--accent-wash);padding:1px 6px;border-radius:4px}
+
+  /* svg thumbnail element classes */
+  .thumb .box{fill:var(--card);stroke:var(--line-strong);stroke-width:2}
+  .thumb .boxf{fill:var(--paper-2);stroke:var(--line-strong);stroke-width:1.6}
+  .thumb .ln{fill:var(--line-strong)}
+  .thumb .a{fill:var(--accent)}
+  .thumb .aw{fill:var(--accent-wash);stroke:var(--accent);stroke-width:1.8}
+  .thumb .con{stroke:var(--line-strong);stroke-width:2;fill:none}
+  .thumb .acon{stroke:var(--accent);stroke-width:2.4;fill:none}
+  .thumb .ax{stroke:var(--ink-faint);stroke-width:1.6;fill:none}
+
+  /* color palette */
+  .pal{margin-top:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
+  .sw{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:var(--shadow)}
+  .sw i{display:block;height:44px}
+  .sw span{display:block;padding:7px 10px;font-size:12px}
+  .sw span small{display:block;font-family:var(--mono);font-size:10px;color:var(--ink-faint)}
+  .taste{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+  .taste .t{border:1px solid var(--line-strong);border-radius:22px;padding:6px 14px;font-size:13px;background:var(--card)}
+
+  .chipwrap{margin-top:14px;display:flex;flex-wrap:wrap;gap:7px}
+  .chipwrap .c{font-size:12px;color:var(--ink-soft);background:var(--card);border:1px solid var(--line);border-radius:7px;padding:5px 10px}
+
+  /* example callout */
+  .eg{margin-top:24px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+  .eg-h{padding:16px 22px;border-bottom:1px solid var(--line);font-family:var(--mincho);font-size:16px;font-weight:600}
+  .eg-h span{font-family:var(--gothic);font-size:12px;color:var(--ink-faint);font-weight:400;margin-left:8px}
+  .eg-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+  @media(max-width:720px){.eg-grid{grid-template-columns:repeat(2,1fr)}}
+  .eg-cell{padding:16px 18px;border-left:1px solid var(--line)}
+  .eg-cell:first-child{border-left:0}
+  @media(max-width:720px){.eg-cell:nth-child(3){border-left:0}.eg-cell:nth-child(n+3){border-top:1px solid var(--line)}}
+  .eg-cell .lab{font-family:var(--mono);font-size:11px;color:var(--accent-ink);font-weight:700}
+  .eg-cell b{font-family:var(--mincho);font-size:15px;display:block;margin:6px 0 5px;font-weight:600}
+  .eg-cell p{font-size:12px;color:var(--ink-soft);margin:0}
+
+  footer{border-top:1px solid var(--line)}
+  .foot{padding:28px 0 46px;font-size:12px;color:var(--ink-faint);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .foot b{color:var(--ink-soft);font-family:var(--mincho);font-weight:600}
+</style>
+
+<div class="bar">
+  <div class="bar-in">
+    <span class="brand">スライド<b>要素図鑑</b></span>
+    <nav class="navlinks">
+      <a href="#map">設計マップ</a>
+      <a href="#compose">構成</a>
+      <a href="#layout">レイアウト図解</a>
+      <a href="#graph">グラフ</a>
+      <a href="#material">素材</a>
+      <a href="#color">色・テイスト</a>
+      <a href="#industry">業種</a>
+    </nav>
+    <button class="theme-btn" id="themeBtn" aria-label="テーマ切替" title="ライト／ダーク切替">◑</button>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Slide Elements · 何を / どう見せるか</span>
+    <h1>スライドは、<span class="mark">要素の引き出し</span>を<br>選んで組むだけ。</h1>
+    <p class="lead">スライド作成でやることは、大きく4つ。<b>資料の種類</b>を決め、<b>構成（ページの並び）</b>を通し、各ページで<b>レイアウト図解</b>と<b>グラフ</b>を選び、<b>素材・色・テイスト</b>で仕上げる。この図鑑は、その一つひとつを実際のミニ図解で並べた「引き出し一覧」です。迷ったらここから選びます。</p>
+    <p class="src">出典：Google Drive のプレゼン資料 — 松上純一郎『PowerPoint資料作成 プロフェッショナルの大原則』図解・グラフテンプレート、コンサル提案テンプレート、スポーツジム参考スライド（株式会社ルバート）／構成分類は slideland.tech・design-sli.de のカテゴリ体系を参照し再構成。</p>
+  </div>
+</header>
+
+<!-- DESIGN MAP -->
+<section id="map">
+  <div class="wrap pad">
+    <span class="kicker">The 4 Layers</span>
+    <h2 class="sec">スライド作成の4層マップ</h2>
+    <p class="sec-note">「どんな要素があるか」は、この4層で捉えると迷いません。上から順に決めていくと、下の選択肢が自然に絞られます。</p>
+    <div class="map">
+      <div class="layer">
+        <div class="ln"><b>LAYER 1</b><strong>資料の種類</strong><span>ゴールと読み手</span></div>
+        <div class="chips">
+          <span class="tag a">会社紹介</span><span class="tag a">サービス紹介</span><span class="tag a">決算説明(IR)</span>
+          <span class="tag a">事業計画</span><span class="tag a">中期経営計画</span><span class="tag a">統合報告書</span>
+          <span class="tag a">登壇・セミナー</span><span class="tag a">ポートフォリオ</span>
+        </div>
+        <div class="arw"><svg width="26" height="14" viewBox="0 0 26 14"><path d="M13 0v9M7 7l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2"/></svg></div>
+      </div>
+      <div class="layer">
+        <div class="ln"><b>LAYER 2</b><strong>構成</strong><span>ページの並び・流れ</span></div>
+        <div class="chips">
+          <span class="tag">表紙・目次</span><span class="tag">会社情報</span><span class="tag">事業内容</span>
+          <span class="tag">財務・決算</span><span class="tag">採用・文化</span><span class="tag">実績・事例</span>
+          <span class="tag">背景→課題→解決策→効果</span>
+        </div>
+        <div class="arw"><svg width="26" height="14" viewBox="0 0 26 14"><path d="M13 0v9M7 7l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2"/></svg></div>
+      </div>
+      <div class="layer">
+        <div class="ln"><b>LAYER 3</b><strong>ページの中身</strong><span>1枚をどう見せるか</span></div>
+        <div class="chips">
+          <span class="tag">レイアウト図解（フロー／比較／マトリクス…）</span>
+          <span class="tag">グラフ（棒／円／折れ線…）</span>
+          <span class="tag">表</span>
+        </div>
+        <div class="arw"><svg width="26" height="14" viewBox="0 0 26 14"><path d="M13 0v9M7 7l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2"/></svg></div>
+      </div>
+      <div class="layer">
+        <div class="ln"><b>LAYER 4</b><strong>仕上げ</strong><span>印象を決める</span></div>
+        <div class="chips">
+          <span class="tag g">素材（アイコン／イラスト／写真）</span>
+          <span class="tag g">色（3色以下）</span>
+          <span class="tag g">テイスト</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPOSITION -->
+<section id="compose" class="band">
+  <div class="wrap pad">
+    <span class="kicker">Composition</span>
+    <h2 class="sec">構成スライド ― ページの引き出し</h2>
+    <p class="sec-note">1つの資料は、役割の違うページの組み合わせでできています。用途ごとに「よく使うページ」をまとめました。必要なものを選んで並べれば骨子になります。</p>
+
+    <div class="sub">表紙まわり <small>すべての資料に共通する枠</small></div>
+    <div class="cols">
+      <div class="col"><h4><span class="no">00</span>表紙・区切り</h4><ul>
+        <li>表紙</li><li>目次</li><li>中表紙</li><li>裏表紙</li><li>アジェンダ</li></ul></div>
+    </div>
+
+    <div class="sub">会社情報 <small>会社紹介・統合報告書</small></div>
+    <div class="cols">
+      <div class="col"><h4><span class="no">01</span>基本情報</h4><ul>
+        <li>会社概要</li><li>沿革</li><li>拠点</li><li>社員数推移</li><li>組織図</li><li>オフィス</li></ul></div>
+      <div class="col"><h4><span class="no">02</span>理念・姿勢</h4><ul>
+        <li>ミッション</li><li>ビジョン</li><li>バリュー</li><li>メッセージ</li><li>サステナビリティ</li><li>価値創造プロセス</li><li>マテリアリティ</li></ul></div>
+      <div class="col"><h4><span class="no">03</span>人・体制</h4><ul>
+        <li>メンバー紹介</li><li>役員一覧</li><li>スキルマトリクス</li><li>ガバナンス</li><li>人的資本</li></ul></div>
+    </div>
+
+    <div class="sub">事業内容 <small>サービス紹介・事業計画</small></div>
+    <div class="cols">
+      <div class="col"><h4><span class="no">04</span>市場・課題</h4><ul>
+        <li>背景</li><li>課題・悩み</li><li>ニーズ</li><li>市場環境</li><li>市場規模／TAM図</li><li>業界構造</li><li>競合比較</li></ul></div>
+      <div class="col"><h4><span class="no">05</span>提供価値</h4><ul>
+        <li>事業概要</li><li>サービスの特徴</li><li>ソリューション</li><li>プロダクト一覧</li><li>強み・選ばれる理由</li><li>ビジネスモデル</li><li>料金・プラン</li></ul></div>
+      <div class="col"><h4><span class="no">06</span>証拠・戦略</h4><ul>
+        <li>導入事例</li><li>導入実績</li><li>お客様の声</li><li>実績</li><li>成長戦略</li><li>ロードマップ</li><li>M&A戦略</li></ul></div>
+    </div>
+
+    <div class="sub">財務・決算 <small>決算説明・IR・統合報告書</small></div>
+    <div class="cols">
+      <div class="col"><h4><span class="no">07</span>ハイライト</h4><ul>
+        <li>サマリー・ハイライト</li><li>業績</li><li>KPI</li><li>財務データ</li><li>売上推移</li></ul></div>
+      <div class="col"><h4><span class="no">08</span>財務三表</h4><ul>
+        <li>PL（損益）</li><li>CF（資金）</li><li>バランスシート</li><li>収益構造</li><li>セグメント別業績</li></ul></div>
+      <div class="col"><h4><span class="no">09</span>見通し・還元</h4><ul>
+        <li>業績予想</li><li>中期経営計画</li><li>資金使途</li><li>株主還元</li><li>キャッシュアロケーション</li><li>リスク情報</li></ul></div>
+    </div>
+
+    <div class="sub">採用・文化 <small>採用資料</small></div>
+    <div class="cols">
+      <div class="col"><h4><span class="no">10</span>カルチャー</h4><ul>
+        <li>カルチャー</li><li>バリュー</li><li>働く環境</li><li>一日の流れ</li><li>メンバーの声・インタビュー</li></ul></div>
+      <div class="col"><h4><span class="no">11</span>条件・制度</h4><ul>
+        <li>給与レンジ</li><li>評価制度</li><li>福利厚生</li><li>技術スタック</li></ul></div>
+      <div class="col"><h4><span class="no">12</span>募集</h4><ul>
+        <li>WE ARE HIRING</li><li>求める人物像</li><li>募集ポジション</li><li>選考フロー</li><li>Q&A</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- LAYOUT PATTERNS -->
+<section id="layout">
+  <div class="wrap pad">
+    <span class="kicker">Layout &amp; Diagram</span>
+    <h2 class="sec">レイアウト・図解パターン図鑑</h2>
+    <p class="sec-note">1枚のスライドで「関係」をどう見せるか。<span style="color:var(--accent-ink);font-weight:600">RUBATO</span> の印はルバート教材の型に対応します。伝えたい関係（並列・流れ・分岐・位置づけ）から選びます。</p>
+
+    <div class="sub">ならべる <small>並列・比較・順位</small></div>
+    <div class="gal" id="g-line"></div>
+
+    <div class="sub">ながす <small>流れ・順序・時間</small></div>
+    <div class="gal" id="g-flow"></div>
+
+    <div class="sub">ひろげる・まとめる <small>分岐・集約・循環</small></div>
+    <div class="gal" id="g-branch"></div>
+
+    <div class="sub">位置づける・構造化 <small>関係・階層・空間</small></div>
+    <div class="gal" id="g-struct"></div>
+  </div>
+</section>
+
+<!-- GRAPHS -->
+<section id="graph" class="band">
+  <div class="wrap pad">
+    <span class="kicker">Charts</span>
+    <h2 class="sec">グラフ選択ガイド</h2>
+    <p class="sec-note">数字は「何を伝えたいか」でグラフを選びます。構成比なら円、推移なら折れ線、増減の内訳ならウォーターフォール。並び順を整え、着目点を1色で強調するのが鉄則です。</p>
+    <div class="gal" id="g-chart"></div>
+  </div>
+</section>
+
+<!-- MATERIALS -->
+<section id="material">
+  <div class="wrap pad">
+    <span class="kicker">Assets</span>
+    <h2 class="sec">使用素材 ― イラスト・写真</h2>
+    <p class="sec-note">図解や文字を補強する素材。テイストを揃えることが第一。混ぜると一気に素人っぽくなります。</p>
+
+    <div class="sub">イラスト系</div>
+    <div class="gal" id="g-illust"></div>
+
+    <div class="sub">写真の種類 <small>被写体で使い分け</small></div>
+    <div class="chipwrap" id="c-photo"></div>
+
+    <div class="sub">その他</div>
+    <div class="chipwrap" id="c-other"></div>
+  </div>
+</section>
+
+<!-- COLOR / TASTE -->
+<section id="color" class="band">
+  <div class="wrap pad">
+    <span class="kicker">Color &amp; Taste</span>
+    <h2 class="sec">色とテイスト</h2>
+    <p class="sec-note">色は資料の第一印象。使うのは「基本色＋アクセント」で、1枚あたり3色以下が目安（→ 向上Hubのチェック⑲）。業界やブランドに合うトーンを選びます。</p>
+
+    <div class="sub">カラーの引き出し</div>
+    <div class="pal" id="p-color"></div>
+
+    <div class="sub">テイスト <small>資料全体の空気感</small></div>
+    <div class="taste" id="t-taste"></div>
+  </div>
+</section>
+
+<!-- EXAMPLE -->
+<section id="example">
+  <div class="wrap pad">
+    <span class="kicker">Worked Example</span>
+    <h2 class="sec">実例 ― ジム事例で見る使い分け</h2>
+    <p class="sec-note">Google Drive の参考スライド（スポーツジムの入会施策）では、同じ提案の中で4種類の見せ方を使い分けています。「何を言いたいか」でパターンが変わる好例です。</p>
+    <div class="eg">
+      <div class="eg-h">スポーツジム 入会促進の提案 <span>1つの提案 × 4つの見せ方</span></div>
+      <div class="eg-grid">
+        <div class="eg-cell"><span class="lab">課題を示す</span><b>横棒グラフ</b><p>「体験しない理由」を数値の大きい順に並べ替え、着目点を強調。定性表現で括る。</p></div>
+        <div class="eg-cell"><span class="lab">案を並べる</span><b>背景型／合流の図解</b><p>3つのプロモ案を背景→課題→解決策→効果の流れで整理し、T1/T2で主張を明示。</p></div>
+        <div class="eg-cell"><span class="lab">案を比べる</span><b>マトリクス</b><p>費用・労力・効果の観点×施策で比較。優劣が一見で分かるようにする。</p></div>
+        <div class="eg-cell"><span class="lab">効果を裏づける</span><b>表</b><p>リーチ・体験者・入会見込みを試算。先頭行・列を塗り、中央揃えで読ませる。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INDUSTRY -->
+<section id="industry" class="band">
+  <div class="wrap pad">
+    <span class="kicker">Industry</span>
+    <h2 class="sec">業種 ― トーンとモチーフの手がかり</h2>
+    <p class="sec-note">業種はテイスト・色・写真選びの出発点。金融なら信頼感のネイビー、SaaSなら爽やかなブルー、というように業界の"らしさ"を素材選択に落とし込みます。</p>
+    <div class="chipwrap" id="c-industry"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <span>出典：<b>ルバート図解・グラフテンプレート／コンサル提案テンプレ／ジム参考スライド</b>（Google Drive）＋ slideland.tech・design-sli.de のカテゴリ体系を学習用に再構成</span>
+    <span>スライド要素図鑑</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var S='<svg class="thumb" viewBox="0 0 132 80">', E='</svg>';
+
+  /* ---- LAYOUT PATTERNS ---- */
+  var LINE=[
+    {n:"箇条書き・列挙",u:"要点を並列に並べる基本形",rb:"RUBATO 列挙型",
+     svg:'<rect class="a" x="16" y="20" width="8" height="8" rx="2"/><rect class="ln" x="30" y="21" width="72" height="6" rx="3"/><rect class="a" x="16" y="37" width="8" height="8" rx="2"/><rect class="ln" x="30" y="38" width="86" height="6" rx="3"/><rect class="a" x="16" y="54" width="8" height="8" rx="2"/><rect class="ln" x="30" y="55" width="60" height="6" rx="3"/>'},
+    {n:"対比・比較",u:"2つを左右に並べて違いを見せる",rb:"RUBATO 対比型",
+     svg:'<rect class="boxf" x="14" y="16" width="48" height="48" rx="4"/><rect class="aw" x="70" y="16" width="48" height="48" rx="4"/><rect class="ln" x="22" y="26" width="32" height="5" rx="2"/><rect class="ln" x="22" y="38" width="26" height="5" rx="2"/><rect class="a" x="78" y="26" width="32" height="5" rx="2"/><rect class="a" x="78" y="38" width="26" height="5" rx="2"/>'},
+    {n:"項目比較図",u:"複数案を評価軸で見比べる",rb:"",
+     svg:'<line class="ax" x1="16" y1="60" x2="116" y2="60"/><rect class="ln" x="26" y="34" width="14" height="26"/><rect class="ln" x="52" y="26" width="14" height="34"/><rect class="a" x="78" y="18" width="14" height="42"/><rect class="ln" x="104" y="40" width="10" height="20"/>'},
+    {n:"ランキング",u:"順位づけで優先度を示す",rb:"",
+     svg:'<circle class="a" cx="22" cy="24" r="8"/><rect class="ln" x="36" y="21" width="80" height="6" rx="3"/><circle class="boxf" cx="22" cy="42" r="8"/><rect class="ln" x="36" y="39" width="66" height="6" rx="3"/><circle class="boxf" cx="22" cy="60" r="8"/><rect class="ln" x="36" y="57" width="52" height="6" rx="3"/>'}
+  ];
+  var FLOW=[
+    {n:"横フロー",u:"左→右へ手順・プロセスを示す",rb:"RUBATO 横フロー型",
+     svg:'<rect class="boxf" x="10" y="30" width="28" height="20" rx="3"/><rect class="boxf" x="52" y="30" width="28" height="20" rx="3"/><rect class="aw" x="94" y="30" width="28" height="20" rx="3"/><path class="acon" d="M40 40h9m-1-3l4 3-4 3"/><path class="acon" d="M82 40h9m-1-3l4 3-4 3"/>'},
+    {n:"縦フロー",u:"上→下へ段階を積む",rb:"RUBATO 縦フロー型",
+     svg:'<rect class="boxf" x="34" y="8" width="64" height="16" rx="3"/><rect class="boxf" x="34" y="32" width="64" height="16" rx="3"/><rect class="aw" x="34" y="56" width="64" height="16" rx="3"/><path class="acon" d="M66 24v4m-3-1l3 3 3-3"/><path class="acon" d="M66 48v4m-3-1l3 3 3-3"/>'},
+    {n:"階段・ステップ",u:"段階的な上昇・成長を示す",rb:"RUBATO 上昇型",
+     svg:'<rect class="boxf" x="12" y="52" width="30" height="14" rx="2"/><rect class="boxf" x="50" y="38" width="30" height="28" rx="2"/><rect class="aw" x="88" y="20" width="30" height="46" rx="2"/><path class="acon" d="M20 48l0-0" /><path class="con" d="M14 46l26-12 46-14" stroke-dasharray="3 3"/>'},
+    {n:"ガントチャート",u:"タスクを時間軸に沿って配置",rb:"RUBATO ガント型",
+     svg:'<line class="ax" x1="14" y1="18" x2="120" y2="18"/><rect class="ln" x="20" y="26" width="44" height="8" rx="2"/><rect class="a" x="48" y="40" width="46" height="8" rx="2"/><rect class="ln" x="76" y="54" width="40" height="8" rx="2"/>'}
+  ];
+  var BRANCH=[
+    {n:"ツリー（ロジックツリー）",u:"全体を要素に分解・整理",rb:"",
+     svg:'<rect class="aw" x="8" y="32" width="26" height="16" rx="3"/><rect class="boxf" x="98" y="12" width="26" height="14" rx="3"/><rect class="boxf" x="98" y="33" width="26" height="14" rx="3"/><rect class="boxf" x="98" y="54" width="26" height="14" rx="3"/><path class="con" d="M34 40h30v-21h34M64 40h34M64 40v21h34"/>'},
+    {n:"放射・拡散",u:"中心から派生・展開を見せる",rb:"RUBATO 拡散型",
+     svg:'<circle class="aw" cx="66" cy="40" r="13"/><circle class="boxf" cx="66" cy="12" r="8"/><circle class="boxf" cx="112" cy="34" r="8"/><circle class="boxf" cx="96" cy="68" r="8"/><circle class="boxf" cx="36" cy="68" r="8"/><circle class="boxf" cx="20" cy="34" r="8"/><path class="con" d="M66 27V20M77 33l28-14M74 51l18 12M58 51L42 63M55 34L28 20"/>'},
+    {n:"合流",u:"複数の要素を1つに集約する",rb:"RUBATO 合流型",
+     svg:'<rect class="boxf" x="8" y="10" width="26" height="14" rx="3"/><rect class="boxf" x="8" y="33" width="26" height="14" rx="3"/><rect class="boxf" x="8" y="56" width="26" height="14" rx="3"/><rect class="aw" x="98" y="32" width="26" height="16" rx="3"/><path class="con" d="M34 17h30v23h30M34 40h60M34 63h30V40"/>'},
+    {n:"サイクル・フライホイール",u:"循環・繰り返す仕組みを示す",rb:"RUBATO 回転型",
+     svg:'<path class="acon" d="M66 16a24 24 0 1 1-20 11" /><path class="a" d="M44 24l4 9-10 -1z"/><circle class="boxf" cx="66" cy="16" r="7"/><circle class="boxf" cx="90" cy="40" r="7"/><circle class="boxf" cx="66" cy="64" r="7"/><circle class="boxf" cx="42" cy="40" r="7"/>'}
+  ];
+  var STRUCT=[
+    {n:"マトリクス",u:"2つの軸で情報を整理する",rb:"RUBATO マトリックス型",
+     svg:'<rect class="ln" x="14" y="14" width="26" height="12"/><rect class="ln" x="44" y="14" width="34" height="12"/><rect class="ln" x="82" y="14" width="34" height="12"/><rect class="ln" x="14" y="30" width="26" height="16"/><rect class="boxf" x="44" y="30" width="34" height="16"/><rect class="aw" x="82" y="30" width="34" height="16"/><rect class="ln" x="14" y="50" width="26" height="16"/><rect class="boxf" x="44" y="50" width="34" height="16"/><rect class="boxf" x="82" y="50" width="34" height="16"/>'},
+    {n:"4象限・ポジショニング",u:"2軸上の位置で優劣を示す",rb:"RUBATO 4象限型",
+     svg:'<line class="ax" x1="66" y1="10" x2="66" y2="70"/><line class="ax" x1="14" y1="40" x2="118" y2="40"/><circle class="boxf" cx="38" cy="56" r="6"/><circle class="boxf" cx="52" cy="30" r="6"/><circle class="a" cx="92" cy="22" r="7"/><circle class="boxf" cx="86" cy="52" r="6"/>'},
+    {n:"ベン図",u:"重なり・共通点を見せる",rb:"",
+     svg:'<circle class="boxf" cx="52" cy="40" r="24" fill-opacity="0.6"/><circle class="aw" cx="82" cy="40" r="24" fill-opacity="0.6"/>'},
+    {n:"ピラミッド",u:"階層・優先順位を積み上げる",rb:"",
+     svg:'<path class="aw" d="M66 12l16 16H50z"/><path class="boxf" d="M50 30l16 0 12 16H38z"/><path class="boxf" d="M38 48h56l12 18H26z"/>'},
+    {n:"相関図・概念図",u:"要素どうしの関係を線でつなぐ",rb:"",
+     svg:'<path class="con" d="M30 24L66 40M102 22L66 40M30 60L66 40M100 62L66 40"/><circle class="aw" cx="66" cy="40" r="10"/><circle class="boxf" cx="26" cy="22" r="8"/><circle class="boxf" cx="106" cy="20" r="8"/><circle class="boxf" cx="26" cy="62" r="8"/><circle class="boxf" cx="104" cy="64" r="8"/>'},
+    {n:"階層・レイヤー",u:"積み重なる構造を示す",rb:"",
+     svg:'<path class="boxf" d="M66 10l46 12-46 12-46-12z"/><path class="boxf" d="M20 34l46 12 46-12" fill="none"/><path class="boxf" d="M66 34l46 12-46 12-46-12z"/><path class="aw" d="M66 46l46 12-46 12-46-12z"/>'},
+    {n:"トライアングル",u:"3要素の均衡・関係を示す",rb:"",
+     svg:'<path class="con" d="M66 16L100 64H32z"/><circle class="a" cx="66" cy="16" r="8"/><circle class="boxf" cx="100" cy="64" r="8"/><circle class="boxf" cx="32" cy="64" r="8"/>'},
+    {n:"ハニカム・パズル",u:"要素の集合・組み合わせを示す",rb:"",
+     svg:'<path class="boxf" d="M40 22l12 0 6 10-6 10-12 0-6-10z"/><path class="aw" d="M66 22l12 0 6 10-6 10-12 0-6-10z"/><path class="boxf" d="M92 22l12 0 6 10-6 10-12 0-6-10z"/><path class="boxf" d="M53 44l12 0 6 10-6 10-12 0-6-10z"/><path class="boxf" d="M79 44l12 0 6 10-6 10-12 0-6-10z"/>'},
+    {n:"地図・マップ",u:"拠点・エリアを空間で示す",rb:"",
+     svg:'<rect class="boxf" x="16" y="14" width="100" height="52" rx="5"/><path class="con" d="M16 40h100M56 14v52" stroke-dasharray="3 3"/><path class="a" d="M78 30a7 7 0 1 0-14 0c0 6 7 13 7 13s7-7 7-13z"/><circle class="aw" cx="71" cy="30" r="3"/>'},
+    {n:"表",u:"行×列で正確に対応づける",rb:"RUBATO 表型",
+     svg:'<rect class="a" x="14" y="16" width="104" height="12"/><rect class="ln" x="14" y="16" width="26" height="48" fill-opacity="0.5"/><line class="con" x1="14" y1="28" x2="118" y2="28"/><line class="con" x1="14" y1="46" x2="118" y2="46"/><line class="con" x1="40" y1="16" x2="40" y2="64"/><line class="con" x1="66" y1="16" x2="66" y2="64"/><line class="con" x1="92" y1="16" x2="92" y2="64"/><rect class="boxf" x="14" y="16" width="104" height="48" fill="none"/>'}
+  ];
+
+  /* ---- CHARTS ---- */
+  var CHART=[
+    {n:"円グラフ",u:"構成比・シェアを見せる",rb:"",
+     svg:'<circle class="boxf" cx="66" cy="40" r="28"/><path class="aw" d="M66 40V12A28 28 0 0 1 90 54z"/>'},
+    {n:"縦棒グラフ",u:"項目間の大小を比べる",rb:"RUBATO 縦棒",
+     svg:'<line class="ax" x1="16" y1="64" x2="118" y2="64"/><rect class="ln" x="24" y="40" width="16" height="24"/><rect class="ln" x="48" y="30" width="16" height="34"/><rect class="a" x="72" y="20" width="16" height="44"/><rect class="ln" x="96" y="46" width="16" height="18"/>'},
+    {n:"積み上げ棒",u:"合計と内訳を同時に見せる",rb:"RUBATO 積上げ",
+     svg:'<line class="ax" x1="16" y1="64" x2="118" y2="64"/><rect class="a" x="30" y="42" width="20" height="22"/><rect class="aw" x="30" y="26" width="20" height="16"/><rect class="ln" x="30" y="16" width="20" height="10"/><rect class="a" x="66" y="48" width="20" height="16"/><rect class="aw" x="66" y="30" width="20" height="18"/><rect class="ln" x="66" y="22" width="20" height="8"/>'},
+    {n:"100%積み上げ",u:"割合の構成を比較する",rb:"",
+     svg:'<rect class="a" x="30" y="14" width="20" height="24"/><rect class="aw" x="30" y="38" width="20" height="14"/><rect class="ln" x="30" y="52" width="20" height="12"/><rect class="a" x="66" y="14" width="20" height="14"/><rect class="aw" x="66" y="28" width="20" height="22"/><rect class="ln" x="66" y="50" width="20" height="14"/><rect class="a" x="102" y="14" width="20" height="30"/><rect class="ln" x="102" y="44" width="20" height="20"/>'},
+    {n:"横棒グラフ",u:"項目が多い／ラベルが長い時",rb:"RUBATO 横棒",
+     svg:'<line class="ax" x1="18" y1="12" x2="18" y2="68"/><rect class="a" x="18" y="16" width="90" height="9"/><rect class="ln" x="18" y="30" width="66" height="9"/><rect class="ln" x="18" y="44" width="48" height="9"/><rect class="ln" x="18" y="58" width="34" height="9"/>'},
+    {n:"折れ線グラフ",u:"時系列の推移・トレンド",rb:"RUBATO 折れ線",
+     svg:'<line class="ax" x1="16" y1="64" x2="118" y2="64"/><polyline class="acon" points="20,52 44,40 66,46 90,26 114,20"/><circle class="a" cx="90" cy="26" r="3.5"/><circle class="a" cx="114" cy="20" r="3.5"/>'},
+    {n:"面グラフ",u:"推移とボリュームを見せる",rb:"",
+     svg:'<line class="ax" x1="16" y1="64" x2="118" y2="64"/><path class="aw" d="M18 64V50l24-12 24 8 24-18 24-6v42z"/><polyline class="acon" points="18,50 42,38 66,46 90,28 114,22"/>'},
+    {n:"ウォーターフォール",u:"増減の積み重ねを分解する",rb:"",
+     svg:'<line class="ax" x1="14" y1="64" x2="120" y2="64"/><rect class="ln" x="18" y="40" width="16" height="24"/><rect class="a" x="40" y="28" width="16" height="12"/><rect class="a" x="62" y="20" width="16" height="8"/><rect class="aw" x="84" y="28" width="16" height="8"/><rect class="ln" x="104" y="20" width="16" height="44"/>'},
+    {n:"散布図",u:"2変数の相関・分布を見る",rb:"RUBATO 散布図",
+     svg:'<line class="ax" x1="18" y1="10" x2="18" y2="66"/><line class="ax" x1="18" y1="66" x2="120" y2="66"/><circle class="ln" cx="36" cy="52" r="3.5"/><circle class="ln" cx="50" cy="44" r="3.5"/><circle class="a" cx="64" cy="40" r="3.5"/><circle class="ln" cx="78" cy="30" r="3.5"/><circle class="a" cx="96" cy="24" r="3.5"/><circle class="ln" cx="106" cy="18" r="3.5"/>'},
+    {n:"アイコンチャート",u:"数量を絵の数で直感的に",rb:"",
+     svg:'<g class="a"><circle cx="26" cy="28" r="6"/><circle cx="46" cy="28" r="6"/><circle cx="66" cy="28" r="6"/><circle cx="86" cy="28" r="6"/></g><g class="ln"><circle cx="26" cy="52" r="6"/><circle cx="46" cy="52" r="6"/></g><circle class="aw" cx="66" cy="52" r="6"/><circle class="ln" cx="86" cy="52" r="6"/><circle class="ln" cx="106" cy="52" r="6"/>'},
+    {n:"ミルフィーユグラフ",u:"多層の推移を重ねて比べる",rb:"",
+     svg:'<line class="ax" x1="16" y1="64" x2="118" y2="64"/><path class="aw" d="M18 64V54l24-4 24-6 24-8 24-4v36z"/><path class="con" d="M18 50l24-4 24-6 24-8 24-4" stroke-dasharray="0"/><path class="acon" d="M18 40l24-6 24-4 24-10 24-4"/>'}
+  ];
+
+  /* ---- ILLUSTRATION ---- */
+  var ILLUST=[
+    {n:"アイコン",u:"要点の目印。線を細く統一",rb:"",
+     svg:'<circle class="acon" cx="66" cy="36" r="16"/><path class="acon" d="M66 28v8h6"/>'},
+    {n:"イラスト（ドローイング）",u:"やわらかい雰囲気づくり",rb:"",
+     svg:'<path class="acon" d="M40 58c0-14 10-26 26-26s26 12 26 26"/><circle class="aw" cx="66" cy="26" r="10"/>'},
+    {n:"アイソメトリック",u:"立体感のある俯瞰表現",rb:"",
+     svg:'<path class="aw" d="M66 20l30 16-30 16-30-16z"/><path class="boxf" d="M36 36v18l30 16V52z"/><path class="con" d="M96 36v18l-30 16V52z" fill="none"/>'},
+    {n:"3Dイラスト",u:"先進性・リッチな印象",rb:"",
+     svg:'<circle class="aw" cx="60" cy="38" r="22"/><path class="con" d="M46 30q14 -8 28 0M46 46q14 8 28 0" fill="none"/><circle class="a" cx="86" cy="22" r="5"/>'}
+  ];
+
+  /* ---- CHIP LISTS ---- */
+  var PHOTO=["集合写真","ポートレート","顔写真","風景","建築物","内観・インテリア","乗り物・交通","ライフスタイル","食べ物","動物","製品","マクロ","オフィスサイン"];
+  var OTHER=["モックアップ画像","キャプチャ","QRコード"];
+  var COLORS=[
+    ["ブルー・青","#2F6FEB"],["ネイビー・紺","#1F2A56"],["ライトブルー・水色","#4FB6E6"],
+    ["グリーン・緑","#2E9E6B"],["イエロー・黄","#F2C21B"],["オレンジ・橙","#E5732B"],
+    ["レッド・赤","#D8443A"],["ピンク・桃","#E86A9B"],["パープル・紫","#7A56C9"],
+    ["ブラウン・茶","#8A5A34"],["ベージュ・肌","#D9C4A3"],["ブラック・黒","#2A2A2A"],
+    ["モノトーン","linear-gradient(90deg,#111,#888,#eee)"],["カラフル・多色","linear-gradient(90deg,#E5732B,#2E9E6B,#2F6FEB,#7A56C9)"],
+    ["ツートン","linear-gradient(90deg,#1F2A56 50%,#E5732B 50%)"],["グラデーション","linear-gradient(90deg,#4FB6E6,#7A56C9)"]
+  ];
+  var TASTE=["ミニマル・シンプル","スタイリッシュ","近未来","やさしい","爽やか","ポップ","ダイナミック","信頼感","高級感"];
+  var INDUSTRY=["食品","化学","デザイン","製造業","SaaS","教育","医療・看護・福祉","AI・人工知能","ゲーム","エンタメ","出版","音楽","コンサルティング","マーケティング","マッチング","開発","EC","印刷","広告","営業","事務","情報・通信","ブランディング","人材・HR","航空","自動車","宿泊・観光","金融","不動産","アート・芸術","メディア","ペット","ファッション","美容・化粧品","建築・建設","NFT・Web3","物流・運輸","レンタルスペース","エネルギー","宇宙","文房具・家具","商社","自治体"];
+
+  function card(p){
+    return '<div class="pat">'+S+p.svg+E+'<div class="cap"><b>'+p.n+'</b><span>'+p.u+'</span>'+
+      (p.rb?'<span class="rb">'+p.rb+'</span>':'')+'</div></div>';
+  }
+  function fill(id,arr){var h=document.getElementById(id);if(h)h.innerHTML=arr.map(card).join('');}
+  fill("g-line",LINE); fill("g-flow",FLOW); fill("g-branch",BRANCH); fill("g-struct",STRUCT);
+  fill("g-chart",CHART); fill("g-illust",ILLUST);
+
+  function chips(id,arr){var h=document.getElementById(id);if(h)h.innerHTML=arr.map(function(x){return '<span class="c">'+x+'</span>';}).join('');}
+  chips("c-photo",PHOTO); chips("c-other",OTHER); chips("c-industry",INDUSTRY);
+
+  var tp=document.getElementById("t-taste");
+  if(tp)tp.innerHTML=TASTE.map(function(x){return '<span class="t">'+x+'</span>';}).join('');
+
+  var pc=document.getElementById("p-color");
+  if(pc)pc.innerHTML=COLORS.map(function(c){
+    return '<div class="sw"><i style="background:'+c[1]+'"></i><span>'+c[0]+'</span></div>';
+  }).join('');
+
+  // theme toggle
+  var root=document.documentElement, tb=document.getElementById("themeBtn");
+  tb.addEventListener("click",function(){
+    var cur=root.getAttribute("data-theme");
+    if(!cur){cur=matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";}
+    root.setAttribute("data-theme",cur==="dark"?"light":"dark");
+  });
+})();
+</script>

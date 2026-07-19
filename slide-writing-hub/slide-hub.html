@@ -1,0 +1,524 @@
+<title>スライドライティング向上Hub</title>
+<style>
+  :root{
+    --paper:#FBF9F5; --paper-2:#F3EFE7; --card:#FFFFFF;
+    --ink:#33312B; --ink-soft:#5F5B51; --ink-faint:#8B857A;
+    --line:#E4DDD0; --line-strong:#D2C8B6;
+    --accent:#E5732B;        /* 校正オレンジ（原典RGB247,150,70系）*/
+    --accent-ink:#B4531A;
+    --accent-wash:#FBEADD;
+    --good:#3F6B5E; --good-wash:#E2ECE7;
+    --bad:#C0442F; --bad-wash:#F7E4DF;
+    --ring-track:#EAE3D6;
+    --shadow:0 1px 2px rgba(51,49,43,.05),0 8px 28px -14px rgba(51,49,43,.22);
+    --mincho:"Hiragino Mincho ProN","Yu Mincho",YuMincho,"Noto Serif JP","Songti SC",serif;
+    --gothic:"Hiragino Kaku Gothic ProN","Yu Gothic",YuGothic,"Noto Sans JP",Meiryo,system-ui,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --paper:#1A1815; --paper-2:#211E1A; --card:#242019;
+      --ink:#EDE7DA; --ink-soft:#BDB4A3; --ink-faint:#8A8271;
+      --line:#37322A; --line-strong:#463F34;
+      --accent:#F0854A; --accent-ink:#F6A375; --accent-wash:#3A2417;
+      --good:#7FB6A4; --good-wash:#20302B;
+      --bad:#E38270; --bad-wash:#37211C;
+      --ring-track:#332E25;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px -16px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="light"]{
+    --paper:#FBF9F5; --paper-2:#F3EFE7; --card:#FFFFFF;
+    --ink:#33312B; --ink-soft:#5F5B51; --ink-faint:#8B857A;
+    --line:#E4DDD0; --line-strong:#D2C8B6;
+    --accent:#E5732B; --accent-ink:#B4531A; --accent-wash:#FBEADD;
+    --good:#3F6B5E; --good-wash:#E2ECE7; --bad:#C0442F; --bad-wash:#F7E4DF;
+    --ring-track:#EAE3D6; --shadow:0 1px 2px rgba(51,49,43,.05),0 8px 28px -14px rgba(51,49,43,.22);
+  }
+  :root[data-theme="dark"]{
+    --paper:#1A1815; --paper-2:#211E1A; --card:#242019;
+    --ink:#EDE7DA; --ink-soft:#BDB4A3; --ink-faint:#8A8271;
+    --line:#37322A; --line-strong:#463F34;
+    --accent:#F0854A; --accent-ink:#F6A375; --accent-wash:#3A2417;
+    --good:#7FB6A4; --good-wash:#20302B; --bad:#E38270; --bad-wash:#37211C;
+    --ring-track:#332E25; --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px -16px rgba(0,0,0,.7);
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--gothic);
+    line-height:1.75;font-feature-settings:"palt" 1;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  section{scroll-margin-top:78px}
+
+  /* ---------- top bar ---------- */
+  .bar{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--paper) 86%,transparent);
+    backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
+  .bar-in{max-width:1080px;margin:0 auto;padding:11px 24px;display:flex;align-items:center;gap:20px}
+  .brand{font-family:var(--mincho);font-weight:600;letter-spacing:.02em;font-size:16px;white-space:nowrap}
+  .brand b{color:var(--accent)}
+  .navlinks{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+  .navlinks a{font-size:12.5px;color:var(--ink-soft);text-decoration:none;padding:6px 10px;border-radius:6px}
+  .navlinks a:hover{color:var(--ink);background:var(--paper-2)}
+  .theme-btn{border:1px solid var(--line-strong);background:var(--card);color:var(--ink-soft);
+    border-radius:7px;width:34px;height:32px;cursor:pointer;font-size:14px;flex:none}
+  .theme-btn:hover{color:var(--accent);border-color:var(--accent)}
+  .theme-btn:focus-visible,a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  @media(max-width:720px){.navlinks{display:none}}
+
+  /* ---------- hero ---------- */
+  .hero{padding:74px 0 40px;position:relative;overflow:hidden}
+  .eyebrow{font-size:12px;letter-spacing:.34em;text-transform:uppercase;color:var(--accent-ink);font-weight:700}
+  .hero h1{font-family:var(--mincho);font-weight:600;font-size:clamp(34px,6vw,60px);line-height:1.18;
+    margin:18px 0 0;letter-spacing:.01em;text-wrap:balance}
+  .hero h1 .mark{position:relative;white-space:nowrap;color:var(--accent-ink)}
+  .hero h1 .mark::after{content:"";position:absolute;left:-2px;right:-2px;bottom:2px;height:.42em;z-index:-1;
+    background:var(--accent-wash);transform:rotate(-.6deg)}
+  .lead{font-size:clamp(15px,1.9vw,18px);color:var(--ink-soft);max-width:60ch;margin:22px 0 0}
+  .lead b{color:var(--ink);font-weight:600;box-shadow:inset 0 -.5em 0 var(--accent-wash)}
+  .hero-meta{margin-top:30px;display:flex;gap:26px;flex-wrap:wrap;align-items:center}
+  .stat b{font-family:var(--mincho);font-size:30px;color:var(--accent-ink);font-weight:600;display:block;line-height:1}
+  .stat span{font-size:12px;color:var(--ink-faint)}
+  .src{margin-top:26px;font-size:11.5px;color:var(--ink-faint);border-left:2px solid var(--line-strong);padding-left:12px;max-width:64ch}
+
+  /* ---------- spine (story) ---------- */
+  .band{background:var(--paper-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .sec-head{max-width:60ch}
+  .kicker{font-size:11.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent-ink);font-weight:700}
+  h2.sec{font-family:var(--mincho);font-weight:600;font-size:clamp(23px,3.4vw,32px);margin:12px 0 0;letter-spacing:.01em;text-wrap:balance}
+  .sec-note{color:var(--ink-soft);font-size:14.5px;margin:12px 0 0}
+  .pad{padding:60px 0}
+
+  .spine{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:34px}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:20px 18px;position:relative;box-shadow:var(--shadow)}
+  .step .n{font-family:var(--mono);font-size:12px;color:var(--accent-ink);font-weight:700}
+  .step h3{font-family:var(--mincho);font-size:19px;margin:8px 0 6px;font-weight:600}
+  .step p{font-size:13px;color:var(--ink-soft);margin:0}
+  .step .arw{position:absolute;right:-13px;top:50%;transform:translateY(-50%);color:var(--line-strong);z-index:2;font-size:16px}
+  .step:last-child .arw{display:none}
+  @media(max-width:860px){.spine{grid-template-columns:repeat(2,1fr)}.step .arw{display:none}}
+  @media(max-width:460px){.spine{grid-template-columns:1fr}}
+
+  /* ---------- checklist ---------- */
+  .check-top{display:grid;grid-template-columns:1fr auto;gap:26px;align-items:center;margin-top:30px;
+    background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 26px;box-shadow:var(--shadow)}
+  .ring-wrap{display:flex;align-items:center;gap:18px}
+  .ring{--p:0;width:96px;height:96px;border-radius:50%;flex:none;
+    background:conic-gradient(var(--accent) calc(var(--p)*1%),var(--ring-track) 0);
+    display:grid;place-items:center;transition:background .5s cubic-bezier(.4,0,.2,1)}
+  .ring::before{content:"";position:absolute;width:74px;height:74px;border-radius:50%;background:var(--card)}
+  .ring{position:relative}
+  .ring b{position:relative;font-family:var(--mincho);font-size:26px;font-weight:600;line-height:1}
+  .ring b small{font-size:13px;color:var(--ink-faint);font-family:var(--gothic)}
+  .score-txt strong{display:block;font-size:15px;font-family:var(--mincho)}
+  .score-txt span{font-size:12.5px;color:var(--ink-soft)}
+  .btn{border:1px solid var(--line-strong);background:var(--card);color:var(--ink-soft);border-radius:8px;
+    padding:9px 15px;font-size:12.5px;cursor:pointer;font-family:var(--gothic);white-space:nowrap}
+  .btn:hover{border-color:var(--accent);color:var(--accent)}
+  @media(max-width:620px){.check-top{grid-template-columns:1fr;text-align:left}}
+
+  .cat{margin-top:30px}
+  .cat-h{display:flex;align-items:baseline;gap:12px;padding-bottom:9px;border-bottom:2px solid var(--line-strong)}
+  .cat-h .lbl{font-family:var(--mincho);font-size:19px;font-weight:600}
+  .cat-h .cnt{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-left:auto}
+  .cat-h .tag{font-size:11px;color:var(--accent-ink);background:var(--accent-wash);border-radius:20px;padding:2px 10px;font-weight:600}
+  .items{list-style:none;margin:0;padding:0}
+  .item{display:flex;gap:14px;align-items:flex-start;padding:13px 6px;border-bottom:1px solid var(--line);cursor:pointer}
+  .item:hover{background:var(--paper-2)}
+  .box{flex:none;width:24px;height:24px;border-radius:7px;border:2px solid var(--line-strong);background:var(--card);
+    display:grid;place-items:center;margin-top:1px;transition:.16s;position:relative}
+  .box svg{width:14px;height:14px;stroke:#fff;stroke-width:3.4;fill:none;opacity:0;transform:scale(.5);transition:.16s}
+  .item.on .box{background:var(--accent);border-color:var(--accent)}
+  .item.on .box svg{opacity:1;transform:scale(1)}
+  .num{font-family:var(--mono);font-size:12px;color:var(--accent-ink);font-weight:700;flex:none;width:22px;margin-top:3px}
+  .txt{flex:1}
+  .txt .q{font-size:14.5px;color:var(--ink)}
+  .item.on .txt .q{color:var(--ink-soft)}
+  .txt .why{font-size:12.5px;color:var(--ink-faint);margin-top:3px;display:block}
+
+  /* ---------- rules ---------- */
+  .rules{display:grid;grid-template-columns:1.15fr 1fr;gap:18px;margin-top:34px}
+  @media(max-width:800px){.rules{grid-template-columns:1fr}}
+  .rcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;box-shadow:var(--shadow)}
+  .rcard h3{font-family:var(--mincho);font-size:17px;margin:0 0 14px;font-weight:600;display:flex;align-items:center;gap:9px}
+  .rcard h3::before{content:"";width:8px;height:8px;background:var(--accent);border-radius:2px;transform:rotate(45deg)}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;font-size:13.5px}
+  .kv dt{color:var(--ink-faint)}
+  .kv dd{margin:0;font-family:var(--mono);font-size:12.5px}
+  .sizes{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+  .chip{border:1px solid var(--line-strong);border-radius:8px;padding:6px 11px;font-size:12px;font-family:var(--mono);
+    display:flex;align-items:baseline;gap:6px;background:var(--paper-2)}
+  .chip b{color:var(--accent-ink)}
+  .swatch{display:flex;gap:10px;margin-top:4px;flex-wrap:wrap}
+  .sw{display:flex;align-items:center;gap:9px;font-size:12px;font-family:var(--mono)}
+  .sw i{width:26px;height:26px;border-radius:7px;border:1px solid rgba(0,0,0,.12);display:block}
+  .dolist{list-style:none;margin:8px 0 0;padding:0;font-size:13.5px}
+  .dolist li{padding:7px 0 7px 26px;position:relative;border-top:1px solid var(--line)}
+  .dolist li:first-child{border-top:0}
+  .dolist li::before{position:absolute;left:0;top:7px;font-weight:700;font-family:var(--mono)}
+  .dolist li.do::before{content:"○";color:var(--good)}
+  .dolist li.dont::before{content:"×";color:var(--bad)}
+
+  /* ---------- before/after ---------- */
+  .ba{margin-top:32px;display:grid;gap:18px}
+  .ba-card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+  .ba-head{padding:16px 22px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+  .ba-head .t{font-family:var(--mincho);font-size:17px;font-weight:600}
+  .ba-head .tags{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+  .ba-head .tags span{font-family:var(--mono);font-size:11px;background:var(--accent-wash);color:var(--accent-ink);
+    padding:2px 8px;border-radius:20px;font-weight:700}
+  .ba-body{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  @media(max-width:640px){.ba-body{grid-template-columns:1fr}}
+  .ba-col{padding:18px 22px}
+  .ba-col+.ba-col{border-left:1px solid var(--line)}
+  @media(max-width:640px){.ba-col+.ba-col{border-left:0;border-top:1px solid var(--line)}}
+  .ba-col .fl{font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;margin-bottom:10px;display:inline-block}
+  .ba-col.before .fl{color:var(--bad)}
+  .ba-col.after .fl{color:var(--good)}
+  .ba-col ul{list-style:none;margin:0;padding:0;font-size:13px}
+  .ba-col li{padding:5px 0 5px 20px;position:relative;color:var(--ink-soft)}
+  .ba-col.before li::before{content:"–";position:absolute;left:2px;color:var(--bad)}
+  .ba-col.after li::before{content:"↑";position:absolute;left:0;color:var(--good);font-size:12px}
+  .ba-col.after li{color:var(--ink)}
+
+  /* ---------- workflow ---------- */
+  .flow{counter-reset:s;margin-top:30px;display:grid;gap:12px}
+  .frow{display:flex;gap:16px;align-items:flex-start;background:var(--card);border:1px solid var(--line);
+    border-radius:12px;padding:16px 20px;box-shadow:var(--shadow)}
+  .frow::before{counter-increment:s;content:counter(s,decimal-leading-zero);font-family:var(--mono);font-size:13px;
+    color:var(--accent-ink);font-weight:700;flex:none;padding-top:2px}
+  .frow div strong{font-family:var(--mincho);font-size:15.5px;display:block;margin-bottom:2px}
+  .frow div span{font-size:13px;color:var(--ink-soft)}
+
+  footer{border-top:1px solid var(--line);margin-top:10px}
+  .foot{padding:30px 0 46px;font-size:12px;color:var(--ink-faint);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .foot b{color:var(--ink-soft);font-family:var(--mincho);font-weight:600}
+</style>
+
+<div class="bar">
+  <div class="bar-in">
+    <span class="brand">スライドライティング<b>向上Hub</b></span>
+    <nav class="navlinks">
+      <a href="#spine">ストーリーの背骨</a>
+      <a href="#check">20チェック</a>
+      <a href="#rules">作成ルール</a>
+      <a href="#examples">添削例</a>
+      <a href="#flow">使い方</a>
+    </nav>
+    <button class="theme-btn" id="themeBtn" aria-label="テーマ切替" title="ライト／ダーク切替">◑</button>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Slide Writing · 添削ドリブン上達</span>
+    <h1>伝わるスライドは、<br><span class="mark">20の添削ポイント</span>でできている。</h1>
+    <p class="lead">「センス」ではなく<b>チェックの積み重ね</b>。300名以上の資料作成講座で、繰り返し赤ペンが入った箇所を20項目に凝縮しました。書く前に眺め、書いた後にもう一度。目的・ストーリー・レイアウト・型・表現の順に、自分のスライドを自分で添削するためのHubです。</p>
+    <div class="hero-meta">
+      <div class="stat"><b>20</b><span>チェックポイント</span></div>
+      <div class="stat"><b>5</b><span>観点カテゴリ</span></div>
+      <div class="stat"><b>4</b><span>ストーリーの型</span></div>
+      <div class="stat"><b>3</b><span>色以下の配色</span></div>
+    </div>
+    <p class="src">出典：Google Drive 上のプレゼン資料より — 「資料チェックリスト20」「スライド作成ルール表」「参考スライド（スポーツジム事例）」（株式会社ルバート）ほか。本Hubはこれらの要点を学習用に再構成したものです。</p>
+  </div>
+</header>
+
+<!-- STORY SPINE -->
+<section id="spine" class="band">
+  <div class="wrap pad">
+    <div class="sec-head">
+      <span class="kicker">Story Line</span>
+      <h2 class="sec">まず、話の「背骨」を通す</h2>
+      <p class="sec-note">スライドを作り込む前に決めるのはストーリー。相手が重要と思うポイントを漏れなく、この4つの順で並べるだけで、資料は一気に伝わるようになります（チェック③の核）。</p>
+    </div>
+    <div class="spine">
+      <div class="step"><span class="n">01 / 背景</span><h3>背景</h3><p>いま何が起きているか。相手と前提をそろえ、話を始める土台をつくる。</p><span class="arw">→</span></div>
+      <div class="step"><span class="n">02 / 課題</span><h3>課題</h3><p>その中で解くべき問いは何か。取り組む価値のある論点に絞り込む。</p><span class="arw">→</span></div>
+      <div class="step"><span class="n">03 / 解決策</span><h3>解決策</h3><p>だからこうする、という打ち手。選択肢を挙げ、比較して1つに寄せる。</p><span class="arw">→</span></div>
+      <div class="step"><span class="n">04 / 効果</span><h3>効果</h3><p>やると何が良くなるか。数字や見込みで相手の「で、結局？」に答える。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CHECKLIST -->
+<section id="check">
+  <div class="wrap pad">
+    <div class="sec-head">
+      <span class="kicker">Checklist 20</span>
+      <h2 class="sec">20のチェックポイントで自己添削</h2>
+      <p class="sec-note">タップして自分のスライドを一項目ずつ確認。満たせた数がスコアになります。まず「目的」から。全部を一度に直そうとせず、上のカテゴリから順に潰していくのがコツです。</p>
+    </div>
+
+    <div class="check-top">
+      <div class="ring-wrap">
+        <div class="ring" id="ring"><b><span id="scoreNum">0</span><small>/20</small></b></div>
+        <div class="score-txt">
+          <strong id="scoreLabel">まだ未チェックです</strong>
+          <span id="scoreSub">項目をタップして添削を始めましょう</span>
+        </div>
+      </div>
+      <button class="btn" id="resetBtn">リセット</button>
+    </div>
+
+    <div id="catHost"></div>
+  </div>
+</section>
+
+<!-- RULES -->
+<section id="rules" class="band">
+  <div class="wrap pad">
+    <div class="sec-head">
+      <span class="kicker">Design Rules</span>
+      <h2 class="sec">迷わないための「作成ルール」早見表</h2>
+      <p class="sec-note">スライドごとに悩まないよう、フォント・サイズ・色・矢印をあらかじめ固定します。T1＝スライドの主題（何の話か）、T2＝そのスライドで言いたい結論の一文。両方が入っているかがチェック⑤です。</p>
+    </div>
+    <div class="rules">
+      <div class="rcard">
+        <h3>フォントサイズの階層</h3>
+        <div class="sizes">
+          <span class="chip">T1 <b>24</b></span>
+          <span class="chip">T2 <b>20</b></span>
+          <span class="chip">タイトル <b>18</b></span>
+          <span class="chip">サブ <b>14</b></span>
+          <span class="chip">本文 <b>14</b></span>
+        </div>
+        <dl class="kv" style="margin-top:16px">
+          <dt>フォント</dt><dd>MS Pゴシック（和文ゴシック系）</dd>
+          <dt>T1</dt><dd>スライドの主題＝タイトル行</dd>
+          <dt>T2</dt><dd>言いたいこと一文＝メッセージ行</dd>
+        </dl>
+      </div>
+      <div class="rcard">
+        <h3>配色は「基本＋アクセント」の2軸</h3>
+        <div class="swatch">
+          <span class="sw"><i style="background:#4D4D4D"></i>基本 RGB 77.77.77</span>
+          <span class="sw"><i style="background:#F79646"></i>アクセント RGB 247.150.70</span>
+        </div>
+        <ul class="dolist">
+          <li class="do">使う色は3色以下に抑える（チェック⑲）</li>
+          <li class="do">強調はアクセント1色に集約する</li>
+          <li class="dont">なんとなくで色を増やさない</li>
+        </ul>
+      </div>
+      <div class="rcard">
+        <h3>矢印と装飾</h3>
+        <ul class="dolist">
+          <li class="do">矢印は水平・垂直で引く</li>
+          <li class="dont">斜めの矢印は使わない</li>
+          <li class="do">タイトルは太字＋下線で明示する</li>
+          <li class="do">図形は縦横で揃える（チェック⑳）</li>
+        </ul>
+      </div>
+      <div class="rcard">
+        <h3>表のルール</h3>
+        <ul class="dolist">
+          <li class="do">先頭行・列は色で塗りつぶす（⑪）</li>
+          <li class="do">先頭行・列の文字は中央揃え（⑫）</li>
+          <li class="do">本文はボディの範囲内に収める（⑥）</li>
+          <li class="do">左→右・上→下の視線の流れを作る（⑦）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BEFORE / AFTER -->
+<section id="examples">
+  <div class="wrap pad">
+    <div class="sec-head">
+      <span class="kicker">Before → After</span>
+      <h2 class="sec">添削例で見る「効く直し方」</h2>
+      <p class="sec-note">同じ内容でも、チェックを当てるだけで伝わり方は変わります。スポーツジムの入会施策を題材にした4つの典型的な直しです。</p>
+    </div>
+    <div class="ba">
+
+      <div class="ba-card">
+        <div class="ba-head"><span class="t">グラフ｜体験しない理由</span>
+          <span class="tags"><span>⑬</span><span>⑭</span><span>⑮</span><span>⑰</span></span></div>
+        <div class="ba-body">
+          <div class="ba-col before"><span class="fl">Before</span>
+            <ul><li>棒がバラバラの順で並び、大小が読み取れない</li><li>全項目が同じ色で、どこを見ればいいか不明</li><li>「時間・金銭・距離」など打ち手にならない要因が混在</li></ul>
+          </div>
+          <div class="ba-col after"><span class="fl">After</span>
+            <ul><li>数値の大きい順に並べ替え、傾向が一目で分かる（⑭）</li><li>「ジムが取り組み可能な課題」と定性表現で括る（⑮）</li><li>着目すべき棒だけ背景を強調（⑰）</li></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="ba-card">
+        <div class="ba-head"><span class="t">図解｜プロモーション3案</span>
+          <span class="tags"><span>③</span><span>⑤</span><span>⑨</span><span>⑯</span></span></div>
+        <div class="ba-body">
+          <div class="ba-col before"><span class="fl">Before</span>
+            <ul><li>3案が並ぶだけで、何を言いたいスライドか不明</li><li>タイトルもメッセージ行もない</li><li>説明が文章のまま、要点が沈む</li></ul>
+          </div>
+          <div class="ba-col after"><span class="fl">After</span>
+            <ul><li>「3案が挙がった」とT1/T2で主張を明示（⑤）</li><li>背景→課題→解決策→効果の順で構成（③）</li><li>ピクトグラム＋文字強調で要点を立てる（⑨⑯）</li></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="ba-card">
+        <div class="ba-head"><span class="t">比較｜2施策のマトリクス</span>
+          <span class="tags"><span>⑩</span><span>⑱</span><span>⑳</span></span></div>
+        <div class="ba-body">
+          <div class="ba-col before"><span class="fl">Before</span>
+            <ul><li>費用・労力・効果が箇条書きで縦に流れる</li><li>どちらが優れているか一見で判断できない</li><li>要素の位置が揃わず視線が迷う</li></ul>
+          </div>
+          <div class="ba-col after"><span class="fl">After</span>
+            <ul><li>観点×施策のマトリクスに整理（⑩）</li><li>評価を並べ、優劣が一見で分かる（⑱）</li><li>図形を縦横で揃える（⑳）</li></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="ba-card">
+        <div class="ba-head"><span class="t">表｜入会見込みの試算</span>
+          <span class="tags"><span>⑪</span><span>⑫</span></span></div>
+        <div class="ba-body">
+          <div class="ba-col before"><span class="fl">Before</span>
+            <ul><li>罫線だけの素の表で、見出しが埋もれる</li><li>数字が左寄せで列同士を比べにくい</li></ul>
+          </div>
+          <div class="ba-col after"><span class="fl">After</span>
+            <ul><li>先頭行・列を色で塗って見出しを立てる（⑪）</li><li>見出し文字を中央に揃える（⑫）</li></ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- WORKFLOW -->
+<section id="flow" class="band">
+  <div class="wrap pad">
+    <div class="sec-head">
+      <span class="kicker">How to use</span>
+      <h2 class="sec">このHubの使い方</h2>
+      <p class="sec-note">作る前と作った後の2回、チェックを通すのが基本。順番に潰していけば迷いません。</p>
+    </div>
+    <div class="flow">
+      <div class="frow"><div><strong>目的を1行で決める</strong><span>「誰が・誰に・どうしてもらうか」を書き出してから作り始める（チェック①）。</span></div></div>
+      <div class="frow"><div><strong>ストーリーの背骨を通す</strong><span>背景→課題→解決策→効果の順に、言いたいことを箇条で並べる（②③④）。</span></div></div>
+      <div class="frow"><div><strong>1スライド＝1メッセージで作る</strong><span>T1/T2を入れ、レイアウト・型・表現のルールに沿って作り込む（⑤〜⑳）。</span></div></div>
+      <div class="frow"><div><strong>最後にもう一度20チェック</strong><span>上のチェックリストでスコアを確認。満たせていない項目だけ直す。</span></div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <span>出典：<b>ルバート「資料チェックリスト20」「スライド作成ルール表」「参考スライド」</b>（Google Drive）を学習用に再構成</span>
+    <span>スライドライティング向上Hub</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var DATA=[
+    {cat:"目的",tag:"WHY",items:[
+      {n:1,q:"「誰が」「誰に」「どうしてもらうか」が明確か",why:"作り始める前に、資料のゴールを1行で言えるか。"}
+    ]},
+    {cat:"ストーリーライン",tag:"STORY",items:[
+      {n:2,q:"「相手が重要と思うポイント」を漏れなく含んでいるか",why:"自分ではなく相手の関心軸で必要な論点をそろえる。"},
+      {n:3,q:"背景→課題→解決策→効果の順を押さえているか",why:"話の背骨。この順に並べるだけで伝わりやすくなる。"},
+      {n:4,q:"サマリー・結論があるか",why:"最初か最後に「で、結論は？」への答えを置く。"}
+    ]},
+    {cat:"スライドレイアウト",tag:"LAYOUT",items:[
+      {n:5,q:"T1（主題）・T2（メッセージ）が入っているか",why:"何の話で、何が言いたいスライドかを明示する。"},
+      {n:6,q:"ボディの範囲内に内容がおさまっているか",why:"版面からはみ出さず、余白を保つ。"},
+      {n:7,q:"左から右・上から下の流れがあるか",why:"視線の自然な動きに沿って要素を配置する。"}
+    ]},
+    {cat:"スライドタイプ",tag:"TYPE",items:[
+      {n:8,q:"適切な図解が使えているか",why:"文章のままにせず、関係を図で見せる。"},
+      {n:9,q:"ピクトグラムが使えているか",why:"アイコンで要点の認識を速くする。"},
+      {n:10,q:"マトリクスが使えているか",why:"2軸で整理すると比較・分類が一目になる。"},
+      {n:11,q:"表の先頭行・列は色で塗りつぶしているか",why:"見出しを立てて構造を見せる。"},
+      {n:12,q:"表の先頭行・列の文字は中央にあるか",why:"見出しの体裁をそろえて読みやすく。"},
+      {n:13,q:"適切なグラフが使えているか",why:"伝えたい比較・推移に合ったグラフを選ぶ。"},
+      {n:14,q:"データの並び順は適切か",why:"大小や意味のある順に並べ替える。"},
+      {n:15,q:"定性表現が使えているか",why:"数字に「取り組み可能な課題」等の意味づけを添える。"}
+    ]},
+    {cat:"スライド表現",tag:"EXPRESS",items:[
+      {n:16,q:"文字が強調されているか",why:"太字・色で読ませたい語を立てる。"},
+      {n:17,q:"大事な部分が強調されているか",why:"背景や囲みで着目点を1つに導く。"},
+      {n:18,q:"比較は点数や〇×で評価が一見でわかるか",why:"優劣を言葉で探させず、記号で即断させる。"},
+      {n:19,q:"3色以下におさめられているか",why:"色を絞るほど強調が効く。"},
+      {n:20,q:"図形の位置が縦横で揃っているか",why:"整列だけで完成度は大きく上がる。"}
+    ]}
+  ];
+
+  var TOTAL=20, state={}, host=document.getElementById("catHost");
+  var check="<svg viewBox='0 0 24 24'><path d='M4 12l5 5L20 6'/></svg>";
+
+  DATA.forEach(function(c,ci){
+    var sec=document.createElement("div"); sec.className="cat";
+    var head=document.createElement("div"); head.className="cat-h";
+    head.innerHTML="<span class='lbl'>"+c.cat+"</span><span class='tag'>"+c.tag+
+      "</span><span class='cnt' id='cnt"+ci+"'>0/"+c.items.length+"</span>";
+    sec.appendChild(head);
+    var ul=document.createElement("ul"); ul.className="items";
+    c.items.forEach(function(it){
+      var li=document.createElement("li"); li.className="item"; li.setAttribute("role","checkbox");
+      li.setAttribute("aria-checked","false"); li.tabIndex=0;
+      li.dataset.cat=ci; li.dataset.n=it.n;
+      li.innerHTML="<span class='box'>"+check+"</span><span class='num'>"+it.n+
+        "</span><span class='txt'><span class='q'>"+it.q+"</span><span class='why'>"+it.why+"</span></span>";
+      function toggle(){
+        var on=!state[it.n]; state[it.n]=on;
+        li.classList.toggle("on",on); li.setAttribute("aria-checked",on?"true":"false");
+        render();
+      }
+      li.addEventListener("click",toggle);
+      li.addEventListener("keydown",function(e){
+        if(e.key===" "||e.key==="Enter"){e.preventDefault();toggle();}
+      });
+      ul.appendChild(li);
+    });
+    sec.appendChild(ul); host.appendChild(sec);
+  });
+
+  var ring=document.getElementById("ring"),
+      num=document.getElementById("scoreNum"),
+      lab=document.getElementById("scoreLabel"),
+      sub=document.getElementById("scoreSub");
+
+  function render(){
+    var total=0;
+    DATA.forEach(function(c,ci){
+      var got=0; c.items.forEach(function(it){ if(state[it.n]) got++; });
+      total+=got;
+      document.getElementById("cnt"+ci).textContent=got+"/"+c.items.length;
+    });
+    num.textContent=total;
+    ring.style.setProperty("--p",(total/TOTAL)*100);
+    var msg,s;
+    if(total===0){msg="まだ未チェックです";s="項目をタップして添削を始めましょう";}
+    else if(total<8){msg="土台づくりの段階";s="まずは目的とストーリーを固めましょう";}
+    else if(total<15){msg="伝わる形に近づいています";s="レイアウトと型を整えていきましょう";}
+    else if(total<TOTAL){msg="あと少しで完成";s="残り"+(TOTAL-total)+"項目、表現を磨きましょう";}
+    else{msg="20項目クリア！提出できる資料です";s="自信を持って共有できます";}
+    lab.textContent=msg; sub.textContent=s;
+  }
+
+  document.getElementById("resetBtn").addEventListener("click",function(){
+    state={};
+    Array.prototype.forEach.call(document.querySelectorAll(".item"),function(li){
+      li.classList.remove("on"); li.setAttribute("aria-checked","false");
+    });
+    render();
+  });
+
+  // theme toggle
+  var root=document.documentElement, tb=document.getElementById("themeBtn");
+  tb.addEventListener("click",function(){
+    var cur=root.getAttribute("data-theme");
+    if(!cur){ cur=matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light"; }
+    root.setAttribute("data-theme",cur==="dark"?"light":"dark");
+  });
+
+  render();
+})();
+</script>
