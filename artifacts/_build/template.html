@@ -32,6 +32,8 @@ h1 { font-size:1.6rem; margin:0 0 4px; display:flex; align-items:center; gap:8px
 .tab { border:1px solid var(--line); background:var(--card); color:var(--ink);
   padding:8px 14px; border-radius:10px; font-size:.85rem; cursor:pointer; font-weight:600; }
 .tab.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+.tab .tc { font-weight:700; opacity:.6; font-size:.82em; margin-left:2px; }
+.tab.active .tc { opacity:.85; }
 .cards { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:22px; }
 @media (max-width:680px) { .cards { grid-template-columns:1fr; } }
 .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px 20px; }
@@ -76,6 +78,13 @@ td.pick:hover { cursor:pointer; }
 .prov { color:var(--sub); font-size:.8rem; white-space:nowrap; }
 .genre { display:inline-block; padding:2px 9px; border-radius:7px; font-size:.72rem;
   background:var(--accent-soft); color:var(--chip-ink); }
+.pri { display:inline-block; min-width:22px; text-align:center; padding:2px 8px; border-radius:7px;
+  font-size:.72rem; font-weight:700; }
+.pri.phi { background:rgba(220,38,38,.14); color:#dc2626; }
+.pri.pmid { background:rgba(234,88,12,.14); color:#ea580c; }
+.pri.plo { background:rgba(107,114,128,.16); color:var(--sub); }
+.pri.ptbd { background:rgba(107,114,128,.12); color:var(--sub); }
+td.dt { color:var(--sub); font-size:.78rem; white-space:nowrap; font-variant-numeric:tabular-nums; }
 a.name { color:var(--accent); text-decoration:none; }
 a.name:hover { text-decoration:underline; }
 .name.plain { color:var(--ink); }
@@ -140,6 +149,7 @@ tr:hover .del { opacity:1; }
     <select id="fCat"><option value="">区分（全て）</option></select>
     <select id="fGenre"><option value="">分類（全て）</option></select>
     <select id="fProv"><option value="">提供（全て）</option></select>
+    <select id="fPri"><option value="">優先（全て）</option></select>
     <select id="fStatus"><option value="">ステータス（全て）</option></select>
     <input id="q" type="search" placeholder="🔍 名称で検索">
     <button class="btn" id="clearBtn">すべてクリア</button>
@@ -158,6 +168,8 @@ tr:hover .del { opacity:1; }
         <th class="sortable" data-field="prov">提供<span class="sar"></span></th>
         <th class="sortable" data-field="name">名称<span class="sar"></span></th>
         <th class="sortable" data-field="genre">分類<span class="sar"></span></th>
+        <th class="sortable" data-field="pri">優先<span class="sar"></span></th>
+        <th class="sortable" data-field="date">日付<span class="sar"></span></th>
         <th class="sortable" data-field="status">ステータス<span class="sar"></span></th>
         <th></th>
       </tr></thead>
@@ -180,11 +192,12 @@ const WIP = new Set(["準備中","着手中","再チェック"]);
 // 固定キー（ビルド版が変わっても編集を保持）。編集は「差分」として安定ID(NotionのURL)で保存し、
 // 読み込み時に最新データ(BASE)へマージする。→ 作り直しても編集が残り、新規データも反映される。
 const KEY = "learning-tracker:store";
-const EDITABLE = ["cat","prov","name","genre","status","date"];
+const EDITABLE = ["cat","prov","name","genre","pri","status","date"];
 let newCtr = 0;
 let curCat = "全一覧";
 
 function stClass(s){ if(DONE.has(s)) return "done"; if(WIP.has(s)) return "wip"; return "todo"; }
+function priClass(p){ if(p==="高"||p==="1") return "phi"; if(p==="中"||p==="2") return "pmid"; if(p==="3"||p==="4") return "plo"; return "ptbd"; }
 function esc(s){ const d=document.createElement("div"); d.textContent=s==null?"":s; return d.innerHTML; }
 function defaultStatus(cat){ return cat==="資格" ? "未取得" : "未着手"; }
 function sidOf(e){ return e.url ? ("u:"+e.url) : ("k:"+(e.cat||"")+"|"+(e.name||"")); }
@@ -203,12 +216,12 @@ function buildState(){
     list.push(Object.assign({}, e, store.edits[sid]||{}, {_sid:sid, _added:false, _id:"u"+i}));
   });
   (store.added||[]).forEach((a,i)=>{
-    list.push(Object.assign({cat:"資格",prov:"",name:"",genre:"",status:"未着手",date:"",url:""}, a, {_added:true, _id:a._id||("n"+i)}));
+    list.push(Object.assign({cat:"資格",prov:"",name:"",genre:"",pri:"",status:"未着手",date:"",url:""}, a, {_added:true, _id:a._id||("n"+i)}));
   });
   return list;
 }
 let STATE = buildState();
-function stripAdded(e){ const o={_id:e._id}; ["cat","prov","name","genre","status","date","url"].forEach(f=>o[f]=e[f]||""); return o; }
+function stripAdded(e){ const o={_id:e._id}; ["cat","prov","name","genre","pri","status","date","url"].forEach(f=>o[f]=e[f]||""); return o; }
 function save(){
   const baseBySid=new Map(); BASE.forEach(e=>baseBySid.set(sidOf(e), e));
   const edits={}, added=[], seen=new Set();
@@ -228,6 +241,7 @@ function byId(id){ return STATE.find(e=>e._id===id); }
 const rowsEl=document.getElementById("rows"), countEl=document.getElementById("count");
 const qEl=document.getElementById("q"), fStatus=document.getElementById("fStatus");
 const fGenre=document.getElementById("fGenre"), fProv=document.getElementById("fProv"), fCat=document.getElementById("fCat");
+const fPri=document.getElementById("fPri");
 let sort={ field:null, dir:1 };
 
 function currentList(){ return curCat==="全一覧" ? STATE : STATE.filter(e=>e.cat===curCat); }
@@ -246,14 +260,16 @@ function populateFilters(){
     sel.value = vals.includes(cur) ? cur : ""; };
   setOpts(fGenre, uniq(base.map(e=>e.genre)), "分類（全て）");
   setOpts(fProv, uniq(base.map(e=>e.prov)), "提供（全て）");
+  setOpts(fPri, uniq(base.map(e=>e.pri)), "優先（全て）");
   setOpts(fStatus, uniq(base.map(e=>e.status)), "ステータス（全て）");
 }
 
 function visibleList(){
-  const gn=fGenre.value, pv=fProv.value, st=fStatus.value, q=qEl.value.trim().toLowerCase();
+  const gn=fGenre.value, pv=fProv.value, pr=fPri.value, st=fStatus.value, q=qEl.value.trim().toLowerCase();
   let list=currentList().filter(e=>{
     if(gn && e.genre!==gn) return false;
     if(pv && (e.prov||"")!==pv) return false;
+    if(pr && (e.pri||"")!==pr) return false;
     if(st && (e.status||"未着手")!==st) return false;
     if(q && !((e.name+e.prov+e.genre+e.cat).toLowerCase().includes(q))) return false;
     return true;
@@ -284,6 +300,7 @@ function renderStats(){
   document.getElementById("ratioDonut").style.background=`conic-gradient(${stops.join(",")})`;
   document.getElementById("progLegend").innerHTML=CAT_ORDER.map(c=>`<li><span class="dot" style="background:${CAT_COLOR[c]}"></span>${c} ${dcount[c]}/${counts[c]}</li>`).join("");
   document.getElementById("ratioLegend").innerHTML=CAT_ORDER.map(c=>`<li><span class="dot" style="background:${CAT_COLOR[c]}"></span>${c} ${counts[c]}</li>`).join("");
+  document.querySelectorAll(".tab").forEach(t=>{ const b=t.querySelector(".tc"); if(b) b.textContent = t.dataset.cat==="全一覧" ? total : (counts[t.dataset.cat]||0); });
 }
 
 function render(){
@@ -300,10 +317,12 @@ function render(){
       `<td class="editable prov" data-field="prov">${e.prov?esc(e.prov):'<span class="ph">—</span>'}</td>`+
       `<td class="editable" data-field="name">${nameHtml}</td>`+
       `<td class="editable pick" data-field="genre">${e.genre?`<span class="genre">${esc(e.genre)}</span>`:'<span class="ph">分類</span>'}</td>`+
+      `<td class="editable pick" data-field="pri">${e.pri?`<span class="pri ${priClass(e.pri)}">${esc(e.pri)}</span>`:'<span class="ph">—</span>'}</td>`+
+      `<td class="editable dt" data-field="date">${e.date?esc(e.date):'<span class="ph">—</span>'}</td>`+
       `<td class="editable pick" data-field="status"><span class="st ${stClass(e.status)}">${esc(e.status||"未着手")}</span></td>`+
       `<td class="act"><button class="del" title="削除" data-del="${esc(e._id)}">✕</button></td></tr>`;
   });
-  rowsEl.innerHTML=html||'<tr><td colspan="7" style="text-align:center;color:var(--sub);padding:30px">該当なし</td></tr>';
+  rowsEl.innerHTML=html||'<tr><td colspan="9" style="text-align:center;color:var(--sub);padding:30px">該当なし</td></tr>';
   countEl.textContent=` ・ ${n} 件表示`;
   renderStats();
 }
@@ -313,6 +332,7 @@ function optionsFor(field, entry){
   if(field==="status") return STATUS_OPTS[entry.cat] || ["未着手","着手中","完了"];
   if(field==="genre") return uniq(STATE.filter(e=>e.cat===entry.cat).map(e=>e.genre));
   if(field==="prov") return uniq(STATE.map(e=>e.prov));
+  if(field==="pri") return entry.cat==="資格" ? ["高","中","TBD","TBU"] : ["1","2","3","4"];
   return null;
 }
 
@@ -361,7 +381,7 @@ document.getElementById("tabs").addEventListener("click", ev=>{
   setCat(b.dataset.cat);
 });
 fCat.addEventListener("change", ()=> setCat(fCat.value||"全一覧"));
-[qEl,fGenre,fProv,fStatus].forEach(el=>el.addEventListener("input", render));
+[qEl,fGenre,fProv,fPri,fStatus].forEach(el=>el.addEventListener("input", render));
 
 document.querySelectorAll("th.sortable").forEach(th=>{
   th.addEventListener("click", ()=>{
@@ -374,19 +394,19 @@ document.querySelectorAll("th.sortable").forEach(th=>{
 });
 
 document.getElementById("clearBtn").addEventListener("click", ()=>{
-  qEl.value=""; fGenre.value=""; fProv.value=""; fStatus.value=""; curCat="全一覧";
+  qEl.value=""; fGenre.value=""; fProv.value=""; fPri.value=""; fStatus.value=""; curCat="全一覧";
   sort={field:null,dir:1}; document.querySelectorAll(".sar").forEach(s=>s.textContent="");
   syncTabs(); populateFilters(); render(); toast("フィルターをクリアしました");
 });
 
 document.getElementById("addBtn").addEventListener("click", ()=>{
   const cat = curCat==="全一覧" ? "資格" : curCat;
-  const e={ _id:"n"+(++newCtr)+"_"+Date.now(), _added:true, cat, prov:"", name:"", genre:"", status:defaultStatus(cat), date:"", url:"" };
+  const e={ _id:"n"+(++newCtr)+"_"+Date.now(), _added:true, cat, prov:"", name:"", genre:"", pri:"", status:defaultStatus(cat), date:"", url:"" };
   const idx = STATE.reduce((last,x,i)=> x.cat===cat ? i : last, -1);
   if(idx>=0) STATE.splice(idx+1,0,e); else STATE.push(e);
   save();
   if(curCat!=="全一覧" && curCat!==cat){ curCat=cat; syncTabs(); }
-  qEl.value=""; fStatus.value=""; fGenre.value=""; fProv.value="";
+  qEl.value=""; fStatus.value=""; fGenre.value=""; fProv.value=""; fPri.value="";
   sort={field:null,dir:1}; document.querySelectorAll(".sar").forEach(s=>s.textContent="");
   populateFilters(); render();
   const cell=[...rowsEl.querySelectorAll('tr')].find(tr=>tr.dataset.id===e._id);
@@ -395,7 +415,7 @@ document.getElementById("addBtn").addEventListener("click", ()=>{
 });
 
 async function doExport(){
-  const canon=STATE.map(e=>({cat:e.cat,prov:e.prov||"",name:e.name||"",genre:e.genre||"",status:e.status||"未着手",date:e.date||"",url:e.url||""}));
+  const canon=STATE.map(e=>({cat:e.cat,prov:e.prov||"",name:e.name||"",genre:e.genre||"",pri:e.pri||"",status:e.status||"未着手",date:e.date||"",url:e.url||""}));
   const text=JSON.stringify(canon, null, 2);
   const filename="entries_override.json";
   if(window.claude && window.claude.downloads){

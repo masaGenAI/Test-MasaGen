@@ -26,6 +26,7 @@ BUILD_DIR = Path(__file__).resolve().parent
 RAW_DIR = BUILD_DIR / "raw"
 ADDITIONS = BUILD_DIR / "additions.json"
 OVERRIDE = BUILD_DIR / "entries_override.json"
+PRI = BUILD_DIR / "pri.json"
 TEMPLATE = BUILD_DIR / "template.html"
 OUT = BUILD_DIR.parent / "learning-tracker" / "artifact.html"
 
@@ -66,6 +67,7 @@ def normalize(row: dict, spec: dict | None) -> dict:
             "prov": row.get("prov", ""),
             "name": row.get("name", ""),
             "genre": row.get("genre", ""),
+            "pri": row.get("pri", ""),
             "status": row.get("status", "未着手") or "未着手",
             "date": row.get("date", ""),
             "url": row.get("url", ""),
@@ -75,10 +77,15 @@ def normalize(row: dict, spec: dict | None) -> dict:
         "prov": (row.get(spec["prov"]) or "") if spec["prov"] else "",
         "name": row.get(spec["name"], "") or "",
         "genre": row.get(spec["genre"], "") or "",
+        "pri": "",
         "status": row.get("ステータス", "") or "未着手",
         "date": row.get("date") or row.get("date:取得予定日:start") or "",
         "url": row.get("url", "") or "",
     }
+
+
+def _id_of(url: str) -> str:
+    return url.rsplit("/", 1)[-1] if url else ""
 
 
 def load_entries() -> list[dict]:
@@ -98,6 +105,11 @@ def load_entries() -> list[dict]:
         if ADDITIONS.exists():
             for row in json.loads(ADDITIONS.read_text(encoding="utf-8")):
                 entries.append(normalize(row, None))
+    # 優先順位を pri.json（ページID→優先）から補完（override/additions が既に持つ場合は尊重）
+    pri_map = json.loads(PRI.read_text(encoding="utf-8")) if PRI.exists() else {}
+    for e in entries:
+        if not e.get("pri"):
+            e["pri"] = pri_map.get(_id_of(e["url"]), "")
     order = {c: i for i, c in enumerate(CAT_ORDER)}
     entries.sort(key=lambda e: order.get(e["cat"], len(CAT_ORDER)))
     return entries
@@ -132,8 +144,8 @@ def render(entries: list[dict]) -> str:
         f'<li><span class="dot" style="background:{CAT_COLOR[c]}"></span>{c} {cat_counts[c]}</li>'
         for c in CAT_ORDER
     )
-    tabs = '<button class="tab active" data-cat="全一覧">📋 全一覧</button>' + "".join(
-        f'<button class="tab" data-cat="{c}">{c}</button>' for c in CAT_ORDER
+    tabs = '<button class="tab active" data-cat="全一覧">📋 全一覧 <b class="tc"></b></button>' + "".join(
+        f'<button class="tab" data-cat="{c}">{c} <b class="tc"></b></button>' for c in CAT_ORDER
     )
 
     data_json = json.dumps(entries, ensure_ascii=False)

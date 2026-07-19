@@ -40,7 +40,9 @@ artifacts/
   _handoff/learning-tracker.md ← このファイル
   _build/
     raw/*.json                 ← Notion 各DBのスナップショット（shikaku/tools/koza/hon*/udemy*）
+    pri.json                   ← 優先順位マップ（ページID→優先: 資格=高/中/TBD/TBU, Tools/書籍=1〜4）
     additions.json             ← キーワードで追加した分（build がここも読む）
+    entries_override.json      ← 公開ページの「JSON書き出し」を置くと正本になる（任意）
     add_entries.py             ← additions.json への追記ヘルパー
     build.py                   ← raw + additions → learning-tracker/artifact.html を再生成
   learning-tracker/artifact.html ← 生成物（= 公開アーティファクト）
