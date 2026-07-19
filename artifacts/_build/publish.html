@@ -2,16 +2,16 @@
 :root {
   --bg:#f4f6fb; --card:#ffffff; --ink:#1f2937; --sub:#6b7280; --line:#e5e7eb;
   --accent:#4f46e5; --accent-soft:#eef2ff; --chip:#eef2ff; --chip-ink:#4f46e5;
-  --done:#16a34a; --wip:#ea580c; --todo:#9ca3af; --edit:#fef9c3; --danger:#dc2626; --mute:#e8eaef;
+  --done:#16a34a; --wip:#ea580c; --todo:#9ca3af; --edit:#fef9c3; --danger:#dc2626; --mute:#d7dbe2;
 }
 @media (prefers-color-scheme: dark) {
   :root { --bg:#0f1420; --card:#171d2b; --ink:#e5e9f0; --sub:#9aa4b2; --line:#2a3244;
     --accent:#818cf8; --accent-soft:#1e2438; --chip:#1e2438; --chip-ink:#a5b4fc;
-    --edit:#3b3a1e; --danger:#f87171; --mute:#1b2231; }
+    --edit:#3b3a1e; --danger:#f87171; --mute:#2a3446; }
 }
 :root[data-theme="dark"] { --bg:#0f1420; --card:#171d2b; --ink:#e5e9f0; --sub:#9aa4b2;
   --line:#2a3244; --accent:#818cf8; --accent-soft:#1e2438; --chip:#1e2438; --chip-ink:#a5b4fc;
-  --edit:#3b3a1e; --danger:#f87171; --mute:#1b2231; }
+  --edit:#3b3a1e; --danger:#f87171; --mute:#2a3446; }
 :root[data-theme="light"] { --bg:#f4f6fb; --card:#ffffff; --ink:#1f2937; --sub:#6b7280;
   --line:#e5e7eb; --accent:#4f46e5; --accent-soft:#eef2ff; --chip:#eef2ff; --chip-ink:#4f46e5;
   --edit:#fef9c3; --danger:#dc2626; --mute:#e8eaef; }
@@ -73,10 +73,11 @@ a.name:hover { text-decoration:underline; }
 .st.done::before { background:var(--done); }
 .st.wip::before { background:var(--wip); }
 .st.todo::before { background:var(--todo); }
-tr.is-done td { background:var(--mute); color:var(--sub); opacity:.6; }
-tr.is-done td .badge, tr.is-done td .genre { background:var(--mute); color:var(--sub); }
-tr.is-done a.name { color:var(--sub); }
-tr.is-done .st { color:var(--sub); }
+tr.is-done td { background:var(--mute); color:var(--sub); }
+tr.is-done td .badge, tr.is-done td .genre { background:transparent; color:var(--sub);
+  border:1px solid var(--line); }
+tr.is-done a.name, tr.is-done .st, tr.is-done .prov { color:var(--sub); }
+tr.is-done .st::before { background:var(--sub) !important; }
 td.act { width:34px; text-align:center; }
 .del { border:none; background:none; color:var(--sub); cursor:pointer; font-size:1rem; line-height:1;
   opacity:0; padding:2px 4px; border-radius:6px; }
