@@ -68,11 +68,7 @@
 <div id="amt"><div class="wrap">
 <div class="hero"><h1>🗂️ Anything Memo トラッカー</h1><p>キーワードから作った「調べ済みノート」を追跡。メモの追加・編集ができ、データはブラウザ内に保存されます。</p></div>
 <div class="banner">Cowork のアーティファクトを Code 側に移設した<strong>編集可能な単体版</strong>です。追加・編集・削除はローカル保存され、JSONで書き出し／読み込みできます。</div>
-<div class="editbar"><button class="ebtn primary" id="amtAdd">＋ メモ追加</button><button class="ebtn" id="amtExport">⬇ JSONエクスポート</button><button class="ebtn" id="amtImport">⬆ JSONインポート</button><button class="ebtn" id="amtReset">↺ 初期データに戻す</button></div>
-<div class="research"><div class="rlabel">🔎 キーワードから調べて追加（Claude in Chrome）</div>
-<div class="rrow"><input class="rin" id="amtKw" placeholder="単語を入力（例: RAG、ゼロトラスト、LoRA）"><button class="rbtn" id="amtClaude">🤖 Claudeで調べて追加</button></div>
-<div class="rstatus" id="amtRStatus"></div>
-<div class="rhint">キーワードを入れて「🤖 Claudeで調べて追加」を押すと、追加フォームを開き、右のClaudeへの指示をコピーします。右のサイドバー（Claude in Chrome）に貼る（または「このページに◯◯を調べて追加して」と頼む）と、Claudeがこのページへ直接追加します。</div></div>
+<div class="editbar"><button class="ebtn" id="amtExport">⬇ JSONエクスポート</button><button class="ebtn" id="amtImport">⬆ JSONインポート</button><button class="ebtn" id="amtReset">↺ 初期データに戻す</button></div>
 <div class="form" id="amtForm"><h3 id="amtFormTitle">メモを追加</h3>
 <div class="fgrid">
 <div class="field" style="grid-column:1/-1"><label>トピック</label><input id="aTopic" placeholder="例: RAG（検索拡張生成）"></div>
@@ -117,7 +113,7 @@ function delMemo(id){var m=D.memos.find(function(x){return x.id===id;});if(!m)re
 function renderAll(){G=Object.fromEntries(D.genres.map(function(g){return [g.key,g];}));renderStats();renderBars();renderChips();renderList();}
 $("amtSearch").oninput=function(e){q=e.target.value;renderList();};
 $("amtSort").onclick=function(){sortDesc=!sortDesc;$("amtSort").textContent="並び替え：日付順 "+(sortDesc?"↓":"↑");renderList();};
-$("amtAdd").onclick=openAdd;$("aSave").onclick=saveForm;$("aCancel").onclick=closeForm;
+$("aSave").onclick=saveForm;$("aCancel").onclick=closeForm;
 $("amtExport").onclick=function(){_exportJSON("anything-memo-tracker-data.json",D);};
 $("amtImport").onclick=function(){_importJSON(function(obj){if(!obj.memos){alert("形式が不正です");return;}D=obj;save();renderAll();});};
 $("amtReset").onclick=function(){if(confirm("編集内容を破棄して初期データに戻しますか？")){D=clone(BASE);save();renderAll();}};
@@ -169,8 +165,6 @@ function researchViaClaude(){
   try{ if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(_claudePromptText(kw)); copied=true; } }catch(e){}
   $("amtRStatus").innerHTML="🤖 右の <b>Claude</b>（Claude in Chrome）に「このページに『"+esc(kw)+"』を調べて追加して」と頼んでください。"+(copied?"指示はクリップボードにもコピー済みです。":"")+" 追加フォームを開いてあります（Claudeが入力→保存、または window.amtAgent.add を実行します）。";
 }
-$("amtClaude").onclick=researchViaClaude;
-$("amtKw").addEventListener("keydown",function(e){if(e.key==="Enter")researchViaClaude();});
 // ---- 外部AIエージェント（Claude in Chrome 等）連携API ----
 // 使い方: window.amtAgent.add({topic, genre, note, date?}) でメモを追加（topic重複はスキップ）。
 //         window.amtAgent.genres で選べるジャンル、window.amtAgent.list() で既存メモ一覧。
@@ -187,7 +181,6 @@ window.amtAgent={
     return {ok:true,topic:o.topic,genre:genre};
   }
 };
-$("amtRStatus").textContent="🤖 キーワードを入れて「Claudeで調べて追加」→ 右の Claude in Chrome に頼むと、このページへ直接メモを追加できます。";
 fillGenreSelect();renderAll();
 })();
 </script>
