@@ -29,6 +29,15 @@ def test_list_excludes_done():
     assert [t.id for t in open_tasks] == [2]
 
 
+def test_count_open():
+    store = TaskStore()
+    store.add("a")
+    store.add("b")
+    assert store.count_open() == 2
+    store.complete(1)
+    assert store.count_open() == 1
+
+
 def test_remove():
     store = TaskStore()
     store.add("temp")

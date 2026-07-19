@@ -30,6 +30,13 @@ class TaskStore:
             tasks = [t for t in tasks if not t.done]
         return sorted(tasks, key=lambda t: t.id)
 
+    def count_open(self) -> int:
+        """Return the number of tasks that are not yet completed.
+
+        Example: ``store.count_open()`` -> ``2``
+        """
+        return sum(1 for task in self._tasks.values() if not task.done)
+
     def complete(self, task_id: int) -> bool:
         """Mark a task done. Returns True if the task existed."""
         task = self._tasks.get(task_id)
