@@ -69,10 +69,10 @@
 <div class="hero"><h1>🗂️ Anything Memo トラッカー</h1><p>キーワードから作った「調べ済みノート」を追跡。メモの追加・編集ができ、データはブラウザ内に保存されます。</p></div>
 <div class="banner">Cowork のアーティファクトを Code 側に移設した<strong>編集可能な単体版</strong>です。追加・編集・削除はローカル保存され、JSONで書き出し／読み込みできます。</div>
 <div class="editbar"><button class="ebtn primary" id="amtAdd">＋ メモ追加</button><button class="ebtn" id="amtExport">⬇ JSONエクスポート</button><button class="ebtn" id="amtImport">⬆ JSONインポート</button><button class="ebtn" id="amtReset">↺ 初期データに戻す</button></div>
-<div class="research"><div class="rlabel">🔎 キーワードから調べて追加（Claude in Chrome / Chrome内蔵AI）</div>
-<div class="rrow"><input class="rin" id="amtKw" placeholder="単語を入力（例: RAG、ゼロトラスト、LoRA）"><button class="rbtn" id="amtClaude">🤖 Claudeで調べて追加</button><button class="rbtn" id="amtResearch" style="background:#5b6072">端末内AIで追加</button></div>
+<div class="research"><div class="rlabel">🔎 キーワードから調べて追加（Claude in Chrome）</div>
+<div class="rrow"><input class="rin" id="amtKw" placeholder="単語を入力（例: RAG、ゼロトラスト、LoRA）"><button class="rbtn" id="amtClaude">🤖 Claudeで調べて追加</button></div>
 <div class="rstatus" id="amtRStatus"></div>
-<div class="rhint"><b>Claude in Chrome</b>: キーワードを入れて「🤖 Claudeで調べて追加」を押すと、追加フォームを開き、右のClaudeへの指示をコピーします。右のサイドバーに貼る（または「このページに◯◯を調べて追加して」と頼む）と、Claudeがこのページへ直接追加します。<br><b>端末内AI（Gemini Nano）</b>: 対応ブラウザでは「端末内AIで追加」がその場で要約・分類して追加（APIキー・ネット送信なし・要確認）。</div></div>
+<div class="rhint">キーワードを入れて「🤖 Claudeで調べて追加」を押すと、追加フォームを開き、右のClaudeへの指示をコピーします。右のサイドバー（Claude in Chrome）に貼る（または「このページに◯◯を調べて追加して」と頼む）と、Claudeがこのページへ直接追加します。</div></div>
 <div class="form" id="amtForm"><h3 id="amtFormTitle">メモを追加</h3>
 <div class="fgrid">
 <div class="field" style="grid-column:1/-1"><label>トピック</label><input id="aTopic" placeholder="例: RAG（検索拡張生成）"></div>
@@ -152,7 +152,6 @@ async function researchAndAdd(){
   }catch(e){_fallback(kw,"生成に失敗しました（"+(e&&e.message||e)+"）。");}
   btn.disabled=false; btn.textContent=oldtxt;
 }
-$("amtResearch").onclick=researchAndAdd;
 // ---- Claude in Chrome 連携 ----
 // このページを見て操作できる Claude in Chrome 向けに、確実に追加できる指示を用意する。
 function _claudePromptText(kw){
@@ -188,7 +187,7 @@ window.amtAgent={
     return {ok:true,topic:o.topic,genre:genre};
   }
 };
-(function(){var LM=_getLM();if(!LM){$("amtRStatus").textContent="🤖 このブラウザは端末内AI(Gemini Nano)未対応です。「Claudeで調べて追加」を使うか、右の Claude in Chrome に「このページに◯◯を調べて追加して」と頼んでください。";}})();
+$("amtRStatus").textContent="🤖 キーワードを入れて「Claudeで調べて追加」→ 右の Claude in Chrome に頼むと、このページへ直接メモを追加できます。";
 fillGenreSelect();renderAll();
 })();
 </script>
