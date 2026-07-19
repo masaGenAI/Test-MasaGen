@@ -3,6 +3,8 @@ import { Waves, Clock3, Users, Brain, Cpu, BookOpen, Layers, ChevronRight, Arrow
 // 完成版 Book-Summary ハブ（971冊・検索・クイズ・メモ付き）を素の文字列として取り込み、
 // 実行時に Blob URL 化して iframe に読み込む（単一ファイルでもスクリプトが実行される）。
 import BOOK_SUMMARY_HTML from "../public/booksummaryhub.html?raw";
+// 学習ロードマップ トラッカー（資格/Tools/講座/書籍/Udemy の一元管理・自動保存つき表アプリ）
+import LEARNING_TRACKER_HTML from "../public/learning-tracker.html?raw";
 
 /* ============================================================
  * Project-Nova : 統合戦略ポータル
@@ -152382,6 +152384,76 @@ const BookSummaryModule = (function () {
   }
   return BookSummaryModule;
 })();
+// ================= LearningTrackerModule (source: learning-tracker.html, Blob-embedded) =================
+const LearningTrackerModule = (function () {
+  // トラッカーの編集内容(localStorage)を親へブリッジして永続化するためのキー。
+  const LT_STORE_KEY = "lt:store:v1";
+  function LearningTrackerModule() {
+    // 学習ロードマップ トラッカー（自動保存つき表アプリ）を Blob URL 化して iframe で読み込む。
+    // Blob は不透明オリジンで localStorage が使えないため、window.localStorage をメモリ実装に
+    // 差し替え、書き込みを postMessage で親へ転送 → 親が自身の localStorage に保存する。
+    // これでダブルクリック起動(file://)でも編集・進捗が保持される。
+    const ref = useRef(null);
+    useEffect(() => {
+      const iframe = ref.current;
+      if (!iframe) return;
+      let mirror = {};
+      try {
+        mirror = JSON.parse(window.localStorage.getItem(LT_STORE_KEY) || "{}") || {};
+      } catch (e) {
+        mirror = {};
+      }
+      const seedJson = JSON.stringify(mirror).replace(/</g, "\\u003c");
+      const bridge =
+        "<script>(function(){try{" +
+        "var mem=" +
+        seedJson +
+        ";" +
+        "function post(op,k,v){try{parent.postMessage({__lt:1,op:op,k:k,v:v},'*');}catch(e){}}" +
+        "var fake={" +
+        "getItem:function(k){return Object.prototype.hasOwnProperty.call(mem,k)?String(mem[k]):null;}," +
+        "setItem:function(k,v){mem[k]=String(v);post('set',String(k),String(v));}," +
+        "removeItem:function(k){delete mem[k];post('rm',String(k));}," +
+        "clear:function(){mem={};post('clr');}," +
+        "key:function(i){var ks=Object.keys(mem);return i>=0&&i<ks.length?ks[i]:null;}" +
+        "};" +
+        "Object.defineProperty(fake,'length',{get:function(){return Object.keys(mem).length;}});" +
+        "try{Object.defineProperty(window,'localStorage',{configurable:true,get:function(){return fake;}});}catch(e){}" +
+        "}catch(e){}})();<" +
+        "/script>";
+      const html = LEARNING_TRACKER_HTML.replace("<head>", "<head>" + bridge);
+      const onMsg = (ev) => {
+        const d = ev.data;
+        if (!d || d.__lt !== 1) return;
+        try {
+          let m = JSON.parse(window.localStorage.getItem(LT_STORE_KEY) || "{}") || {};
+          if (d.op === "set") m[d.k] = d.v;
+          else if (d.op === "rm") delete m[d.k];
+          else if (d.op === "clr") m = {};
+          window.localStorage.setItem(LT_STORE_KEY, JSON.stringify(m));
+        } catch (e) {
+          /* ignore */
+        }
+      };
+      window.addEventListener("message", onMsg);
+      const blob = new Blob([html], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      iframe.src = url;
+      return () => {
+        window.removeEventListener("message", onMsg);
+        URL.revokeObjectURL(url);
+      };
+    }, []);
+    return (
+      <iframe
+        ref={ref}
+        title="学習ロードマップ トラッカー"
+        style={{ width: "100%", height: "calc(100vh - 46px)", border: "none", display: "block" }}
+      />
+    );
+  }
+  return LearningTrackerModule;
+})();
 // ================= LinguisticsHubModule (source: linguistics-hub.jsx) =================
 const LinguisticsHubModule = (function () {
 
@@ -157973,6 +158045,7 @@ const NOVA = {
   languagehub: "#6BB6E0",
   linguisticshub: "#2A5C87",
   booksummary: "#173D63",
+  tracker: "#4f46e5",
 };
 
 const NOVA_SERIF = '"Fraunces", Georgia, "Hiragino Mincho ProN", serif';
@@ -158083,6 +158156,16 @@ function IconBook({ color, size }) {
     </svg>
   );
 }
+function IconTracker({ color, size }) {
+  return (
+    <svg viewBox="0 0 40 40" width={size} height={size} fill="none">
+      <rect x="9" y="8" width="22" height="26" rx="3" stroke={color} strokeWidth="1.6" />
+      <path d="M15 6.5h10v4H15z" stroke={color} strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M14.5 18.5l2 2 4-4M14.5 26l2 2 4-4" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M24 18.5h3M24 26h3" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 const NOVA_STATIONS = [
   {
@@ -158147,6 +158230,15 @@ const NOVA_STATIONS = [
     en: "Book-Summary",
     tagJa: "10 セクション",
     tagEn: "10 sections",
+  },
+  {
+    id: "tracker",
+    accent: NOVA.tracker,
+    Icon: IconTracker,
+    ja: "学習ロードマップ",
+    en: "Learning Roadmap",
+    tagJa: "進捗トラッカー",
+    tagEn: "Progress tracker",
   },
 ];
 
@@ -158322,6 +158414,7 @@ function ProjectNova() {
   else if (active === "certification") hubEl = <CertHubModule />;
   else if (active === "languagehub") hubEl = <LanguageHubModule />;
   else if (active === "booksummary") hubEl = <BookSummaryModule />;
+  else if (active === "tracker") hubEl = <LearningTrackerModule />;
   else if (active === "linguisticshub") hubEl = <LinguisticsHubModule />;
 
   let content;
