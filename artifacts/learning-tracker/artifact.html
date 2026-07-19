@@ -62,11 +62,30 @@ table { width:100%; border-collapse:collapse; font-size:.83rem; }
 th, td { text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
 th { position:sticky; top:0; background:var(--card); color:var(--sub); font-weight:700;
   font-size:.76rem; white-space:nowrap; z-index:1; }
-th.sortable { cursor:pointer; user-select:none; }
-th.sortable:hover { color:var(--ink); }
+th.sortable .hl { cursor:pointer; user-select:none; }
+th.sortable:hover .hl { color:var(--ink); }
 .sar { margin-left:4px; font-size:.72em; color:var(--accent); }
-.tlabel { font-size:.82rem; color:var(--sub); font-weight:600; }
 .tsep { flex:1; }
+.fbtn { border:1px solid transparent; background:none; color:var(--sub); cursor:pointer;
+  font-size:.7rem; line-height:1; padding:2px 4px; border-radius:5px; margin-left:5px; }
+.fbtn:hover { background:var(--accent-soft); color:var(--accent); }
+.fbtn.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+.colpop { position:absolute; z-index:60; width:250px; max-width:92vw; background:var(--card);
+  border:1px solid var(--line); border-radius:12px; box-shadow:0 12px 34px rgba(0,0,0,.22);
+  padding:10px; font-size:.82rem; }
+.cp-search input { width:100%; border:1px solid var(--line); border-radius:8px; padding:6px 8px;
+  background:var(--bg); color:var(--ink); font:inherit; margin-bottom:8px; }
+.cp-all { display:flex; align-items:center; gap:8px; padding:4px 6px; font-weight:700;
+  border-bottom:1px solid var(--line); margin-bottom:4px; cursor:pointer; }
+.cp-list { max-height:230px; overflow-y:auto; display:flex; flex-direction:column; gap:1px; }
+.cp-list label { display:flex; align-items:center; gap:8px; padding:4px 6px; border-radius:6px; cursor:pointer; }
+.cp-list label:hover { background:var(--accent-soft); }
+.cp-list input, .cp-all input { accent-color:var(--accent); width:15px; height:15px; flex:none; }
+.cp-list .txt { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.cp-foot { display:flex; gap:8px; margin-top:9px; }
+.cp-foot .btn { flex:1; text-align:center; }
+.cp-foot .btn.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+.cp-empty { color:var(--sub); padding:10px 6px; text-align:center; }
 tr:last-child td { border-bottom:none; }
 td.no { color:var(--sub); width:40px; }
 td.editable { cursor:text; }
@@ -145,37 +164,32 @@ tr:hover .del { opacity:1; }
   </div>
 
   <div class="toolbar">
-    <span class="tlabel">絞り込み：</span>
-    <select id="fCat"><option value="">区分（全て）</option></select>
-    <select id="fGenre"><option value="">分類（全て）</option></select>
-    <select id="fProv"><option value="">提供（全て）</option></select>
-    <select id="fPri"><option value="">優先（全て）</option></select>
-    <select id="fStatus"><option value="">ステータス（全て）</option></select>
     <input id="q" type="search" placeholder="🔍 名称で検索">
-    <button class="btn" id="clearBtn">すべてクリア</button>
+    <button class="btn" id="clearBtn">絞り込みを解除</button>
     <span class="tsep"></span>
     <button class="btn primary" id="addBtn">＋ 行を追加</button>
     <button class="btn" id="exportBtn">⬇ JSON書き出し</button>
     <button class="btn" id="resetBtn">↺ リセット</button>
   </div>
-  <p class="hint">列見出しをクリックで並べ替え（▲昇順／▼降順）。セルをクリックで編集（分類・ステータスは候補選択＋自由入力可）。行末の ✕ で削除。<span id="count"></span></p>
+  <p class="hint">各列見出しの <b>▾</b> から Excel のように複数選択で絞り込み。見出し名クリックで並べ替え（▲昇順／▼降順）。セルクリックで編集。行末の ✕ で削除。<span id="count"></span></p>
 
   <div class="tablewrap">
     <table>
       <thead><tr>
-        <th class="sortable" data-field="_no">No<span class="sar"></span></th>
-        <th class="sortable" data-field="cat">区分<span class="sar"></span></th>
-        <th class="sortable" data-field="prov">提供<span class="sar"></span></th>
-        <th class="sortable" data-field="name">名称<span class="sar"></span></th>
-        <th class="sortable" data-field="genre">分類<span class="sar"></span></th>
-        <th class="sortable" data-field="pri">優先<span class="sar"></span></th>
-        <th class="sortable" data-field="date">日付<span class="sar"></span></th>
-        <th class="sortable" data-field="status">ステータス<span class="sar"></span></th>
+        <th class="sortable" data-field="_no"><span class="hl">No</span><span class="sar"></span></th>
+        <th class="sortable" data-field="cat"><span class="hl">区分</span><span class="sar"></span><button class="fbtn" data-field="cat" title="絞り込み">▾</button></th>
+        <th class="sortable" data-field="prov"><span class="hl">提供</span><span class="sar"></span><button class="fbtn" data-field="prov" title="絞り込み">▾</button></th>
+        <th class="sortable" data-field="name"><span class="hl">名称</span><span class="sar"></span><button class="fbtn" data-field="name" title="絞り込み">▾</button></th>
+        <th class="sortable" data-field="genre"><span class="hl">分類</span><span class="sar"></span><button class="fbtn" data-field="genre" title="絞り込み">▾</button></th>
+        <th class="sortable" data-field="pri"><span class="hl">優先</span><span class="sar"></span><button class="fbtn" data-field="pri" title="絞り込み">▾</button></th>
+        <th class="sortable" data-field="date"><span class="hl">日付</span><span class="sar"></span><button class="fbtn" data-field="date" title="絞り込み">▾</button></th>
+        <th class="sortable" data-field="status"><span class="hl">ステータス</span><span class="sar"></span><button class="fbtn" data-field="status" title="絞り込み">▾</button></th>
         <th></th>
       </tr></thead>
       <tbody id="rows"></tbody>
     </table>
   </div>
+  <div id="colpop" class="colpop" hidden></div>
 
   <p class="foot">編集・進捗はこのブラウザに自動保存され、<b>アーティファクトを作り直しても保持</b>されます（新しいデータは自動でマージ）。全端末で共有・恒久化するには「JSON書き出し」→ <code>artifacts/_build/entries_override.json</code> に置いて <code>build.py</code> を実行。</p>
 </div>
@@ -239,45 +253,42 @@ function save(){
 function byId(id){ return STATE.find(e=>e._id===id); }
 
 const rowsEl=document.getElementById("rows"), countEl=document.getElementById("count");
-const qEl=document.getElementById("q"), fStatus=document.getElementById("fStatus");
-const fGenre=document.getElementById("fGenre"), fProv=document.getElementById("fProv"), fCat=document.getElementById("fCat");
-const fPri=document.getElementById("fPri");
+const qEl=document.getElementById("q");
 let sort={ field:null, dir:1 };
+let colFilters={};   // field -> Set(選択値)。存在すればその列で絞り込み中
 
+const BLANK="(空白)";
+function fieldVal(e,field){
+  let v = field==="status" ? (e.status||"未着手") : e[field];
+  v = (v==null?"":(""+v));
+  return v===""? BLANK : v;
+}
 function currentList(){ return curCat==="全一覧" ? STATE : STATE.filter(e=>e.cat===curCat); }
 function uniq(vals){ return [...new Set(vals.filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ja")); }
+function distinctValues(field){
+  return [...new Set(currentList().map(e=>fieldVal(e,field)))]
+    .sort((a,b)=> a===BLANK?1 : b===BLANK?-1 : a.localeCompare(b,"ja",{numeric:true}));
+}
 
 function syncTabs(){
   document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active", t.dataset.cat===curCat));
 }
 
-function populateFilters(){
-  fCat.innerHTML='<option value="">区分（全て）</option>'+CAT_ORDER.map(c=>`<option value="${c}">${c}</option>`).join("");
-  fCat.value = curCat==="全一覧" ? "" : curCat;
-  const base = currentList();
-  const setOpts=(sel,vals,label)=>{ const cur=sel.value;
-    sel.innerHTML=`<option value="">${label}</option>`+vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");
-    sel.value = vals.includes(cur) ? cur : ""; };
-  setOpts(fGenre, uniq(base.map(e=>e.genre)), "分類（全て）");
-  setOpts(fProv, uniq(base.map(e=>e.prov)), "提供（全て）");
-  setOpts(fPri, uniq(base.map(e=>e.pri)), "優先（全て）");
-  setOpts(fStatus, uniq(base.map(e=>e.status)), "ステータス（全て）");
-}
-
 function visibleList(){
-  const gn=fGenre.value, pv=fProv.value, pr=fPri.value, st=fStatus.value, q=qEl.value.trim().toLowerCase();
+  const q=qEl.value.trim().toLowerCase();
   let list=currentList().filter(e=>{
-    if(gn && e.genre!==gn) return false;
-    if(pv && (e.prov||"")!==pv) return false;
-    if(pr && (e.pri||"")!==pr) return false;
-    if(st && (e.status||"未着手")!==st) return false;
+    for(const f in colFilters){ if(!colFilters[f].has(fieldVal(e,f))) return false; }
     if(q && !((e.name+e.prov+e.genre+e.cat).toLowerCase().includes(q))) return false;
     return true;
   });
   if(sort.field==="_no"){ if(sort.dir===-1) list=[...list].reverse(); }
   else if(sort.field){ const f=sort.field;
-    list=[...list].sort((a,b)=>((a[f]||"")+"").localeCompare((b[f]||"")+"","ja")*sort.dir); }
+    list=[...list].sort((a,b)=>((a[f]||"")+"").localeCompare((b[f]||"")+"","ja",{numeric:true})*sort.dir); }
   return list;
+}
+
+function updateFbtns(){
+  document.querySelectorAll(".fbtn").forEach(b=> b.classList.toggle("on", !!colFilters[b.dataset.field]));
 }
 
 function renderStats(){
@@ -324,7 +335,54 @@ function render(){
   });
   rowsEl.innerHTML=html||'<tr><td colspan="9" style="text-align:center;color:var(--sub);padding:30px">該当なし</td></tr>';
   countEl.textContent=` ・ ${n} 件表示`;
-  renderStats();
+  renderStats(); updateFbtns();
+}
+
+// ===== Excel風 列フィルター ポップアップ =====
+function closePop(){ const pop=document.getElementById("colpop"); pop.hidden=true; }
+function openFilter(field, anchor){
+  const pop=document.getElementById("colpop");
+  const values=distinctValues(field);
+  const sel = colFilters[field] ? new Set(colFilters[field]) : new Set(values);
+  pop.innerHTML =
+    '<div class="cp-search"><input type="text" id="cpq" placeholder="値を検索"></div>'+
+    '<label class="cp-all"><input type="checkbox" id="cpall"> (すべて選択)</label>'+
+    '<div class="cp-list" id="cplist"></div>'+
+    '<div class="cp-foot"><button class="btn primary" id="cpok">OK</button>'+
+    '<button class="btn" id="cpcancel">キャンセル</button></div>';
+  const listEl=pop.querySelector("#cplist");
+  function draw(filter){
+    const vis=values.filter(v=> !filter || v.toLowerCase().includes(filter));
+    listEl.innerHTML = vis.length ? vis.map(v=>
+      `<label><input type="checkbox" value="${esc(v)}" ${sel.has(v)?"checked":""}><span class="txt">${esc(v)}</span></label>`
+    ).join("") : '<div class="cp-empty">該当なし</div>';
+    pop.querySelector("#cpall").checked = values.every(v=>sel.has(v));
+  }
+  draw("");
+  pop.hidden=false;
+  const r=anchor.getBoundingClientRect();
+  const w=pop.offsetWidth||250;
+  pop.style.left=Math.max(8, Math.min(r.left+window.scrollX, window.scrollX+document.documentElement.clientWidth-w-8))+"px";
+  pop.style.top=(r.bottom+window.scrollY+4)+"px";
+  pop.querySelector("#cpq").focus();
+  pop.querySelector("#cpq").addEventListener("input",e=>draw(e.target.value.trim().toLowerCase()));
+  listEl.addEventListener("change",e=>{
+    if(e.target.matches("input[type=checkbox]")){
+      if(e.target.checked) sel.add(e.target.value); else sel.delete(e.target.value);
+      pop.querySelector("#cpall").checked=values.every(v=>sel.has(v));
+    }
+  });
+  pop.querySelector("#cpall").addEventListener("change",e=>{
+    if(e.target.checked) values.forEach(v=>sel.add(v)); else sel.clear();
+    draw(pop.querySelector("#cpq").value.trim().toLowerCase());
+  });
+  pop.querySelector("#cpok").addEventListener("click",()=>{
+    if(sel.size===0){ /* 全解除は「該当なし」になるので確認 */ }
+    if(values.every(v=>sel.has(v))) delete colFilters[field];
+    else colFilters[field]=sel;
+    closePop(); render();
+  });
+  pop.querySelector("#cpcancel").addEventListener("click",closePop);
 }
 
 function optionsFor(field, entry){
@@ -374,17 +432,17 @@ rowsEl.addEventListener("click", ev=>{
   if(td) beginEdit(td);
 });
 
-function setCat(cat){ curCat=cat; syncTabs(); populateFilters(); render(); }
+function setCat(cat){ curCat=cat; colFilters={}; closePop(); syncTabs(); render(); }
 
 document.getElementById("tabs").addEventListener("click", ev=>{
   const b=ev.target.closest(".tab"); if(!b) return;
   setCat(b.dataset.cat);
 });
-fCat.addEventListener("change", ()=> setCat(fCat.value||"全一覧"));
-[qEl,fGenre,fProv,fPri,fStatus].forEach(el=>el.addEventListener("input", render));
+qEl.addEventListener("input", render);
 
 document.querySelectorAll("th.sortable").forEach(th=>{
-  th.addEventListener("click", ()=>{
+  th.addEventListener("click", ev=>{
+    if(ev.target.closest(".fbtn")) return;   // フィルターボタンは並べ替えしない
     const f=th.dataset.field;
     if(sort.field===f) sort.dir*=-1; else { sort.field=f; sort.dir=1; }
     document.querySelectorAll(".sar").forEach(s=>s.textContent="");
@@ -392,11 +450,20 @@ document.querySelectorAll("th.sortable").forEach(th=>{
     render();
   });
 });
+document.querySelectorAll(".fbtn").forEach(b=>{
+  b.addEventListener("click", ev=>{ ev.stopPropagation(); openFilter(b.dataset.field, b); });
+});
+document.addEventListener("click", ev=>{
+  const pop=document.getElementById("colpop");
+  if(pop.hidden) return;
+  if(pop.contains(ev.target) || ev.target.closest(".fbtn")) return;
+  closePop();
+});
 
 document.getElementById("clearBtn").addEventListener("click", ()=>{
-  qEl.value=""; fGenre.value=""; fProv.value=""; fPri.value=""; fStatus.value=""; curCat="全一覧";
+  qEl.value=""; colFilters={}; closePop();
   sort={field:null,dir:1}; document.querySelectorAll(".sar").forEach(s=>s.textContent="");
-  syncTabs(); populateFilters(); render(); toast("フィルターをクリアしました");
+  render(); toast("絞り込みを解除しました");
 });
 
 document.getElementById("addBtn").addEventListener("click", ()=>{
@@ -406,9 +473,9 @@ document.getElementById("addBtn").addEventListener("click", ()=>{
   if(idx>=0) STATE.splice(idx+1,0,e); else STATE.push(e);
   save();
   if(curCat!=="全一覧" && curCat!==cat){ curCat=cat; syncTabs(); }
-  qEl.value=""; fStatus.value=""; fGenre.value=""; fProv.value=""; fPri.value="";
+  qEl.value=""; colFilters={}; closePop();
   sort={field:null,dir:1}; document.querySelectorAll(".sar").forEach(s=>s.textContent="");
-  populateFilters(); render();
+  render();
   const cell=[...rowsEl.querySelectorAll('tr')].find(tr=>tr.dataset.id===e._id);
   if(cell){ cell.scrollIntoView({block:"center"}); beginEdit(cell.querySelector('[data-field="name"]')); }
   toast("行を追加しました");
@@ -435,7 +502,7 @@ document.getElementById("resetBtn").addEventListener("click", ()=>{
   if(!confirm("このブラウザでの編集内容を破棄し、ビルド時点の状態に戻します。よろしいですか？")) return;
   localStorage.removeItem(KEY);
   STATE=buildState();
-  curCat="全一覧"; syncTabs(); populateFilters(); render(); toast("リセットしました");
+  curCat="全一覧"; colFilters={}; closePop(); syncTabs(); render(); toast("リセットしました");
 });
 
 let toastT=null;
@@ -444,7 +511,7 @@ function toast(msg){
   clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"), 1800);
 }
 
-syncTabs(); populateFilters(); render();
+syncTabs(); render();
 </script>
 </body>
 </html>
