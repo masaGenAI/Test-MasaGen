@@ -54,6 +54,11 @@ table { width:100%; border-collapse:collapse; font-size:.83rem; }
 th, td { text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
 th { position:sticky; top:0; background:var(--card); color:var(--sub); font-weight:700;
   font-size:.76rem; white-space:nowrap; z-index:1; }
+th.sortable { cursor:pointer; user-select:none; }
+th.sortable:hover { color:var(--ink); }
+.sar { margin-left:4px; font-size:.72em; color:var(--accent); }
+.tlabel { font-size:.82rem; color:var(--sub); font-weight:600; }
+.tsep { flex:1; }
 tr:last-child td { border-bottom:none; }
 td.no { color:var(--sub); width:40px; }
 td.editable { cursor:text; }
@@ -125,19 +130,31 @@ tr:hover .del { opacity:1; }
   </div>
 
   <div class="toolbar">
-    <input id="q" type="search" placeholder="🔍 名称・提供・分類で検索">
-    <select id="fStatus"><option value="">ステータス（全て）</option>
-      <option value="done">完了</option><option value="wip">着手中</option><option value="todo">未着手</option></select>
+    <span class="tlabel">絞り込み：</span>
+    <select id="fCat"><option value="">区分（全て）</option></select>
     <select id="fGenre"><option value="">分類（全て）</option></select>
+    <select id="fProv"><option value="">提供（全て）</option></select>
+    <select id="fStatus"><option value="">ステータス（全て）</option></select>
+    <input id="q" type="search" placeholder="🔍 名称で検索">
+    <button class="btn" id="clearBtn">すべてクリア</button>
+    <span class="tsep"></span>
     <button class="btn primary" id="addBtn">＋ 行を追加</button>
-    <button class="btn" id="exportBtn">⬇ JSONで書き出し</button>
+    <button class="btn" id="exportBtn">⬇ JSON書き出し</button>
     <button class="btn" id="resetBtn">↺ リセット</button>
   </div>
-  <p class="hint">セル（提供・名称・分類・ステータス・区分）をクリックすると編集できます。分類とステータスは候補から選択も自由入力も可。行末の ✕ で削除。<span id="count"></span></p>
+  <p class="hint">列見出しをクリックで並べ替え（▲昇順／▼降順）。セルをクリックで編集（分類・ステータスは候補選択＋自由入力可）。行末の ✕ で削除。<span id="count"></span></p>
 
   <div class="tablewrap">
     <table>
-      <thead><tr><th>No</th><th>区分</th><th>提供</th><th>名称</th><th>分類</th><th>ステータス</th><th></th></tr></thead>
+      <thead><tr>
+        <th class="sortable" data-field="_no">No<span class="sar"></span></th>
+        <th class="sortable" data-field="cat">区分<span class="sar"></span></th>
+        <th class="sortable" data-field="prov">提供<span class="sar"></span></th>
+        <th class="sortable" data-field="name">名称<span class="sar"></span></th>
+        <th class="sortable" data-field="genre">分類<span class="sar"></span></th>
+        <th class="sortable" data-field="status">ステータス<span class="sar"></span></th>
+        <th></th>
+      </tr></thead>
       <tbody id="rows"></tbody>
     </table>
   </div>
@@ -172,14 +189,42 @@ function save(){ try{ localStorage.setItem(KEY, JSON.stringify(STATE)); }catch(_
 function byId(id){ return STATE.find(e=>e._id===id); }
 
 const rowsEl=document.getElementById("rows"), countEl=document.getElementById("count");
-const qEl=document.getElementById("q"), fStatus=document.getElementById("fStatus"), fGenre=document.getElementById("fGenre");
+const qEl=document.getElementById("q"), fStatus=document.getElementById("fStatus");
+const fGenre=document.getElementById("fGenre"), fProv=document.getElementById("fProv"), fCat=document.getElementById("fCat");
+let sort={ field:null, dir:1 };
 
 function currentList(){ return curCat==="全一覧" ? STATE : STATE.filter(e=>e.cat===curCat); }
-function uniq(vals){ return [...new Set(vals.filter(Boolean))].sort(); }
+function uniq(vals){ return [...new Set(vals.filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ja")); }
 
-function refreshGenreOptions(){
-  const genres=uniq(currentList().map(e=>e.genre));
-  fGenre.innerHTML='<option value="">分類（全て）</option>'+genres.map(g=>`<option value="${esc(g)}">${esc(g)}</option>`).join("");
+function syncTabs(){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active", t.dataset.cat===curCat));
+}
+
+function populateFilters(){
+  fCat.innerHTML='<option value="">区分（全て）</option>'+CAT_ORDER.map(c=>`<option value="${c}">${c}</option>`).join("");
+  fCat.value = curCat==="全一覧" ? "" : curCat;
+  const base = currentList();
+  const setOpts=(sel,vals,label)=>{ const cur=sel.value;
+    sel.innerHTML=`<option value="">${label}</option>`+vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");
+    sel.value = vals.includes(cur) ? cur : ""; };
+  setOpts(fGenre, uniq(base.map(e=>e.genre)), "分類（全て）");
+  setOpts(fProv, uniq(base.map(e=>e.prov)), "提供（全て）");
+  setOpts(fStatus, uniq(base.map(e=>e.status)), "ステータス（全て）");
+}
+
+function visibleList(){
+  const gn=fGenre.value, pv=fProv.value, st=fStatus.value, q=qEl.value.trim().toLowerCase();
+  let list=currentList().filter(e=>{
+    if(gn && e.genre!==gn) return false;
+    if(pv && (e.prov||"")!==pv) return false;
+    if(st && (e.status||"未着手")!==st) return false;
+    if(q && !((e.name+e.prov+e.genre+e.cat).toLowerCase().includes(q))) return false;
+    return true;
+  });
+  if(sort.field==="_no"){ if(sort.dir===-1) list=[...list].reverse(); }
+  else if(sort.field){ const f=sort.field;
+    list=[...list].sort((a,b)=>((a[f]||"")+"").localeCompare((b[f]||"")+"","ja")*sort.dir); }
+  return list;
 }
 
 function renderStats(){
@@ -205,12 +250,8 @@ function renderStats(){
 }
 
 function render(){
-  const q=qEl.value.trim().toLowerCase(), st=fStatus.value, gn=fGenre.value;
   let n=0, html="";
-  currentList().forEach(e=>{
-    if(st && stClass(e.status)!==st) return;
-    if(gn && e.genre!==gn) return;
-    if(q && !((e.name+e.prov+e.genre+e.cat).toLowerCase().includes(q))) return;
+  visibleList().forEach(e=>{
     n++;
     const cls = stClass(e.status)==="done" ? ' class="is-done"' : '';
     const nameHtml = e.name
@@ -276,13 +317,30 @@ rowsEl.addEventListener("click", ev=>{
   if(td) beginEdit(td);
 });
 
+function setCat(cat){ curCat=cat; syncTabs(); populateFilters(); render(); }
+
 document.getElementById("tabs").addEventListener("click", ev=>{
   const b=ev.target.closest(".tab"); if(!b) return;
-  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-  b.classList.add("active"); curCat=b.dataset.cat;
-  refreshGenreOptions(); render();
+  setCat(b.dataset.cat);
 });
-[qEl,fStatus,fGenre].forEach(el=>el.addEventListener("input", render));
+fCat.addEventListener("change", ()=> setCat(fCat.value||"全一覧"));
+[qEl,fGenre,fProv,fStatus].forEach(el=>el.addEventListener("input", render));
+
+document.querySelectorAll("th.sortable").forEach(th=>{
+  th.addEventListener("click", ()=>{
+    const f=th.dataset.field;
+    if(sort.field===f) sort.dir*=-1; else { sort.field=f; sort.dir=1; }
+    document.querySelectorAll(".sar").forEach(s=>s.textContent="");
+    th.querySelector(".sar").textContent = sort.dir===1 ? "▲" : "▼";
+    render();
+  });
+});
+
+document.getElementById("clearBtn").addEventListener("click", ()=>{
+  qEl.value=""; fGenre.value=""; fProv.value=""; fStatus.value=""; curCat="全一覧";
+  sort={field:null,dir:1}; document.querySelectorAll(".sar").forEach(s=>s.textContent="");
+  syncTabs(); populateFilters(); render(); toast("フィルターをクリアしました");
+});
 
 document.getElementById("addBtn").addEventListener("click", ()=>{
   const cat = curCat==="全一覧" ? "資格" : curCat;
@@ -290,9 +348,10 @@ document.getElementById("addBtn").addEventListener("click", ()=>{
   const idx = STATE.reduce((last,x,i)=> x.cat===cat ? i : last, -1);
   if(idx>=0) STATE.splice(idx+1,0,e); else STATE.push(e);
   save();
-  if(curCat!=="全一覧" && curCat!==cat){ curCat=cat; }
-  qEl.value=""; fStatus.value=""; fGenre.value="";
-  render();
+  if(curCat!=="全一覧" && curCat!==cat){ curCat=cat; syncTabs(); }
+  qEl.value=""; fStatus.value=""; fGenre.value=""; fProv.value="";
+  sort={field:null,dir:1}; document.querySelectorAll(".sar").forEach(s=>s.textContent="");
+  populateFilters(); render();
   const cell=[...rowsEl.querySelectorAll('tr')].find(tr=>tr.dataset.id===e._id);
   if(cell){ cell.scrollIntoView({block:"center"}); beginEdit(cell.querySelector('[data-field="name"]')); }
   toast("行を追加しました");
@@ -319,7 +378,7 @@ document.getElementById("resetBtn").addEventListener("click", ()=>{
   if(!confirm("このブラウザでの編集内容を破棄し、ビルド時点の状態に戻します。よろしいですか？")) return;
   localStorage.removeItem(KEY);
   STATE=BASE.map(e=>Object.assign({}, e));
-  save(); render(); toast("リセットしました");
+  save(); curCat="全一覧"; syncTabs(); populateFilters(); render(); toast("リセットしました");
 });
 
 let toastT=null;
@@ -328,5 +387,5 @@ function toast(msg){
   clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"), 1800);
 }
 
-refreshGenreOptions(); render();
+syncTabs(); populateFilters(); render();
 </script>
