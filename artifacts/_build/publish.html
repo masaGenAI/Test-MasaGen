@@ -159,7 +159,7 @@ tr:hover .del { opacity:1; }
     </table>
   </div>
 
-  <p class="foot">変更はブラウザに保存されます。「JSONで書き出し」→ <code>artifacts/_build/entries_override.json</code> に置いて <code>build.py</code> を実行すると恒久反映されます。</p>
+  <p class="foot">編集・進捗はこのブラウザに自動保存され、<b>アーティファクトを作り直しても保持</b>されます（新しいデータは自動でマージ）。全端末で共有・恒久化するには「JSON書き出し」→ <code>artifacts/_build/entries_override.json</code> に置いて <code>build.py</code> を実行。</p>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -171,21 +171,52 @@ const CAT_COLOR = {"資格": "#6366f1", "Tools": "#22c55e", "講座": "#a855f7",
 const STATUS_OPTS = {"資格": ["未取得", "準備中", "取得済み"], "Tools": ["未着手", "着手中", "完了", "保留", "その他"], "講座": ["未着手", "着手中", "再チェック", "完了", "保留", "その他"], "書籍": ["未着手", "着手中", "完了", "保留", "その他"], "Udemy": ["未着手", "完了"]};
 const DONE = new Set(["完了","取得済み"]);
 const WIP = new Set(["準備中","着手中","再チェック"]);
-const KEY = "learning-tracker:" + VER;
+// 固定キー（ビルド版が変わっても編集を保持）。編集は「差分」として安定ID(NotionのURL)で保存し、
+// 読み込み時に最新データ(BASE)へマージする。→ 作り直しても編集が残り、新規データも反映される。
+const KEY = "learning-tracker:store";
+const EDITABLE = ["cat","prov","name","genre","status","date"];
 let newCtr = 0;
 let curCat = "全一覧";
 
 function stClass(s){ if(DONE.has(s)) return "done"; if(WIP.has(s)) return "wip"; return "todo"; }
 function esc(s){ const d=document.createElement("div"); d.textContent=s==null?"":s; return d.innerHTML; }
 function defaultStatus(cat){ return cat==="資格" ? "未取得" : "未着手"; }
+function sidOf(e){ return e.url ? ("u:"+e.url) : ("k:"+(e.cat||"")+"|"+(e.name||"")); }
 
-function loadState(){
-  BASE.forEach((e,i)=>{ if(!e._id) e._id = "b"+i; });
-  try{ const s=JSON.parse(localStorage.getItem(KEY)); if(Array.isArray(s)&&s.length) return s; }catch(_){}
-  return BASE.map(e=>Object.assign({}, e));
+function loadStore(){
+  try{ const s=JSON.parse(localStorage.getItem(KEY));
+    if(s&&typeof s==="object"&&!Array.isArray(s)) return {edits:s.edits||{}, added:s.added||[], deleted:s.deleted||[]};
+  }catch(_){}
+  return {edits:{}, added:[], deleted:[]};
 }
-let STATE = loadState();
-function save(){ try{ localStorage.setItem(KEY, JSON.stringify(STATE)); }catch(_){} }
+function buildState(){
+  const store=loadStore(), del=new Set(store.deleted);
+  const list=[];
+  BASE.forEach((e,i)=>{
+    const sid=sidOf(e); if(del.has(sid)) return;
+    list.push(Object.assign({}, e, store.edits[sid]||{}, {_sid:sid, _added:false, _id:"u"+i}));
+  });
+  (store.added||[]).forEach((a,i)=>{
+    list.push(Object.assign({cat:"資格",prov:"",name:"",genre:"",status:"未着手",date:"",url:""}, a, {_added:true, _id:a._id||("n"+i)}));
+  });
+  return list;
+}
+let STATE = buildState();
+function stripAdded(e){ const o={_id:e._id}; ["cat","prov","name","genre","status","date","url"].forEach(f=>o[f]=e[f]||""); return o; }
+function save(){
+  const baseBySid=new Map(); BASE.forEach(e=>baseBySid.set(sidOf(e), e));
+  const edits={}, added=[], seen=new Set();
+  STATE.forEach(e=>{
+    if(e._added){ added.push(stripAdded(e)); return; }
+    seen.add(e._sid);
+    const base=baseBySid.get(e._sid);
+    if(!base){ added.push(stripAdded(e)); return; }
+    const ov={}; EDITABLE.forEach(f=>{ if((e[f]||"")!==(base[f]||"")) ov[f]=e[f]||""; });
+    if(Object.keys(ov).length) edits[e._sid]=ov;
+  });
+  const deleted=[...baseBySid.keys()].filter(sid=>!seen.has(sid));
+  try{ localStorage.setItem(KEY, JSON.stringify({edits, added, deleted})); }catch(_){}
+}
 function byId(id){ return STATE.find(e=>e._id===id); }
 
 const rowsEl=document.getElementById("rows"), countEl=document.getElementById("count");
@@ -344,7 +375,7 @@ document.getElementById("clearBtn").addEventListener("click", ()=>{
 
 document.getElementById("addBtn").addEventListener("click", ()=>{
   const cat = curCat==="全一覧" ? "資格" : curCat;
-  const e={ _id:"n"+(++newCtr)+"_"+Date.now(), cat, prov:"", name:"", genre:"", status:defaultStatus(cat), date:"", url:"" };
+  const e={ _id:"n"+(++newCtr)+"_"+Date.now(), _added:true, cat, prov:"", name:"", genre:"", status:defaultStatus(cat), date:"", url:"" };
   const idx = STATE.reduce((last,x,i)=> x.cat===cat ? i : last, -1);
   if(idx>=0) STATE.splice(idx+1,0,e); else STATE.push(e);
   save();
@@ -377,8 +408,8 @@ document.getElementById("exportBtn").addEventListener("click", doExport);
 document.getElementById("resetBtn").addEventListener("click", ()=>{
   if(!confirm("このブラウザでの編集内容を破棄し、ビルド時点の状態に戻します。よろしいですか？")) return;
   localStorage.removeItem(KEY);
-  STATE=BASE.map(e=>Object.assign({}, e));
-  save(); curCat="全一覧"; syncTabs(); populateFilters(); render(); toast("リセットしました");
+  STATE=buildState();
+  curCat="全一覧"; syncTabs(); populateFilters(); render(); toast("リセットしました");
 });
 
 let toastT=null;
