@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "validate": "node scripts/validate-quiz.mjs",
+    "prebuild": "node scripts/validate-quiz.mjs",
     "build": "vite build",
     "preview": "vite preview"
   },

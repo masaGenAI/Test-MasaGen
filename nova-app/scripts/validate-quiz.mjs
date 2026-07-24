@@ -1,0 +1,115 @@
+#!/usr/bin/env node
+// クイズデータ整合性チェッカー
+// 全認定ハブ（CLF/SAA/CCA-F/AICX/PL-900/AB-620/ADP）の選択式問題データが
+// 品質不変条件を満たすか検査する。問題追加・編集時のリグレッション防止用。
+//   実行: node scripts/validate-quiz.mjs   （npm run validate）
+//   失敗（hard error）があれば終了コード 1 を返す。
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const SRC = path.resolve(__dirname, '..', 'src', 'ProjectNova.jsx');
+const text = fs.readFileSync(SRC, 'utf8');
+
+const len = (s) => [...String(s)].length;
+const norm = (s) => String(s).trim().replace(/\s+/g, '');
+
+// `const/var/let NAME = [ ... ]` または `{ ... }` を波括弧対応で切り出して eval する
+function extract(name, afterIdx = 0) {
+  const re = new RegExp('(?:const|var|let)\\s+' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*=\\s*', 'g');
+  re.lastIndex = afterIdx;
+  const m = re.exec(text);
+  if (!m) throw new Error('not found: ' + name);
+  let i = m.index + m[0].length;
+  const open = text[i], close = open === '{' ? '}' : ']';
+  if (open !== '{' && open !== '[') throw new Error(name + ' is not an array/object literal');
+  let depth = 0, inStr = false, q = null, esc = false;
+  for (; i < text.length; i++) {
+    const c = text[i];
+    if (inStr) { if (esc) { esc = false; continue; } if (c === '\\') { esc = true; continue; } if (c === q) inStr = false; continue; }
+    if (c === '"' || c === "'" || c === '`') { inStr = true; q = c; continue; }
+    if (c === open) depth++;
+    else if (c === close) { depth--; if (depth === 0) { const lit = text.slice(m.index + m[0].length, i + 1); return (0, eval)('(' + lit + ')'); } }
+  }
+  throw new Error('unbalanced literal: ' + name);
+}
+
+// 誤りを自己申告してしまう括弧書きタグ（CCA-F で除去した種類）
+const TAG_RE = /（[^）]*(?:推奨されない|非推奨|アンチパターン|信頼性を下げる|信頼性が下がる|顕在化しやすい|望ましくない)[^）]*）/;
+
+// ハブ → 検査対象配列とフォーマット
+//   obj      : [{d,q,o:[...],a:<idx|number[]>,e}]
+//   domRowQ1 : {D1:[[q, correct, w1, w2, w3, e], ...], ...}（正解は index0）
+//   rowDQOAE : [[d, q, o:[...], a:<idx>, e, ...], ...]
+const STATIONS = [
+  { name: 'Station_CLF', arrays: [['SET1','obj'],['SET2','obj'],['SET3','obj'],['SET4','obj'],['MOCK1','obj'],['MOCK2','obj'],['MOCK3','obj'],['MOCK4','obj']] },
+  { name: 'Station_SAA', arrays: [['BANK_D1','obj'],['BANK_D2','obj'],['BANK_D3','obj'],['BANK_D4','obj'],['EXAM_SET1','obj'],['EXAM_SET2','obj'],['EXAM_SET3','obj'],['EXAM_SET4','obj'],['EXAM_SET5','obj']] },
+  { name: 'Station_CCAF', arrays: [['BANK','obj'],['EXTRA','obj'],['SET1','obj'],['SET2','obj'],['SET3','obj'],['SET4','obj'],['SCEN_BANK','obj']] },
+  { name: 'Station_AICX', arrays: [['EXAM_POOL','domRowQ1'],['QUIZ_EXTRA','domRowQ1']] },
+  { name: 'Station_PL900', arrays: [['BANK','obj'],['BANK_EXTRA','obj'],['BANK_EXTRA2','obj']] },
+  { name: 'Station_AB620', arrays: [['BANK','obj']] },
+  { name: 'Station_ADP', arrays: [['CORE','rowDQOAE']] },
+];
+
+// 各行を {q, opts:[...], correct:<idx|number[]|null>} に正規化
+function* rows(value, fmt) {
+  if (fmt === 'obj') {
+    for (const r of value) yield { q: r.q, opts: r.o, correct: r.a };
+  } else if (fmt === 'rowDQOAE') {
+    for (const r of value) yield { q: r[1], opts: r[2], correct: r[3] };
+  } else if (fmt === 'domRowQ1') {
+    for (const dom of Object.keys(value)) for (const r of value[dom]) yield { q: r[0], opts: [r[1], r[2], r[3], r[4]], correct: 0 };
+  }
+}
+
+let hardFail = 0, warn = 0, totalItems = 0;
+const log = (s) => process.stdout.write(s + '\n');
+
+for (const st of STATIONS) {
+  const anchor = text.indexOf('const ' + st.name);
+  if (anchor < 0) { log(`✗ ${st.name}: station not found`); hardFail++; continue; }
+  for (const [arrName, fmt] of st.arrays) {
+    let value;
+    try { value = extract(arrName, anchor); } catch (e) { log(`✗ ${st.name}.${arrName}: ${e.message}`); hardFail++; continue; }
+    const seenQ = new Set();
+    let n = 0, allShort = 0, taggedRows = 0, dupQ = 0, fails = 0;
+    for (const { q, opts, correct } of rows(value, fmt)) {
+      n++; totalItems++;
+      const where = `${st.name}.${arrName}#${n - 1}`;
+      // 問題文の完全重複
+      const key = norm(q);
+      if (seenQ.has(key)) { dupQ++; } else seenQ.add(key);
+      // 選択肢: 非空・相異
+      if (!Array.isArray(opts) || opts.length < 2) { log(`  ✗ ${where}: options malformed`); fails++; continue; }
+      if (opts.some((o) => o == null || String(o).trim() === '')) { log(`  ✗ ${where}: empty option`); fails++; }
+      if (new Set(opts.map(norm)).size !== opts.length) { log(`  ✗ ${where}: duplicate option`); fails++; }
+      // 自己申告タグ
+      if (opts.some((o) => TAG_RE.test(String(o)))) { taggedRows++; }
+      // 正解 index
+      const multi = Array.isArray(correct);
+      const idxs = multi ? correct : [correct];
+      if (idxs.some((a) => typeof a !== 'number' || a < 0 || a >= opts.length)) { log(`  ✗ ${where}: invalid correct index ${JSON.stringify(correct)}`); fails++; continue; }
+      // 単一正解のみ: 長さ帯＋誤答一致
+      if (!multi) {
+        const a = correct;
+        const cl = len(opts[a]);
+        const wrongs = opts.filter((_, i) => i !== a);
+        if (wrongs.some((w) => norm(w) === norm(opts[a]))) { log(`  ✗ ${where}: distractor equals correct`); fails++; }
+        if (wrongs.map(len).every((x) => x < cl)) allShort++;
+      }
+    }
+    if (taggedRows > 0) { log(`  ✗ ${st.name}.${arrName}: ${taggedRows} row(s) contain self-incriminating tags`); fails += taggedRows; }
+    if (allShort > 0) { log(`  ✗ ${st.name}.${arrName}: ${allShort} item(s) where every distractor is shorter than the correct answer`); fails += allShort; }
+    if (dupQ > 0) { log(`  ⚠ ${st.name}.${arrName}: ${dupQ} duplicate question text(s)`); warn += dupQ; }
+    hardFail += fails;
+    const status = fails ? '✗' : '✓';
+    log(`${status} ${st.name}.${arrName}: ${n} items` + (fails ? ` — ${fails} error(s)` : '') + (dupQ ? ` (${dupQ} dup-q)` : ''));
+  }
+}
+
+log(`\nTotal items checked: ${totalItems}`);
+log(`Hard errors: ${hardFail}`);
+log(`Warnings: ${warn}`);
+if (hardFail > 0) { log('\nFAILED: quiz data has integrity errors.'); process.exit(1); }
+log('\nOK: all quiz banks pass integrity checks.');
