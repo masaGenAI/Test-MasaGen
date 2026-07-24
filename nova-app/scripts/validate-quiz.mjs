@@ -108,6 +108,35 @@ for (const st of STATIONS) {
   }
 }
 
+// ── 非認定ハブ（Finance/MegaTech 等）: "choices":[{ja,en},...], "ans":N 形式を横断検査 ──
+//   ハブに依存せずファイル全体を走査する。選択肢の非空・相異・正解index・自己申告タグに加え、
+//   「全誤答が正解より短い」長さバイアスを hard error として検出する（認定ハブと同基準）。
+{
+  const re = /"choices":\s*(\[[\s\S]*?\])\s*,\s*"ans":\s*(\d+)/g;
+  let m, n = 0, fails = 0, allShort = 0, taggedRows = 0;
+  while ((m = re.exec(text))) {
+    let opts;
+    try { opts = JSON.parse(m[1]); } catch { continue; }
+    if (!Array.isArray(opts) || opts.length < 2) continue;
+    const ans = Number(m[2]);
+    const ja = opts.map((o) => (o && o.ja != null ? o.ja : o));
+    n++; totalItems++;
+    const where = `choices/ans#${n - 1}`;
+    if (ja.some((o) => o == null || String(o).trim() === '')) { log(`  ✗ ${where}: empty option`); fails++; }
+    if (new Set(ja.map(norm)).size !== ja.length) { log(`  ✗ ${where}: duplicate option`); fails++; }
+    if (ja.some((o) => TAG_RE.test(String(o)))) { taggedRows++; }
+    if (typeof ans !== 'number' || ans < 0 || ans >= ja.length) { log(`  ✗ ${where}: invalid correct index ${m[2]}`); fails++; continue; }
+    const cl = len(ja[ans]);
+    const wrongs = ja.filter((_, i) => i !== ans);
+    if (wrongs.some((w) => norm(w) === norm(ja[ans]))) { log(`  ✗ ${where}: distractor equals correct`); fails++; }
+    if (wrongs.map(len).every((x) => x < cl)) allShort++;
+  }
+  if (taggedRows > 0) { log(`  ✗ choices/ans: ${taggedRows} row(s) contain self-incriminating tags`); fails += taggedRows; }
+  if (allShort > 0) { log(`  ✗ choices/ans: ${allShort} item(s) where every distractor is shorter than the correct answer`); fails += allShort; }
+  hardFail += fails;
+  log(`${fails ? '✗' : '✓'} choices/ans (non-cert hubs): ${n} items` + (fails ? ` — ${fails} error(s)` : ''));
+}
+
 log(`\nTotal items checked: ${totalItems}`);
 log(`Hard errors: ${hardFail}`);
 log(`Warnings: ${warn}`);
