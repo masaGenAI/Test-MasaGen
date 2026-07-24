@@ -387,7 +387,7 @@ function QuizTab({ section, lang, progress, saveProgress }) {
               <button key={i} onClick={() => choose(i)} disabled={revealed}
                 style={{ textAlign: "left", padding: "12px 14px", borderRadius: 10, border: `1.5px solid ${bd}`, background: bg, color: fg,
                   cursor: revealed ? "default" : "pointer", fontSize: 14, lineHeight: 1.6, display: "flex", gap: 10 }}>
-                <span style={{ fontWeight: 800, color: C.slateLight }}>{String.fromCharCode(65 + i)}</span>
+                <span style={{ fontWeight: 800, color: C.slateLight }}>{revealed && (isAns) ? "✓" : revealed && (isPicked) ? "✗" : String.fromCharCode(65 + i)}</span>
                 <span>{L(ch.ja, ch.en, lang)}</span>
               </button>
             );
@@ -465,7 +465,7 @@ function MockView({ section, lang }) {
             return (
               <button key={i} onClick={() => choose(i)} disabled={revealed}
                 style={{ textAlign: "left", padding: "12px 14px", borderRadius: 10, border: `1.5px solid ${bd}`, background: bg, color: fg, cursor: revealed ? "default" : "pointer", fontSize: 14, lineHeight: 1.6, display: "flex", gap: 10 }}>
-                <span style={{ fontWeight: 800, color: C.slateLight }}>{String.fromCharCode(65 + i)}</span>
+                <span style={{ fontWeight: 800, color: C.slateLight }}>{revealed && (isAns) ? "✓" : revealed && (isPicked) ? "✗" : String.fromCharCode(65 + i)}</span>
                 <span>{L(ch.ja, ch.en, lang)}</span>
               </button>
             );
@@ -696,7 +696,7 @@ function CalcView({ section, lang }) {
                 return (
                   <button key={i} onClick={() => { if (pk == null) setPicked({ ...picked, [c.id]: i }); }} disabled={revealed}
                     style={{ textAlign: "left", padding: "12px 14px", borderRadius: 10, border: `1.5px solid ${bd}`, background: bg, color: fg, cursor: revealed ? "default" : "pointer", fontSize: 14, lineHeight: 1.6, display: "flex", gap: 10 }}>
-                    <span style={{ fontWeight: 800, color: C.slateLight }}>{String.fromCharCode(65 + i)}</span>
+                    <span style={{ fontWeight: 800, color: C.slateLight }}>{revealed && (isAns) ? "✓" : revealed && (isPicked) ? "✗" : String.fromCharCode(65 + i)}</span>
                     <span>{L(ch.ja, ch.en, lang)}</span>
                   </button>
                 );
@@ -138246,7 +138246,7 @@ function Quiz({ onAnswer, lang, t }) {
               style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 10, padding: "14px 16px", borderRadius: 10,
                 border: `1.5px solid ${bd}`, background: bg, color: col, cursor: sel === null ? "pointer" : "default",
                 fontSize: 14, lineHeight: 1.4, fontWeight: sel !== null && i === Q.a ? 700 : 500 }}>
-              <span style={{ fontWeight: 700, marginRight: 10 }}>{"ABCD"[i]}</span>{opt}
+              <span style={{ fontWeight: 700, marginRight: 10 }}>{sel !== null && (i === Q.a) ? "✓" : sel !== null && (i === sel) ? "✗" : "ABCD"[i]}</span>{opt}
             </button>
           );
         })}
@@ -142164,7 +142164,7 @@ function Quiz({ onAnswer, lang, t }) {
                 borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col,
                 cursor: sel === null ? "pointer" : "default", fontSize: 13.5, lineHeight: 1.4,
                 fontWeight: sel !== null && i === Q.a ? 700 : 500 }}>
-              <span style={{ fontWeight: 700, marginRight: 8 }}>{"ABCD"[i]}</span>{opt}
+              <span style={{ fontWeight: 700, marginRight: 8 }}>{sel !== null && (i === Q.a) ? "✓" : sel !== null && (i === sel) ? "✗" : "ABCD"[i]}</span>{opt}
             </button>
           );
         })}
@@ -142387,7 +142387,7 @@ function Exam({ onAnswer, lang, t }) {
           return (
             <button key={i} onClick={() => choose(i)} disabled={disabled}
               style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: disabled ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4, fontWeight: locked && i === Q.a ? 700 : 500 }}>
-              <span style={{ fontWeight: 700, marginRight: 8 }}>{"ABCD"[i]}</span>{opt}
+              <span style={{ fontWeight: 700, marginRight: 8 }}>{(locked) && (i === Q.a) ? "✓" : (locked) && (recorded && i === recorded.sel) ? "✗" : "ABCD"[i]}</span>{opt}
             </button>
           );
         })}
@@ -142534,7 +142534,7 @@ function Scenario({ onAnswer, lang, t }) {
           return (
             <button key={i} onClick={() => choose(i)} disabled={sel !== null}
               style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: sel === null ? "pointer" : "default", fontSize: 13.5, lineHeight: 1.45, fontWeight: sel !== null && i === Q.a ? 700 : 500 }}>
-              <span style={{ fontWeight: 700, marginRight: 8 }}>{"ABCD"[i]}</span>{opt}
+              <span style={{ fontWeight: 700, marginRight: 8 }}>{sel !== null && (i === Q.a) ? "✓" : sel !== null && (i === sel) ? "✗" : "ABCD"[i]}</span>{opt}
             </button>
           );
         })}
@@ -144923,7 +144923,7 @@ function QuestionCard({ Q, sel, choose, next, lastBtn, lang }) {
               borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col,
               cursor: sel === null ? "pointer" : "default", fontSize: 13.5, lineHeight: 1.4,
               fontWeight: sel !== null && i === Q.a ? 700 : 500 }}>
-            <span style={{ fontWeight: 700, marginRight: 8 }}>{"ABCD"[i]}</span>{opt}
+            <span style={{ fontWeight: 700, marginRight: 8 }}>{sel !== null && (i === Q.a) ? "✓" : sel !== null && (i === sel) ? "✗" : "ABCD"[i]}</span>{opt}
           </button>
         );
       })}
@@ -145276,7 +145276,7 @@ function CaseStudy({ onAnswer, lang }) {
                 borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col,
                 cursor: sel === null ? "pointer" : "default", fontSize: 13.5, lineHeight: 1.4,
                 fontWeight: sel !== null && opt.ok ? 700 : 500 }}>
-              <span style={{ fontWeight: 700, marginRight: 8 }}>{"ABCD"[i]}</span>{opt.label}
+              <span style={{ fontWeight: 700, marginRight: 8 }}>{sel !== null && (opt.ok) ? "✓" : sel !== null && (i === sel) ? "✗" : "ABCD"[i]}</span>{opt.label}
             </button>
           );
         })}
@@ -145382,7 +145382,7 @@ function ReviewCard({ rec, onAnswer, removeReview, lang }) {
               borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col,
               cursor: sel === null ? "pointer" : "default", fontSize: 13, lineHeight: 1.4,
               fontWeight: sel !== null && i === answerIdx ? 700 : 500 }}>
-            <span style={{ fontWeight: 700, marginRight: 8 }}>{"ABCD"[i]}</span>{opt}
+            <span style={{ fontWeight: 700, marginRight: 8 }}>{sel !== null && (i === answerIdx) ? "✓" : sel !== null && (i === sel) ? "✗" : "ABCD"[i]}</span>{opt}
           </button>
         );
       })}
@@ -146471,7 +146471,7 @@ const BANK_EXTRA2 = [
 ];
 
 // クイズ全問題（BANK + BANK_EXTRA + BANK_EXTRA2 を結合）
-const ALL_QUESTIONS = BANK.concat(BANK_EXTRA).concat(BANK_EXTRA2).filter((q, i, a) => a.findIndex(x => x.q === q.q) === i);
+const ALL_QUESTIONS = BANK.concat(BANK_EXTRA).concat(BANK_EXTRA2).filter((q, i, a) => a.findIndex(x => x.q.replace(/\s+/g, "") === q.q.replace(/\s+/g, "")) === i);
 
 // ===== 永続化 =====
 async function loadState() {
@@ -146788,7 +146788,7 @@ function Quiz({ onAnswer, t, questions }) {
                 background: bg, color: col, cursor: sel === null ? "pointer" : "default",
                 fontSize: 13.5, lineHeight: 1.4, fontWeight: sel !== null && i === correctIdx ? 700 : 500,
               }}>
-              <span style={{ fontWeight: 700, marginRight: 8 }}>{"ABCD"[i]}</span>{opt}
+              <span style={{ fontWeight: 700, marginRight: 8 }}>{sel !== null && (i === correctIdx) ? "✓" : sel !== null && (i === sel) ? "✗" : "ABCD"[i]}</span>{opt}
             </button>
           );
         })}
@@ -147013,7 +147013,7 @@ function Exam({ onAnswer, t }) {
           return (
             <button key={i} onClick={() => mode === "practice" ? choosePractice(i) : chooseReal(i)} disabled={disabled}
               style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: disabled ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4, fontWeight: (mode === "practice" && sel !== null && i === Q.a) || (mode === "real" && curPick === i) ? 700 : 500 }}>
-              <span style={{ fontWeight: 700, marginRight: 8 }}>{"ABCD"[i]}</span>{opt}
+              <span style={{ fontWeight: 700, marginRight: 8 }}>{(mode === "practice" && sel !== null) && (i === Q.a) ? "✓" : (mode === "practice" && sel !== null) && (i === sel) ? "✗" : "ABCD"[i]}</span>{opt}
             </button>
           );
         })}
@@ -148284,7 +148284,7 @@ function Quiz({ onAnswer, lang, t }) {
                 borderRadius: 10, border: `1.5px solid ${bd}`, background: bg, color: col,
                 cursor: sel === null ? "pointer" : "default", fontSize: 14, lineHeight: 1.4,
                 fontWeight: sel !== null && i === ans ? 700 : 500 }}>
-              <span style={{ fontWeight: 700, marginRight: 10 }}>{"ABCD"[i]}</span>{opt}
+              <span style={{ fontWeight: 700, marginRight: 10 }}>{sel !== null && (i === ans) ? "✓" : sel !== null && (i === sel) ? "✗" : "ABCD"[i]}</span>{opt}
             </button>
           );
         })}
@@ -148486,7 +148486,7 @@ function Exam({ onAnswer, lang, t }) {
           return (
             <button key={i} onClick={() => choose(i)} disabled={sel !== null}
               style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: sel === null ? "pointer" : "default", fontSize: 13.5, lineHeight: 1.4, fontWeight: sel !== null && ((mode === "practice" && i === ans) || (mode === "exam" && i === sel)) ? 700 : 500 }}>
-              <span style={{ fontWeight: 700, marginRight: 8 }}>{"ABCD"[i]}</span>{opt}
+              <span style={{ fontWeight: 700, marginRight: 8 }}>{(sel !== null) && (i === ans) ? "✓" : (sel !== null) && (i === sel) ? "✗" : "ABCD"[i]}</span>{opt}
             </button>
           );
         })}
@@ -148603,7 +148603,7 @@ function Review({ lang, t, onAnswer }) {
           return (
             <button key={i} onClick={() => choose(i)} disabled={sel !== null}
               style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: sel === null ? "pointer" : "default", fontSize: 13.5, lineHeight: 1.4, fontWeight: sel !== null && i === ans ? 700 : 500 }}>
-              <span style={{ fontWeight: 700, marginRight: 8 }}>{"ABCD"[i]}</span>{opt}
+              <span style={{ fontWeight: 700, marginRight: 8 }}>{sel !== null && (i === ans) ? "✓" : sel !== null && (i === sel) ? "✗" : "ABCD"[i]}</span>{opt}
             </button>
           );
         })}
@@ -149819,7 +149819,7 @@ function QuestionCard({ Q, sel, onChoose, lang, reveal, t }) {
         return (
           <button key={i} onClick={() => onChoose(i)} disabled={sel !== null}
             style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: sel === null ? "pointer" : "default", fontSize: 13.5, lineHeight: 1.4, fontWeight: sel !== null && reveal && i === Q.a ? 700 : 500 }}>
-            <span style={{ fontWeight: 700, marginRight: 8 }}>{"ABCD"[i]}</span>{opt}
+            <span style={{ fontWeight: 700, marginRight: 8 }}>{sel !== null && (i === Q.a) ? "✓" : sel !== null && (i === sel) ? "✗" : "ABCD"[i]}</span>{opt}
           </button>
         );
       })}
