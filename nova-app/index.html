@@ -6,6 +6,17 @@
     <title>Project Nova</title>
     <style>
       html, body, #root { margin: 0; padding: 0; min-height: 100%; }
+      /* a11y: キーボード操作時に可視のフォーカスリングを全要素へ付与（マウス操作時は非表示） */
+      :focus-visible { outline: 3px solid #2563EB; outline-offset: 2px; border-radius: 4px; }
+      /* a11y: 動きを減らす設定のユーザーにはアニメーション/トランジションを抑制 */
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
     </style>
   </head>
   <body>
