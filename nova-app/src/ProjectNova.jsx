@@ -144554,7 +144554,7 @@ function pickCase(row, rowEn, lang, seq) {
   const correct = rawOpts.find(o => o.ok);
   const wrongs = rawOpts.filter(o => !o.ok);
   const base = correct ? [correct, ...wrongs] : rawOpts;
-  const targetPos = ((seq || 0) * 3 + 1) % base.length;
+  const targetPos = (seq || 0) % base.length;
   const order = [];
   let wi = 1;
   for (let p = 0; p < base.length; p++) {
@@ -144971,9 +144971,48 @@ function Quiz({ onAnswer, lang }) {
     setStats(s => ({ c: s.c + (correct ? 1 : 0), a: s.a + 1 }));
     onAnswer(Q.d, correct);
   };
-  const next = () => setPos(p => p + 1);
+  const next = () => setPos(p => Math.min(order.length, p + 1));
   const prev = () => setPos(p => Math.max(0, p - 1));
   const rate = stats.a ? Math.round((stats.c / stats.a) * 100) : 0;
+
+  // 全問回答後の結果画面（正答率＋誤答の解説）
+  if (pos >= order.length) {
+    const total = order.length;
+    let correct = 0;
+    const wrongs = [];
+    for (let p = 0; p < total; p++) {
+      const wq = L(QUIZ_BANK[order[p]], lang);
+      const ch = history[p];
+      if (ch === wq.a) correct++; else wrongs.push({ wq, ch });
+    }
+    const frate = total ? Math.round((correct / total) * 100) : 0;
+    return (
+      <div>
+        <div style={{ textAlign: "center", marginBottom: 14 }}>
+          <div style={{ fontSize: 13, color: "#5a6a85", fontWeight: 600, marginBottom: 6 }}>{lang === "ja" ? "クイズ完了" : "Quiz complete"}</div>
+          <div style={{ fontSize: 34, fontWeight: 800, color: frate >= PASS ? C.ok : C.ng }}>{frate}%</div>
+          <div style={{ fontSize: 12.5, color: "#8595ad", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${total} 問` : `${correct} / ${total} correct`}</div>
+        </div>
+        <div style={{ marginBottom: 14 }}><Bar pct={frate} color={frate >= PASS ? C.ok : C.ng} /></div>
+        <button onClick={() => { setPos(0); setHistory({}); setStats({ c: 0, a: 0 }); }}
+          style={{ width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", marginBottom: 16 }}>
+          {lang === "ja" ? "もう一度挑戦する" : "Try again"}
+        </button>
+        <div style={{ fontSize: 13, fontWeight: 700, color: C.ink, marginBottom: 8 }}>
+          {lang === "ja" ? `誤答 ${wrongs.length} 問（解説付き）` : `Incorrect: ${wrongs.length} (with explanations)`}
+        </div>
+        {wrongs.length === 0 && <div style={{ fontSize: 12.5, color: C.ok, fontWeight: 600 }}>{lang === "ja" ? "全問正解です。" : "All correct!"}</div>}
+        {wrongs.map(({ wq, ch }, k) => (
+          <div key={k} style={{ background: C.light, borderRadius: 9, padding: 12, marginBottom: 8, fontSize: 12.5, lineHeight: 1.6 }}>
+            <div style={{ fontWeight: 700, color: C.ink, marginBottom: 6 }}>{k + 1}. {wq.q}</div>
+            <div style={{ color: C.ng }}>{lang === "ja" ? "あなたの回答: " : "Your answer: "}{ch != null && wq.o[ch] != null ? `${"ABCD"[ch]}. ${wq.o[ch]}` : "—"}</div>
+            <div style={{ color: C.ok }}>{lang === "ja" ? "正解: " : "Correct: "}{"ABCD"[wq.a]}. {wq.o[wq.a]}</div>
+            <div style={{ marginTop: 4, color: "#5a6a85" }}>{wq.e}</div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -145014,7 +145053,7 @@ function Quiz({ onAnswer, lang }) {
         </button>
         <span style={{ fontSize: 12.5, color: "#8595ad", fontWeight: 600 }}>{pos + 1} / {order.length}</span>
       </div>
-      <QuestionCard Q={Q} sel={sel} choose={choose} next={next} lastBtn={t.nextQuestion} lang={lang} />
+      <QuestionCard Q={Q} sel={sel} choose={choose} next={next} lastBtn={pos === order.length - 1 ? t.seeResult : t.nextQuestion} lang={lang} />
     </div>
   );
 }
@@ -145027,11 +145066,17 @@ function Exam({ onAnswer, lang }) {
   const [pos, setPos] = useState(0);
   const [answers, setAnswers] = useState({});
   const [sel, setSel] = useState(null);
-  const rawQs = setNo ? EXAM_SETS[setNo] : [];
+  const [orderMode, setOrderMode] = useState("fixed");
+  const [sessionQs, setSessionQs] = useState([]);
+  const rawQs = sessionQs;
   const qs = rawQs.map(q => L(q, lang));
   const exLabels = EXAM_LABELS[lang];
 
-  const start = (n) => { setSetNo(n); setPos(0); setAnswers({}); setSel(null); setPhase("run"); };
+  const start = (n) => {
+    const base = EXAM_SETS[n];
+    setSessionQs(orderMode === "random" ? shuffle(base) : base);
+    setSetNo(n); setPos(0); setAnswers({}); setSel(null); setPhase("run");
+  };
 
   const choosePractice = (i) => {
     if (sel !== null) return;
@@ -145060,6 +145105,18 @@ function Exam({ onAnswer, lang }) {
                   style={{ border: "none", cursor: "pointer", borderRadius: 999, padding: "8px 22px", fontSize: 13.5, fontWeight: 700,
                     background: examMode === k ? "#fff" : "transparent", color: examMode === k ? C.deep : "#8a8275",
                     boxShadow: examMode === k ? "0 1px 2px rgba(0,0,0,0.08)" : "none" }}>
+                  {lbl}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div style={{ display: "flex", justifyContent: "center", marginTop: 10, marginBottom: 8 }}>
+            <div style={{ display: "inline-flex", background: "#EDE9E0", borderRadius: 999, padding: 3 }}>
+              {[["fixed", t.fixed], ["random", t.random]].map(([k, lbl]) => (
+                <button key={k} onClick={() => setOrderMode(k)}
+                  style={{ border: "none", cursor: "pointer", borderRadius: 999, padding: "6px 18px", fontSize: 12.5, fontWeight: 700,
+                    background: orderMode === k ? "#fff" : "transparent", color: orderMode === k ? C.deep : "#8a8275",
+                    boxShadow: orderMode === k ? "0 1px 2px rgba(0,0,0,0.08)" : "none" }}>
                   {lbl}
                 </button>
               ))}
@@ -145209,18 +145266,36 @@ function Exam({ onAnswer, lang }) {
 function CaseStudy({ onAnswer, lang }) {
   const t = UI[lang];
   const [setNo, setSetNo] = useState(null);
-  const list = setNo ? CASE_SETS[setNo] : [];
+  const [orderMode, setOrderMode] = useState("fixed");
+  const [sessionList, setSessionList] = useState([]);
+  const list = sessionList;
   const [idx, setIdx] = useState(0);
   const [sel, setSel] = useState(null);
   const labels = CASE_LABELS[lang];
 
-  const start = (n) => { setSetNo(n); setIdx(0); setSel(null); };
+  const start = (n) => {
+    const base = CASE_SETS[n];
+    setSessionList(orderMode === "random" ? shuffle(base) : base);
+    setSetNo(n); setIdx(0); setSel(null);
+  };
 
   if (!setNo) {
     return (
       <div>
         <Card title={t.caseTitle}>
-          <div style={{ fontSize: 13, lineHeight: 1.6, color: "#475569" }}>{t.caseDesc}</div>
+          <div style={{ fontSize: 13, lineHeight: 1.6, color: "#475569", marginBottom: 10 }}>{t.caseDesc}</div>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <div style={{ display: "inline-flex", background: "#EDE9E0", borderRadius: 999, padding: 3 }}>
+              {[["fixed", t.fixed], ["random", t.random]].map(([k, lbl]) => (
+                <button key={k} onClick={() => setOrderMode(k)}
+                  style={{ border: "none", cursor: "pointer", borderRadius: 999, padding: "6px 18px", fontSize: 12.5, fontWeight: 700,
+                    background: orderMode === k ? "#fff" : "transparent", color: orderMode === k ? C.deep : "#8a8275",
+                    boxShadow: orderMode === k ? "0 1px 2px rgba(0,0,0,0.08)" : "none" }}>
+                  {lbl}
+                </button>
+              ))}
+            </div>
+          </div>
         </Card>
         {[1, 2, 3, 4, 5].map(n => {
           const ready = CASE_SETS[n].length > 0;
