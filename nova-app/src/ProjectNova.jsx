@@ -145361,7 +145361,7 @@ function CaseStudy({ onAnswer, lang }) {
   const [sel, setSel] = useState(null);
   const labels = CASE_LABELS[lang];
 
-  if (showExam) return <ExamCaseRunner data={AICX_EXAM_CASES[0]} lang={lang} onBack={() => setShowExam(false)} />;
+  if (showExam) return <ExamCaseRunner data={AICX_EXAM_CASES} lang={lang} onBack={() => setShowExam(false)} />;
 
   const start = (n) => {
     const base = CASE_SETS[n];
