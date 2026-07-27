@@ -175,6 +175,46 @@ for (const st of STATIONS) {
   log(`${fails ? '✗' : '✓'} opts/a (MegaTech hub): ${n} items` + (fails ? ` — ${fails} error(s)` : ''));
 }
 
+// ── Linguistics ハブ: buildQuestions([[d,q,A,B,C,D,ansIdx,exp], ...]) 形式を検査 ──
+//   タプル配列を波括弧対応で切り出し、choices(2..5)/ansIdx(6) を取り出して長さバイアス等を検査する。
+{
+  const re = /buildQuestions\(\s*\[/g;
+  let m, n = 0, fails = 0, allShort = 0;
+  const matchBracket = (start) => {
+    let depth = 0, inStr = false, q = null, esc = false;
+    for (let i = start; i < text.length; i++) {
+      const c = text[i];
+      if (inStr) { if (esc) { esc = false; continue; } if (c === '\\') { esc = true; continue; } if (c === q) inStr = false; continue; }
+      if (c === '"' || c === "'" || c === '`') { inStr = true; q = c; continue; }
+      if (c === '[') depth++; else if (c === ']') { depth--; if (depth === 0) return i; }
+    }
+    return -1;
+  };
+  while ((m = re.exec(text))) {
+    const bs = text.indexOf('[', m.index), be = matchBracket(bs);
+    if (be < 0) continue;
+    let arr;
+    try { arr = (0, eval)('(' + text.slice(bs, be + 1) + ')'); } catch { continue; }
+    if (!Array.isArray(arr)) continue;
+    for (const row of arr) {
+      if (!Array.isArray(row) || row.length < 7) continue;
+      const ch = [row[2], row[3], row[4], row[5]];
+      const a = row[6];
+      if (!ch.every((o) => typeof o === 'string') || typeof a !== 'number' || a < 0 || a >= ch.length) continue;
+      n++; totalItems++;
+      const where = `buildQuestions#${n - 1}`;
+      if (ch.some((o) => String(o).trim() === '')) { log(`  ✗ ${where}: empty option`); fails++; }
+      if (new Set(ch.map(norm)).size !== ch.length) { log(`  ✗ ${where}: duplicate option`); fails++; }
+      if (ch.some((o) => TAG_RE.test(o))) { log(`  ✗ ${where}: self-incriminating tag`); fails++; }
+      const cl = len(ch[a]);
+      if (ch.filter((_, i) => i !== a).map(len).every((x) => x < cl)) allShort++;
+    }
+  }
+  if (allShort > 0) { log(`  ✗ buildQuestions: ${allShort} item(s) where every distractor is shorter than the correct answer`); fails += allShort; }
+  hardFail += fails;
+  log(`${fails ? '✗' : '✓'} buildQuestions (Linguistics hub): ${n} items` + (fails ? ` — ${fails} error(s)` : ''));
+}
+
 log(`\nTotal items checked: ${totalItems}`);
 log(`Hard errors: ${hardFail}`);
 log(`Warnings: ${warn}`);
