@@ -137,6 +137,44 @@ for (const st of STATIONS) {
   log(`${fails ? '✗' : '✓'} choices/ans (non-cert hubs): ${n} items` + (fails ? ` — ${fails} error(s)` : ''));
 }
 
+// ── MegaTech ハブ: opts:[<string>...], a:N（英語は optsEn）形式を横断検査 ──
+//   文字列選択肢配列を波括弧対応で切り出し、非空・相異・正解index・タグ・長さバイアスを検査する。
+{
+  const re = /\bopts:\s*\[/g;
+  let m, n = 0, fails = 0, allShort = 0, taggedRows = 0;
+  while ((m = re.exec(text))) {
+    const bs = text.indexOf('[', m.index);
+    // 波括弧対応で配列末尾を探す（文字列内の括弧は無視）
+    let depth = 0, inStr = false, q = null, esc = false, be = -1;
+    for (let i = bs; i < text.length; i++) {
+      const c = text[i];
+      if (inStr) { if (esc) { esc = false; continue; } if (c === '\\') { esc = true; continue; } if (c === q) inStr = false; continue; }
+      if (c === '"' || c === "'" || c === '`') { inStr = true; q = c; continue; }
+      if (c === '[') depth++; else if (c === ']') { depth--; if (depth === 0) { be = i; break; } }
+    }
+    if (be < 0) continue;
+    let opts;
+    try { opts = (0, eval)('(' + text.slice(bs, be + 1) + ')'); } catch { continue; }
+    if (!Array.isArray(opts) || opts.length < 2 || !opts.every((o) => typeof o === 'string')) continue;
+    const am = text.slice(be + 1, be + 2000).match(/^\s*,\s*a:\s*(\d+)/);
+    if (!am) continue;
+    const a = Number(am[1]);
+    if (a < 0 || a >= opts.length) continue;
+    n++; totalItems++;
+    const where = `opts/a#${n - 1}`;
+    if (opts.some((o) => o == null || String(o).trim() === '')) { log(`  ✗ ${where}: empty option`); fails++; }
+    if (new Set(opts.map(norm)).size !== opts.length) { log(`  ✗ ${where}: duplicate option`); fails++; }
+    if (opts.some((o) => TAG_RE.test(o))) { taggedRows++; }
+    const cl = len(opts[a]);
+    const wrongs = opts.filter((_, i) => i !== a);
+    if (wrongs.map(len).every((x) => x < cl)) allShort++;
+  }
+  if (taggedRows > 0) { log(`  ✗ opts/a: ${taggedRows} row(s) contain self-incriminating tags`); fails += taggedRows; }
+  if (allShort > 0) { log(`  ✗ opts/a: ${allShort} item(s) where every distractor is shorter than the correct answer`); fails += allShort; }
+  hardFail += fails;
+  log(`${fails ? '✗' : '✓'} opts/a (MegaTech hub): ${n} items` + (fails ? ` — ${fails} error(s)` : ''));
+}
+
 log(`\nTotal items checked: ${totalItems}`);
 log(`Hard errors: ${hardFail}`);
 log(`Warnings: ${warn}`);
