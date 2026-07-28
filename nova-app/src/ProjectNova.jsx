@@ -142461,9 +142461,7 @@ function buildQuizSession(filter, order) {
 }
 
 // ドメイン重点版（模試タブのドメイン選択用）：クイズバンクから各ドメインを集約
-const DOMAIN_SETS = Object.fromEntries(
-  DOMAINS.map(d => [d.id, dedupe(QUIZ_BANK.filter(q => q.d === d.id))])
-);
+// DOMAIN_SETS は CCAF_EXAM_HARD 定義後に構築する（本試験形式の長文問題〜200字を使用）
 
 // ===== 模試セット2〜4を構築（依存定義後）=====
 // 各ドメインを公式比率で抽出し、応用・シナリオを前方に寄せて難度を底上げ。
@@ -142494,6 +142492,11 @@ RAW_SETS[4] = buildExamSet("exam-set-4");
 // 模擬試験セットにも英訳と選択肢シャッフルをマージ
 const EXAM_SETS = Object.fromEntries(
   Object.entries(RAW_SETS).map(([k, arr]) => [k, arr.map(withEn).map(shuffleOptions)])
+);
+
+// ドメイン重点：通常セットと同じ本試験形式（〜200字）の長文問題をドメイン別に集約
+const DOMAIN_SETS = Object.fromEntries(
+  DOMAINS.map(d => [d.id, dedupe(CCAF_EXAM_HARD.filter(q => q.d === d.id)).map(withEn).map(shuffleOptions)])
 );
 
 // ===== 混同しやすいポイント =====
