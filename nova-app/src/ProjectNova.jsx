@@ -125800,336 +125800,506 @@ function extractJSON(raw) {
 // ============ 模擬面接モード ============
 // 口頭試問(図面ノード)・設計判断(VERSUS)・逆質問(REVERSE_Q)・概算(DRILLS)を織り交ぜた連続面接。
 // 各問で受験者の回答をAI(callClaude)が面接官として講評する。
-// AWS AI Solutions Architect 面接 必答テーマ（モデル解答つき・カテゴリ別）
+// AWS AI Solutions Architect 面接 必答テーマ（詳説モデル解答＋関連アーキ図＋確認クイズ）
 const SA_INTERVIEW_QA = [
   // ── 基礎 ──
   {
-    cat: "基礎", catEn: "Fundamentals",
+    cat: "基礎", catEn: "Fundamentals", diag: "llmapp",
     q: "生成AIとは何か？",
     qEn: "What is generative AI?",
-    tldr: "大量データで事前学習した基盤モデルが、プロンプトに対し確率的に次のトークンを予測し、文章・画像・コードなどの新しいコンテンツを『生成』する技術です。",
-    tldrEn: "Foundation models pretrained on large corpora predict the next token probabilistically from a prompt and thereby generate new content — text, images, code — rather than only classifying existing data.",
+    tldr: "大量のデータで事前学習した基盤モデルが、入力（プロンプト）に対して確率的に次のトークンを予測し、文章・画像・コード・音声などの新しいコンテンツを『生成』する技術です。既存データを分類・予測する従来の識別系AIと対比され、学習した確率分布から新しい出力を作り出す点が本質的な違いです。",
+    tldrEn: "Foundation models pretrained on massive data predict the next token probabilistically from a prompt and thereby generate new content — text, images, code, audio. Unlike discriminative AI that classifies or predicts over existing data, generative AI creates new outputs sampled from a learned distribution.",
     sections: [
-      { h: "従来AIとの違い", hEn: "vs. traditional AI", t: "識別系AIは『分類・予測』が中心。生成AIは学習した分布から新しい出力を作ります。中核はTransformerで、自己注意により文脈を捉え自己回帰的に生成します。", tEn: "Discriminative AI classifies/predicts; generative AI samples new outputs from a learned distribution. The core is the Transformer, using self-attention and autoregressive generation." },
-      { h: "SAとしての話し方", hEn: "How an SA frames it", t: "『要約・生成・対話・抽出・コード化』という業務価値に翻訳し、AWSではAmazon Bedrockで基盤モデルをマネージドに使える、と結びつけます。", tEn: "Translate into business value (summarize, generate, converse, extract, code) and connect to AWS: Amazon Bedrock offers managed access to foundation models." },
+      { h: "技術的な核", hEn: "Technical core", t: "中核はTransformerアーキテクチャです。自己注意（self-attention）によって文中の遠い語どうしの関係も並列に捉え、文脈を反映した表現を作ります。テキスト生成は自己回帰的で、直前までの系列から次の1トークンを確率で選び、それを繰り返して文章を伸ばします。学習は『次トークン予測』という単純な目的で大量テキストを事前学習し、その後に指示追従（instruction tuning）や人間フィードバック（RLHF）で使いやすく整えます。", tEn: "The core is the Transformer. Self-attention captures relationships between distant tokens in parallel to build context-aware representations. Text generation is autoregressive: it picks the next token by probability from the prior sequence and repeats. Training is simply next-token prediction at scale, followed by instruction tuning and RLHF to make models helpful." },
+      { h: "基盤モデルという発想", hEn: "The foundation-model idea", t: "巨大データで一度事前学習した汎用モデルを、プロンプトや少量の適応で多様なタスクに転用できる点が革新でした。1タスク1モデルで作り込む従来型と異なり、同じ基盤モデルを要約・分類・対話・抽出・コード生成に横断利用できます。代表例はClaude、Amazon Titan/Nova、Stable Diffusion（画像）など。", tEn: "The breakthrough is that one general model, pretrained once on huge data, transfers to many tasks via prompting or light adaptation. Instead of one model per task, the same foundation model serves summarization, classification, dialog, extraction, and code. Examples: Claude, Amazon Titan/Nova, Stable Diffusion." },
+      { h: "SAとしての話し方", hEn: "How an SA frames it", t: "面接では『技術の説明』で止めず、必ず業務価値と実装に橋渡しします。『要約・生成・対話・抽出・コード化といった作業を、人手より速く安価に肩代わりできる』と価値を述べ、AWSではAmazon Bedrockで複数ベンダの基盤モデルをマネージドに使え、セキュリティ（VPC/KMS/IAM）と運用まで一気通貫で組める、と結びます。", tEn: "Don't stop at the definition — bridge to business value and implementation. State the value (offloading summarize/generate/converse/extract/code faster and cheaper than humans), then connect to AWS: Amazon Bedrock offers managed multi-vendor models with end-to-end security (VPC/KMS/IAM) and operations." },
     ],
   },
   {
-    cat: "基礎", catEn: "Fundamentals",
+    cat: "基礎", catEn: "Fundamentals", diag: "llmapp",
+    q: "Transformer・自己注意（self-attention）の仕組みは？",
+    qEn: "How do the Transformer and self-attention work?",
+    tldr: "Transformerは、系列内の各トークンが『他のどのトークンにどれだけ注目するか』を重み付けして文脈表現を作るアーキテクチャです。自己注意はQuery・Key・Valueという3つの射影の内積で関連度を計算し、並列処理と長距離依存の両立を可能にしました。",
+    tldrEn: "The Transformer builds contextual representations by having each token weight how much it attends to every other token. Self-attention computes relevance via dot products of Query, Key, and Value projections, enabling both parallelism and long-range dependencies.",
+    sections: [
+      { h: "なぜ強いか", hEn: "Why it works", t: "RNNは逐次処理で長距離依存や並列化が弱点でしたが、自己注意は全トークン間の関係を一度に計算するため、長い文脈でも関係を捉えやすく、GPUで大規模並列学習できます。多頭注意（multi-head）で複数の観点を同時に見て、位置エンコーディングで語順を与えます。", tEn: "RNNs process sequentially, struggling with long-range dependencies and parallelism. Self-attention computes all pairwise relations at once, capturing long context and enabling massive GPU parallelism. Multi-head attention looks from several subspaces at once, and positional encodings supply word order." },
+      { h: "推論コストとの関係", hEn: "Relation to inference cost", t: "注意計算は系列長の二乗に比例しがちで、これが長コンテキストのコスト・レイテンシ増の一因です。KVキャッシュ、FlashAttention、各種の効率化がここに効きます。SA面接では『なぜ長文は高い・遅いのか』を自己注意の計算量から説明できると強い。", tEn: "Attention tends to scale quadratically with sequence length, a key driver of cost and latency at long context. KV caching, FlashAttention, and other optimizations target this. In interviews, explaining why long prompts are costly/slow from attention complexity is a strong signal." },
+    ],
+  },
+  {
+    cat: "基礎", catEn: "Fundamentals", diag: "contexteng",
     q: "トークン・埋め込み・コンテキストウィンドウとは？",
     qEn: "What are tokens, embeddings, and the context window?",
-    tldr: "トークンはモデルが扱う語の断片、埋め込みは意味を数百〜数千次元のベクトルで表したもの、コンテキストウィンドウは一度に扱えるトークン数の上限です。",
-    tldrEn: "Tokens are sub-word units the model processes; embeddings represent meaning as high-dimensional vectors; the context window is the maximum number of tokens processed at once.",
+    tldr: "トークンはモデルが処理する語の断片、埋め込みは語や文の意味を数百〜数千次元のベクトルで表したもの、コンテキストウィンドウは一度に扱えるトークン数の上限です。この3つは課金・レイテンシ・設計方式のすべてに直結する基礎概念です。",
+    tldrEn: "Tokens are the sub-word units a model processes; embeddings represent the meaning of words/sentences as high-dimensional vectors; the context window is the maximum tokens processed at once. These three directly drive cost, latency, and architecture choices.",
     sections: [
-      { h: "なぜ重要か", hEn: "Why it matters", t: "課金・レイテンシはトークン数に比例します。埋め込みは類似検索（RAG）の基礎。コンテキスト上限を超えると入りきらないため、要約やRAGで必要分だけ渡す設計が要ります。", tEn: "Cost and latency scale with token count. Embeddings underpin similarity search (RAG). Exceeding the context limit forces summarization or RAG to pass only what is needed." },
-      { h: "実務ポイント", hEn: "Practical points", t: "日本語は英語よりトークン効率が悪くなりがち。長文はチャンク化し、必要な文脈だけを注入してコスト・精度を両立させます。", tEn: "Japanese often tokenizes less efficiently than English. Chunk long text and inject only the needed context to balance cost and accuracy." },
+      { h: "コスト・レイテンシとの直結", hEn: "Direct link to cost/latency", t: "料金と処理時間は入力＋出力のトークン数にほぼ比例します。日本語は英語よりトークン効率が悪くなりがちで、同じ内容でも消費が増えます。だからプロンプト短縮・不要文脈の削減・出力上限の設定がそのままコスト最適化になります。", tEn: "Price and latency scale roughly with input+output token count. Japanese often tokenizes less efficiently than English, consuming more for the same content. So trimming prompts, cutting unneeded context, and capping output length are direct cost optimizations." },
+      { h: "埋め込みの役割", hEn: "Role of embeddings", t: "埋め込みは『意味の近さ＝ベクトルの近さ』に写像するため、類似検索（RAG）・クラスタリング・重複検出・レコメンドの基礎になります。距離はコサイン類似度やユークリッド距離で測ります。埋め込みモデルの選定（言語・ドメイン・次元）が検索精度を左右します。", tEn: "Embeddings map meaning to vector proximity, underpinning similarity search (RAG), clustering, dedup, and recommendation. Distance is measured by cosine similarity or Euclidean distance. Choosing the embedding model (language, domain, dimensionality) governs retrieval quality." },
+      { h: "コンテキスト上限の扱い", hEn: "Handling the context limit", t: "上限を超える情報は入りません。だからロングコンテキストに頼るか、要約・チャンク化・RAGで『必要な分だけ』渡すかを設計します。長く詰めるほどコスト増・ノイズ増・忘却（中間の軽視）が起きるため、量と質のバランスをとります。", tEn: "Information beyond the limit cannot fit, so you design whether to rely on long context or pass only what is needed via summarization, chunking, and RAG. More stuffing means higher cost, more noise, and 'lost-in-the-middle' effects — balance quantity and quality." },
     ],
   },
   {
     cat: "基礎", catEn: "Fundamentals",
     q: "temperature や top-p とは？出力にどう影響するか？",
     qEn: "What are temperature and top-p, and how do they affect output?",
-    tldr: "いずれも生成のランダム性（多様性）を制御するサンプリングパラメータです。temperatureは確率分布の鋭さ、top-pは累積確率で候補を絞る核サンプリングです。",
-    tldrEn: "Both are sampling parameters controlling randomness/diversity. Temperature sharpens or flattens the probability distribution; top-p (nucleus sampling) restricts candidates by cumulative probability.",
+    tldr: "どちらも生成のランダム性（多様性）を制御するサンプリングパラメータです。temperatureは確率分布の鋭さ（低いほど最尤に集中＝決定的寄り）、top-p（核サンプリング）は累積確率pに入る候補だけから選ぶ仕組みで、外れ値的な語を切り落とします。",
+    tldrEn: "Both control randomness/diversity of generation. Temperature sharpens or flattens the distribution (lower = more concentrated on the top choice, more deterministic); top-p (nucleus sampling) samples only from candidates within cumulative probability p, cutting off unlikely tokens.",
     sections: [
-      { h: "使い分け", hEn: "How to use", t: "正確性・再現性が要る業務（分類・抽出・要約）は低温（0〜0.3）。発想・多様性が要る用途（コピー案）は高温。非決定性を抑えたいときは温度を下げます。", tEn: "Use low temperature (0–0.3) for accuracy/reproducibility (classification, extraction, summarization) and higher for creative tasks. Lower temperature to reduce non-determinism." },
+      { h: "使い分けの原則", hEn: "How to choose", t: "正確性・再現性が要る業務（分類・抽出・要約・コード）は低温（0〜0.3）＋低めのtop-p。発想・多様性が要る用途（コピー案・ブレスト）は高温。非決定性を抑えたいときはまず温度を下げ、必要なら構造化出力や検証を足します。", tEn: "For accuracy/reproducibility (classification, extraction, summarization, code), use low temperature (0–0.3) and lower top-p. For creativity (copywriting, brainstorming), use higher temperature. To reduce non-determinism, first lower temperature, then add structured output and validation if needed." },
+      { h: "面接での一言", hEn: "Interview soundbite", t: "『温度を下げても完全な決定論にはならない』点を押さえておくと差がつきます。低温は揺れを抑えますが、精度の担保は温度単独でなく、根拠付け（RAG）・検証・評価と組み合わせる総合設計だと述べられると強い。", tEn: "Note that lowering temperature does not yield full determinism — a differentiating point. Low temperature reduces variance, but accuracy is guaranteed by a holistic design (grounding via RAG, validation, evaluation), not temperature alone." },
     ],
   },
   {
-    cat: "基礎", catEn: "Fundamentals",
+    cat: "基礎", catEn: "Fundamentals", diag: "defense",
     q: "ハルシネーションはなぜ起きる？どう抑えるか？",
     qEn: "Why do hallucinations happen and how do you mitigate them?",
-    tldr: "モデルは『事実』ではなく『尤もらしい続き』を確率的に生成するため、学習外・曖昧・知識の古い領域では誤った断定（幻覚）が起きます。",
-    tldrEn: "Models generate the most plausible continuation, not verified facts, so on out-of-distribution, ambiguous, or stale topics they can assert incorrect statements (hallucinate).",
+    tldr: "モデルは『事実』を検索しているのではなく、学習した分布から『尤もらしい続き』を確率的に生成します。そのため学習範囲外・曖昧・知識が古い領域では、自信ありげに誤った断定（幻覚）を出します。原因はデータの偏り・不足、プロンプトの曖昧さ、知識の陳腐化などです。",
+    tldrEn: "Models don't look up facts — they sample the most plausible continuation from a learned distribution. On out-of-distribution, ambiguous, or stale topics they can confidently assert falsehoods. Causes include data bias/gaps, ambiguous prompts, and knowledge staleness.",
     sections: [
-      { h: "抑制策", hEn: "Mitigations", t: "RAGで根拠に基づかせ出典を提示、Guardrailsで逸脱を制御、構造化出力と検証、温度を下げる、『分からない場合はそう答える』指示、高リスクはHITL。", tEn: "Ground with RAG and cite sources, control drift with Guardrails, validate structured outputs, lower temperature, instruct 'say you don't know' when unsure, and add HITL for high-risk cases." },
+      { h: "抑制策（多層）", hEn: "Mitigations (layered)", t: "①根拠付け: RAGで信頼できる情報源に基づかせ、出典を提示する。②制御: Bedrock Guardrailsで禁止トピック・PII・文脈逸脱を止める。③出力設計: 構造化出力＋検証、温度を下げる、『不明ならそう答える』と指示。④人の関与: 高リスク判断はHITL（人間の確認）を挟む。", tEn: "1) Grounding: base answers on trusted sources via RAG with citations. 2) Control: stop prohibited topics, PII, and drift with Bedrock Guardrails. 3) Output design: structured output + validation, lower temperature, instruct 'say you don't know'. 4) Human oversight: insert HITL for high-risk decisions." },
+      { h: "SAとしての設計思想", hEn: "SA design mindset", t: "幻覚をゼロにはできない前提で『ユースケースのリスクに応じて許容範囲に管理する』のがSAの考え方です。低リスクは軽く、金額確定や法務など高リスクは根拠・検証・人手を厚く積みます。評価データセットで幻覚率を定量把握し、継続的に下げます。", tEn: "Assume hallucination cannot be zeroed and manage it within tolerance by use-case risk. Keep low-risk light; for high-risk (final amounts, legal) layer on grounding, validation, and humans. Quantify hallucination rate on an eval set and drive it down over time." },
     ],
   },
   {
-    cat: "基礎", catEn: "Fundamentals",
+    cat: "基礎", catEn: "Fundamentals", diag: "contexteng",
     q: "プロンプトエンジニアリングの要点は？",
     qEn: "What are the key techniques of prompt engineering?",
-    tldr: "役割・文脈・制約・出力形式を明確に与え、例示（few-shot）や思考手順（Chain-of-Thought）で精度を上げ、JSON等の構造化出力で後段処理を安定させる技術です。",
-    tldrEn: "Give a clear role, context, constraints, and output format; improve accuracy with few-shot examples and chain-of-thought; and stabilize downstream processing with structured output (e.g., JSON).",
+    tldr: "役割・文脈・制約・出力形式を曖昧さなく与え、例示（few-shot）や思考手順の明示（Chain-of-Thought）で精度を上げ、JSONやスキーマによる構造化出力で後段処理を安定させる技術です。最小コストで効果が出るため、実装は原則ここから始めます。",
+    tldrEn: "Give a clear role, context, constraints, and output format without ambiguity; raise accuracy with few-shot examples and explicit reasoning (chain-of-thought); and stabilize downstream processing with structured output (JSON/schema). It is the cheapest lever, so implementation starts here.",
     sections: [
-      { h: "実務ポイント", hEn: "Practical points", t: "曖昧さを減らし、境界条件（禁止事項・不明時の挙動）を明記。プレフィルやstop条件で出力を制御。まずプロンプトで解けるかを最初に検討します（最小コスト）。", tEn: "Reduce ambiguity and specify edge cases (prohibitions, behavior when unsure). Control output with prefilling and stop sequences. Always check whether prompting alone suffices first — it is the cheapest option." },
+      { h: "効く型", hEn: "Techniques that work", t: "役割付与（system）、明確な指示と制約、few-shotの良質な例、段階的思考（CoT）、出力スキーマの固定、境界条件（禁止事項・不明時の挙動）の明記、プレフィルやstop条件での制御。まず『プロンプトだけで解けるか』を最初に検証します。", tEn: "Role assignment (system), clear instructions and constraints, high-quality few-shot examples, chain-of-thought, fixed output schemas, explicit edge cases (prohibitions, behavior when unsure), and control via prefilling and stop sequences. First test whether prompting alone suffices." },
+      { h: "限界と次の一手", hEn: "Limits and next step", t: "社内知識が必要ならRAG、振る舞い・形式を安定させたいならfine-tuning、多段自動化ならエージェントへ段階的に進みます。プロンプトは万能ではなく『まず試す最小構成』と位置づけると説明が締まります。", tEn: "When internal knowledge is needed, move to RAG; to stabilize behavior/format, fine-tuning; for multi-step automation, agents. Frame prompting as the minimal first attempt, not a cure-all." },
     ],
   },
   // ── RAG ──
   {
-    cat: "RAG", catEn: "RAG",
+    cat: "RAG", catEn: "RAG", diag: "rag",
     q: "RAGとは何か？",
     qEn: "What is RAG?",
-    tldr: "Retrieval-Augmented Generation。生成時に外部知識をベクトル検索で取得し、根拠としてプロンプトに与えて回答させる手法。知識の古さや幻覚を抑え、最新・独自情報に基づく回答と出典提示を可能にします。",
-    tldrEn: "Retrieval-Augmented Generation retrieves external knowledge via vector search at inference time and injects it as grounding, reducing stale knowledge and hallucination while enabling up-to-date, source-cited answers.",
+    tldr: "Retrieval-Augmented Generation。回答生成の直前に、社内文書などの外部知識をベクトル検索で取得し、根拠としてプロンプトに与えて答えさせる手法です。モデル内部の知識の古さや幻覚を抑え、最新・独自情報に基づいた、出典付きの回答を可能にします。",
+    tldrEn: "Retrieval-Augmented Generation retrieves external knowledge (e.g., internal docs) via vector search just before generation and injects it as grounding. It reduces stale internal knowledge and hallucination, enabling up-to-date, proprietary, source-cited answers.",
     sections: [
-      { h: "仕組み", hEn: "How it works", t: "①文書をチャンク化し埋め込み ②ベクトルDBに格納 ③質問を埋め込み類似検索 ④（再ランク）⑤取得文を注入して生成。出典を付けられます。", tEn: "1) Chunk & embed docs, 2) store in a vector DB, 3) embed the query and retrieve by similarity, 4) optionally re-rank, 5) inject and generate — with citations." },
-      { h: "AWSでの実装", hEn: "On AWS", t: "Amazon Bedrock Knowledge Bases、ベクトルストアにOpenSearch Serverlessやpgvector(Aurora)、あるいはAmazon Kendra。", tEn: "Amazon Bedrock Knowledge Bases with OpenSearch Serverless or pgvector (Aurora), or Amazon Kendra." },
+      { h: "処理の流れ", hEn: "The pipeline", t: "①文書を意味のまとまりでチャンク分割し埋め込み（ベクトル化）②ベクトルDBに格納 ③ユーザーの質問を埋め込み、類似度で関連チャンクを検索 ④必要に応じ再ランクで精度を上げる ⑤取得文をコンテキストとしてプロンプトに注入して生成。回答に出典を付けられます。", tEn: "1) Chunk documents at semantic boundaries and embed them, 2) store in a vector DB, 3) embed the user query and retrieve relevant chunks by similarity, 4) optionally re-rank for precision, 5) inject retrieved text into the prompt and generate — with citations." },
+      { h: "AWSでの実装", hEn: "On AWS", t: "Amazon Bedrock Knowledge Basesがデータ取り込み・チャンク・埋め込み・検索・出典付与をマネージドに提供します。ベクトルストアはOpenSearch Serverless、Aurora pgvector、あるいはAmazon Kendra（高精度マネージド検索）。権限フィルタや更新頻度を要件に合わせます。", tEn: "Amazon Bedrock Knowledge Bases manages ingestion, chunking, embedding, retrieval, and citations. Vector stores: OpenSearch Serverless, Aurora pgvector, or Amazon Kendra (high-accuracy managed search). Match ACL filtering and update frequency to requirements." },
+      { h: "fine-tuningとの違い", hEn: "vs. fine-tuning", t: "RAGは『知識の注入』（何を知っているか）に強く、更新が容易で出典を示せます。fine-tuningは『振る舞い・形式・文体の適応』（どう答えるか）に向きます。頻繁に変わる社内知識・出典必須の業務では、RAGが第一候補です。", tEn: "RAG injects knowledge (what the model knows), is easy to update, and can cite sources. Fine-tuning adapts behavior/format/style (how it answers). For frequently changing internal knowledge or citation-required work, RAG is the first choice." },
     ],
   },
   {
-    cat: "RAG", catEn: "RAG",
+    cat: "RAG", catEn: "RAG", diag: "rag",
     q: "チャンク分割（chunking）の設計ポイントは？",
     qEn: "What are the design points for chunking?",
-    tldr: "検索単位を意味のまとまりで切り、サイズと重なり（overlap）を調整して『必要な文脈が1チャンクに収まる』ことと『無関係情報の混入を抑える』ことを両立させます。",
-    tldrEn: "Split at semantic boundaries and tune chunk size and overlap so that the needed context fits in a chunk while limiting irrelevant content.",
+    tldr: "検索の単位を意味のまとまりで切り、サイズと重なり（overlap）を調整して、『答えに必要な文脈が1チャンクに収まる』ことと『無関係情報の混入を抑える』ことを両立させます。RAGの精度はチャンク設計で大きく変わります。",
+    tldrEn: "Split retrieval units at semantic boundaries and tune chunk size and overlap so the context needed for an answer fits within a chunk while limiting irrelevant content. RAG accuracy hinges heavily on chunking.",
     sections: [
-      { h: "指針", hEn: "Guidelines", t: "小さすぎると文脈不足、大きすぎるとノイズとコスト増。見出し・段落・表など構造を尊重し、メタデータ（出典/日付/権限）を付与。検索ヒット率で調整します。", tEn: "Too small loses context; too large adds noise and cost. Respect structure (headings, paragraphs, tables) and attach metadata (source, date, ACL). Tune by retrieval hit rate." },
+      { h: "サイズと重なり", hEn: "Size and overlap", t: "小さすぎると文脈が切れて答えに必要な情報が分断され、大きすぎるとノイズとトークンコストが増えます。段落・見出し・表など文書構造を尊重して切り、境界での情報欠落を防ぐためにoverlapを少し持たせるのが定石です。", tEn: "Too small severs the context needed for an answer; too large adds noise and token cost. Split respecting document structure (paragraphs, headings, tables) and add a little overlap to avoid losing information at boundaries." },
+      { h: "メタデータと評価", hEn: "Metadata and evaluation", t: "各チャンクに出典・日付・アクセス権（ACL）などのメタデータを付け、権限フィルタや鮮度制御に使います。最適値は一意でないため、検索ヒット率や回答忠実性を評価データで実測し、反復的に調整します。", tEn: "Attach metadata (source, date, ACL) to each chunk for permission filtering and freshness. There is no single optimal size — measure retrieval hit rate and answer faithfulness on an eval set and iterate." },
     ],
   },
   {
-    cat: "RAG", catEn: "RAG",
-    q: "埋め込みモデルとベクトルDBはどう選ぶ？",
-    qEn: "How do you choose an embedding model and a vector database?",
-    tldr: "埋め込みは対象言語・ドメイン・次元数・コストで選び、ベクトルDBは規模・レイテンシ・フィルタ（メタデータ/権限）・運用性で選びます。",
-    tldrEn: "Choose embeddings by language/domain coverage, dimensionality, and cost; choose the vector DB by scale, latency, metadata/ACL filtering, and operability.",
+    cat: "RAG", catEn: "RAG", diag: "vectorsearch",
+    q: "埋め込みモデルとベクトルDBはどう選ぶ？ベクトル検索の内部は？",
+    qEn: "How do you choose an embedding model and vector DB, and how does vector search work internally?",
+    tldr: "埋め込みは対象言語・ドメイン適合・次元数・コストで選び、ベクトルDBは規模・レイテンシ・メタデータ/権限フィルタ・運用性で選びます。内部は近似最近傍探索（ANN, 例: HNSW）で、全件比較せず高速に類似ベクトルを見つけます。",
+    tldrEn: "Choose embeddings by language/domain fit, dimensionality, and cost; choose the vector DB by scale, latency, metadata/ACL filtering, and operability. Internally it uses approximate nearest neighbor (ANN, e.g., HNSW) to find similar vectors quickly without exhaustive comparison.",
     sections: [
-      { h: "AWSでの選択肢", hEn: "AWS options", t: "埋め込みはBedrock（Titan Embeddings等）。ベクトルストアはOpenSearch Serverless、Aurora pgvector、Kendra（マネージド検索）。権限フィルタや更新頻度を要件に合わせます。", tEn: "Embeddings via Bedrock (e.g., Titan Embeddings). Vector stores: OpenSearch Serverless, Aurora pgvector, or Kendra (managed). Match ACL filtering and update frequency to requirements." },
+      { h: "内部の仕組み", hEn: "Internals", t: "テキストを埋め込みベクトルにし、コサイン類似度などで近さを測ります。数百万〜億件を全件走査するのは非現実的なので、HNSWなどのANNインデックスで近似的に高速検索します。精度と速度・メモリのトレードオフをパラメータで調整します。", tEn: "Text becomes an embedding vector, and similarity is measured (e.g., cosine). Scanning millions–billions of vectors exhaustively is impractical, so ANN indexes like HNSW retrieve approximately and fast, with parameters trading accuracy against speed and memory." },
+      { h: "AWSでの選択", hEn: "AWS options", t: "埋め込みはBedrock（Titan Embeddings等、多言語対応）。ベクトルストアはOpenSearch Serverless、Aurora pgvector、Kendra。日本語主体なら多言語埋め込みの品質、権限が要るならACLフィルタ、更新が速いなら再インデックス運用を評価軸にします。", tEn: "Embeddings via Bedrock (e.g., multilingual Titan Embeddings). Vector stores: OpenSearch Serverless, Aurora pgvector, or Kendra. For Japanese-heavy content weigh multilingual embedding quality; for permissions weigh ACL filtering; for fast updates weigh re-indexing operations." },
     ],
   },
   {
-    cat: "RAG", catEn: "RAG",
+    cat: "RAG", catEn: "RAG", diag: "llmops",
     q: "RAGの精度はどう評価・改善するか？",
     qEn: "How do you evaluate and improve RAG accuracy?",
-    tldr: "『検索（retrieval）』と『生成（generation）』を分けて評価します。検索は再現率/適合率、生成は忠実性（根拠に沿うか）と関連性で測り、弱い側を改善します。",
-    tldrEn: "Evaluate retrieval and generation separately: retrieval by recall/precision, generation by faithfulness (grounded in sources) and relevance, then fix the weaker side.",
+    tldr: "『検索（retrieval）』と『生成（generation）』を分けて評価するのが要点です。検索は再現率・適合率で『正しい根拠を引けたか』、生成は忠実性（根拠に沿うか）・関連性・網羅性で『根拠から正しく答えたか』を測り、弱い側を狙って改善します。",
+    tldrEn: "The key is to evaluate retrieval and generation separately. Measure retrieval by recall/precision (did it fetch the right evidence?) and generation by faithfulness (grounded?), relevance, and coverage (did it answer correctly from evidence?), then target the weaker side.",
     sections: [
-      { h: "改善レバー", hEn: "Improvement levers", t: "チャンク設計、ハイブリッド検索（ベクトル＋キーワード）、再ランク（クロスエンコーダ）、クエリ書き換え、メタデータフィルタ、コンテキスト量の調整。", tEn: "Chunking, hybrid search (vector + keyword), re-ranking (cross-encoder), query rewriting, metadata filtering, and tuning context size." },
-      { h: "運用評価", hEn: "Operational eval", t: "評価データセットで定量化し、LLM-as-judgeや人手評価を併用。本番はログとフィードバックで継続監視します。", tEn: "Quantify with an evaluation set, combine LLM-as-judge with human review, and monitor continuously via logs and feedback in production." },
+      { h: "改善レバー", hEn: "Improvement levers", t: "検索が弱い→チャンク設計、ハイブリッド検索（ベクトル＋キーワード）、再ランク（クロスエンコーダ）、クエリ書き換え、メタデータフィルタ。生成が弱い→プロンプト強化、出典必須化、コンテキスト量の最適化、モデル選定。切り分けずに闇雲に触ると改善しません。", tEn: "Weak retrieval → chunking, hybrid search (vector + keyword), re-ranking (cross-encoder), query rewriting, metadata filtering. Weak generation → stronger prompts, mandatory citations, right-sizing context, model choice. Fixing blindly without isolating the cause won't help." },
+      { h: "運用での定量評価", hEn: "Quantitative eval in ops", t: "代表的な質問と正解根拠の評価セットを整備し、LLM-as-judgeや人手で忠実性・関連性をスコア化。本番はログとユーザーフィードバックで継続監視し、回帰を検知します。Bedrockのナレッジベース評価やモデル評価機能も活用できます。", tEn: "Curate an eval set of representative questions and gold evidence, and score faithfulness/relevance via LLM-as-judge or humans. In production, monitor continuously with logs and user feedback to catch regressions. Bedrock's knowledge base and model evaluation can help." },
     ],
   },
   {
-    cat: "RAG", catEn: "RAG",
+    cat: "RAG", catEn: "RAG", diag: "staircase",
     q: "RAG・fine-tuning・ロングコンテキストの使い分けは？",
     qEn: "When do you use RAG vs. fine-tuning vs. long context?",
-    tldr: "知識の注入・更新はRAG、振る舞い/形式/文体の定着はfine-tuning、都度の少量文書を丸ごと渡すならロングコンテキスト。多くの業務ではまずRAGが第一候補です。",
-    tldrEn: "Use RAG to inject/update knowledge, fine-tuning to lock behavior/format/style, and long context to pass a small set of documents wholesale. For most enterprise cases RAG is the first choice.",
+    tldr: "知識の注入・更新はRAG、振る舞い/形式/文体の定着はfine-tuning、都度の少量文書を丸ごと渡すならロングコンテキスト、と役割で使い分けます。多くのエンタープライズ用途ではまずRAGが第一候補で、必要に応じて組み合わせます。",
+    tldrEn: "Match by role: RAG to inject/update knowledge, fine-tuning to lock behavior/format/style, and long context to pass a small set of documents wholesale. For most enterprise cases RAG is the first choice, combined with others as needed.",
     sections: [
-      { h: "判断軸", hEn: "Decision axes", t: "更新頻度・出典要否・データ量・コスト・レイテンシで判断。組み合わせも可（RAG＋軽いfine-tuning）。ロングコンテキストはコストとノイズに注意。", tEn: "Decide by update frequency, need for citations, data volume, cost, and latency. Combinations are valid (RAG + light fine-tuning). Long context risks cost and noise." },
+      { h: "判断軸", hEn: "Decision axes", t: "更新頻度（速い→RAG）、出典の要否（要る→RAG）、データ量と一貫性（振る舞い固定→fine-tuning）、コストとレイテンシ、規制。組み合わせも普通で、RAGで知識、軽いfine-tuningで文体・形式、という併用が実務では多いです。", tEn: "Update frequency (fast → RAG), need for citations (yes → RAG), data volume and consistency (fixed behavior → fine-tuning), cost and latency, regulation. Combinations are normal — RAG for knowledge plus light fine-tuning for tone/format is common in practice." },
+      { h: "ロングコンテキストの注意", hEn: "Caveats of long context", t: "全文を長く詰めるとコスト増・レイテンシ増に加え、中間情報の軽視（lost in the middle）で精度が落ちることがあります。少量・単発ならロングコンテキスト、恒常的・大規模・出典必須ならRAGが堅実です。", tEn: "Stuffing everything into a long prompt raises cost and latency and can lose 'middle' information (lost-in-the-middle), hurting accuracy. Long context suits small one-off sets; RAG is sound for persistent, large-scale, citation-required cases." },
     ],
   },
   // ── チューニング ──
   {
-    cat: "チューニング", catEn: "Tuning",
-    q: "fine-tuningとは何か？",
-    qEn: "What is fine-tuning?",
-    tldr: "事前学習済みモデルに追加データで再学習し、特定タスク・ドメイン・出力形式・文体に重みを適応させる手法。『知識』より『振る舞い』を固定したいときに有効です。",
-    tldrEn: "Continuing training on additional data to adapt weights to a task, domain, format, or style. Best for fixing behavior rather than injecting knowledge.",
+    cat: "チューニング", catEn: "Tuning", diag: "tuning",
+    q: "fine-tuningとは何か？いつ使う？",
+    qEn: "What is fine-tuning and when do you use it?",
+    tldr: "事前学習済みモデルに追加の教師データで再学習を行い、特定タスク・ドメイン・出力形式・文体にモデルの重みを適応させる手法です。『知識』を増やすより『振る舞い』を安定して固定したいときに有効で、プロンプトやRAGで届かない一貫性を出せます。",
+    tldrEn: "Continuing to train a pretrained model on additional labeled data to adapt its weights to a task, domain, output format, or style. It is best for locking in behavior consistently rather than adding knowledge, achieving consistency that prompting or RAG cannot.",
     sections: [
-      { h: "いつ使うか", hEn: "When to use", t: "専門的な文体・一貫した出力形式・独自分類など、プロンプトやRAGで安定させにくい振る舞いを定着させたいとき。まずプロンプト→RAG→fine-tuningの順で検討します。", tEn: "To lock in behavior (tone, format, bespoke classification) that prompting/RAG cannot stabilize. Try prompting first, then RAG, then fine-tuning." },
-      { h: "AWSでの実装", hEn: "On AWS", t: "Amazon BedrockのカスタムモデルやSageMaker。データ品質、過学習・破滅的忘却、評価、専用スループットを考慮します。", tEn: "Custom models in Amazon Bedrock or SageMaker; consider data quality, overfitting/catastrophic forgetting, evaluation, and provisioned throughput." },
+      { h: "いつ使うか", hEn: "When to use", t: "専門的な文体、常に同じ出力フォーマット、独自の分類/タグ付けなど、プロンプトやRAGでは安定しにくい振る舞いを定着させたいとき。原則は『まずプロンプト→次にRAG→それでも足りなければfine-tuning』の順です。", tEn: "To lock in behavior that prompting/RAG can't stabilize — specialized tone, an always-consistent output format, bespoke classification/tagging. The rule of thumb: prompting first, then RAG, then fine-tuning." },
+      { h: "コストと落とし穴", hEn: "Cost and pitfalls", t: "良質な教師データの準備が要で、過学習や破滅的忘却（他能力の劣化）に注意します。全パラメータ更新は高コストなので、多くはLoRAなどのPEFTを使います。効果は評価データで実測し、回帰を確認します。", tEn: "It needs quality labeled data and care against overfitting and catastrophic forgetting (loss of other skills). Full-parameter updates are costly, so PEFT (e.g., LoRA) is common. Measure effects on an eval set and check for regressions." },
+      { h: "AWSでの実装", hEn: "On AWS", t: "Amazon Bedrockのカスタムモデル（対応モデルのfine-tuning）やSageMakerでの学習。本番では専用スループット（プロビジョンド）、バージョン管理、評価ゲートを設計します。", tEn: "Custom models in Amazon Bedrock (fine-tuning supported models) or training on SageMaker. In production, design provisioned throughput, versioning, and evaluation gates." },
     ],
   },
   {
-    cat: "チューニング", catEn: "Tuning",
+    cat: "チューニング", catEn: "Tuning", diag: "tuning",
     q: "LoRA／QLoRA（PEFT）とは？",
     qEn: "What are LoRA/QLoRA (PEFT)?",
-    tldr: "PEFT（パラメータ効率的チューニング）の代表。元の重みを凍結し、低ランクの差分行列だけを学習するのがLoRA。量子化と併用しメモリを大幅節約するのがQLoRA。",
-    tldrEn: "Representative PEFT methods. LoRA freezes the base weights and trains only small low-rank update matrices; QLoRA adds quantization to cut memory sharply.",
+    tldr: "PEFT（パラメータ効率的ファインチューニング）の代表手法です。LoRAは元の重みを凍結し、低ランクの差分行列（アダプタ）だけを学習します。QLoRAは加えてモデルを量子化し、メモリ消費を大幅に抑えて小さなGPUでも適応可能にします。",
+    tldrEn: "Representative PEFT (parameter-efficient fine-tuning) methods. LoRA freezes the base weights and trains only small low-rank update matrices (adapters). QLoRA also quantizes the model, sharply cutting memory so adaptation runs on smaller GPUs.",
     sections: [
-      { h: "利点", hEn: "Benefits", t: "全パラメータ更新より低コスト・小データで適応でき、複数の差分（アダプタ）を切り替えられます。フルFTが過剰な多くの実務で第一候補。", tEn: "Cheaper and needs less data than full fine-tuning, and multiple adapters can be swapped. A first choice where full FT is overkill." },
+      { h: "利点", hEn: "Benefits", t: "全パラメータ更新に比べ、計算・メモリ・データが少なくて済み、学習が速く安価です。複数の差分（アダプタ）を用途ごとに切り替えられ、ベースモデルは共有できます。フルFTが過剰な多くの実務で第一候補になります。", tEn: "Compared to full fine-tuning, it needs less compute, memory, and data, and trains faster and cheaper. Multiple adapters can be swapped per use case while sharing the base model. It is a first choice where full FT is overkill." },
+      { h: "面接での位置づけ", hEn: "Framing in interviews", t: "『fine-tuning＝全部作り直す高コスト』という誤解に対し、PEFTで現実的にコストを抑えられると説明できると技術理解が伝わります。ただし知識注入はRAG、という棲み分けも併せて述べます。", tEn: "Against the misconception that fine-tuning means an expensive full rebuild, explaining that PEFT makes it realistic conveys technical depth. Also restate that knowledge injection belongs to RAG." },
     ],
   },
   {
-    cat: "チューニング", catEn: "Tuning",
-    q: "蒸留（distillation）とは？どんな時に使う？",
-    qEn: "What is distillation and when is it used?",
-    tldr: "大きな高精度モデル（教師）の出力を使って小さなモデル（生徒）を学習させ、品質を保ちつつ推論コスト・レイテンシを下げる手法です。",
-    tldrEn: "Training a smaller 'student' model on a large 'teacher' model's outputs to retain quality while lowering inference cost and latency.",
+    cat: "チューニング", catEn: "Tuning", diag: "inference",
+    q: "蒸留（distillation）・量子化とは？なぜ効く？",
+    qEn: "What are distillation and quantization, and why do they help?",
+    tldr: "蒸留は大きな高精度モデル（教師）の出力で小さなモデル（生徒）を学習させ、品質を保ちつつ推論コスト・レイテンシを下げる手法。量子化は重みの数値精度（例: FP16→INT8/INT4）を落としてメモリと帯域を削減し、高速・低コスト化する手法です。",
+    tldrEn: "Distillation trains a small student model on a large teacher model's outputs to retain quality while cutting inference cost and latency. Quantization lowers the numeric precision of weights (e.g., FP16→INT8/INT4) to reduce memory and bandwidth, making inference faster and cheaper.",
     sections: [
-      { h: "使いどころ", hEn: "Where it fits", t: "高トラフィック・低レイテンシ・コスト制約が厳しい本番で、特定タスクに絞って小型化したいとき。汎用性は下がるため用途を固定して使います。", tEn: "For high-traffic, low-latency, cost-constrained production where you can narrow to a specific task. It reduces generality, so scope the use case." },
+      { h: "使いどころ", hEn: "Where they fit", t: "高トラフィック・低レイテンシ・コスト厳格な本番で効きます。蒸留は用途を絞るほど有利、量子化は品質劣化とのトレードオフを評価して精度を実測します。両者はモデルルーティングやキャッシュと組み合わせて総合最適化します。", tEn: "They shine in high-traffic, low-latency, cost-constrained production. Distillation benefits from a narrow scope; quantization trades some quality, so measure accuracy empirically. Combine both with model routing and caching for holistic optimization." },
+      { h: "SA視点の一言", hEn: "SA soundbite", t: "『精度は少し譲るがコスト/レイテンシを大きく取りに行く』判断ができるとSAらしい。要件（SLA・予算・許容誤差）に照らして、大型のまま使うか小型化するかを設計します。", tEn: "Deciding to trade a little accuracy for large cost/latency gains is very SA-like. Design whether to keep a large model or shrink it, judged against requirements (SLA, budget, tolerance)." },
     ],
   },
   {
-    cat: "チューニング", catEn: "Tuning",
+    cat: "チューニング", catEn: "Tuning", diag: "kvopt",
+    q: "KVキャッシュとは？推論最適化になぜ重要か？",
+    qEn: "What is the KV cache and why is it important for inference optimization?",
+    tldr: "自己回帰生成では毎トークンごとに過去系列の注意計算が必要ですが、過去のKey/Valueをキャッシュ（KVキャッシュ）して再利用することで再計算を避け、生成を大幅に高速化します。ただしコンテキストが長いほどKVキャッシュのメモリ使用量が増えます。",
+    tldrEn: "In autoregressive generation, each new token requires attention over the past sequence. Caching the past Keys/Values (KV cache) avoids recomputation and speeds generation greatly — but the KV cache's memory grows with context length.",
+    sections: [
+      { h: "効果と制約", hEn: "Effect and constraints", t: "KVキャッシュにより2トークン目以降の計算量が激減し、スループット・レイテンシが改善します。一方でメモリ圧迫がボトルネックになり、長コンテキスト・大バッチではメモリ最適化（PagedAttention等）や量子化が要ります。", tEn: "The KV cache drastically cuts compute from the second token on, improving throughput and latency. But its memory footprint becomes the bottleneck; long context and large batches need memory optimizations (e.g., PagedAttention) and quantization." },
+      { h: "面接で示す深さ", hEn: "Depth to show", t: "『なぜ長文は遅く高いのか』を、自己注意の二乗計算とKVキャッシュのメモリから説明できると、単なる利用者でなく仕組みを理解したSAだと伝わります。", tEn: "Explaining why long prompts are slow and costly from quadratic attention and KV-cache memory shows you understand the internals, not just usage." },
+    ],
+  },
+  {
+    cat: "チューニング", catEn: "Tuning", diag: "staircase",
     q: "モデル選定のトレードオフは？（サイズ/コスト/レイテンシ/品質）",
     qEn: "What are the trade-offs in model selection (size/cost/latency/quality)?",
-    tldr: "大型は高品質だが高コスト・高レイテンシ。小型は安く速いが難タスクで劣化。ユースケースの難度・SLA・コスト上限に合わせ、必要十分な最小モデルを選びます。",
-    tldrEn: "Larger models are higher quality but costlier and slower; smaller ones are cheap and fast but weaker on hard tasks. Pick the smallest model that meets the task difficulty, SLA, and cost ceiling.",
+    tldr: "大型モデルは高品質だが高コスト・高レイテンシ、小型は安く速いが難タスクで劣化します。ユースケースの難度・SLA・コスト上限・データ主権に照らし、要件を満たす『必要十分な最小モデル』を選ぶのが原則です。",
+    tldrEn: "Large models are higher quality but costlier and slower; small ones are cheap and fast but weaker on hard tasks. The principle is to pick the smallest model that meets the task difficulty, SLA, cost ceiling, and data-sovereignty needs.",
     sections: [
-      { h: "実務の型", hEn: "Practical approach", t: "難所だけ大型、定型は小型に振り分ける（ルーティング）。量子化・蒸留・キャッシュで最適化。評価データで品質を実測して選定します。", tEn: "Route hard cases to large models and routine ones to small (model routing); optimize with quantization, distillation, and caching; and select by measured quality on an eval set." },
+      { h: "実務の型", hEn: "Practical approach", t: "難所だけ大型、定型は小型に振り分けるモデルルーティングでコストと品質を両立させます。量子化・蒸留・キャッシュで最適化し、選定は主観でなく評価データでの実測品質に基づきます。Bedrockは複数モデルを差し替え可能で比較検証が容易です。", tEn: "Route hard cases to large models and routine ones to small (model routing) to balance cost and quality. Optimize with quantization, distillation, and caching, and base selection on measured quality on an eval set, not intuition. Bedrock's swappable models make comparison easy." },
+      { h: "非機能の観点", hEn: "Non-functional lens", t: "品質だけでなく、レイテンシSLA、スループット、コスト、リージョン可用性、データがモデル学習に使われないか等を総合評価します。要件表を作り、候補モデルを軸で採点する進め方が説得力を持ちます。", tEn: "Weigh not only quality but latency SLA, throughput, cost, regional availability, and whether data is used for training. Building a requirements matrix and scoring candidate models against axes is persuasive." },
     ],
   },
   // ── エージェント ──
   {
-    cat: "エージェント", catEn: "Agents",
-    q: "AIエージェントとは？（ReAct／ツール使用）",
-    qEn: "What is an AI agent (ReAct/tool use)?",
-    tldr: "LLMを『推論エンジン』として、目標に向けツール（検索・API・計算）を選び実行し、結果を観察して次の行動を決める——という自律的なループで多段タスクを解く仕組みです。",
-    tldrEn: "Using an LLM as a reasoning engine that, toward a goal, selects and calls tools (search, APIs, calculation), observes results, and decides the next action — an autonomous loop that solves multi-step tasks.",
+    cat: "エージェント", catEn: "Agents", diag: "agent",
+    q: "AIエージェントとは？（ReAct・ツール使用・オーケストレーション）",
+    qEn: "What is an AI agent (ReAct, tool use, orchestration)?",
+    tldr: "LLMを『推論エンジン』として、目標達成に向けツール（検索・API・計算・DB）を自ら選んで実行し、結果を観察して次の行動を決める——という自律的なループ（例: ReAct＝Reasoning＋Acting）で、単発生成では解けない多段タスクを解く仕組みです。",
+    tldrEn: "Using an LLM as a reasoning engine that, toward a goal, selects and calls tools (search, APIs, calculation, DBs), observes results, and decides the next action — an autonomous loop (e.g., ReAct = Reasoning + Acting) that solves multi-step tasks single-shot generation cannot.",
     sections: [
-      { h: "設計の要点", hEn: "Design points", t: "ツール定義（説明・スキーマ）の品質、権限分離、エラー処理とフォールバック、ループ暴走の抑止、決定論的処理へ委譲、高リスクは人の承認。", tEn: "Quality of tool definitions (descriptions/schemas), least-privilege, error handling and fallback, loop-runaway guards, delegating to deterministic tools, and human approval for high-risk actions." },
-      { h: "AWSでの実装", hEn: "On AWS", t: "Amazon Bedrock Agentsがオーケストレーション・ツール呼び出し・Knowledge Bases連携・Guardrailsを提供します。", tEn: "Amazon Bedrock Agents provides orchestration, tool invocation, Knowledge Bases integration, and Guardrails." },
+      { h: "設計の要点", hEn: "Design points", t: "ツール定義（説明文・入力スキーマ）の品質が選択精度を左右します。権限は最小化し、破壊的操作は保護。エラー処理・フォールバック、ループ暴走の抑止、厳密計算は決定論的ツールへ委譲、高リスク行為は人の承認（HITL）を挟みます。", tEn: "Tool-definition quality (descriptions, input schemas) governs selection accuracy. Apply least privilege and protect destructive operations. Add error handling and fallback, guard against runaway loops, delegate exact math to deterministic tools, and require human approval (HITL) for high-risk actions." },
+      { h: "AWSでの実装", hEn: "On AWS", t: "Amazon Bedrock Agentsがオーケストレーション、ツール（Lambda等）呼び出し、Knowledge Bases連携、Guardrailsを提供します。ツール標準としてMCP（Model Context Protocol）も広がっており、外部システム連携を整理できます。", tEn: "Amazon Bedrock Agents provides orchestration, tool (e.g., Lambda) invocation, Knowledge Bases integration, and Guardrails. MCP (Model Context Protocol) is emerging as a tool-integration standard for organizing external system access." },
     ],
   },
   {
-    cat: "エージェント", catEn: "Agents",
-    q: "Bedrock の主要機能（Agents／Knowledge Bases／Guardrails）は？",
-    qEn: "What are Bedrock's key features (Agents/Knowledge Bases/Guardrails)?",
-    tldr: "Bedrockは複数ベンダの基盤モデルをAPIでマネージド提供。Knowledge BasesはRAG、Agentsは多段タスクの自動化、Guardrailsは安全制御（禁止トピック/PII/幻覚抑制）を担います。",
-    tldrEn: "Bedrock offers managed API access to foundation models from multiple vendors. Knowledge Bases provides RAG, Agents automates multi-step tasks, and Guardrails enforces safety (prohibited topics, PII, hallucination reduction).",
+    cat: "エージェント", catEn: "Agents", diag: "toolexec",
+    q: "エージェントのツール実行はどう安全に設計する？",
+    qEn: "How do you design safe tool execution for agents?",
+    tldr: "『LLMは何をするか決める、実行は制御された環境で行う』を徹底します。ツールごとに最小権限のIAM、入力検証、レート制限、監査ログ、破壊的操作の承認フローを設け、失敗時のフォールバックと冪等性を担保します。",
+    tldrEn: "Enforce that the LLM decides what to do while execution runs in a controlled environment. Give each tool least-privilege IAM, input validation, rate limits, audit logs, and an approval flow for destructive actions, with fallback and idempotency on failure.",
     sections: [
-      { h: "SA視点", hEn: "SA perspective", t: "サーバレスでインフラ管理不要、モデル差し替えが容易、VPC/PrivateLink・KMS・IAMでエンタープライズのセキュリティ要件に対応。データはモデル学習に使われません。", tEn: "Serverless with no infra to manage, easy model swapping, and enterprise security via VPC/PrivateLink, KMS, and IAM. Your data is not used to train the base models." },
+      { h: "脅威と対策", hEn: "Threats and controls", t: "プロンプトインジェクションで意図しないツールを呼ばせる攻撃に対し、指示とデータの分離、ツール実行権限の分離、出力・引数の検証、Guardrails、承認ゲートで多層防御します。エージェントに与える権限は『できることを絞る』のが基本です。", tEn: "Against prompt injection tricking the agent into unintended tool calls, layer defenses: separate instructions from data, isolate tool-execution privileges, validate outputs/arguments, use Guardrails, and add approval gates. Scope down what the agent is allowed to do." },
+      { h: "信頼性", hEn: "Reliability", t: "外部API失敗に備えリトライ・タイムアウト・サーキットブレーカ、同一操作の二重実行を防ぐ冪等キー、部分障害時の縮退運転を設計します。可観測性（トレース・ログ）で挙動を追える状態にします。", tEn: "For external API failures, design retries, timeouts, and circuit breakers; idempotency keys to prevent double execution; and graceful degradation on partial failure. Keep behavior observable via traces and logs." },
+    ],
+  },
+  {
+    cat: "エージェント", catEn: "Agents", diag: "multiagent",
+    q: "マルチエージェント構成はいつ・どう使う？",
+    qEn: "When and how do you use multi-agent architectures?",
+    tldr: "1つのエージェントに詰め込むと責務が肥大し精度・保守性が落ちる場合に、役割ごとに専門エージェントを分け、オーケストレータが協調させます。計画・実行・検証などを分業し、各々に適したモデル・ツール・権限を割り当てます。",
+    tldrEn: "When cramming everything into one agent bloats responsibilities and hurts accuracy and maintainability, split into specialized agents by role coordinated by an orchestrator. Divide planning, execution, and verification, assigning each the right model, tools, and privileges.",
+    sections: [
+      { h: "利点と注意", hEn: "Benefits and caveats", t: "専門分化で各タスク精度と保守性が上がり、モデルの適材適所（難所は大型、定型は小型）でコスト最適化できます。一方でオーケストレーションの複雑さ・レイテンシ・コストが増えるため、単一エージェントで足りるなら過剰設計を避けます。", tEn: "Specialization improves per-task accuracy and maintainability and enables cost optimization by right-sizing models (large for hard, small for routine). But orchestration complexity, latency, and cost rise, so avoid over-engineering when a single agent suffices." },
+      { h: "設計の勘所", hEn: "Design tips", t: "エージェント間の契約（入出力の形式）を明確にし、失敗の伝播を抑える。共有状態の扱い、権限分離、全体のトレースを設計します。検証専任エージェントを置くと品質担保に効きます。", tEn: "Define clear contracts (I/O formats) between agents and contain failure propagation. Design shared-state handling, privilege separation, and end-to-end tracing. A dedicated verifier agent helps ensure quality." },
+    ],
+  },
+  {
+    cat: "エージェント", catEn: "Agents", diag: "mcp",
+    q: "MCP（Model Context Protocol）とは？",
+    qEn: "What is MCP (Model Context Protocol)?",
+    tldr: "LLM／エージェントが外部のツール・データ・プロンプトに接続するための標準プロトコルです。各連携を個別実装する代わりに共通規格で繋ぐことで、ツールの再利用・権限管理・保守性を高め、エコシステムを整理します。",
+    tldrEn: "A standard protocol for connecting LLMs/agents to external tools, data, and prompts. Instead of bespoke integrations, a common standard improves tool reuse, permission management, and maintainability, tidying the ecosystem.",
+    sections: [
+      { h: "何が嬉しいか", hEn: "Why it matters", t: "N個のモデルとM個のツールを個別に繋ぐとN×Mの実装が要りますが、標準化でN＋Mに抑えられます。SAとしては、既存システム・社内データへの安全な接続を、標準に沿って権限・監査込みで設計できる利点を説明します。", tEn: "Connecting N models to M tools bespoke needs N×M integrations; a standard reduces it toward N+M. As an SA, explain the benefit of designing safe, standardized access to existing systems and internal data with permissions and auditing built in." },
     ],
   },
   // ── 評価・品質 ──
   {
-    cat: "評価", catEn: "Evaluation",
+    cat: "評価", catEn: "Evaluation", diag: "llmops",
     q: "LLMの品質はどう評価するか？",
     qEn: "How do you evaluate LLM quality?",
-    tldr: "オフライン（評価データセットで正確性・忠実性・関連性を測る、LLM-as-judgeや人手）とオンライン（A/B、ユーザー満足度、フィードバック）を組み合わせて継続的に評価します。",
-    tldrEn: "Combine offline evaluation (accuracy, faithfulness, relevance on a curated set via LLM-as-judge or humans) with online evaluation (A/B, satisfaction, feedback) on an ongoing basis.",
+    tldr: "オフライン（評価データセットで正確性・忠実性・関連性・安全性を測る。LLM-as-judgeや人手評価）とオンライン（A/Bテスト、ユーザー満足度、フィードバック、事故率）を組み合わせ、更新のたびに回帰を検知しながら継続的に評価します。",
+    tldrEn: "Combine offline evaluation (accuracy, faithfulness, relevance, safety on a curated set via LLM-as-judge or humans) with online evaluation (A/B tests, satisfaction, feedback, incident rate), catching regressions on every update.",
     sections: [
-      { h: "要点", hEn: "Key points", t: "タスクに合う指標を定義し、代表的な評価セットを整備。回帰検知のため更新前後で比較。Bedrockのモデル評価機能も活用できます。", tEn: "Define task-appropriate metrics, curate a representative eval set, and compare before/after updates to catch regressions. Bedrock's model evaluation can help." },
+      { h: "指標の選び方", hEn: "Choosing metrics", t: "タスクに合う指標を定義します。要約なら忠実性・網羅性、RAGなら根拠一致、分類なら正解率、対話なら有用性・安全性。単一スコアに頼らず、複数観点と代表的な評価セットで多面的に測ります。", tEn: "Define task-appropriate metrics: for summarization, faithfulness/coverage; for RAG, groundedness; for classification, accuracy; for dialog, helpfulness/safety. Don't rely on a single score — measure multi-dimensionally on a representative eval set." },
+      { h: "回帰と運用", hEn: "Regression and ops", t: "モデル/プロンプト更新の前後で同じ評価セットを回し、性能低下（回帰）を検知してからリリースします。本番はログ・フィードバック・A/Bで継続監視。Bedrockのモデル評価機能を土台に自動化できます。", tEn: "Run the same eval set before/after model/prompt updates to catch regressions before release. In production, monitor continuously with logs, feedback, and A/B. Bedrock's model evaluation can serve as an automation foundation." },
     ],
   },
   {
-    cat: "評価", catEn: "Evaluation",
+    cat: "評価", catEn: "Evaluation", diag: "llmops",
     q: "非決定的な出力に対して精度をどう担保するか？",
     qEn: "How do you ensure accuracy given non-deterministic output?",
-    tldr: "非決定性はサンプリング由来。精度は単一施策でなく『設計・根拠・検証・運用』の多層で管理し、100%決定論ではなくユースケースのリスクに応じた許容誤差内に収めます。",
-    tldrEn: "Non-determinism comes from sampling. Manage accuracy in layers — design, grounding, validation, operations — aiming not for 100% determinism but for error within a tolerance matched to the use case's risk.",
+    tldr: "非決定性はサンプリング（temperature等）に由来します。精度は単一施策でなく『設計・根拠・検証・運用』の多層で管理します。100%の決定論を目指すのではなく、ユースケースのリスクに応じて許容誤差内に収める、という設計思想が核心です。",
+    tldrEn: "Non-determinism comes from sampling (temperature, etc.). Manage accuracy in layers — design, grounding, validation, operations — not with a single lever. The core mindset is not 100% determinism but keeping error within a tolerance matched to the use case's risk.",
     sections: [
-      { h: "設計・根拠", hEn: "Design & grounding", t: "温度↓・構造化出力・厳密計算はツールへ委譲。RAGで根拠と出典、Guardrailsで逸脱・PII制御。", tEn: "Lower temperature, structured output, delegate exact math to tools. Ground with RAG and citations; control drift/PII with Guardrails." },
-      { h: "検証・運用", hEn: "Validation & ops", t: "出力バリデーション、高リスクはHITL。評価データで定量評価し、本番はログ・A/B・フィードバックで『測って直す』ループを回します。", tEn: "Validate outputs, add HITL for high-risk. Quantify with an eval set and run a measure-and-improve loop via logs, A/B, and feedback in production." },
+      { h: "設計・根拠", hEn: "Design & grounding", t: "温度を下げる、明確なプロンプトと制約、few-shot、JSON/スキーマの構造化出力で揺れを抑える。厳密な計算やルールは決定論的な処理（ツール/コード）に委譲。RAGで信頼できる情報源に基づかせ出典を提示し、Bedrock Guardrailsで禁止事項・PII・逸脱を制御します。", tEn: "Lower temperature; use clear prompts and constraints, few-shot, and structured output (JSON/schema). Delegate exact calculations and rules to deterministic tools/code. Ground with RAG and cite sources, and control prohibitions, PII, and drift with Bedrock Guardrails." },
+      { h: "検証・運用", hEn: "Validation & ops", t: "出力の自動バリデーション（形式・値域）、高リスク判断は人間の確認（HITL）。評価データセットで正確性・忠実性を定量評価（LLM-as-judge）、本番はログ・A/B・フィードバックで『測って直す』ループを回します。精度は総合設計の産物だと述べるのが要点です。", tEn: "Validate outputs automatically (format, ranges); add HITL for high-risk. Quantify accuracy/faithfulness with an eval set (LLM-as-judge), and run a measure-and-improve loop via logs, A/B, and feedback in production. The key point: accuracy is a product of holistic design." },
     ],
   },
-  // ── セキュリティ・責任あるAI ──
+  // ── セキュリティ ──
   {
-    cat: "セキュリティ", catEn: "Security",
+    cat: "セキュリティ", catEn: "Security", diag: "defense",
     q: "プロンプトインジェクションとは？どう防ぐ？",
     qEn: "What is prompt injection and how do you defend against it?",
-    tldr: "外部入力（ユーザー文やRAG取得文書）に紛れた悪意ある指示が、システムの意図を上書きしてしまう攻撃です。信頼境界の設計と多層防御で抑えます。",
-    tldrEn: "An attack where malicious instructions hidden in external input (user text or retrieved documents) override the system's intent. Defend with trust boundaries and layered controls.",
+    tldr: "外部入力（ユーザー文やRAGで取得した文書）に紛れ込んだ悪意ある指示が、システムの本来の意図を上書きしてしまう攻撃です。直接的なもの（ユーザーが命令）と間接的なもの（取得文書に埋め込み）があり、信頼境界の設計と多層防御で抑えます。",
+    tldrEn: "An attack where malicious instructions hidden in external input (user text or retrieved documents) override the system's intended behavior. It can be direct (user commands) or indirect (embedded in retrieved docs), and is contained via trust boundaries and layered defense.",
     sections: [
-      { h: "対策", hEn: "Mitigations", t: "指示とデータの分離、外部文書は『データとして扱う』明示、権限最小化（エージェントの実行権限を絞る）、出力/ツール呼び出しの検証、Guardrails、高リスク操作の人手承認。", tEn: "Separate instructions from data, treat external docs strictly as data, least-privilege for agents, validate outputs/tool calls, use Guardrails, and require human approval for high-risk actions." },
+      { h: "対策", hEn: "Mitigations", t: "指示とデータを明確に分離し、外部文書は『データとして扱う』と明示。エージェントの実行権限を最小化し、出力・ツール引数を検証。Bedrock Guardrailsで禁止トピック・PII・逸脱を止め、高リスク操作は人手承認。単一策でなく多層で守ります。", tEn: "Clearly separate instructions from data and treat external docs strictly as data. Minimize agent execution privileges and validate outputs/tool arguments. Use Bedrock Guardrails to stop prohibited topics, PII, and drift, and require human approval for high-risk actions — defense in depth, not a single control." },
+      { h: "SAとしての視点", hEn: "SA perspective", t: "『生成AIは信頼できない入力を扱う前提でゼロトラスト的に設計する』と述べられると強い。被害範囲を絞る（権限分離）、検知する（監査ログ）、回復する（ロールバック）の三点で説明します。", tEn: "It's strong to say you design as if generative AI always handles untrusted input, zero-trust style. Explain via limiting blast radius (privilege separation), detection (audit logs), and recovery (rollback)." },
     ],
   },
   {
-    cat: "セキュリティ", catEn: "Security",
+    cat: "セキュリティ", catEn: "Security", diag: "security",
     q: "PII・データガバナンス・責任あるAIはどう担保する？",
     qEn: "How do you handle PII, data governance, and responsible AI?",
-    tldr: "データの分類・最小化・暗号化・アクセス制御を前提に、入力/出力のPII検出とマスキング、監査ログ、公平性・透明性・人の監督を組み込みます。",
-    tldrEn: "Classify, minimize, encrypt, and access-control data, then add PII detection/masking on inputs and outputs, audit logs, and fairness, transparency, and human oversight.",
+    tldr: "データの分類・最小化・暗号化・アクセス制御を前提に、入力/出力のPII検出とマスキング、監査ログ、公平性・透明性・人の監督を組み込みます。『どのデータが、どこで、誰に、どう使われるか』を設計段階で明確にするのが要点です。",
+    tldrEn: "On a foundation of data classification, minimization, encryption, and access control, add PII detection/masking on inputs and outputs, audit logs, and fairness, transparency, and human oversight. The key is to make clear at design time which data is used, where, by whom, and how.",
     sections: [
-      { h: "AWSでの実装", hEn: "On AWS", t: "IAM最小権限・KMS暗号化・VPC/PrivateLinkで隔離、Guardrailsでトピック/PII制御、CloudTrailで監査。Bedrockはデータをモデル学習に使いません。", tEn: "Least-privilege IAM, KMS encryption, isolation via VPC/PrivateLink, topic/PII control with Guardrails, and auditing with CloudTrail. Bedrock does not use your data to train base models." },
+      { h: "AWSでの実装", hEn: "On AWS", t: "IAM最小権限、KMS暗号化、VPC/PrivateLinkによる隔離、Bedrock Guardrailsでのトピック/PII制御、CloudTrailでの監査。重要な点として、Amazon Bedrockは入力データを基盤モデルの学習に使いません。データ主権・リージョン要件にも配慮します。", tEn: "Least-privilege IAM, KMS encryption, isolation via VPC/PrivateLink, topic/PII control with Bedrock Guardrails, and auditing with CloudTrail. Importantly, Amazon Bedrock does not use your input data to train the base models. Also address data-sovereignty and regional requirements." },
+      { h: "責任あるAI", hEn: "Responsible AI", t: "公平性・説明可能性・安全性・プライバシー・透明性を要件として扱い、評価・監視・人の監督で継続的に担保します。規制業種では監査対応・記録保持も設計に含めます。", tEn: "Treat fairness, explainability, safety, privacy, and transparency as requirements, sustained by evaluation, monitoring, and human oversight. In regulated industries, include audit readiness and record retention in the design." },
+    ],
+  },
+  {
+    cat: "セキュリティ", catEn: "Security", diag: "safety_levels",
+    q: "安全性フレームワーク（RSP／ASL）とは？",
+    qEn: "What are safety frameworks (RSP/ASL)?",
+    tldr: "モデルの能力が上がるほどリスクも上がるため、能力段階（ASL: AI Safety Levels）に応じて必要な安全対策・評価・運用統制を強めていく、という責任あるスケーリング方針（RSP: Responsible Scaling Policy）の考え方です。",
+    tldrEn: "Because risk grows with model capability, safety measures, evaluations, and operational controls are strengthened according to capability tiers (ASL: AI Safety Levels) — the idea behind a Responsible Scaling Policy (RSP).",
+    sections: [
+      { h: "実務への示唆", hEn: "Practical implication", t: "エンタープライズ導入では、ユースケースのリスク階層に応じてGuardrails・HITL・監査・アクセス制御の強度を変える、という設計に落とし込めます。『高リスクほど統制を厚く』という段階思考をSAとして示せます。", tEn: "In enterprise adoption, translate it into varying the strength of Guardrails, HITL, auditing, and access control by the use case's risk tier. As an SA, you can show tiered thinking: the higher the risk, the heavier the controls." },
     ],
   },
   // ── AWS実装・運用 ──
   {
-    cat: "AWS実装", catEn: "AWS & Ops",
+    cat: "AWS実装", catEn: "AWS & Ops", diag: "platform",
     q: "Amazon Bedrock とは？なぜ選ぶか？",
     qEn: "What is Amazon Bedrock and why choose it?",
-    tldr: "複数ベンダの基盤モデルを単一APIでマネージドに使えるサーバレスサービス。インフラ管理不要でモデル選択・RAG・エージェント・安全制御・セキュリティを揃えて本番化できます。",
-    tldrEn: "A serverless, managed service offering foundation models from multiple vendors via one API. No infrastructure to manage, with model choice, RAG, agents, guardrails, and security for production.",
+    tldr: "複数ベンダの基盤モデルを単一APIでマネージドに使えるサーバレスサービスです。インフラ管理不要でモデルを選択・差し替えでき、RAG（Knowledge Bases）・エージェント（Agents）・安全制御（Guardrails）・エンタープライズ・セキュリティまで一体で本番化できます。",
+    tldrEn: "A serverless, managed service offering foundation models from multiple vendors via one API. With no infrastructure to manage, you can choose and swap models and productionize with RAG (Knowledge Bases), agents (Agents), safety (Guardrails), and enterprise security — all integrated.",
     sections: [
-      { h: "選定理由", hEn: "Why", t: "モデルの選択肢と差し替えの容易さ、Knowledge Bases/Agents/Guardrailsの一体提供、VPC/KMS/IAMによるエンタープライズ対応、従量課金。自前運用より速く安全に立ち上げられます。", tEn: "Model choice and easy swapping, integrated Knowledge Bases/Agents/Guardrails, enterprise readiness via VPC/KMS/IAM, and pay-per-use — faster and safer to launch than self-hosting." },
+      { h: "選定理由", hEn: "Why choose it", t: "モデルの選択肢と差し替えの容易さ、Knowledge Bases/Agents/Guardrailsの一体提供、VPC/KMS/IAMによるエンタープライズ対応、従量課金と（必要なら）プロビジョンドスループット。自前でGPU運用・モデルサービングを構築するより、速く・安全に立ち上げられます。", tEn: "Model choice and easy swapping, integrated Knowledge Bases/Agents/Guardrails, enterprise readiness via VPC/KMS/IAM, and pay-per-use with optional provisioned throughput. It launches faster and more safely than self-hosting GPUs and model serving." },
+      { h: "データの扱い", hEn: "Data handling", t: "入力データは基盤モデルの学習に使われず、暗号化・ネットワーク隔離が可能です。規制・機密要件のある企業にとって重要な差別化点として説明できます。", tEn: "Input data is not used to train the base models, and encryption and network isolation are available — an important differentiator to articulate for companies with regulatory or confidentiality requirements." },
     ],
   },
   {
-    cat: "AWS実装", catEn: "AWS & Ops",
+    cat: "AWS実装", catEn: "AWS & Ops", diag: "llmops",
     q: "生成AIの本番化（LLMOps）で考えることは？",
     qEn: "What do you consider for productionizing generative AI (LLMOps)?",
-    tldr: "評価ゲート、バージョン管理、監視（品質・レイテンシ・コスト・ドリフト）、ガードレール、フィードバック収集、コスト最適化、ロールバック——を継続運用の仕組みとして作り込みます。",
-    tldrEn: "Build ongoing practices: evaluation gates, versioning, monitoring (quality, latency, cost, drift), guardrails, feedback capture, cost optimization, and rollback.",
+    tldr: "評価ゲート、バージョン管理、監視（品質・レイテンシ・コスト・ドリフト）、ガードレール、フィードバック収集、コスト最適化、ロールバックを、継続運用の仕組みとして作り込みます。作って終わりではなく『測って直し続ける』ループが本質です。",
+    tldrEn: "Build evaluation gates, versioning, monitoring (quality, latency, cost, drift), guardrails, feedback capture, cost optimization, and rollback as ongoing practices. The essence is not shipping once but a continuous measure-and-improve loop.",
     sections: [
-      { h: "要点", hEn: "Key points", t: "モデル更新は評価ゲート通過後に段階リリース。プロンプト/根拠基盤も版管理。CloudWatch等で監視し、劣化検知で自動アラート・ロールバック。", tEn: "Release model updates gradually after passing evaluation gates. Version prompts and knowledge bases too. Monitor via CloudWatch and auto-alert/rollback on degradation." },
+      { h: "リリース設計", hEn: "Release design", t: "モデル/プロンプト更新は評価ゲート通過後に段階リリース（カナリア/ブルーグリーン）。プロンプト・根拠基盤（Knowledge Base）・モデルバージョンをすべて版管理し、劣化検知時に自動アラート・ロールバックできる状態にします。", tEn: "Release model/prompt updates gradually (canary/blue-green) after passing evaluation gates. Version prompts, the knowledge base, and model versions, with auto-alert and rollback on detected degradation." },
+      { h: "監視の観点", hEn: "What to monitor", t: "品質（忠実性・満足度）、レイテンシ、コスト（トークン消費）、安全（Guardrails違反）、ドリフト（入力分布・性能の変化）。CloudWatchやログ基盤で可視化し、フィードバックを次の改善に回します。", tEn: "Quality (faithfulness, satisfaction), latency, cost (token usage), safety (Guardrails violations), and drift (input distribution and performance shifts). Visualize via CloudWatch and logging, and feed feedback into the next improvement." },
     ],
   },
   {
-    cat: "AWS実装", catEn: "AWS & Ops",
+    cat: "AWS実装", catEn: "AWS & Ops", diag: "inference",
     q: "レイテンシとスループットはどう最適化する？",
     qEn: "How do you optimize latency and throughput?",
-    tldr: "体感速度はストリーミング出力とプロンプト短縮（プレフィル削減）で改善、スループットはプロビジョンドスループットや量子化・小型モデル・並列化で確保します。",
-    tldrEn: "Improve perceived latency with streaming and shorter prompts (less prefill); secure throughput with provisioned throughput, quantization, smaller models, and parallelism.",
+    tldr: "体感レイテンシはストリーミング出力とプロンプト短縮（プレフィル削減）で改善し、スループットはプロビジョンドスループット・量子化・小型モデル・並列化で確保します。指標（TTFT: 初回トークンまでの時間、トークン/秒）をSLAに対して測って調整します。",
+    tldrEn: "Improve perceived latency with streaming output and shorter prompts (less prefill); secure throughput with provisioned throughput, quantization, smaller models, and parallelism. Measure metrics (TTFT: time-to-first-token, tokens/sec) against the SLA and tune.",
     sections: [
-      { h: "レバー", hEn: "Levers", t: "出力トークン削減、キャッシュ（同一/類似要求）、モデルルーティング、非同期・バッチ化、リージョン/配置最適化。SLAに対して測定して調整します。", tEn: "Reduce output tokens, cache identical/similar requests, route models, use async/batch, and optimize region/placement — measured against the SLA." },
+      { h: "レバー", hEn: "Levers", t: "出力トークン削減、意味的キャッシュ（同一/類似要求の再利用）、モデルルーティング（難所だけ大型）、非同期・バッチ化、リージョン/配置最適化、KVキャッシュ最適化。ストリーミングは『速く見せる』体感改善に特に効きます。", tEn: "Reduce output tokens, semantic caching (reuse identical/similar requests), model routing (large only for hard cases), async/batch, region/placement optimization, and KV-cache optimization. Streaming especially improves perceived speed." },
+      { h: "設計判断", hEn: "Design decisions", t: "リアルタイム対話はストリーミング＋小型・低レイテンシ、大量処理はバッチ＋スループット重視、と用途で分けます。プロビジョンドスループットは安定容量が要る本番で検討します。", tEn: "Split by use case: real-time chat with streaming and small low-latency models; bulk processing with batching for throughput. Consider provisioned throughput for production needing stable capacity." },
     ],
   },
   {
-    cat: "AWS実装", catEn: "AWS & Ops",
+    cat: "AWS実装", catEn: "AWS & Ops", diag: "finops",
     q: "生成AIのコストはどう最適化する？",
     qEn: "How do you optimize the cost of generative AI?",
-    tldr: "課金はトークン量が主。プロンプト/コンテキストの圧縮、適材適所のモデル選択（小型/量子化）、キャッシュ、バッチ、プロビジョンドスループットの見極めでコストを下げます。",
-    tldrEn: "Cost is driven mainly by token volume. Reduce it via prompt/context compression, right-sizing models (small/quantized), caching, batching, and judicious use of provisioned throughput.",
+    tldr: "課金は主に入出力トークン量で決まります。プロンプト/コンテキストの圧縮、適材適所のモデル選択（小型・量子化）、キャッシュ、バッチ、出力上限、そしてプロビジョンドスループットの要否見極めで、品質を保ちつつコストを下げます。",
+    tldrEn: "Cost is driven mainly by input/output token volume. Reduce it via prompt/context compression, right-sizing models (small/quantized), caching, batching, output caps, and judging whether provisioned throughput is warranted — while preserving quality.",
     sections: [
-      { h: "要点", hEn: "Key points", t: "難所だけ大型に振り分けるルーティング、RAGで無駄な文脈を減らす、出力上限の設定、使用量の可視化と上限アラート。品質とコストを評価で両立させます。", tEn: "Route only hard cases to large models, trim context with RAG, cap output length, and monitor usage with budget alerts — balancing quality and cost via evaluation." },
+      { h: "主なレバー", hEn: "Main levers", t: "難所だけ大型に振るモデルルーティング、RAGで無駄な文脈を削る、意味的キャッシュ、出力長の制限、不要なリトライ削減。使用量を可視化し予算アラートを設定して、コストを継続監視します。", tEn: "Route only hard cases to large models, trim context with RAG, semantic caching, cap output length, and cut needless retries. Make usage visible with budget alerts and monitor cost continuously." },
+      { h: "FinOpsの視点", hEn: "FinOps lens", t: "コストは単発の削減でなく、品質×コストのバランスを評価で担保しながら継続統制するもの、と述べます。用途別にコスト配賦（タグ付け）し、ROIで投資判断を支える設計がSAらしい。", tEn: "Frame cost not as a one-off cut but as ongoing governance that keeps the quality-vs-cost balance via evaluation. Allocating cost by use case (tagging) and supporting investment decisions with ROI is SA-like." },
+    ],
+  },
+  {
+    cat: "AWS実装", catEn: "AWS & Ops", diag: "resilience",
+    q: "生成AIサービスの耐障害・マルチリージョンはどう設計する？",
+    qEn: "How do you design resilience and multi-region for a generative AI service?",
+    tldr: "モデルエンドポイント・ベクトルDB・アプリ層それぞれに単一障害点を作らず、マルチAZ、必要に応じマルチリージョン、フォールバックモデル、キャッシュ、縮退運転を設計します。RTO/RPOの要件から必要な冗長度を決めます。",
+    tldrEn: "Avoid single points of failure across the model endpoint, vector DB, and app layers with Multi-AZ and, where needed, multi-region, fallback models, caching, and graceful degradation. Derive the required redundancy from RTO/RPO requirements.",
+    sections: [
+      { h: "設計要素", hEn: "Design elements", t: "モデル障害時の代替モデルへのフォールバック、リージョン間のベクトルDB複製、Route 53等でのフェイルオーバー、キャッシュによる部分継続。RTO/RPOに対し過剰にも過小にもならない冗長度を選びます。", tEn: "Fallback to an alternate model on failure, cross-region vector DB replication, failover (e.g., Route 53), and partial continuity via caching. Choose redundancy that is neither excessive nor insufficient for the RTO/RPO." },
     ],
   },
   // ── コンサル ──
   {
-    cat: "コンサル", catEn: "Advisory",
+    cat: "コンサル", catEn: "Advisory", diag: "staircase",
     q: "生成AIを活用したい・作りたいお客様にどう説明するか？",
     qEn: "How do you advise a customer who wants to adopt or build generative AI?",
-    tldr: "『何を作るか』より『どの課題を、どのKPIで解くか』から入り、データ・制約を確認し、最小構成（プロンプト→RAG→fine-tuning→エージェント）から段階的にPoCで評価し、セキュリティ・運用・コストまで見据えて本番化する、というSAの型で説明します。",
-    tldrEn: "Start from the problem and KPI, not the tech: clarify the use case, check data/constraints, choose the minimal approach first (prompt → RAG → fine-tuning → agents), validate via PoC, and design for security, ops, and cost toward production.",
+    tldr: "『何を作るか』より先に『どの課題を、どのKPIで解くか』から入り、データと制約を確認し、最小構成（プロンプト→RAG→fine-tuning→エージェント）から段階的にPoCで検証し、セキュリティ・運用・コストまで見据えて本番化する——というSAの型で、期待値も正直に整えながら説明します。",
+    tldrEn: "Start from the problem and KPI, not the tech: clarify the use case, check data and constraints, escalate from a minimal approach (prompt → RAG → fine-tuning → agents), validate via PoC, and design for security, ops, and cost toward production — while honestly setting expectations.",
     sections: [
-      { h: "進め方", hEn: "The flow", t: "①課題とKPI ②データと制約（機密/規制/レイテンシ/コスト） ③方式は段階的に ④PoCで評価 ⑤本番化（Guardrails/IAM/暗号化/監視/コスト）。過剰設計と過度な期待を避け、リスクも正直に共有。", tEn: "1) Problem & KPI, 2) data/constraints (confidentiality/regulation/latency/cost), 3) escalate the approach, 4) validate via PoC, 5) productionize (Guardrails/IAM/encryption/monitoring/cost). Avoid over-engineering and hype; be candid about risks." },
+      { h: "進め方", hEn: "The flow", t: "①課題とKPIの明確化（生成AIありきにしない）②データと制約（機密/規制/レイテンシ/コスト）③方式は段階的に④PoCで評価指標に照らし検証⑤本番化（Guardrails/IAM/暗号化/監視/コスト最適化/責任あるAI）。過剰設計と過度な期待を避け、幻覚・PIIのリスクも共有します。", tEn: "1) Frame the problem and KPI (not AI for its own sake), 2) data and constraints (confidentiality/regulation/latency/cost), 3) escalate the approach, 4) validate against metrics via PoC, 5) productionize (Guardrails/IAM/encryption/monitoring/cost/responsible AI). Avoid over-engineering and hype; share hallucination and PII risks." },
+      { h: "信頼を得る話し方", hEn: "Earning trust", t: "できること・できないこと・リスクを率直に示し、最小構成で価値を素早く証明してから広げる姿勢が信頼を生みます。技術用語を相手の言葉（業務価値・コスト・リスク）に翻訳して伝えるのがSAの腕です。", tEn: "Being candid about what is and isn't possible and the risks, then proving value quickly with a minimal build before scaling, earns trust. Translating jargon into the customer's language (business value, cost, risk) is the SA's craft." },
     ],
   },
   {
     cat: "コンサル", catEn: "Advisory",
     q: "生成AIが向く／向かないユースケースの見極めは？",
     qEn: "How do you judge whether a use case fits generative AI?",
-    tldr: "『言語・非構造データを扱う』『多少の揺らぎが許容できる』『人が最終確認できる』業務は向きます。厳密な正確性・決定性・監査が絶対要件の領域は、単独では不向きで補強が要ります。",
-    tldrEn: "It fits tasks involving language/unstructured data where some variability is acceptable and a human can review. Domains that absolutely require exactness, determinism, or audit are poor fits on their own and need reinforcement.",
+    tldr: "『言語や非構造データを扱う』『多少の揺らぎが許容できる』『人が最終確認できる』業務は向きます。一方、厳密な正確性・完全な決定性・強い監査が絶対要件の領域は、生成AI単独では不向きで、ツール委譲・RAG・HITLでの補強が必要です。",
+    tldrEn: "It fits tasks involving language or unstructured data where some variability is acceptable and a human can review. Domains that absolutely require exactness, full determinism, or strong audit are poor fits for generative AI alone and need reinforcement via tool delegation, RAG, and HITL.",
     sections: [
-      { h: "判断", hEn: "Judgment", t: "要約・生成・分類・抽出・対話・コード支援は好適。金額確定など厳密処理はツール/ルールに委譲し、RAGで根拠、HITLで確認を足す設計にします。", tEn: "Summarization, generation, classification, extraction, conversation, and coding assist fit well. Delegate exact processing (e.g., final amounts) to tools/rules, add RAG grounding, and insert HITL." },
+      { h: "向く/補強が要る", hEn: "Fits / needs reinforcement", t: "要約・生成・分類・抽出・対話・コード支援は好適。金額確定・法令判断・厳密計算などは、決定論的処理やルールに委譲し、RAGで根拠、HITLで確認を足す設計にします。『AIに全部やらせない』切り分けが重要です。", tEn: "Summarization, generation, classification, extraction, dialog, and coding assist fit well. For final amounts, legal judgments, and exact calculations, delegate to deterministic processing or rules, add RAG grounding, and insert HITL. The key is not making AI do everything." },
     ],
   },
+];
+
+// 確認クイズ（4択・正解index a）
+const SA_QUIZ = [
+  { q: "生成AIと従来の識別系AIの最も本質的な違いはどれか。", o: ["学習した分布から新しい出力を生成する", "常に決定的で同じ入力に同じ出力を返す", "ルールベースで動作し学習を行わない", "画像専用で言語は扱えない"], a: 0, e: "生成AIは学習した確率分布から新しいコンテンツを生成する点が本質。識別系は分類・予測が中心。", qEn: "What is the most essential difference between generative and discriminative AI?", oEn: ["It generates new outputs from a learned distribution", "It is always deterministic with identical outputs", "It is rule-based and does not learn", "It only handles images, not language"], eEn: "Generative AI creates new content sampled from a learned distribution; discriminative AI mainly classifies/predicts." },
+  { q: "RAGを採用する最大の理由として最も適切なのはどれか。", o: ["最新・独自の知識に基づき出典付きで回答させたい", "モデルの文体を恒久的に変えたい", "推論のGPUコストをゼロにしたい", "出力を完全に決定的にしたい"], a: 0, e: "RAGは知識の注入・更新と出典提示に強い。文体固定はfine-tuning、決定性は別問題。", qEn: "What is the most appropriate main reason to adopt RAG?", oEn: ["To answer from up-to-date/proprietary knowledge with citations", "To permanently change the model's writing style", "To make inference GPU cost zero", "To make output fully deterministic"], eEn: "RAG excels at injecting/updating knowledge and citing sources; style-fixing is fine-tuning, and determinism is separate." },
+  { q: "『振る舞い・出力形式・文体を安定して固定したい』要件に最も適すのはどれか。", o: ["fine-tuning（必要ならLoRA等のPEFT）", "RAG", "temperatureを上げる", "コンテキストを最大まで詰める"], a: 0, e: "振る舞いの定着はfine-tuning。知識注入はRAG、という棲み分けが基本。", qEn: "Which best fits the need to stably lock in behavior, output format, and style?", oEn: ["Fine-tuning (PEFT like LoRA if needed)", "RAG", "Raising temperature", "Stuffing maximum context"], eEn: "Locking in behavior is fine-tuning; knowledge injection is RAG." },
+  { q: "生成AIの非決定的な出力に対する精度担保として最も適切な考え方はどれか。", o: ["設計・根拠・検証・運用の多層で許容誤差内に管理する", "temperatureを0にすれば完全に決定的になる", "大きいモデルにすれば幻覚は起きない", "人手確認は不要になる"], a: 0, e: "精度は単一施策でなく多層設計の総合。温度0でも完全な決定論にはならず、幻覚もゼロにはできない。", qEn: "What is the most appropriate way to ensure accuracy for non-deterministic output?", oEn: ["Manage within tolerance via layered design, grounding, validation, and ops", "Setting temperature to 0 makes it fully deterministic", "A bigger model eliminates hallucination", "Human review becomes unnecessary"], eEn: "Accuracy is a holistic, layered result; temperature 0 is not fully deterministic and hallucination cannot be zeroed." },
+  { q: "長いプロンプト（コンテキスト）がコスト・レイテンシを押し上げる主因はどれか。", o: ["トークン数増と自己注意の計算量・KVキャッシュのメモリ", "ネットワーク帯域の制限のみ", "ディスクI/Oの遅延のみ", "ライセンス料金の従量制のみ"], a: 0, e: "課金はトークンに比例し、自己注意は系列長に対し重く、KVキャッシュのメモリも増える。", qEn: "What primarily drives up cost/latency for long prompts?", oEn: ["More tokens plus attention compute and KV-cache memory", "Only network bandwidth limits", "Only disk I/O latency", "Only per-use license fees"], eEn: "Billing scales with tokens, self-attention is heavy in sequence length, and KV-cache memory grows." },
+  { q: "エージェントに外部ツールを与える際の安全設計として最も適切なのはどれか。", o: ["最小権限・入力/引数検証・破壊的操作の承認・監査ログ", "全権限を与えて自由に実行させる", "検証やログは性能のため省く", "全操作をユーザー承認なしで自動化する"], a: 0, e: "ツール実行はゼロトラストで、権限最小化・検証・承認・監査を多層に。", qEn: "What is the safest design when giving an agent external tools?", oEn: ["Least privilege, input/argument validation, approval for destructive ops, audit logs", "Grant all privileges to run freely", "Skip validation and logs for performance", "Automate all actions without user approval"], eEn: "Treat tool execution as zero-trust with layered least-privilege, validation, approval, and auditing." },
+  { q: "RAGの精度改善で『検索は当たるが回答が根拠から外れる』場合、まず見直すべきはどれか。", o: ["生成側（プロンプト強化・出典必須化・コンテキスト最適化）", "埋め込みモデルの次元数のみ", "ベクトルDBのレプリカ数", "GPUのリージョン"], a: 0, e: "検索と生成を分けて評価し、弱い側を直す。検索が当たるなら生成側の問題。", qEn: "If retrieval is good but answers drift from the evidence, what should you revisit first?", oEn: ["The generation side (stronger prompts, mandatory citations, context tuning)", "Only the embedding dimensionality", "The vector DB replica count", "The GPU region"], eEn: "Evaluate retrieval and generation separately and fix the weak side; good retrieval means a generation-side issue." },
+  { q: "Amazon Bedrock を選ぶ利点として最も適切なのはどれか。", o: ["複数モデルをマネージドAPIで使え、入力データは学習に使われない", "唯一のモデルしか使えないが最速", "GPUを自前運用する必要がある", "データは必ず学習に使われ精度が上がる"], a: 0, e: "Bedrockは複数ベンダのモデルをサーバレスに提供し、入力データを基盤モデル学習に使わない。", qEn: "What is the most appropriate benefit of choosing Amazon Bedrock?", oEn: ["Managed multi-model API where input data is not used for training", "Only one model but fastest", "You must self-manage GPUs", "Data is always used for training to improve accuracy"], eEn: "Bedrock offers multi-vendor models serverlessly and does not use your input data to train base models." },
+  { q: "生成AIが単独では不向きなユースケースはどれか。", o: ["1円単位で厳密・監査必須の最終金額確定", "問い合わせ文の要約", "社内FAQの下書き生成", "コードのレビュー補助"], a: 0, e: "厳密な正確性・決定性・監査が絶対要件の処理は、ツール委譲やHITLでの補強が必要。", qEn: "Which use case is a poor fit for generative AI alone?", oEn: ["Exact, audit-required final amount to the yen", "Summarizing an inquiry", "Drafting internal FAQ answers", "Assisting code review"], eEn: "Tasks requiring exactness, determinism, and audit need reinforcement via tool delegation and HITL." },
+  { q: "推論のコスト最適化として不適切なものはどれか。", o: ["全リクエストを常に最大モデルで処理する", "難所だけ大型に振るモデルルーティング", "意味的キャッシュの活用", "出力トークン長の上限設定"], a: 0, e: "常に最大モデルはコスト非効率。適材適所・キャッシュ・出力制限が定石。", qEn: "Which is NOT appropriate for inference cost optimization?", oEn: ["Always using the largest model for every request", "Routing only hard cases to large models", "Using semantic caching", "Capping output token length"], eEn: "Always using the largest model is cost-inefficient; right-sizing, caching, and output caps are standard." },
 ];
 
 function SAInterviewPrep() {
   const lang = useLang();
   const en = lang === "en";
+  const [mode, setMode] = useState("study"); // study | quiz
   const [open, setOpen] = useState("0");
   const [cat, setCat] = useState("ALL");
+  const [diagOpen, setDiagOpen] = useState({});
   const cats = [];
   SA_INTERVIEW_QA.forEach((it) => { if (!cats.some((c) => c.cat === it.cat)) cats.push({ cat: it.cat, catEn: it.catEn }); });
   const items = SA_INTERVIEW_QA.map((it, i) => ({ ...it, _i: i })).filter((it) => cat === "ALL" || it.cat === cat);
+
+  // ── 演習（クイズ）モード ──
+  const [qOrder] = useState(() => SA_QUIZ.map((_, i) => i));
+  const [qPos, setQPos] = useState(0);
+  const [qSel, setQSel] = useState(null);
+  const [qScore, setQScore] = useState(0);
+  const [qAnswered, setQAnswered] = useState(0);
+  const Q = SA_QUIZ[qOrder[qPos % qOrder.length]];
+  const qChoose = (i) => { if (qSel !== null) return; setQSel(i); setQAnswered((n) => n + 1); if (i === Q.a) setQScore((s) => s + 1); };
+  const qNext = () => { setQSel(null); setQPos((p) => p + 1); };
+  const qReset = () => { setQPos(0); setQSel(null); setQScore(0); setQAnswered(0); };
+
+  const modeBtn = (k, label) => (
+    <button onClick={() => setMode(k)}
+      style={{ border: `1px solid ${mode === k ? C.gold : C.line}`, background: mode === k ? C.gold : "transparent", color: mode === k ? "#1a1204" : C.muted, borderRadius: 999, padding: "6px 16px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>{label}</button>
+  );
+
   return (
     <Card style={{ borderColor: C.gold, marginBottom: 16 }}>
       <div className="gh-display" style={{ fontSize: 16, color: C.gold, marginBottom: 4 }}>{en ? "AWS AI Solutions Architect — Technical Interview Prep" : "AWS AI Solutions Architect 面接 必答テーマ（技術）"}</div>
-      <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.7, marginBottom: 10 }}>{en ? `Model answers to ${SA_INTERVIEW_QA.length} core technical questions an AI SA interview asks. Pick a category, read the one-liner, then the supporting points.` : `AI SA面接で問われる技術テーマ${SA_INTERVIEW_QA.length}問のモデル解答。カテゴリを選び、まず一言（結論）、続けて要点を確認してください。`}</div>
-      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
-        {[{ cat: "ALL", catEn: "All" }, ...cats].map((c) => {
-          const active = cat === c.cat;
-          return (
-            <button key={c.cat} onClick={() => setCat(c.cat)}
-              style={{ border: `1px solid ${active ? C.gold : C.line}`, background: active ? C.gold : "transparent", color: active ? "#1a1204" : C.muted, borderRadius: 999, padding: "5px 12px", fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>
-              {c.cat === "ALL" ? (en ? "All" : "すべて") : (en ? c.catEn : c.cat)}
-            </button>
-          );
-        })}
+      <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.7, marginBottom: 10 }}>{en ? `Detailed model answers to ${SA_INTERVIEW_QA.length} technical themes with linked architecture diagrams, plus a ${SA_QUIZ.length}-question check quiz.` : `AI SA面接で問われる技術テーマ${SA_INTERVIEW_QA.length}問の詳説モデル解答（関連アーキ図つき）と、確認クイズ${SA_QUIZ.length}問。`}</div>
+      <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+        {modeBtn("study", en ? "Study" : "解説")}
+        {modeBtn("quiz", en ? "Quiz" : "演習")}
       </div>
-      <div style={{ display: "grid", gap: 8 }}>
-        {items.map((it) => {
-          const key = String(it._i);
-          const isOpen = open === key;
-          return (
-            <div key={key} style={{ border: `1px solid ${isOpen ? C.gold : C.line}`, borderRadius: 8, overflow: "hidden" }}>
-              <button onClick={() => setOpen(isOpen ? "" : key)}
-                style={{ width: "100%", textAlign: "left", background: isOpen ? C.surface2 : "transparent", border: "none", cursor: "pointer", padding: "11px 13px", color: C.text, fontSize: 13.5, fontWeight: 700, display: "flex", justifyContent: "space-between", gap: 10 }}>
-                <span><span style={{ color: C.teal, fontSize: 10.5, marginRight: 8 }}>{en ? it.catEn : it.cat}</span>{en ? it.qEn : it.q}</span>
-                <span style={{ color: C.gold }}>{isOpen ? "−" : "+"}</span>
-              </button>
-              {isOpen && (
-                <div style={{ padding: "4px 13px 13px" }}>
-                  <div style={{ background: C.surface2, borderLeft: `3px solid ${C.gold}`, borderRadius: 6, padding: "9px 11px", fontSize: 12.5, lineHeight: 1.7, color: C.text, marginBottom: 10 }}>
-                    <span style={{ color: C.gold, fontWeight: 700, marginRight: 6 }}>{en ? "In one line:" : "一言で:"}</span>{en ? it.tldrEn : it.tldr}
-                  </div>
-                  {it.sections.map((s, k) => (
-                    <div key={k} style={{ marginBottom: 8 }}>
-                      <div style={{ fontSize: 11, color: C.teal, fontWeight: 700, marginBottom: 2 }}>{en ? s.hEn : s.h}</div>
-                      <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.7 }}>{en ? s.tEn : s.t}</div>
+
+      {mode === "study" && (
+        <div>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
+            {[{ cat: "ALL", catEn: "All" }, ...cats].map((c) => {
+              const active = cat === c.cat;
+              return (
+                <button key={c.cat} onClick={() => setCat(c.cat)}
+                  style={{ border: `1px solid ${active ? C.gold : C.line}`, background: active ? C.gold : "transparent", color: active ? "#1a1204" : C.muted, borderRadius: 999, padding: "5px 12px", fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>
+                  {c.cat === "ALL" ? (en ? "All" : "すべて") : (en ? c.catEn : c.cat)}
+                </button>
+              );
+            })}
+          </div>
+          <div style={{ display: "grid", gap: 8 }}>
+            {items.map((it) => {
+              const key = String(it._i);
+              const isOpen = open === key;
+              const dg = it.diag && DIAGRAMS[it.diag];
+              return (
+                <div key={key} style={{ border: `1px solid ${isOpen ? C.gold : C.line}`, borderRadius: 8, overflow: "hidden" }}>
+                  <button onClick={() => setOpen(isOpen ? "" : key)}
+                    style={{ width: "100%", textAlign: "left", background: isOpen ? C.surface2 : "transparent", border: "none", cursor: "pointer", padding: "11px 13px", color: C.text, fontSize: 13.5, fontWeight: 700, display: "flex", justifyContent: "space-between", gap: 10 }}>
+                    <span><span style={{ color: C.teal, fontSize: 10.5, marginRight: 8 }}>{en ? it.catEn : it.cat}</span>{en ? it.qEn : it.q}</span>
+                    <span style={{ color: C.gold }}>{isOpen ? "−" : "+"}</span>
+                  </button>
+                  {isOpen && (
+                    <div style={{ padding: "4px 13px 13px" }}>
+                      <div style={{ background: C.surface2, borderLeft: `3px solid ${C.gold}`, borderRadius: 6, padding: "9px 11px", fontSize: 12.5, lineHeight: 1.75, color: C.text, marginBottom: 10 }}>
+                        <span style={{ color: C.gold, fontWeight: 700, marginRight: 6 }}>{en ? "In one line:" : "一言で:"}</span>{en ? it.tldrEn : it.tldr}
+                      </div>
+                      {it.sections.map((s, k) => (
+                        <div key={k} style={{ marginBottom: 9 }}>
+                          <div style={{ fontSize: 11, color: C.teal, fontWeight: 700, marginBottom: 2 }}>{en ? s.hEn : s.h}</div>
+                          <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.8 }}>{en ? s.tEn : s.t}</div>
+                        </div>
+                      ))}
+                      {dg && (
+                        <div style={{ marginTop: 10, border: `1px solid ${C.line}`, borderRadius: 8, overflow: "hidden" }}>
+                          <button onClick={() => setDiagOpen((o) => ({ ...o, [key]: !o[key] }))}
+                            style={{ width: "100%", textAlign: "left", background: C.surface2, border: "none", cursor: "pointer", padding: "8px 11px", color: C.teal, fontSize: 11.5, fontWeight: 700, display: "flex", justifyContent: "space-between" }}>
+                            <span>{en ? "Related architecture: " : "関連アーキ図: "}{en ? (dg.titleEn || dg.title) : dg.title}</span>
+                            <span style={{ color: C.gold }}>{diagOpen[key] ? "−" : "+"}</span>
+                          </button>
+                          {diagOpen[key] && (
+                            <div style={{ padding: 8, background: C.bg }}>
+                              <ArchDiagram diagram={dg} selected={null} onSelect={() => {}} onDrag={() => {}} lang={lang} />
+                              <div style={{ fontSize: 10.5, color: C.dim, marginTop: 4 }}>{en ? "Full interactive version: Tech Dojo → Diagram Dojo." : "図面道場でドラッグ操作・詳細解説つきの完全版を確認できます。"}</div>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  ))}
+                  )}
                 </div>
-              )}
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {mode === "quiz" && (
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, fontSize: 11.5, color: C.muted }}>
+            <span>{en ? `Q ${(qPos % qOrder.length) + 1} / ${qOrder.length}` : `第${(qPos % qOrder.length) + 1}問 / ${qOrder.length}問`}</span>
+            {qAnswered > 0 && <span style={{ color: C.teal }}>{en ? "Score" : "正答"}: {qScore} / {qAnswered}</span>}
+          </div>
+          <div style={{ fontSize: 13.5, fontWeight: 700, color: C.text, marginBottom: 10, lineHeight: 1.7 }}>{en ? Q.qEn : Q.q}</div>
+          {(en ? Q.oEn : Q.o).map((opt, i) => {
+            let bg = "transparent", bd = C.line, col = C.text;
+            if (qSel !== null) { if (i === Q.a) { bg = "rgba(45,160,120,.15)"; bd = C.teal; col = C.teal; } else if (i === qSel) { bg = "rgba(180,70,70,.15)"; bd = C.wine; col = C.wine; } }
+            return (
+              <button key={i} onClick={() => qChoose(i)} disabled={qSel !== null}
+                style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 7, padding: "10px 12px", borderRadius: 8, border: `1px solid ${bd}`, background: bg, color: col, cursor: qSel === null ? "pointer" : "default", fontSize: 12.5, lineHeight: 1.5 }}>
+                <span style={{ fontWeight: 700, marginRight: 8 }}>{qSel !== null && i === Q.a ? "✓" : qSel !== null && i === qSel ? "✗" : "ABCD"[i]}</span>{opt}
+              </button>
+            );
+          })}
+          {qSel !== null && (
+            <div style={{ marginTop: 8 }}>
+              <div style={{ background: C.surface2, borderRadius: 8, padding: "9px 11px", fontSize: 12, lineHeight: 1.7, color: C.muted }}>{en ? Q.eEn : Q.e}</div>
+              <button className="gh-btn gh-btn-primary" onClick={qNext} style={{ marginTop: 10 }}>{en ? "Next" : "次の問題"} →</button>
+              <button className="gh-btn" onClick={qReset} style={{ marginTop: 10, marginLeft: 8 }}>{en ? "Reset" : "最初から"}</button>
             </div>
-          );
-        })}
-      </div>
+          )}
+        </div>
+      )}
     </Card>
   );
 }
