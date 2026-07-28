@@ -148943,6 +148943,7 @@ function TreeNode({ node, depth, defaultOpen }) {
 // ===== シナリオ問題 =====
 function Scenario({ t }) {
   const [filter, setFilter] = useState("ALL");
+  const [picked, setPicked] = useState({});
   const [open, setOpen] = useState({});
 
   const list = SCENARIOS.filter(s => {
@@ -148950,8 +148951,34 @@ function Scenario({ t }) {
     if (filter === "scenario" || filter === "calc") return s.type === filter;
     return s.d === filter;
   });
-
   const typeLabel = (ty) => ty === "calc" ? t.typeCalc : t.typeScenario;
+
+  // 他資格と体裁を揃える：シナリオ型は4択（誤答は同ドメインの実在サービス/手法から生成）。
+  const poolAll = [...new Set(SCENARIOS.filter(s => s.type !== "calc").map(s => s.a))];
+  const buildOptions = (s) => {
+    const correct = s.a;
+    const domCand = [...new Set(SCENARIOS.filter(x => x.type !== "calc" && x.d === s.d && x.a !== correct).map(x => x.a))];
+    const cand = [...domCand, ...poolAll.filter(a => a !== correct && !domCand.includes(a))];
+    const seed = [...s.id].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 100000, 7);
+    const picks = [];
+    let idx = seed % Math.max(1, cand.length), guard = 0;
+    while (picks.length < 3 && picks.length < cand.length && guard < 100) {
+      const c = cand[idx % cand.length];
+      if (!picks.includes(c)) picks.push(c);
+      idx += 1 + (seed % 5); guard++;
+    }
+    const opts = [correct, ...picks];
+    for (let i = opts.length - 1; i > 0; i--) { const j = (seed + i * 7) % (i + 1); const tmp = opts[i]; opts[i] = opts[j]; opts[j] = tmp; }
+    return { opts, ans: opts.indexOf(correct) };
+  };
+
+  const head = (s) => (
+    <div style={{ display: "flex", gap: 6, alignItems: "center", marginBottom: 8, flexWrap: "wrap" }}>
+      <span style={{ background: C.deep, color: "#fff", borderRadius: 4, padding: "1px 7px", fontSize: 11, fontWeight: 700 }}>{s.id}</span>
+      <span style={{ background: s.type === "calc" ? "#3BB8D4" : DOM_HUE[s.d], color: "#fff", borderRadius: 4, padding: "1px 7px", fontSize: 10.5 }}>{typeLabel(s.type)}</span>
+      <span style={{ fontSize: 11, color: "#86a6b0" }}>{s.d} · {domName(s.d)}</span>
+    </div>
+  );
 
   return (
     <div>
@@ -148977,23 +149004,45 @@ function Scenario({ t }) {
       </div>
 
       {list.map((s) => {
-        const isOpen = open[s.id];
+        if (s.type === "calc") {
+          const isOpen = open[s.id];
+          return (
+            <div key={s.id} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 11, padding: 14, marginBottom: 11 }}>
+              {head(s)}
+              <div style={{ fontSize: 14, fontWeight: 600, lineHeight: 1.55, marginBottom: 10 }}>{s.q}</div>
+              {!isOpen ? (
+                <button onClick={() => setOpen(o => ({ ...o, [s.id]: true }))}
+                  style={{ padding: "8px 16px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
+                  {t.showAnswer}
+                </button>
+              ) : (
+                <div style={{ background: C.light, borderRadius: 9, padding: 12 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: C.deep, marginBottom: 5 }}>{s.a}</div>
+                  <div style={{ fontSize: 13, lineHeight: 1.55, color: "#476770" }}>{s.e}</div>
+                </div>
+              )}
+            </div>
+          );
+        }
+        const { opts, ans } = buildOptions(s);
+        const sel = picked[s.id];
         return (
           <div key={s.id} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 11, padding: 14, marginBottom: 11 }}>
-            <div style={{ display: "flex", gap: 6, alignItems: "center", marginBottom: 8, flexWrap: "wrap" }}>
-              <span style={{ background: C.deep, color: "#fff", borderRadius: 4, padding: "1px 7px", fontSize: 11, fontWeight: 700 }}>{s.id}</span>
-              <span style={{ background: s.type === "calc" ? "#3BB8D4" : DOM_HUE[s.d], color: "#fff", borderRadius: 4, padding: "1px 7px", fontSize: 10.5 }}>{typeLabel(s.type)}</span>
-              <span style={{ fontSize: 11, color: "#86a6b0" }}>{s.d} · {domName(s.d)}</span>
-            </div>
+            {head(s)}
             <div style={{ fontSize: 14, fontWeight: 600, lineHeight: 1.55, marginBottom: 10 }}>{s.q}</div>
-            {!isOpen ? (
-              <button onClick={() => setOpen(o => ({ ...o, [s.id]: true }))}
-                style={{ padding: "8px 16px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
-                {t.showAnswer}
-              </button>
-            ) : (
-              <div style={{ background: C.light, borderRadius: 9, padding: 12 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: C.deep, marginBottom: 5 }}>{s.a}</div>
+            {opts.map((o, i) => {
+              let bg = "#fff", bd = C.mid, col = C.ink;
+              if (sel != null) { if (i === ans) { bg = "#E6F4EF"; bd = C.ok; col = C.ok; } else if (i === sel) { bg = "#FBEAE8"; bd = C.ng; col = C.ng; } }
+              return (
+                <button key={i} onClick={() => { if (sel == null) setPicked(p => ({ ...p, [s.id]: i })); }} disabled={sel != null}
+                  style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 7, padding: "10px 12px", borderRadius: 8, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: sel == null ? "pointer" : "default", fontSize: 13, lineHeight: 1.5, fontWeight: sel != null && i === ans ? 700 : 500 }}>
+                  <span style={{ fontWeight: 700, marginRight: 8 }}>{sel != null && i === ans ? "✓" : sel != null && i === sel ? "✗" : "ABCD"[i]}</span>{o}
+                </button>
+              );
+            })}
+            {sel != null && (
+              <div style={{ background: C.light, borderRadius: 9, padding: 12, marginTop: 4 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: sel === ans ? C.ok : C.ng, marginBottom: 5 }}>{sel === ans ? "正解" : "不正解"} ・ {s.a}</div>
                 <div style={{ fontSize: 13, lineHeight: 1.55, color: "#476770" }}>{s.e}</div>
               </div>
             )}
@@ -149003,7 +149052,6 @@ function Scenario({ t }) {
     </div>
   );
 }
-
 // ===== 比較表 =====
 function Compare({ t }) {
   const [idx, setIdx] = useState(0);
