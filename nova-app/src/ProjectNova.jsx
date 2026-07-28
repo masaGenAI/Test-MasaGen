@@ -137741,6 +137741,13 @@ function App() {
 
   return (
     <div style={{ background: "#ffffff", minHeight: "100%" }}>
+      {active !== "progress" && (
+        <button onClick={() => { setActive("progress"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
+          aria-label="Back to top"
+          style={{ position: "fixed", right: 16, bottom: 16, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: "#1a3a5c", color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          ↑ トップへ
+        </button>
+      )}
       <div className="clf-app" id="app">
         <style>{CLF_CSS}</style>
         <div className="hdr"><div className="logo">CLF</div><h1>AWS Certified Cloud Practitioner</h1></div>
@@ -138993,6 +139000,13 @@ function App() {
           </button>
         ))}
       </div>
+      {tab !== "home" && (
+        <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
+          aria-label="Back to top"
+          style={{ position: "fixed", right: 16, bottom: 16, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          ↑ {lang === "en" ? "Top" : "トップへ"}
+        </button>
+      )}
       <div style={{ padding: 16, maxWidth: 820, margin: "0 auto" }}>
         {tab === "home" && <Home state={state} lang={lang} t={t} />}
         {tab === "quiz" && <Quiz onAnswer={record} lang={lang} t={t} />}
@@ -142973,6 +142987,13 @@ function App() {
           </button>
         ))}
       </div>
+      {tab !== "home" && (
+        <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
+          aria-label="Back to top"
+          style={{ position: "fixed", right: 16, bottom: 16, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          ↑ {lang === "en" ? "Top" : "トップへ"}
+        </button>
+      )}
       <div style={{ padding: 16, maxWidth: 820, margin: "0 auto" }}>
         {tab === "home" && <Home state={state} lang={lang} t={t} />}
         {tab === "quiz" && <Quiz onAnswer={record} lang={lang} t={t} />}
@@ -146002,6 +146023,13 @@ function App() {
           </button>
         ))}
       </div>
+      {tab !== "home" && (
+        <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
+          aria-label="Back to top"
+          style={{ position: "fixed", right: 16, bottom: 16, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          ↑ {lang === "en" ? "Top" : "トップへ"}
+        </button>
+      )}
       <div style={{ padding: 16, maxWidth: 820, margin: "0 auto" }}>
         {tab === "home" && <Home state={state} lang={lang} />}
         {tab === "quiz" && <Quiz onAnswer={record} lang={lang} />}
@@ -148135,6 +148163,13 @@ function App() {
           </button>
         ))}
       </div>
+      {tab !== "home" && (
+        <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
+          aria-label="Back to top"
+          style={{ position: "fixed", right: 16, bottom: 16, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          ↑ トップへ
+        </button>
+      )}
       <div style={{ padding: 16, maxWidth: 820, margin: "0 auto" }}>
         {tab === "home" && <Home state={state} t={t} />}
         {tab === "quiz" && <Quiz onAnswer={record} t={t} questions={ALL_QUESTIONS} />}
@@ -149763,6 +149798,13 @@ function App() {
           </button>
         ))}
       </div>
+      {tab !== "home" && (
+        <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
+          aria-label="Back to top"
+          style={{ position: "fixed", right: 16, bottom: 16, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          ↑ {lang === "en" ? "Top" : "トップへ"}
+        </button>
+      )}
       <div style={{ padding: 16, maxWidth: 820, margin: "0 auto" }}>
         {tab === "home" && <Home state={state} lang={lang} t={t} />}
         {tab === "quiz" && <Quiz onAnswer={record} lang={lang} t={t} />}
@@ -149874,12 +149916,12 @@ function Quiz({ onAnswer, lang, t }) {
 
   useEffect(() => { setOrder(pool); setPos(0); setSel(null); setAnsweredMap({}); }, [pool]);
 
-  if (order.length === 0) return null;
   const poolCount = order.length;
-  const qi = order[pos];
-  const Q = BANK[qi];
-  // 選択肢をシャッフル（クイズはsalt="quiz"+session）
-  const sc = useMemo(() => shuffleChoices(Q, lang, "quiz" + sessionSalt), [Q, lang, sessionSalt]);
+  const qi = order.length ? order[pos] : -1;
+  const Q = qi >= 0 ? BANK[qi] : null;
+  // 選択肢をシャッフル（クイズはsalt="quiz"+session）。フックは早期returnより前で必ず呼ぶ。
+  const sc = useMemo(() => (Q ? shuffleChoices(Q, lang, "quiz" + sessionSalt) : { opts: [], answer: -1 }), [Q, lang, sessionSalt]);
+  if (order.length === 0) return null;
   const opts = sc.opts;
   const ans = sc.answer;
 
@@ -151490,6 +151532,13 @@ function App() {
           </button>
         ))}
       </div>
+      {tab !== "home" && (
+        <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
+          aria-label="Back to top"
+          style={{ position: "fixed", right: 16, bottom: 16, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          ↑ {lang === "en" ? "Top" : "トップへ"}
+        </button>
+      )}
       <div style={{ padding: 16, maxWidth: 820, margin: "0 auto" }}>
         {tab === "home" && <Home state={state} lang={lang} t={t} reviewCount={review.length} />}
         {tab === "quiz" && <Quiz onAnswer={record} lang={lang} t={t} />}
