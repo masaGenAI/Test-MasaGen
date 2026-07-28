@@ -125800,6 +125800,106 @@ function extractJSON(raw) {
 // ============ 模擬面接モード ============
 // 口頭試問(図面ノード)・設計判断(VERSUS)・逆質問(REVERSE_Q)・概算(DRILLS)を織り交ぜた連続面接。
 // 各問で受験者の回答をAI(callClaude)が面接官として講評する。
+// AWS AI Solutions Architect 面接 必答テーマ（モデル解答つき）
+const SA_INTERVIEW_QA = [
+  {
+    q: "生成AIとは何か？",
+    qEn: "What is generative AI?",
+    tldr: "大量のデータで事前学習した基盤モデルが、入力（プロンプト）に対して確率的に次のトークンを予測し、文章・画像・コードなどの新しいコンテンツを『生成』する技術です。",
+    tldrEn: "Foundation models pretrained on large corpora predict the next token probabilistically from a prompt and thereby generate new content — text, images, code — rather than only classifying existing data.",
+    sections: [
+      { h: "従来AIとの違い", hEn: "vs. traditional AI", t: "従来の識別系AIは『分類・予測（スパムか否か等）』が中心でしたが、生成AIは学習した分布から新しい出力を作り出します。中核はTransformerアーキテクチャで、自己注意により文脈を捉え、自己回帰的にトークンを生成します。", tEn: "Traditional discriminative AI mainly classifies or predicts (e.g., spam or not). Generative AI samples new outputs from a learned distribution. The core is the Transformer architecture, using self-attention to capture context and generating tokens autoregressively." },
+      { h: "基盤モデル", hEn: "Foundation models", t: "巨大データで事前学習した汎用モデル（LLM/マルチモーダル）を、プロンプトや少量の適応で多様なタスクに転用できる点が特徴です。例：Claude、Amazon Titan/Nova、Stable Diffusion。", tEn: "General-purpose models pretrained on massive data (LLMs/multimodal) can be adapted to many tasks via prompting or light tuning. Examples: Claude, Amazon Titan/Nova, Stable Diffusion." },
+      { h: "SAとしての話し方", hEn: "How an SA frames it", t: "『要約・生成・対話・抽出・コード化』といった業務価値に翻訳し、AWSではAmazon Bedrockでこれら基盤モデルをマネージドに利用できる、と結びつけます。", tEn: "Translate it into business value — summarize, generate, converse, extract, code — and connect to AWS: Amazon Bedrock provides managed access to these foundation models." },
+    ],
+  },
+  {
+    q: "RAGとは何か？",
+    qEn: "What is RAG?",
+    tldr: "Retrieval-Augmented Generation。生成時に外部知識（社内文書など）をベクトル検索で取得し、根拠としてプロンプトに与えて回答させる手法です。モデルの知識の古さや幻覚を抑え、最新・独自情報に基づく回答と出典提示を可能にします。",
+    tldrEn: "Retrieval-Augmented Generation retrieves external knowledge (e.g., internal documents) via vector search at inference time and injects it into the prompt as grounding, reducing stale knowledge and hallucination while enabling up-to-date, source-cited answers.",
+    sections: [
+      { h: "仕組み", hEn: "How it works", t: "①文書をチャンク分割し埋め込み（ベクトル化）②ベクトルDBに格納 ③質問を埋め込み類似検索で関連チャンクを取得 ④（必要に応じ再ランク）⑤取得文をコンテキストとしてプロンプトに注入し生成。回答に出典を付けられます。", tEn: "1) Chunk documents and embed them, 2) store in a vector DB, 3) embed the query and retrieve relevant chunks by similarity, 4) optionally re-rank, 5) inject retrieved text into the prompt as context and generate — with citations." },
+      { h: "AWSでの実装", hEn: "On AWS", t: "Amazon Bedrock Knowledge Bases、ベクトルストアにOpenSearch Serverlessやpgvector(Aurora)、あるいはAmazon Kendraを組み合わせます。", tEn: "Amazon Bedrock Knowledge Bases with a vector store such as OpenSearch Serverless or pgvector (Aurora), or Amazon Kendra for managed retrieval." },
+      { h: "fine-tuningとの違い", hEn: "vs. fine-tuning", t: "RAGは『知識の注入』（何を知っているか）に強く、更新が容易で出典を示せます。fine-tuningは『振る舞い・形式・文体の適応』（どう答えるか）に向きます。頻繁に変わる社内知識にはRAGが第一候補です。", tEn: "RAG injects knowledge (what the model knows), is easy to update, and can cite sources. Fine-tuning adapts behavior/format/style (how it answers). For frequently changing internal knowledge, RAG is the first choice." },
+    ],
+  },
+  {
+    q: "fine tuningとは何か？",
+    qEn: "What is fine-tuning?",
+    tldr: "事前学習済みモデルに追加の教師データで再学習を行い、特定タスク・ドメイン・出力形式・文体にモデルの重みを適応させる手法です。『知識』より『振る舞い』を固定したいときに有効です。",
+    tldrEn: "Continuing to train a pretrained model on additional labeled data to adapt its weights to a specific task, domain, output format, or style. It is most useful for fixing behavior rather than injecting knowledge.",
+    sections: [
+      { h: "手法とコスト", hEn: "Methods and cost", t: "全パラメータ更新のfull fine-tuningと、LoRA等のPEFT（一部のみ更新で低コスト）があります。良質な教師データの準備が要で、過学習や破滅的忘却に注意します。", tEn: "Full fine-tuning updates all parameters; PEFT methods like LoRA update only a subset at lower cost. It requires quality labeled data and care against overfitting and catastrophic forgetting." },
+      { h: "いつ使うか", hEn: "When to use", t: "専門的な文体・一貫した出力形式・独自の分類/タグ付けなど、プロンプトやRAGでは安定させにくい『振る舞い』を定着させたいときです。まずプロンプト→RAG→fine-tuningの順で検討するのが定石です。", tEn: "When you must lock in behavior — specialized tone, consistent output format, bespoke classification — that prompting or RAG cannot stabilize. The rule of thumb is to try prompting first, then RAG, then fine-tuning." },
+      { h: "AWSでの実装", hEn: "On AWS", t: "Amazon BedrockのカスタムモデルやSageMakerでのファインチューニング。運用では専用スループットやバージョン管理・評価を考慮します。", tEn: "Custom models in Amazon Bedrock or fine-tuning on SageMaker; in production, consider provisioned throughput, versioning, and evaluation." },
+    ],
+  },
+  {
+    q: "生成AIを活用したい・作りたいというお客様の相談にどう説明するか？",
+    qEn: "How do you advise a customer who wants to adopt or build generative AI?",
+    tldr: "『何を作るか』より先に『どの課題を、どのKPIで解くか』から入り、データと制約を確認し、最小構成（プロンプト→RAG→fine-tuning→エージェント）から段階的に、PoCで評価し、セキュリティ・運用・コストまで見据えて本番化する——というSAの型で説明します。",
+    tldrEn: "Start from the problem and KPI, not the tech: clarify the use case, check data and constraints, choose the minimal approach first (prompt → RAG → fine-tuning → agents), validate with a PoC against metrics, and design for security, operations, and cost on the path to production.",
+    sections: [
+      { h: "①課題とKPIの明確化", hEn: "1) Frame the problem and KPI", t: "ユースケース・対象業務・期待効果を定義し、成功指標（工数削減、応答時間、正確率など）を先に合意します。生成AIありきにしません。", tEn: "Define the use case and expected impact, and agree on success metrics (effort saved, latency, accuracy) up front — not 'AI for its own sake'." },
+      { h: "②データと制約の確認", hEn: "2) Assess data and constraints", t: "利用可能なデータ、機密・個人情報・規制、レイテンシ、コスト上限を確認します。ここで実現方式が決まります。", tEn: "Review available data, confidentiality/PII/regulation, latency, and cost ceilings — these determine the viable approach." },
+      { h: "③方式は段階的に", hEn: "3) Escalate the approach", t: "まずプロンプト設計、次に社内知識が必要ならRAG、振る舞いを固定したいならfine-tuning、複数手順の自動化ならエージェント（Bedrock Agents）。過剰設計を避けます。", tEn: "Prompting first; RAG when internal knowledge is needed; fine-tuning to lock behavior; agents (Bedrock Agents) for multi-step automation. Avoid over-engineering." },
+      { h: "④PoC→⑤本番化", hEn: "4) PoC → 5) Productionize", t: "評価データで効果を検証し、合格後にセキュリティ（Guardrails/IAM/暗号化）、監視・ログ、コスト最適化、責任あるAIまで作り込みます。幻覚やPIIのリスクも正直に共有します。", tEn: "Validate with an evaluation set; then build in security (Guardrails/IAM/encryption), monitoring/logging, cost optimization, and responsible AI. Be candid about hallucination and PII risks." },
+    ],
+  },
+  {
+    q: "生成AIの非決定的な出力に対して、精度はどのように担保するか？",
+    qEn: "How do you ensure accuracy given generative AI's non-deterministic output?",
+    tldr: "非決定性はサンプリング（temperature等）に由来します。精度は単一の施策ではなく、『設計・根拠・検証・運用』の多層で管理します。100%決定論を目指すのではなく、ユースケースのリスクに応じて許容誤差内に収める設計思想が要点です。",
+    tldrEn: "Non-determinism comes from sampling (temperature, etc.). Accuracy is managed in layers — design, grounding, validation, operations — not by a single lever. The mindset is not 100% determinism but keeping error within tolerance appropriate to the use case's risk.",
+    sections: [
+      { h: "設計（入力側）", hEn: "Design (inputs)", t: "温度を下げる、明確で制約付きのプロンプト、few-shot例示、JSON/スキーマによる構造化出力で揺れを抑えます。厳密な計算やルールは決定論的な処理（ツール/コード）に委ねます。", tEn: "Lower temperature, use clear constrained prompts, few-shot examples, and structured output (JSON/schema). Delegate exact calculations and rules to deterministic tools/code." },
+      { h: "根拠（グラウンディング）", hEn: "Grounding", t: "RAGで信頼できる情報源に基づかせ、出典を提示。Bedrock Guardrailsで禁止トピック・PII・逸脱を制御します。", tEn: "Ground answers in trusted sources via RAG with citations, and use Bedrock Guardrails to control prohibited topics, PII, and off-scope behavior." },
+      { h: "検証", hEn: "Validation", t: "出力の自動バリデーション（形式・値域）、高リスク判断は人間の確認（HITL）を挟みます。", tEn: "Validate outputs automatically (format, ranges) and insert human-in-the-loop review for high-risk decisions." },
+      { h: "評価と運用", hEn: "Evaluation and operations", t: "評価データセットで正確性・忠実性を定量評価（LLM-as-judgeやモデル評価）、本番はログ・フィードバック・A/Bで継続監視し改善します。『測って直す』ループを回すのがSAの担保です。", tEn: "Quantitatively evaluate accuracy/faithfulness with an evaluation set (LLM-as-judge or model evaluation), and in production keep monitoring via logs, feedback, and A/B testing. The SA's real guarantee is a measure-and-improve loop." },
+    ],
+  },
+];
+
+function SAInterviewPrep() {
+  const lang = useLang();
+  const en = lang === "en";
+  const [open, setOpen] = useState(0);
+  return (
+    <Card style={{ borderColor: C.gold, marginBottom: 16 }}>
+      <div className="gh-display" style={{ fontSize: 16, color: C.gold, marginBottom: 4 }}>{en ? "AWS AI Solutions Architect — Must-Answer Themes" : "AWS AI Solutions Architect 面接 必答テーマ"}</div>
+      <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.7, marginBottom: 12 }}>{en ? "Model answers to the core technical questions an AI SA interview asks. Read the one-liner first, then the supporting points." : "AI SA面接で問われる技術的な必答テーマのモデル解答です。まず一言（結論）を押さえ、続けて要点を確認してください。"}</div>
+      <div style={{ display: "grid", gap: 8 }}>
+        {SA_INTERVIEW_QA.map((it, i) => {
+          const isOpen = open === i;
+          return (
+            <div key={i} style={{ border: `1px solid ${isOpen ? C.gold : C.line}`, borderRadius: 8, overflow: "hidden" }}>
+              <button onClick={() => setOpen(isOpen ? -1 : i)}
+                style={{ width: "100%", textAlign: "left", background: isOpen ? C.surface2 : "transparent", border: "none", cursor: "pointer", padding: "11px 13px", color: C.text, fontSize: 13.5, fontWeight: 700, display: "flex", justifyContent: "space-between", gap: 10 }}>
+                <span>{`Q${i + 1}. `}{en ? it.qEn : it.q}</span>
+                <span style={{ color: C.gold }}>{isOpen ? "−" : "+"}</span>
+              </button>
+              {isOpen && (
+                <div style={{ padding: "4px 13px 13px" }}>
+                  <div style={{ background: C.surface2, borderLeft: `3px solid ${C.gold}`, borderRadius: 6, padding: "9px 11px", fontSize: 12.5, lineHeight: 1.7, color: C.text, marginBottom: 10 }}>
+                    <span style={{ color: C.gold, fontWeight: 700, marginRight: 6 }}>{en ? "In one line:" : "一言で:"}</span>{en ? it.tldrEn : it.tldr}
+                  </div>
+                  {it.sections.map((s, k) => (
+                    <div key={k} style={{ marginBottom: 8 }}>
+                      <div style={{ fontSize: 11, color: C.teal, fontWeight: 700, marginBottom: 2 }}>{en ? s.hEn : s.h}</div>
+                      <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.7 }}>{en ? s.tEn : s.t}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </Card>
+  );
+}
+
 function MockInterview() {
   const lang = useLang();
   const en = lang === "en";
@@ -125922,6 +126022,7 @@ function MockInterview() {
   if (!session) {
     return (
       <div>
+        <SAInterviewPrep />
         <div style={{ fontSize: 12, color: C.muted, marginBottom: 14, lineHeight: 1.8 }}>{t(lang, "mock_intro")}</div>
         <div style={{ fontSize: 11, color: C.gold, marginBottom: 8 }}>{t(lang, "mock_len_label")}</div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
