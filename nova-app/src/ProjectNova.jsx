@@ -116737,7 +116737,7 @@ const UI = {
   d_industry: ["業界別パターン", "Industry"],
   d_versus: ["設計判断バトル", "Trade-offs"],
   d_drills: ["概算ドリル", "Estimation"],
-  d_mock: ["模擬面接", "Mock Interview"],
+  d_mock: ["面接道場", "Interview Dojo"],
   d_devlang: ["開発・言語道場", "Dev & Languages"],
   d_cloud: ["クラウド道場", "Cloud Dojo"],
   // 開発・言語道場
@@ -126828,6 +126828,7 @@ function MockInterview() {
     return (
       <div>
         <SAInterviewPrep />
+        <div className="gh-display" style={{ fontSize: 15, color: C.gold, margin: "20px 0 4px", paddingTop: 16, borderTop: `1px solid ${C.line}` }}>{lang === "en" ? "AI Mock Interview" : "AI模擬面接"}</div>
         <div style={{ fontSize: 12, color: C.muted, marginBottom: 14, lineHeight: 1.8 }}>{t(lang, "mock_intro")}</div>
         <div style={{ fontSize: 11, color: C.gold, marginBottom: 8 }}>{t(lang, "mock_len_label")}</div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
