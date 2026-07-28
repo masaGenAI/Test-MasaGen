@@ -138493,14 +138493,14 @@ function ExamCaseRunner({ cases, lang, onBack }) {
   const clist = Array.isArray(cases) ? cases : [cases];
   const [pick, setPick] = useState(clist.length === 1 ? 0 : null);
   const [qi, setQi] = useState(0);
-  const [sel, setSel] = useState(null);
   const [answers, setAnswers] = useState({});
+  const [finished, setFinished] = useState(false);
 
   const th = { textAlign: "left", padding: "7px 9px", background: "#EDE9E0", color: C.deep, fontSize: 11.5, fontWeight: 700, borderBottom: `1px solid ${C.mid}`, whiteSpace: "nowrap" };
   const td = { padding: "7px 9px", fontSize: 12, borderBottom: `1px solid ${C.mid}`, verticalAlign: "top", lineHeight: 1.45 };
 
-  const openCase = (i) => { setPick(i); setQi(0); setSel(null); setAnswers({}); };
-  const backToList = () => { if (clist.length > 1) { setPick(null); setQi(0); setSel(null); setAnswers({}); } else onBack(); };
+  const openCase = (i) => { setPick(i); setQi(0); setAnswers({}); setFinished(false); };
+  const backToList = () => { if (clist.length > 1) { setPick(null); setQi(0); setAnswers({}); setFinished(false); } else onBack(); };
 
   if (pick === null) {
     return (
@@ -138524,15 +138524,26 @@ function ExamCaseRunner({ cases, lang, onBack }) {
 
   const data = clist[pick];
   const qs = data.questions;
-  const finished = qi >= qs.length;
-  const Q = finished ? null : qs[qi];
-  const choose = (i) => { if (sel !== null) return; setSel(i); setAnswers(a => ({ ...a, [qi]: i })); };
-  const next = () => { setSel(null); setQi(q => q + 1); };
-  const restart = () => { setQi(0); setSel(null); setAnswers({}); };
+  const Q = qs[qi];
+  const sel = answers[qi] != null ? answers[qi] : null;
+  const choose = (i) => { if (sel !== null) return; setAnswers(a => ({ ...a, [qi]: i })); };
+  const prev = () => { if (qi > 0) setQi(qi - 1); };
+  const next = () => { if (qi < qs.length - 1) setQi(qi + 1); };
+  const restart = () => { setQi(0); setAnswers({}); setFinished(false); };
 
   let correct = 0;
   for (let k = 0; k < qs.length; k++) { const a = answers[k]; if (a != null && qs[k].options[a] && qs[k].options[a].ok) correct++; }
+  const answeredCount = Object.keys(answers).length;
   const rate = qs.length ? Math.round((correct / qs.length) * 100) : 0;
+
+  const navBtn = (label, onClick, enabled, primary) => (
+    <button onClick={enabled ? onClick : undefined} disabled={!enabled}
+      style={{ flex: 1, padding: "11px 12px", borderRadius: 9, fontSize: 13.5, fontWeight: 700,
+        cursor: enabled ? "pointer" : "default",
+        border: primary ? "none" : `1.5px solid ${enabled ? C.primary : C.mid}`,
+        background: primary ? (enabled ? C.primary : C.mid) : "#fff",
+        color: primary ? "#fff" : (enabled ? C.primary : "#b9c4d6") }}>{label}</button>
+  );
 
   return (
     <div>
@@ -138567,8 +138578,8 @@ function ExamCaseRunner({ cases, lang, onBack }) {
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
-            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
-            {clist.length > 1 && <button onClick={backToList} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "他のケースへ" : "Other cases"}</button>}
+            <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
+            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
           </div>
         </div>
       ) : (
@@ -138591,9 +138602,14 @@ function ExamCaseRunner({ cases, lang, onBack }) {
                   <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#8595ad") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
                 </div>
               ))}
-              <button onClick={next} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{qi === qs.length - 1 ? (lang === "ja" ? "結果を見る →" : "See result →") : (lang === "ja" ? "次の問題 →" : "Next →")}</button>
             </div>
           )}
+          <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+            {navBtn(lang === "ja" ? "← 前の問題" : "← Previous", prev, qi > 0, false)}
+            {qi < qs.length - 1
+              ? navBtn(lang === "ja" ? "次の問題 →" : "Next →", next, sel !== null, true)
+              : navBtn(lang === "ja" ? "結果を見る →" : "See result →", () => setFinished(true), answeredCount === qs.length, true)}
+          </div>
         </div>
       )}
     </div>
@@ -142570,14 +142586,14 @@ function ExamCaseRunner({ cases, lang, onBack }) {
   const clist = Array.isArray(cases) ? cases : [cases];
   const [pick, setPick] = useState(clist.length === 1 ? 0 : null);
   const [qi, setQi] = useState(0);
-  const [sel, setSel] = useState(null);
   const [answers, setAnswers] = useState({});
+  const [finished, setFinished] = useState(false);
 
   const th = { textAlign: "left", padding: "7px 9px", background: "#EDE9E0", color: C.deep, fontSize: 11.5, fontWeight: 700, borderBottom: `1px solid ${C.mid}`, whiteSpace: "nowrap" };
   const td = { padding: "7px 9px", fontSize: 12, borderBottom: `1px solid ${C.mid}`, verticalAlign: "top", lineHeight: 1.45 };
 
-  const openCase = (i) => { setPick(i); setQi(0); setSel(null); setAnswers({}); };
-  const backToList = () => { if (clist.length > 1) { setPick(null); setQi(0); setSel(null); setAnswers({}); } else onBack(); };
+  const openCase = (i) => { setPick(i); setQi(0); setAnswers({}); setFinished(false); };
+  const backToList = () => { if (clist.length > 1) { setPick(null); setQi(0); setAnswers({}); setFinished(false); } else onBack(); };
 
   if (pick === null) {
     return (
@@ -142601,15 +142617,26 @@ function ExamCaseRunner({ cases, lang, onBack }) {
 
   const data = clist[pick];
   const qs = data.questions;
-  const finished = qi >= qs.length;
-  const Q = finished ? null : qs[qi];
-  const choose = (i) => { if (sel !== null) return; setSel(i); setAnswers(a => ({ ...a, [qi]: i })); };
-  const next = () => { setSel(null); setQi(q => q + 1); };
-  const restart = () => { setQi(0); setSel(null); setAnswers({}); };
+  const Q = qs[qi];
+  const sel = answers[qi] != null ? answers[qi] : null;
+  const choose = (i) => { if (sel !== null) return; setAnswers(a => ({ ...a, [qi]: i })); };
+  const prev = () => { if (qi > 0) setQi(qi - 1); };
+  const next = () => { if (qi < qs.length - 1) setQi(qi + 1); };
+  const restart = () => { setQi(0); setAnswers({}); setFinished(false); };
 
   let correct = 0;
   for (let k = 0; k < qs.length; k++) { const a = answers[k]; if (a != null && qs[k].options[a] && qs[k].options[a].ok) correct++; }
+  const answeredCount = Object.keys(answers).length;
   const rate = qs.length ? Math.round((correct / qs.length) * 100) : 0;
+
+  const navBtn = (label, onClick, enabled, primary) => (
+    <button onClick={enabled ? onClick : undefined} disabled={!enabled}
+      style={{ flex: 1, padding: "11px 12px", borderRadius: 9, fontSize: 13.5, fontWeight: 700,
+        cursor: enabled ? "pointer" : "default",
+        border: primary ? "none" : `1.5px solid ${enabled ? C.primary : C.mid}`,
+        background: primary ? (enabled ? C.primary : C.mid) : "#fff",
+        color: primary ? "#fff" : (enabled ? C.primary : "#b9c4d6") }}>{label}</button>
+  );
 
   return (
     <div>
@@ -142644,8 +142671,8 @@ function ExamCaseRunner({ cases, lang, onBack }) {
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
-            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
-            {clist.length > 1 && <button onClick={backToList} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "他のケースへ" : "Other cases"}</button>}
+            <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
+            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
           </div>
         </div>
       ) : (
@@ -142668,9 +142695,14 @@ function ExamCaseRunner({ cases, lang, onBack }) {
                   <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#8595ad") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
                 </div>
               ))}
-              <button onClick={next} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{qi === qs.length - 1 ? (lang === "ja" ? "結果を見る →" : "See result →") : (lang === "ja" ? "次の問題 →" : "Next →")}</button>
             </div>
           )}
+          <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+            {navBtn(lang === "ja" ? "← 前の問題" : "← Previous", prev, qi > 0, false)}
+            {qi < qs.length - 1
+              ? navBtn(lang === "ja" ? "次の問題 →" : "Next →", next, sel !== null, true)
+              : navBtn(lang === "ja" ? "結果を見る →" : "See result →", () => setFinished(true), answeredCount === qs.length, true)}
+          </div>
         </div>
       )}
     </div>
@@ -145526,14 +145558,14 @@ function ExamCaseRunner({ cases, lang, onBack }) {
   const clist = Array.isArray(cases) ? cases : [cases];
   const [pick, setPick] = useState(clist.length === 1 ? 0 : null);
   const [qi, setQi] = useState(0);
-  const [sel, setSel] = useState(null);
   const [answers, setAnswers] = useState({});
+  const [finished, setFinished] = useState(false);
 
   const th = { textAlign: "left", padding: "7px 9px", background: "#EDE9E0", color: C.deep, fontSize: 11.5, fontWeight: 700, borderBottom: `1px solid ${C.mid}`, whiteSpace: "nowrap" };
   const td = { padding: "7px 9px", fontSize: 12, borderBottom: `1px solid ${C.mid}`, verticalAlign: "top", lineHeight: 1.45 };
 
-  const openCase = (i) => { setPick(i); setQi(0); setSel(null); setAnswers({}); };
-  const backToList = () => { if (clist.length > 1) { setPick(null); setQi(0); setSel(null); setAnswers({}); } else onBack(); };
+  const openCase = (i) => { setPick(i); setQi(0); setAnswers({}); setFinished(false); };
+  const backToList = () => { if (clist.length > 1) { setPick(null); setQi(0); setAnswers({}); setFinished(false); } else onBack(); };
 
   if (pick === null) {
     return (
@@ -145557,15 +145589,26 @@ function ExamCaseRunner({ cases, lang, onBack }) {
 
   const data = clist[pick];
   const qs = data.questions;
-  const finished = qi >= qs.length;
-  const Q = finished ? null : qs[qi];
-  const choose = (i) => { if (sel !== null) return; setSel(i); setAnswers(a => ({ ...a, [qi]: i })); };
-  const next = () => { setSel(null); setQi(q => q + 1); };
-  const restart = () => { setQi(0); setSel(null); setAnswers({}); };
+  const Q = qs[qi];
+  const sel = answers[qi] != null ? answers[qi] : null;
+  const choose = (i) => { if (sel !== null) return; setAnswers(a => ({ ...a, [qi]: i })); };
+  const prev = () => { if (qi > 0) setQi(qi - 1); };
+  const next = () => { if (qi < qs.length - 1) setQi(qi + 1); };
+  const restart = () => { setQi(0); setAnswers({}); setFinished(false); };
 
   let correct = 0;
   for (let k = 0; k < qs.length; k++) { const a = answers[k]; if (a != null && qs[k].options[a] && qs[k].options[a].ok) correct++; }
+  const answeredCount = Object.keys(answers).length;
   const rate = qs.length ? Math.round((correct / qs.length) * 100) : 0;
+
+  const navBtn = (label, onClick, enabled, primary) => (
+    <button onClick={enabled ? onClick : undefined} disabled={!enabled}
+      style={{ flex: 1, padding: "11px 12px", borderRadius: 9, fontSize: 13.5, fontWeight: 700,
+        cursor: enabled ? "pointer" : "default",
+        border: primary ? "none" : `1.5px solid ${enabled ? C.primary : C.mid}`,
+        background: primary ? (enabled ? C.primary : C.mid) : "#fff",
+        color: primary ? "#fff" : (enabled ? C.primary : "#b9c4d6") }}>{label}</button>
+  );
 
   return (
     <div>
@@ -145600,8 +145643,8 @@ function ExamCaseRunner({ cases, lang, onBack }) {
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
-            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
-            {clist.length > 1 && <button onClick={backToList} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "他のケースへ" : "Other cases"}</button>}
+            <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
+            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
           </div>
         </div>
       ) : (
@@ -145624,9 +145667,14 @@ function ExamCaseRunner({ cases, lang, onBack }) {
                   <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#8595ad") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
                 </div>
               ))}
-              <button onClick={next} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{qi === qs.length - 1 ? (lang === "ja" ? "結果を見る →" : "See result →") : (lang === "ja" ? "次の問題 →" : "Next →")}</button>
             </div>
           )}
+          <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+            {navBtn(lang === "ja" ? "← 前の問題" : "← Previous", prev, qi > 0, false)}
+            {qi < qs.length - 1
+              ? navBtn(lang === "ja" ? "次の問題 →" : "Next →", next, sel !== null, true)
+              : navBtn(lang === "ja" ? "結果を見る →" : "See result →", () => setFinished(true), answeredCount === qs.length, true)}
+          </div>
         </div>
       )}
     </div>
