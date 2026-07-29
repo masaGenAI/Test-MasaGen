@@ -43,7 +43,7 @@ const TAG_RE = /（[^）]*(?:推奨されない|非推奨|アンチパターン|
 //   domRowQ1 : {D1:[[q, correct, w1, w2, w3, e], ...], ...}（正解は index0）
 //   rowDQOAE : [[d, q, o:[...], a:<idx>, e, ...], ...]
 const STATIONS = [
-  { name: 'Station_CLF', arrays: [['SET1','obj'],['SET2','obj'],['SET3','obj'],['SET4','obj'],['MOCK1','obj'],['MOCK2','obj'],['MOCK3','obj'],['MOCK4','obj']] },
+  { name: 'Station_CLF', arrays: [['SET1','obj'],['SET2','obj'],['SET3','obj'],['SET4','obj'],['SET5','obj'],['MOCK1','obj'],['MOCK2','obj'],['MOCK3','obj'],['MOCK4','obj'],['MOCK5','obj']] },
   { name: 'Station_SAA', arrays: [['BANK_D1','obj'],['BANK_D2','obj'],['BANK_D3','obj'],['BANK_D4','obj'],['EXAM_SET1','obj'],['EXAM_SET2','obj'],['EXAM_SET3','obj'],['EXAM_SET4','obj'],['EXAM_SET5','obj']] },
   { name: 'Station_CCAF', arrays: [['BANK','obj'],['EXTRA','obj'],['SET1','obj'],['SET2','obj'],['SET3','obj'],['SET4','obj'],['SCEN_BANK','obj']] },
   { name: 'Station_AICX', arrays: [['EXAM_POOL','domRowQ1'],['QUIZ_EXTRA','domRowQ1']] },
