@@ -154119,6 +154119,1548 @@ function Glossary({ lang, t }) {
 return App;
 })();
 
+const Station_GH900 = (function(){
+
+// ===== テーマカラー（青/水色基調）=====
+const C = {
+  primary: "#24292F", deep: "#1B1F24", light: "#F0F3F6", mid: "#D0D7DE",
+  ink: "#1F2328", ok: "#1A7F37", ng: "#CF222E", accent: "#2DA44E",
+};
+
+const DOMAINS = [
+  { id: "D1", name: "Git と GitHub の基礎", nameEn: "Understand Git & GitHub basics", pct: 28, range: "25–30%", hue: "#1F2328" },
+  { id: "D2", name: "GitHubリポジトリの操作", nameEn: "Work with GitHub repositories", pct: 13, range: "10–15%", hue: "#2DA44E" },
+  { id: "D3", name: "GitHubでのコラボレーション", nameEn: "Collaborate using GitHub", pct: 13, range: "10–15%", hue: "#0969DA" },
+  { id: "D4", name: "モダン開発プラクティス", nameEn: "Apply modern development practices", pct: 13, range: "10–15%", hue: "#8250DF" },
+  { id: "D5", name: "GitHubでのプロジェクト管理", nameEn: "Manage projects with GitHub", pct: 8, range: "5–10%", hue: "#BF3989" },
+  { id: "D6", name: "プライバシー・セキュリティ・管理", nameEn: "Privacy, security & administration", pct: 13, range: "10–15%", hue: "#CF222E" },
+  { id: "D7", name: "GitHubコミュニティ", nameEn: "Explore the GitHub community", pct: 8, range: "5–10%", hue: "#BC4C00" },
+];
+const DOM_NAME = Object.fromEntries(DOMAINS.map(d => [d.id, d.name]));
+const DOM_NAME_EN = Object.fromEntries(DOMAINS.map(d => [d.id, d.nameEn]));
+const DOM_HUE = Object.fromEntries(DOMAINS.map(d => [d.id, d.hue]));
+
+const PASS = 70;
+const STORE_KEY = "gh900_study_v1";
+const REVIEW_KEY = "gh900_review_v1";
+
+const T = {
+  ja: {
+    appTitle: "GH-900 学習ダッシュボード", appSub: "GitHub の基礎（GitHub Foundations）",
+    tabHome: "進捗", tabQuiz: "クイズ", tabExam: "模擬試験", tabDiagram: "図解", tabCompare: "比較表", tabConfuse: "混同", tabGlossary: "用語集",
+    compareSearch: "比較表を検索...",
+    loading: "読み込み中...",
+    overallRate: "総合正答率", questionsUnit: "問",
+    domMastery: "ドメイン別 習熟度（公式比率）", notStarted: "未着手",
+    weakDomains: "苦手ドメイン（正答率の低い順）",
+    allFields: "全分野",
+    correct: "正解", incorrect: "不正解", answerIs: (l) => `正解は${l}。`, nextQ: "次の問題 →",
+    examTitle: "模擬試験 — 各65問・本番相当の長文シナリオ",
+    examDesc: `本番同様の65問構成（D1:20 / D2:9 / D3:8 / D4:8 / D5:5 / D6:10 / D7:5）。各問は本番相当のシナリオ形式です。合格ラインは700点（${PASS}%相当）。選択肢は毎回シャッフルされます。ドメイン重点では分野別に集中演習できます。`,
+    setLabel: "セット", start: "開始 →", preparing: "準備中", setsNote: "※ セット1〜5（本番相当の長文シナリオ）", kindNormal: "通常セット", kindDomain: "ドメイン重点", domainSetCount: (n) => `${n}問`,
+    result: "結果", reachedPass: "合格ライン到達", needMore: (n) => `あと${n}ポイント`, correctOf: (c, t) => `${c}/${t}問正解`,
+    domBreakdown: "ドメイン別内訳", wrongTitle: (n) => `間違えた問題（${n}問）`, allCorrect: "全問正解です。",
+    yourAnswer: "あなたの解答", answer: "正解", retrySet: "このセットを再挑戦", toSetSelect: "セット選択へ",
+    seeResult: "結果を見る →", questionNo: (n, t) => `第${n}問 / ${t}`, scoreSoFar: "正答",
+    diagIntro: "各図はタップ・操作できます。要素を選ぶと詳しい解説が出ます。デフォルトは全て閉じています。",
+    confuseSearch: "混同ポイントを検索...", judgeAxis: "判断軸", noMatch: "該当なし",
+    glossarySearch: "用語を検索...",
+    bankCount: (n) => `クイズ総数 ${n}問`, examCount: (n) => `模試総数 ${n}問`,
+    countExam: "収録",
+    modePractice: "演習モード", modeExam: "本番モード",
+    modePracticeHint: "1問ごとに正誤と解説を表示", modeExamHint: "最後まで正誤を隠して採点",
+    order: "出題順", orderRandom: "ランダム", orderSeq: "固定順",
+    submitExam: "採点する →",
+    diagCat: { hier: "階層・上下関係", para: "並列関係", flow: "フロー", concept: "概念図" },
+    reviewTab: "復習", reviewTitle: "間違えた問題の復習",
+    reviewEmpty: "復習する問題はありません。模擬試験で間違えた問題がここに溜まります。",
+    reviewCount: (n) => `復習対象 ${n}問`, reviewStart: "復習を始める →",
+    reviewCleared: "正解！復習リストから外しました。", reviewMiss: (n) => `誤答 ${n}回`,
+    reviewToList: "一覧へ戻る",
+    reviewSource: "模試の誤答", addedToReview: "間違えた問題は「復習」タブに保存されました。",
+  },
+  en: {
+    appTitle: "GH-900 Study Dashboard", appSub: "GitHub Foundations",
+    tabHome: "Progress", tabQuiz: "Quiz", tabExam: "Mock Exam", tabDiagram: "Diagrams", tabCompare: "Compare", tabConfuse: "Confusion", tabGlossary: "Glossary",
+    compareSearch: "Search comparison tables...",
+    loading: "Loading...",
+    overallRate: "Overall accuracy", questionsUnit: "Q",
+    domMastery: "Domain mastery (official weights)", notStarted: "Not started",
+    weakDomains: "Weak domains (lowest accuracy first)",
+    allFields: "All",
+    correct: "Correct", incorrect: "Incorrect", answerIs: (l) => `Answer is ${l}.`, nextQ: "Next →",
+    examTitle: "Mock Exam — 65 exam-style scenarios each",
+    examDesc: `Full 65-question format (D1:20 / D2:9 / D3:8 / D4:8 / D5:5 / D6:10 / D7:5). Each item is an exam-style scenario. Passing line is 700 (${PASS}% equivalent). Answer choices are shuffled every time. Domain-focus lets you drill one area at a time.`,
+    setLabel: "Set", start: "Start →", preparing: "Coming soon", setsNote: "* Sets 1–5 (exam-style long scenarios)", kindNormal: "Standard", kindDomain: "Domain focus", domainSetCount: (n) => `${n} Q`,
+    result: "Result", reachedPass: "Passing line reached", needMore: (n) => `${n} points to go`, correctOf: (c, t) => `${c}/${t} correct`,
+    domBreakdown: "Domain breakdown", wrongTitle: (n) => `Missed questions (${n})`, allCorrect: "All correct.",
+    yourAnswer: "Your answer", answer: "Answer", retrySet: "Retry this set", toSetSelect: "To set selection",
+    seeResult: "See result →", questionNo: (n, t) => `Q${n} / ${t}`, scoreSoFar: "Score",
+    diagIntro: "Each diagram is tappable. Select an element for a detailed explanation. All sections start collapsed.",
+    confuseSearch: "Search confusion points...", judgeAxis: "Key axis", noMatch: "No match",
+    glossarySearch: "Search terms...",
+    bankCount: (n) => `${n} quiz questions`, examCount: (n) => `${n} mock questions`,
+    countExam: "Loaded",
+    modePractice: "Practice mode", modeExam: "Exam mode",
+    modePracticeHint: "Show correctness & explanation per question", modeExamHint: "Hide correctness until the end, then score",
+    order: "Order", orderRandom: "Random", orderSeq: "Fixed",
+    submitExam: "Submit →",
+    diagCat: { hier: "Hierarchy / order", para: "Parallel", flow: "Flow", concept: "Concept" },
+    reviewTab: "Review", reviewTitle: "Review missed questions",
+    reviewEmpty: "No questions to review. Questions you miss in mock exams collect here.",
+    reviewCount: (n) => `${n} to review`, reviewStart: "Start review →",
+    reviewCleared: "Correct! Removed from the review list.", reviewMiss: (n) => `Missed ${n}x`,
+    reviewToList: "Back to list",
+    reviewSource: "Mock exam misses", addedToReview: "Missed questions were saved to the Review tab.",
+  },
+};
+
+// ===== 問題バンク（クイズ用・抜粋。全問は元データを保持）=====
+// 注: 元の全BANK配列をそのまま保持
+const BANK = [{"d":"D1","q":"バージョン管理システムを使う主な利点として、最も適切に説明しているものはどれですか。","o":["ファイルの変更履歴を記録し以前の状態へ復元できる","コードを自動的にコンパイルし実行ファイルを生成する","サーバーの負荷を分散し可用性を高める","データベースのクエリ速度を最適化する"],"a":0,"e":"バージョン管理は変更履歴を追跡し、過去の任意の時点へ復元できることが最大の利点です。コンパイルや負荷分散は目的ではありません。","qEn":"Which statement best describes a primary benefit of using a version control system?","oEn":["It records file change history and lets you restore prior states","It automatically compiles code into executable files","It distributes server load to improve availability","It optimizes database query performance"],"eEn":"Version control's main benefit is tracking change history and restoring any earlier state. Compilation and load balancing are not its purpose."},{"d":"D1","q":"Git と GitHub の関係を最も正確に述べているものはどれですか。","o":["Git は GitHub の有料プランでのみ使える機能である","Git は分散バージョン管理システム、GitHub はそれを利用するホスティングサービスである","GitHub は分散バージョン管理システム本体である","両者は同一の製品で名称だけが異なる"],"a":1,"e":"Git はローカルで動く分散バージョン管理システムであり、GitHub はGitリポジトリをクラウドでホストしコラボレーションを支えるサービスです。","qEn":"Which statement most accurately describes the relationship between Git and GitHub?","oEn":["Git is a feature available only in GitHub's paid plans","Git is a distributed version control system; GitHub is a hosting service that uses it","GitHub is the distributed version control system itself","They are the same product with different names"],"eEn":"Git is a distributed version control system that runs locally, while GitHub is a service that hosts Git repositories in the cloud and enables collaboration."},{"d":"D1","q":"Git における「コミット（commit）」を最も正しく説明しているものはどれですか。","o":["リモートサーバーへ変更を送信する操作","他人の変更を取り込む操作","ある時点のスナップショットを履歴として記録する操作","作業を一時的に退避させる操作"],"a":2,"e":"コミットは変更内容をリポジトリ履歴にスナップショットとして記録する操作です。リモートへの送信は push、退避は stash です。","qEn":"Which best describes a 'commit' in Git?","oEn":["Sending changes to a remote server","Pulling in another person's changes","Recording a snapshot of a point in time into history","Temporarily setting work aside"],"eEn":"A commit records changes as a snapshot in the repository history. Sending to remote is push; setting work aside is stash."},{"d":"D1","q":"Git のブランチ（branch）を使う目的として最も適切なものはどれですか。","o":["リポジトリの容量を圧縮するため","ファイルの文字コードを変換するため","コミット履歴を完全に削除するため","メイン作業から独立して並行に開発を進めるため"],"a":3,"e":"ブランチは本流から分岐して独立した作業ラインを作り、並行開発や実験を安全に行うための仕組みです。","qEn":"What is the main purpose of using a branch in Git?","oEn":["To compress the repository size","To convert file character encodings","To completely delete commit history","To develop in parallel independently from the main line"],"eEn":"A branch creates an independent line of work diverging from the mainline, enabling safe parallel development and experimentation."},{"d":"D1","q":"Git における「リポジトリ（repository）」とは何を指しますか。","o":["プロジェクトのファイルと全変更履歴を保持する保管場所","コードを実行する仮想マシン","ユーザー認証を管理するサーバー","自動テストを実行するツール"],"a":0,"e":"リポジトリはプロジェクトのファイル群とその全変更履歴（コミット）を格納する保管場所です。","qEn":"What does a 'repository' refer to in Git?","oEn":["A store holding a project's files and its full change history","A virtual machine that runs code","A server that manages user authentication","A tool that runs automated tests"],"eEn":"A repository is a store that holds a project's files and their full change history (commits)."},{"d":"D1","q":"「分散バージョン管理システム」の特徴として最も適切なものはどれですか。","o":["履歴は中央サーバーにのみ存在する","各開発者が完全な履歴のコピーをローカルに持つ","オフラインではコミットできない","ブランチ機能を持たない"],"a":1,"e":"分散型では各開発者がリポジトリの完全な複製を持つため、オフラインでもコミットや履歴閲覧が可能です。","qEn":"Which is a characteristic of a 'distributed version control system'?","oEn":["History exists only on a central server","Each developer holds a full copy of the history locally","You cannot commit while offline","It has no branching capability"],"eEn":"In distributed systems each developer has a full clone of the repository, so committing and viewing history work even offline."},{"d":"D1","q":"リモートリポジトリの変更をローカルに取り込んで作業ツリーへ反映する Git コマンドはどれですか。","o":["git push","git init","git pull","git branch"],"a":2,"e":"git pull はリモートの変更を取得（fetch）して現在のブランチへマージします。push は送信、init は初期化です。","qEn":"Which Git command fetches remote changes and applies them to your working tree?","oEn":["git push","git init","git pull","git branch"],"eEn":"git pull fetches remote changes and merges them into the current branch. push sends changes; init initializes a repo."},{"d":"D1","q":"ローカルのコミットをリモートリポジトリへ送信する Git 操作はどれですか。","o":["stash","clone","merge","push"],"a":3,"e":"push はローカルのコミットをリモートリポジトリへアップロードします。clone は複製、merge は統合です。","qEn":"Which Git operation uploads your local commits to a remote repository?","oEn":["stash","clone","merge","push"],"eEn":"push uploads local commits to the remote repository. clone copies a repo; merge integrates branches."},{"d":"D1","q":"既存のリモートリポジトリをローカルへ複製し、履歴ごと取得する Git コマンドはどれですか。","o":["git clone","git copy","git fork","git download"],"a":0,"e":"git clone はリモートリポジトリを履歴も含めてローカルに複製します。fork はGitHub上での複製操作で、Gitコマンドではありません。","qEn":"Which Git command copies an existing remote repository locally, including its history?","oEn":["git clone","git copy","git fork","git download"],"eEn":"git clone copies a remote repository locally including history. fork is a GitHub operation, not a Git command."},{"d":"D1","q":"GitHub Flow における最初の一般的なステップはどれですか。","o":["直接メインブランチへコミットする","作業用のブランチを作成する","本番環境へ即時デプロイする","リポジトリを削除する"],"a":1,"e":"GitHub Flow ではまずメインから作業用ブランチを作り、そこで変更を加えます。メインへの直接コミットは推奨されません。","qEn":"What is a typical first step in GitHub Flow?","oEn":["Commit directly to the main branch","Create a working branch","Immediately deploy to production","Delete the repository"],"eEn":"GitHub Flow starts by creating a working branch off main and making changes there. Committing directly to main is discouraged."},{"d":"D1","q":"GitHub Flow でブランチの変更をメインへ統合するための提案・レビューの仕組みはどれですか。","o":["Issue","Gist","Pull Request","Wiki"],"a":2,"e":"Pull Request（PR）は変更をメインへ統合する前にレビューや議論を行うための仕組みです。Issue は課題追跡用です。","qEn":"In GitHub Flow, which mechanism proposes and reviews merging a branch into main?","oEn":["Issue","Gist","Pull Request","Wiki"],"eEn":"A Pull Request (PR) proposes changes and enables review and discussion before merging into main. Issues track tasks."},{"d":"D1","q":"GitHub の Issue の主な用途として最も適切なものはどれですか。","o":["ソースコードをコンパイルする","支払い情報を管理する","リポジトリをバックアップする","バグ報告やタスク・機能要望を追跡・議論する"],"a":3,"e":"Issue はバグ・タスク・機能要望などの作業項目を記録し、議論や進捗管理を行うための機能です。","qEn":"What is the main use of a GitHub Issue?","oEn":["Compiling source code","Managing billing information","Backing up the repository","Tracking and discussing bugs, tasks, and feature requests"],"eEn":"Issues record work items such as bugs, tasks, and feature requests and enable discussion and progress tracking."},{"d":"D1","q":"GitHub の Issue や Pull Request の説明文で書式を整えるために使われる軽量マークアップ言語はどれですか。","o":["Markdown","XML","YAML","SQL"],"a":0,"e":"GitHub の Issue・PR・コメント・READMEでは Markdown が使われ、見出しやリスト、リンクなどを簡潔に記述できます。","qEn":"Which lightweight markup language is used to format GitHub Issue and Pull Request descriptions?","oEn":["Markdown","XML","YAML","SQL"],"eEn":"GitHub uses Markdown in Issues, PRs, comments, and READMEs to format headings, lists, links, and more concisely."},{"d":"D1","q":"Markdown で見出し（heading）を作成する際に行頭に付ける記号はどれですか。","o":["アスタリスク（*）","ハッシュ（#）","スラッシュ（/）","アットマーク（@）"],"a":1,"e":"Markdown では行頭の # の数で見出しレベルを表します。* はリストや強調、@ はメンションに使われます。","qEn":"In Markdown, which character at the start of a line creates a heading?","oEn":["Asterisk (*)","Hash (#)","Slash (/)","At sign (@)"],"eEn":"In Markdown the number of leading # signs sets the heading level. * is for lists/emphasis; @ is for mentions."},{"d":"D1","q":"Markdown でテキストを太字（bold）にする一般的な書き方はどれですか。","o":["`text`","_text_","**text**","~text~"],"a":2,"e":"二重アスタリスク **text** で太字になります。単一のアンダースコアは斜体、バッククォートはコード表記です。","qEn":"Which is the common way to make text bold in Markdown?","oEn":["`text`","_text_","**text**","~text~"],"eEn":"Double asterisks **text** produce bold. Single underscores make italics; backticks denote inline code."},{"d":"D1","q":"GitHub のコメント本文で他のユーザーへ通知を送る「メンション」の書き方はどれですか。","o":["#username","!username","&username","@username"],"a":3,"e":"@username と書くと対象ユーザーに通知が送られます。#番号 は Issue/PR への参照に使われます。","qEn":"How do you 'mention' another user to notify them in a GitHub comment?","oEn":["#username","!username","&username","@username"],"eEn":"Writing @username notifies that user. #number references an Issue or Pull Request."},{"d":"D1","q":"個人の学習や小規模な個人プロジェクトに最も適した GitHub アカウントの種類はどれですか。","o":["個人（Personal）アカウント","Enterprise アカウント","サービスアカウントのみ","Organization は必須"],"a":0,"e":"個人利用や学習には個人アカウントが適しています。Organization や Enterprise はチームや大規模組織向けです。","qEn":"Which GitHub account type best suits personal learning or a small individual project?","oEn":["Personal account","Enterprise account","Only a service account","Organization is required"],"eEn":"A personal account fits individual use and learning. Organizations and Enterprise are for teams and large organizations."},{"d":"D1","q":"複数人のチームでリポジトリやチーム、権限をまとめて管理するのに適した GitHub の単位はどれですか。","o":["Gist","Organization","個人アカウント単体","Star"],"a":1,"e":"Organization は複数メンバーやチームを束ね、リポジトリと権限を一元管理する単位です。個人アカウントより協働に向いています。","qEn":"Which GitHub unit is suited to managing repositories, teams, and permissions for a group of people?","oEn":["Gist","Organization","A single personal account","Star"],"eEn":"An Organization groups members and teams to centrally manage repositories and permissions, better suited to collaboration than a personal account."},{"d":"D1","q":"複数の Organization をまとめ、大企業向けに一元的な管理・課金・ポリシー適用を行える GitHub の階層はどれですか。","o":["Gist アカウント","Personal アカウント","Enterprise アカウント","Team アカウント"],"a":2,"e":"Enterprise アカウントは複数の Organization を統括し、大規模組織向けの一元管理・課金・ポリシー制御を提供します。","qEn":"Which GitHub tier groups multiple Organizations for centralized management, billing, and policy across a large company?","oEn":["Gist account","Personal account","Enterprise account","Team account"],"eEn":"An Enterprise account oversees multiple Organizations, providing centralized management, billing, and policy control for large organizations."},{"d":"D1","q":"GitHub Desktop はどのようなユーザーに特に役立つツールですか。","o":["スプレッドシートを作りたいユーザー","サーバーを構築したいユーザー","画像を編集したいユーザー","コマンドラインを避けGUIでGit操作をしたいユーザー"],"a":3,"e":"GitHub Desktop はコミットやブランチ操作をGUIで行えるデスクトップアプリで、CLIに不慣れなユーザーに役立ちます。","qEn":"For which users is GitHub Desktop especially helpful?","oEn":["Users who want to make spreadsheets","Users who want to build servers","Users who want to edit images","Users who want a GUI for Git instead of the command line"],"eEn":"GitHub Desktop is a GUI app for commits and branch operations, helpful for users not comfortable with the command line."},{"d":"D1","q":"外出先からスマートフォンで Issue の確認や通知への対応を行いたい場合に適した公式アプリはどれですか。","o":["GitHub Mobile","GitHub Desktop","GitHub CLI","GitHub Pages"],"a":0,"e":"GitHub Mobile はスマートフォン向け公式アプリで、Issue・PRの確認や通知対応を外出先から行えます。","qEn":"Which official app suits checking Issues and responding to notifications from a smartphone on the go?","oEn":["GitHub Mobile","GitHub Desktop","GitHub CLI","GitHub Pages"],"eEn":"GitHub Mobile is the official smartphone app for reviewing Issues and PRs and handling notifications while away from a desk."},{"d":"D1","q":"Pull Request でレビュアーに変更内容や意図を明確に伝えるために最も重要なことはどれですか。","o":["ファイル名をすべて大文字にする","説明文に変更点や背景を明確に記述する","できるだけ多くのコミットに分割する","本文を空欄のままにする"],"a":1,"e":"PRの説明に変更内容・目的・背景を明記することで、レビュアーが意図を理解しやすくなり円滑な協働につながります。","qEn":"What matters most for clearly communicating changes and intent to reviewers in a Pull Request?","oEn":["Making all file names uppercase","Clearly describing the changes and context in the description","Splitting into as many commits as possible","Leaving the body blank"],"eEn":"Clearly stating what changed, why, and the context in the PR description helps reviewers understand intent and enables smooth collaboration."},{"d":"D1","q":"コミットメッセージの書き方として、GitHub のコラボレーションで推奨される良い習慣はどれですか。","o":["空メッセージにする","常に「update」の一語だけにする","変更内容が分かる簡潔で意味のある文にする","無関係な絵文字だけを並べる"],"a":2,"e":"何を・なぜ変更したか分かる簡潔で意味のあるメッセージは、後から履歴を追う人やレビュアーの理解を助けます。","qEn":"Which is a good commit message practice recommended for collaboration on GitHub?","oEn":["Leave the message empty","Always use just the single word 'update'","Write a concise, meaningful message that conveys the change","List only unrelated emojis"],"eEn":"A concise, meaningful message describing what and why helps reviewers and anyone reading the history later."},{"d":"D1","q":"Git でまだコミットしていない変更を次のコミットに含める準備をする領域の名称はどれですか。","o":["ワーキングディレクトリ","スタッシュ","リモート","ステージングエリア（インデックス）"],"a":3,"e":"git add で変更をステージングエリア（インデックス）に載せ、次の commit に含める内容を選びます。","qEn":"What is the area where changes are prepared to be included in the next commit in Git?","oEn":["Working directory","Stash","Remote","Staging area (index)"],"eEn":"git add places changes into the staging area (index), selecting what the next commit will include."},{"d":"D1","q":"二つのブランチの変更を一つに統合する Git の操作はどれですか。","o":["merge","clone","init","log"],"a":0,"e":"merge は別ブランチの変更を現在のブランチに統合します。log は履歴表示、init は初期化です。","qEn":"Which Git operation combines changes from two branches into one?","oEn":["merge","clone","init","log"],"eEn":"merge integrates changes from another branch into the current one. log shows history; init initializes a repo."},{"d":"D1","q":"リポジトリのトップに置かれ、プロジェクトの概要や使い方を説明する慣習的なファイルはどれですか。","o":["LICENSE","README",".gitignore","CHANGELOG"],"a":1,"e":"README はプロジェクトの概要・使い方を説明する慣習的なファイルで、リポジトリのトップページに表示されます。","qEn":"Which conventional file at a repository's top explains the project's overview and usage?","oEn":["LICENSE","README",".gitignore","CHANGELOG"],"eEn":"The README conventionally describes the project overview and usage and is shown on the repository's landing page."},{"d":"D1","q":"Git の追跡対象から特定のファイルやフォルダを除外するために使うファイルはどれですか。","o":["LICENSE","README.md",".gitignore","config.yml"],"a":2,"e":".gitignore に記述したパターンに一致するファイルは Git の追跡対象から除外されます。","qEn":"Which file is used to exclude specific files or folders from Git tracking?","oEn":["LICENSE","README.md",".gitignore","config.yml"],"eEn":"Files matching patterns listed in .gitignore are excluded from Git tracking."},{"d":"D1","q":"他人のリポジトリを自分のアカウント配下に複製し、独立して変更・提案できるようにする GitHub の機能はどれですか。","o":["Star","Sponsor","Watch","Fork"],"a":3,"e":"Fork は他人のリポジトリを自分のアカウントへ複製し、独立して変更できます。変更は Pull Request で元へ提案します。","qEn":"Which GitHub feature copies someone's repository under your account so you can change and propose independently?","oEn":["Star","Sponsor","Watch","Fork"],"eEn":"Fork copies another's repository into your account for independent changes, which you can propose back via a Pull Request."},{"d":"D1","q":"GitHub でリポジトリに関心を示し、後で見つけやすいようブックマーク的に印を付ける機能はどれですか。","o":["Star","Fork","Clone","Merge"],"a":0,"e":"Star はリポジトリへの関心を示し、ブックマークのように後から見つけやすくする機能です。Fork は複製です。","qEn":"Which GitHub feature marks a repository as a bookmark to show interest and find it later?","oEn":["Star","Fork","Clone","Merge"],"eEn":"Star shows interest in a repository and bookmarks it for easy retrieval later. Fork creates a copy."},{"d":"D1","q":"空のフォルダを新しい Git リポジトリとして初期化する Git コマンドはどれですか。","o":["git start","git init","git new","git create"],"a":1,"e":"git init は現在のフォルダを新しい Git リポジトリとして初期化します。start や new はGitコマンドではありません。","qEn":"Which Git command initializes an empty folder as a new Git repository?","oEn":["git start","git init","git new","git create"],"eEn":"git init initializes the current folder as a new Git repository. start and new are not Git commands."},{"d":"D1","q":"Git のコミット履歴を一覧表示するコマンドはどれですか。","o":["git diff","git status","git log","git show-branch"],"a":2,"e":"git log はコミット履歴を新しい順に一覧表示します。status は現在の状態、diff は差分を表示します。","qEn":"Which command lists the Git commit history?","oEn":["git diff","git status","git log","git show-branch"],"eEn":"git log lists the commit history, newest first. status shows current state; diff shows changes."},{"d":"D1","q":"作業ツリーとステージングの現在の状態（変更・未追跡ファイルなど）を確認する Git コマンドはどれですか。","o":["git clone","git commit","git push","git status"],"a":3,"e":"git status は変更済み・ステージ済み・未追跡ファイルなど現在の状態を表示します。","qEn":"Which Git command shows the current state of the working tree and staging (changed, untracked files)?","oEn":["git clone","git commit","git push","git status"],"eEn":"git status shows the current state including modified, staged, and untracked files."},{"d":"D1","q":"GitHub Flow を採用する主な狙いとして最も適切なものはどれですか。","o":["軽量なブランチベースの流れで安全に協働・レビューを行う","すべての変更をメインへ直接反映して速度を上げる","履歴を残さず作業する","レビューを廃止して自動承認する"],"a":0,"e":"GitHub Flow はブランチ作成・PR・レビュー・マージという軽量な流れで、安全にレビューしながら協働することを狙いとします。","qEn":"What is the main aim of adopting GitHub Flow?","oEn":["A lightweight branch-based flow for safe collaboration and review","Applying all changes directly to main for speed","Working without keeping history","Abolishing review and auto-approving"],"eEn":"GitHub Flow uses a lightweight cycle of branch, PR, review, and merge to collaborate safely with review."},{"d":"D1","q":"Pull Request のレビューで変更を承認し、統合してよいと示す一般的なアクションはどれですか。","o":["Close","Approve","Fork","Star"],"a":1,"e":"レビュアーは Approve で変更を承認し、マージ可能であることを示します。Close は取り下げ、Fork は複製です。","qEn":"In a Pull Request review, which common action signals the change is approved to merge?","oEn":["Close","Approve","Fork","Star"],"eEn":"Reviewers use Approve to accept changes and indicate they are ready to merge. Close discards; Fork copies."},{"d":"D1","q":"Markdown で番号なしの箇条書きリストを作る一般的な行頭記号はどれですか。","o":["パイプ（|）","等号（=）","ハイフン（-）","セミコロン（;）"],"a":2,"e":"行頭に -、* または + を置くと番号なしリストになります。| は表、= は見出しの下線などに使われます。","qEn":"Which line-start character commonly creates an unordered list in Markdown?","oEn":["Pipe (|)","Equals (=)","Hyphen (-)","Semicolon (;)"],"eEn":"Starting a line with -, *, or + makes an unordered list. | builds tables; = can underline a heading."},{"d":"D1","q":"Markdown でインラインのコード片を表すために文字を囲む記号はどれですか。","o":["丸括弧（()）","波括弧（{}）","山括弧（<>）","バッククォート（`）"],"a":3,"e":"バッククォートで囲むとインラインコードになります。三連のバッククォートはコードブロックを作ります。","qEn":"Which characters surround text to show inline code in Markdown?","oEn":["Parentheses (())","Braces ({})","Angle brackets (<>)","Backticks (`)"],"eEn":"Wrapping text in backticks creates inline code. Triple backticks create a code block."},{"d":"D1","q":"コミットメッセージの本文で Issue 番号 42 を参照・関連付ける一般的な書き方はどれですか。","o":["#42","@42","$42","%42"],"a":0,"e":"#42 のように # と番号を書くと、その Issue や Pull Request への参照リンクになります。@ はユーザーメンションです。","qEn":"How do you commonly reference Issue number 42 in a commit or comment on GitHub?","oEn":["#42","@42","$42","%42"],"eEn":"Writing # followed by a number, like #42, links to that Issue or Pull Request. @ is for user mentions."},{"d":"D1","q":"バージョン管理を使わずファイルを「file_final_v2_最新.docx」のようにコピー管理する方法の主な問題点はどれですか。","o":["ファイルが自動的に暗号化される","履歴や変更理由が追えず競合や混乱が起きやすい","ディスク容量が無限になる","変更が即座に全員へ同期される"],"a":1,"e":"手動コピーでは誰が何をなぜ変えたか追えず、最新版の判別や統合が困難になります。バージョン管理はこれを解決します。","qEn":"What is a main problem with managing files by copies like 'file_final_v2_latest.docx' instead of version control?","oEn":["Files are automatically encrypted","No history or reasons, causing conflicts and confusion","Disk space becomes unlimited","Changes instantly sync to everyone"],"eEn":"Manual copies lose track of who changed what and why, making it hard to identify the latest version or merge. Version control solves this."},{"d":"D1","q":"ブランチで完成した変更をレビュー・マージした後、そのブランチに対して一般的に行う整理作業はどれですか。","o":["リポジトリごと削除する","メインブランチを削除する","不要になった作業ブランチを削除する","全コミットを取り消す"],"a":2,"e":"マージ済みで役目を終えた作業ブランチは削除してリポジトリを整理するのが一般的です。メインは残します。","qEn":"After a branch's changes are reviewed and merged, what cleanup is commonly done to that branch?","oEn":["Delete the entire repository","Delete the main branch","Delete the now-unneeded working branch","Undo all commits"],"eEn":"A merged working branch that has served its purpose is commonly deleted to keep the repository tidy. Main is kept."},{"d":"D1","q":"GitHub 上で複数人が同じプロジェクトに協働できる主な理由として最も適切なものはどれですか。","o":["1人しか同時に編集できないから","全員が同時に同じ1ファイルを直接上書きするから","変更履歴を一切保持しないから","各自のローカルGitと共有リモートを通じ変更を提案・統合できるから"],"a":3,"e":"各開発者がローカルで作業し、共有リモートへ push・Pull Request で変更を提案・レビュー・統合することで安全に協働できます。","qEn":"Why can multiple people collaborate on the same project on GitHub?","oEn":["Only one person can ever edit","Everyone directly overwrites the same single file at once","No change history is kept at all","Each uses local Git and a shared remote to propose and integrate changes"],"eEn":"Each developer works locally and proposes, reviews, and integrates changes via push and Pull Requests to a shared remote, enabling safe collaboration."},{"d":"D2","q":"リポジトリのルートに置く README ファイルの主な役割として最も適切なものはどれですか。","o":["プロジェクトの概要や使い方を訪問者に説明する","コードの著作権ライセンス条件だけを規定する","自動テストをCIで実行する設定を記述する","コミット権限を持つ利用者を制限する"],"a":0,"e":"README はリポジトリを開いた人が最初に目にする文書で、目的・導入方法・使い方などプロジェクトの概要を伝えます。","qEn":"What is the primary role of the README file placed at a repository's root?","oEn":["Explain the project's overview and usage to visitors","Define only the copyright license terms of the code","Configure automated tests to run in CI","Restrict which users have commit permissions"],"eEn":"The README is the first document a visitor sees and communicates the project's overview, setup, and usage."},{"d":"D2","q":"リポジトリに LICENSE ファイルを追加する目的として最も適切なものはどれですか。","o":["貢献者の行動規範を定義するため","他者がコードを利用・改変・配布できる条件を明示するため","セキュリティ脆弱性の報告先を示すため","プルリクエストのレビュー担当を割り当てるため"],"a":1,"e":"LICENSE はソフトウェアの利用・改変・再配布に関する法的条件を明示し、他者がどう使えるかを定めます。","qEn":"What is the purpose of adding a LICENSE file to a repository?","oEn":["To define the contributors' code of conduct","To state the terms under which others may use, modify, and distribute the code","To indicate where to report security vulnerabilities","To assign reviewers for pull requests"],"eEn":"A LICENSE states the legal terms for using, modifying, and redistributing the software, defining how others may use it."},{"d":"D2","q":"CONTRIBUTING.md ファイルが果たす役割として最も適切なものはどれですか。","o":["リポジトリの依存関係を一覧化する","リリースノートを自動生成する","プロジェクトへの貢献方法や手順を案内する","GitHub Pages の公開設定を保持する"],"a":2,"e":"CONTRIBUTING.md は貢献の手順やルールを説明し、issueやPRを作成する際に貢献者へガイダンスを提供します。","qEn":"What role does a CONTRIBUTING.md file serve?","oEn":["List the repository's dependencies","Automatically generate release notes","Guide how to contribute to the project and its procedures","Store GitHub Pages publishing settings"],"eEn":"CONTRIBUTING.md explains contribution steps and rules, offering guidance to contributors when opening issues or PRs."},{"d":"D2","q":"CODEOWNERS ファイルを設定すると得られる主な効果はどれですか。","o":["指定パスの変更に対して所有者が自動でレビュー依頼される","リポジトリ全体が読み取り専用になる","コミットメッセージの形式が強制される","依存関係の脆弱性が自動修正される"],"a":0,"e":"CODEOWNERS は特定のファイルやディレクトリの所有者を定義し、その部分が変更されたPRで自動的にレビュー依頼されます。","qEn":"What is the main effect of configuring a CODEOWNERS file?","oEn":["Owners are automatically requested to review changes to specified paths","The entire repository becomes read-only","A commit message format is enforced","Dependency vulnerabilities are auto-fixed"],"eEn":"CODEOWNERS defines owners for specific files or directories, so those owners are auto-requested as reviewers on relevant PRs."},{"d":"D2","q":"SECURITY.md ファイルを配置する目的として最も適切なものはどれですか。","o":["コードのフォーマット規則を定義する","プロジェクトのスター数を記録する","ブランチ保護ルールを有効化する","セキュリティ脆弱性の報告方法やポリシーを示す"],"a":3,"e":"SECURITY.md はサポート対象バージョンや脆弱性の報告手順など、セキュリティポリシーを利用者に伝えるための文書です。","qEn":"What is the purpose of placing a SECURITY.md file?","oEn":["Define code formatting rules","Record the project's star count","Enable branch protection rules","Describe how to report security vulnerabilities and the policy"],"eEn":"SECURITY.md communicates the security policy, such as supported versions and how to report vulnerabilities."},{"d":"D2","q":"リポジトリテンプレートを使う主な利点として最も適切なものはどれですか。","o":["既存の履歴をすべて引き継いだコピーを作成できる","定型の初期構成を持つ新規リポジトリを素早く作成できる","既存リポジトリのissueを一括で移行できる","複数リポジトリを1つに統合できる"],"a":1,"e":"テンプレートリポジトリは、共通のディレクトリ構成やファイルを備えた新規リポジトリを、履歴なしで素早く生成するために使います。","qEn":"What is the main benefit of using a repository template?","oEn":["Create a copy that inherits all existing history","Quickly create a new repository with a standard starting structure","Bulk-migrate issues from an existing repository","Merge multiple repositories into one"],"eEn":"A template repository quickly generates new repos with a common structure and files, without carrying over commit history."},{"d":"D2","q":"作業を整理するためにブランチを使う目的として最も適切なものはどれですか。","o":["リポジトリの容量を削減するため","過去のコミットを完全に削除するため","変更を独立した線で進め、後で統合するため","アクセス権限をユーザーごとに分けるため"],"a":2,"e":"ブランチは既定ブランチに影響を与えず並行して開発を進め、完成後にプルリクエストで統合するために使います。","qEn":"What is the purpose of using branches to organize work?","oEn":["To reduce the repository's storage size","To permanently delete past commits","To develop changes on an independent line and merge them later","To separate access permissions per user"],"eEn":"Branches let you work in parallel without affecting the default branch, then integrate the work via a pull request."},{"d":"D2","q":"リポジトリに置く .gitignore ファイルが果たす役割として最も適切なものはどれですか。","o":["追跡対象外にするファイルやパターンを指定する","自動的にコミットするファイルを指定する","レビュー担当者を割り当てる","ライセンス種別を宣言する"],"a":0,"e":".gitignore はビルド生成物や秘密情報など、Git の追跡対象から除外したいファイルやパターンを指定します。","qEn":"What role does a .gitignore file serve in a repository?","oEn":["Specify files and patterns to exclude from tracking","Specify files to commit automatically","Assign reviewers","Declare the license type"],"eEn":"A .gitignore specifies files and patterns, such as build artifacts or secrets, that Git should not track."},{"d":"D2","q":"テンプレートリポジトリから新規リポジトリを作成したとき、既定でコピーされないものはどれですか。","o":["ディレクトリ構成","テンプレート内のファイル内容","コミット履歴やブランチの全履歴","既定ブランチのファイル"],"a":2,"e":"テンプレートからの作成では既定ブランチのファイル構成はコピーされますが、コミット履歴はコピーされず新しい履歴で始まります。","qEn":"When creating a new repository from a template, what is NOT copied by default?","oEn":["The directory structure","The file contents inside the template","The full commit history and all branch history","The files on the default branch"],"eEn":"Creating from a template copies the default branch's files but not the commit history; the new repo starts with fresh history."},{"d":"D2","q":"リポジトリの Insights タブから確認できる情報として最も適切なものはどれですか。","o":["アカウントの請求情報","コントリビューションやトラフィックなどの分析情報","個人のSSH鍵一覧","組織の課金プラン変更履歴"],"a":1,"e":"Insights タブでは Pulse、Contributors、Traffic、Dependency graph など、リポジトリの活動や健全性の指標を確認できます。","qEn":"What information can be viewed from a repository's Insights tab?","oEn":["Account billing information","Analytics such as contributions and traffic","A list of personal SSH keys","The organization's billing plan change history"],"eEn":"The Insights tab surfaces repository activity and health metrics like Pulse, Contributors, Traffic, and the dependency graph."},{"d":"D2","q":"リポジトリに Star を付ける行為の意味として最も適切なものはどれですか。","o":["リポジトリをフォークして自分のコピーを作る","リポジトリへの書き込み権限を取得する","関心を示し、後で見つけやすくブックマークする","リポジトリを非公開に設定する"],"a":2,"e":"Star はリポジトリへの関心や評価を示すとともに、自分のスター一覧から後で見つけやすくするブックマークの役割を持ちます。","qEn":"What does starring a repository mean?","oEn":["Fork the repository to make your own copy","Gain write access to the repository","Show interest and bookmark it for easy access later","Set the repository to private"],"eEn":"Starring signals interest or appreciation and bookmarks the repo so you can find it later in your stars list."},{"d":"D2","q":"GitHub の Feature preview（機能プレビュー）の目的として最も適切なものはどれですか。","o":["一般提供前の新機能を試せるようにする","リポジトリを完全に削除する","課金を停止する","全ユーザーの権限を初期化する"],"a":0,"e":"Feature preview は正式リリース前や提供中の新機能を有効化して試せる仕組みで、早期に新しい体験を確認できます。","qEn":"What is the purpose of GitHub's feature preview?","oEn":["Let you try new features before general availability","Permanently delete a repository","Suspend billing","Reset all users' permissions"],"eEn":"Feature preview lets you enable and try new or upcoming features early, before or during their general rollout."},{"d":"D2","q":"依存関係グラフ（Dependency graph）が提供する情報として最も適切なものはどれですか。","o":["リポジトリのコミット数の推移","プロジェクトが依存するパッケージとその関係","各ファイルの最終更新者","プルリクエストのマージ順序"],"a":1,"e":"依存関係グラフはマニフェストやロックファイルを解析し、プロジェクトが依存するパッケージや依存元を可視化します。","qEn":"What information does the dependency graph provide?","oEn":["The trend of the repository's commit count","The packages the project depends on and their relationships","The last person to update each file","The merge order of pull requests"],"eEn":"The dependency graph parses manifest and lock files to visualize the packages a project depends on and their dependents."},{"d":"D2","q":"リポジトリの Community Standards（コミュニティ標準）ページで確認できるものはどれですか。","o":["リポジトリの月間トラフィック数のグラフ","実行中のGitHub Actionsの一覧","READMEやライセンスなど推奨ファイルの充足状況","組織のメンバーの二要素認証状況"],"a":2,"e":"Community Standards は README、LICENSE、CONTRIBUTING、行動規範など推奨される健全性ファイルが揃っているかを一覧で示します。","qEn":"What can you check on a repository's Community Standards page?","oEn":["A graph of the repository's monthly traffic","A list of running GitHub Actions","Whether recommended files like README and license are present","Two-factor authentication status of organization members"],"eEn":"Community Standards shows a checklist of recommended health files such as README, LICENSE, CONTRIBUTING, and a code of conduct."},{"d":"D2","q":"リポジトリの既定ブランチ（default branch）についての説明として正しいものはどれですか。","o":["削除すると全コミットが消える唯一のブランチである","クローンやPRの基準となる主要ブランチである","常に read-only で変更できない","1リポジトリに1つしか作れない特殊なタグである"],"a":1,"e":"既定ブランチはクローン時に取得され、プルリクエストの基準にもなる中心的なブランチで、通常は main です。","qEn":"Which statement about a repository's default branch is correct?","oEn":["It is the only branch whose deletion erases all commits","It is the primary branch used as the base for clones and PRs","It is always read-only and cannot be changed","It is a special tag limited to one per repository"],"eEn":"The default branch is checked out on clone and serves as the base for pull requests; it is typically named main."},{"d":"D2","q":"GitHub の Web インターフェイス上で新しいファイルをリポジトリに追加する方法として正しいものはどれですか。","o":["ローカルにクローンしないと追加は一切できない","「Add file」から作成またはアップロードしてコミットできる","issue を作成すると自動でファイルが生成される","Star を付けるとテンプレートが追加される"],"a":1,"e":"リポジトリの「Add file」メニューから、ブラウザ上で新規ファイルの作成や既存ファイルのアップロードを行い、直接コミットできます。","qEn":"How can you add a new file to a repository from GitHub's web interface?","oEn":["You cannot add files at all without cloning locally","Use 'Add file' to create or upload and commit it","Creating an issue automatically generates a file","Starring adds a template"],"eEn":"The repository's 'Add file' menu lets you create a new file or upload one in the browser and commit it directly."},{"d":"D2","q":"使われなくなったリポジトリを保守する最善策として、読み取り専用にしつつ記録を残す方法はどれですか。","o":["リポジトリをアーカイブする","リポジトリを完全に削除する","既定ブランチを削除する","全issueをクローズする"],"a":0,"e":"アーカイブはリポジトリを読み取り専用にして更新を止めつつ内容を保持でき、非アクティブなプロジェクトの維持に適しています。","qEn":"To maintain an inactive repository as read-only while keeping the record, which action is best?","oEn":["Archive the repository","Permanently delete the repository","Delete the default branch","Close all issues"],"eEn":"Archiving makes a repository read-only and stops updates while preserving its content, ideal for inactive projects."},{"d":"D2","q":"Insights の Traffic ページで確認できる指標として最も適切なものはどれですか。","o":["各コミットの差分行数","閲覧数（views）やクローン数などの訪問統計","依存パッケージの脆弱性一覧","メンバーのアクセス権限一覧"],"a":1,"e":"Traffic ページでは過去14日間の views、ユニーク訪問者、クローン数、参照元などのアクセス統計を確認できます。","qEn":"What metric can you view on the Insights Traffic page?","oEn":["The diff line count of each commit","Visit statistics such as views and clones","A list of dependency vulnerabilities","A list of members' access permissions"],"eEn":"The Traffic page shows access statistics like views, unique visitors, clones, and referring sites over the past 14 days."},{"d":"D2","q":"リポジトリ内の .github ディレクトリに関する説明として正しいものはどれですか。","o":["GitHub が予約する特別なファイルを置く場所である","アプリケーションの実行バイナリを格納する場所である","ユーザーのパスワードを保存する場所である","配置すると自動的にリポジトリが公開される"],"a":0,"e":".github ディレクトリには issue/PR テンプレートやワークフロー、CODEOWNERS など GitHub 機能用の構成ファイルを配置します。","qEn":"Which statement about the .github directory in a repository is correct?","oEn":["It holds special configuration files recognized by GitHub","It stores the application's executable binaries","It stores users' passwords","Placing it automatically makes the repository public"],"eEn":"The .github directory holds configuration for GitHub features such as issue/PR templates, workflows, and CODEOWNERS."},{"d":"D2","q":"Insights の Pulse ページが提供する情報として最も適切なものはどれですか。","o":["リポジトリのライセンス全文","一定期間のマージPRやオープンissueなど活動の要約","個々のユーザーの支払い履歴","サーバーの稼働率グラフ"],"a":1,"e":"Pulse は指定期間内にマージされたPR、オープン/クローズしたissue、活発な貢献者など、リポジトリ活動の概要をまとめます。","qEn":"What information does the Insights Pulse page provide?","oEn":["The full text of the repository's license","A summary of activity like merged PRs and open issues over a period","Individual users' payment history","A graph of server uptime"],"eEn":"Pulse summarizes repository activity over a chosen period, such as merged PRs, opened/closed issues, and active contributors."},{"d":"D3","q":"GitHub の Issue を使う主な目的として最も適切なものはどれですか。","o":["コード変更を本番環境へ自動デプロイする","バグ報告やタスク、機能要望などを記録し追跡する","リポジトリのライセンスを変更する","ブランチを物理的に削除する"],"a":1,"e":"issue はバグ、タスク、機能要望などの作業項目を記録し、議論やアサイン、ラベル付けを通じて追跡するための機能です。","qEn":"What is the primary purpose of using GitHub Issues?","oEn":["Automatically deploy code changes to production","Record and track bugs, tasks, and feature requests","Change the repository's license","Physically delete a branch"],"eEn":"Issues record work items such as bugs, tasks, and feature requests, and track them through discussion, assignment, and labels."},{"d":"D3","q":"プルリクエスト（Pull Request）が主に担う役割はどれですか。","o":["あるブランチの変更をレビューし別ブランチへ統合提案する","リポジトリのトラフィックを計測する","依存関係グラフを生成する","Star の数を増やす"],"a":0,"e":"プルリクエストはブランチ間の変更差分を提示してレビューや議論を行い、承認後にマージして統合するための機能です。","qEn":"What role does a pull request primarily serve?","oEn":["Propose merging one branch's changes into another after review","Measure the repository's traffic","Generate the dependency graph","Increase the number of stars"],"eEn":"A pull request presents the diff between branches for review and discussion, then merges the changes once approved."},{"d":"D3","q":"GitHub Discussions を使う目的として最も適切なものはどれですか。","o":["コードを自動的にビルドする","脆弱性を自動修正する","質問やアイデアなどコミュニティの会話の場を提供する","リリースタグを作成する"],"a":2,"e":"Discussions は特定の作業項目に紐づかない質問・アイデア・お知らせなど、コミュニティのオープンな会話を行う場です。","qEn":"What is the purpose of using GitHub Discussions?","oEn":["Automatically build the code","Automatically fix vulnerabilities","Provide a space for community conversations like questions and ideas","Create release tags"],"eEn":"Discussions offer an open space for community conversation, such as questions, ideas, and announcements not tied to a task."},{"d":"D3","q":"プルリクエストの説明に「Closes #12」と書くと得られる効果はどれですか。","o":["issue #12 が即座に削除される","PRがマージされると issue #12 が自動でクローズされる","issue #12 がロックされ編集できなくなる","issue #12 の作成者が変更される"],"a":1,"e":"Closes/Fixes/Resolves などのキーワードでissue番号を参照すると、そのPRがマージされた際に対象issueが自動でクローズされます。","qEn":"What is the effect of writing 'Closes #12' in a pull request description?","oEn":["Issue #12 is deleted immediately","Issue #12 closes automatically when the PR merges","Issue #12 is locked and cannot be edited","The author of issue #12 is changed"],"eEn":"Keywords like Closes/Fixes/Resolves with an issue number auto-close that issue when the referencing PR is merged."},{"d":"D3","q":"issue テンプレートを用意する主な利点として最も適切なものはどれですか。","o":["issue の作成時に必要な情報を定型フォームで収集できる","issue を作成できる人数を制限できる","issue が自動的にクローズされる","issue がプルリクエストに変換される"],"a":0,"e":"issue テンプレートは報告時に必要な項目をあらかじめ提示し、一貫した情報収集と分類を容易にします。","qEn":"What is the main benefit of providing issue templates?","oEn":["Collect necessary information via a standard form when creating issues","Limit how many people can create issues","Automatically close issues","Convert issues into pull requests"],"eEn":"Issue templates prompt for the needed fields up front, enabling consistent information gathering and easier triage."},{"d":"D3","q":"多数の issue から特定のものを絞り込むために使える方法として最も適切なものはどれですか。","o":["リポジトリをアーカイブする","ラベルや担当者などの条件でフィルター検索する","既定ブランチを切り替える","Star を付ける"],"a":1,"e":"issue 一覧では label、assignee、state、milestone などの検索条件でフィルターし、目的のissueを絞り込めます。","qEn":"Which method helps narrow down specific issues from many?","oEn":["Archive the repository","Filter by criteria such as labels and assignees","Switch the default branch","Add a star"],"eEn":"The issue list can be filtered by search qualifiers such as label, assignee, state, and milestone to find target issues."},{"d":"D3","q":"issue を特定のメンバーにアサインする目的として最も適切なものはどれですか。","o":["そのメンバーのアクセス権限を昇格させる","issue を自動的にクローズする","その作業の担当者を明確にする","リポジトリを非公開にする"],"a":2,"e":"アサインはそのissueに責任を持つ担当者を明示し、誰が対応中かをチームで共有できるようにします。","qEn":"What is the purpose of assigning an issue to a specific member?","oEn":["Elevate that member's access permissions","Automatically close the issue","Clarify who is responsible for the work","Make the repository private"],"eEn":"Assigning designates who is responsible for an issue, letting the team see who is handling it."},{"d":"D3","q":"GitHub の通知（Notifications）の主な目的として最も適切なものはどれですか。","o":["関心のあるアクティビティの更新を利用者に知らせる","リポジトリのバックアップを取る","コードのビルドを高速化する","ライセンスを自動生成する"],"a":0,"e":"通知は自分が関与またはウォッチしているissue、PR、Discussionなどの更新を知らせ、必要な情報を見逃さないようにします。","qEn":"What is the primary purpose of GitHub notifications?","oEn":["Inform users of updates to activity they care about","Back up the repository","Speed up code builds","Auto-generate a license"],"eEn":"Notifications inform you of updates on issues, PRs, and discussions you're involved in or watching, so you don't miss them."},{"d":"D3","q":"リポジトリを「Watch」して「All Activity」を選ぶと起きることはどれですか。","o":["そのリポジトリへの書き込み権限が付与される","リポジトリの全アクティビティの通知を受け取る","リポジトリが自動的にフォークされる","既定ブランチが変更される"],"a":1,"e":"Watch でAll Activityを選ぶと、そのリポジトリのissue、PR、リリースなどすべての更新について通知を受け取ります。","qEn":"What happens when you Watch a repository and choose 'All Activity'?","oEn":["You are granted write access to the repository","You receive notifications for all activity in the repository","The repository is automatically forked","The default branch is changed"],"eEn":"Choosing All Activity when watching sends you notifications for all updates like issues, PRs, and releases in that repo."},{"d":"D3","q":"GitHub の Gist の用途として最も適切なものはどれですか。次のうち正しいものを選んでください。","o":["大規模アプリの本番デプロイ","コード断片やメモを手軽に共有・保存する","組織のメンバー権限を管理する","ブランチ保護ルールを設定する"],"a":1,"e":"Gist はスニペットや短いメモを素早く共有・保存できる仕組みで、公開または限定公開のGistを作成できます。","qEn":"What is Gist most appropriate for?","oEn":["Production deployment of large applications","Easily sharing and storing code snippets or notes","Managing organization member permissions","Setting branch protection rules"],"eEn":"Gists let you quickly share and store snippets or short notes, either as public or secret gists."},{"d":"D3","q":"リポジトリの Wiki 機能が主に提供するものとして最も適切なものはどれですか。","o":["自動テストの実行環境","課金と請求の管理画面","プロジェクトのドキュメントを整理して公開する場","依存パッケージの脆弱性スキャン"],"a":2,"e":"Wiki はコードとは別に、使い方やガイド、設計メモなどプロジェクトのドキュメントをページ単位で整理・公開できる機能です。","qEn":"What does a repository Wiki primarily provide?","oEn":["An environment to run automated tests","A billing and invoice management screen","A place to organize and publish project documentation","Vulnerability scanning of dependencies"],"eEn":"A Wiki lets you organize and publish project documentation, such as guides and design notes, in pages separate from the code."},{"d":"D3","q":"GitHub Pages の主な用途として最も適切なものはどれですか。","o":["リポジトリのコンテンツから静的Webサイトを公開する","データベースサーバーをホストする","コンテナイメージを保管する","秘密情報を安全に保管する"],"a":0,"e":"GitHub Pages はリポジトリ内のHTMLやMarkdownなどから静的Webサイトを生成・公開でき、プロジェクトサイトや文書公開に使えます。","qEn":"What is GitHub Pages primarily used for?","oEn":["Publishing a static website from repository content","Hosting a database server","Storing container images","Securely storing secrets"],"eEn":"GitHub Pages builds and publishes a static website from repository content like HTML or Markdown, ideal for project sites and docs."},{"d":"D3","q":"プルリクエストテンプレートを用意する目的として最も適切なものはどれですか。","o":["PRの作成者を自動で割り当てる","PR作成時に説明の定型項目を提示し記述を促す","PRを自動的にマージする","PRのコミット履歴を削除する"],"a":1,"e":"PRテンプレートは変更概要や関連issue、確認項目など記載すべき内容をあらかじめ提示し、一貫したレビュー情報を促します。","qEn":"What is the purpose of providing a pull request template?","oEn":["Automatically assign the PR's author","Prompt authors with standard description fields when opening a PR","Automatically merge the PR","Delete the PR's commit history"],"eEn":"A PR template pre-populates fields like a change summary, related issues, and a checklist to encourage consistent review info."},{"d":"D3","q":"issue やコメントで「@ユーザー名」と記載する主な効果はどれですか。","o":["そのユーザーに権限を付与する","そのユーザーへメンションして通知を送る","issue を自動でクローズする","コメントを非公開にする"],"a":1,"e":"@ユーザー名やチーム名でメンションすると、その相手に通知が送られ、会話に注意を向けてもらえます。","qEn":"What is the main effect of writing '@username' in an issue or comment?","oEn":["Grant that user permissions","Mention that user and send them a notification","Automatically close the issue","Make the comment private"],"eEn":"Mentioning with @username or a team name sends that recipient a notification, drawing their attention to the conversation."},{"d":"D3","q":"issue や PR にラベルを付ける主な目的として最も適切なものはどれですか。","o":["分類し、種別や状態を視覚的に整理・検索しやすくする","自動的にコードをマージする","リポジトリを複製する","コミット権限を変更する"],"a":0,"e":"ラベルは bug や enhancement などの分類を色付きで示し、issueやPRの整理、フィルター、優先度付けを容易にします。","qEn":"What is the main purpose of applying labels to issues or PRs?","oEn":["Categorize them to visually organize and filter by type or state","Automatically merge code","Duplicate the repository","Change commit permissions"],"eEn":"Labels provide colored categories like bug or enhancement, making issues and PRs easier to organize, filter, and prioritize."},{"d":"D3","q":"マイルストーン（Milestone）を使う目的として最も適切なものはどれですか。","o":["ブランチを保護する","関連するissueやPRをまとめ進捗を追跡する","リポジトリを公開する","ライセンスを付与する"],"a":1,"e":"マイルストーンはリリースや期限に向けた一群のissue/PRをまとめ、完了率など進捗をまとめて把握できるようにします。","qEn":"What is the purpose of using a milestone?","oEn":["Protect a branch","Group related issues and PRs and track their progress","Make a repository public","Grant a license"],"eEn":"Milestones group a set of issues and PRs toward a release or deadline and track overall progress like completion percentage."},{"d":"D3","q":"ドラフトのプルリクエスト（Draft pull request）の特徴として正しいものはどれですか。","o":["作成すると即座にマージされる","作業中を示し、まだマージできない状態でレビュー前の共有ができる","コメントを一切付けられない","レビュー担当者を割り当てられない"],"a":1,"e":"ドラフトPRはまだ完成していない作業を共有するための状態で、準備完了に切り替えるまでマージできません。","qEn":"Which is a characteristic of a draft pull request?","oEn":["It merges immediately when created","It marks work in progress, sharable pre-review and not yet mergeable","No comments can be added to it","No reviewers can be assigned"],"eEn":"A draft PR marks unfinished work for early sharing and cannot be merged until it's marked ready for review."},{"d":"D3","q":"プルリクエストで特定のメンバーにレビューを依頼（Request reviewers）する目的として最も適切なものはどれですか。","o":["そのメンバーへ書き込み権限を付与するため","プルリクエストを即座にマージするため","コミット履歴を書き換えるため","指定した相手に変更の確認と承認を求めるため"],"a":3,"e":"レビュー依頼は指定したメンバーやチームに変更内容の確認・承認を求める機能で、依頼された相手には通知が届きます。","qEn":"What is the purpose of requesting reviewers on a pull request?","oEn":["To grant that member write access","To merge the pull request immediately","To rewrite the commit history","To ask the specified people to review and approve the changes"],"eEn":"Requesting reviewers asks specified members or teams to review and approve the changes, and notifies those requested."},{"d":"D4","q":"GitHub Actions の主な目的として、公式に最も適切に説明しているのはどれですか。","o":["リポジトリ内のワークフローを自動化する CI/CD などの自動化プラットフォーム","ソースコードを保存するためのバージョン管理システム本体","課題やタスクを管理するプロジェクト管理ボード","コードレビューのためのプルリクエスト機能"],"a":0,"e":"GitHub Actions はイベントに応じてワークフローを実行し、ビルド・テスト・デプロイなどを自動化する CI/CD プラットフォームです。","qEn":"Which statement best describes the primary purpose of GitHub Actions?","oEn":["An automation/CI-CD platform that runs workflows in a repository","The core version control system that stores source code","A project management board for tracking issues and tasks","The pull request feature used for code review"],"eEn":"GitHub Actions is a CI/CD automation platform that runs workflows in response to events to build, test, and deploy code."},{"d":"D4","q":"GitHub Actions のワークフローが実行される「きっかけ」となるものを何と呼びますか。","o":["ランナー（runner）","イベント（event）","アクション（action）","アーティファクト（artifact）"],"a":1,"e":"push や pull_request、スケジュールなどのイベントがワークフローの実行トリガーになります。","qEn":"What triggers a GitHub Actions workflow to run?","oEn":["A runner","An event","An action","An artifact"],"eEn":"Events such as push, pull_request, or a schedule trigger a workflow to run."},{"d":"D4","q":"GitHub Actions のワークフロー定義ファイルは、リポジトリ内のどこにどの形式で置きますか。","o":["リポジトリ直下に workflow.json として置く","docs フォルダーに Markdown として置く",".github/workflows ディレクトリに YAML ファイルとして置く","任意の場所に .ini 形式で置く"],"a":2,"e":"ワークフローは .github/workflows ディレクトリ内に YAML 形式のファイルとして定義します。","qEn":"Where and in what format are GitHub Actions workflow files stored in a repository?","oEn":["As workflow.json at the repository root","As Markdown in the docs folder","As YAML files in the .github/workflows directory","As .ini files anywhere in the repo"],"eEn":"Workflows are defined as YAML files inside the .github/workflows directory."},{"d":"D4","q":"GitHub Actions で、ジョブ内のコマンドを実際に実行する仮想マシンやコンテナを何と呼びますか。","o":["リポジトリ","シークレット","マイルストーン","ランナー（runner）"],"a":3,"e":"ランナーはジョブを実行する環境で、GitHub ホステッドランナーとセルフホステッドランナーがあります。","qEn":"In GitHub Actions, what is the machine that executes the commands in a job called?","oEn":["A repository","A secret","A milestone","A runner"],"eEn":"A runner is the environment that executes a job; GitHub offers hosted runners and self-hosted runners."},{"d":"D4","q":"既存の再利用可能なアクションを見つけて自分のワークフローに組み込むには、どこを利用しますか。","o":["GitHub Marketplace のアクション","GitHub Sponsors","GitHub Discussions","GitHub Gist"],"a":0,"e":"GitHub Marketplace には公開・共有された再利用可能なアクションが多数あり、ワークフローに組み込めます。","qEn":"Where can you find reusable prebuilt actions to include in your workflow?","oEn":["Actions on GitHub Marketplace","GitHub Sponsors","GitHub Discussions","GitHub Gist"],"eEn":"GitHub Marketplace hosts many shared, reusable actions that you can add to your workflows."},{"d":"D4","q":"GitHub Actions のワークフローにおける「ジョブ（job）」と「ステップ（step）」の関係として正しいものはどれですか。","o":["ステップは複数のジョブを内包する最上位の単位である","ジョブは複数のステップから構成され、各ステップがコマンドやアクションを実行する","ジョブは1つのステップしか持てない","ジョブとステップは同義語で違いはない"],"a":1,"e":"ワークフローはジョブから成り、ジョブは順に実行される複数のステップを含みます。各ステップはコマンドやアクションを実行します。","qEn":"Which correctly describes the relationship between a job and a step in a GitHub Actions workflow?","oEn":["A step is the top-level unit that contains multiple jobs","A job is made of multiple steps, each running a command or action","A job can only contain a single step","Job and step are synonyms with no difference"],"eEn":"A workflow contains jobs, and each job contains multiple steps that run commands or actions in order."},{"d":"D4","q":"GitHub Copilot が開発者に提供する中心的な機能として、最も適切なものはどれですか。","o":["リポジトリのバックアップを自動作成する","サーバーの物理ホスティングを提供する","コーディング中に AI がコードの提案・補完を行う","ドメイン名を登録する"],"a":2,"e":"GitHub Copilot はエディター上でコンテキストに基づいたコードの提案や補完を行う AI ペアプログラマーです。","qEn":"What is the central capability GitHub Copilot provides to developers?","oEn":["Automatically backing up repositories","Physical server hosting","AI-powered code suggestions and completions while coding","Registering domain names"],"eEn":"GitHub Copilot is an AI pair programmer that offers context-aware code suggestions and completions in the editor."},{"d":"D4","q":"GitHub Copilot の「エージェント（Agent Mode/コーディングエージェント）」が可能にすることとして正しいものはどれですか。","o":["単語の予測変換のみを行う","リポジトリを完全に削除する","GitHub の課金を管理する","課題を割り当てられると自律的にコード変更を計画・実行しプルリクエストを作成できる"],"a":3,"e":"Copilot のエージェント機能は、タスクを与えると複数ファイルにわたる変更を自律的に計画・実行し、プルリクエストとして提案できます。","qEn":"What does GitHub Copilot's agent (Agent Mode / coding agent) enable?","oEn":["Only single-word autocomplete","Permanently deleting a repository","Managing GitHub billing","Autonomously planning and making code changes and opening a pull request when assigned a task"],"eEn":"Copilot's agent capability can autonomously plan and carry out multi-file changes for a given task and propose them as a pull request."},{"d":"D4","q":"GitHub Copilot の「マルチモデル対応」とは何を意味しますか。","o":["利用者が用途に応じて複数の基盤 AI モデルから選択できること","複数のプログラミング言語だけに対応すること","複数のリポジトリを同時に開けること","複数のユーザーで1ライセンスを共有できること"],"a":0,"e":"Copilot は複数の基盤モデルをサポートしており、Chat などで用途に合わせてモデルを選択できます。","qEn":"What does GitHub Copilot's 'multi-model support' mean?","oEn":["Users can choose among several underlying AI models for their task","Support for multiple programming languages only","Opening multiple repositories at once","Sharing one license among multiple users"],"eEn":"Copilot supports multiple foundation models, letting users pick a model appropriate for their task in features like Chat."},{"d":"D4","q":"GitHub Copilot の Individuals・Business・Enterprise プランの違いとして正しいものはどれですか。","o":["3つとも機能・管理範囲は完全に同じである","Business/Enterprise は組織による一元管理やポリシー制御が可能で、Enterprise はさらに組織向けの高度な機能を含む","Individuals プランのみが組織のポリシー管理を提供する","Enterprise プランは個人しか利用できない"],"a":1,"e":"Individuals は個人向け、Business は組織でのライセンス・ポリシー管理、Enterprise はさらに組織のナレッジ連携など高度な機能を提供します。","qEn":"Which correctly describes the difference between GitHub Copilot Individuals, Business, and Enterprise plans?","oEn":["All three have exactly the same features and management scope","Business/Enterprise add centralized org management and policy control, and Enterprise adds further org-focused capabilities","Only the Individuals plan offers organization policy management","The Enterprise plan can only be used by individuals"],"eEn":"Individuals is for personal use; Business adds org license and policy management; Enterprise adds further advanced org-focused capabilities."},{"d":"D4","q":"GitHub Copilot Chat が提供するのは主にどのような体験ですか。","o":["リポジトリ間でファイルを物理的にコピーする","課題にラベルを自動付与するだけの機能","自然言語でコードやエラーについて質問し、対話的に説明や提案を得る","サーバーのログを外部に送信する機能"],"a":2,"e":"Copilot Chat はエディターや GitHub 上で、自然言語による対話でコードの説明・修正・生成などを支援します。","qEn":"What experience does GitHub Copilot Chat primarily provide?","oEn":["Physically copying files between repositories","A feature that only auto-labels issues","Asking about code or errors in natural language and getting interactive explanations and suggestions","A feature that sends server logs externally"],"eEn":"Copilot Chat provides a conversational, natural-language interface to explain, fix, or generate code in the editor or on GitHub."},{"d":"D4","q":"GitHub Copilot Enterprise が組織向けに提供する代表的な機能はどれですか。","o":["個人アカウントの2要素認証を無効化する","無料でドメインを提供する","リポジトリを自動で公開に変更する","組織のリポジトリ知識に基づいた回答や、プルリクエストの要約などの支援"],"a":3,"e":"Copilot Enterprise は組織のコードベースに根ざした回答やプルリクエスト要約など、組織のナレッジと統合した支援を提供します。","qEn":"Which is a representative capability GitHub Copilot Enterprise provides for organizations?","oEn":["Disabling two-factor authentication on personal accounts","Providing free domains","Automatically switching repositories to public","Answers grounded in the org's repository knowledge and pull request summaries"],"eEn":"Copilot Enterprise integrates with org knowledge, offering answers grounded in the organization's codebase and pull request summaries."},{"d":"D4","q":"GitHub Codespaces とは何を提供するサービスですか。","o":["クラウド上でホストされる、ブラウザーや VS Code から使える開発環境","静的ウェブサイトのホスティング専用サービス","課題を追跡するためのボードのみ","ソースコードの差分を表示する機能"],"a":0,"e":"GitHub Codespaces はクラウド上に構成される完全な開発環境で、ブラウザーや VS Code から利用できます。","qEn":"What does GitHub Codespaces provide?","oEn":["A cloud-hosted development environment usable from a browser or VS Code","A service only for hosting static websites","Only a board for tracking issues","A feature to show source code diffs"],"eEn":"GitHub Codespaces is a complete cloud-hosted development environment accessible from a browser or VS Code."},{"d":"D4","q":"Codespaces で開発環境の構成（ツールや拡張機能、設定）を定義するために使うものは何ですか。","o":["README.md ファイル","dev container（devcontainer.json）の設定","LICENSE ファイル","CODEOWNERS ファイル"],"a":1,"e":"dev container を devcontainer.json で定義すると、Codespaces の環境（言語・ツール・拡張機能など）を再現可能に構成できます。","qEn":"What is used to define the development environment configuration (tools, extensions, settings) for a Codespace?","oEn":["A README.md file","A dev container (devcontainer.json) configuration","A LICENSE file","A CODEOWNERS file"],"eEn":"A dev container defined by devcontainer.json configures a reproducible Codespaces environment (languages, tools, extensions)."},{"d":"D4","q":"ローカル環境の代わりに Codespaces を使う利点として最も適切なものはどれですか。","o":["インターネット接続が一切不要になる","ソースコードのバージョン管理が不要になる","各自のPCに依存しない一貫した開発環境をすぐに立ち上げられる","プルリクエストの作成が禁止される"],"a":2,"e":"Codespaces は構成済み環境をクラウドで即座に用意でき、環境差異による問題を減らし、どこからでも一貫した開発ができます。","qEn":"What is a key advantage of using Codespaces instead of a local setup?","oEn":["It removes any need for an internet connection","It removes the need for version control","You can quickly spin up a consistent dev environment independent of each person's PC","It prohibits creating pull requests"],"eEn":"Codespaces provides preconfigured, consistent cloud environments on demand, reducing 'works on my machine' issues and enabling development from anywhere."},{"d":"D4","q":"リポジトリのコード画面でキーボードの「.（ピリオド）」を押すと起動するものは何ですか。","o":["GitHub Actions のワークフロー","リポジトリの削除確認画面","GitHub Sponsors のページ","ブラウザー上の軽量エディター github.dev"],"a":3,"e":"リポジトリで「.」キーを押すと、ブラウザー内で動く軽量エディター github.dev が開き、コードを閲覧・編集できます。","qEn":"What opens when you press the period (.) key on a repository's code page?","oEn":["A GitHub Actions workflow","The repository deletion confirmation screen","The GitHub Sponsors page","The lightweight in-browser editor github.dev"],"eEn":"Pressing '.' on a repository opens github.dev, a lightweight browser-based editor for viewing and editing code."},{"d":"D4","q":"github.dev エディターと Codespaces の違いとして正しいものはどれですか。","o":["github.dev はコンピューティング環境やターミナルを持たず、Codespaces は完全な実行環境を持つ","Codespaces にはエディターが無く、github.dev だけがコードを編集できる","両者はまったく同じもので違いはない","github.dev はローカルにインストールが必要で Codespaces は不要"],"a":0,"e":"github.dev は軽量な閲覧・編集向けでターミナルやコード実行はできませんが、Codespaces はクラウド上の完全な開発環境でビルドや実行が可能です。","qEn":"Which correctly describes the difference between the github.dev editor and Codespaces?","oEn":["github.dev has no compute or terminal, while Codespaces provides a full runtime environment","Codespaces has no editor; only github.dev can edit code","They are exactly the same with no difference","github.dev needs local install while Codespaces does not"],"eEn":"github.dev is lightweight for viewing/editing with no terminal or code execution, whereas Codespaces is a full cloud dev environment that can build and run code."},{"d":"D4","q":"Codespaces の「prebuild（プレビルド）」が主に解決する課題はどれですか。","o":["リポジトリの可視性を変更すること","Codespace 起動時に依存関係やビルドを事前準備して起動を高速化すること","課題にラベルを付けること","プルリクエストをマージすること"],"a":1,"e":"prebuild は依存関係のインストールやビルドをあらかじめ実行しておくことで、Codespace の作成・起動を高速化します。","qEn":"What problem do Codespaces 'prebuilds' primarily solve?","oEn":["Changing a repository's visibility","Preparing dependencies and builds in advance to speed up Codespace startup","Adding labels to issues","Merging pull requests"],"eEn":"Prebuilds run dependency installation and builds ahead of time, so creating and starting a Codespace is much faster."},{"d":"D5","q":"GitHub Projects とは何を目的としたツールですか。","o":["課題やプルリクエストを柔軟に整理・計画・追跡するプロジェクト管理ツール","ソースコードをコンパイルするビルドツール","AI がコードを補完する機能","リポジトリのバックアップ専用ツール"],"a":0,"e":"GitHub Projects は課題やプルリクエストをテーブルやボードで整理し、作業の計画と進捗追跡を行う柔軟な管理ツールです。","qEn":"What is the purpose of GitHub Projects?","oEn":["A flexible project management tool to organize, plan, and track issues and pull requests","A build tool that compiles source code","An AI code completion feature","A tool solely for backing up repositories"],"eEn":"GitHub Projects is a flexible planning tool that organizes issues and pull requests in tables or boards to plan and track work."},{"d":"D5","q":"GitHub Projects で選択できるレイアウト（表示形式）の組み合わせとして正しいものはどれですか。","o":["スプレッドシート、スライド、ドキュメント","テーブル、ボード、ロードマップ","地図、カレンダーのみ","ターミナル、エディター"],"a":1,"e":"Projects はテーブル・ボード・ロードマップの各レイアウトで同じ項目を異なる視点から表示できます。","qEn":"Which set of layouts can you use in GitHub Projects?","oEn":["Spreadsheet, slides, and document","Table, board, and roadmap","Map and calendar only","Terminal and editor"],"eEn":"Projects offers table, board, and roadmap layouts to view the same items from different perspectives."},{"d":"D5","q":"課題やプルリクエストに付ける「ラベル（label）」の主な用途はどれですか。","o":["課題を完全に削除する","ユーザーの2要素認証を設定する","課題を分類・整理し、種類や状態を色付きで示す","リポジトリを非公開にする"],"a":2,"e":"ラベルは bug や enhancement など、課題やプルリクエストを分類・フィルターするための色付きタグです。","qEn":"What is the main use of labels on issues and pull requests?","oEn":["To permanently delete an issue","To configure a user's two-factor authentication","To categorize and organize items and indicate type or state with colors","To make a repository private"],"eEn":"Labels are colored tags such as bug or enhancement used to categorize and filter issues and pull requests."},{"d":"D5","q":"「マイルストーン（milestone）」の役割として最も適切なものはどれですか。","o":["個々のコミットに署名する","リポジトリのライセンスを決める","ブランチ保護ルールを設定する","関連する課題やプルリクエストをまとめ、期限付きの目標として進捗を追跡する"],"a":3,"e":"マイルストーンは特定のリリースや目標に向けた課題・プルリクエストをまとめ、期限と達成率で進捗を追えます。","qEn":"What is the role of a milestone?","oEn":["To sign individual commits","To choose a repository's license","To set branch protection rules","To group related issues and pull requests toward a dated goal and track progress"],"eEn":"A milestone groups issues and pull requests toward a release or goal, tracking progress with a due date and completion rate."},{"d":"D5","q":"GitHub Projects の組み込みワークフロー（built-in workflows）が可能にすることはどれですか。","o":["項目のステータス変更などをトリガーに自動化を実行する","リポジトリを別アカウントへ譲渡する","コミット履歴を書き換える","AI モデルを学習させる"],"a":0,"e":"Projects の組み込みワークフローは、課題がクローズされたら Done にするなど、イベントに応じて項目を自動更新します。","qEn":"What do GitHub Projects' built-in workflows enable?","oEn":["Running automations triggered by events like item status changes","Transferring a repository to another account","Rewriting commit history","Training an AI model"],"eEn":"Built-in workflows in Projects automatically update items on events, e.g., setting an item to Done when its issue is closed."},{"d":"D5","q":"GitHub の「保存済み返信（saved replies）」の目的として正しいものはどれですか。","o":["ブランチを自動で削除する","よく使うコメント文を保存し、課題やプルリクエストで再利用する","リポジトリの可視性を切り替える","2要素認証を強制する"],"a":1,"e":"保存済み返信は、頻繁に書くコメントをテンプレートとして保存し、課題やプルリクエストで素早く再利用できる機能です。","qEn":"What is the purpose of GitHub saved replies?","oEn":["To automatically delete branches","To save frequently used comment text and reuse it on issues and pull requests","To toggle repository visibility","To enforce two-factor authentication"],"eEn":"Saved replies let you store commonly used comment text as templates to quickly reuse on issues and pull requests."},{"d":"D5","q":"課題を特定の担当者に「アサイン（assign）」することの意味として正しいものはどれですか。","o":["課題を自動的にクローズする","リポジトリを削除する","その課題の対応責任者を明確にし、担当者を割り当てる","コードを自動生成する"],"a":2,"e":"アサインは課題やプルリクエストに担当者を割り当て、誰が対応するかを明確にする機能です。","qEn":"What does assigning an issue to someone mean?","oEn":["It automatically closes the issue","It deletes the repository","It designates who is responsible for the issue by assigning an assignee","It auto-generates code"],"eEn":"Assigning designates an assignee for an issue or pull request, clarifying who is responsible for it."},{"d":"D5","q":"GitHub Projects の insights（インサイト）は主に何に役立ちますか。","o":["リポジトリのソースコードを暗号化する","ユーザーのパスワードを管理する","ドメイン名を購入する","チャートやグラフでプロジェクトの進捗や傾向を可視化して把握する"],"a":3,"e":"project insights は、項目データからチャートを生成し、進捗やバーンダウンなどの傾向を可視化して把握するのに役立ちます。","qEn":"What are GitHub Projects insights primarily useful for?","oEn":["Encrypting a repository's source code","Managing users' passwords","Purchasing domain names","Visualizing project progress and trends with charts and graphs"],"eEn":"Project insights generate charts from item data to visualize progress and trends such as burndown."},{"d":"D5","q":"GitHub Projects の「カスタムフィールド（custom fields）」が可能にすることはどれですか。","o":["優先度や見積もりなど独自の情報を項目に追加して管理する","リポジトリのブランチを保護する","AI モデルを切り替える","アカウントを削除する"],"a":0,"e":"カスタムフィールドを使うと、テキスト・数値・単一選択・日付・イテレーションなど独自の項目を追加し、優先度や見積もりを管理できます。","qEn":"What do custom fields in GitHub Projects enable?","oEn":["Adding custom information like priority or estimate to items for management","Protecting a repository's branches","Switching AI models","Deleting an account"],"eEn":"Custom fields let you add fields such as text, number, single select, date, or iteration to track things like priority and estimates."},{"d":"D5","q":"GitHub Projects とリポジトリの関係として正しいものはどれですか。","o":["プロジェクトは必ず1つのリポジトリ内でしか使えない","1つのプロジェクトは複数のリポジトリの課題やプルリクエストを横断してまとめられる","プロジェクトにはリポジトリの項目を追加できない","プロジェクトはリポジトリのソースコードそのものである"],"a":1,"e":"GitHub Projects（新しい Projects）は組織やユーザー単位で作成でき、複数リポジトリの課題・プルリクエストを横断して管理できます。","qEn":"Which correctly describes the relationship between GitHub Projects and repositories?","oEn":["A project can only be used within a single repository","A single project can span issues and pull requests across multiple repositories","You cannot add repository items to a project","A project is the repository's source code itself"],"eEn":"The new GitHub Projects can be created at the org or user level and manage issues and pull requests across multiple repositories."},{"d":"D5","q":"既存の課題やプルリクエストを GitHub Project に取り込むには、通常どうしますか。","o":["リポジトリを削除して作り直す","課題を必ずクローズしてから移動する","プロジェクトに項目として追加（add item）してリンクする","新しいアカウントを作成する"],"a":2,"e":"課題やプルリクエストは、プロジェクトに項目として追加することでリンクされ、ボードやテーブルで管理できます。","qEn":"How do you typically bring an existing issue or pull request into a GitHub Project?","oEn":["Delete and recreate the repository","Always close the issue before moving it","Add it as an item to the project to link it","Create a new account"],"eEn":"You add issues or pull requests as items to a project to link them, then manage them in the board or table."},{"d":"D5","q":"GitHub Projects の「ボード（board）」レイアウトで、各列は一般的に何を表しますか。","o":["各ユーザーのパスワード","コミットのハッシュ値","リポジトリのライセンス種別","項目の状態（ステータス）やカテゴリー"],"a":3,"e":"ボードレイアウトの列は通常、Todo・In progress・Done などのステータスを表し、カードを列間で移動して進捗を管理します。","qEn":"In the board layout of GitHub Projects, what do the columns typically represent?","oEn":["Each user's password","Commit hash values","The repository's license type","The status or category of items"],"eEn":"Board columns typically represent statuses such as Todo, In progress, and Done, and cards move between columns to track progress."},{"d":"D6","q":"2要素認証（2FA）がアカウントのセキュリティを高める理由として正しいものはどれですか。","o":["パスワードに加えて別の要素の確認を求めることで、不正アクセスを防ぎやすくする","パスワードを不要にして誰でもログインできるようにする","リポジトリを自動的に公開する","コードを自動生成する"],"a":0,"e":"2FA はパスワードに加え、認証アプリやセキュリティキーなど第2の要素を要求するため、パスワードが漏れても不正アクセスを防ぎやすくなります。","qEn":"Why does two-factor authentication (2FA) improve account security?","oEn":["It requires a second factor in addition to a password, helping prevent unauthorized access","It removes the need for a password so anyone can log in","It automatically makes repositories public","It auto-generates code"],"eEn":"2FA requires a second factor (e.g., an authenticator app or security key) beyond the password, so a leaked password alone is not enough."},{"d":"D6","q":"パスキー（passkey）による認証の利点として最も適切なものはどれですか。","o":["パスワードを平文で共有できる","パスワードを使わずに、フィッシングに強い方法でサインインできる","2要素認証を無効化できる","リポジトリのライセンスを変更できる"],"a":1,"e":"パスキーは公開鍵暗号に基づくパスワードレス認証で、フィッシング耐性が高く、安全かつ簡単にサインインできます。","qEn":"What is a key advantage of passkey authentication?","oEn":["Sharing passwords in plain text","Signing in without a password using a phishing-resistant method","Disabling two-factor authentication","Changing a repository's license"],"eEn":"Passkeys are passwordless, public-key-based credentials that are phishing-resistant and enable secure, easy sign-in."},{"d":"D6","q":"GitHub の2要素認証で利用できる方式として正しい組み合わせはどれですか。","o":["リポジトリのフォークのみ","ラベルとマイルストーンのみ","認証アプリ（TOTP）やセキュリティキー、SMS など","プルリクエストのマージのみ"],"a":2,"e":"GitHub の2FA は認証アプリ（TOTP）、セキュリティキー、パスキー、SMS などを設定でき、より安全な方式が推奨されます。","qEn":"Which are valid methods for GitHub two-factor authentication?","oEn":["Only forking a repository","Only labels and milestones","Authenticator apps (TOTP), security keys, SMS, and similar","Only merging pull requests"],"eEn":"GitHub 2FA supports authenticator apps (TOTP), security keys, passkeys, and SMS, with more secure methods recommended."},{"d":"D6","q":"GitHub のリポジトリ権限ロールを、権限が小さい順に正しく並べているものはどれですか。","o":["Admin → Write → Read → Triage → Maintain","Write → Read → Admin → Triage → Maintain","Triage → Admin → Read → Maintain → Write","Read → Triage → Write → Maintain → Admin"],"a":3,"e":"リポジトリロールは Read・Triage・Write・Maintain・Admin の順に権限が広がり、Admin が最も強い権限を持ちます。","qEn":"Which lists GitHub repository roles from least to most permissions?","oEn":["Admin → Write → Read → Triage → Maintain","Write → Read → Admin → Triage → Maintain","Triage → Admin → Read → Maintain → Write","Read → Triage → Write → Maintain → Admin"],"eEn":"Repository roles increase in permission as Read, Triage, Write, Maintain, then Admin, with Admin having the most."},{"d":"D6","q":"Organization（組織）の Owner ロールが持つ権限として正しいものはどれですか。","o":["組織全体の設定・メンバー・課金などを管理できる最上位の権限","1つの課題にコメントするだけの権限","ソースコードを閲覧するだけの権限","自分のリポジトリのみ削除できる権限"],"a":0,"e":"Organization の Owner は、メンバー管理・請求・セキュリティ設定など組織全体を管理できる最も強い管理者ロールです。","qEn":"What permissions does the Organization Owner role have?","oEn":["The top-level ability to manage org-wide settings, members, and billing","Only commenting on a single issue","Only viewing source code","Only deleting one's own repositories"],"eEn":"An Organization Owner is the highest admin role, able to manage org-wide members, billing, and security settings."},{"d":"D6","q":"Organization でメンバーのアクセス権をまとめて管理するのに便利な仕組みはどれですか。","o":["全員に個別に手動で権限を毎回設定する以外に方法はない","チーム（team）を作成し、チーム単位でリポジトリへのアクセスを付与する","ラベルでアクセス権を管理する","マイルストーンでアクセス権を管理する"],"a":1,"e":"チームを使うと、メンバーをグループ化してチーム単位でリポジトリ権限を付与でき、アクセス管理を効率化できます。","qEn":"What mechanism helps manage members' access at scale in an Organization?","oEn":["There is no way other than manually setting each person's permission every time","Creating teams and granting repository access at the team level","Managing access with labels","Managing access with milestones"],"eEn":"Teams let you group members and grant repository permissions at the team level, streamlining access management."},{"d":"D6","q":"Enterprise Managed Users（EMU）とは何ですか。","o":["誰でも自由に作れる個人の無料アカウント","リポジトリの一種","企業の ID プロバイダー（IdP）で作成・管理されるユーザーアカウントで、Enterprise が一元管理する","課題のラベルの一種"],"a":2,"e":"EMU では、ユーザーアカウントが企業の IdP により作成・管理され、Enterprise 管理者がライフサイクルとアクセスを一元的に制御します。","qEn":"What are Enterprise Managed Users (EMU)?","oEn":["Free personal accounts anyone can create freely","A kind of repository","User accounts created and managed via the company's identity provider (IdP), centrally controlled by the enterprise","A kind of issue label"],"eEn":"With EMU, user accounts are provisioned and managed through the company's IdP, giving the enterprise central control of lifecycle and access."},{"d":"D6","q":"EMU 環境における利用者のアカウントの扱いとして正しいものはどれですか。","o":["利用者が自由に外部の公開リポジトリへ自分のEMUアカウントで無制限に貢献できる","アカウントは GitHub 上で完全に匿名になる","アカウントは課金対象外で管理不能になる","アカウントは Enterprise に属し、IdP を通じて管理・プロビジョニングされる"],"a":3,"e":"EMU アカウントは Enterprise に帰属し IdP で管理されるため、企業の統制下に置かれ、外部利用は制限されます。","qEn":"How are users' accounts handled in an EMU environment?","oEn":["Users can freely contribute to external public repos without limits using their EMU account","Accounts become fully anonymous on GitHub","Accounts become unbillable and unmanageable","Accounts belong to the enterprise and are managed and provisioned via the IdP"],"eEn":"EMU accounts belong to the enterprise and are provisioned via the IdP, keeping them under corporate control with restricted external use."},{"d":"D6","q":"組織全体で GitHub Copilot の利用ポリシー（有効/無効や提案の設定など）を管理できるのは誰ですか。","o":["Organization/Enterprise の管理者が Copilot ポリシーを一元管理できる","誰も Copilot のポリシーは変更できない","個々の課題の担当者のみが設定できる","外部コラボレーターだけが設定できる"],"a":0,"e":"Copilot Business/Enterprise では、組織や Enterprise の管理者が Copilot の有効化やポリシー（提案のフィルターなど）を一元管理できます。","qEn":"Who can manage GitHub Copilot usage policies (enable/disable, suggestion settings) across an organization?","oEn":["Organization/Enterprise admins can centrally manage Copilot policies","No one can change Copilot policies","Only the assignee of each issue can set them","Only outside collaborators can set them"],"eEn":"With Copilot Business/Enterprise, org or enterprise admins can centrally manage enabling Copilot and its policies, such as suggestion filtering."},{"d":"D6","q":"GitHub リポジトリの可視性（visibility）の種類として正しい組み合わせはどれですか。","o":["Open、Closed、Merged","Public、Private、Internal","Read、Write、Admin","Todo、Doing、Done"],"a":1,"e":"リポジトリの可視性は Public（誰でも閲覧可）、Private（許可された人のみ）、Internal（Enterprise 内のメンバー向け）の3種類です。","qEn":"Which is the correct set of GitHub repository visibilities?","oEn":["Open, Closed, Merged","Public, Private, Internal","Read, Write, Admin","Todo, Doing, Done"],"eEn":"Repository visibility can be Public (anyone), Private (only permitted people), or Internal (members within the enterprise)."},{"d":"D6","q":"「Internal（内部）」リポジトリの特徴として正しいものはどれですか。","o":["インターネット上の誰でも閲覧・編集できる","作成者本人以外は誰も見られない","同じ Enterprise に属するメンバーには見えるが、外部の一般ユーザーには公開されない","GitHub 上に一切保存されない"],"a":2,"e":"Internal リポジトリは Enterprise のメンバー全員が閲覧できる一方、外部の一般公開はされず、InnerSource に適しています。","qEn":"What characterizes an Internal repository?","oEn":["Anyone on the internet can view and edit it","No one but the creator can see it","Visible to members of the same enterprise but not to the general public","It is never stored on GitHub"],"eEn":"Internal repositories are visible to all members of the enterprise but not to the general public, making them well suited for InnerSource."},{"d":"D6","q":"ブランチ保護ルール（branch protection rule）の目的として最も適切なものはどれですか。","o":["リポジトリを自動的に削除する","課題にラベルを付ける","AI モデルを選択する","重要なブランチへの変更に条件を課し、品質やレビューを担保する"],"a":3,"e":"ブランチ保護ルールは、main などの重要ブランチに対してレビュー必須やステータスチェック合格などの条件を課し、望まない変更を防ぎます。","qEn":"What is the purpose of a branch protection rule?","oEn":["To automatically delete a repository","To add labels to issues","To select an AI model","To impose conditions on changes to important branches to ensure quality and review"],"eEn":"Branch protection rules enforce conditions such as required reviews or passing checks on important branches to prevent unwanted changes."},{"d":"D6","q":"ブランチ保護で「マージ前にプルリクエストのレビュー承認を必須にする」設定の効果はどれですか。","o":["レビューで承認されない限り、そのブランチへ変更をマージできなくなる","誰でも即座に直接ブランチへ push できるようになる","リポジトリが自動的に公開される","課題が自動的にクローズされる"],"a":0,"e":"この設定を有効にすると、必要な数のレビュー承認を得るまでプルリクエストをマージできず、変更前にレビューが保証されます。","qEn":"What is the effect of requiring pull request review approval before merging in branch protection?","oEn":["Changes cannot be merged into the branch until approved by review","Anyone can immediately push directly to the branch","The repository is automatically made public","Issues are automatically closed"],"eEn":"When enabled, a pull request cannot be merged until it receives the required approvals, guaranteeing review before changes land."},{"d":"D6","q":"ブランチ保護で「必須ステータスチェック（required status checks）」を設定する狙いはどれですか。","o":["全メンバーの権限を Admin に昇格する","CI のテストなどが成功しなければマージできないようにする","リポジトリの可視性を Internal に固定する","課題のラベルを自動生成する"],"a":1,"e":"必須ステータスチェックにより、GitHub Actions などのチェックが合格するまでマージをブロックし、壊れた変更の混入を防ぎます。","qEn":"What is the goal of configuring required status checks in branch protection?","oEn":["To promote all members' permissions to Admin","To block merging unless checks such as CI tests pass","To fix repository visibility to Internal","To auto-generate issue labels"],"eEn":"Required status checks block merges until checks (e.g., GitHub Actions) pass, preventing broken changes from being merged."},{"d":"D6","q":"Organization の「メンバー」と「外部コラボレーター（outside collaborator）」の違いとして正しいものはどれですか。","o":["外部コラボレーターは組織のすべての設定を変更できる","メンバーはリポジトリに一切アクセスできない","外部コラボレーターは組織のメンバーではなく、招待された特定リポジトリにのみアクセスできる","両者に違いはなく完全に同じ権限を持つ"],"a":2,"e":"外部コラボレーターは組織メンバーではなく、招待された個別リポジトリにのみアクセスできる点で、組織全体に属するメンバーと異なります。","qEn":"What distinguishes an Organization member from an outside collaborator?","oEn":["An outside collaborator can change all org settings","Members cannot access any repositories","An outside collaborator is not an org member and can access only the specific repositories they are invited to","There is no difference; both have identical permissions"],"eEn":"An outside collaborator is not a member of the org and can access only the specific repositories they are invited to, unlike full members."},{"d":"D6","q":"Organization で新しいメンバーに適用される「ベース権限（base permissions）」とは何ですか。","o":["個々の課題にのみ適用される色設定","AI モデルの選択肢","パスキーの種類","組織のすべてのリポジトリに対してメンバーが既定で持つアクセスレベル"],"a":3,"e":"ベース権限は、組織メンバーが組織内リポジトリに対して既定で持つアクセスレベル（No access、Read など）を定めます。","qEn":"What is the base permission applied to members in an Organization?","oEn":["A color setting applied only to individual issues","A choice of AI model","A type of passkey","The default access level members have to all of the org's repositories"],"eEn":"Base permissions define the default access level (e.g., No access, Read) that org members have to the organization's repositories."},{"d":"D6","q":"GitHub のチームで「入れ子（ネスト）構造」を使う利点はどれですか。","o":["親チームの権限を子チームが継承し、階層的にアクセスを整理できる","リポジトリのライセンスを自動変更できる","課題を自動的に翻訳できる","コミットを暗号化できる"],"a":0,"e":"ネストされたチームでは、子チームが親チームのアクセス権を継承でき、組織構造に合わせて権限を階層的に管理できます。","qEn":"What is the benefit of nested teams in GitHub?","oEn":["Child teams inherit the parent team's permissions, organizing access hierarchically","It can automatically change a repository's license","It can automatically translate issues","It can encrypt commits"],"eEn":"With nested teams, child teams inherit the parent team's access, letting you organize permissions hierarchically to match your org structure."},{"d":"D6","q":"リポジトリ作成時に既定で選ばれる可視性を選択でき、後から変更もできるのは誰ですか（適切な説明はどれか）。","o":["可視性は一度作成すると誰も変更できない","適切な権限を持つ管理者/所有者は、リポジトリの可視性を Public・Private・Internal 間で変更できる","外部コラボレーターだけが可視性を変更できる","可視性の変更には新しいアカウントが必要"],"a":1,"e":"リポジトリの管理者権限を持つユーザーは、設定から可視性を Public・Private・Internal 間で変更できます（組織のポリシーに従う）。","qEn":"Which statement about changing a repository's visibility is correct?","oEn":["Visibility can never be changed once created","An admin/owner with appropriate rights can change visibility among Public, Private, and Internal","Only outside collaborators can change visibility","Changing visibility requires a new account"],"eEn":"A user with admin rights on the repository can change its visibility among Public, Private, and Internal, subject to org policy."},{"d":"D6","q":"Organization で2要素認証を「必須（enforce）」にする設定の効果はどれですか。","o":["メンバーのパスワードが不要になる","リポジトリがすべて公開される","組織のメンバーは2FAを有効にしないと組織のリソースにアクセスできなくなる","課題が自動的に閉じられる"],"a":2,"e":"組織で2FAを必須にすると、2FA未設定のメンバーは組織のリポジトリなどにアクセスできなくなり、組織全体のセキュリティが向上します。","qEn":"What is the effect of enforcing two-factor authentication in an Organization?","oEn":["Members no longer need passwords","All repositories become public","Members who do not enable 2FA lose access to the organization's resources","Issues are closed automatically"],"eEn":"Enforcing 2FA blocks members without 2FA from accessing the org's repositories, strengthening organization-wide security."},{"d":"D6","q":"セキュリティキーやパスキーがSMSベースの2FAより優れているとされる主な理由はどれですか。","o":["パスワードを不要にして誰でもログインできる","課金が無料になる","リポジトリの容量が増える","フィッシング攻撃に対する耐性が高い"],"a":3,"e":"セキュリティキーやパスキーは正規サイトに紐づく公開鍵暗号を使うため、偽サイトに認証情報を渡さず、フィッシング耐性が高いです。","qEn":"Why are security keys and passkeys considered stronger than SMS-based 2FA?","oEn":["They remove passwords so anyone can log in","They make billing free","They increase repository storage","They are more resistant to phishing attacks"],"eEn":"Security keys and passkeys use public-key cryptography bound to the legitimate site, so credentials are not phished by fake sites."},{"d":"D6","q":"「Private（プライベート）」リポジトリの既定のアクセスに関する説明として正しいものはどれですか。","o":["所有者と明示的にアクセスを付与された人だけが閲覧・操作できる","インターネット上の誰でも自由に閲覧できる","同じ Enterprise の全員が自動的に閲覧できる","検索エンジンに必ずインデックスされる"],"a":0,"e":"Private リポジトリは、所有者と明示的にアクセスを与えられたユーザーやチームのみが閲覧・操作でき、一般には公開されません。","qEn":"Which statement about default access to a Private repository is correct?","oEn":["Only the owner and people explicitly granted access can view or work in it","Anyone on the internet can freely view it","Everyone in the same enterprise can automatically view it","It is always indexed by search engines"],"eEn":"A private repository is viewable and usable only by the owner and users or teams explicitly granted access; it is not public."},{"d":"D6","q":"リポジトリの「Triage」ロールが持つ代表的な権限はどれですか。","o":["リポジトリを削除できる","課題やプルリクエストの管理（ラベル付けやアサインなど）はできるが、コードへの書き込みはできない","組織全体の課金を管理できる","ブランチ保護ルールを無条件に解除できる"],"a":1,"e":"Triage ロールは、課題やプルリクエストの整理（ラベル付け、アサイン、クローズなど）はできますが、コードの push 権限は持ちません。","qEn":"What is a representative permission of the repository Triage role?","oEn":["It can delete the repository","It can manage issues and pull requests (labeling, assigning) but cannot write code","It can manage org-wide billing","It can unconditionally remove branch protection rules"],"eEn":"The Triage role can manage issues and pull requests (label, assign, close) but does not have write/push access to code."},{"d":"D6","q":"Organization の監査ログ（audit log）が主に役立つ場面はどれですか。","o":["ソースコードを自動的にコンパイルする","課題にラベルを自動付与する","組織内で誰がいつどんな操作を行ったかを記録・確認し、コンプライアンスやセキュリティ調査に使う","リポジトリをフォークする"],"a":2,"e":"監査ログは、メンバーの追加や権限変更、設定変更などの操作履歴を記録し、セキュリティやコンプライアンスの調査に役立ちます。","qEn":"When is an Organization's audit log primarily useful?","oEn":["Automatically compiling source code","Auto-labeling issues","Recording and reviewing who did what and when for compliance and security investigations","Forking a repository"],"eEn":"The audit log records actions such as member additions, permission changes, and setting changes, aiding security and compliance reviews."},{"d":"D6","q":"CODEOWNERS ファイルの役割として正しいものはどれですか。","o":["リポジトリを暗号化する","課金プランを変更する","AI モデルを選択する","特定のパスやファイルの変更に対して、自動的にレビュアーとして要求される担当者を定義する"],"a":3,"e":"CODEOWNERS は、指定したファイルやディレクトリの変更時に、自動でレビュー依頼される所有者（担当者/チーム）を定義します。","qEn":"What is the role of a CODEOWNERS file?","oEn":["It encrypts the repository","It changes the billing plan","It selects an AI model","It defines owners automatically requested as reviewers for changes to specific paths or files"],"eEn":"CODEOWNERS defines owners (people or teams) automatically requested for review when specified files or directories change."},{"d":"D7","q":"オープンソースソフトウェア（OSS）の一般的な利点として最も適切なものはどれですか。","o":["誰でもソースを閲覧・利用・改善でき、コミュニティによる協働と透明性が得られる","ソースコードを必ず非公開にしなければならない","1人しか貢献できない","常に有料でしか使えない"],"a":0,"e":"OSS はソースが公開され、誰でも利用・学習・改善に参加できるため、透明性とコミュニティによる協働という利点があります。","qEn":"Which is a general benefit of open source software (OSS)?","oEn":["Anyone can view, use, and improve the source, enabling community collaboration and transparency","Source code must always be kept private","Only one person can contribute","It can always only be used for a fee"],"eEn":"OSS makes source public so anyone can use, learn from, and improve it, providing transparency and community collaboration."},{"d":"D7","q":"GitHub Sponsors とは何をするための仕組みですか。","o":["リポジトリを自動的にフォークする","オープンソースの開発者やプロジェクトに金銭的な支援（スポンサー）を提供する","課題にラベルを付ける","2要素認証を設定する"],"a":1,"e":"GitHub Sponsors は、貢献している開発者やプロジェクトに対して個人や組織が資金援助を行える仕組みです。","qEn":"What is GitHub Sponsors for?","oEn":["Automatically forking a repository","Providing financial support (sponsorship) to open source developers and projects","Adding labels to issues","Setting up two-factor authentication"],"eEn":"GitHub Sponsors lets individuals and organizations fund the developers and projects they rely on."},{"d":"D7","q":"GitHub がオープンソースを支援する仕組みとして正しいものはどれですか。","o":["OSS の利用を禁止している","公開リポジトリを有料でしか作れないようにしている","公開リポジトリのホスティングや協働ツールを無償で提供し、Sponsors などで支援を促す","OSS 開発者のアカウントを削除する"],"a":2,"e":"GitHub は公開リポジトリの無償ホスティング、課題・プルリクエストなどの協働機能、Sponsors による資金支援など、OSS を多面的に支えています。","qEn":"Which describes how GitHub supports open source?","oEn":["It prohibits the use of OSS","It only allows creating public repos for a fee","It offers free hosting and collaboration tools for public repos and enables support via Sponsors","It deletes OSS developers' accounts"],"eEn":"GitHub supports OSS with free public repo hosting, collaboration features like issues and pull requests, and funding via Sponsors."},{"d":"D7","q":"GitHub で他のユーザーを「フォロー（follow）」すると得られることはどれですか。","o":["そのユーザーのプライベートリポジトリが見られる","そのユーザーのパスワードが分かる","そのユーザーの2FAを解除できる","そのユーザーの公開活動がフィードに表示され、動向を追える"],"a":3,"e":"ユーザーをフォローすると、そのユーザーの公開リポジトリの作成やスターなどの活動が自分のフィードに表示され、動向を追えます。","qEn":"What do you gain by following another user on GitHub?","oEn":["You can see their private repositories","You learn their password","You can disable their 2FA","Their public activity appears in your feed so you can follow what they do"],"eEn":"Following a user shows their public activity, such as new repos and stars, in your feed so you can keep up with them."},{"d":"D7","q":"GitHub で Organization（組織）をフォローできることの意味として正しいものはどれですか。","o":["その組織の公開活動を追い、新しいプロジェクトなどの情報を受け取れる","その組織の全メンバーの権限を変更できる","その組織の課金を代わりに支払う","その組織のプライベートリポジトリを閲覧できる"],"a":0,"e":"組織をフォローすると、その組織の公開活動がフィードに表示され、新しいリポジトリや活動などの情報を受け取れます。","qEn":"What does following an Organization on GitHub mean?","oEn":["You follow its public activity and receive updates about new projects and more","You can change all its members' permissions","You pay its billing on its behalf","You can view its private repositories"],"eEn":"Following an organization surfaces its public activity in your feed so you receive updates about new repositories and activity."},{"d":"D7","q":"GitHub Marketplace の主な役割はどれですか。","o":["個人のパスワードを保管する場所","ワークフローを拡張するアプリやアクションを見つけて導入できる場所","リポジトリのソースコードを削除する場所","課題をクローズする場所"],"a":1,"e":"GitHub Marketplace では、開発ワークフローを拡張するアプリや Actions を検索・導入でき、無料・有料のツールが提供されています。","qEn":"What is the main role of GitHub Marketplace?","oEn":["A place to store personal passwords","A place to find and add apps and actions that extend your workflow","A place to delete repository source code","A place to close issues"],"eEn":"GitHub Marketplace is where you discover and install apps and Actions that extend your development workflow, both free and paid."},{"d":"D7","q":"InnerSource（インナーソース）の考え方として最も適切なものはどれですか。","o":["すべてのコードを外部に公開することを義務づける","コードのバージョン管理を廃止する","組織内でオープンソースのやり方（公開・協働・貢献）を取り入れて社内開発を進める","課題管理を禁止する"],"a":2,"e":"InnerSource は、オープンソースの協働文化やプラクティスを組織の内部（社内リポジトリなど）に適用し、部門を超えた協働を促す考え方です。","qEn":"Which best describes the concept of InnerSource?","oEn":["Mandating that all code be made public externally","Abolishing version control of code","Applying open source practices (openness, collaboration, contribution) to development within an organization","Prohibiting issue tracking"],"eEn":"InnerSource applies open source collaboration culture and practices inside an organization to enable cross-team collaboration."},{"d":"D7","q":"GitHub における「フォーク（fork）」とは何ですか。","o":["リポジトリを完全に削除すること","課題を2つに分割すること","ブランチ保護を解除すること","他のリポジトリを自分のアカウントにコピーし、独立して変更・貢献できるようにすること"],"a":3,"e":"フォークは他人のリポジトリを自分のアカウントに複製する操作で、自由に変更し、必要ならプルリクエストで元へ貢献できます。","qEn":"What is a fork on GitHub?","oEn":["Permanently deleting a repository","Splitting an issue into two","Removing branch protection","Copying another repository into your account so you can change and contribute independently"],"eEn":"A fork is a copy of someone's repository under your account that you can change freely and contribute back via a pull request."},{"d":"D7","q":"テンプレートリポジトリ（template repository）の利点として正しいものはどれですか。","o":["同じ初期構成を持つ新しいリポジトリを、履歴なしで素早く作成できる","既存リポジトリの全履歴を必ず引き継ぐ","リポジトリを非公開にできなくなる","課題を自動でクローズする"],"a":0,"e":"テンプレートリポジトリからは、共通の初期ファイルや構成を持つ新規リポジトリを、元のコミット履歴を引き継がずに簡単に作成できます。","qEn":"What is a benefit of a template repository?","oEn":["Quickly creating new repositories with the same starting setup and no history","Always inheriting the full history of the existing repository","Making it impossible to keep a repo private","Automatically closing issues"],"eEn":"A template repository lets you quickly create new repositories with the same starter files and structure, without the original commit history."},{"d":"D7","q":"リポジトリを検索されやすく（discoverable）するために有効な手段はどれですか。","o":["リポジトリ名をランダムな文字列にする","適切な説明文や topics（トピック）、README を付けて内容を分かりやすくする","README を削除する","可視性を必ず Private にする"],"a":1,"e":"説明文やトピック、分かりやすい README を整えると、GitHub の検索やトピック一覧で見つけられやすくなります。","qEn":"What helps make a repository more discoverable?","oEn":["Naming the repository a random string","Adding a clear description, topics, and README to convey its content","Deleting the README","Always setting visibility to Private"],"eEn":"A clear description, topics, and a helpful README make a repository easier to find via GitHub search and topic listings."},{"d":"D7","q":"リポジトリに「スター（star）」を付けることの主な意味はどれですか。","o":["そのリポジトリを自分のものに変更する","そのリポジトリを削除する","気に入ったプロジェクトをブックマークし、関心や評価を示す","そのリポジトリの権限を昇格する"],"a":2,"e":"スターは、気に入ったリポジトリをブックマークして後で見つけやすくし、プロジェクトへの関心や人気を示す指標にもなります。","qEn":"What does starring a repository primarily mean?","oEn":["Taking ownership of that repository","Deleting that repository","Bookmarking a project you like and signaling interest or appreciation","Elevating your permissions on it"],"eEn":"Starring bookmarks a repository you like for easy access later and signals interest, also serving as a popularity indicator."},{"d":"D7","q":"オープンソースプロジェクトに変更を貢献する一般的な流れとして正しいものはどれですか。","o":["メンテナーのアカウントを乗っ取る","リポジトリを削除してから連絡する","課題を作らずに直接本番へ push する権限を要求する","フォークして変更し、プルリクエストを送ってメンテナーのレビューを受ける"],"a":3,"e":"一般に、リポジトリをフォークして変更し、プルリクエストを作成してメンテナーにレビュー・マージしてもらう流れで貢献します。","qEn":"What is a typical flow for contributing changes to an open source project?","oEn":["Take over the maintainer's account","Delete the repository and then reach out","Demand direct push access to production without any issue","Fork, make changes, and open a pull request for the maintainers to review"],"eEn":"You typically fork the repo, make changes, and open a pull request for maintainers to review and merge."},{"d":"D7","q":"オープンソースリポジトリに LICENSE ファイルを含めることが重要なのはなぜですか。","o":["他者がそのコードをどのように利用・改変・再配布できるかを明確に示すため","リポジトリのサイズを小さくするため","課題を自動でクローズするため","2要素認証を有効にするため"],"a":0,"e":"ライセンスは、コードの利用・改変・再配布の条件を明確化します。ライセンスがないと、既定では他者が自由に使えない場合があります。","qEn":"Why is including a LICENSE file important in an open source repository?","oEn":["It clearly states how others may use, modify, and redistribute the code","It reduces the repository's size","It auto-closes issues","It enables two-factor authentication"],"eEn":"A license clarifies terms for using, modifying, and redistributing the code; without one, others may have no default right to reuse it."},{"d":"D7","q":"オープンソースプロジェクトの README ファイルの主な役割はどれですか。","o":["ソースコードをコンパイルする","プロジェクトの概要・使い方・貢献方法などを説明し、利用者や貢献者を案内する","リポジトリを暗号化する","ユーザーのパスワードを保存する"],"a":1,"e":"README はプロジェクトの入口として、目的・インストール方法・使い方・貢献ガイドなどを伝え、利用者や貢献者を導きます。","qEn":"What is the main role of a README file in an open source project?","oEn":["Compiling the source code","Explaining the project's overview, usage, and how to contribute to guide users and contributors","Encrypting the repository","Storing users' passwords"],"eEn":"The README is the project's front door, describing its purpose, setup, usage, and contribution guidance for users and contributors."},{"d":"D7","q":"GitHub Discussions がコミュニティにもたらす価値として正しいものはどれですか。","o":["リポジトリを自動的にデプロイする","ブランチ保護ルールを設定する","課題管理とは別に、質問・アイデア・雑談などのオープンな会話の場を提供する","パスキーを発行する"],"a":2,"e":"GitHub Discussions は、バグ追跡用の課題とは別に、Q&Aやアイデア共有などコミュニティの対話の場を提供します。","qEn":"What value do GitHub Discussions bring to a community?","oEn":["Automatically deploying the repository","Setting branch protection rules","An open space for questions, ideas, and conversation, separate from issue tracking","Issuing passkeys"],"eEn":"GitHub Discussions provide an open forum for Q&A, ideas, and conversation, distinct from issues used for bug tracking."},{"d":"D7","q":"「フォーク（fork）」と「クローン（clone）」の違いとして正しいものはどれですか。","o":["両者はまったく同じ操作である","クローンは GitHub 上にコピーを作る操作である","フォークはローカルへのダウンロード専用である","フォークは GitHub 上に自分のリポジトリコピーを作り、クローンはリポジトリをローカルに複製する"],"a":3,"e":"フォークは GitHub 上で自分のアカウントにコピーを作る操作、クローンは（フォーク元や自分のリポジトリを）手元の環境に複製する操作です。","qEn":"What is the difference between forking and cloning?","oEn":["They are exactly the same operation","Cloning makes a copy on GitHub","Forking is only for downloading locally","Forking makes your own copy on GitHub; cloning copies a repository to your local machine"],"eEn":"Forking creates a copy under your account on GitHub, while cloning copies a repository to your local machine."},{"d":"D7","q":"GitHub Sponsors における資金の受け取り方に関する説明として正しいものはどれですか。","o":["対象の開発者や組織が、一度きりまたは継続的なスポンサーシップを受け取れる","スポンサーは必ずリポジトリの Admin 権限を得る","支援を受けるとリポジトリが自動的に非公開になる","Sponsors はコードを自動生成する機能である"],"a":0,"e":"GitHub Sponsors では、対象者が単発または月額など継続的な支援を受け取れます。支援と引き換えに管理権限が付与されるわけではありません。","qEn":"Which statement about receiving funds via GitHub Sponsors is correct?","oEn":["Eligible developers or orgs can receive one-time or recurring sponsorships","Sponsors always gain repository Admin permissions","Receiving support automatically makes the repo private","Sponsors is a feature that auto-generates code"],"eEn":"With GitHub Sponsors, eligible developers or organizations can receive one-time or recurring support; sponsorship does not grant admin rights."},{"d":"D7","q":"GitHub Marketplace で提供される要素として代表的なものはどれですか。","o":["各ユーザーのパスワード一覧","ワークフローに追加できる GitHub Actions やアプリ（連携ツール）","リポジトリの削除ボタンのみ","課題のラベル色の定義ファイル"],"a":1,"e":"GitHub Marketplace では、CI/CD やコード品質などの Actions や、GitHub と連携するアプリを見つけて導入できます。","qEn":"What are representative offerings on GitHub Marketplace?","oEn":["A list of each user's passwords","GitHub Actions and apps (integrations) you can add to your workflow","Only a repository delete button","A definition file for issue label colors"],"eEn":"GitHub Marketplace offers Actions for CI/CD, code quality, and more, plus apps that integrate with GitHub, ready to install."}];
+const GH900_HARD = [{"d":"D1","q":"あるチームは長年、ファイル名の末尾に日付や版数を付けて手作業でコピーを残し、変更履歴を管理してきた。ファイルが乱立し、誰がいつ何を変えたか追えず、複数人が同じファイルを編集して上書き事故も頻発している。この状況を根本から改善するために導入すべき仕組みとして、最も適切なものはどれか。","o":["バージョン管理システム（Git）を導入し、変更履歴とコミット単位で管理する","共有フォルダの命名規則をさらに細かく決め、日付形式を統一する","ファイルを毎回 zip 圧縮してメールで全員に配布する","編集前に口頭で声を掛け合い、同時編集を避ける運用を徹底する"],"a":0,"e":"手作業のコピーや命名規則では履歴追跡や同時編集の衝突を根本解決できない。Git などのバージョン管理システムは変更をコミット単位で記録し、誰が何をいつ変えたかを追跡でき、複数人の変更も統合できる。命名規則の強化や zip 配布、口頭調整は運用でカバーする対症療法にすぎず、規模拡大で破綻する。","qEn":"A team has long tracked changes by manually copying files with dates or version numbers appended to filenames. Files proliferate, no one can tell who changed what and when, and overwrite accidents happen when several people edit the same file. What is the most appropriate mechanism to fundamentally fix this?","oEn":["Adopt a version control system (Git) and manage history in commits","Define even more detailed naming rules and standardize the date format","Zip each file and email it to everyone every time","Enforce verbal coordination before editing to avoid concurrent edits"],"eEn":"Manual copies and naming rules cannot fundamentally solve history tracking or concurrent-edit conflicts. A version control system like Git records changes as commits, tracks who changed what and when, and merges multiple people's work. Stronger naming, zipping, or verbal coordination are only stopgaps that break down at scale."},{"d":"D1","q":"プログラミングを学び始めた同僚が「Git と GitHub は同じものだと思っていた」と言い、両者の役割の違いを一度きちんと整理したいと相談してきた。あなたはこの二つの関係を初学者にも分かるよう正しく説明しようとしている。Git と GitHub の関係を最も正確に述べているものはどれか。","o":["Git はGitHub社が販売する有料アプリで、GitHub は無料版の名称である","Git はローカルでも動く分散型バージョン管理ツール、GitHub はその Git リポジトリをホスティングし協働機能を提供するクラウドサービスである","GitHub がバージョン管理の中核エンジンで、Git はその Web 画面を指す","両者は同義で、呼び方が新旧で異なるだけである"],"a":1,"e":"Git はローカル環境でも完結する分散型バージョン管理ツールそのもの。GitHub はその Git リポジトリをクラウド上でホスティングし、プルリクエストや Issue などの協働機能を付加するサービスである。両者は別物で、GitHub が中核エンジンでも、Git が有料アプリでも、同義語でもない。","qEn":"A colleague new to programming says they thought Git and GitHub were the same thing and asks you to clarify the difference in roles. You want to explain the relationship correctly. Which statement most accurately describes the relationship between Git and GitHub?","oEn":["Git is a paid app sold by GitHub, and GitHub is the name of its free edition","Git is a distributed version control tool that runs even locally; GitHub is a cloud service that hosts Git repositories and adds collaboration features","GitHub is the core version-control engine, and Git refers to its web interface","They are synonyms, differing only as old and new names"],"eEn":"Git is the distributed version control tool itself, working fully offline. GitHub hosts Git repositories in the cloud and adds collaboration features like pull requests and issues. They are distinct: GitHub is not the core engine, Git is not a paid app, and they are not synonyms."},{"d":"D1","q":"新しいプロジェクトを開始するにあたり、ソースコードや関連ファイル、そしてそれらの全変更履歴をまとめて格納する入れ物が必要になった。チームはこの単位でアクセス権や公開範囲、ブランチ構成を管理したいと考えている。Git と GitHub でこの入れ物にあたる概念として、最も適切なものはどれか。","o":["プルリクエスト","コミット","リポジトリ","ワークフロー"],"a":2,"e":"リポジトリはプロジェクトのファイル群と全変更履歴を格納する単位で、アクセス権や公開範囲、ブランチはリポジトリ単位で管理される。コミットは変更のスナップショット一つ、プルリクエストは変更提案、ワークフローは自動化の定義であり、いずれも入れ物そのものではない。","qEn":"Starting a new project, you need a container that stores source code, related files, and their entire change history together. The team wants to manage access rights, visibility, and branch structure at this unit. In Git and GitHub, which concept corresponds to this container?","oEn":["Pull request","Commit","Repository","Workflow"],"eEn":"A repository is the unit that stores a project's files and full change history; access rights, visibility, and branches are managed per repository. A commit is one snapshot of changes, a pull request is a change proposal, and a workflow defines automation—none is the container itself."},{"d":"D1","q":"開発者が複数のファイルにまたがる一連の修正を行い、その変更をひとまとまりの意味ある単位として履歴に記録し、後から差分や理由を辿れるようにしたい。各記録にはメッセージを添え、必要ならその時点の状態に戻せることも重視している。Git でこの記録単位にあたるものはどれか。","o":["タグの一覧表示","リポジトリ","リモート","コミット"],"a":3,"e":"コミットは変更をひとまとまりの意味ある単位として履歴に記録するスナップショットで、メッセージを添え、後からその時点の状態に戻せる。リポジトリは全体の入れ物、リモートは別ホスト上の複製先の参照、タグ一覧は特定コミットに付けた目印を並べるだけで、記録単位そのものではない。","qEn":"A developer makes a set of related edits spanning several files and wants to record them as one meaningful unit in history, so diffs and reasons can be traced later. Each record carries a message, and reverting to that state matters. In Git, which corresponds to this unit of record?","oEn":["Listing tags","Repository","Remote","Commit"],"eEn":"A commit is a snapshot that records changes as one meaningful unit in history, carries a message, and lets you return to that state. A repository is the whole container, a remote is a reference to a copy on another host, and listing tags just shows markers on commits—none is the unit of record itself."},{"d":"D1","q":"本番で使う安定版コードを壊さずに、新機能を試作したい開発者がいる。既存の履歴から分岐した独立した作業ラインを作り、そこで自由に実験・コミットし、問題なければ後で本流へ統合したいと考えている。Git でこの独立した作業ラインを実現する仕組みとして、最も適切なものはどれか。","o":["ブランチを作成して作業する","リポジトリを新規に複製して別に作る","コミットメッセージに feature と書いて区別する","毎回ファイルを手動でバックアップする"],"a":0,"e":"ブランチは既存履歴から分岐した独立した作業ラインで、安定版を壊さず自由に実験・コミットでき、後でマージして統合できる。別リポジトリの複製は過剰で連携が煩雑、コミットメッセージの記述やファイルの手動バックアップは分離された作業ラインを提供しない。","qEn":"A developer wants to prototype a new feature without breaking the stable production code. They want an independent line of work branched from existing history, where they can freely experiment and commit, then merge into the mainline later if all is well. What best provides this independent line of work in Git?","oEn":["Create and work on a branch","Clone the repository into a separate new one","Write 'feature' in commit messages to distinguish them","Manually back up files each time"],"eEn":"A branch is an independent line of work diverging from existing history, letting you experiment and commit freely without breaking the stable version, then merge later. A separate clone is overkill and hard to sync; writing in commit messages or manual backups do not provide an isolated line of work."},{"d":"D1","q":"小規模チームが、軽量で頻繁なデプロイを前提としたシンプルな協働手順を採用したいと考えている。main は常にデプロイ可能に保ち、作業ごとに短命なブランチを切って、プルリクエストでレビューと議論を経てから main に統合する流れを標準化したい。この考え方に最も合致するモデルはどれか。","o":["リリースごとに長期ブランチを多数維持する重量級の分岐モデル","GitHub Flow","全員が main へ直接コミットし続ける運用","変更を四半期末にまとめて一括マージする運用"],"a":1,"e":"GitHub Flow は main を常にデプロイ可能に保ち、作業ごとに短命なブランチを切ってプルリクエストでレビュー後に統合する軽量モデルで、頻繁なデプロイに適する。重量級の長期ブランチ多用や main への直接コミット、四半期末の一括マージはこの軽量・継続的な考え方に反する。","qEn":"A small team wants a simple collaboration process built around lightweight, frequent deployments. They want to keep main always deployable, cut a short-lived branch per task, and standardize merging into main only after review and discussion via pull requests. Which model best matches this thinking?","oEn":["A heavyweight model maintaining many long-lived branches per release","GitHub Flow","Everyone committing directly to main continuously","Batching all changes into one merge at quarter-end"],"eEn":"GitHub Flow keeps main always deployable, cuts a short-lived branch per task, and merges after pull request review—a lightweight model suited to frequent deploys. Heavy long-lived branches, direct commits to main, or quarter-end batch merges all contradict this lightweight, continuous approach."},{"d":"D1","q":"あなたはリポジトリの README や Issue の説明に、見出し・箇条書き・コードの断片・リンクを手軽に整形して読みやすく記述したい。特別なエディタを使わずプレーンテキストのまま書け、GitHub 上で自動的に整形表示される記法を採用したいと考えている。この目的に最も適した記法はどれか。","o":["生の HTML を必ず全文で書く方式","PDF バイナリ形式","Markdown","スプレッドシートのセル記法"],"a":2,"e":"Markdown はプレーンテキストで見出し・箇条書き・コード・リンクを簡潔に記述でき、GitHub が README や Issue 上で自動整形して表示する軽量マークアップ記法。PDF はバイナリで手軽な編集に不向き、HTML 全文記述は冗長、スプレッドシート記法は文書整形の用途に合わない。","qEn":"You want to format headings, bullet lists, code snippets, and links easily and readably in your repository README and issue descriptions. You want a notation you can write as plain text without a special editor, which GitHub renders automatically. Which notation is best suited to this?","oEn":["Always writing full raw HTML","PDF binary format","Markdown","Spreadsheet cell notation"],"eEn":"Markdown lets you write headings, lists, code, and links concisely as plain text, and GitHub auto-renders it in READMEs and issues—a lightweight markup notation. PDF is binary and unsuited to easy editing, full HTML is verbose, and spreadsheet notation does not fit document formatting."},{"d":"D1","q":"あなたと数人の友人が、会社に属さない個人的なオープンソースの趣味プロジェクトを始めようとしている。当面は費用を抑え、各自の個人アカウントで貢献し合う形で十分だと考えている。まだ企業としての一元管理やチーム単位の権限設計は不要だ。この段階で選ぶアカウント形態として、最も適切なものはどれか。","o":["GitHub アカウントなしで匿名のまま共同作業する","Enterprise アカウントを最初から契約する","Organization を作らないと一切リポジトリを作成できないので必須である","個人アカウント（Personal account）を使う"],"a":3,"e":"個人プロジェクトで一元管理やチーム権限設計が不要な段階では、各自の個人アカウントで十分。Enterprise は大企業向けの統制・請求の集約層で過剰、Organization は必須ではなく個人アカウントでもリポジトリは作れる。GitHub アカウントなしでは貢献履歴や権限管理ができない。","qEn":"You and a few friends are starting a personal, non-corporate open-source hobby project. For now you want to keep costs low and contribute from each person's individual account. You do not yet need company-wide central management or team-level permission design. Which account type is most appropriate at this stage?","oEn":["Collaborate anonymously with no GitHub account","Sign a contract for an Enterprise account from the start","An Organization is mandatory because you cannot create any repository without one","Use a personal account"],"eEn":"For a personal project not yet needing central management or team permissions, individual personal accounts suffice. Enterprise is an overkill governance/billing layer for large companies, an Organization is not mandatory since personal accounts can create repos, and without an account there is no contribution history or permissions."},{"d":"D1","q":"従業員数千人規模の企業が、多数の Organization を横断して統一のセキュリティポリシーや SAML シングルサインオン、請求の一元化、コンプライアンス統制を適用したいと考えている。個々の Organization を個別管理する現状では統制が効かず限界を感じている。この要件を満たす GitHub の管理階層として、最も適切なものはどれか。","o":["Enterprise アカウント","個人アカウントを人数分だけ手動で束ねる","単一の Organization だけで全社員を運用し続ける","リポジトリごとに個別のポリシーを手作業でコピーする"],"a":0,"e":"Enterprise アカウントは複数の Organization を束ね、統一ポリシー・SAML SSO・請求の一元化・コンプライアンス統制を全社横断で適用できる上位階層。個人アカウントの手動集約や単一 Organization では大規模横断の統制に限界があり、リポジトリ単位の手作業コピーは非現実的で一貫性も保てない。","qEn":"An enterprise with thousands of employees wants to apply unified security policies, SAML single sign-on, consolidated billing, and compliance governance across many Organizations. Managing each Organization separately no longer scales. Which GitHub management tier best meets these requirements?","oEn":["Enterprise account","Manually bundling one personal account per person","Continuing to run all employees under a single Organization","Manually copying individual policies per repository"],"eEn":"An Enterprise account bundles multiple Organizations and applies unified policy, SAML SSO, consolidated billing, and compliance governance company-wide—a higher tier. Manual aggregation of personal accounts or a single Organization cannot govern at cross-org scale, and per-repo manual copying is impractical and inconsistent."},{"d":"D1","q":"コマンドラインの操作に不慣れなデザイナーが、変更のステージング、コミット、ブランチ切り替え、履歴の閲覧をビジュアルな画面で直感的に行いたいと望んでいる。ターミナルのコマンドを覚えずに、デスクトップ上で Git 操作を完結させたい。この要望に最も適したツールはどれか。","o":["サーバー用の CI ランナーを個人PCに常駐させる","GitHub Desktop","Web ブラウザの開発者ツールコンソール","表計算アプリのマクロ機能"],"a":1,"e":"GitHub Desktop はステージング、コミット、ブランチ切り替え、履歴閲覧などの Git 操作を GUI で直感的に行えるデスクトップアプリで、コマンドラインが苦手なユーザーに適する。CI ランナーは自動化実行環境、ブラウザの開発者ツールやマクロは Git 操作用ではなく、この要望に合わない。","qEn":"A designer unfamiliar with the command line wants to stage changes, commit, switch branches, and view history intuitively on a visual screen. They want to complete Git operations on the desktop without memorizing terminal commands. Which tool best fits this need?","oEn":["Running a server CI runner resident on a personal PC","GitHub Desktop","The web browser's developer tools console","A spreadsheet app's macro feature"],"eEn":"GitHub Desktop is a desktop app for performing Git operations—staging, committing, switching branches, viewing history—intuitively via a GUI, ideal for users uncomfortable with the command line. A CI runner is an automation environment, and browser dev tools or macros are not for Git operations."},{"d":"D1","q":"外出中のプロジェクトオーナーが、スマートフォンから届いた通知に目を通し、Issue にコメントを返し、小さなプルリクエストをレビューして承認したい場面がある。PC を開かずに、移動時間でこれらの軽い協働作業をこなしたいと考えている。この用途に最も適したものはどれか。","o":["ローカルにインストールした IDE のデバッガ","サーバー用の大規模モニタリングダッシュボード","GitHub Mobile アプリ","オフライン専用のテキストエディタ"],"a":2,"e":"GitHub Mobile はスマートフォンから通知確認、Issue へのコメント、プルリクエストのレビューや承認などの軽い協働作業を移動中に行うのに適したアプリ。大規模監視ダッシュボードや IDE デバッガは重い開発・運用向け、オフラインエディタは GitHub の協働機能に接続しない。","qEn":"A project owner who is out and about wants to check notifications on their smartphone, reply to comments on issues, and review and approve small pull requests. They want to handle these light collaboration tasks during travel time without opening a PC. Which is best suited to this use?","oEn":["A locally installed IDE debugger","A large-scale monitoring dashboard for servers","The GitHub Mobile app","An offline-only text editor"],"eEn":"GitHub Mobile is suited to light collaboration on the go from a phone—checking notifications, commenting on issues, reviewing and approving pull requests. A large monitoring dashboard or IDE debugger targets heavy development/operations, and an offline editor does not connect to GitHub's collaboration features."},{"d":"D1","q":"あなたは他者が公開している GitHub 上のプロジェクトに変更を提案したいが、そのリポジトリへの書き込み権限を持っていない。まず自分のアカウント配下に独立した複製を作り、そこで自由に変更を加えてから本家へプルリクエストを送りたい。この最初の複製操作にあたるものとして、最も適切なものはどれか。","o":["Issue を立てるだけで複製は行わない","ローカルへ clone するだけで自分のアカウントには複製を作らない","本家リポジトリの main へ直接 push する","フォーク（Fork）する"],"a":3,"e":"フォークは他者のリポジトリを自分のアカウント配下に独立した複製として作る操作で、書き込み権限がなくても自由に変更し本家へプルリクエストを送れる。単なる clone は自分のアカウントに複製を作らず、直接 push は権限がなく不可、Issue 起票は複製にあたらない。","qEn":"You want to propose changes to someone else's public GitHub project, but you lack write access to that repository. You first want to create an independent copy under your own account, freely make changes there, then send a pull request to the original. Which operation is this first copy step?","oEn":["Only open an issue without copying","Just clone it locally without creating a copy under your account","Push directly to the original repository's main","Fork it"],"eEn":"A fork creates an independent copy of someone's repository under your own account, letting you change it freely without write access and send a pull request to the original. A plain clone makes no copy under your account, a direct push is blocked without access, and opening an issue is not a copy."},{"d":"D1","q":"作業ツリーで複数ファイルを編集したが、その中から論理的に関連する一部の変更だけを次のコミットに含め、残りは別のコミットに分けたい。コミットの前に、含める変更を選んで準備領域に登録する段階を踏みたいと考えている。この準備段階を指す Git の概念として、最も適切なものはどれか。","o":["ステージング（git add でインデックスに追加）","リモートへの push","ブランチの削除","タグ付け"],"a":0,"e":"ステージングは git add で変更をインデックス（準備領域）に登録し、次のコミットに含める内容を選ぶ段階。これにより関連する変更だけを分けてコミットできる。push はコミット済み履歴をリモートへ送る操作、ブランチ削除やタグ付けはコミット前の変更選択とは無関係である。","qEn":"You edited several files in the working tree, but want to include only a logically related subset in the next commit and split the rest into another commit. You want a step before committing to select and register the changes to include into a preparation area. Which Git concept refers to this preparation step?","oEn":["Staging (adding to the index with git add)","Pushing to a remote","Deleting a branch","Tagging"],"eEn":"Staging registers changes into the index (preparation area) with git add, selecting what goes into the next commit, so related changes can be committed separately. Pushing sends committed history to a remote; deleting a branch or tagging are unrelated to selecting changes before a commit."},{"d":"D1","q":"ローカルで数個のコミットを積み上げた開発者が、その成果をチームの共有リモートリポジトリに反映し、他のメンバーが最新の変更を取得できるようにしたい。ネットワーク越しに自分のローカルのコミット履歴をリモートへ送り届けたいと考えている。この操作にあたる Git コマンドとして、最も適切なものはどれか。","o":["git init","git push","git log","git status"],"a":1,"e":"git push はローカルのコミット履歴をリモートリポジトリへ送信し共有する操作で、他メンバーが取得できるようになる。git init は新規リポジトリの初期化、git log は履歴の表示、git status は作業ツリーの状態確認であり、いずれもリモートへの送信操作ではない。","qEn":"A developer who stacked a few commits locally wants to reflect that work to the team's shared remote repository so other members can retrieve the latest changes. They want to send their local commit history to the remote over the network. Which Git command corresponds to this?","oEn":["git init","git push","git log","git status"],"eEn":"git push sends local commit history to the remote repository to share it, so other members can retrieve it. git init initializes a new repository, git log shows history, and git status checks the working tree state—none sends commits to a remote."},{"d":"D1","q":"二人の開発者が同じファイルの同じ行を、それぞれ別のブランチで異なる内容に変更した。これらを一つのブランチに統合しようとしたところ、Git が自動的にどちらを採用すべきか判断できず統合を完了できなかった。この状態を指す用語と、正しい対処として最も適切なものはどれか。","o":["リポジトリの破損であり、作り直す必要がある","ネットワーク障害であり、再接続すれば自動で解決する","マージコンフリクトであり、該当箇所を人が確認して手動で解決しコミットする","権限不足であり、管理者に昇格を依頼すれば解決する"],"a":2,"e":"同じ行への競合する変更を Git が自動統合できない状態はマージコンフリクトで、開発者が該当箇所を確認しどちらを採用するか手動で解決してコミットする。ネットワーク障害やリポジトリ破損、権限不足ではなく、再接続や作り直し、昇格では解決しない論理的な内容の衝突である。","qEn":"Two developers changed the same line of the same file to different content on separate branches. When merging them into one branch, Git could not decide which to take and could not complete the merge. What is this state called, and what is the correct handling?","oEn":["Repository corruption; it must be recreated","A network failure; reconnecting resolves it automatically","A merge conflict; a person reviews the spot, resolves it manually, and commits","Insufficient permissions; asking an admin to promote you resolves it"],"eEn":"When Git cannot auto-merge conflicting changes to the same line, it is a merge conflict; the developer reviews the spot, decides which to keep, resolves manually, and commits. It is a logical content clash, not a network failure, corruption, or permission issue that reconnecting, recreating, or promotion would fix."},{"d":"D1","q":"あるリポジトリでは、ビルド生成物やローカルの設定ファイル、依存パッケージのディレクトリが誤ってコミットされ、履歴が肥大化して差分が見づらくなっている。今後こうした特定のファイルやパターンを Git の追跡対象から恒久的に除外したい。この目的で用意すべき仕組みとして、最も適切なものはどれか。","o":["README に「これらは無視してください」と書く","毎回コミット前に手動で対象ファイルを削除する","リポジトリを private にすれば自動的に除外される",".gitignore ファイルに除外するパターンを記述する"],"a":3,"e":".gitignore に除外パターンを記述すると、ビルド生成物や設定ファイル、依存ディレクトリなどを Git の追跡対象から恒久的に外せる。手動削除は運用ミスが起きやすく、private 化は公開範囲の設定で追跡除外とは無関係、README の注意書きには技術的な除外効果がない。","qEn":"In a repository, build artifacts, local config files, and a dependency directory were accidentally committed, bloating history and making diffs hard to read. Going forward you want to permanently exclude such specific files and patterns from Git's tracking. Which mechanism should you set up for this?","oEn":["Write 'please ignore these' in the README","Manually delete the target files before every commit","Making the repository private excludes them automatically","Write exclusion patterns in a .gitignore file"],"eEn":"Writing exclusion patterns in .gitignore permanently keeps build artifacts, config files, and dependency directories out of Git's tracking. Manual deletion is error-prone, making it private is a visibility setting unrelated to tracking, and a README note has no technical exclusion effect."},{"d":"D1","q":"チームのコミット履歴を後から読み返すと、多くのメッセージが「fix」「update」「aaa」など内容が伝わらないものばかりで、変更の意図を追うのに苦労している。今後は履歴の可読性を高め、各変更の目的が一目で分かるようにしたい。コミットメッセージの書き方として、最も適切な指針はどれか。","o":["命令形・現在形で、何をなぜ変えたかが分かる簡潔で具体的なメッセージを書く","できるだけ短く一文字だけにしてタイプ量を減らす","毎回同じ定型文をコピーして統一感を出す","メッセージは空欄にして差分だけで判断させる"],"a":0,"e":"命令形・現在形で何をなぜ変えたかを簡潔かつ具体的に書くと、履歴の可読性が上がり変更意図が追いやすい。一文字だけや空欄では情報が失われ、同じ定型文の使い回しは各変更の目的を区別できず、いずれも後からの理解や追跡を助けない。","qEn":"Reviewing the team's commit history later, many messages are uninformative like 'fix', 'update', or 'aaa', making it hard to trace intent. Going forward you want to improve history readability so each change's purpose is clear at a glance. Which guideline for writing commit messages is most appropriate?","oEn":["Write concise, specific messages in the imperative present tense conveying what changed and why","Make them as short as a single character to reduce typing","Copy the same boilerplate each time for consistency","Leave messages blank and judge by the diff alone"],"eEn":"Writing concise, specific messages in the imperative present tense stating what and why improves readability and traceability of intent. Single characters or blanks lose information, and reusing identical boilerplate fails to distinguish each change's purpose—none aids later understanding or tracing."},{"d":"D1","q":"開発者が現在の作業ブランチから、以前に作成した別のブランチに切り替えて、その状態のファイル群を作業ツリーに反映させたい。コミットは変更せず、単に別の作業ラインへ移動して続きの作業を行いたいと考えている。この「別ブランチへ移動する」操作を表す Git の概念として、最も適切なものはどれか。","o":["コミットの取り消し（git revert）","チェックアウト（git checkout / git switch でブランチを切り替える）","リモートの追加（git remote add）","変更の破棄をせず単に git log を眺める"],"a":1,"e":"チェックアウト（git switch も同義的に使える）は作業ブランチを切り替え、そのブランチの状態を作業ツリーに反映する操作。git revert はコミットを打ち消す新コミットの作成、git remote add はリモート参照の登録、git log は履歴表示であり、ブランチ間の移動操作ではない。","qEn":"A developer wants to switch from the current working branch to another branch created earlier and reflect that branch's files into the working tree. They do not want to change commits, just move to another line of work and continue. Which Git concept represents moving to another branch?","oEn":["Undoing a commit (git revert)","Checkout (switching branches with git checkout / git switch)","Adding a remote (git remote add)","Merely viewing git log without discarding changes"],"eEn":"Checkout (git switch is used equivalently) switches the working branch and reflects that branch's state into the working tree. git revert creates a new commit that undoes one, git remote add registers a remote reference, and git log shows history—none is moving between branches."},{"d":"D1","q":"分散開発の特徴を評価している。ネットワークに接続できない出張先でも、各開発者のローカルには完全な履歴を含むリポジトリの複製があり、コミットやブランチ操作、履歴の閲覧をオフラインで実行できることが強みだと聞いた。Git のこの性質を最も正確に説明しているものはどれか。","o":["Git ではローカルに履歴は保存されず、常にクラウド上のみに存在する","Git は中央サーバーに常時接続していないと一切のコミットができない集中型である","Git は分散型で、各ローカルに完全な履歴の複製を持つためオフラインでも多くの操作が可能","Git のオフライン操作にはリモートの管理者承認が毎回必要である"],"a":2,"e":"Git は分散型バージョン管理で、各ローカルに完全な履歴を含む複製を持つため、オフラインでもコミット・ブランチ操作・履歴閲覧が可能。中央サーバー常時接続が必須の集中型ではなく、履歴はローカルに保存され、オフライン操作に毎回の承認は不要である。","qEn":"You are evaluating distributed development. You heard that even on a business trip without network access, each developer's local machine holds a full copy of the repository including complete history, so commits, branch operations, and history viewing work offline. Which most accurately describes this property of Git?","oEn":["In Git, history is not stored locally and exists only in the cloud","Git is centralized and cannot commit at all unless always connected to a central server","Git is distributed; each local holds a full copy of history, so many operations work offline","Offline Git operations require a remote admin's approval each time"],"eEn":"Git is distributed version control; each local machine holds a full copy including complete history, so commits, branch operations, and history viewing work offline. It is not a centralized system requiring a constant central connection, history is stored locally, and offline operations need no per-action approval."},{"d":"D1","q":"初めてリポジトリを訪れた利用者が、そのプロジェクトが何をするもので、どうインストールし使い始めるのかを最初に知りたい。リポジトリのトップページを開いたときに、プロジェクトの概要説明として自動的に一番目立つ位置に表示される標準ファイルとして、最も適切なものはどれか。","o":["非公開の内部メモファイル",".gitignore ファイル","package-lock などの依存ロックファイル","README ファイル"],"a":3,"e":"README はリポジトリのトップページで自動的に表示され、プロジェクトの概要・導入・使い方を最初に伝える標準ファイル。.gitignore は追跡除外の設定、依存ロックファイルは依存関係の固定であり、いずれも来訪者向けの概要説明としてトップに表示される役割ではない。","qEn":"A first-time visitor to a repository wants to know what the project does and how to install and start using it. When they open the repository's top page, which standard file is automatically shown most prominently as the project's overview description?","oEn":["A private internal notes file","The .gitignore file","A dependency lock file such as package-lock","The README file"],"eEn":"The README is automatically displayed on the repository's top page and is the standard file that first conveys the project's overview, setup, and usage. .gitignore configures tracking exclusions and a lock file pins dependencies—neither serves as the visitor-facing overview shown at the top."},{"d":"D2","q":"公開したオープンソースリポジトリに対し、外部の開発者から「このコードを自社製品に組み込んでよいのか、改変や再配布は許されるのか」という問い合わせが相次いでいる。利用・改変・再配布の条件を法的に明示し、誰もが参照できる形で示したい。この目的で追加すべき標準ファイルとして、最も適切なものはどれか。","o":["LICENSE ファイル","CODEOWNERS ファイル","README の末尾に一行だけ「自由に使ってOK」と書く","SECURITY.md ファイル"],"a":0,"e":"LICENSE ファイルは利用・改変・再配布の条件を法的に明示する標準ファイルで、外部利用者が権利を判断できる。CODEOWNERS はレビュー担当の自動割り当て、SECURITY は脆弱性報告の窓口であり用途が異なる。README の曖昧な一行は法的効力や明確さに欠け、正式なライセンス表明にならない。","qEn":"Your public open-source repository is getting repeated inquiries from outside developers asking whether they may embed the code in their products and whether modification and redistribution are allowed. You want to state the terms of use, modification, and redistribution legally and referenceably. Which standard file should you add?","oEn":["A LICENSE file","A CODEOWNERS file","One line at the end of the README saying 'free to use'","A SECURITY.md file"],"eEn":"A LICENSE file legally states the terms of use, modification, and redistribution so outside users can judge their rights. CODEOWNERS auto-assigns reviewers and SECURITY is the vulnerability-reporting channel—different purposes. A vague one-line README lacks legal force and clarity and is not a formal license."},{"d":"D2","q":"活発なオープンソースプロジェクトに新しい貢献者が次々と現れるが、開発環境の準備方法、コーディング規約、ブランチやプルリクエストの出し方、テストの実行手順がバラバラで、レビュー負荷が増大している。貢献の進め方を一箇所に明文化して参加者に案内したい。このために用意すべきファイルとして、最も適切なものはどれか。","o":["LICENSE ファイル","CONTRIBUTING ファイル","CODEOWNERS ファイル","依存関係グラフの設定ファイル"],"a":1,"e":"CONTRIBUTING は開発環境の準備、規約、ブランチやプルリクエストの手順、テスト実行など貢献の進め方を明文化し、GitHub が Issue 作成時などに案内する標準ファイル。LICENSE は利用条件、CODEOWNERS はレビュー割り当て、依存関係グラフ設定は貢献手順の周知には用いない。","qEn":"New contributors keep appearing in an active open-source project, but their approaches to setting up the environment, coding style, branching, opening pull requests, and running tests vary widely, increasing review load. You want to document how to contribute in one place and guide participants. Which file should you provide?","oEn":["A LICENSE file","A CONTRIBUTING file","A CODEOWNERS file","A dependency graph configuration file"],"eEn":"CONTRIBUTING documents how to contribute—environment setup, conventions, branching and pull request steps, running tests—and GitHub surfaces it when creating issues. LICENSE covers usage terms, CODEOWNERS assigns reviewers, and a dependency graph config is not for communicating contribution steps."},{"d":"D2","q":"大規模リポジトリで、特定のディレクトリやファイル群に変更が加わるプルリクエストには、その領域に責任を持つ担当者へ自動的にレビュー依頼が飛ぶようにしたい。パスごとに担当者を対応付け、レビュー漏れを防ぐ仕組みを導入したいと考えている。このために設定すべきファイルとして、最も適切なものはどれか。","o":["README ファイル","CONTRIBUTING ファイル","CODEOWNERS ファイル","LICENSE ファイル"],"a":2,"e":"CODEOWNERS はパスやパターンごとに責任者を対応付け、その領域を変更するプルリクエストへ自動でレビュー依頼を割り当てる標準ファイル。CONTRIBUTING は貢献手順、README は概要、LICENSE は利用条件であり、パス単位のレビュー自動割り当てを行う機能は持たない。","qEn":"In a large repository, you want pull requests that change specific directories or file groups to automatically request review from the people responsible for that area. You want to map owners to paths and prevent missed reviews. Which file should you configure for this?","oEn":["A README file","A CONTRIBUTING file","A CODEOWNERS file","A LICENSE file"],"eEn":"CODEOWNERS maps owners to paths or patterns and automatically requests review from them on pull requests touching that area. CONTRIBUTING covers contribution steps, README the overview, and LICENSE usage terms—none performs path-based automatic review assignment."},{"d":"D2","q":"公開ライブラリを運用するチームが、外部のセキュリティ研究者から脆弱性を発見された際に、公開の Issue で暴露される前に非公開の適切な連絡先へ報告してほしいと考えている。報告手順やサポート対象バージョン、連絡方法をリポジトリ内で標準的に示したい。このために用意すべきファイルとして、最も適切なものはどれか。","o":["CODEOWNERS ファイル","CHANGELOG ファイル","README のインストール手順","SECURITY ファイル（SECURITY.md）"],"a":3,"e":"SECURITY.md は脆弱性の報告手順や連絡先、サポート対象バージョンを示す標準ファイルで、GitHub の Security タブから案内され、公開 Issue での暴露前に非公開報告を促せる。CHANGELOG は変更履歴、README のインストール手順や CODEOWNERS は脆弱性報告窓口の役割を持たない。","qEn":"A team maintaining a public library wants external security researchers who find a vulnerability to report it to an appropriate private contact before it is exposed in a public issue. They want to state the reporting process, supported versions, and contact method as a standard within the repository. Which file should they provide?","oEn":["A CODEOWNERS file","A CHANGELOG file","The README's installation steps","A SECURITY file (SECURITY.md)"],"eEn":"SECURITY.md states the vulnerability reporting process, contacts, and supported versions; GitHub surfaces it from the Security tab, encouraging private reports before public exposure. A CHANGELOG lists changes, and the README's install steps or CODEOWNERS do not serve as the vulnerability reporting channel."},{"d":"D2","q":"あるリポジトリでは、報告される Issue の多くに再現手順や環境情報が欠けており、対応者が毎回追加で聞き直す往復が発生して非効率だ。今後、Issue を起票する人が必要な項目を最初から埋めやすいよう、定型の入力フォーマットをあらかじめ提示したい。このために用意すべき仕組みとして、最も適切なものはどれか。","o":["Issue テンプレート（テンプレートやフォーム）を用意する","リポジトリを archive して読み取り専用にする","すべての Issue を一律にクローズする自動化を組む","README にだけ注意書きを増やす"],"a":0,"e":"Issue テンプレートは起票時に再現手順や環境情報などの入力欄をあらかじめ提示し、必要事項を最初から埋めやすくして往復を減らす。リポジトリの archive は編集停止、全 Issue の自動クローズは報告自体を潰す誤り、README の注意書きだけでは入力フォーマットを強制・案内できない。","qEn":"In a repository, many reported issues lack reproduction steps or environment info, causing responders to repeatedly ask for more, which is inefficient. Going forward you want to present a standard input format so people filing issues fill in the needed items from the start. Which mechanism should you provide?","oEn":["Provide issue templates (templates or forms)","Archive the repository to make it read-only","Set up automation to close all issues uniformly","Only add more notes to the README"],"eEn":"Issue templates present fields like reproduction steps and environment info up front, making it easy to fill in the essentials and reducing back-and-forth. Archiving stops editing, auto-closing all issues destroys the reports themselves, and README notes alone cannot enforce or guide the input format."},{"d":"D2","q":"チームのポリシーとして、main ブランチへは必ずプルリクエストを経由し、少なくとも一人のレビュー承認と CI の成功を満たさないと直接マージや push ができないようにしたい。誤ってレビューなしで本番相当のブランチが変更される事故を防ぎたい。この統制を実現する GitHub の機能として、最も適切なものはどれか。","o":["リポジトリを private にする","ブランチ保護ルール（branch protection rules）を設定する","README にルールを箇条書きする",".gitignore に main を追加する"],"a":1,"e":"ブランチ保護ルールは、プルリクエスト必須・レビュー承認数・必須ステータスチェック（CI 成功）などを条件化し、満たさない直接マージや push を技術的に禁止できる。private 化は公開範囲、README の箇条書きは強制力がなく、.gitignore は追跡除外で保護の役割を持たない。","qEn":"As team policy, changes to main must go through a pull request and cannot be merged or pushed directly unless at least one review approval and a passing CI are satisfied. You want to prevent accidents where a production-like branch is changed without review. Which GitHub feature achieves this control?","oEn":["Make the repository private","Set branch protection rules","List the rules as bullets in the README","Add main to .gitignore"],"eEn":"Branch protection rules can require pull requests, a number of review approvals, and required status checks (passing CI), technically blocking non-compliant direct merges or pushes. Making it private is a visibility setting, README bullets have no enforcement, and .gitignore is for tracking exclusion, not protection."},{"d":"D2","q":"プロジェクトの健全性を四半期ごとに振り返るため、直近のコミット頻度、マージされたプルリクエスト数、新規・クローズされた Issue の推移、アクティブな貢献者といった活動の傾向をまとめて把握したい。追加ツールを入れず GitHub 標準の機能で確認したい。この目的に最も適した場所はどれか。","o":["README の更新日時だけを見る","個々のコミットの diff を一つずつ手で数える","リポジトリの Insights（Pulse や Contributors などの分析）","ローカルの git status の出力"],"a":2,"e":"リポジトリの Insights は Pulse や Contributors などで、コミット頻度、マージされた PR、Issue の増減、活発な貢献者といった活動傾向を GitHub 標準で集約表示する。diff の手作業集計は非現実的、README の更新日時や git status は活動全体の傾向把握には不十分である。","qEn":"To review project health each quarter, you want to grasp trends in recent commit frequency, number of merged pull requests, opened/closed issue movement, and active contributors, all together. You want to check this with GitHub's built-in features without adding tools. Which location is best suited for this?","oEn":["Only looking at the README's last-updated date","Manually counting each commit's diff one by one","The repository's Insights (analytics like Pulse and Contributors)","The output of local git status"],"eEn":"The repository's Insights, via Pulse and Contributors, aggregates activity trends—commit frequency, merged PRs, issue movement, active contributors—natively in GitHub. Manually tallying diffs is impractical, and the README date or git status are insufficient for grasping overall activity trends."},{"d":"D2","q":"セキュリティ担当者が、自分たちのリポジトリがどのオープンソースパッケージにどのバージョンで依存しているかを把握し、既知の脆弱性を含む依存が使われていないかを継続的に監視したい。マニフェストやロックファイルから依存を可視化し警告を受け取りたい。この目的に最も適した GitHub の機能はどれか。","o":["Gist に依存リストを貼り付けて共有する","Wiki に依存ライブラリ一覧を手書きで維持する","Discussions に依存の質問スレッドを立てる","依存関係グラフと Dependabot アラート（依存関係インサイト）"],"a":3,"e":"依存関係グラフはマニフェストやロックファイルから依存を可視化し、Dependabot アラートが既知の脆弱性を含む依存を検知して警告する GitHub 標準機能。Wiki の手書き一覧や Discussions のスレッド、Gist への貼り付けは自動検知・継続監視を提供せず、脆弱性の把握には不十分である。","qEn":"A security engineer wants to know which open-source packages and versions their repository depends on and continuously monitor whether any dependency with a known vulnerability is in use. They want dependencies visualized from manifests and lockfiles and to receive alerts. Which GitHub feature best fits this?","oEn":["Pasting the dependency list into a Gist to share","Maintaining a hand-written list of dependencies in the Wiki","Opening a dependency question thread in Discussions","The dependency graph and Dependabot alerts (dependency insights)"],"eEn":"The dependency graph visualizes dependencies from manifests and lockfiles, and Dependabot alerts detect and warn about dependencies with known vulnerabilities—native GitHub features. A hand-written Wiki list, a Discussions thread, or a pasted Gist provide no automatic detection or continuous monitoring."},{"d":"D2","q":"数年前に完成し、もう新機能開発も保守も行わないリポジトリがある。だが過去の実装は参考資料として残し、誰も新たに Issue やプルリクエストを立てられないよう読み取り専用にして、メンテ終了を明確に示したい。削除はしたくない。この意図に最も適した GitHub の操作はどれか。","o":["リポジトリを archive（アーカイブ）して読み取り専用にする","リポジトリを完全に delete する","README を空にして更新を止める","すべてのブランチを削除する"],"a":0,"e":"リポジトリの archive は内容を残したまま読み取り専用にし、新規の Issue やプルリクエストを受け付けず、メンテ終了を明示できる。delete は参考資料ごと消えてしまい意図に反し、README の空白化やブランチ削除は編集停止や状態表明の手段として不適切である。","qEn":"There is a repository finished years ago, with no more feature development or maintenance. You want to keep the past implementation as reference, make it read-only so no one can open new issues or pull requests, and clearly signal that maintenance has ended. You do not want to delete it. Which GitHub action best fits this intent?","oEn":["Archive the repository to make it read-only","Delete the repository entirely","Empty the README and stop updating","Delete all branches"],"eEn":"Archiving a repository makes it read-only while keeping the content, rejects new issues and pull requests, and clearly signals maintenance has ended. Deleting removes the reference material too, contrary to the intent, and emptying the README or deleting branches are inappropriate ways to stop editing or declare status."},{"d":"D2","q":"オープンソースの人気が高まり、外部からのプルリクエストが増えてきた。すべての PR が同じ書式で説明・関連 Issue・動作確認手順を記載してくれると、レビューが速く一貫する。作成者が PR を開いた瞬間に、記入すべき項目があらかじめ本文に差し込まれるようにしたい。この目的に最も適した仕組みはどれか。","o":["毎回レビュアーが本文の書き直しを依頼する","プルリクエストテンプレートを用意する","README にPRの書き方を長文で書くだけにする","ブランチ名の命名規則だけを強制する"],"a":1,"e":"プルリクエストテンプレートは PR を開いた時点で説明・関連 Issue・動作確認手順などの記入欄を本文に自動挿入し、書式を統一してレビューを速く一貫させる。レビュアーの都度依頼は非効率、README の長文は自動挿入されず、ブランチ命名規則だけでは本文の記載項目を揃えられない。","qEn":"As the open-source project's popularity grows, external pull requests are increasing. Reviews are faster and more consistent when every PR describes the change, related issue, and verification steps in the same format. You want the items to fill in pre-inserted into the body the moment the author opens a PR. Which mechanism best fits this?","oEn":["Have reviewers request a rewrite of the body each time","Provide a pull request template","Just write a long description of PR etiquette in the README","Only enforce a branch naming convention"],"eEn":"A pull request template auto-inserts fields—description, related issue, verification steps—into the body when a PR is opened, standardizing format for faster, consistent review. Per-PR reviewer requests are inefficient, a long README is not auto-inserted, and a branch naming rule alone cannot standardize the body's content."},{"d":"D3","q":"利用者から「特定の操作をするとアプリが落ちる」という不具合の報告を受け取った。チームはこの問題を追跡可能な単位として登録し、再現手順や担当者、進捗、関連する議論を一箇所に集約し、修正が取り込まれたら閉じられるようにしたい。この目的に最も適した GitHub の機能はどれか。","o":["新しいブランチを push する","リポジトリを fork する","Issue を作成する","Gist を作成する"],"a":2,"e":"Issue は不具合や作業を追跡可能な単位として登録し、再現手順・担当者・進捗・議論を集約でき、修正が入れば閉じられる GitHub の中核機能。fork は複製、ブランチ push はコード変更の反映、Gist は断片的なスニペット共有であり、いずれも課題追跡の役割を担わない。","qEn":"A user reports a bug that the app crashes during a specific operation. The team wants to register this problem as a trackable unit, consolidate reproduction steps, an assignee, progress, and related discussion in one place, and close it once a fix lands. Which GitHub feature best fits this purpose?","oEn":["Push a new branch","Fork the repository","Create an issue","Create a Gist"],"eEn":"An issue registers a bug or task as a trackable unit, consolidating reproduction steps, assignee, progress, and discussion, and closes once fixed—a core GitHub feature. A fork is a copy, pushing a branch reflects code changes, and a Gist shares snippets—none handles issue tracking."},{"d":"D3","q":"開発者がブランチ上で不具合修正を完了し、チームメンバーにコードの差分をレビューしてもらった上で main に取り込みたい。マージ前に自動テストを走らせ、コメントで議論し、承認を得てから統合するという一連の流れを一つの単位で扱いたい。この目的に最も適した GitHub の機能はどれか。","o":["Wiki のページを作る","Issue を作成する","Discussions のスレッドを立てる","プルリクエストを作成する"],"a":3,"e":"プルリクエストはブランチの変更を main などへ統合する提案の単位で、差分レビュー、コメント議論、自動テスト実行、承認を経てマージする一連の流れを一つにまとめる。Issue は課題追跡、Discussions は自由な議論、Wiki は文書化であり、コード統合のレビュー手続きを担わない。","qEn":"A developer finished a bug fix on a branch and wants teammates to review the code diff before it is merged into main. They want to run automated tests before merging, discuss via comments, and integrate only after approval—all handled as one unit. Which GitHub feature best fits this?","oEn":["Create a Wiki page","Create an issue","Start a Discussions thread","Create a pull request"],"eEn":"A pull request is the unit for proposing to integrate a branch's changes into main, bundling diff review, comment discussion, automated tests, and approval before merging. Issues track tasks, Discussions is for open conversation, and Wiki is for documentation—none handles the code-integration review process."},{"d":"D3","q":"コミュニティの参加者から、使い方の相談、アイデアの提案、Q&A といった、必ずしもコード修正や明確なバグ追跡につながらないオープンな会話が増えてきた。Issue で扱うと乱雑になり、スレッド形式で気軽に議論・投票・ベストアンサー選定ができる場が欲しい。この目的に最も適した GitHub の機能はどれか。","o":["Discussions を有効にする","すべてを Issue として起票させる","Wiki のコメント欄で会話する","プルリクエストのレビュー欄で雑談する"],"a":0,"e":"Discussions は Q&A や相談、アイデア提案などコード修正に直結しないオープンな会話をスレッド形式で扱い、投票やベストアンサー選定もできるコミュニティ向け機能。会話を Issue に詰め込むと課題追跡が乱雑になり、Wiki やプルリクエストのレビュー欄は議論の場として設計されていない。","qEn":"Community participants increasingly have open conversations—usage questions, idea proposals, Q&A—that do not necessarily lead to code changes or clear bug tracking. Handling them as issues gets messy; you want a place to discuss casually in threads, vote, and mark best answers. Which GitHub feature best fits this?","oEn":["Enable Discussions","Make everyone file everything as issues","Converse in the Wiki's comment area","Chat in a pull request's review area"],"eEn":"Discussions handles open conversations not tied to code changes—Q&A, requests, idea proposals—in threads, with voting and best-answer selection, a community-oriented feature. Stuffing conversations into issues clutters tracking, and the Wiki or a pull request's review area are not designed as discussion venues."},{"d":"D3","q":"あるプルリクエストは、報告済みの不具合 Issue #42 を修正するものだ。この PR が main にマージされたら、対応する Issue #42 が自動的にクローズされるようにして、二重管理や閉じ忘れを防ぎたい。PR 側でこの自動連携を成立させる方法として、最も適切なものはどれか。","o":["Issue #42 のタイトルに PR 番号を手で書き込む","PR の説明やコミットに「Closes #42」などのクローズ用キーワードを記述する","PR と Issue に同じラベルを付けるだけにする","マージ後に毎回手動で Issue を閉じる運用にする"],"a":1,"e":"PR の説明やコミットに「Closes #42」「Fixes #42」などのクローズキーワードを書くと、マージ時に対象 Issue が自動でクローズされ、閉じ忘れを防げる。タイトルへの手書きや同一ラベル付けだけでは自動連携せず、手動クローズ運用は自動化の利点を失い漏れの原因になる。","qEn":"A pull request fixes reported bug issue #42. You want the corresponding issue #42 to close automatically when this PR merges into main, to avoid double management and forgetting to close it. What is the correct way on the PR side to establish this automatic linkage?","oEn":["Manually type the PR number into issue #42's title","Write a closing keyword like 'Closes #42' in the PR description or commit","Just apply the same label to the PR and the issue","Manually close the issue after every merge"],"eEn":"Writing a closing keyword like 'Closes #42' or 'Fixes #42' in the PR description or a commit auto-closes the referenced issue on merge, preventing forgotten closures. Typing into the title or merely sharing a label does not auto-link, and manual closing loses the automation benefit and invites misses."},{"d":"D3","q":"リポジトリに寄せられる Issue が「バグ報告」「機能要望」「質問」と種類がまちまちで、それぞれ必要な情報が異なるため、起票者に応じた入力欄を出し分けたい。起票時に種類を選ばせ、それぞれ最適化されたフォーム形式で必要事項を記入させたい。この目的に最も適した仕組みはどれか。","o":["Discussions に一本化してテンプレートは使わない","全員に同じ真っ白な Issue を書かせる","種類別の Issue テンプレート（Issue フォーム）を複数用意する","ラベルを後から付け替えるだけで対応する"],"a":2,"e":"種類別の Issue テンプレートやフォームを複数用意すると、起票時に種類を選ばせ、それぞれに最適化された入力欄で必要事項を記入させられる。真っ白な Issue は情報が揃わず、Discussions 一本化は課題追跡に不向き、事後のラベル付け替えだけでは入力項目の出し分けができない。","qEn":"Issues submitted to the repository vary in type—bug reports, feature requests, questions—each needing different information, so you want to present input fields tailored to the submitter. You want them to pick a type at filing time and fill in the essentials via a form optimized for each. Which mechanism best fits this?","oEn":["Consolidate into Discussions and use no templates","Have everyone write the same blank issue","Provide multiple issue templates (issue forms) by type","Just relabel issues afterward"],"eEn":"Providing multiple issue templates/forms by type lets submitters pick a type and fill in essentials via fields optimized for each. A blank issue yields incomplete info, consolidating into Discussions is unsuited to tracking, and relabeling afterward cannot present tailored input fields at filing time."},{"d":"D3","q":"数百件の Issue を抱えるリポジトリで、メンテナが「自分に割り当てられ、かつ bug ラベルが付いた未クローズの項目」だけを素早く絞り込んで対応したい。毎回目視で探すのは非現実的で、条件を指定して一覧を機械的に抽出したい。この目的に最も適した GitHub の機能はどれか。","o":["Wiki に手作業で対応表を作る","Issue を一つずつ開いて確認する","リポジトリを clone してローカルで grep する","Issue のフィルターと検索クエリ（assignee やラベル、状態で絞り込む）"],"a":3,"e":"GitHub の Issue はフィルターと検索クエリで assignee・ラベル・オープン/クローズ状態などを指定し、条件に合う項目だけを機械的に一覧抽出できる。個別に開く確認や clone しての grep、Wiki の手作業表は大量の Issue を効率よく絞り込む用途には非現実的で保守も難しい。","qEn":"In a repository with hundreds of issues, a maintainer wants to quickly narrow down to only 'open items assigned to me and labeled bug' to work on. Eyeballing each time is impractical; they want to extract a list mechanically by specifying conditions. Which GitHub feature best fits this?","oEn":["Manually building a mapping table in the Wiki","Opening and checking issues one by one","Cloning the repository and grepping locally","Issue filters and search queries (narrow by assignee, label, state)"],"eEn":"GitHub issues support filters and search queries by assignee, label, open/closed state, and more, mechanically extracting only matching items. Opening each one, cloning to grep, or a manual Wiki table are impractical and hard to maintain for narrowing large numbers of issues efficiently."},{"d":"D3","q":"多数のリポジトリをウォッチしているうちに、通知メールが大量に届き重要なものが埋もれてしまうようになった。自分が担当・参加している事項や、直接メンションされた通知に絞って受け取り、それ以外の頻度を下げたい。この状況を改善するために調整すべき設定として、最も適切なものはどれか。","o":["通知設定（Watch の粒度や Participating / メンションのみ受信など）を見直す","GitHub アカウントを削除して通知を止める","すべてのリポジトリを一律で fork する","メールソフト側で GitHub からのメールを全部迷惑メールにする"],"a":0,"e":"GitHub の通知設定では Watch の粒度を変え、Participating やメンションのみ受信に絞るなどして重要な通知だけを残せる。アカウント削除は極端で作業ができなくなり、全リポジトリの fork は無関係、GitHub メールを一括で迷惑メール化すると必要な通知まで失われる。","qEn":"While watching many repositories, you now receive a flood of notification emails and important ones get buried. You want to receive only items you own or participate in and notifications where you are directly mentioned, and reduce the frequency of the rest. Which setting should you adjust to improve this?","oEn":["Review notification settings (Watch granularity, Participating/mentions-only, etc.)","Delete your GitHub account to stop notifications","Fork all repositories uniformly","Send all GitHub emails to spam in your mail client"],"eEn":"GitHub notification settings let you change Watch granularity and limit to Participating or mentions-only, keeping just the important notifications. Deleting the account is extreme and stops your work, forking all repos is irrelevant, and spamming all GitHub email loses needed notifications too."},{"d":"D3","q":"開発者が、便利な小さなスクリプトやログの断片を、リポジトリを新規に作るほどではない形で手早く共有したい。単独のファイルや数個のスニペットに URL を付けて他者へ渡し、必要なら公開・非公開を選びたいと考えている。この用途に最も適した GitHub の機能はどれか。","o":["フル機能のリポジトリを毎回新規作成する","Gist を作成する","Wiki に貼り付けて管理する","Discussions に投稿してからクローズする"],"a":1,"e":"Gist は単独ファイルや小さなスニペットに URL を付けて手早く共有でき、公開・秘密（非公開）を選べる軽量機能で、リポジトリを作るほどでない共有に最適。フルリポジトリの新規作成は過剰、Wiki はプロジェクト文書向け、Discussions は議論の場でスニペット共有の主目的ではない。","qEn":"A developer wants to quickly share a handy small script or a log snippet, without going as far as creating a whole new repository. They want to give others a single file or a few snippets with a URL, and optionally choose public or secret. Which GitHub feature best fits this use?","oEn":["Create a full-featured repository each time","Create a Gist","Manage it by pasting into the Wiki","Post to Discussions then close it"],"eEn":"A Gist quickly shares a single file or small snippets with a URL and lets you choose public or secret—a lightweight feature ideal for sharing not warranting a full repository. Creating a full repo is overkill, the Wiki is for project docs, and Discussions is for conversation, not primarily snippet sharing."},{"d":"D3","q":"あるプロジェクトで、コード本体とは別に、詳細な設計ドキュメント、チュートリアル、用語集などを複数ページにわたり体系立てて整備し、リポジトリ内で誰でも編集・参照できるようにしたい。一方で、プロジェクトの公開紹介サイトそのものを作りたいわけではない。この社内向け文書整備に最も適した機能はどれか。","o":["Gist に全ページを散在させる","GitHub Pages で公開 Web サイトを構築する","リポジトリの Wiki を使う","README 一枚にすべてを詰め込む"],"a":2,"e":"Wiki はリポジトリに紐づき、設計文書・チュートリアル・用語集などを複数ページで体系立てて整備・共同編集できる文書機能で、内部向け整備に適する。Pages は公開 Web サイト構築用で目的が異なり、Gist の散在は体系化に不向き、README 一枚に詰め込むと肥大化し構造化できない。","qEn":"In a project, apart from the code itself, you want to systematically build detailed design documents, tutorials, and a glossary across multiple pages, editable and referenceable by anyone within the repository. However, you do not want to build a public showcase website itself. Which feature best fits this internal documentation?","oEn":["Scatter all pages across Gists","Build a public website with GitHub Pages","Use the repository's Wiki","Cram everything into a single README"],"eEn":"The Wiki is tied to the repository and lets you systematically build and co-edit design docs, tutorials, and glossaries across multiple pages—suited to internal documentation. Pages is for building a public website (a different purpose), scattering Gists is unsuited to systematization, and one README bloats and cannot structure it."},{"d":"D3","q":"オープンソースのメンテナが、プロジェクトの紹介、導入ガイド、ドキュメントを、リポジトリ内の Markdown ファイルから見栄えの良い公開 Web サイトとして誰でもブラウザで閲覧できる形で提供したい。独自にサーバーを用意せず GitHub の機能だけで静的サイトを公開したい。この目的に最も適した機能はどれか。","o":["Discussions に紹介文を投稿する","Wiki を内部向けにだけ整備する","Gist にドキュメントを置いて URL を配る","GitHub Pages で静的サイトを公開する"],"a":3,"e":"GitHub Pages はリポジトリ内の Markdown や HTML から、独自サーバーなしで見栄えの良い公開静的 Web サイトをホスティングできる機能で、紹介や導入ガイドの公開に最適。Wiki は内部文書向け、Gist はスニペット共有、Discussions は議論の場であり、公開サイトの構築という目的には合わない。","qEn":"An open-source maintainer wants to offer the project's introduction, getting-started guide, and documentation as a polished public website that anyone can view in a browser, generated from Markdown files in the repository. They want to publish a static site using only GitHub's features without their own server. Which feature best fits this?","oEn":["Post the introduction to Discussions","Maintain the Wiki for internal use only","Put docs in a Gist and hand out the URL","Publish a static site with GitHub Pages"],"eEn":"GitHub Pages hosts a polished public static website from a repository's Markdown or HTML without your own server—ideal for publishing introductions and getting-started guides. The Wiki is for internal docs, a Gist shares snippets, and Discussions is for conversation—none fits building a public site."},{"d":"D4","q":"あるWebチームは、mainブランチへプルリクエストが作成されるたびに自動でテストとlintを実行し、失敗すればマージをブロックしたいと考えています。追加サーバーを用意せずGitHub上で完結させたい場合、リポジトリに設定すべき最適な仕組みはどれですか。最も適切な選択肢を一つ選んでください。","o":["GitHub Actionsのワークフローをpull_requestイベントで定義し、必須ステータスチェックに設定する","Codespacesを起動して開発者が毎回手動でテストを流す運用にする","リポジトリのWikiにテスト手順を書き各自が実行を約束する","Issueテンプレートにチェックリストを入れてレビュー時に確認する"],"a":0,"e":"正解は0。GitHub Actionsはpull_requestイベントでワークフローを起動でき、その結果をブランチ保護の必須ステータスチェックに指定すれば失敗時にマージを阻止できます。1は自動化されず手動依存、2は手順の記載のみで強制力がなく、3はレビュー時の目視確認に過ぎず自動実行やマージブロックを実現できません。","qEn":"A web team wants tests and lint to run automatically on every pull request to main, blocking the merge if they fail, without provisioning extra servers and staying entirely within GitHub. Which mechanism should they configure on the repository? Choose the single best option.","oEn":["Define a GitHub Actions workflow on the pull_request event and set it as a required status check","Have developers manually run tests each time by starting a Codespace","Write the test procedure in the repository Wiki and rely on each person","Add a checklist to the issue template and confirm it during review"],"eEn":"Correct is 0. GitHub Actions can trigger on the pull_request event, and marking that check as a required status check in branch protection blocks merges on failure. Option 1 is manual, 2 is only documentation with no enforcement, and 3 is a visual review step that provides no automatic execution or merge blocking."},{"d":"D4","q":"開発者が「この機能をリポジトリ全体を横断して実装し、複数ファイルの編集と反復的な修正まで自律的に進めてほしい」とCopilotに依頼したいと考えています。単発のコード補完ではなく、計画立案と複数ステップの変更を任せられるCopilotの利用形態として最も適切なものはどれですか。","o":["コメント行に沿ってその場で1行だけ補完するインライン補完","Copilotのエージェントモード（Agent Mode）を使い自律的に複数ステップの変更を任せる","READMEにやりたいことを書いて放置する","PRの説明欄に要件を書くだけで実装を待つ"],"a":1,"e":"正解は1。Copilotのエージェントモードは、目標を与えると計画を立て、複数ファイルにまたがる編集や反復的な修正を自律的に進められます。0は単一箇所の補完にとどまり自律的な多段変更はできません。2と3は単なる記述であり、Copilotが自動で実装を進める仕組みではありません。","qEn":"A developer wants to ask Copilot to implement a feature across the whole repository, autonomously editing multiple files and iterating on fixes, rather than doing single-shot code completion, delegating planning and multi-step changes. Which Copilot usage form is most appropriate?","oEn":["Inline completion that suggests a single line in place following a comment","Use Copilot Agent Mode to autonomously delegate multi-step changes","Write the intent in the README and leave it","Just write requirements in the PR description and wait for implementation"],"eEn":"Correct is 1. Copilot Agent Mode takes a goal, forms a plan, and autonomously performs edits across multiple files with iterative fixes. Option 0 is limited to a single-spot completion, and 2 and 3 are mere descriptions with no mechanism for Copilot to implement automatically."},{"d":"D4","q":"あるエンジニアは、Copilot Chatで難しい設計課題を検討する際に、用途に応じて異なる基盤モデルを選んで回答の傾向を比較したいと考えています。Copilotが提供する、複数の大規模言語モデルから状況に合わせて選択できる機能を指す説明として最も適切なものはどれですか。","o":["Copilotは常に単一の固定モデルのみで動作し切り替えは一切できない","モデル選択はEnterprise管理者のみが操作でき利用者は選べない","Copilotのマルチモデル対応により利用者が複数モデルから選択できる","モデルを変えるには別サブスクリプションの新規契約が必須である"],"a":2,"e":"正解は2。CopilotはChatなどで複数の大規模言語モデルから選択できるマルチモデル対応を備え、課題に応じてモデルを切り替えて比較できます。0は固定モデルという誤り、1は利用者が選べるため誤り、3は別契約が必須という誤りで、いずれもマルチモデル選択の仕様と一致しません。","qEn":"An engineer wants, while exploring a hard design problem in Copilot Chat, to pick different underlying models for the situation and compare the flavor of the answers. Which description best captures Copilot's ability to choose among multiple large language models to fit the context?","oEn":["Copilot always runs on a single fixed model and cannot switch at all","Only an Enterprise admin can operate model selection; users cannot choose","Copilot's multi-model support lets the user choose among several models","Changing the model requires signing up for a separate new subscription"],"eEn":"Correct is 2. Copilot offers multi-model support in surfaces like Chat, letting users choose among multiple large language models and compare per problem. Option 0 wrongly claims a fixed model, 1 wrongly restricts choice to admins, and 3 wrongly requires a separate contract."},{"d":"D4","q":"ある企業が、社員のCopilot利用について組織単位でポリシー管理を行い、どのユーザーにシートを割り当てるかを一元管理したいと考えています。個人が各自で契約する形ではなく、組織が席（シート）を管理し方針を統制できるCopilotのプランとして、最も基本的で適切なものはどれですか。最も適切なものを一つ選んでください。","o":["Copilot Free（無償枠のみ）","サブスクリプション不要でOSSなら無制限利用","個人が各自契約するCopilot Proのみ","Copilot Business（組織がシートとポリシーを管理する）"],"a":3,"e":"正解は3。Copilot Businessは組織がシート割り当てとポリシーを一元管理でき、社員へのアクセス統制に適します。0の無償枠は組織的なシート管理を目的とせず、2の個人契約Proは各自管理で組織統制に向かず、1は事実ではありません。より高度な統制はEnterpriseですが、基本的な組織管理はBusinessが適切です。","qEn":"A company wants to manage Copilot usage at the organization level with policy control and centrally decide which users are assigned seats. Rather than an individual plan, which Copilot plan is the most basic and appropriate for an organization to manage seats and govern policy?","oEn":["Copilot Free (free tier only)","Unlimited use for OSS with no subscription needed","Only Copilot Pro contracted individually by each person","Copilot Business (the organization manages seats and policy)"],"eEn":"Correct is 3. Copilot Business lets an organization centrally manage seat assignment and policy, fitting access governance. Option 0's free tier is not aimed at org seat management, 2's individual Pro is self-managed and unsuited to org control, and 1 is untrue. Enterprise offers deeper control, but Business is the appropriate basic org option."},{"d":"D4","q":"新メンバーがリポジトリをクローンして環境構築しようとしても、言語ランタイムや依存関係の準備に半日かかり生産性が落ちています。ブラウザからすぐに、あらかじめ構成されたクラウド開発環境を起動して即コーディングを始めたい場合、GitHubが提供する最適な機能はどれですか。","o":["リポジトリのReleasesからバイナリをダウンロードする","GitHub Codespacesでクラウド上の開発環境を起動する","ローカルにVMを手動で構築し直す","GitHub Pagesで静的サイトを公開する"],"a":1,"e":"正解は1。GitHub Codespacesはブラウザやエディタからクラウド上の構成済み開発環境を起動でき、環境構築の時間を大幅に短縮して即座にコーディングを始められます。0は成果物取得で開発環境ではなく、2は手動構築で時間短縮にならず、3は静的サイト公開機能で開発環境の目的とは異なります。","qEn":"New members spend half a day preparing runtimes and dependencies after cloning a repository, hurting productivity. To immediately spin up a pre-configured cloud development environment from the browser and start coding at once, which GitHub feature is the best fit?","oEn":["Download binaries from the repository Releases","Start a cloud development environment with GitHub Codespaces","Manually rebuild a VM locally","Publish a static site with GitHub Pages"],"eEn":"Correct is 1. GitHub Codespaces launches a pre-configured cloud dev environment from a browser or editor, cutting setup time and letting coding start instantly. Option 0 fetches artifacts, not an environment, 2 is manual and saves no time, and 3 is static site hosting, unrelated to a dev environment."},{"d":"D4","q":"チームは、CodespacesやローカルのVS Codeで誰が開いても同じツール群・拡張機能・言語バージョンが揃うよう、開発環境の定義をコードとしてリポジトリに含めたいと考えています。この目的で用いる、環境構成を宣言的に記述する仕組みとして最も適切なものはどれですか。","o":["dev container（devcontainer.json）で環境構成を定義する",".gitignoreに必要なツール名を列挙する","READMEに手順を箇条書きで書くだけにする","各自のシェル設定ファイルを個別に配布する"],"a":0,"e":"正解は0。dev container（devcontainer.json）は開発環境の構成をコードとして宣言的に記述でき、Codespacesや対応エディタで誰が開いても同一の環境を再現できます。1のgitignoreは追跡除外の設定で環境定義ではなく、2は手動手順、3は個別配布で一貫した自動再現にはなりません。","qEn":"A team wants the development environment definition committed to the repository so anyone opening it in Codespaces or local VS Code gets the same tools, extensions, and language versions. Which mechanism for declaratively describing the environment is most appropriate for this purpose?","oEn":["Define the environment with a dev container (devcontainer.json)","List the required tool names in .gitignore","Just write steps as bullet points in the README","Distribute each person's shell config file separately"],"eEn":"Correct is 0. A dev container (devcontainer.json) declaratively describes the environment as code, reproducing an identical environment for anyone who opens it in Codespaces or a supporting editor. Option 1's gitignore controls tracking exclusions, 2 is manual steps, and 3 is per-person distribution without consistent automatic reproduction."},{"d":"D4","q":"レビュー担当者が、リポジトリ上でちょっとしたタイポ修正やドキュメントの軽微な編集を、コンテナやサーバーといった計算環境を起動せず、ブラウザ内の軽量なエディタで素早く行いたいと考えています。リポジトリ画面で「.」キーを押すと開ける、計算環境を伴わない編集特化の機能として最も適切なものはどれですか。","o":["フル機能のCodespacesを毎回起動する","GitHub CLIをインストールして操作する","ローカルにリポジトリをクローンしてから編集する","github.dev（ブラウザ内の軽量エディタ）を使う"],"a":3,"e":"正解は3。github.devは「.」キーで開けるブラウザ内の軽量エディタで、計算環境（実行やターミナル）を持たず、軽微な編集やコミットに向きます。0のCodespacesは計算環境を伴い軽微編集には過剰、2はローカル準備が必要、1はCLIで別目的であり、素早いブラウザ内編集の要件に合いません。","qEn":"A reviewer wants to make small typo fixes or minor doc edits on a repository quickly in a lightweight in-browser editor without starting a container or server. Which editing-focused feature, opened with the '.' key and without a compute environment, is most appropriate?","oEn":["Start full-featured Codespaces every time","Install the GitHub CLI to operate","Clone the repository locally before editing","Use github.dev (a lightweight in-browser editor)"],"eEn":"Correct is 3. github.dev is a lightweight in-browser editor opened with the '.' key that has no compute environment (no execution or terminal), suited to minor edits and commits. Option 0 Codespaces includes compute and is overkill, 2 needs local setup, and 1 is the CLI for a different purpose, none matching quick in-browser editing."},{"d":"D4","q":"あるチームは、複数のプロジェクトで同じデプロイ用のワークフロー処理を再利用したいと考えています。共通処理を毎回コピーせず、コミュニティや自作の再利用可能な部品を組み込んでワークフローを構築したい場合、GitHub Actionsで活用すべき仕組みとして最も適切なものはどれですか。","o":["毎回ワークフロー全体を手書きでコピーして貼り付ける","デプロイ手順を口頭で共有し各自が実行する","GitHub Marketplaceのアクションや再利用可能ワークフローを組み込む","リポジトリごとに別々のスクリプトを無関係に管理する"],"a":2,"e":"正解は2。GitHub Actionsでは、Marketplaceで公開されたアクションや再利用可能ワークフローを組み込むことで共通処理を部品化し、複数プロジェクトで再利用できます。0はコピー運用で保守性が低く、1は自動化されず、3は分散管理で再利用にならないため、いずれも要件を満たしません。","qEn":"A team wants to reuse the same deployment workflow logic across multiple projects. To build workflows by incorporating reusable community or self-authored components instead of copying common logic every time, which GitHub Actions mechanism should they leverage? Choose the best option.","oEn":["Hand-copy and paste the entire workflow every time","Share deployment steps verbally and have each person run them","Incorporate GitHub Marketplace actions or reusable workflows","Manage separate unrelated scripts per repository"],"eEn":"Correct is 2. In GitHub Actions, incorporating Marketplace actions or reusable workflows componentizes common logic for reuse across projects. Option 0 is copy-based and hard to maintain, 1 is not automated, and 3 is scattered management that is not reuse, so none meets the requirement."},{"d":"D4","q":"ある開発者は、エディタ上でコードを書きながらリアルタイムに次のコード候補を提示してもらう用途と、自然言語で質問して設計方針やエラーの原因の解説を対話で得る用途の両方を、状況に応じて使い分けたいと考えています。後者、すなわち対話形式で質問と回答をやり取りするCopilotの機能名として最も適切なものはどれですか。","o":["Copilot Chat（対話形式で質問と回答を行う）","Copilotのインラインコード補完のみ","GitHub Actionsのログ出力","リポジトリのInsightsグラフ"],"a":0,"e":"正解は0。Copilot Chatは自然言語で質問し、設計方針やエラーの原因などを対話形式で説明してもらえる機能です。1はリアルタイムの補完で対話ではなく、2はCIの実行ログ、3はリポジトリ統計の表示であり、いずれも自然言語での対話的な質問応答という要件には合致しません。","qEn":"A developer wants to use both real-time next-code suggestions while typing in the editor and a mode to ask questions in natural language and get conversational explanations of design or errors. What is the name of the latter Copilot feature that answers questions in a conversational form?","oEn":["Copilot Chat (asks and answers in a conversational form)","Only Copilot inline code completion","GitHub Actions log output","The repository Insights graphs"],"eEn":"Correct is 0. Copilot Chat lets you ask in natural language and get conversational explanations of design choices or error causes. Option 1 is real-time completion, not conversation, 2 is CI run logs, and 3 shows repository statistics, none matching conversational natural-language Q&A."},{"d":"D4","q":"あるワークフローで外部サービスへ接続するためのAPIキーを使う必要がありますが、キーをコードやログに平文で残したくありません。GitHub Actionsでこの機密値を安全に保持し、実行時にワークフローへ渡すために使うべき仕組みとして最も適切なものはどれですか。","o":["READMEにキーを記載してリポジトリで共有する","ワークフローファイルにキーを直書きしてコミットする","Issueのコメントにキーを貼り付けて参照させる","リポジトリまたはOrganizationのActions Secretsに保存して参照する"],"a":3,"e":"正解は3。GitHub ActionsではリポジトリやOrganizationのSecretsに機密値を暗号化保存し、ワークフローから安全に参照できます。ログにも自動的にマスクされます。0・1・2はいずれもキーを平文で残す危険な方法で、漏洩リスクが高く機密情報の取り扱いとして不適切です。","qEn":"A workflow needs an API key to connect to an external service, but you must not leave the key in plaintext in code or logs. In GitHub Actions, which mechanism should be used to hold this secret safely and pass it to the workflow at runtime? Choose the best option.","oEn":["Write the key in the README and share it in the repository","Hard-code the key in the workflow file and commit it","Paste the key into an issue comment for reference","Store it in repository or Organization Actions Secrets and reference it"],"eEn":"Correct is 3. GitHub Actions stores secrets encrypted at the repository or Organization level and lets workflows reference them safely, with automatic masking in logs. Options 0, 1, and 2 all leave the key in plaintext, which is dangerous, high-leak-risk, and inappropriate for handling secrets."},{"d":"D5","q":"プロダクトマネージャーが、複数リポジトリにまたがるIssueとプルリクエストを一つの場所で計画・追跡し、状況に応じてボード表示・テーブル表示・ロードマップ表示を切り替えて可視化したいと考えています。この用途に最も適したGitHubの機能はどれですか。最も適切なものを選んでください。","o":["リポジトリのWikiにタスク一覧を手書きする","GitHub Projects（複数レイアウトを切り替えて計画・追跡する）","個々のIssueに長いコメントを追記していく","READMEにToDoリストを箇条書きで置く"],"a":1,"e":"正解は1。GitHub Projectsは複数リポジトリのIssueやPRを集約し、ボード・テーブル・ロードマップなどのレイアウトを切り替えて計画・追跡できます。0のWikiや3のREADMEは手書きの静的一覧で自動連携がなく、2はコメント追記で全体可視化に向かず、いずれも柔軟な可視化の要件を満たしません。","qEn":"A product manager wants to plan and track issues and pull requests spanning multiple repositories in one place, switching among board, table, and roadmap views to visualize status. Which GitHub feature best fits this need? Choose the single best option.","oEn":["Hand-write a task list in the repository Wiki","GitHub Projects (switch among multiple layouts to plan and track)","Keep adding long comments to individual issues","Put a to-do list as bullet points in the README"],"eEn":"Correct is 1. GitHub Projects aggregates issues and PRs from multiple repositories and lets you switch layouts such as board, table, and roadmap to plan and track. Options 0 and 3 are static hand-written lists with no automatic linkage, and 2 is comment appending unsuited to overall visualization, so none meets the flexible-visualization requirement."},{"d":"D5","q":"サポートチームは、日々寄せられる多数のIssueを「bug」「documentation」「good first issue」などのカテゴリで色分けして分類し、後から特定の種類だけを絞り込んで一覧できるようにしたいと考えています。Issueやプルリクエストにカテゴリ属性を付与して分類・フィルタするための、最も基本的なGitHubの機能はどれですか。","o":["マイルストーンを個別に大量作成する","各Issueをフォークして分ける","Issueをすべてクローズして整理する","ラベル（Labels）を付与して分類・フィルタする"],"a":3,"e":"正解は3。ラベルはIssueやPRに色付きのカテゴリ属性を付与でき、後から特定ラベルで絞り込み一覧できます。0のマイルストーンは期限付きの達成目標をまとめる別機能で分類用途とは異なり、2のクローズは完了処理、1のフォークはリポジトリ複製であり、いずれもカテゴリ分類・フィルタの目的に合いません。","qEn":"A support team wants to color-code incoming issues into categories like 'bug', 'documentation', and 'good first issue' and later filter and list them. Which is the most basic GitHub feature for attaching category attributes to issues and pull requests to classify and filter?","oEn":["Create many milestones individually","Fork each issue to separate them","Close all issues to organize them","Apply Labels to classify and filter"],"eEn":"Correct is 3. Labels attach colored category attributes to issues and PRs, letting you filter and list by a specific label later. Option 0's milestones group time-bound goals, a different purpose, 2's closing is completion, and 1's fork copies a repository, none matching category classification and filtering."},{"d":"D5","q":"リリース計画を立てるプロジェクトリードが、「v2.0リリース」という一つの目標に向けて関連する複数のIssueをまとめ、期限を設定し、達成の進捗率を一目で把握したいと考えています。この目的に最も適したGitHubの機能はどれですか。最も適切なものを一つ選んでください。","o":["リポジトリを新規に分割して作る","各Issueに個別のラベルを一つずつ付ける","マイルストーン（Milestone）に関連Issueをまとめ期限と進捗を管理する","saved repliesで定型文を用意する"],"a":2,"e":"正解は2。マイルストーンは特定のリリースや目標に向けて複数のIssueやPRをまとめ、期限を設定し、完了・未完了の比率から進捗率を可視化できます。1のラベルは分類用で進捗集計はできず、0のリポジトリ分割は無関係、3のsaved repliesは返信定型文であり、いずれも進捗管理の要件に合致しません。","qEn":"A project lead planning a release wants to group multiple related issues toward one goal, 'v2.0 release', set a due date, and see completion progress at a glance. Which GitHub feature best fits this purpose? Choose the single best option.","oEn":["Create a new split repository","Put one individual label on each issue","Group related issues into a Milestone with a due date and progress","Prepare canned text with saved replies"],"eEn":"Correct is 2. A milestone groups multiple issues and PRs toward a specific release or goal, sets a due date, and visualizes progress from the completed-versus-open ratio. Option 1's labels classify but do not tally progress, 0's repository split is unrelated, and 3's saved replies are canned responses, none meeting progress management."},{"d":"D5","q":"チームは、Projects上でIssueのステータスが「Done」に変わったら自動的にそのアイテムをボードの完了列へ移動させ、手作業の更新を減らしたいと考えています。GitHub Projectsに組み込まれた、条件に応じて項目を自動更新する仕組みを指す用語として最も適切なものはどれですか。","o":["ブランチ保護ルール","Projectsの組み込みワークフロー（built-in workflows）による自動化","リポジトリのCODEOWNERS","Gitのタグ付け"],"a":1,"e":"正解は1。GitHub Projectsには組み込みワークフローがあり、たとえばステータス変更やItem追加などのイベントに応じて項目を自動で更新・移動できます。0のブランチ保護はマージ制御、2のCODEOWNERSはレビュー担当の指定、3のタグ付けはリリース目印であり、いずれもProjects上の項目自動化とは異なります。","qEn":"A team wants items in Projects to move automatically to the board's done column when an issue's status changes to 'Done', reducing manual updates. Which term best refers to the built-in mechanism in GitHub Projects that automatically updates items based on conditions?","oEn":["Branch protection rules","Automation via Projects' built-in workflows","The repository CODEOWNERS","Git tagging"],"eEn":"Correct is 1. GitHub Projects has built-in workflows that can automatically update or move items in response to events such as status changes or item additions. Option 0's branch protection controls merges, 2's CODEOWNERS designates reviewers, and 3's tagging marks releases, none being Projects item automation."},{"d":"D5","q":"メンテナは、Issueへの問い合わせに対し「情報が不足しています。再現手順を追記してください」といった同じ返信を繰り返し送っています。毎回入力する手間を省き、あらかじめ用意した定型文をワンクリックで挿入したいと考えています。この用途に最も適したGitHubの機能はどれですか。","o":["マイルストーンを使う","ブランチを新規作成する","saved replies（保存済み返信）を用意して挿入する","リポジトリをアーカイブする"],"a":2,"e":"正解は2。saved repliesは、よく使う返信文をあらかじめ保存しておき、IssueやPRのコメント欄にワンクリックで挿入できる機能で、定型返信の反復入力を省けます。0のマイルストーンは進捗管理、1のブランチ作成は開発作業、3のアーカイブは凍結であり、いずれも定型返信の挿入という目的に合致しません。","qEn":"A maintainer repeatedly sends the same reply to issue inquiries, such as 'Information is missing; please add reproduction steps.' They want to avoid retyping it each time and insert a prepared canned message with one click. Which GitHub feature best fits this purpose?","oEn":["Use milestones","Create a new branch","Prepare and insert saved replies","Archive the repository"],"eEn":"Correct is 2. Saved replies let you store frequently used response text and insert it into an issue or PR comment with one click, avoiding repeated typing of canned replies. Option 0's milestones manage progress, 1's branch creation is development work, and 3's archiving freezes a repo, none matching inserting a canned reply."},{"d":"D5","q":"あるIssueについて、実際に対応する責任者を明確にし、その人のToDoやフィルタに確実に表示されるようにしたいと考えています。特定のメンバーをそのIssueの担当として明示的に紐づける、GitHubの基本的な仕組みとして最も適切なものはどれですか。最も適切なものを選んでください。","o":["そのメンバーをIssueのアサイン担当者（Assignees）に設定する","リポジトリのStarを付けてもらう","メンバーをフォローする","Issueに絵文字リアクションを付ける"],"a":0,"e":"正解は0。Assignees（担当者）に特定メンバーを設定すると、そのIssueの責任者が明確になり、本人のフィルタや通知にも反映され対応漏れを防げます。1のStarはお気に入り登録、2のフォローはユーザー購読、3のリアクションは感情表明であり、いずれも担当者を割り当てて責任を明確化する目的には合いません。","qEn":"For a particular issue, you want to clarify who is responsible for handling it and ensure it appears in that person's to-dos and filters. Which basic GitHub mechanism for explicitly tying a specific member to an issue as its owner is most appropriate? Choose the best option.","oEn":["Set that member as the issue's Assignee","Have them Star the repository","Follow the member","Add an emoji reaction to the issue"],"eEn":"Correct is 0. Setting a specific member as an Assignee clarifies who owns the issue and surfaces it in their filters and notifications, preventing missed work. Option 1's Star is a favorite, 2's follow subscribes to a user, and 3's reaction expresses sentiment, none matching assigning ownership."},{"d":"D5","q":"スクラムマスターが、直近スプリントで各ステータスにアイテムがどれだけ滞留しているか、完了までの傾向はどうかといった指標をProjects上のチャートで把握し、ボトルネックを議論したいと考えています。GitHub Projectsが提供する、こうした指標を可視化する機能として最も適切なものはどれですか。","o":["リポジトリのSecrets","リポジトリのライセンスファイル","コミット署名（GPG）","Projectsのインサイト（Insights）でチャートを表示する"],"a":3,"e":"正解は3。GitHub ProjectsのインサイトはItemの状況を集計してチャート化でき、各ステータスの件数や傾向を可視化してボトルネックの議論に役立ちます。0のSecretsは機密値の保存、2のコミット署名は真正性の担保、1のライセンスは利用条件の明示であり、いずれもProjectsの指標可視化とは目的が異なります。","qEn":"A scrum master wants to see, in Projects charts, how many items are stuck in each status in the recent sprint and the trend toward completion, to discuss bottlenecks. Which GitHub Projects feature for visualizing such metrics is most appropriate?","oEn":["Repository Secrets","The repository license file","Commit signing (GPG)","Display charts with Projects Insights"],"eEn":"Correct is 3. GitHub Projects Insights aggregates item status into charts, visualizing counts per status and trends to help discuss bottlenecks. Option 0's Secrets store secret values, 2's commit signing ensures authenticity, and 1's license states usage terms, none serving Projects metric visualization."},{"d":"D5","q":"アジャイルチームは、Projectsの各アイテムに「見積もりポイント」や「所属スプリント」といった独自の属性を持たせ、それらでグループ化やフィルタを行いたいと考えています。GitHub Projectsで、標準にない情報を項目ごとに保持するために設定すべき仕組みとして最も適切なものはどれですか。","o":["リポジトリのブランチ","コミットハッシュ","Projectsのカスタムフィールド（custom fields）を定義する","Gitのstash"],"a":2,"e":"正解は2。GitHub Projectsではテキスト・数値・単一選択・日付・イテレーションなどのカスタムフィールドを定義でき、見積もりポイントやスプリントなど独自属性を各アイテムに持たせてグループ化やフィルタに使えます。0・1・3はいずれもGitやリポジトリの別概念で、Projects上の項目属性を定義する手段ではありません。","qEn":"An agile team wants each Projects item to carry custom attributes such as 'estimate points' and 'sprint' and to group and filter by them. Which mechanism should be configured in GitHub Projects to hold non-standard information per item? Choose the best option.","oEn":["Repository branches","Commit hashes","Define custom fields in Projects","Git stash"],"eEn":"Correct is 2. GitHub Projects lets you define custom fields such as text, number, single-select, date, and iteration, giving each item custom attributes like estimate points or sprint for grouping and filtering. Options 0, 1, and 3 are separate Git or repository concepts, not a way to define item attributes in Projects."},{"d":"D6","q":"あるOrganizationは、メンバーのアカウント乗っ取りを防ぐため、パスワードだけでなく追加の認証要素を全員に必須化したいと考えています。GitHubで、ログイン時にパスワードに加えもう一つの本人確認要素を求める、この基本的なセキュリティ機能を指す用語として最も適切なものはどれですか。","o":["二要素認証（2FA）を必須化する","リポジトリを非公開にする","ブランチ保護を有効にする","コミットに署名する"],"a":0,"e":"正解は0。二要素認証（2FA）はパスワードに加え、認証アプリのコードやセキュリティキーなど別の要素を要求し、アカウント乗っ取りを大きく防ぎます。Organizationでは全メンバーに必須化できます。1は公開範囲、2はマージ制御、3はコミットの真正性であり、いずれもログイン時の追加認証要素という目的とは異なります。","qEn":"An organization wants to require every member to use an additional authentication factor beyond a password to prevent account takeover. Which term best refers to this basic GitHub security feature that asks for a second proof of identity in addition to the password at login?","oEn":["Require two-factor authentication (2FA)","Make repositories private","Enable branch protection","Sign commits"],"eEn":"Correct is 0. Two-factor authentication (2FA) requires a second factor, such as an authenticator code or security key, in addition to the password, greatly reducing account takeover, and an organization can require it for all members. Option 1 is visibility, 2 is merge control, and 3 is commit authenticity, none being a second login factor."},{"d":"D6","q":"セキュリティ担当者は、フィッシングに耐性のある、パスワードを入力しないサインイン方式を導入したいと考えています。GitHubがサポートする、公開鍵暗号を用いて端末の生体認証やPINでログインを完結できる、パスワードレスな認証手段を指す用語として最も適切なものはどれですか。","o":["個人アクセストークンのメール送信","パスキー（passkey）によるパスワードレス認証","共有パスワードのチーム内配布","リポジトリのフォーク"],"a":1,"e":"正解は1。パスキーは公開鍵暗号に基づくパスワードレス認証で、端末の生体認証やPINでログインでき、フィッシング耐性が高いのが特長です。GitHubがサポートしています。0のトークンをメールで送るのは危険な運用、2の共有パスワードは推奨されず、3のフォークは複製機能であり、いずれもパスワードレス認証の要件に合いません。","qEn":"A security officer wants to introduce a phishing-resistant, passwordless sign-in method. Which term best refers to the passwordless authentication method GitHub supports that uses public-key cryptography to complete login with the device's biometrics or PIN?","oEn":["Emailing a personal access token","Passwordless authentication with passkeys","Distributing a shared password within the team","Forking a repository"],"eEn":"Correct is 1. Passkeys are passwordless authentication based on public-key cryptography, letting you log in with device biometrics or a PIN and offering strong phishing resistance, and GitHub supports them. Option 0's emailing a token is dangerous, 2's shared password is discouraged, and 3's fork is a copy feature, none meeting passwordless authentication."},{"d":"D6","q":"あるコントリビュータには、Issueやプルリクエストのトリアージ（ラベル付けや担当者の割り当て、クローズなど）は任せたいものの、コードをリポジトリへ直接プッシュする権限までは与えたくありません。リポジトリのアクセスレベル（ロール）のうち、この要件に最も合致するものはどれですか。最も適切なものを一つ選んでください。","o":["Admin（管理者）ロール","Write（書き込み）ロール","Triage（トリアージ）ロール","Maintain（メンテナ）ロール"],"a":2,"e":"正解は2。Triageロールはコードのプッシュ権限を持たず、Issueやプルリクエストの管理（ラベル付け、割り当て、クローズなど）ができ、要件に合致します。0のAdminは全権限、1のWriteはプッシュ可能、3のMaintainはさらに広い管理権限を持ち、いずれもコードプッシュを与えない要件を超えてしまいます。","qEn":"You want a contributor to triage issues (labeling, assigning, closing) but not to have permission to push code directly. Among repository access levels, which role best matches this requirement? Choose the single best option.","oEn":["Admin role","Write role","Triage role","Maintain role"],"eEn":"Correct is 2. The Triage role has no code-push permission but can manage issues and pull requests (labeling, assigning, closing), matching the requirement. Option 0 Admin has full rights, 1 Write can push, and 3 Maintain has broader management rights, all exceeding the requirement of no code push."},{"d":"D6","q":"Organizationの管理者は、あるメンバーに対し、課金情報や組織全体の設定には触らせずに、チームやメンバーの管理といった特定の管理業務だけを委任したいと考えています。オーナー権限を丸ごと与えることなく、限定的な範囲の管理責任だけを割り当てる仕組みとして最も適切なものはどれですか。最も適切なものを選んでください。","o":["全員をOwnerに昇格させる","個人アカウントを共有する","そのメンバーをリポジトリから削除する","Organizationのロール（例: メンバー、モデレーター等の限定ロール）を割り当てる"],"a":3,"e":"正解は3。GitHubのOrganizationにはOwner・Memberに加え、特定の管理業務を委任できる限定的なロールがあり、オーナー全権を与えずに責任範囲を絞って割り当てられます。0は全員に全権を与え危険、2は排除でありアクセス委任ではなく、1のアカウント共有は禁止されるべき運用で、いずれも要件に合いません。","qEn":"An organization admin wants to delegate to a member only specific administrative duties, such as managing teams and members, without letting them touch billing or org-wide settings. Which mechanism for assigning limited administrative responsibility without granting full owner rights is most appropriate?","oEn":["Promote everyone to Owner","Share a personal account","Remove that member from the repository","Assign an Organization role (e.g., a limited role such as member or moderator)"],"eEn":"Correct is 3. GitHub organizations offer, beyond Owner and Member, limited roles that delegate specific administrative duties, letting you assign a narrow scope of responsibility without full owner rights. Option 0 dangerously grants everyone full rights, 2 is removal rather than delegation, and 1's account sharing should be prohibited, none meeting the requirement."},{"d":"D6","q":"ある大企業は、開発者のGitHubアカウントを企業のIDプロバイダーで一元的にプロビジョニング・管理し、個人の公開アカウントとは分離した、組織が完全に統制するアカウント体系を求めています。この要件に最も合致するGitHub Enterpriseの提供形態を指す用語はどれですか。","o":["GitHub Pages","GitHub Sponsors","Enterprise Managed Users（EMU）","GitHub Marketplace"],"a":2,"e":"正解は2。Enterprise Managed Users（EMU）は、企業のIDプロバイダーがユーザーをプロビジョニング・管理し、個人の公開アカウントと分離した企業統制下のアカウントを提供します。0のPagesは静的サイト公開、1のSponsorsは資金支援、3のMarketplaceはアプリ配布であり、いずれもアカウントの一元統制という要件とは無関係です。","qEn":"A large enterprise wants to provision and manage developers' GitHub accounts centrally through its identity provider, with an account scheme fully controlled by the organization and separated from personal public accounts. Which GitHub Enterprise offering best matches this requirement?","oEn":["GitHub Pages","GitHub Sponsors","Enterprise Managed Users (EMU)","GitHub Marketplace"],"eEn":"Correct is 2. Enterprise Managed Users (EMU) has the enterprise's identity provider provision and manage users, providing enterprise-controlled accounts separated from personal public accounts. Option 0 Pages hosts static sites, 1 Sponsors is funding, and 3 Marketplace distributes apps, none relating to centrally controlled accounts."},{"d":"D6","q":"あるOrganizationのオーナーは、社内方針として、機密を扱う一部のチームだけにCopilotの利用を許可し、他のメンバーには無効にしたいと考えています。組織レベルでCopilotの有効・無効やアクセス範囲を制御するために設定すべき仕組みとして最も適切なものはどれですか。","o":["OrganizationのCopilotポリシー設定で対象範囲を制御する","各開発者のローカルエディタ設定に任せる","リポジトリのライセンスを変更する","ブランチ保護ルールを追加する"],"a":0,"e":"正解は0。Organization管理者はCopilotのポリシー設定で、どのメンバーやチームに利用を許可するか、機能の有効・無効を組織レベルで制御できます。1のローカル設定任せは統制にならず、2のライセンス変更は利用条件の話でCopilot制御ではなく、3のブランチ保護はマージ制御であり、いずれも組織的なCopilotアクセス制御には合いません。","qEn":"An organization owner wants, per internal policy, to allow Copilot only for certain teams handling sensitive data and disable it for others. Which mechanism should be configured to control Copilot's enablement and access scope at the organization level? Choose the best option.","oEn":["Control scope via the Organization's Copilot policy settings","Leave it to each developer's local editor settings","Change the repository license","Add branch protection rules"],"eEn":"Correct is 0. An organization admin can control, via Copilot policy settings, which members or teams may use it and whether features are enabled at the org level. Option 1's local settings provide no governance, 2's license change concerns usage terms not Copilot control, and 3's branch protection is merge control, none fitting org-level Copilot access control."},{"d":"D6","q":"スタートアップは、社内の実験的なコードを、検索やインターネットの誰からも見えないようにしつつ、招待した特定のメンバーだけがアクセスできるようにしたいと考えています。この要件を満たすリポジトリの可視性（visibility）設定として最も適切なものはどれですか。最も適切なものを選んでください。","o":["Public（公開）に設定する","リポジトリをアーカイブする","GitHub Pagesで公開する","Private（非公開）に設定し、必要なメンバーのみに権限を付与する"],"a":3,"e":"正解は3。Privateリポジトリはインターネット検索や一般ユーザーからは見えず、明示的にアクセス権を与えたメンバーだけが閲覧・操作できます。0のPublicは誰でも閲覧可能で要件と正反対、2のPagesは公開サイト化、1のアーカイブは読み取り専用に凍結するだけで可視性を制限する目的とは異なります。","qEn":"A startup wants its experimental internal code hidden from search and everyone on the internet, while only invited specific members can access it. Which repository visibility setting best meets this requirement? Choose the single best option.","oEn":["Set it to Public","Archive the repository","Publish it with GitHub Pages","Set it to Private and grant access only to the needed members"],"eEn":"Correct is 3. A private repository is invisible to internet search and the general public, and only members explicitly granted access can view or operate on it. Option 0 Public is visible to anyone, the opposite of the requirement, 2 Pages makes a public site, and 1 archiving only freezes to read-only, not restricting visibility."},{"d":"D6","q":"チームは、mainブランチへ直接プッシュされることを防ぎ、必ずプルリクエストとレビュー承認、CIの成功を経てからでないとマージできないよう強制したいと考えています。この要件を満たすためにリポジトリで設定すべき仕組みとして最も適切なものはどれですか。最も適切なものを選んでください。","o":["リポジトリをPublicにする","全員にAdmin権限を付与する","コミットに絵文字を付ける","mainブランチにブランチ保護ルールを設定する"],"a":3,"e":"正解は3。ブランチ保護ルールはmainなど特定ブランチへの直接プッシュを禁止し、プルリクエスト、必須レビュー承認、必須ステータスチェック（CI成功）などを満たさないとマージできないよう強制できます。0の公開は可視性の話、1の全員Admin権限はむしろ危険、2は無関係であり、いずれもマージ条件の強制という要件に合致しません。","qEn":"A team wants to prevent direct pushes to the main branch and force merges to go through a pull request, required review approval, and passing CI. Which mechanism should be configured on the repository to meet this requirement? Choose the single best option.","oEn":["Make the repository Public","Grant everyone Admin permission","Add emojis to commits","Set a branch protection rule on the main branch"],"eEn":"Correct is 3. A branch protection rule can forbid direct pushes to a branch like main and force merges to satisfy conditions such as a pull request, required review approvals, and required status checks (passing CI). Option 0 concerns visibility, 1 granting everyone Admin is dangerous, and 2 is irrelevant, none meeting enforced merge conditions."},{"d":"D6","q":"新しく作成されたリポジトリに対し、Organizationの全メンバーがデフォルトでどの程度アクセスできるか（読み取りのみか、書き込みまでか、あるいはアクセス不可か）を、リポジトリごとに設定するのではなく組織全体で統一的に決めたいと考えています。この用途に最も適した設定はどれですか。","o":["個々のIssueに担当者を割り当てる","各リポジトリのタグを付け替える","Organizationのベース権限（base permissions）を設定する","コミットメッセージの規約を決める"],"a":2,"e":"正解は2。Organizationのベース権限は、メンバーが組織内リポジトリに対して既定で持つアクセスレベル（なし・読み取り・書き込み等）を組織全体で一括設定でき、個別設定の手間を減らせます。1のタグや3のコミット規約、0のIssue担当割り当てはいずれもアクセスレベルの一括設定とは無関係で要件に合いません。","qEn":"You want to decide uniformly across the whole organization, rather than per repository, how much access all organization members have by default to newly created repositories (read-only, write, or no access). Which setting best fits this purpose?","oEn":["Assign assignees to individual issues","Re-tag each repository","Set the Organization's base permissions","Decide a commit message convention"],"eEn":"Correct is 2. An organization's base permissions set, org-wide in one place, the default access level members have to repositories in the org (none, read, write, etc.), reducing per-repo effort. Option 1's tags, 3's commit convention, and 0's issue assignment are unrelated to bulk-setting access levels."},{"d":"D6","q":"Organizationは、外部の業務委託先の開発者に対し、特定の1リポジトリにだけ限定して参加してもらいたいと考えています。組織の正式メンバーにはせず、必要なリポジトリにのみ招待する形で協力してもらう仕組みを指す用語として最も適切なものはどれですか。最も適切なものを選んでください。","o":["その人をOrganization Ownerにする","外部コラボレーター（outside collaborator）として特定リポジトリに招待する","全リポジトリに一括で追加する","個人アカウントの認証情報を共有する"],"a":1,"e":"正解は1。外部コラボレーターは組織の正式メンバーではなく、招待された特定のリポジトリにのみアクセスできる協力者で、業務委託先などに最小限の範囲で参加してもらうのに適します。0のOwner化は過剰かつ危険、2の全リポジトリ追加は範囲過大、3の認証情報共有は禁止事項であり、いずれも最小権限の要件に反します。","qEn":"An organization wants an external contractor developer to participate in only one specific repository, cooperating via invitation to the needed repository rather than becoming a formal org member. Which term best refers to this mechanism? Choose the single best option.","oEn":["Make them an Organization Owner","Invite them as an outside collaborator to the specific repository","Add them to all repositories at once","Share personal account credentials"],"eEn":"Correct is 1. An outside collaborator is not a formal org member but a cooperator who can access only the specific repositories they are invited to, fitting contractors with minimal scope. Option 0 making them Owner is excessive and dangerous, 2 adding to all repos is too broad, and 3 sharing credentials is prohibited, all violating least privilege."},{"d":"D6","q":"Organizationのオーナーは、部門ごとにメンバーをまとめ、その集団に対して一括でリポジトリのアクセス権を付与したり、@メンションでまとめて通知したりしたいと考えています。個々人に権限を割り当てるのではなく、集団単位で管理するためのGitHubの機能として最も適切なものはどれですか。","o":["チーム（Teams）を作成してメンバーをまとめ権限を付与する","各人に個別にリポジトリ権限を手作業で付ける","ラベルでメンバーを分類する","マイルストーンで部門を表す"],"a":0,"e":"正解は0。GitHubのチームはメンバーを集団としてまとめ、そのチーム単位でリポジトリのアクセス権を一括付与でき、@チーム名でまとめてメンションや通知もできます。1の個別付与は手間が多く保守しにくく、2のラベルはIssue分類用、3のマイルストーンは進捗管理であり、いずれも集団単位の権限管理には適しません。","qEn":"An organization owner wants to group members by department, grant repository access to the group in bulk, and notify them together via @mention. Which GitHub feature for managing by group rather than assigning permissions to individuals is most appropriate?","oEn":["Create Teams to group members and grant permissions","Manually grant repository permissions to each person individually","Classify members with labels","Represent departments with milestones"],"eEn":"Correct is 0. GitHub Teams group members and let you grant repository access in bulk per team, and you can @mention the whole team for notifications. Option 1's individual grants are laborious and hard to maintain, 2's labels classify issues, and 3's milestones manage progress, none suited to group-level permission management."},{"d":"D6","q":"大規模なOrganizationでは、「エンジニアリング」という親チームの下に「フロントエンド」「バックエンド」という子チームを置き、親チームの権限やメンションを子チームへ引き継がせて階層的に管理したいと考えています。GitHubでこの階層構造を実現する仕組みとして最も適切なものはどれですか。","o":["リポジトリを入れ子にする","ブランチを階層的に命名する","Issueをサブタスクに分割する","ネストされたチーム（nested teams、子チーム）を作成する"],"a":3,"e":"正解は3。GitHubのチームは親子構造（ネストされたチーム）を持て、子チームは親チームのアクセス権を継承し、親へのメンションは子にも及びます。これにより組織構造を反映した階層管理ができます。0のリポジトリ入れ子や1のブランチ命名は権限継承を伴わず、2のサブタスク分割はIssue管理であり、いずれもチーム階層とは異なります。","qEn":"A large organization wants child teams 'frontend' and 'backend' under a parent 'engineering' team, with the parent's permissions and mentions cascading to the child teams for hierarchical management. Which GitHub mechanism best realizes this hierarchy?","oEn":["Nest repositories","Name branches hierarchically","Split issues into subtasks","Create nested teams (child teams)"],"eEn":"Correct is 3. GitHub teams can be nested (parent-child), where child teams inherit the parent's access and mentions to the parent reach the children, enabling hierarchical management reflecting the org structure. Option 0's nested repositories and 1's branch naming carry no permission inheritance, and 2's subtask splitting is issue management, none being a team hierarchy."},{"d":"D6","q":"セキュリティチームは、開発者が誤ってAPIキーやトークンなどの認証情報をコミットしてしまった場合に、それを自動で検知して警告してほしいと考えています。リポジトリにプッシュされた内容から漏洩した機密情報を見つけ出すGitHubの機能として最も適切なものはどれですか。最も適切なものを選んでください。","o":["ブランチ保護ルール","GitHub Pages","シークレットスキャン（secret scanning）","マイルストーン"],"a":2,"e":"正解は2。シークレットスキャンはリポジトリの内容からAPIキーやトークンなどの既知の機密情報パターンを検出し、漏洩を警告します。0のブランチ保護はマージ制御で機密検出はせず、1のPagesは静的サイト公開、3のマイルストーンは進捗管理であり、いずれもコミットされた機密情報の自動検知という目的には合致しません。","qEn":"A security team wants automatic detection and alerts if a developer accidentally commits credentials such as API keys or tokens. Which GitHub feature that finds leaked secrets in content pushed to a repository is most appropriate? Choose the single best option.","oEn":["Branch protection rules","GitHub Pages","Secret scanning","Milestones"],"eEn":"Correct is 2. Secret scanning detects known secret patterns such as API keys and tokens in repository content and alerts on leaks. Option 0's branch protection is merge control with no secret detection, 1's Pages hosts static sites, and 3's milestones manage progress, none matching automatic detection of committed secrets."},{"d":"D6","q":"監査対応として、Organizationのオーナーは、誰がいつメンバーを追加・削除したか、権限をどう変更したかといった管理操作の履歴を後から確認できるようにしておきたいと考えています。組織レベルでこうした操作記録を参照するために利用すべき仕組みとして最も適切なものはどれですか。","o":["コミットのdiffを一つずつ見る","各Issueのコメント履歴を読む","Organizationの監査ログ（audit log）を確認する","READMEの更新履歴をたどる"],"a":2,"e":"正解は2。Organizationの監査ログは、メンバーの追加・削除や権限変更、設定変更などの管理操作を時系列で記録し、後から誰が何をしたかを追跡でき、監査に役立ちます。1のIssueコメントや0のコミットdiff、3のREADME履歴はコードや議論の記録であり、組織の管理操作履歴を網羅的に参照する目的には合いません。","qEn":"For audit purposes, an organization owner wants to be able to later review the history of administrative actions, such as who added or removed members and when, and how permissions changed. Which mechanism should be used to review such action records at the organization level?","oEn":["Look at commit diffs one by one","Read the comment history of each issue","Review the Organization's audit log","Trace the README's update history"],"eEn":"Correct is 2. The organization audit log records administrative actions such as member add/remove, permission changes, and setting changes in chronological order, letting you trace who did what for audits. Option 1's issue comments, 0's commit diffs, and 3's README history record code or discussion, not comprehensive org administrative action history."},{"d":"D7","q":"オープンソースの利用者が、特定の言語で書かれ、かつ活発にメンテナンスされているライブラリを探しています。GitHub全体から、言語・スター数・更新時期などの条件を指定して目的のリポジトリを効率よく見つけ出したい場合に活用すべき、GitHubの機能として最も適切なものはどれですか。最も適切なものを選んでください。","o":["自分のリポジトリのIssue検索だけを使う","GitHubのコード・リポジトリ検索で言語やスターなどの条件フィルタを使う","手当たり次第にURLを直接入力して探す","友人にDMで教えてもらうのを待つ"],"a":1,"e":"正解は1。GitHubの検索機能はlanguageやstars、pushedなどの検索修飾子（フィルタ）でリポジトリを絞り込め、目的の言語かつ活発に更新されたリポジトリを効率よく発見できます。0は自分のIssueに限定され横断検索にならず、2は非効率かつ現実的でなく、3は機能に頼らない当てずっぽうで、いずれも発見性の要件に合いません。","qEn":"An open-source user is looking for a library written in a specific language and actively maintained. To efficiently find the target repository across all of GitHub by specifying conditions such as language, star count, and last update, which GitHub feature should be leveraged? Choose the single best option.","oEn":["Use only issue search within your own repository","Use GitHub's code/repository search with filters like language and stars","Randomly type URLs directly to look","Wait for a friend to tell you via DM"],"eEn":"Correct is 1. GitHub search lets you narrow repositories with qualifiers (filters) such as language, stars, and pushed, efficiently discovering repos in the desired language that are actively updated. Option 0 is limited to your own issues and is not cross-cutting, 2 is inefficient and impractical, and 3 is guesswork without the feature, none meeting discoverability."},{"d":"D7","q":"あるスタートアップの経営者が、オープンソースとして自社ツールを公開することの利点を検討しています。「外部の開発者からの貢献を受けられる」「透明性が高まり信頼を得やすい」といった利点に加えて、最も一般的に挙げられるオープンソースの利点として最も適切なものはどれですか。","o":["ソースコードを完全に秘匿できる","コミュニティによるレビューやバグ報告で品質改善が期待できる","誰もIssueを立てられなくなる","自動的に売上が保証される"],"a":1,"e":"正解は1。オープンソース化の代表的な利点は、広いコミュニティからのレビュー、バグ報告、コントリビューションを受けられ、品質や機能の改善が加速する点です。0はソース公開の性質と矛盾し、2はむしろ協働を妨げる誤り、3は売上保証などされないため、いずれもオープンソースの一般的な利点としては不適切です。","qEn":"A startup executive is weighing the benefits of releasing the company's tool as open source. Beyond benefits like 'receiving contributions from external developers' and 'gaining trust through transparency', which is the most commonly cited benefit of open source?","oEn":["The source code can be kept completely secret","Community review and bug reports can improve quality","No one can open issues anymore","Sales are automatically guaranteed"],"eEn":"Correct is 1. A hallmark benefit of open source is receiving review, bug reports, and contributions from a broad community, accelerating quality and feature improvement. Option 0 contradicts the nature of open source, 2 wrongly hinders collaboration, and 3 guarantees no sales, none being a common open-source benefit."},{"d":"D7","q":"個人開発者が、自分が余暇で保守している人気オープンソースライブラリに対して、利用者や企業から金銭的な支援を受け取れるようにしたいと考えています。GitHub上で、メンテナが継続的または一度きりの資金提供を受けられる公式の仕組みを指す名称として最も適切なものはどれですか。","o":["GitHub Sponsors（スポンサーによる資金支援）","GitHub Actions","GitHub Pages","GitHub Codespaces"],"a":0,"e":"正解は0。GitHub Sponsorsは、開発者やメンテナが利用者・企業から継続的または一度きりの資金支援を受け取れる公式の仕組みで、オープンソースの持続可能性を支えます。1のActionsはCI/CD、2のPagesは静的サイト公開、3のCodespacesはクラウド開発環境であり、いずれも資金支援の仕組みとは目的が異なります。","qEn":"An individual developer who maintains a popular open-source library in their spare time wants to receive financial support from users and companies. What is the name of GitHub's official mechanism that lets maintainers receive recurring or one-time funding?","oEn":["GitHub Sponsors (funding via sponsors)","GitHub Actions","GitHub Pages","GitHub Codespaces"],"eEn":"Correct is 0. GitHub Sponsors is the official mechanism letting developers and maintainers receive recurring or one-time funding from users and companies, supporting open-source sustainability. Option 1 Actions is CI/CD, 2 Pages hosts static sites, and 3 Codespaces is a cloud dev environment, none being a funding mechanism."},{"d":"D7","q":"ある開発者は、尊敬する著名なメンテナが新しく公開するリポジトリやスター、リリースといった活動を、自分のホームフィードで継続的に把握したいと考えています。特定のユーザーの公開アクティビティを追跡するために使う、GitHubの基本的なソーシャル機能として最も適切なものはどれですか。最も適切なものを一つ選んでください。","o":["そのユーザーのリポジトリをすべてフォークする","そのユーザーをフォロー（Follow）する","そのユーザーにIssueを大量に送る","そのユーザーの権限を変更する"],"a":1,"e":"正解は1。GitHubのフォロー機能を使うと、対象ユーザーの公開活動（新規リポジトリ、スター、リリースなど）が自分のフィードに表示され、継続的に追跡できます。0の全フォークは複製で追跡目的に過大、2のIssue送付は迷惑行為、3の権限変更は無関係かつ不可能であり、いずれもソーシャルな追跡の要件に合いません。","qEn":"A developer wants to keep up in their feed with the new repositories and activity of a respected, well-known maintainer. Which basic GitHub social feature for tracking a specific user's public activity is most appropriate? Choose the single best option.","oEn":["Fork all of that user's repositories","Follow that user","Send that user a flood of issues","Change that user's permissions"],"eEn":"Correct is 1. GitHub's Follow feature surfaces a user's public activity (new repositories, stars, releases, etc.) in your feed for continuous tracking. Option 0's forking everything is excessive copying, 2's issue flooding is abuse, and 3's permission change is unrelated and impossible, none meeting social tracking."},{"d":"D7","q":"チームは、CIやコードレビュー、通知連携などをGitHubに追加したいと考えており、自前開発せず既製のアプリやアクションを探して導入したいと考えています。GitHubのエコシステムで、こうした連携アプリやアクションを見つけて導入できる公式の場を指す名称として最も適切なものはどれですか。","o":["GitHub Marketplace（アプリやアクションを探して導入する）","GitHub Gist","GitHub Wiki","GitHub Releases"],"a":0,"e":"正解は0。GitHub Marketplaceは、CI/CDやコードレビュー、通知連携などのアプリやActionsを検索して自分のリポジトリやOrganizationに導入できる公式の場です。1のGistはコード断片の共有、2のWikiは文書、3のReleasesは成果物配布であり、いずれも連携アプリやアクションを探して導入する目的には合致しません。","qEn":"A team wants to add CI, code review, and notification integrations to GitHub, finding and adopting off-the-shelf apps and actions rather than building their own. What is the name of the official place in GitHub's ecosystem to discover and adopt such integration apps and actions?","oEn":["GitHub Marketplace (discover and adopt apps and actions)","GitHub Gist","GitHub Wiki","GitHub Releases"],"eEn":"Correct is 0. GitHub Marketplace is the official place to search for and adopt apps and Actions for CI/CD, code review, notification integrations, and more into your repository or organization. Option 1 Gist shares code snippets, 2 Wiki is documentation, and 3 Releases distributes artifacts, none matching discovering and adopting integration apps."},{"d":"D7","q":"大企業の開発部門が、コードを社外には公開しないものの、社内では各チームが互いのリポジトリを自由に閲覧し、プルリクエストで貢献し合える、オープンソースのような透明な協働文化を取り入れたいと考えています。組織の内部にオープンソースの手法を適用するこのアプローチを指す用語として最も適切なものはどれですか。","o":["フォークボム","インナーソース（InnerSource）","モノリポ強制","シャドーIT"],"a":1,"e":"正解は1。インナーソースは、オープンソースの透明な協働手法（公開的なIssue議論、プルリクエストによる貢献、横断的なコード共有）を組織の内部に適用する考え方で、社外非公開のまま社内協働文化を育てられます。0は攻撃手法、2は構成方針、3は無許可のIT利用であり、いずれも社内協働文化の用語ではありません。","qEn":"A large enterprise's development division wants to adopt an open-source-like collaboration culture internally, where teams view and contribute to each other's repositories without publishing them externally. Which term best refers to applying open-source practices inside an organization?","oEn":["Fork bomb","InnerSource","Forced monorepo","Shadow IT"],"eEn":"Correct is 1. InnerSource applies open source's transparent collaboration practices (open issue discussion, contribution via pull requests, cross-team code sharing) inside an organization, fostering internal collaboration while staying private externally. Option 0 is an attack, 2 is a structural policy, and 3 is unsanctioned IT use, none being a term for internal collaboration culture."},{"d":"D7","q":"貢献したいオープンソースプロジェクトに対し、直接の書き込み権限がない開発者が、そのリポジトリを自分のアカウントに複製して自由に変更を加え、後で本家へプルリクエストとして提案したいと考えています。この最初の複製ステップを指すGitHubの用語として最も適切なものはどれですか。","o":["そのリポジトリをフォーク（Fork）する","そのリポジトリをアーカイブする","そのリポジトリをスターする","そのリポジトリをウォッチする"],"a":0,"e":"正解は0。フォークは他者のリポジトリを自分のアカウントに複製する操作で、書き込み権限がなくても自由に変更でき、後で本家へプルリクエストを送って貢献を提案できます。1のアーカイブは凍結、2のスターはお気に入り登録、3のウォッチは通知購読であり、いずれもリポジトリを複製して独自変更を加える目的には合いません。","qEn":"A developer without direct write access to an open-source project wants to copy the repository into their own account, freely make changes, and later propose them upstream as a pull request. Which GitHub term best refers to this initial copying step?","oEn":["Fork the repository","Archive the repository","Star the repository","Watch the repository"],"eEn":"Correct is 0. Forking copies someone else's repository into your own account, letting you change it freely without write access and later send a pull request upstream to propose your contribution. Option 1 archiving freezes, 2 starring favorites, and 3 watching subscribes to notifications, none matching copying a repo to make your own changes."},{"d":"D7","q":"あるチームは、新しいマイクロサービスのリポジトリを作るたびに、同じディレクトリ構成、標準のREADME、ライセンス、CI設定を毎回手作業でコピーしています。この初期構成をひな形として登録し、新規リポジトリ作成時にワンクリックで再現したい場合、最も適したGitHubの機能はどれですか。","o":["リポジトリをフォークして毎回中身を消す","Wikiに構成手順を書く","GistにREADMEだけ保存する","テンプレートリポジトリ（template repository）を用意する"],"a":3,"e":"正解は3。テンプレートリポジトリは、標準の構成やファイルをひな形として登録し、新規リポジトリ作成時にその内容を丸ごと複製（履歴なしの新規リポジトリとして）できます。0のフォーク流用は手間が増え不適切、2のGistは断片保存、1のWikiは手順記載に過ぎず、いずれも構成の自動再現という要件には合致しません。","qEn":"A team manually copies the same directory structure, standard README, license, and CI config every time they create a new microservice repository. To register this initial setup as a template and reproduce it with one click when creating a new repository, which GitHub feature best fits?","oEn":["Fork a repository and delete its contents each time","Write the setup steps in a Wiki","Save only the README in a Gist","Prepare a template repository"],"eEn":"Correct is 3. A template repository registers standard structure and files as a template and reproduces them wholesale as a new repository (without history) when creating a new repo. Option 0's fork reuse adds effort and is unsuitable, 2's Gist stores snippets, and 1's Wiki only documents steps, none meeting automatic reproduction of setup."}];
+function buildHardSets_G(bank, plan, nSets){
+  const by = {}; bank.forEach(q => { (by[q.d] = by[q.d] || []).push(q); });
+  const sets = {};
+  for (let s = 0; s < nSets; s++) { const arr = []; Object.entries(plan).forEach(([dom, n]) => { const pool = by[dom] || []; if (!pool.length) return; for (let i = 0; i < n; i++) arr.push(pool[(i + s * n) % pool.length]); }); sets[s + 1] = arr; }
+  return sets;
+}
+const EXAM_SETS = buildHardSets_G(GH900_HARD, { D1:20, D2:9, D3:8, D4:8, D5:5, D6:10, D7:5 }, 5);
+const DOMAIN_SETS = Object.fromEntries(DOMAINS.map(d => [d.id, GH900_HARD.filter(q => q.d === d.id)]));
+const SET_READY = { 1: true, 2: true, 3: true, 4: true, 5: true };
+const EXAM_TOTAL = Object.values(EXAM_SETS).reduce((s, x) => s + x.length, 0);
+
+const CONFUSE = [["Git と GitHub","Git は分散型バージョン管理ソフト、GitHub はそれをホストする Web サービス。","ローカルのツールか、クラウド上の共同作業基盤か。","Git vs GitHub","Git is distributed version-control software; GitHub is a web service that hosts Git repositories.","A local tool vs a cloud collaboration platform."],["コミット と ブランチ","コミットは変更を記録するスナップショット、ブランチはコミット列を指す可動ポインタ。","一時点の記録か、履歴の系統(ライン)か。","Commit vs Branch","A commit is a snapshot recording changes; a branch is a movable pointer to a line of commits.","A point-in-time record vs a line of history."],["マージ と リベース","マージは履歴を保ちつつ統合コミットを作る、リベースは履歴を書き換えて一直線にする。","履歴を残すか、履歴を作り直すか。","Merge vs Rebase","Merge integrates keeping history with a merge commit; rebase rewrites history into a linear sequence.","Preserve history vs rewrite history."],["fork と clone","fork は GitHub 上に自分のコピーを作る、clone はリポジトリをローカルへ複製する。","サーバー上の複製か、手元への複製か。","Fork vs Clone","A fork copies a repo to your GitHub account; a clone copies a repo to your local machine.","Server-side copy vs local copy."],["issue と pull request","issue は作業や課題の追跡、pull request は変更の提案とレビュー・マージの依頼。","話し合う場か、コードを取り込む依頼か。","Issue vs Pull request","An issue tracks work or problems; a pull request proposes changes for review and merge.","Tracking discussion vs requesting a code change."],["pull request と Discussion","PR はコード変更に紐づく、Discussion は Q&A やアイデアなど自由な会話の場。","コードに結び付くか、オープンな対話か。","Pull request vs Discussion","A PR is tied to code changes; a Discussion is an open forum for Q&A and ideas.","Bound to code vs open conversation."],["README と CONTRIBUTING","README はプロジェクト概要と使い方、CONTRIBUTING は貢献の手順やルール。","利用者向けか、貢献者向けか。","README vs CONTRIBUTING","README explains what the project is and how to use it; CONTRIBUTING explains how to contribute.","For users vs for contributors."],["LICENSE と CODEOWNERS","LICENSE は利用・再配布の法的条件、CODEOWNERS はレビュー担当者を経路で自動割当。","利用許諾の定義か、レビュー責任の定義か。","LICENSE vs CODEOWNERS","LICENSE defines legal terms of use; CODEOWNERS auto-assigns reviewers by file path.","Usage rights vs review ownership."],["Gist と リポジトリ","Gist は単一/少数スニペットの手軽な共有、リポジトリは本格的プロジェクト管理。","断片の共有か、プロジェクト全体か。","Gist vs Repository","A Gist shares small snippets quickly; a repository manages a full project.","Sharing snippets vs whole project."],["Wiki と Pages","Wiki はリポジトリ付随の文書、Pages はリポジトリから公開する静的 Web サイト。","内部ドキュメントか、公開サイトか。","Wiki vs Pages","A Wiki holds repo documentation; Pages publishes a static website from the repo.","Internal docs vs public site."],["GitHub Desktop と github.dev","Desktop はローカル用 GUI アプリ、github.dev はブラウザ内の軽量エディタ(.でも起動)。","デスクトップアプリか、ブラウザエディタか。","GitHub Desktop vs github.dev","Desktop is a local GUI app; github.dev is a lightweight in-browser editor.","Desktop app vs browser editor."],["github.dev と Codespaces","github.dev は計算環境なしの編集専用、Codespaces はクラウド上の完全な開発環境。","編集だけか、実行できる環境か。","github.dev vs Codespaces","github.dev only edits with no compute; Codespaces is a full cloud dev environment.","Edit-only vs runnable environment."],["Copilot Individual と Business","Individual は個人向け契約、Business は組織で一元管理・ポリシー適用が可能。","個人契約か、組織管理付きか。","Copilot Individual vs Business","Individual is for personal use; Business adds org-level management and policy controls.","Personal plan vs org-managed plan."],["Copilot Business と Enterprise","Business は組織管理、Enterprise は Enterprise 全体機能と知識ベース等の高度機能。","組織単位か、Enterprise 単位の高度機能か。","Copilot Business vs Enterprise","Business manages an org; Enterprise adds enterprise-wide and advanced knowledge features.","Org scope vs enterprise-wide advanced scope."],["ラベル と マイルストーン","ラベルは issue/PR の分類タグ、マイルストーンは期限付きの達成目標にまとめる単位。","分類か、期限付きの束ね方か。","Labels vs Milestones","Labels categorize issues/PRs; milestones group them toward a dated goal.","Categorization vs dated grouping."],["2FA と パスキー","2FA は追加の認証要素(TOTP/SMS等)、パスキーは公開鍵暗号のパスワードレス認証。","追加の要素か、パスワード自体を置き換えるか。","2FA vs Passkey","2FA adds a second factor (TOTP/SMS); a passkey is passwordless public-key authentication.","Extra factor vs password replacement."],["Triage 権限 と Write 権限","Triage は issue/PR の管理はできるがコードは書けない、Write はプッシュもできる。","整理までか、書き込みまでか。","Triage vs Write role","Triage can manage issues/PRs but not push code; Write can also push code.","Manage only vs push access."],["Organization と Enterprise","Organization はユーザーとリポジトリの集合、Enterprise は複数 Org を束ねる最上位階層。","アカウント集合か、Org を束ねる階層か。","Organization vs Enterprise","An organization groups users and repos; an enterprise groups multiple organizations at the top.","Group of accounts vs group of orgs."]];
+const COMPARE = [{"title":"Git と GitHub の比較","titleEn":"Git vs GitHub","cols":["Git","GitHub"],"colsEn":["Git","GitHub"],"rows":[["種別 / Type","バージョン管理ソフト","ホスティングサービス"],["動作場所 / Where","ローカル","クラウド(Web)"],["主な役割 / Role","履歴の記録・分岐","共同作業・レビュー・公開"],["ネット接続 / Network","不要でも動く","基本オンライン"],["提供元 / Vendor","オープンソース","GitHub(Microsoft)"]]},{"title":"issue / PR / Discussion","titleEn":"Issue / PR / Discussion","cols":["issue","pull request","Discussion"],"colsEn":["Issue","Pull request","Discussion"],"rows":[["目的 / Purpose","課題・作業の追跡","変更の提案とマージ","自由な対話・Q&A"],["コード紐付け / Code","任意","必須","なし"],["マージ可 / Merge","不可","可能","不可"],["クローズ / Close","できる","できる","回答をマーク"]]},{"title":"権限ロール","titleEn":"Permission roles","cols":["コード書込","issue/PR管理","設定・管理"],"colsEn":["Push code","Manage issues/PRs","Admin settings"],"rows":[["Read","不可","不可","不可"],["Triage","不可","可能","不可"],["Write","可能","可能","不可"],["Maintain","可能","可能","一部可能"],["Admin","可能","可能","全て可能"]]},{"title":"Copilot プラン","titleEn":"Copilot plans","cols":["Individual","Business","Enterprise"],"colsEn":["Individual","Business","Enterprise"],"rows":[["対象 / Target","個人","組織","Enterprise"],["一元管理 / Central mgmt","なし","あり","あり"],["ポリシー / Policy","個人設定","組織ポリシー","Enterprise全体"],["高度機能 / Advanced","基本","組織向け","知識ベース等"]]},{"title":"エディタ / 開発環境","titleEn":"Editors / dev environments","cols":["GitHub Desktop","github.dev","Codespaces"],"colsEn":["GitHub Desktop","github.dev","Codespaces"],"rows":[["動作 / Runs on","ローカルGUI","ブラウザ","クラウドVM"],["計算環境 / Compute","ローカル","なし","あり"],["用途 / Use","Git操作","軽い編集","本格開発"],["起動 / Launch","アプリ起動",". キー","リポジトリから作成"]]},{"title":"特別ファイルの役割","titleEn":"Special file roles","cols":["配置","主な役割"],"colsEn":["Location","Main role"],"rows":[["README","ルート等","概要と使い方の説明"],["LICENSE","ルート","利用・再配布の条件"],["CONTRIBUTING","ルート/.github","貢献の手順"],["CODEOWNERS",".github等","レビュー担当の自動割当"],["SECURITY","ルート/.github","脆弱性報告の方法"]]},{"title":"Organization と Enterprise","titleEn":"Organization vs Enterprise","cols":["Organization","Enterprise"],"colsEn":["Organization","Enterprise"],"rows":[["階層 / Level","Org単位","複数Orgの上位"],["管理対象 / Manages","メンバー・リポジトリ","Org・課金・ポリシー"],["チーム / Teams","利用可","Org横断で統制"],["EMU 対応 / EMU","非対象","EMUで一元ID管理"]]},{"title":"テンプレート と fork","titleEn":"Template vs fork","cols":["テンプレートリポジトリ","fork"],"colsEn":["Template repo","Fork"],"rows":[["履歴 / History","引き継がない","引き継ぐ"],["上流との関係 / Upstream","独立","上流とつながる"],["用途 / Use","雛形から新規作成","改変・貢献"],["PR 送付 / PR back","想定しない","上流へ送れる"]]}];
+const GLOSSARY = [["D1","リポジトリ","Repository","プロジェクトのファイルと変更履歴を格納する保管場所。","A storage location holding a project's files and their change history."],["D1","コミット","Commit","変更をひとまとまりで記録するスナップショット。","A snapshot that records a set of changes."],["D1","ブランチ","Branch","独立して作業できる履歴の系統を指すポインタ。","A pointer to an independent line of development."],["D1","マージ","Merge","あるブランチの変更を別のブランチへ統合すること。","Combining changes from one branch into another."],["D1","クローン","Clone","リモートのリポジトリをローカルへ複製する操作。","Copying a remote repository to your local machine."],["D1","フォーク","Fork","他人のリポジトリを自分のアカウントへ複製すること。","Copying someone else's repository into your own account."],["D1","ステージング","Staging area","次のコミットに含める変更を準備する領域。","An area where changes are prepared for the next commit."],["D1","リモート","Remote","GitHub 上などネットワーク先のリポジトリの参照。","A reference to a repository hosted elsewhere, such as on GitHub."],["D1","バージョン管理","Version control","ファイルの変更履歴を記録・追跡する仕組み。","A system for recording and tracking changes to files over time."],["D2","README","README","プロジェクトの概要と使い方を説明するファイル。","A file that describes what the project is and how to use it."],["D2","ライセンス","LICENSE","利用・改変・再配布の法的条件を定めるファイル。","A file that sets the legal terms for using and redistributing the project."],["D2","Gist","Gist","コード断片やメモを手軽に共有できる仕組み。","A way to quickly share code snippets or notes."],["D2","Wiki","Wiki","リポジトリに付随するドキュメント用スペース。","A documentation space attached to a repository."],["D2","GitHub Pages","GitHub Pages","リポジトリから静的 Web サイトを公開する機能。","A feature that publishes a static website from a repository."],["D2","テンプレートリポジトリ","Template repository","履歴なしで雛形として複製できるリポジトリ。","A repository used as a starting template, copied without its history."],["D2",".gitignore",".gitignore","追跡対象から除外するファイルを指定する設定。","A file that specifies which files Git should ignore."],["D2","リリース","Release","特定バージョンに配布物とメモを付けて公開する単位。","A packaged version of the project published with notes and assets."],["D2","タグ","Tag","特定コミットに付ける不変の目印(版番号など)。","An immutable marker on a specific commit, often a version number."],["D3","issue","Issue","課題・要望・作業を記録して追跡する単位。","A unit for tracking a task, bug, or request."],["D3","プルリクエスト","Pull request","変更を提案しレビューとマージを求める依頼。","A request to review and merge proposed changes."],["D3","Discussion","Discussion","コードに縛られない Q&A やアイデアの対話の場。","A forum for open Q&A and ideas not tied to code."],["D3","コードレビュー","Code review","PR の変更を他者が確認し承認・修正依頼する工程。","The process where others inspect and approve or request changes to a PR."],["D3","メンション","Mention","@ユーザー名 で人やチームに通知して呼びかける機能。","Notifying a person or team by writing @username."],["D3","CONTRIBUTING","CONTRIBUTING","貢献の手順やルールを説明するファイル。","A file explaining how to contribute to the project."],["D3","CODEOWNERS","CODEOWNERS","ファイル経路ごとにレビュー担当を自動割当する設定。","A file that auto-assigns reviewers based on file paths."],["D3","GitHub Flow","GitHub Flow","ブランチ作成→PR→レビュー→マージの軽量な開発フロー。","A lightweight workflow: branch, open a PR, review, then merge."],["D3","リンク付けキーワード","Linking keyword","'Closes #12' 等で PR と issue を連携・自動クローズする記法。","Keywords like 'Closes #12' that link a PR to an issue and auto-close it."],["D4","GitHub Actions","GitHub Actions","イベント起点でビルド・テスト・配備を自動化する CI/CD 基盤。","A CI/CD platform that automates build, test, and deploy on events."],["D4","ワークフロー","Workflow","Actions の一連の自動処理を定義した YAML 設定。","A YAML file defining an automated Actions process."],["D4","GitHub Copilot","GitHub Copilot","コードやコメントを提案する AI ペアプログラマ。","An AI pair programmer that suggests code and text."],["D4","Codespaces","Codespaces","ブラウザから使えるクラウド上の完全な開発環境。","A full cloud-based development environment usable from a browser."],["D4","github.dev","github.dev","ブラウザ内で使える軽量な編集専用エディタ。","A lightweight browser-based editor for quick edits."],["D4","GitHub Desktop","GitHub Desktop","Git 操作をGUIで行うローカル用アプリ。","A local GUI app for performing Git operations."],["D4","GitHub Mobile","GitHub Mobile","スマートフォンから通知や issue/PR を扱うアプリ。","A mobile app to handle notifications, issues, and PRs on the go."],["D4","Marketplace","GitHub Marketplace","Actions やアプリを見つけ導入できる場。","A place to find and install Actions and apps."],["D4","ランナー","Runner","Actions のジョブを実際に実行するマシン。","A machine that executes the jobs in a workflow."],["D5","Projects","GitHub Projects","issue/PR を表やボードで計画・追跡する管理ツール。","A tool to plan and track issues/PRs on boards and tables."],["D5","ラベル","Label","issue/PR を分類・絞り込みするためのタグ。","A tag used to categorize and filter issues and PRs."],["D5","マイルストーン","Milestone","期限を持つ目標に issue/PR をまとめる単位。","A dated goal that groups related issues and PRs."],["D5","担当者","Assignee","issue や PR の対応責任を負う割当ユーザー。","The user assigned responsibility for an issue or PR."],["D5","ボード","Board","作業をカンバン形式の列で可視化するビュー。","A kanban-style view that shows work in columns."],["D5","ロードマップ","Roadmap","Projects で期間軸に沿って計画を表示するビュー。","A Projects view that lays out plans along a timeline."],["D5","テンプレート(issue)","Issue template","issue 作成時に定型の入力欄を提示する雛形。","A predefined form shown when creating an issue."],["D5","自動化(Projects)","Project automation","アイテムの状態を条件で自動更新する仕組み。","Built-in rules that update item status automatically."],["D5","サブissue","Sub-issue","親 issue の下に階層化して作業を分解する項目。","A child item that breaks a parent issue into smaller work."],["D6","二要素認証","Two-factor authentication (2FA)","パスワードに加え第二の要素で本人確認する仕組み。","Verifying identity with a second factor in addition to a password."],["D6","パスキー","Passkey","公開鍵暗号でパスワードなしにサインインする方式。","A passwordless sign-in method based on public-key cryptography."],["D6","ブランチ保護","Branch protection","レビューや検査を必須化しブランチへの変更を制限する規則。","Rules that restrict changes to a branch, e.g. requiring reviews and checks."],["D6","権限ロール","Permission role","Read/Triage/Write/Maintain/Admin など操作範囲を定める役割。","A role such as Read/Triage/Write/Maintain/Admin defining allowed actions."],["D6","Organization","Organization","ユーザーとリポジトリをまとめる共有アカウント。","A shared account that groups users and repositories."],["D6","Enterprise","Enterprise","複数の Organization を束ねて統制する最上位アカウント。","A top-level account that groups and governs multiple organizations."],["D6","EMU","Enterprise Managed Users (EMU)","企業がIdP経由で利用者IDを一元管理する仕組み。","A model where the enterprise centrally manages user identities via an IdP."],["D6","Dependabot","Dependabot","依存関係の脆弱性を検出し更新を提案する機能。","A feature that detects vulnerable dependencies and proposes updates."],["D6","SECURITY.md","SECURITY policy","脆弱性の報告方法や対応方針を示すファイル。","A file describing how to report vulnerabilities and the security policy."],["D7","オープンソース","Open source","誰でも閲覧・利用・貢献できる公開ライセンスのソフト。","Software with a public license anyone can view, use, and contribute to."],["D7","GitHub Sponsors","GitHub Sponsors","開発者やプロジェクトを金銭的に支援できる仕組み。","A program to financially support developers and projects."],["D7","InnerSource","InnerSource","組織内でオープンソースの手法を取り入れる開発文化。","Applying open-source practices within an organization."],["D7","スター","Star","リポジトリを気に入り印を付けて後で見つけやすくする機能。","Bookmarking a repository you like for easy access later."],["D7","Watch","Watch","リポジトリの更新通知を受け取る購読設定。","Subscribing to receive notifications about a repository."],["D7","プロフィール","Profile","ユーザーの活動や自己紹介を示す公開ページ。","A public page showing a user's activity and introduction."],["D7","貢献グラフ","Contribution graph","日々の貢献量をマス目で可視化する表示。","A grid that visualizes a user's daily contribution activity."],["D7","行動規範","Code of conduct","コミュニティ参加者に期待される振る舞いを定めた文書。","A document defining expected behavior for community participants."],["D7","GitHub Community","GitHub Community","利用者が質問や情報交換を行う公式のフォーラム。","The official forum where users ask questions and exchange information."]];
+const GLOSSARY_CATS = ["すべて", ...DOMAINS.map(d => d.id)];
+
+const BANK_COUNT = { D1: BANK.filter(q=>q.d==="D1").length, D2: BANK.filter(q=>q.d==="D2").length, D3: BANK.filter(q=>q.d==="D3").length };
+
+// ===== 選択肢シャッフルの中核 =====
+// 問題から安定キーを生成
+function qKey(q) {
+  const base = (q.d || "") + "|" + (q.q || "");
+  let h = 0;
+  for (let i = 0; i < base.length; i++) { h = (h * 31 + base.charCodeAt(i)) | 0; }
+  return "q" + (h >>> 0).toString(36);
+}
+// 決定的乱数（seedから0..1）
+function mulberry32(seed) {
+  return function () {
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+// シードから順列を作る（Fisher-Yates）
+function permFromSeed(n, seed) {
+  const rng = mulberry32(seed);
+  const idx = Array.from({ length: n }, (_, i) => i);
+  for (let i = n - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [idx[i], idx[j]] = [idx[j], idx[i]];
+  }
+  return idx;
+}
+// 問題の選択肢をシャッフルし、正答が必ず先頭に来ないようにする
+// salt を変えると同じ問題でも別の並びになる（クイズ⇔模試⇔セッションで分散）
+function shuffleChoices(q, lang, salt = 0) {
+  const opts = lang === "en" ? (q.oEn || q.o) : q.o;
+  const n = opts.length;
+  // キーから決定的シード
+  let h = 0; const base = qKey(q) + "|" + salt;
+  for (let i = 0; i < base.length; i++) { h = (h * 33 + base.charCodeAt(i)) | 0; }
+  let perm = permFromSeed(n, h >>> 0);
+  // 正答が先頭に来てしまう場合は別シードで再試行（数回）し、最終的には強制スワップ
+  let tries = 0;
+  while (perm[0] === q.a && tries < 8) {
+    h = (h * 1103515245 + 12345) | 0;
+    perm = permFromSeed(n, h >>> 0);
+    tries++;
+  }
+  if (perm[0] === q.a) {
+    // 正答を後ろの位置と入れ替える（先頭回避を保証）
+    const target = 1 + ((h >>> 0) % (n - 1));
+    [perm[0], perm[target]] = [perm[target], perm[0]];
+  }
+  const shuffledOpts = perm.map(i => opts[i]);
+  const newAnswer = perm.indexOf(q.a);
+  return { opts: shuffledOpts, answer: newAnswer };
+}
+
+// ===== 永続化 =====
+async function loadState() {
+  try { const r = await window.storage.get(STORE_KEY); return r ? JSON.parse(r.value) : null; } catch { return null; }
+}
+async function saveState(s) { try { await window.storage.set(STORE_KEY, JSON.stringify(s)); } catch {} }
+async function loadReview() {
+  try { const r = await window.storage.get(REVIEW_KEY); return r ? JSON.parse(r.value) : {}; } catch { return {}; }
+}
+async function saveReview(obj) { try { await window.storage.set(REVIEW_KEY, JSON.stringify(obj)); } catch {} }
+async function addReviewItems(questions) {
+  const cur = await loadReview();
+  questions.forEach(q => {
+    const k = qKey(q);
+    const prev = cur[k];
+    cur[k] = { q, miss: (prev?.miss || 0) + 1, added: prev?.added || Date.now() };
+  });
+  await saveReview(cur);
+  return cur;
+}
+async function clearReviewItem(q) {
+  const cur = await loadReview();
+  const k = qKey(q);
+  if (cur[k]) { delete cur[k]; await saveReview(cur); }
+  return cur;
+}
+
+function L(obj, key, lang) { if (lang === "en") return obj[key + "En"] || obj[key]; return obj[key]; }
+function domName(id, lang) { return lang === "en" ? DOM_NAME_EN[id] : DOM_NAME[id]; }
+function shuffle(arr) { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+const GH900_EXAM_CASES = [{"id":"gh900-1","title":{"ja":"ケース：小規模開発チームのコラボレーションワークフロー","en":"Case: Collaboration Workflow for a Small Development Team"},"body":{"ja":["あるスタートアップの開発チーム（6名）が、Web アプリを GitHub 上の単一リポジトリで開発している。これまでは全員が main ブランチに直接コミットしていたため、壊れたコードが本番へ混入する事故が続いていた。","チームリードは GitHub Flow を採用することにした。作業は必ず短命なフィーチャーブランチで行い、Pull Request（PR）を通じて main へ統合する方針とする。変更内容の議論やタスク管理には Issue を使い、PR と Issue を相互にリンクさせたい。","品質を担保するため、main への直接 push を禁止し、マージ前に最低 1 名のレビュー承認と CI（GitHub Actions）チェックの成功を必須にしたい。これらは Branch protection rule（またはルールセット）で強制する。","レビューでは、コードの特定行に対するコメントや変更提案（suggested change）を活用し、レビュアーは Approve / Request changes / Comment のいずれかで意思表示する。会話が解決したら PR をマージする。","また、繰り返し発生する定型作業（バグ報告のフォーマットなど）を統一するため、Issue テンプレートや PR テンプレートの導入も検討している。担当者は @メンションで通知し、ラベルで分類する。"],"en":["A startup's development team (6 members) builds a web app in a single GitHub repository. Until now everyone committed directly to the main branch, which repeatedly let broken code reach production.","The team lead decides to adopt GitHub Flow: all work must happen on short-lived feature branches and be merged into main through Pull Requests (PRs). Issues will be used to discuss changes and track tasks, and the team wants PRs and Issues cross-linked.","To protect quality, direct pushes to main must be blocked, and before merging each PR needs at least one approving review and a passing CI (GitHub Actions) check. These will be enforced with a branch protection rule (or ruleset).","During review, reviewers use line-level comments and suggested changes, and express their decision with Approve, Request changes, or Comment. Once conversations are resolved, the PR is merged.","The team also considers Issue templates and PR templates to standardize recurring routine work (such as bug-report formatting). Assignees are notified via @mentions, and items are categorized with labels."]},"tables":[{"title":{"ja":"GitHub Flow の主要ステップ","en":"Key Steps of GitHub Flow"},"headers":{"ja":["ステップ","操作","目的"],"en":["Step","Action","Purpose"]},"rows":{"ja":[["1","ブランチを作成","main から独立して安全に作業する"],["2","コミットして push","変更を記録し共有する"],["3","Pull Request を開く","レビューと議論を依頼する"],["4","レビューと CI","品質を確認する"],["5","main へマージしデプロイ","変更を統合する"]],"en":[["1","Create a branch","Work safely, isolated from main"],["2","Commit and push","Record and share changes"],["3","Open a Pull Request","Request review and discussion"],["4","Review and CI","Verify quality"],["5","Merge to main and deploy","Integrate the changes"]]}}],"questions":[{"n":1,"q":{"ja":"main への直接 push を禁止し、マージ前にレビュー承認と CI 成功を必須にするために最も適切な機能はどれか。","en":"Which feature best enforces blocking direct pushes to main and requiring an approving review plus a passing CI before merge?"},"options":[{"label":{"ja":"Branch protection rule（ブランチ保護ルール）／ルールセット","en":"Branch protection rule / ruleset"},"exp":{"ja":"正解。保護対象ブランチへの直接 push 禁止、必須レビュー数、必須ステータスチェックなどを強制できる。","en":"Correct. It can enforce blocking direct pushes, required number of reviews, and required status checks on the protected branch."}},{"label":{"ja":"リポジトリの README にルールを書く","en":"Write the rules in the repository README"},"exp":{"ja":"不正解。README は説明であり、技術的な強制力はない。","en":"Incorrect. A README is documentation and has no technical enforcement."}},{"label":{"ja":"全員をリポジトリの管理者(Admin)にする","en":"Make everyone a repository Admin"},"exp":{"ja":"不正解。権限を上げても制約は増えず、むしろ直接 push を防げない。","en":"Incorrect. Elevating permissions adds no constraints and does not prevent direct pushes."}},{"label":{"ja":"Issue テンプレートを追加する","en":"Add an Issue template"},"exp":{"ja":"不正解。Issue テンプレートは報告様式の統一用で、マージ制御はできない。","en":"Incorrect. Issue templates standardize reporting; they cannot control merges."}}],"a":0},{"n":2,"q":{"ja":"PR がマージされたときに、関連する Issue を自動的にクローズするために PR の説明に書く記述はどれか。","en":"What should you write in a PR description so that the linked Issue closes automatically when the PR is merged?"},"options":[{"label":{"ja":"「関連 Issue: #123」とだけ書く","en":"Just write \"Related issue: #123\""},"exp":{"ja":"不正解。単に番号を参照するだけではリンクはされるが自動クローズはされない。","en":"Incorrect. Merely referencing the number links it but does not auto-close it."}},{"label":{"ja":"「Closes #123」などのクローズ用キーワードを書く","en":"Write a closing keyword such as \"Closes #123\""},"exp":{"ja":"正解。close / closes / fixes / resolves などのキーワード＋Issue 番号で、マージ時に自動クローズされる。","en":"Correct. Keywords like close/closes/fixes/resolves plus the issue number auto-close it on merge."}},{"label":{"ja":"Issue にラベル「done」を付ける","en":"Add a \"done\" label to the Issue"},"exp":{"ja":"不正解。ラベルは分類用で、クローズ動作とは連動しない。","en":"Incorrect. Labels are for categorization and do not trigger closing."}},{"label":{"ja":"Issue を Draft PR に変換する","en":"Convert the Issue into a Draft PR"},"exp":{"ja":"不正解。Issue を PR に変換する機能はなく、自動クローズの手段でもない。","en":"Incorrect. There is no such conversion, and it is not a way to auto-close."}}],"a":1},{"n":3,"q":{"ja":"レビュアーが「この変更ではマージすべきでない、修正が必要」と明確に示すには、どのレビュー操作を選ぶべきか。","en":"To clearly indicate \"this should not be merged as-is; changes are needed,\" which review action should a reviewer choose?"},"options":[{"label":{"ja":"Comment（コメントのみ）","en":"Comment (comment only)"},"exp":{"ja":"不正解。Comment は承認も却下もしない中立的なフィードバックで、ブロックの意思表示にはならない。","en":"Incorrect. Comment is neutral feedback that neither approves nor blocks."}},{"label":{"ja":"Approve（承認）","en":"Approve"},"exp":{"ja":"不正解。Approve はマージを支持する意思表示で、逆の意味になる。","en":"Incorrect. Approve signals support for merging, the opposite intent."}},{"label":{"ja":"Request changes（変更を要求）","en":"Request changes"},"exp":{"ja":"正解。修正が必要という明確な意思表示で、保護ルール次第でマージをブロックできる。","en":"Correct. It explicitly requests changes and, depending on protection rules, can block the merge."}},{"label":{"ja":"PR を Draft に戻す","en":"Convert the PR back to Draft"},"exp":{"ja":"不正解。Draft 化は作成者側の状態管理で、レビュアーの正式な評価手段ではない。","en":"Incorrect. Converting to Draft is the author's state management, not a reviewer's formal verdict."}}],"a":2},{"n":4,"q":{"ja":"GitHub Flow に沿った日々の作業手順として最も適切なものはどれか。","en":"Which is the most appropriate day-to-day workflow that follows GitHub Flow?"},"options":[{"label":{"ja":"main に直接コミットし、問題があれば後で revert する","en":"Commit directly to main and revert later if there are problems"},"exp":{"ja":"不正解。直接コミットは本ケースで避けたい事故原因であり、GitHub Flow の趣旨に反する。","en":"Incorrect. Direct commits are exactly the incident cause the team wants to avoid and contradict GitHub Flow."}},{"label":{"ja":"long-lived な dev ブランチにためて月末に一括で main へマージ","en":"Accumulate on a long-lived dev branch and bulk-merge into main monthly"},"exp":{"ja":"不正解。GitHub Flow は短命ブランチと小さな頻繁な統合を推奨する。","en":"Incorrect. GitHub Flow favors short-lived branches and small, frequent integration."}},{"label":{"ja":"作業ごとに main からブランチを切り、PR を開いてレビューと CI 後にマージする","en":"Branch from main per task, open a PR, and merge after review and CI"},"exp":{"ja":"正解。GitHub Flow の標準的な流れそのもので、本ケースの要件に合致する。","en":"Correct. This is the standard GitHub Flow and matches the case requirements."}},{"label":{"ja":"各自がリポジトリを個別に持ち、統合は行わない","en":"Everyone keeps a separate repository and never integrates"},"exp":{"ja":"不正解。統合しなければ共同開発が成立せず、方針に反する。","en":"Incorrect. Without integration there is no collaboration, contrary to the policy."}}],"a":2}]},{"id":"gh900-2","title":{"ja":"ケース：Organization / Enterprise の運用とセキュリティ","en":"Case: Organization / Enterprise Administration and Security"},"body":{"ja":["ある企業が GitHub を全社導入し、Organization を作成して複数チームのリポジトリを集約する。セキュリティ管理者は、権限を最小権限の原則で割り当てたいと考えている。","Organization では、メンバーへの基本ロール（Owner / Member）に加え、リポジトリ単位のアクセス権（Read / Triage / Write / Maintain / Admin）を Team を通じて付与する運用を想定している。個人ごとの直接付与ではなく Team ベースで管理したい。","コンプライアンス要件として、Organization の全メンバーに二要素認証（2FA）を必須化する。パスワードレス強化のため passkey も推奨する。監査ログでアクセス状況を追跡する。","さらに、社員のアイデンティティを会社の IdP で一元管理し、GitHub 上の個人アカウントと切り離したい。そこで Enterprise Managed Users（EMU）を含む Enterprise 契約を検討している。","生成 AI 活用のため GitHub Copilot も導入するが、どのファイル／リポジトリで使えるか、公開コードに一致する提案の扱いなどを Organization の Copilot ポリシーで制御したい。リポジトリの可視性（public / private / internal）も適切に設定する。"],"en":["A company rolls out GitHub company-wide, creating an Organization to consolidate multiple teams' repositories. The security admin wants to assign permissions following the principle of least privilege.","In the Organization, in addition to base member roles (Owner / Member), repository-level access (Read / Triage / Write / Maintain / Admin) will be granted through Teams. They prefer Team-based management over direct per-user grants.","For compliance, two-factor authentication (2FA) will be required for all Organization members. To strengthen passwordless sign-in, passkeys are also recommended. Access is tracked via the audit log.","The company also wants to centrally manage employee identities in its IdP and decouple them from personal GitHub accounts. It is therefore evaluating an Enterprise plan including Enterprise Managed Users (EMU).","To leverage generative AI, GitHub Copilot will be adopted, but the company wants to control where it can be used and how suggestions matching public code are handled, via the Organization's Copilot policies. Repository visibility (public / private / internal) will also be set appropriately."]},"tables":[{"title":{"ja":"リポジトリ権限ロールの主な違い","en":"Key Differences Among Repository Permission Roles"},"headers":{"ja":["ロール","主にできること","想定利用者"],"en":["Role","Main capabilities","Typical user"]},"rows":{"ja":[["Read","閲覧・クローン・Issue 作成","利害関係者・閲覧者"],["Triage","Issue/PR の管理（コード変更なし）","コミュニティ整理担当"],["Write","push・ブランチ作成・PR マージ","コントリビューター"],["Maintain","一部設定管理（機微設定は除く）","プロジェクト管理者"],["Admin","全設定・権限・削除","リポジトリ責任者"]],"en":[["Read","View, clone, open issues","Stakeholders / viewers"],["Triage","Manage issues/PRs (no code write)","Community triager"],["Write","Push, create branches, merge PRs","Contributors"],["Maintain","Some settings (not sensitive ones)","Project managers"],["Admin","All settings, access, deletion","Repository owner"]]}},{"title":{"ja":"リポジトリの可視性","en":"Repository Visibility"},"headers":{"ja":["可視性","閲覧できる範囲"],"en":["Visibility","Who can see it"]},"rows":{"ja":[["Public","インターネット上の誰でも"],["Private","明示的にアクセスを与えられた人のみ"],["Internal","同じ Enterprise のメンバー全員"]],"en":[["Public","Anyone on the internet"],["Private","Only people explicitly granted access"],["Internal","All members of the same Enterprise"]]}}],"questions":[{"n":1,"q":{"ja":"コード変更はさせず、Issue や PR のラベル付け・アサインなどの整理だけを許可したい。最小権限に合うロールはどれか。","en":"You want to allow triaging issues and PRs (labeling, assigning) but no code changes. Which role fits least privilege?"},"options":[{"label":{"ja":"Write","en":"Write"},"exp":{"ja":"不正解。Write は push などコード変更が可能で、要件より過大。","en":"Incorrect. Write allows pushing code, exceeding the requirement."}},{"label":{"ja":"Triage","en":"Triage"},"exp":{"ja":"正解。Triage は Issue/PR の管理はできるがコードの書き込みはできず、要件に合致する。","en":"Correct. Triage can manage issues/PRs but cannot write code, matching the requirement."}},{"label":{"ja":"Admin","en":"Admin"},"exp":{"ja":"不正解。Admin は全設定にアクセスでき、最小権限に反する。","en":"Incorrect. Admin has full settings access, violating least privilege."}},{"label":{"ja":"Read","en":"Read"},"exp":{"ja":"不正解。Read では Issue/PR のラベル付けやアサインなどの整理操作ができない。","en":"Incorrect. Read cannot perform triage actions like labeling or assigning."}}],"a":1},{"n":2,"q":{"ja":"社員の GitHub アイデンティティを会社の IdP で一元管理し、個人アカウントと切り離してプロビジョニングしたい。最も適した仕組みはどれか。","en":"You want employees' GitHub identities managed centrally by the company IdP, provisioned and decoupled from personal accounts. Which mechanism fits best?"},"options":[{"label":{"ja":"各社員が個人アカウントを作り Organization に招待する","en":"Each employee creates a personal account and is invited to the Organization"},"exp":{"ja":"不正解。個人アカウント運用は IdP による一元管理・切り離しの要件を満たさない。","en":"Incorrect. Personal accounts do not meet centralized IdP management and decoupling."}},{"label":{"ja":"Enterprise Managed Users（EMU）","en":"Enterprise Managed Users (EMU)"},"exp":{"ja":"正解。EMU は IdP がユーザーを管理・プロビジョニングし、個人アカウントと分離された企業専用ユーザーを提供する。","en":"Correct. EMU has the IdP manage/provision users, providing enterprise-only accounts decoupled from personal ones."}},{"label":{"ja":"リポジトリを public にする","en":"Make repositories public"},"exp":{"ja":"不正解。可視性の話でアイデンティティ管理とは無関係。","en":"Incorrect. Visibility is unrelated to identity management."}},{"label":{"ja":"全員に Admin ロールを付与する","en":"Grant everyone the Admin role"},"exp":{"ja":"不正解。権限付与の話であり、IdP 連携やアカウント分離を実現しない。","en":"Incorrect. This is about permissions and does not provide IdP integration or account separation."}}],"a":1},{"n":3,"q":{"ja":"同じ Enterprise 内のメンバー全員には見せたいが、インターネット全体には公開したくない社内共通リポジトリの可視性はどれか。","en":"For a shared internal repository visible to all members of the same Enterprise but not to the whole internet, which visibility should you use?"},"options":[{"label":{"ja":"Public","en":"Public"},"exp":{"ja":"不正解。Public はインターネット上の誰でも閲覧でき、非公開の要件に反する。","en":"Incorrect. Public is visible to anyone on the internet, violating the requirement."}},{"label":{"ja":"Private","en":"Private"},"exp":{"ja":"不正解。Private は明示的に許可した人のみで、Enterprise 全員には自動で見えない。","en":"Incorrect. Private is only for explicitly granted people, not automatically all Enterprise members."}},{"label":{"ja":"Internal","en":"Internal"},"exp":{"ja":"正解。Internal は同一 Enterprise のメンバー全員に見え、外部には非公開で要件に合致する。","en":"Correct. Internal is visible to all members of the same Enterprise and hidden externally, matching the requirement."}},{"label":{"ja":"Archived","en":"Archived"},"exp":{"ja":"不正解。Archived は読み取り専用化の状態であり、可視性の種類ではない。","en":"Incorrect. Archived is a read-only state, not a visibility level."}}],"a":2},{"n":4,"q":{"ja":"全メンバーへのアカウント保護強化として、Organization レベルで最初に実施すべき設定はどれか。","en":"To strengthen account protection for all members, which setting should be enforced first at the Organization level?"},"options":[{"label":{"ja":"二要素認証（2FA）の必須化","en":"Require two-factor authentication (2FA)"},"exp":{"ja":"正解。2FA 必須化はアカウント乗っ取り対策の基本で、Organization 全体に適用できる。passkey は更なる強化策。","en":"Correct. Requiring 2FA is a fundamental defense against account takeover and can apply org-wide; passkeys further strengthen it."}},{"label":{"ja":"全リポジトリを public にする","en":"Make all repositories public"},"exp":{"ja":"不正解。可視性を上げると情報漏えいリスクが増え、保護強化にならない。","en":"Incorrect. Increasing visibility raises leakage risk and does not strengthen protection."}},{"label":{"ja":"監査ログを削除する","en":"Delete the audit log"},"exp":{"ja":"不正解。監査ログは追跡に不可欠で、削除は逆効果。","en":"Incorrect. The audit log is essential for tracking; deleting it is counterproductive."}},{"label":{"ja":"全員のパスワードを共有する","en":"Share one password among everyone"},"exp":{"ja":"不正解。認証情報の共有は重大なセキュリティ違反。","en":"Incorrect. Sharing credentials is a serious security violation."}}],"a":0}]},{"id":"gh900-3","title":{"ja":"ケース：モダン開発とコミュニティ／プロジェクト管理","en":"Case: Modern Development and Community / Project Management"},"body":{"ja":["あるオープンソースプロジェクトが GitHub のモダンな開発機能を活用して生産性とコミュニティの健全性を高めようとしている。メンテナは自動化と可視化を重視している。","CI/CD を自動化するため、GitHub Actions を用いてワークフローを構築する。push や pull_request などのイベントをトリガーに、テストやビルドを自動実行したい。ワークフローは YAML でリポジトリ内に定義する。","貢献者がローカル環境構築に時間を取られないよう、ブラウザ上でクラウド開発環境を起動できる GitHub Codespaces を導入する。加えて、コーディング支援として GitHub Copilot を活用する。","作業の可視化とロードマップ管理には GitHub Projects（かんばん・テーブル・ロードマップのビュー）を用い、Issue や PR をアイテムとして進捗をトラッキングする。","コミュニティ運営では、行動規範（CODE_OF_CONDUCT）や CONTRIBUTING、ライセンスなどコミュニティヘルスファイルを整備する。資金支援には GitHub Sponsors、再利用可能なアクションの配布には GitHub Marketplace の利用を検討している。"],"en":["An open-source project wants to use GitHub's modern development features to boost productivity and community health. The maintainers emphasize automation and visibility.","To automate CI/CD, they build workflows with GitHub Actions. Triggered by events such as push and pull_request, tests and builds should run automatically. Workflows are defined in YAML inside the repository.","So contributors don't spend time on local setup, they adopt GitHub Codespaces, a cloud development environment launched in the browser. They also use GitHub Copilot for coding assistance.","For visibility and roadmap management they use GitHub Projects (board, table, and roadmap views), tracking progress with Issues and PRs as items.","For community operations they add community health files such as CODE_OF_CONDUCT, CONTRIBUTING, and a license. They consider GitHub Sponsors for funding and GitHub Marketplace for distributing reusable actions."]},"tables":[{"title":{"ja":"GitHub Actions の基本用語","en":"Core GitHub Actions Terminology"},"headers":{"ja":["用語","意味"],"en":["Term","Meaning"]},"rows":{"ja":[["Workflow","自動化プロセス全体（YAML で定義）"],["Event","実行のきっかけ（push, pull_request など）"],["Job","同一ランナー上で実行されるステップの集まり"],["Runner","ワークフローを実行するサーバー"],["Action","再利用可能な処理単位"]],"en":[["Workflow","The whole automated process (defined in YAML)"],["Event","What triggers a run (push, pull_request, etc.)"],["Job","A set of steps run on the same runner"],["Runner","The server that executes the workflow"],["Action","A reusable unit of work"]]}}],"questions":[{"n":1,"q":{"ja":"push や pull_request をきっかけにテストを自動実行するワークフローを定義する場所と形式はどれか。","en":"Where and in what format do you define a workflow that auto-runs tests on push or pull_request?"},"options":[{"label":{"ja":"リポジトリの .github/workflows 配下に YAML ファイルで定義する","en":"As a YAML file under the repository's .github/workflows directory"},"exp":{"ja":"正解。GitHub Actions のワークフローは .github/workflows 内の YAML で定義し、イベントで起動する。","en":"Correct. Actions workflows are defined as YAML in .github/workflows and triggered by events."}},{"label":{"ja":"README.md にシェルスクリプトを書く","en":"Write a shell script in README.md"},"exp":{"ja":"不正解。README はドキュメントで、Actions を起動しない。","en":"Incorrect. The README is documentation and does not trigger Actions."}},{"label":{"ja":"各開発者のローカル PC に cron を設定する","en":"Set up cron on each developer's local PC"},"exp":{"ja":"不正解。ローカル cron は GitHub のイベントと連動せず、共有もされない。","en":"Incorrect. Local cron is not tied to GitHub events and is not shared."}},{"label":{"ja":"Issue に手順をコメントする","en":"Comment the steps on an Issue"},"exp":{"ja":"不正解。Issue コメントは実行環境ではない。","en":"Incorrect. An Issue comment is not an execution environment."}}],"a":0},{"n":2,"q":{"ja":"新しい貢献者がローカル環境構築なしに、ブラウザからすぐにコーディングを始められるようにする機能はどれか。","en":"Which feature lets new contributors start coding immediately from the browser without local environment setup?"},"options":[{"label":{"ja":"GitHub Pages","en":"GitHub Pages"},"exp":{"ja":"不正解。Pages は静的サイトのホスティングで、開発環境ではない。","en":"Incorrect. Pages hosts static sites; it is not a dev environment."}},{"label":{"ja":"GitHub Codespaces","en":"GitHub Codespaces"},"exp":{"ja":"正解。Codespaces はクラウド上のオンデマンド開発環境をブラウザ等で提供し、ローカル構築が不要。","en":"Correct. Codespaces provides an on-demand cloud dev environment in the browser, no local setup needed."}},{"label":{"ja":"GitHub Sponsors","en":"GitHub Sponsors"},"exp":{"ja":"不正解。Sponsors は資金支援の仕組みで開発環境ではない。","en":"Incorrect. Sponsors is a funding mechanism, not a dev environment."}},{"label":{"ja":"GitHub Projects","en":"GitHub Projects"},"exp":{"ja":"不正解。Projects は進捗管理ツールで、コーディング環境は提供しない。","en":"Incorrect. Projects is for tracking work, not a coding environment."}}],"a":1},{"n":3,"q":{"ja":"Issue や PR をアイテムとして扱い、かんばん・テーブル・ロードマップのビューで進捗を可視化・管理するのに最適な機能はどれか。","en":"Which feature best visualizes and manages progress with Issues and PRs as items across board, table, and roadmap views?"},"options":[{"label":{"ja":"GitHub Actions","en":"GitHub Actions"},"exp":{"ja":"不正解。Actions は CI/CD 自動化で、進捗可視化のビュー機能ではない。","en":"Incorrect. Actions is CI/CD automation, not a progress-visualization view."}},{"label":{"ja":"GitHub Marketplace","en":"GitHub Marketplace"},"exp":{"ja":"不正解。Marketplace はアプリやアクションの配布・入手の場。","en":"Incorrect. Marketplace is for distributing/obtaining apps and actions."}},{"label":{"ja":"GitHub Projects","en":"GitHub Projects"},"exp":{"ja":"正解。Projects は Issue/PR をアイテム化し、ボード・テーブル・ロードマップで可視化・管理できる。","en":"Correct. Projects turns Issues/PRs into items and manages them in board, table, and roadmap views."}},{"label":{"ja":"GitHub Copilot","en":"GitHub Copilot"},"exp":{"ja":"不正解。Copilot はコーディング支援 AI で、プロジェクト管理ツールではない。","en":"Incorrect. Copilot is an AI coding assistant, not a project management tool."}}],"a":2},{"n":4,"q":{"ja":"オープンソースプロジェクトの利用者に貢献方法を案内し、参加のハードルを下げるために追加すべきコミュニティヘルスファイルはどれか。","en":"Which community health file should you add to guide users on how to contribute and lower the barrier to participation?"},"options":[{"label":{"ja":"package-lock.json","en":"package-lock.json"},"exp":{"ja":"不正解。依存関係のロックファイルで、貢献ガイドではない。","en":"Incorrect. A dependency lock file, not a contribution guide."}},{"label":{"ja":".gitignore","en":".gitignore"},"exp":{"ja":"不正解。追跡除外の設定であり、貢献方法の案内ではない。","en":"Incorrect. It excludes files from tracking; it does not guide contribution."}},{"label":{"ja":"CONTRIBUTING（.md）","en":"CONTRIBUTING (.md)"},"exp":{"ja":"正解。CONTRIBUTING は貢献手順・規約を案内し、Issue/PR 作成時にも参照され参加を促す。","en":"Correct. CONTRIBUTING explains how to contribute and is surfaced when opening Issues/PRs, encouraging participation."}},{"label":{"ja":"workflow.yml","en":"workflow.yml"},"exp":{"ja":"不正解。Actions のワークフロー定義で、貢献ガイドではない。","en":"Incorrect. An Actions workflow definition, not a contribution guide."}}],"a":2}]}];
+
+function ExamCaseRunner({ cases, lang, onBack }) {
+  const g = (o) => (o && (o[lang] != null ? o[lang] : o.ja));
+  const clist = Array.isArray(cases) ? cases : [cases];
+  const [pick, setPick] = useState(clist.length === 1 ? 0 : null);
+  const [qi, setQi] = useState(0);
+  const [answers, setAnswers] = useState({});
+  const [finished, setFinished] = useState(false);
+
+  const th = { textAlign: "left", padding: "7px 9px", background: "#EDE9E0", color: C.deep, fontSize: 11.5, fontWeight: 700, borderBottom: `1px solid ${C.mid}`, whiteSpace: "nowrap" };
+  const td = { padding: "7px 9px", fontSize: 12, borderBottom: `1px solid ${C.mid}`, verticalAlign: "top", lineHeight: 1.45 };
+
+  const openCase = (i) => { setPick(i); setQi(0); setAnswers({}); setFinished(false); };
+  const backToList = () => { if (clist.length > 1) { setPick(null); setQi(0); setAnswers({}); setFinished(false); } else onBack(); };
+
+  if (pick === null) {
+    return (
+      <div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+          <button onClick={onBack} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
+        </div>
+        <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 4 }}>{lang === "ja" ? "本試験形式ケース" : "Exam-style cases"}</div>
+        <div style={{ fontSize: 12, color: "#8595ad", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
+        {clist.map((c, i) => (
+          <button key={i} onClick={() => openCase(i)}
+            style={{ width: "100%", textAlign: "left", padding: "14px 15px", marginBottom: 10, borderRadius: 11,
+              border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep, lineHeight: 1.45, paddingRight: 10 }}>{g(c.title)}</span>
+            <span style={{ fontSize: 11.5, color: "#8595ad", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
+          </button>
+        ))}
+      </div>
+    );
+  }
+
+  const data = clist[pick];
+  const qs = data.questions;
+  const Q = qs[qi];
+  const sel = answers[qi] != null ? answers[qi] : null;
+  const choose = (i) => { if (sel !== null) return; setAnswers(a => ({ ...a, [qi]: i })); };
+  const prev = () => { if (qi > 0) setQi(qi - 1); };
+  const next = () => { if (qi < qs.length - 1) setQi(qi + 1); };
+  const restart = () => { setQi(0); setAnswers({}); setFinished(false); };
+
+  let correct = 0;
+  for (let k = 0; k < qs.length; k++) { const a = answers[k]; if (a != null && qs[k].options[a] && qs[k].options[a].ok) correct++; }
+  const answeredCount = Object.keys(answers).length;
+  const rate = qs.length ? Math.round((correct / qs.length) * 100) : 0;
+
+  const navBtn = (label, onClick, enabled, primary) => (
+    <button onClick={enabled ? onClick : undefined} disabled={!enabled}
+      style={{ flex: 1, padding: "11px 12px", borderRadius: 9, fontSize: 13.5, fontWeight: 700,
+        cursor: enabled ? "pointer" : "default",
+        border: primary ? "none" : `1.5px solid ${enabled ? C.primary : C.mid}`,
+        background: primary ? (enabled ? C.primary : C.mid) : "#fff",
+        color: primary ? "#fff" : (enabled ? C.primary : "#b9c4d6") }}>{label}</button>
+  );
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+        <button onClick={backToList} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
+        {!finished && <span style={{ fontSize: 12, color: "#8595ad" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
+      </div>
+
+      <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 12 }}>
+        <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 10 }}>{g(data.title)}</div>
+        <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, marginBottom: 6 }}>{lang === "ja" ? "ケース本文（資料）" : "Case (materials)"}</div>
+        {g(data.body).map((p, i) => (<div key={i} style={{ fontSize: 13, lineHeight: 1.7, marginBottom: 8, color: C.ink }}>{p}</div>))}
+        {(data.tables || []).map((tb, ti) => (
+          <div key={ti} style={{ marginTop: 12 }}>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.deep, marginBottom: 5 }}>{g(tb.title)}</div>
+            <div style={{ overflowX: "auto", border: `1px solid ${C.mid}`, borderRadius: 8 }}>
+              <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 320 }}>
+                <thead><tr>{g(tb.headers).map((h, hi) => (<th key={hi} style={th}>{h}</th>))}</tr></thead>
+                <tbody>{g(tb.rows).map((r, ri) => (<tr key={ri}>{r.map((cell, ci) => (<td key={ci} style={td}>{cell}</td>))}</tr>))}</tbody>
+              </table>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {finished ? (
+        <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
+          <div style={{ textAlign: "center", marginBottom: 12 }}>
+            <div style={{ fontSize: 13, color: "#5a6a85", fontWeight: 600, marginBottom: 6 }}>{lang === "ja" ? "ケース完了" : "Case complete"}</div>
+            <div style={{ fontSize: 32, fontWeight: 800, color: rate >= PASS ? C.ok : C.ng }}>{rate}%</div>
+            <div style={{ fontSize: 12.5, color: "#8595ad", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
+          </div>
+          <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
+          <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
+            <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
+            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
+          </div>
+        </div>
+      ) : (
+        <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
+          <div style={{ fontSize: 14.5, fontWeight: 700, marginBottom: 12, color: C.deep }}>{lang === "ja" ? `問${Q.n}. ` : `Q${Q.n}. `}{g(Q.q)}</div>
+          {Q.options.map((opt, i) => {
+            let bg = "#fff", bd = C.mid, col = C.ink;
+            if (sel !== null) { if (opt.ok) { bg = "#E6F4EC"; bd = C.ok; col = C.ok; } else if (i === sel) { bg = "#FBEAE8"; bd = C.ng; col = C.ng; } }
+            return (
+              <button key={i} onClick={() => choose(i)} disabled={sel !== null}
+                style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: sel === null ? "pointer" : "default", fontSize: 13.5, lineHeight: 1.5, fontWeight: sel !== null && opt.ok ? 700 : 500 }}>
+                <span style={{ fontWeight: 700, marginRight: 8 }}>{sel !== null && opt.ok ? "✓" : sel !== null && i === sel ? "✗" : "ABCD"[i]}</span>{g(opt.label)}
+              </button>
+            );
+          })}
+          {sel !== null && (
+            <div style={{ marginTop: 12 }}>
+              {Q.options.map((opt, i) => (
+                <div key={i} style={{ background: opt.ok ? "#E6F4EC" : (i === sel ? "#FBEAE8" : C.light), borderRadius: 8, padding: "9px 11px", marginBottom: 6, fontSize: 12.5, lineHeight: 1.55 }}>
+                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#8595ad") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
+                </div>
+              ))}
+            </div>
+          )}
+          <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+            {navBtn(lang === "ja" ? "← 前の問題" : "← Previous", prev, qi > 0, false)}
+            {qi < qs.length - 1
+              ? navBtn(lang === "ja" ? "次の問題 →" : "Next →", next, sel !== null, true)
+              : navBtn(lang === "ja" ? "結果を見る →" : "See result →", () => setFinished(true), answeredCount === qs.length, true)}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function App() {
+  const [tab, _setTab] = useState("home");
+  const [tabHist, setTabHist] = useState([]);
+  const setTab = (k) => { if (k !== tab) setTabHist(h => [...h, tab]); _setTab(k); };
+  const goBackTab = () => { if (!tabHist.length) return; const prev = tabHist[tabHist.length - 1]; setTabHist(tabHist.slice(0, -1)); _setTab(prev); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const [state, setState] = useState(null);
+  const [loaded, setLoaded] = useState(false);
+  const [lang, setLang] = useState("ja");
+  const t = T[lang];
+
+  useEffect(() => {
+    loadState().then(s => {
+      setState(s || { progress: {} });
+      setLoaded(true);
+    });
+  }, []);
+
+  const persist = (next) => { setState(next); saveState(next); };
+
+  const record = (domId, correct) => {
+    const next = JSON.parse(JSON.stringify(state));
+    if (!next.progress[domId]) next.progress[domId] = { correct: 0, attempts: 0 };
+    next.progress[domId].attempts++;
+    if (correct) next.progress[domId].correct++;
+    persist(next);
+  };
+
+  if (!loaded) return <div style={{ padding: 40, textAlign: "center", color: C.deep }}>{t.loading}</div>;
+
+  const TABS = [
+    ["home", t.tabHome], ["quiz", t.tabQuiz], ["exam", t.tabExam], ["review", t.reviewTab],
+    ["diagram", t.tabDiagram], ["compare", t.tabCompare], ["confuse", t.tabConfuse], ["glossary", t.tabGlossary], ["examcase", (lang === "en" ? "Exam Cases" : "本試験形式ケース")],
+  ];
+
+  return (
+    <div style={{ fontFamily: "system-ui, sans-serif", color: C.ink, background: "#F7FBFF", minHeight: "100vh" }}>
+      <div style={{ background: C.deep, color: "#fff", padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div>
+          <div style={{ fontSize: 19, fontWeight: 700 }}>{t.appTitle}</div>
+          <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>{t.appSub}</div>
+          <div style={{ fontSize: 11, opacity: 0.8, marginTop: 4 }}>{t.bankCount(BANK.length)} ・ {t.examCount(EXAM_TOTAL)}</div>
+        </div>
+        <div style={{ display: "flex", background: "rgba(255,255,255,.15)", borderRadius: 20, padding: 3 }}>
+          {["ja", "en"].map(l => (
+            <button key={l} onClick={() => setLang(l)}
+              style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "5px 12px", fontSize: 12, fontWeight: 700,
+                background: lang === l ? "#fff" : "transparent", color: lang === l ? C.deep : "#fff" }}>
+              {l === "ja" ? "日本語" : "English"}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `2px solid ${C.mid}`, background: C.light }}>
+        {TABS.map(([k, label]) => (
+          <button key={k} onClick={() => setTab(k)}
+            style={{ flex: "1 1 auto", padding: "11px 8px", border: "none", cursor: "pointer",
+              background: tab === k ? "#fff" : "transparent", color: tab === k ? C.deep : C.ink,
+              fontWeight: tab === k ? 700 : 500, fontSize: 13,
+              borderBottom: tab === k ? `3px solid ${C.primary}` : "3px solid transparent" }}>
+            {label}
+          </button>
+        ))}
+      </div>
+      {tabHist.length > 0 && (
+        <button onClick={goBackTab}
+          aria-label="Back"
+          style={{ position: "fixed", right: 16, bottom: 104, zIndex: 45, border: `1.5px solid ${C.deep}`, cursor: "pointer", borderRadius: 22, padding: "9px 15px", background: "#fff", color: C.deep, fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.20)" }}>
+          ← {lang === "en" ? "Back" : "戻る"}
+        </button>
+      )}
+      {tab !== "home" && (
+        <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
+          aria-label="Back to top"
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          ↑ {lang === "en" ? "Top" : "トップへ"}
+        </button>
+      )}
+      <div style={{ padding: 16, maxWidth: 820, margin: "0 auto" }}>
+        {tab === "home" && <Home state={state} lang={lang} t={t} />}
+        {tab === "quiz" && <Quiz onAnswer={record} lang={lang} t={t} />}
+        {tab === "exam" && <Exam onAnswer={record} lang={lang} t={t} />}
+        {tab === "review" && <Review lang={lang} t={t} onAnswer={record} />}
+        {tab === "diagram" && <Diagrams lang={lang} t={t} />}
+        {tab === "compare" && <Compare lang={lang} t={t} />}
+        {tab === "confuse" && <Confuse lang={lang} t={t} />}
+        {tab === "glossary" && <Glossary lang={lang} t={t} />}
+        {tab === "examcase" && <ExamCaseRunner cases={GH900_EXAM_CASES} lang={lang} onBack={() => setTab("home")} />}
+      </div>
+    </div>
+  );
+}
+
+function Home({ state, lang, t }) {
+  const totals = useMemo(() => {
+    let c = 0, a = 0;
+    Object.values(state.progress).forEach(p => { c += p.correct; a += p.attempts; });
+    return { c, a, rate: a ? Math.round((c / a) * 100) : 0 };
+  }, [state]);
+
+  const weak = useMemo(() => {
+    return DOMAINS.map(d => {
+      const p = state.progress[d.id] || { correct: 0, attempts: 0 };
+      const rate = p.attempts ? Math.round((p.correct / p.attempts) * 100) : null;
+      return { ...d, rate, attempts: p.attempts };
+    }).filter(d => d.attempts > 0).sort((a, b) => a.rate - b.rate);
+  }, [state]);
+
+  return (
+    <div>
+      <div style={{ marginBottom: 16 }}>
+        <Stat label={t.overallRate} value={`${totals.rate}%`} sub={`${totals.c}/${totals.a}${t.questionsUnit}`} color={totals.rate >= PASS ? C.ok : C.primary} />
+      </div>
+      <Card title={t.domMastery}>
+        {DOMAINS.map(d => {
+          const p = state.progress[d.id] || { correct: 0, attempts: 0 };
+          const rate = p.attempts ? Math.round((p.correct / p.attempts) * 100) : 0;
+          return (
+            <div key={d.id} style={{ marginBottom: 12 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
+                <span style={{ fontWeight: 600 }}>
+                  <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+                  {domName(d.id, lang)}
+                  <span style={{ color: "#8499ad", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
+                </span>
+                <span style={{ color: "#5b6b7d" }}>{d.range} · {p.attempts ? `${rate}%` : t.notStarted}</span>
+              </div>
+              <Bar pct={rate} color={d.hue} faint={!p.attempts} />
+            </div>
+          );
+        })}
+      </Card>
+      {weak.length > 0 && (
+        <Card title={t.weakDomains}>
+          {weak.slice(0, 3).map(d => (
+            <div key={d.id} style={{ fontSize: 13, padding: "6px 0", borderBottom: `1px solid ${C.light}` }}>
+              <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+              {domName(d.id, lang)} — <strong style={{ color: d.rate < PASS ? C.ng : C.ok }}>{d.rate}%</strong>
+            </div>
+          ))}
+        </Card>
+      )}
+    </div>
+  );
+}
+
+function Stat({ label, value, sub, color }) {
+  return (
+    <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
+      <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
+      <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
+      <div style={{ fontSize: 11, color: "#8499ad" }}>{sub}</div>
+    </div>
+  );
+}
+function Card({ title, children }) {
+  return (
+    <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14, marginBottom: 14 }}>
+      <div style={{ fontSize: 13.5, fontWeight: 700, color: C.deep, marginBottom: 10 }}>{title}</div>
+      {children}
+    </div>
+  );
+}
+function Bar({ pct, color, faint }) {
+  return (
+    <div style={{ background: C.light, borderRadius: 8, height: 9, overflow: "hidden" }}>
+      <div style={{ width: `${pct}%`, height: "100%", background: faint ? C.mid : color, transition: "width .3s" }} />
+    </div>
+  );
+}
+
+function Quiz({ onAnswer, lang, t }) {
+  const [filter, setFilter] = useState("ALL");
+  const [orderMode, setOrderMode] = useState("seq");
+  const [order, setOrder] = useState([]);
+  const [pos, setPos] = useState(0);
+  const [sel, setSel] = useState(null);
+  const [answeredMap, setAnsweredMap] = useState({});
+  // セッションごとに選択肢の並びを変えるためのソルト
+  const [sessionSalt] = useState(() => Math.floor(Math.random() * 100000));
+
+  const pool = useMemo(() => {
+    let idxs = filter === "ALL" ? BANK.map((_, i) => i) : BANK.map((_, i) => i).filter(i => BANK[i].d === filter);
+    if (orderMode === "random") idxs = shuffle(idxs);
+    return idxs;
+  }, [filter, orderMode]);
+
+  useEffect(() => { setOrder(pool); setPos(0); setSel(null); setAnsweredMap({}); }, [pool]);
+
+  const poolCount = order.length;
+  const qi = order.length ? order[pos] : -1;
+  const Q = qi >= 0 ? BANK[qi] : null;
+  // 選択肢をシャッフル（クイズはsalt="quiz"+session）。フックは早期returnより前で必ず呼ぶ。
+  const sc = useMemo(() => (Q ? shuffleChoices(Q, lang, "quiz" + sessionSalt) : { opts: [], answer: -1 }), [Q, lang, sessionSalt]);
+  if (order.length === 0) return null;
+  const opts = sc.opts;
+  const ans = sc.answer;
+
+  const choose = (i) => {
+    if (sel !== null) return;
+    setSel(i);
+    const correct = i === ans;
+    setAnsweredMap(m => ({ ...m, [pos]: i }));
+    onAnswer(Q.d, correct);
+  };
+  const goPrev = () => {
+    if (pos === 0) return;
+    const np = pos - 1;
+    setPos(np);
+    setSel(answeredMap[np] !== undefined ? answeredMap[np] : null);
+  };
+  const goNext = () => {
+    const np = pos + 1 >= poolCount ? 0 : pos + 1;
+    setPos(np);
+    setSel(answeredMap[np] !== undefined ? answeredMap[np] : null);
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+        <span style={{ fontSize: 12.5, color: "#8499ad" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
+        <div style={{ display: "inline-flex", background: C.light, borderRadius: 20, padding: 4 }}>
+          {[["seq", t.orderSeq], ["random", t.orderRandom]].map(([k, label]) => (
+            <button key={k} onClick={() => setOrderMode(k)}
+              style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "6px 18px", fontSize: 13, fontWeight: 700,
+                background: orderMode === k ? "#fff" : "transparent",
+                color: orderMode === k ? C.deep : "#7d93a8",
+                boxShadow: orderMode === k ? "0 1px 3px rgba(0,0,0,.12)" : "none" }}>
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
+        {["ALL", ...DOMAINS.map(d => d.id)].map(k => (
+          <button key={k} onClick={() => setFilter(k)}
+            style={{ padding: "7px 16px", borderRadius: 20, fontSize: 13, cursor: "pointer",
+              border: `1.5px solid ${filter === k ? C.primary : C.mid}`,
+              background: filter === k ? C.primary : "#fff", color: filter === k ? "#fff" : C.ink, fontWeight: 600 }}>
+            {k === "ALL" ? t.allFields : k}
+          </button>
+        ))}
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+        <button onClick={goPrev} disabled={pos === 0}
+          style={{ padding: "8px 16px", borderRadius: 9, fontSize: 13, fontWeight: 600,
+            border: `1.5px solid ${C.mid}`, background: pos === 0 ? C.light : "#fff",
+            color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
+          {lang === "en" ? "← Previous" : "← 前の問題"}
+        </button>
+        <span style={{ fontSize: 13, color: "#8499ad" }}>{pos + 1} / {poolCount}</span>
+      </div>
+
+      <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
+        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+          {Q.d} · {domName(Q.d, lang)}
+        </div>
+        <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, lineHeight: 1.5 }}>{L(Q, "q", lang)}</div>
+        {opts.map((opt, i) => {
+          let bg = "#fff", bd = C.mid, col = C.ink;
+          if (sel !== null) {
+            if (i === ans) { bg = "#E6F4EF"; bd = C.ok; col = C.ok; }
+            else if (i === sel) { bg = "#FBEAE8"; bd = C.ng; col = C.ng; }
+          }
+          return (
+            <button key={i} onClick={() => choose(i)} disabled={sel !== null}
+              style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 10, padding: "14px 16px",
+                borderRadius: 10, border: `1.5px solid ${bd}`, background: bg, color: col,
+                cursor: sel === null ? "pointer" : "default", fontSize: 14, lineHeight: 1.4,
+                fontWeight: sel !== null && i === ans ? 700 : 500 }}>
+              <span style={{ fontWeight: 700, marginRight: 10 }}>{sel !== null && (i === ans) ? "✓" : sel !== null && (i === sel) ? "✗" : "ABCD"[i]}</span>{opt}
+            </button>
+          );
+        })}
+        {sel !== null && (
+          <div style={{ marginTop: 12 }}>
+            <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
+              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}
+            </div>
+            <button onClick={goNext}
+              style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+              {t.nextQ}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Exam({ onAnswer, lang, t }) {
+  const [setNo, setSetNo] = useState(null);
+  const [phase, setPhase] = useState("select");
+  const [pos, setPos] = useState(0);
+  const [answers, setAnswers] = useState([]);
+  const [sel, setSel] = useState(null);
+  const [savedReview, setSavedReview] = useState(false);
+  const [mode, setMode] = useState("practice");
+  const [kind, setKind] = useState("normal");
+  // 試行ごとに選択肢の並びを変えるためのソルト（開始時に更新）
+  const [attemptSalt, setAttemptSalt] = useState(0);
+
+  const qs = setNo ? (kind === "domain" ? (DOMAIN_SETS[setNo] || []) : EXAM_SETS[setNo]) : [];
+  const start = (n) => {
+    setSetNo(n); setPos(0); setAnswers([]); setSel(null); setSavedReview(false);
+    setAttemptSalt(Math.floor(Math.random() * 100000));
+    setPhase("run");
+  };
+
+  // 現在の問題のシャッフル結果
+  const sc = useMemo(() => {
+    if (phase !== "run" || !qs[pos]) return null;
+    return shuffleChoices(qs[pos], lang, "exam" + setNo + "_" + attemptSalt);
+  }, [phase, qs, pos, lang, setNo, attemptSalt]);
+
+  const choose = (i) => {
+    if (sel !== null || !sc) return;
+    setSel(i);
+    if (mode === "practice") {
+      const Q = qs[pos];
+      const correct = i === sc.answer;
+      onAnswer(Q.d, correct);
+      setAnswers(a => [...a, { q: Q, sel: i, correct, opts: sc.opts, ans: sc.answer }]);
+    }
+  };
+  const next = () => {
+    if (mode === "exam" && sc) {
+      const Q = qs[pos];
+      const correct = sel === sc.answer;
+      onAnswer(Q.d, correct);
+      setAnswers(a => [...a, { q: Q, sel, correct, opts: sc.opts, ans: sc.answer }]);
+    }
+    setSel(null);
+    if (pos + 1 >= qs.length) setPhase("result");
+    else setPos(pos + 1);
+  };
+
+  if (phase === "select") {
+    return (
+      <div>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
+          <div style={{ display: "inline-flex", background: C.light, borderRadius: 22, padding: 4 }}>
+            {[["practice", t.modePractice], ["exam", t.modeExam]].map(([k, label]) => (
+              <button key={k} onClick={() => setMode(k)}
+                style={{ border: "none", cursor: "pointer", borderRadius: 18, padding: "7px 18px", fontSize: 13, fontWeight: 700,
+                  background: mode === k ? C.primary : "transparent", color: mode === k ? "#fff" : C.ink }}>
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div style={{ textAlign: "center", fontSize: 11.5, color: "#8499ad", marginBottom: 14 }}>
+          {mode === "practice" ? t.modePracticeHint : t.modeExamHint}
+        </div>
+        <Card title={t.examTitle}>
+          <div style={{ fontSize: 13, lineHeight: 1.6, color: "#46566a" }}>{t.examDesc}</div>
+        </Card>
+        <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+          {[["normal", t.kindNormal], ["domain", t.kindDomain]].map(([kk, label]) => (
+            <button key={kk} onClick={() => setKind(kk)}
+              style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer",
+                border: `1.5px solid ${kind === kk ? C.primary : C.mid}`,
+                background: kind === kk ? C.primary : "#fff", color: kind === kk ? "#fff" : C.ink }}>
+              {label}
+            </button>
+          ))}
+        </div>
+        {kind === "domain" && DOMAINS.map(d => (
+          <button key={d.id} onClick={() => start(d.id)}
+            style={{ width: "100%", textAlign: "left", padding: "15px 16px", marginBottom: 10, borderRadius: 11,
+              border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer",
+              display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ background: d.hue, color: "#fff", borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
+              <span>
+                <span style={{ fontWeight: 700, fontSize: 14, color: C.deep }}>{lang === "en" ? d.nameEn : d.name}</span>
+                <span style={{ fontSize: 12, color: "#8499ad", marginLeft: 8 }}>{t.domainSetCount(DOMAIN_SETS[d.id].length)}</span>
+              </span>
+            </span>
+            <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, flexShrink: 0 }}>{t.start}</span>
+          </button>
+        ))}
+        {kind === "normal" && [1, 2, 3, 4, 5].map(n => (
+          <button key={n} onClick={() => SET_READY[n] && start(n)} disabled={!SET_READY[n]}
+            style={{ width: "100%", textAlign: "left", padding: "15px 16px", marginBottom: 10, borderRadius: 11,
+              border: `1.5px solid ${SET_READY[n] ? C.primary : C.mid}`,
+              background: SET_READY[n] ? "#fff" : C.light, cursor: SET_READY[n] ? "pointer" : "not-allowed",
+              display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span>
+              <span style={{ fontWeight: 700, fontSize: 15, color: SET_READY[n] ? C.deep : "#8499ad" }}>{t.setLabel} {n}</span>
+              <span style={{ fontSize: 12, color: "#8499ad", marginLeft: 10 }}>{EXAM_SETS[n].length}{t.questionsUnit}</span>
+            </span>
+            <span style={{ fontSize: 12.5, fontWeight: 700, color: SET_READY[n] ? C.primary : "#a9bccf" }}>
+              {SET_READY[n] ? t.start : t.preparing}
+            </span>
+          </button>
+        ))}
+        <div style={{ fontSize: 11.5, color: "#8499ad", textAlign: "center", marginTop: 6 }}>{t.setsNote} · {t.countExam} {EXAM_TOTAL}{t.questionsUnit}</div>
+      </div>
+    );
+  }
+
+  if (phase === "result") {
+    const c = answers.filter(a => a.correct).length;
+    const rate = Math.round((c / answers.length) * 100);
+    const passed = rate >= PASS;
+    const byDom = DOMAINS.map(d => {
+      const sub = answers.filter(a => a.q.d === d.id);
+      const cc = sub.filter(a => a.correct).length;
+      return { ...d, total: sub.length, correct: cc };
+    }).filter(d => d.total > 0);
+    const wrong = answers.filter(a => !a.correct);
+
+    if (!savedReview && wrong.length > 0) {
+      addReviewItems(wrong.map(a => a.q)).then(() => setSavedReview(true));
+    } else if (!savedReview) {
+      setSavedReview(true);
+    }
+
+    return (
+      <div>
+        <div style={{ background: passed ? "#E6F4EF" : "#FBEAE8", border: `2px solid ${passed ? C.ok : C.ng}`, borderRadius: 12, padding: 18, textAlign: "center", marginBottom: 14 }}>
+          <div style={{ fontSize: 13, color: "#5b6b7d" }}>{t.setLabel}{setNo} {t.result}</div>
+          <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : C.ng }}>{rate}%</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: passed ? C.ok : C.ng }}>{passed ? t.reachedPass : t.needMore(PASS - rate)}</div>
+          <div style={{ fontSize: 12, color: "#5b6b7d", marginTop: 4 }}>{t.correctOf(c, answers.length)}</div>
+        </div>
+        {wrong.length > 0 && (
+          <div style={{ background: C.light, border: `1px solid ${C.mid}`, borderRadius: 10, padding: "10px 12px", marginBottom: 14, fontSize: 12.5, color: C.deep, display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 16 }}>🔖</span>{t.addedToReview}
+          </div>
+        )}
+        <Card title={t.domBreakdown}>
+          {byDom.map(d => (
+            <div key={d.id} style={{ marginBottom: 9 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
+                <span><span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>{domName(d.id, lang)}</span>
+                <strong style={{ color: d.correct / d.total >= PASS / 100 ? C.ok : C.ng }}>{d.correct}/{d.total}</strong>
+              </div>
+              <Bar pct={Math.round(d.correct / d.total * 100)} color={d.correct / d.total >= PASS / 100 ? C.ok : C.ng} />
+            </div>
+          ))}
+        </Card>
+        <Card title={t.wrongTitle(wrong.length)}>
+          {wrong.length === 0 ? (
+            <div style={{ fontSize: 13, color: C.ok }}>{t.allCorrect}</div>
+          ) : wrong.map((a, idx) => (
+            <div key={idx} style={{ padding: "8px 0", borderBottom: `1px solid ${C.light}`, fontSize: 13 }}>
+              <div style={{ fontWeight: 600, marginBottom: 4 }}>
+                <span style={{ background: DOM_HUE[a.q.d], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5, marginRight: 6 }}>{a.q.d}</span>
+                {L(a.q, "q", lang)}
+              </div>
+              <div style={{ color: C.ng, fontSize: 12.5 }}>{t.yourAnswer}：{"ABCD"[a.sel]} {a.opts[a.sel]}</div>
+              <div style={{ color: C.ok, fontSize: 12.5 }}>{t.answer}：{"ABCD"[a.ans]} {a.opts[a.ans]}</div>
+              <div style={{ color: "#5b6b7d", fontSize: 12.5, marginTop: 2 }}>{L(a.q, "e", lang)}</div>
+            </div>
+          ))}
+        </Card>
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.retrySet}</button>
+          <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.toSetSelect}</button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!sc) return null;
+  const Q = qs[pos];
+  const opts = sc.opts;
+  const ans = sc.answer;
+  const answeredCount = answers.length;
+  const correctSoFar = answers.filter(a => a.correct).length;
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 12.5, color: "#5b6b7d" }}>
+        <span>{t.setLabel}{setNo} · {mode === "practice" ? t.modePractice : t.modeExam} · {t.questionNo(pos + 1, qs.length)}</span>
+        <span>{t.scoreSoFar} {correctSoFar}/{answeredCount}</span>
+      </div>
+      <Bar pct={Math.round((pos / qs.length) * 100)} color={C.primary} />
+      <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginTop: 12 }}>
+        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+          {Q.d} · {domName(Q.d, lang)}
+        </div>
+        <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{L(Q, "q", lang)}</div>
+        {opts.map((opt, i) => {
+          let bg = "#fff", bd = C.mid, col = C.ink;
+          if (sel !== null) {
+            if (mode === "practice") {
+              if (i === ans) { bg = "#E6F4EF"; bd = C.ok; col = C.ok; }
+              else if (i === sel) { bg = "#FBEAE8"; bd = C.ng; col = C.ng; }
+            } else if (sel === i) {
+              bg = C.light; bd = C.primary; col = C.deep;
+            }
+          }
+          return (
+            <button key={i} onClick={() => choose(i)} disabled={sel !== null}
+              style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: sel === null ? "pointer" : "default", fontSize: 13.5, lineHeight: 1.4, fontWeight: sel !== null && ((mode === "practice" && i === ans) || (mode === "exam" && i === sel)) ? 700 : 500 }}>
+              <span style={{ fontWeight: 700, marginRight: 8 }}>{(sel !== null) && (i === ans) ? "✓" : (sel !== null) && (i === sel) ? "✗" : "ABCD"[i]}</span>{opt}
+            </button>
+          );
+        })}
+        {sel !== null && (
+          <div style={{ marginTop: 12 }}>
+            {mode === "practice" && (
+              <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
+                <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+                ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}
+              </div>
+            )}
+            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+              {pos + 1 >= qs.length ? (mode === "exam" ? t.submitExam : t.seeResult) : t.nextQ}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Review({ lang, t, onAnswer }) {
+  const [items, setItems] = useState(null);
+  const [phase, setPhase] = useState("list");
+  const [order, setOrder] = useState([]);
+  const [pos, setPos] = useState(0);
+  const [sel, setSel] = useState(null);
+  const [cleared, setCleared] = useState(false);
+  const [sessionSalt, setSessionSalt] = useState(0);
+
+  useEffect(() => { loadReview().then(setItems); }, []);
+
+  if (items === null) return <div style={{ padding: 30, textAlign: "center", color: C.deep }}>{t.loading}</div>;
+
+  const keys = Object.keys(items);
+  const list = keys.map(k => items[k]).sort((a, b) => b.miss - a.miss || a.added - b.added);
+
+  if (phase === "list") {
+    return (
+      <div>
+        <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14, marginBottom: 14 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: C.deep, marginBottom: 6 }}>{t.reviewTitle}</div>
+          <div style={{ fontSize: 12.5, color: "#5b6b7d", lineHeight: 1.6 }}>
+            {list.length === 0 ? t.reviewEmpty : `${t.reviewCount(list.length)} ・ ${lang === "en" ? "Answer them all correctly to clear the list." : "正解すると一覧から外れます。"}`}
+          </div>
+        </div>
+        {list.length > 0 && (
+          <button onClick={() => { setOrder(keys); setPos(0); setSel(null); setSessionSalt(Math.floor(Math.random() * 100000)); setPhase("run"); }}
+            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
+            {t.reviewStart}
+          </button>
+        )}
+        {list.map((it, i) => (
+          <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 12, marginBottom: 9 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
+              <span style={{ background: DOM_HUE[it.q.d], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
+              <span style={{ fontSize: 10.5, color: C.ng, fontWeight: 700 }}>{t.reviewMiss(it.miss)}</span>
+              <span style={{ fontSize: 10.5, color: "#8499ad" }}>{t.reviewSource}</span>
+            </div>
+            <div style={{ fontSize: 13, lineHeight: 1.5 }}>{L(it.q, "q", lang)}</div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (order.length === 0) { setPhase("list"); return null; }
+  const k = order[pos];
+  const entry = items[k];
+  if (!entry) {
+    if (pos + 1 >= order.length) { setPhase("list"); return null; }
+    setPos(pos + 1); setSel(null); return null;
+  }
+  const Q = entry.q;
+  const sc = shuffleChoices(Q, lang, "review" + sessionSalt);
+  const opts = sc.opts;
+  const ans = sc.answer;
+  const remaining = order.slice(pos).filter(key => items[key]).length;
+
+  const choose = (i) => {
+    if (sel !== null) return;
+    setSel(i);
+    const correct = i === ans;
+    onAnswer(Q.d, correct);
+    if (correct) { setCleared(true); clearReviewItem(Q).then(setItems); }
+    else { setCleared(false); }
+  };
+  const next = () => {
+    setSel(null); setCleared(false);
+    if (pos + 1 >= order.length) setPhase("list");
+    else setPos(pos + 1);
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+        <button onClick={() => { setPhase("list"); setSel(null); }}
+          style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 13, padding: 0 }}>
+          {lang === "en" ? "← Back to list" : "← 一覧へ戻る"}
+        </button>
+        <span style={{ fontSize: 12, color: "#5b6b7d" }}>{lang === "en" ? "Left" : "残り"} {remaining}{t.questionsUnit}</span>
+      </div>
+      <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
+        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+          {Q.d} · {domName(Q.d, lang)} · {t.reviewMiss(entry.miss)}
+        </div>
+        <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{L(Q, "q", lang)}</div>
+        {opts.map((opt, i) => {
+          let bg = "#fff", bd = C.mid, col = C.ink;
+          if (sel !== null) {
+            if (i === ans) { bg = "#E6F4EF"; bd = C.ok; col = C.ok; }
+            else if (i === sel) { bg = "#FBEAE8"; bd = C.ng; col = C.ng; }
+          }
+          return (
+            <button key={i} onClick={() => choose(i)} disabled={sel !== null}
+              style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: sel === null ? "pointer" : "default", fontSize: 13.5, lineHeight: 1.4, fontWeight: sel !== null && i === ans ? 700 : 500 }}>
+              <span style={{ fontWeight: 700, marginRight: 8 }}>{sel !== null && (i === ans) ? "✓" : sel !== null && (i === sel) ? "✗" : "ABCD"[i]}</span>{opt}
+            </button>
+          );
+        })}
+        {sel !== null && (
+          <div style={{ marginTop: 12 }}>
+            <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
+              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}
+            </div>
+            {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
+            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+              {pos + 1 >= order.length ? t.reviewToList : t.nextQ}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Diagrams({ lang, t }) {
+  const [open, setOpen] = useState("");
+  const en = lang === "en";
+  const Section = ({ id, cat, title, children }) => (
+    <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, marginBottom: 12, overflow: "hidden" }}>
+      <button onClick={() => setOpen(open === id ? "" : id)}
+        style={{ width: "100%", textAlign: "left", padding: "13px 15px", border: "none", background: open === id ? C.light : "#fff", color: C.deep, fontWeight: 700, fontSize: 13.5, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {cat && <span style={{ background: C.mid, color: C.deep, borderRadius: 5, padding: "2px 7px", fontSize: 10.5, fontWeight: 700 }}>{cat}</span>}
+          <span>{title}</span>
+        </span>
+        <span>{open === id ? "−" : "+"}</span>
+      </button>
+      {open === id && <div style={{ padding: 15, borderTop: `1px solid ${C.light}` }}>{children}</div>}
+    </div>
+  );
+  const Flow = ({ steps }) => (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      {steps.map((st, i) => (
+        <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ minWidth: 26, height: 26, borderRadius: 13, background: C.primary, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
+          <div style={{ flex: 1, background: C.light, borderRadius: 8, padding: "8px 11px", fontSize: 12.5, color: C.ink, lineHeight: 1.5 }}><strong>{st[0]}</strong>{st[1] ? " — " + st[1] : ""}</div>
+        </div>
+      ))}
+    </div>
+  );
+  const Cols = ({ items }) => (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 8 }}>
+      {items.map((it, i) => (
+        <div key={i} style={{ border: `1px solid ${C.mid}`, borderRadius: 9, padding: "10px 11px", background: "#fff" }}>
+          <div style={{ fontSize: 12.5, fontWeight: 700, color: C.deep, marginBottom: 3 }}>{it[0]}</div>
+          <div style={{ fontSize: 11.5, color: "#5b6b7d", lineHeight: 1.5 }}>{it[1]}</div>
+        </div>
+      ))}
+    </div>
+  );
+  const flow = en
+    ? [["Create a branch","Branch off main for your work"],["Commit","Make small, logical commits"],["Open a pull request","Propose changes and request review"],["Review & discuss","Team comments and approves"],["Merge","Integrate into main"],["Deploy / delete branch","Ship and clean up"]]
+    : [["ブランチを作成","mainから作業用ブランチを切る"],["コミット","小さく論理的に変更を積む"],["プルリクエストを作成","変更を提案しレビューを依頼"],["レビュー＆議論","チームがコメント・承認"],["マージ","mainへ統合"],["デプロイ/ブランチ削除","反映して片付ける"]];
+  const roles = en
+    ? [["Read","View, clone, open issues"],["Triage","Manage issues/PRs (no write)"],["Write","Push, manage branches"],["Maintain","Manage repo minus sensitive settings"],["Admin","Full access incl. settings/delete"]]
+    : [["Read","閲覧・クローン・issue作成"],["Triage","issue/PR管理（書き込み不可）"],["Write","push・ブランチ管理"],["Maintain","機微設定を除く管理"],["Admin","設定/削除を含むフルアクセス"]];
+  const files = en
+    ? [["README","Project overview & usage"],["LICENSE","Usage terms"],["CONTRIBUTING","How to contribute"],["CODEOWNERS","Auto-assign reviewers"],["SECURITY","How to report vulnerabilities"]]
+    : [["README","概要・使い方"],["LICENSE","利用条件"],["CONTRIBUTING","貢献ガイド"],["CODEOWNERS","レビュー担当を自動指定"],["SECURITY","脆弱性の報告方針"]];
+  const copilot = en
+    ? [["Individuals","Personal completions & chat"],["Business","Org policy mgmt & content exclusion"],["Enterprise","Advanced: PR summaries, knowledge bases, org-wide policy"]]
+    : [["Individuals","個人向け補完・チャット"],["Business","組織ポリシー管理・コンテンツ除外"],["Enterprise","PR要約・ナレッジベース等の高度機能・組織ポリシー"]];
+  return (
+    <div>
+      <div style={{ fontSize: 12, color: "#8499ad", marginBottom: 10 }}>{t.diagIntro}</div>
+      <Section id="weights" cat={t.diagCat.concept} title={en ? "Exam weight by domain" : "ドメインの出題比率"}><DomainBars lang={lang} /></Section>
+      <Section id="map" cat={t.diagCat.hier} title={en ? "GitHub feature map (expandable tree)" : "GitHub 機能マップ（展開ツリー）"}><InteractiveTree data={en ? CS_TREE_EN : CS_TREE} /></Section>
+      <Section id="flow" cat={t.diagCat.flow} title={en ? "The GitHub Flow" : "GitHub Flow の流れ"}><Flow steps={flow} /></Section>
+      <Section id="roles" cat={t.diagCat.para} title={en ? "Repository permission roles" : "リポジトリの権限ロール"}><Cols items={roles} /></Section>
+      <Section id="files" cat={t.diagCat.para} title={en ? "Key repository files" : "リポジトリの主要ファイル"}><Cols items={files} /></Section>
+      <Section id="copilot" cat={t.diagCat.para} title={en ? "GitHub Copilot editions" : "GitHub Copilot のエディション"}><Cols items={copilot} /></Section>
+    </div>
+  );
+}
+function DomainBars({ lang }) {
+  const [sel, setSel] = useState(null);
+  const max = Math.max(...DOMAINS.map(d => d.pct));
+  const detail = {
+    D1: lang==="en"?"Version control, Git vs GitHub, repos/commits/branches, GitHub Flow, Markdown, Desktop/Mobile":"バージョン管理・Git/GitHub・リポジトリ/コミット/ブランチ・GitHub Flow・Markdown・Desktop/Mobile",
+    D2: lang==="en"?"Repo key files (README/LICENSE/CODEOWNERS...), templates & branches, insights":"主要ファイル(README/LICENSE/CODEOWNERS...)・テンプレート/ブランチ・Insights",
+    D3: lang==="en"?"Issues, pull requests, discussions, notifications, Gists/Wikis/Pages":"issue・PR・Discussions・通知・Gists/Wikis/Pages",
+    D4: lang==="en"?"GitHub Actions, Copilot (Agent Mode/tiers), Codespaces & dev containers, github.dev":"GitHub Actions・Copilot(Agent Mode/エディション)・Codespaces/dev container・github.dev",
+    D5: lang==="en"?"GitHub Projects & layouts, labels, milestones, workflows, insights":"GitHub Projects/レイアウト・ラベル・マイルストーン・ワークフロー・insights",
+    D6: lang==="en"?"2FA & passkeys, roles & permissions, EMUs, branch protection, org/teams":"2FA/passkey・ロールと権限・EMU・ブランチ保護・Org/チーム",
+    D7: lang==="en"?"Open source & Sponsors, Marketplace, InnerSource, forks & templates":"OSS/Sponsors・Marketplace・InnerSource・fork/テンプレート",
+  };
+  return (
+    <div>
+      {DOMAINS.map(d => (
+        <div key={d.id} onClick={() => setSel(sel === d.id ? null : d.id)} style={{ marginBottom: 10, cursor: "pointer" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 3, color: C.ink }}>
+            <span><span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6, fontWeight: 700 }}>{d.id}</span>{domName(d.id, lang)}</span>
+            <strong>{d.range}</strong>
+          </div>
+          <div style={{ background: C.light, borderRadius: 6, height: 18, overflow: "hidden", border: sel === d.id ? `2px solid ${C.ink}` : "none" }}>
+            <div style={{ width: `${d.pct / max * 100}%`, height: "100%", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: "#fff", fontSize: 10.5, fontWeight: 700 }}>{d.pct}%</div>
+          </div>
+          {sel === d.id && <div style={{ fontSize: 11.5, color: "#5b6b7d", marginTop: 4, lineHeight: 1.5 }}>{detail[d.id]}</div>}
+        </div>
+      ))}
+      <div style={{ fontSize: 12, color: "#5b6b7d", marginTop: 6 }}>{lang==="en"?"→ D1 (Git & GitHub basics) is the largest at ~28%. Nail the fundamentals first.":"→ D1（Git と GitHub の基礎）が最大で約28%。まず基礎を固めましょう。"}</div>
+    </div>
+  );
+}
+
+function ConnMeans({ lang }) {
+  const en = lang === "en";
+  const items = [
+    { k:"connector", t: en?"Connector":"コネクタ", d: en?"Prebuilt connection to known services, auth included":"既知サービスへの既製接続。認証込み", hue: C.deep },
+    { k:"custom", t: en?"Custom connector":"カスタムコネクタ", d: en?"Wrap any REST API via an OpenAPI definition":"任意のREST APIをOpenAPIでラップ", hue: C.primary },
+    { k:"mcp", t: "MCP", d: en?"Standardized tool/data server, reusable across agents":"標準ツール/データサーバー。再利用可能", hue: C.accent },
+    { k:"a2a", t: "A2A", d: en?"Standard protocol for agent-to-agent collaboration":"エージェント間連携の標準プロトコル", hue: "#6BA8E8" },
+  ];
+  const [sel, setSel] = useState(null);
+  return (
+    <div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
+        {items.map(it => (
+          <div key={it.k} onClick={() => setSel(sel === it.k ? null : it.k)}
+            style={{ background: it.hue, color: "#fff", borderRadius: 9, padding: "12px 10px", cursor: "pointer",
+              border: sel === it.k ? `3px solid ${C.ink}` : "3px solid transparent", textAlign: "center", fontWeight: 700, fontSize: 13 }}>
+            {it.t}
+          </div>
+        ))}
+      </div>
+      {sel ? (
+        <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.5 }}>
+          <strong style={{ color: C.deep }}>{items.find(i => i.k === sel).t}</strong>：{items.find(i => i.k === sel).d}
+        </div>
+      ) : (
+        <div style={{ fontSize: 12.5, color: "#5b6b7d" }}>{en?"Four parallel connection means. Tap to compare.":"4つの並列な接続手段。タップで比較。接続対象の性質で選ぶ。"}</div>
+      )}
+    </div>
+  );
+}
+
+function ReqFlow({ lang }) {
+  const en = lang === "en";
+  const steps = en ? [
+    ["User message", "User asks in a channel", C.accent],
+    ["Topic", "Trigger matches; conversation flow starts", C.primary],
+    ["Agent flow / tool", "Call connector, API, MCP, or flow", C.deep],
+    ["Response", "Format result, optionally human-in-the-loop", C.ok],
+  ] : [
+    ["ユーザー発話", "チャネルでユーザーが質問", C.accent],
+    ["トピック", "トリガー一致で会話フロー開始", C.primary],
+    ["フロー/ツール", "コネクタ・API・MCP・フローを呼ぶ", C.deep],
+    ["応答", "結果を整形、必要なら人の承認", C.ok],
+  ];
+  const [sel, setSel] = useState(null);
+  return (
+    <div>
+      <div style={{ marginBottom: 12 }}>
+        {steps.map((s, i) => (
+          <div key={i}>
+            <div onClick={() => setSel(sel === i ? null : i)}
+              style={{ background: s[2], color: "#fff", borderRadius: 9, padding: "11px 12px", cursor: "pointer",
+                border: sel === i ? `3px solid ${C.ink}` : "3px solid transparent", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontWeight: 700, fontSize: 13 }}>{s[0]}</span>
+              <span style={{ fontSize: 11, opacity: .85 }}>{i + 1}</span>
+            </div>
+            {i < steps.length - 1 && <div style={{ textAlign: "center", fontSize: 18, color: C.primary, lineHeight: 1 }}>↓</div>}
+          </div>
+        ))}
+      </div>
+      {sel !== null ? (
+        <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.5 }}>
+          <strong style={{ color: C.deep }}>{steps[sel][0]}</strong>：{steps[sel][1]}
+        </div>
+      ) : (
+        <div style={{ fontSize: 12.5, color: "#5b6b7d" }}>{en?"Top-to-bottom request flow. Tap each step.":"上から下への処理フロー。各ステップをタップ。"}</div>
+      )}
+    </div>
+  );
+}
+
+function RAGConcept({ lang }) {
+  const en = lang === "en";
+  const nodes = {
+    q: [en?"Question":"質問", en?"The user's natural-language query":"ユーザーの自然言語の問い"],
+    idx: [en?"Index (Azure AI Search)":"インデックス（Azure AI検索）", en?"Documents chunked & embedded for vector/semantic search":"文書をチャンク化・埋め込みしベクトル/セマンティック検索"],
+    retr: [en?"Retrieve":"検索（取得）", en?"Fetch the most relevant chunks as grounding":"最も関連する断片をグラウンディングとして取得"],
+    gen: [en?"Generate":"生成", en?"The model answers using retrieved grounds, with citations":"取得した根拠を使い出典付きで応答を生成"],
+  };
+  const [sel, setSel] = useState(null);
+  const cN = { q: C.accent, idx: C.primary, retr: "#6BA8E8", gen: C.deep };
+  return (
+    <div>
+      <svg viewBox="0 0 360 180" style={{ width: "100%" }}>
+        {[["q", 10, 70], ["idx", 130, 10], ["retr", 130, 130], ["gen", 250, 70]].map(([k, x, y]) => (
+          <g key={k} style={{ cursor: "pointer" }} onClick={() => setSel(sel === k ? null : k)}>
+            <rect x={x} y={y} width="100" height="40" rx="9" fill={cN[k]} opacity={sel && sel !== k ? 0.45 : 0.95} stroke={sel===k?C.ink:"none"} strokeWidth="3" />
+            <text x={x + 50} y={y + 24} fontSize="11.5" fontWeight="700" fill="#fff" textAnchor="middle">{nodes[k][0].split("（")[0].split(" (")[0]}</text>
+          </g>
+        ))}
+        <line x1="110" y1="90" x2="130" y2="30" stroke={C.mid} strokeWidth="2" />
+        <line x1="110" y1="90" x2="130" y2="150" stroke={C.mid} strokeWidth="2" />
+        <line x1="230" y1="30" x2="250" y2="90" stroke={C.mid} strokeWidth="2" />
+        <line x1="230" y1="150" x2="250" y2="90" stroke={C.mid} strokeWidth="2" />
+      </svg>
+      {sel ? (
+        <div style={{ background: C.light, borderRadius: 9, padding: 12 }}>
+          <div style={{ fontWeight: 700, color: C.deep, fontSize: 14 }}>{nodes[sel][0]}</div>
+          <div style={{ fontSize: 13, marginTop: 4, lineHeight: 1.5 }}>{nodes[sel][1]}</div>
+        </div>
+      ) : (
+        <div style={{ fontSize: 12.5, color: "#5b6b7d" }}>{en?"Concept map of RAG. Tap each node.":"RAGの概念図。各ノードをタップ。検索が生成を根拠づける。"}</div>
+      )}
+    </div>
+  );
+}
+
+function Anatomy({ lang }) {
+  const en = lang === "en";
+  const parts = {
+    topics: [en?"Topics":"トピック", en?"Conversation flows triggered by phrases":"トリガーで起動する会話フロー", en?"The structure of what the agent talks about":"エージェントが何を話すかの構造"],
+    knowledge: [en?"Knowledge":"ナレッジ", en?"Grounding data for RAG responses":"RAG応答の根拠データ", en?"SharePoint, Azure AI Search, enterprise sources":"SharePoint・Azure AI検索・企業ソース"],
+    tools: [en?"Tools":"ツール", en?"Operations: connectors, APIs, MCP, flows":"操作：コネクタ・API・MCP・フロー", en?"How the agent acts on the world":"エージェントが外界に作用する手段"],
+    orch: [en?"Orchestration":"オーケストレーション", en?"Generative selection of knowledge/tools":"ナレッジ・ツールの生成的選択", en?"The model dynamically assembles responses":"モデルが応答を動的に組み立てる"],
+  };
+  const lbl = { topics: en?"Topics":"トピック", knowledge: en?"Knowledge":"ナレッジ", tools: en?"Tools":"ツール", orch: en?"Orchestr.":"オーケスト" };
+  const [sel, setSel] = useState(null);
+  const cN = { orch: C.deep, topics: C.primary, knowledge: C.accent, tools: "#6BA8E8" };
+  return (
+    <div>
+      <svg viewBox="0 0 360 210" style={{ width: "100%" }}>
+        <g style={{ cursor: "pointer" }} onClick={() => setSel(sel === "orch" ? null : "orch")}>
+          <rect x="120" y="10" width="120" height="40" rx="9" fill={cN.orch} stroke={sel==="orch"?C.ink:"none"} strokeWidth="3" />
+          <text x="180" y="34" fontSize="12" fontWeight="700" fill="#fff" textAnchor="middle">{lbl.orch}</text>
+        </g>
+        {[["topics", 30], ["knowledge", 130], ["tools", 230]].map(([k, x]) => (
+          <g key={k} style={{ cursor: "pointer" }} onClick={() => setSel(sel === k ? null : k)}>
+            <line x1="180" y1="50" x2={x + 50} y2="110" stroke={C.mid} strokeWidth="2" />
+            <rect x={x} y="110" width="100" height="44" rx="9" fill={cN[k]} opacity={sel && sel !== k ? 0.45 : 0.92} stroke={sel===k?C.ink:"none"} strokeWidth="3" />
+            <text x={x + 50} y="137" fontSize="11.5" fontWeight="700" fill="#fff" textAnchor="middle">{lbl[k]}</text>
+          </g>
+        ))}
+      </svg>
+      {sel ? (
+        <div style={{ background: C.light, borderRadius: 9, padding: 12, marginTop: 6 }}>
+          <div style={{ fontWeight: 700, color: C.deep, fontSize: 14 }}>{parts[sel][0]}</div>
+          <div style={{ fontSize: 13, marginTop: 4, lineHeight: 1.5 }}>{parts[sel][1]}</div>
+          <div style={{ fontSize: 12.5, marginTop: 4, color: C.primary, fontWeight: 600 }}>{parts[sel][2]}</div>
+        </div>
+      ) : (
+        <div style={{ fontSize: 12.5, color: "#5b6b7d" }}>{en?"Tap each element. Orchestration ties topics, knowledge, and tools together.":"各要素をタップ。オーケストレーションがトピック・ナレッジ・ツールを束ねる。"}</div>
+      )}
+    </div>
+  );
+}
+
+function IntegrationTree({ lang }) {
+  const en = lang === "en";
+  const steps = {
+    start: { q: en?"What do you want to connect?":"何を接続したい？", opts: [[en?"An external service/system":"外部サービス・システム", "service"], [en?"Another agent":"別のエージェント", "agent"], [en?"Proprietary documents":"独自ドキュメント", "kb"]] },
+    service: { q: en?"Is there a prebuilt connector?":"既製コネクタはある？", opts: [[en?"Yes":"ある", "connector"], [en?"No, but there's a REST API":"ないがREST APIはある", "custom"], [en?"It's a standardized tool server":"標準化されたツールサーバー", "mcp"]] },
+    agent: { q: en?"Where does the other agent live?":"相手のエージェントは？", opts: [[en?"Built in Foundry":"Foundryで構築", "foundry"], [en?"Another Copilot Studio agent":"別のCopilot Studioエージェント", "cs"], [en?"Cross-vendor / standardized":"ベンダー横断・標準", "a2a"]] },
+  };
+  const leaves = {
+    connector: [en?"Copilot connector":"Copilotコネクタ", en?"Use a prebuilt connection with auth included":"認証込みの既製接続を利用する"],
+    custom: [en?"Custom connector":"カスタムコネクタ", en?"Wrap the REST API via an OpenAPI definition":"OpenAPI定義でREST APIをラップする"],
+    mcp: [en?"MCP tool":"MCPツール", en?"Connect a standardized tool/data server, reusable across agents":"標準化されたツール/データサーバーを接続し再利用する"],
+    foundry: [en?"Integrate Foundry agent":"Foundryエージェント統合", en?"Call advanced models/orchestration built in Foundry":"Foundryの高度なモデル・オーケストレーションを呼び出す"],
+    cs: [en?"Integrate existing agent":"既存エージェント統合", en?"Link agents in a multi-agent solution":"マルチエージェントで連携させる"],
+    a2a: [en?"A2A protocol":"A2Aプロトコル", en?"Use the standard protocol for inter-agent collaboration":"標準プロトコルでエージェント間連携を行う"],
+    kb: [en?"Azure AI Search (RAG)":"Azure AI検索（RAG）", en?"Index documents for vector/semantic grounded responses":"文書をインデックス化し根拠付き応答を生成する"],
+  };
+  const [path, setPath] = useState([]);
+  const cur = path.length === 0 ? "start" : path[path.length - 1];
+  const leaf = leaves[cur];
+  return (
+    <div>
+      <div style={{ marginBottom: 10, fontSize: 12, color: "#8499ad" }}>
+        {path.length > 0 && <button onClick={() => setPath(p => p.slice(0, -1))} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, padding: 0 }}>{en?"← Back":"← 戻る"}</button>}
+      </div>
+      {!leaf && steps[cur] && (
+        <div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: C.deep, marginBottom: 12 }}>{steps[cur].q}</div>
+          {steps[cur].opts.map(([label, to]) => (
+            <button key={to} onClick={() => setPath(p => [...p, to])}
+              style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "12px 14px", borderRadius: 9, border: `1.5px solid ${C.mid}`, background: "#fff", color: C.ink, cursor: "pointer", fontSize: 14, fontWeight: 600 }}>
+              {label} →
+            </button>
+          ))}
+        </div>
+      )}
+      {leaf && (
+        <div style={{ background: "#E6F4EF", border: `2px solid ${C.ok}`, borderRadius: 10, padding: 14 }}>
+          <div style={{ fontSize: 11, color: C.ok, fontWeight: 700 }}>{en?"Conclusion":"結論"}</div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: C.deep, margin: "4px 0" }}>{leaf[0]}</div>
+          <div style={{ fontSize: 13, lineHeight: 1.5 }}>{leaf[1]}</div>
+          <button onClick={() => setPath([])} style={{ marginTop: 12, padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>{en?"Restart":"最初から"}</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ALMFlow({ lang }) {
+  const en = lang === "en";
+  const stages = en ? [
+    ["Dev", "Unmanaged solution; build & customize", C.accent],
+    ["Test", "Validate with test sets; detect regression", C.primary],
+    ["Production", "Managed solution; read-only deployment", C.deep],
+  ] : [
+    ["開発", "未管理ソリューションで構築・カスタマイズ", C.accent],
+    ["テスト", "テストセットで検証・回帰検知", C.primary],
+    ["本番", "管理ソリューションとして読み取り専用配布", C.deep],
+  ];
+  const [sel, setSel] = useState(null);
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "stretch", gap: 4, marginBottom: 12 }}>
+        {stages.map((s, i) => (
+          <div key={i} style={{ display: "flex", alignItems: "center", flex: 1 }}>
+            <div onClick={() => setSel(sel === i ? null : i)}
+              style={{ flex: 1, background: s[2], color: "#fff", borderRadius: 9, padding: "14px 8px", textAlign: "center", cursor: "pointer", border: sel === i ? `3px solid ${C.ink}` : "3px solid transparent" }}>
+              <div style={{ fontSize: 13, fontWeight: 800 }}>{s[0]}</div>
+            </div>
+            {i < stages.length - 1 && <div style={{ fontSize: 18, color: C.primary, padding: "0 2px" }}>→</div>}
+          </div>
+        ))}
+      </div>
+      {sel !== null ? (
+        <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.5 }}>
+          <strong style={{ color: C.deep }}>{stages[sel][0]}</strong>：{stages[sel][1]}
+        </div>
+      ) : (
+        <div style={{ fontSize: 12.5, color: "#5b6b7d" }}>{en?"Tap each stage. Environment variables, connection references, and pipelines move solutions across stages.":"各段階をタップ。環境変数・接続参照・パイプラインが段階間の移送を担う。"}</div>
+      )}
+    </div>
+  );
+}
+
+function MultiAgent({ lang }) {
+  const en = lang === "en";
+  const nodes = {
+    orch: [en?"Orchestrator":"オーケストレーター", en?"Judges intent and delegates to the right child agent":"意図を判断し適切な子エージェントへ委譲する"],
+    cs: [en?"Copilot Studio agent":"Copilot Studioエージェント", en?"A specialized child agent for a domain":"特定ドメインに特化した子エージェント"],
+    foundry: [en?"Foundry agent":"Foundryエージェント", en?"Advanced model/orchestration capabilities":"高度なモデル・オーケストレーション機能"],
+    fabric: [en?"Fabric data agent":"Fabricデータエージェント", en?"Natural-language querying over large-scale data":"大規模データへの自然言語問い合わせ"],
+  };
+  const lbl = { orch: en?"Orchestrator":"オーケスト", cs: "Copilot Studio", foundry: "Foundry", fabric: "Fabric" };
+  const [sel, setSel] = useState(null);
+  const cN = { orch: C.deep, cs: C.primary, foundry: C.accent, fabric: "#6BA8E8" };
+  return (
+    <div>
+      <svg viewBox="0 0 360 210" style={{ width: "100%" }}>
+        <g style={{ cursor: "pointer" }} onClick={() => setSel(sel === "orch" ? null : "orch")}>
+          <rect x="125" y="8" width="110" height="40" rx="9" fill={cN.orch} stroke={sel==="orch"?C.ink:"none"} strokeWidth="3" />
+          <text x="180" y="32" fontSize="11.5" fontWeight="700" fill="#fff" textAnchor="middle">{lbl.orch}</text>
+        </g>
+        {[["cs", 20], ["foundry", 130], ["fabric", 240]].map(([k, x]) => (
+          <g key={k} style={{ cursor: "pointer" }} onClick={() => setSel(sel === k ? null : k)}>
+            <line x1="180" y1="48" x2={x + 50} y2="115" stroke={C.mid} strokeWidth="2" />
+            <rect x={x} y="115" width="100" height="42" rx="9" fill={cN[k]} opacity={sel && sel !== k ? 0.45 : 0.92} stroke={sel===k?C.ink:"none"} strokeWidth="3" />
+            <text x={x + 50} y="141" fontSize="11" fontWeight="700" fill="#fff" textAnchor="middle">{lbl[k]}</text>
+          </g>
+        ))}
+        <text x="180" y="185" fontSize="10.5" fill={C.primary} textAnchor="middle">{en?"A2A protocol enables cross-agent collaboration":"A2Aプロトコルがエージェント横断連携を実現"}</text>
+      </svg>
+      {sel ? (
+        <div style={{ background: C.light, borderRadius: 9, padding: 12 }}>
+          <div style={{ fontWeight: 700, color: C.deep, fontSize: 14 }}>{nodes[sel][0]}</div>
+          <div style={{ fontSize: 13, marginTop: 4, lineHeight: 1.5 }}>{nodes[sel][1]}</div>
+        </div>
+      ) : (
+        <div style={{ fontSize: 12.5, color: "#5b6b7d" }}>{en?"Tap each node. The orchestrator delegates to specialized child agents.":"各ノードをタップ。オーケストレーターが専門特化した子エージェントへ委譲する。"}</div>
+      )}
+    </div>
+  );
+}
+
+const CS_TREE = {
+  label: "GitHub Foundations（GH-900）",
+  children: [
+    { label: "Git の基礎", children: [
+      { label: "リポジトリ / コミット / ブランチ", note: "変更履歴を管理する単位" },
+      { label: "GitHub Flow", note: "ブランチ→PR→レビュー→マージ" },
+      { label: "Markdown", note: "issue/PRでの明確な記述" },
+    ]},
+    { label: "リポジトリ", children: [
+      { label: "主要ファイル", note: "README/LICENSE/CONTRIBUTING/CODEOWNERS/SECURITY" },
+      { label: "テンプレート / ブランチ", note: "作成・整理・維持" },
+      { label: "Insights / 依存関係", note: "可視性・メトリクス" },
+    ]},
+    { label: "コラボレーション", children: [
+      { label: "Issues / PR / Discussions", note: "課題・変更提案・議論" },
+      { label: "通知", note: "ワークフロー管理" },
+      { label: "Gists / Wikis / Pages", note: "共有・ドキュメント" },
+    ]},
+    { label: "モダン開発", children: [
+      { label: "GitHub Actions", note: "CI/CD・自動化" },
+      { label: "Copilot", note: "AI補完・Agent Mode・エディション" },
+      { label: "Codespaces / github.dev", note: "クラウド開発環境" },
+    ]},
+    { label: "プロジェクト管理", children: [
+      { label: "Projects / レイアウト", note: "ボード・テーブル・ロードマップ" },
+      { label: "ラベル / マイルストーン", note: "整理と計画" },
+    ]},
+    { label: "セキュリティ・管理", children: [
+      { label: "2FA / passkey", note: "アカウント保護" },
+      { label: "ロールと権限", note: "Read/Triage/Write/Maintain/Admin" },
+      { label: "ブランチ保護 / EMU", note: "統制と企業管理" },
+    ]},
+    { label: "コミュニティ", children: [
+      { label: "OSS / Sponsors", note: "支援と貢献" },
+      { label: "Marketplace / InnerSource", note: "拡張と社内OSS" },
+    ]},
+  ],
+};
+const CS_TREE_EN = {
+  label: "GitHub Foundations (GH-900)",
+  children: [
+    { label: "Git basics", children: [
+      { label: "Repos / commits / branches", note: "Units of change history" },
+      { label: "GitHub Flow", note: "Branch -> PR -> review -> merge" },
+      { label: "Markdown", note: "Clear issues/PRs" },
+    ]},
+    { label: "Repositories", children: [
+      { label: "Key files", note: "README/LICENSE/CONTRIBUTING/CODEOWNERS/SECURITY" },
+      { label: "Templates / branches", note: "Create, organize, maintain" },
+      { label: "Insights / dependencies", note: "Visibility & metrics" },
+    ]},
+    { label: "Collaboration", children: [
+      { label: "Issues / PRs / Discussions", note: "Track, propose, discuss" },
+      { label: "Notifications", note: "Workflow management" },
+      { label: "Gists / Wikis / Pages", note: "Share & document" },
+    ]},
+    { label: "Modern development", children: [
+      { label: "GitHub Actions", note: "CI/CD & automation" },
+      { label: "Copilot", note: "AI completions, Agent Mode, tiers" },
+      { label: "Codespaces / github.dev", note: "Cloud dev environments" },
+    ]},
+    { label: "Project management", children: [
+      { label: "Projects / layouts", note: "Board, table, roadmap" },
+      { label: "Labels / milestones", note: "Organize & plan" },
+    ]},
+    { label: "Security & admin", children: [
+      { label: "2FA / passkeys", note: "Account protection" },
+      { label: "Roles & permissions", note: "Read/Triage/Write/Maintain/Admin" },
+      { label: "Branch protection / EMU", note: "Governance & enterprise" },
+    ]},
+    { label: "Community", children: [
+      { label: "OSS / Sponsors", note: "Support & contribute" },
+      { label: "Marketplace / InnerSource", note: "Extend & internal OSS" },
+    ]},
+  ],
+};
+function InteractiveTree({ data }) {
+  return <div style={{ fontSize: 13 }}><TreeNode node={data} depth={0} defaultOpen /></div>;
+}
+function TreeNode({ node, depth, defaultOpen }) {
+  const [open, setOpen] = useState(!!defaultOpen);
+  const hasKids = node.children && node.children.length > 0;
+  return (
+    <div style={{ marginLeft: depth === 0 ? 0 : 14 }}>
+      <div onClick={() => hasKids && setOpen(o => !o)}
+        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? "#fff" : C.ink, marginBottom: 3 }}>
+        {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : C.primary }}>{open ? "▼" : "▶"}</span>}
+        {!hasKids && <span style={{ color: C.mid }}>•</span>}
+        <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{node.label}</span>
+      </div>
+      {node.note && (!hasKids || open) && (
+        <div style={{ fontSize: 12, color: "#5b6b7d", marginLeft: 22, marginBottom: 5, lineHeight: 1.4 }}>{node.note}</div>
+      )}
+      {hasKids && open && (
+        <div style={{ borderLeft: `2px solid ${C.light}`, marginLeft: 8 }}>
+          {node.children.map((ch, i) => <TreeNode key={i} node={ch} depth={depth + 1} />)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Compare({ lang, t }) {
+  const [q, setQ] = useState("");
+  const en = lang === "en";
+  const list = COMPARE.filter(c => {
+    if (!q) return true;
+    const hay = [c.title, c.titleEn, ...c.cols, ...c.colsEn, ...c.rows.flat(), ...c.rowsEn.flat()].join("").toLowerCase();
+    return hay.includes(q.toLowerCase());
+  });
+  return (
+    <div>
+      <input value={q} onChange={e => setQ(e.target.value)} placeholder={t.compareSearch}
+        style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 14, boxSizing: "border-box" }} />
+      {list.map((c, ci) => {
+        const cols = en ? c.colsEn : c.cols;
+        const rows = en ? c.rowsEn : c.rows;
+        return (
+          <div key={ci} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14, marginBottom: 14 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: C.deep, marginBottom: 10 }}>{en ? c.titleEn : c.title}</div>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5, minWidth: cols.length > 2 ? 460 : 0 }}>
+                <thead>
+                  <tr style={{ background: C.light }}>
+                    <th style={{ textAlign: "left", padding: "8px 10px", borderBottom: `2px solid ${C.mid}` }}></th>
+                    {cols.map((col, i) => (
+                      <th key={i} style={{ textAlign: "left", padding: "8px 10px", borderBottom: `2px solid ${C.mid}`, color: C.deep, fontWeight: 700 }}>{col}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((row, ri) => (
+                    <tr key={ri}>
+                      <td style={{ padding: "8px 10px", borderBottom: `1px solid ${C.light}`, fontWeight: 700, color: C.ink, whiteSpace: "nowrap" }}>{row[0]}</td>
+                      {row.slice(1).map((cell, i) => (
+                        <td key={i} style={{ padding: "8px 10px", borderBottom: `1px solid ${C.light}`, color: "#33485e", lineHeight: 1.5 }}>{cell}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        );
+      })}
+      {list.length === 0 && <div style={{ textAlign: "center", color: "#8499ad", padding: 20 }}>{t.noMatch}</div>}
+    </div>
+  );
+}
+
+function Confuse({ lang, t }) {
+  const [q, setQ] = useState("");
+  const list = CONFUSE.filter(c => !q || c.join("").toLowerCase().includes(q.toLowerCase()));
+  return (
+    <div>
+      <input value={q} onChange={e => setQ(e.target.value)} placeholder={t.confuseSearch}
+        style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 14, boxSizing: "border-box" }} />
+      {list.map((c, i) => (
+        <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 10 }}>
+          <div style={{ fontWeight: 700, color: C.deep, fontSize: 13.5, marginBottom: 5 }}>{lang === "en" && c[3] ? c[3] : c[0]}</div>
+          <div style={{ fontSize: 13, lineHeight: 1.5, marginBottom: 4 }}>{lang === "en" && c[4] ? c[4] : c[1]}</div>
+          <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{t.judgeAxis}：{lang === "en" && c[5] ? c[5] : c[2]}</div>
+        </div>
+      ))}
+      {list.length === 0 && <div style={{ textAlign: "center", color: "#8499ad", padding: 20 }}>{t.noMatch}</div>}
+    </div>
+  );
+}
+
+function Glossary({ lang, t }) {
+  const [q, setQ] = useState("");
+  const [cat, setCat] = useState("すべて");
+  const list = GLOSSARY.filter(g => {
+    if (cat !== "すべて" && g[0] !== cat) return false;
+    if (!q) return true;
+    return (g[1] + g[2] + g[3] + (g[4] || "")).toLowerCase().includes(q.toLowerCase());
+  });
+  return (
+    <div>
+      <input value={q} onChange={e => setQ(e.target.value)} placeholder={t.glossarySearch}
+        style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 10, boxSizing: "border-box" }} />
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
+        {GLOSSARY_CATS.map(k => (
+          <button key={k} onClick={() => setCat(k)}
+            style={{ padding: "5px 11px", borderRadius: 16, fontSize: 12, cursor: "pointer", border: `1px solid ${cat === k ? C.primary : C.mid}`, background: cat === k ? C.primary : "#fff", color: cat === k ? "#fff" : C.ink, fontWeight: 600 }}>
+            {k === "すべて" ? t.allFields : k}
+          </button>
+        ))}
+      </div>
+      {list.map((g, i) => (
+        <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 9 }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
+            <span style={{ background: DOM_HUE[g[0]], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{g[0]}</span>
+            {lang === "en" && g[2] !== "-" ? (
+              <>
+                <span style={{ fontWeight: 700, fontSize: 14, color: C.deep }}>{g[2]}</span>
+                <span style={{ fontSize: 11.5, color: "#8499ad" }}>{g[1]}</span>
+              </>
+            ) : (
+              <>
+                <span style={{ fontWeight: 700, fontSize: 14, color: C.deep }}>{g[1]}</span>
+                {g[2] !== "-" && <span style={{ fontSize: 11.5, color: "#8499ad" }}>{g[2]}</span>}
+              </>
+            )}
+          </div>
+          <div style={{ fontSize: 13, lineHeight: 1.5 }}>{lang === "en" && g[4] ? g[4] : g[3]}</div>
+        </div>
+      ))}
+      {list.length === 0 && <div style={{ textAlign: "center", color: "#8499ad", padding: 20 }}>{t.noMatch}</div>}
+    </div>
+  );
+}
+return App;
+})();
+
 const Station_ADP = (function(){
 
 const C = { primary:"#1A73E8", deep:"#174EA6", light:"#E8F0FE", mid:"#C6D6F2", ink:"#202124", ok:"#188038", ng:"#D93025", warn:"#F29900" };
@@ -155773,6 +157315,19 @@ const HUB_STATIONS = [
     vendor: "Microsoft",
     category: "microsoft",
     Comp: Station_AI200,
+  },
+  {
+    id: "gh900",
+    code: "GH-900",
+    ja: "GitHub Foundations（GitHubの基礎）",
+    en: "GitHub Foundations",
+    descJa: "Git・リポジトリ・コラボレーション・Actions・セキュリティなど GitHub の基礎を問う入門資格。",
+    descEn: "Entry-level cert on Git, repositories, collaboration, Actions, and GitHub security fundamentals.",
+    accent: "#2DA44E",
+    deep: "#1B1F24",
+    vendor: "GitHub",
+    category: "microsoft",
+    Comp: Station_GH900,
   },
   {
     id: "adp",
