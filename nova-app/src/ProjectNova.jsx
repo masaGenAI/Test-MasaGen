@@ -137660,7 +137660,10 @@ function GlossaryView({ glCat, setGlCat, glSearch, setGlSearch }) {
 
 /* ---------------- App（全体シェル） ---------------- */
 function App() {
-  const [active, setActive] = useState("progress");
+  const [active, _setActive] = useState("progress");
+  const [activeHist, setActiveHist] = useState([]);
+  const setActive = (k) => { if (k !== active) setActiveHist(h => [...h, active]); _setActive(k); };
+  const goBackActive = () => { if (!activeHist.length) return; const prev = activeHist[activeHist.length - 1]; setActiveHist(activeHist.slice(0, -1)); _setActive(prev); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); };
   const [quizSet, setQuizSet] = useState(1);
   const [quizFilter, setQuizFilter] = useState("all");
   const [quizIdx, setQuizIdx] = useState(0);
@@ -137741,6 +137744,13 @@ function App() {
 
   return (
     <div style={{ background: "#ffffff", minHeight: "100%" }}>
+      {activeHist.length > 0 && (
+        <button onClick={goBackActive}
+          aria-label="Back"
+          style={{ position: "fixed", right: 16, bottom: 104, zIndex: 45, border: "1.5px solid #1a3a5c", cursor: "pointer", borderRadius: 22, padding: "9px 15px", background: "#fff", color: "#1a3a5c", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.20)" }}>
+          ← 戻る
+        </button>
+      )}
       {active !== "progress" && (
         <button onClick={() => { setActive("progress"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
@@ -138929,7 +138939,10 @@ function arrEq(a, b) {
 }
 
 function App() {
-  const [tab, setTab] = useState("home");
+  const [tab, _setTab] = useState("home");
+  const [tabHist, setTabHist] = useState([]);
+  const setTab = (k) => { if (k !== tab) setTabHist(h => [...h, tab]); _setTab(k); };
+  const goBackTab = () => { if (!tabHist.length) return; const prev = tabHist[tabHist.length - 1]; setTabHist(tabHist.slice(0, -1)); _setTab(prev); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); };
   const [state, setState] = useState(null);
   const [loaded, setLoaded] = useState(false);
   const [lang, setLang] = useState("ja");
@@ -139033,6 +139046,13 @@ function App() {
           </button>
         ))}
       </div>
+      {tabHist.length > 0 && (
+        <button onClick={goBackTab}
+          aria-label="Back"
+          style={{ position: "fixed", right: 16, bottom: 104, zIndex: 45, border: `1.5px solid ${C.deep}`, cursor: "pointer", borderRadius: 22, padding: "9px 15px", background: "#fff", color: C.deep, fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.20)" }}>
+          ← {lang === "en" ? "Back" : "戻る"}
+        </button>
+      )}
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
@@ -142951,7 +142971,10 @@ function locQ(Q, lang) {
 function shuffle(arr) { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 
 function App() {
-  const [tab, setTab] = useState("home");
+  const [tab, _setTab] = useState("home");
+  const [tabHist, setTabHist] = useState([]);
+  const setTab = (k) => { if (k !== tab) setTabHist(h => [...h, tab]); _setTab(k); };
+  const goBackTab = () => { if (!tabHist.length) return; const prev = tabHist[tabHist.length - 1]; setTabHist(tabHist.slice(0, -1)); _setTab(prev); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); };
   const [state, setState] = useState(null);
   const [wrong, setWrong] = useState([]);
   const [loaded, setLoaded] = useState(false);
@@ -143023,6 +143046,13 @@ function App() {
           </button>
         ))}
       </div>
+      {tabHist.length > 0 && (
+        <button onClick={goBackTab}
+          aria-label="Back"
+          style={{ position: "fixed", right: 16, bottom: 104, zIndex: 45, border: `1.5px solid ${C.deep}`, cursor: "pointer", borderRadius: 22, padding: "9px 15px", background: "#fff", color: C.deep, fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.20)" }}>
+          ← {lang === "en" ? "Back" : "戻る"}
+        </button>
+      )}
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
@@ -145989,7 +146019,10 @@ async function loadState() {
 async function saveState(s) { try { await window.storage.set(STORE_KEY, JSON.stringify(s)); } catch {} }
 
 function App() {
-  const [tab, setTab] = useState("home");
+  const [tab, _setTab] = useState("home");
+  const [tabHist, setTabHist] = useState([]);
+  const setTab = (k) => { if (k !== tab) setTabHist(h => [...h, tab]); _setTab(k); };
+  const goBackTab = () => { if (!tabHist.length) return; const prev = tabHist[tabHist.length - 1]; setTabHist(tabHist.slice(0, -1)); _setTab(prev); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); };
   const [lang, setLang] = useState("ja");
   const [state, setState] = useState(null);
   const [loaded, setLoaded] = useState(false);
@@ -146059,6 +146092,13 @@ function App() {
           </button>
         ))}
       </div>
+      {tabHist.length > 0 && (
+        <button onClick={goBackTab}
+          aria-label="Back"
+          style={{ position: "fixed", right: 16, bottom: 104, zIndex: 45, border: `1.5px solid ${C.deep}`, cursor: "pointer", borderRadius: 22, padding: "9px 15px", background: "#fff", color: C.deep, fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.20)" }}>
+          ← {lang === "en" ? "Back" : "戻る"}
+        </button>
+      )}
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
@@ -148152,7 +148192,10 @@ function ExamCaseRunner({ cases, lang, onBack }) {
 }
 
 function App() {
-  const [tab, setTab] = useState("home");
+  const [tab, _setTab] = useState("home");
+  const [tabHist, setTabHist] = useState([]);
+  const setTab = (k) => { if (k !== tab) setTabHist(h => [...h, tab]); _setTab(k); };
+  const goBackTab = () => { if (!tabHist.length) return; const prev = tabHist[tabHist.length - 1]; setTabHist(tabHist.slice(0, -1)); _setTab(prev); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); };
   const [state, setState] = useState(null);
   const [loaded, setLoaded] = useState(false);
   const t = T;
@@ -148208,6 +148251,13 @@ function App() {
           </button>
         ))}
       </div>
+      {tabHist.length > 0 && (
+        <button onClick={goBackTab}
+          aria-label="Back"
+          style={{ position: "fixed", right: 16, bottom: 104, zIndex: 45, border: `1.5px solid ${C.deep}`, cursor: "pointer", borderRadius: 22, padding: "9px 15px", background: "#fff", color: C.deep, fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.20)" }}>
+          ← 戻る
+        </button>
+      )}
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
@@ -149866,7 +149916,10 @@ function ExamCaseRunner({ cases, lang, onBack }) {
 }
 
 function App() {
-  const [tab, setTab] = useState("home");
+  const [tab, _setTab] = useState("home");
+  const [tabHist, setTabHist] = useState([]);
+  const setTab = (k) => { if (k !== tab) setTabHist(h => [...h, tab]); _setTab(k); };
+  const goBackTab = () => { if (!tabHist.length) return; const prev = tabHist[tabHist.length - 1]; setTabHist(tabHist.slice(0, -1)); _setTab(prev); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); };
   const [state, setState] = useState(null);
   const [loaded, setLoaded] = useState(false);
   const [lang, setLang] = useState("ja");
@@ -149925,6 +149978,13 @@ function App() {
           </button>
         ))}
       </div>
+      {tabHist.length > 0 && (
+        <button onClick={goBackTab}
+          aria-label="Back"
+          style={{ position: "fixed", right: 16, bottom: 104, zIndex: 45, border: `1.5px solid ${C.deep}`, cursor: "pointer", borderRadius: 22, padding: "9px 15px", background: "#fff", color: C.deep, fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.20)" }}>
+          ← {lang === "en" ? "Back" : "戻る"}
+        </button>
+      )}
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
@@ -151601,7 +151661,10 @@ function ExamCaseRunner({ cases, lang, onBack }) {
 }
 
 function App() {
-  const [tab, setTab] = useState("home");
+  const [tab, _setTab] = useState("home");
+  const [tabHist, setTabHist] = useState([]);
+  const setTab = (k) => { if (k !== tab) setTabHist(h => [...h, tab]); _setTab(k); };
+  const goBackTab = () => { if (!tabHist.length) return; const prev = tabHist[tabHist.length - 1]; setTabHist(tabHist.slice(0, -1)); _setTab(prev); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); };
   const [state, setState] = useState(null);
   const [review, setReview] = useState(null);
   const [loaded, setLoaded] = useState(false);
@@ -151687,6 +151750,13 @@ function App() {
           </button>
         ))}
       </div>
+      {tabHist.length > 0 && (
+        <button onClick={goBackTab}
+          aria-label="Back"
+          style={{ position: "fixed", right: 16, bottom: 104, zIndex: 45, border: `1.5px solid ${C.deep}`, cursor: "pointer", borderRadius: 22, padding: "9px 15px", background: "#fff", color: C.deep, fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.20)" }}>
+          ← {lang === "en" ? "Back" : "戻る"}
+        </button>
+      )}
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
