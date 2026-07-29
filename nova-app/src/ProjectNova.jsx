@@ -137744,7 +137744,7 @@ function App() {
       {active !== "progress" && (
         <button onClick={() => { setActive("progress"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
-          style={{ position: "fixed", right: 16, bottom: 16, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: "#1a3a5c", color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: "#1a3a5c", color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ トップへ
         </button>
       )}
@@ -139036,7 +139036,7 @@ function App() {
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
-          style={{ position: "fixed", right: 16, bottom: 16, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ {lang === "en" ? "Top" : "トップへ"}
         </button>
       )}
@@ -143026,7 +143026,7 @@ function App() {
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
-          style={{ position: "fixed", right: 16, bottom: 16, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ {lang === "en" ? "Top" : "トップへ"}
         </button>
       )}
@@ -146062,7 +146062,7 @@ function App() {
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
-          style={{ position: "fixed", right: 16, bottom: 16, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ {lang === "en" ? "Top" : "トップへ"}
         </button>
       )}
@@ -148202,7 +148202,7 @@ function App() {
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
-          style={{ position: "fixed", right: 16, bottom: 16, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ トップへ
         </button>
       )}
@@ -149885,7 +149885,7 @@ function App() {
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
-          style={{ position: "fixed", right: 16, bottom: 16, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ {lang === "en" ? "Top" : "トップへ"}
         </button>
       )}
@@ -151619,7 +151619,7 @@ function App() {
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
-          style={{ position: "fixed", right: 16, bottom: 16, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ {lang === "en" ? "Top" : "トップへ"}
         </button>
       )}
