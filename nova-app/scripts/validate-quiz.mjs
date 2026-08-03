@@ -47,7 +47,7 @@ const STATIONS = [
   { name: 'Station_SAA', arrays: [['BANK_D1','obj'],['BANK_D2','obj'],['BANK_D3','obj'],['BANK_D4','obj'],['EXAM_SET1','obj'],['EXAM_SET2','obj'],['EXAM_SET3','obj'],['EXAM_SET4','obj'],['EXAM_SET5','obj']] },
   { name: 'Station_CCAF', arrays: [['BANK','obj'],['EXTRA','obj'],['SET1','obj'],['SET2','obj'],['SET3','obj'],['SET4','obj'],['SCEN_BANK','obj']] },
   { name: 'Station_AICX', arrays: [['EXAM_POOL','domRowQ1'],['QUIZ_EXTRA','domRowQ1']] },
-  { name: 'Station_PL900', arrays: [['BANK','obj'],['BANK_EXTRA','obj'],['BANK_EXTRA2','obj']] },
+  { name: 'Station_PL900', arrays: [['BANK','obj'],['BANK_EXTRA','obj'],['BANK_EXTRA2','obj'],['PL900_HARD','obj']] },
   { name: 'Station_AB620', arrays: [['BANK','obj']] },
   { name: 'Station_ADP', arrays: [['CORE','rowDQOAE']] },
 ];
