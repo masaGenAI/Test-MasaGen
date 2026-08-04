@@ -49,6 +49,7 @@ const STATIONS = [
   { name: 'Station_AICX', arrays: [['EXAM_POOL','domRowQ1'],['QUIZ_EXTRA','domRowQ1']] },
   { name: 'Station_PL900', arrays: [['BANK','obj'],['BANK_EXTRA','obj'],['BANK_EXTRA2','obj'],['BANK_EXTRA3','obj'],['PL900_HARD','obj']] },
   { name: 'Station_AB620', arrays: [['BANK','obj']] },
+  { name: 'Station_SC500', arrays: [['BANK','obj']] },
   { name: 'Station_SC900', arrays: [['BANK','obj']] },
   { name: 'Station_ADP', arrays: [['CORE','rowDQOAE']] },
 ];
