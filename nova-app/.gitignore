@@ -1,0 +1,7 @@
+node_modules/
+dist/
+*.local
+.vite/
+
+# 単一ファイルビルドの生成物（`npm run build` で再生成可能）
+ProjectNova.html

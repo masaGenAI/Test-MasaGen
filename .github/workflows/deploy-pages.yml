@@ -1,0 +1,71 @@
+name: Deploy nova-app to GitHub Pages
+
+# nova-app（Vite + vite-plugin-singlefile）をビルドし、生成物 dist/ を
+# GitHub Pages に公開する。これにより PC・他端末の各ブラウザから
+# 同一の固定 URL でアプリにアクセスできる。
+# 注意: 学習進捗はブラウザの localStorage に保存されるため端末間では同期しない
+# （アプリ内の「バックアップ（書き出し/読み込み）」で手動移行は可能）。
+
+on:
+  push:
+    branches: ["claude/friendly-allen-xZn87"]
+    paths:
+      - "nova-app/**"
+      - ".github/workflows/deploy-pages.yml"
+  workflow_dispatch:
+
+# Pages へのデプロイに必要な権限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同時実行を1本に制限（進行中のデプロイはキャンセルしない）
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: nova-app
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: nova-app/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (single-file)
+        run: npm run build
+
+      - name: Configure Pages (auto-enable if needed)
+        uses: actions/configure-pages@v5
+        with:
+          # リポジトリで Pages 未設定でもワークフローの token で自動有効化を試みる
+          enablement: true
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: nova-app/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
