@@ -3,9 +3,9 @@
   "source": "Cowork artifact: Anything Memo Tracker",
   "capturedFrom": "0679c7cc-anythingmemotracker.pdf",
   "stats": {
-    "memoTotal": 20,
+    "memoTotal": 21,
     "genreCount": 5,
-    "withDetail": 20
+    "withDetail": 21
   },
   "palette": {
     "headerGradient": [
@@ -39,7 +39,7 @@
       "name": "開発/DevOps",
       "fill": "#e6f6ee",
       "text": "#15803d",
-      "count": 3
+      "count": 4
     },
     {
       "key": "biz",
@@ -59,6 +59,12 @@
     }
   ],
   "memos": [
+    {
+      "topic": "Git / GitHub",
+      "genre": "dev",
+      "date": "2026-07-19",
+      "note": "Gitは変更履歴を管理する分散型バージョン管理ツール（各PCに全履歴のコピーを持ち、オフラインでもコミット可）。GitHubはそのGitリポジトリをホストし、Pull Request・レビュー・Issue・CI等で共同開発を支えるクラウドサービス。両者は別物。"
+    },
     {
       "topic": "MMR（Maximal Marginal Relevance）",
       "genre": "ai",
