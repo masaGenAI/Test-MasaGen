@@ -95,6 +95,16 @@ function BackupBar() {
   const [msg, setMsg] = useState("");
   const [showBackup, setShowBackup] = useState(false);
   const [hovered, setHovered] = useState(false);
+  // トップ（ランチャー）画面では非表示。ハブ内でのみ表示する。
+  const [onLauncher, setOnLauncher] = useState(
+    typeof window !== "undefined" ? window.__novaLauncher !== false : true,
+  );
+  React.useEffect(() => {
+    const h = (e) => setOnLauncher(!!(e && e.detail));
+    window.addEventListener("nova:launcher", h);
+    return () => window.removeEventListener("nova:launcher", h);
+  }, []);
+  if (onLauncher) return null;
 
   const flash = (m) => {
     setMsg(m);
