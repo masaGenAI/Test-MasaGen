@@ -183,15 +183,15 @@ function BackupBar() {
       onMouseLeave={() => setHovered(false)}
       style={{
         position: "fixed",
-        right: 12,
+        left: 12,
         bottom: 12,
         zIndex: 2147483000,
         display: "flex",
         flexDirection: "column",
-        alignItems: "flex-end",
+        alignItems: "flex-start",
         gap: 6,
-        // 普段は半透明の小さなアイコンのみ。ホバー/展開時だけくっきり表示して邪魔にならないように。
-        opacity: expanded || msg ? 1 : 0.35,
+        // 常時はっきり表示（別PC/ブラウザへ移すためのバックアップ入口）。ホバー/クリックで展開。
+        opacity: expanded || msg ? 1 : 0.92,
         transition: "opacity .18s ease",
       }}
     >
@@ -224,49 +224,43 @@ function BackupBar() {
             maxWidth: 250,
           }}
         >
-          <div style={{ fontSize: 12, fontWeight: 600, color: LS_OK ? "#166534" : "#b45309", marginBottom: 8, lineHeight: 1.5 }}>
+          <div style={{ fontSize: 12, fontWeight: 600, color: LS_OK ? "#166534" : "#b45309", marginBottom: 4, lineHeight: 1.5 }}>
             {LS_OK ? "✓ 進捗はこの端末に自動保存されています" : "⚠ このブラウザは自動保存オフ。バックアップ推奨"}
           </div>
-          {showBackup ? (
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-              <button style={btn} onClick={exportProgress} title="学習の進捗をファイルに書き出します（バックアップ用）">
-                ⬇ ファイルに書き出し
-              </button>
-              <button style={btn} onClick={importProgress} title="書き出した進捗ファイルを読み込みます">
-                ⬆ 読み込み
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setShowBackup(true)}
-              style={{ ...btn, fontSize: 11.5, padding: "5px 10px", color: "#64748b", fontWeight: 500 }}
-            >
-              バックアップ（任意）
+          <div style={{ fontSize: 11, color: "#64748b", marginBottom: 8, lineHeight: 1.5 }}>
+            別のPC・ブラウザへ移すには、書き出したファイルを相手側で読み込みます。
+          </div>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            <button style={btn} onClick={exportProgress} title="学習の進捗をファイルに書き出します（別のPC/ブラウザへ移せます）">
+              ⬇ ファイルに書き出し
             </button>
-          )}
+            <button style={btn} onClick={importProgress} title="書き出した進捗ファイルを読み込みます">
+              ⬆ 読み込み
+            </button>
+          </div>
         </div>
       ) : null}
 
       {/* 常時: 小さなアイコンのみ（クリックでバックアップ操作を固定表示） */}
       <button
         onClick={() => setShowBackup((v) => !v)}
-        title={LS_OK ? "進捗は自動保存されています" : "自動保存オフ。クリックしてバックアップ"}
-        aria-label="進捗の保存状態"
+        title={LS_OK ? "進捗は自動保存されています。別のPC/ブラウザへ移すにはここから書き出し/読み込み" : "自動保存オフ。ここからバックアップ"}
+        aria-label="進捗バックアップ"
         style={{
-          width: 30,
-          height: 30,
-          borderRadius: "50%",
+          borderRadius: 999,
           border: "1px solid " + (LS_OK ? "#cfe3d6" : "#f0d9a8"),
-          background: LS_OK ? "rgba(22,163,74,0.10)" : "rgba(180,83,9,0.12)",
+          background: LS_OK ? "rgba(22,163,74,0.12)" : "rgba(180,83,9,0.14)",
           color: LS_OK ? "#166534" : "#b45309",
-          fontSize: 14,
+          fontSize: 12.5,
+          fontWeight: 700,
           lineHeight: 1,
           cursor: "pointer",
-          boxShadow: "0 1px 3px rgba(11,31,63,0.10)",
-          padding: 0,
+          boxShadow: "0 1px 4px rgba(11,31,63,0.14)",
+          padding: "8px 14px",
+          fontFamily: "'Inter',-apple-system,'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif",
         }}
       >
-        {LS_OK ? "✓" : "⚠"}
+        {LS_OK ? "💾 進捗バックアップ" : "⚠ 進捗バックアップ"}
       </button>
     </div>
   );
