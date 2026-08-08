@@ -16,6 +16,16 @@ Cowork の「keyword research」と同じく、**単語（キーワード）を�
    - **Learning**：区分（資格/Tools/講座/書籍/Udemy）／提供／名称／分類
 3. `data.json` に追記 → HTML を再生成 → コミット＆Artifact を更新します。
 4. 追加結果（何をどのジャンルで入れたか）をチャットで報告します。
+5. **GitHub Pages への反映**（Anything Memo）: `bash artifacts/_build/sync_to_nova.sh` を実行。
+   これで最新データが Nova 側（デフォルトブランチ `claude/friendly-allen-xZn87` の
+   `nova-app/public/anything-memo.html`）に反映され、push で Pages が再ビルドされる。
+   → https://masagenai.github.io/Test-MasaGen/ に自動で出る。
+
+## GitHub Pages（Project-Nova）への反映
+
+- Pages サイト `https://masagenai.github.io/Test-MasaGen/` は **Project-Nova（`nova-app`）** を配信している。
+- Anything Memo は `nova-app/public/anything-memo.html` に**埋め込みデータ（`const BASE`）**として同梱され、`deploy-pages.yml` がデフォルトブランチへの push で自動デプロイする。
+- 反映は **`bash artifacts/_build/sync_to_nova.sh`** の一発。`data.json` の最新内容で `const BASE` 行だけを差し替えるため、Nova 側の UI や `window.amtAgent` 連携は保持される。
 
 ## 対象トラッカー
 
