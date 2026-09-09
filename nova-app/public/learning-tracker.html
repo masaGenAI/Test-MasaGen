@@ -116,9 +116,10 @@ tr:hover .delrow{ opacity:1; } .delrow:hover{ color:#c0392b; }
 #rowtools{ position:fixed; display:none; gap:6px; z-index:55; background:#fff; border:1px solid #e3ebf5; border-radius:8px; box-shadow:0 2px 10px rgba(30,64,175,.18); padding:3px 7px; }
 #rowtools.show{ display:flex; }
 #rowtools span{ cursor:pointer; font-size:13px; line-height:20px; }
-.viz{ display:flex; gap:36px; align-items:flex-start; flex-wrap:nowrap; justify-content:center; overflow-x:auto; }
-.vhalf{ flex:0 1 auto; display:flex; align-items:flex-start; justify-content:center; gap:16px; padding:4px 8px; }
+.viz{ display:flex; gap:24px 36px; align-items:flex-start; flex-wrap:wrap; justify-content:center; }
+.vhalf{ flex:1 1 min(100%,380px); min-width:0; display:flex; align-items:flex-start; justify-content:center; gap:16px; padding:4px 8px; }
 .vsep{ border-left:1px solid #eef2f7; padding-left:36px; }
+@media(max-width:920px){ .vsep{ border-left:none; padding-left:8px; border-top:1px solid #eef2f7; padding-top:14px; } }
 .filterbtn{ cursor:pointer; margin-left:6px; color:#7f93b3; position:relative; z-index:3; display:inline-block; }
 .filterbtn:hover{ color:var(--accent); } .filterbtn.on{ color:var(--accent); }
 .filtermenu{ position:fixed; z-index:80; background:#fff; border:1px solid #d6e0ee; border-radius:8px; box-shadow:0 6px 20px rgba(30,64,175,.18); padding:8px; min-width:180px; max-height:320px; overflow:auto; }
@@ -549,7 +550,7 @@ function renderViz(k){
   var gmap={}; items.forEach(function(it){ var gg=vizGroup(k,it)||"未分類"; gmap[gg]=(gmap[gg]||0)+1; });
   var gentries=Object.keys(gmap).map(function(n){return [n,gmap[n]];}).sort(function(a,b){return b[1]-a[1];});
   var gsegs=[], glegend=""; gentries.forEach(function(e,idx){ var gc=PAL[idx%PAL.length]; gsegs.push({value:e[1],color:gc}); glegend+='<div class="s"><i style="background:'+gc+'"></i>'+esc(e[0])+' '+e[1]+'</div>'; });
-  var gcols=gentries.length>6?3:2; var genreHTML = gentries.length? '<div class="vhalf vsep"><div><div class="cap">ジャンル別の比率</div><div style="display:flex;align-items:flex-start;gap:16px">'+donut(gsegs,116,String(tot),"件")+'<div style="display:grid;grid-template-columns:repeat('+gcols+',max-content);gap:3px 18px">'+glegend+'</div></div></div></div>' : '';
+  var gcols=gentries.length>6?3:2; var genreHTML = gentries.length? '<div class="vhalf vsep"><div style="min-width:0"><div class="cap">ジャンル別の比率</div><div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;min-width:0">'+donut(gsegs,116,String(tot),"件")+'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:3px 18px;flex:1 1 220px;min-width:0">'+glegend+'</div></div></div></div>' : '';
   document.getElementById("viz").innerHTML=`<div class="viz"><div class="vhalf"><div><div class="cap">${LABEL[k]} の${VLABEL[k]}${filt}</div><div style="display:flex;align-items:flex-start;gap:16px">${donut(segs,116,pct+"%",DONEWORD[k]+"率")}<div><div class="hl">${dn}<span> / ${tot} ${DONEWORD[k]}</span></div><div class="statlist">${legend}</div></div></div></div></div>${genreHTML}</div>`;
 }
 const COLORDER={};
