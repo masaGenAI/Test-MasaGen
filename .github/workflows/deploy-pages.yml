@@ -69,3 +69,6 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          # Pages 側のステータス反映が遅い日があるため、既定10分→30分に延長
+          timeout: 1800000
