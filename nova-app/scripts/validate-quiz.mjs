@@ -227,22 +227,22 @@ for (const st of STATIONS) {
 // 新しく増やすことは即失敗、既存の借金は修正のたびに数字を下げていく。0 になったら行ごと消す。
 {
   const LENGTH_DEBT = {
-    BANK: 2175,
+    BANK: 1155,
     MCQS: 716,
     AI300_HARD: 233,
-    AI103_HARD: 218,
     SET1: 210,
     AI200_HARD: 189,
-    GH900_HARD: 181,
     AB100_HARD: 112,
     AB410_HARD: 89,
     GOVDOJO_BANK: 80,
+    AI103_HARD: 48,
     CHECK_CORE_GEN2: 40,
     CHECK_AX_GEN2: 40,
     DP900_HARD: 36,
     CHECK_CORE_GEN3: 25,
     CHECK_AX_GEN3: 24,
     SET5: 19,
+    GH900_HARD: 11,
     SA_QUIZ: 6,
     AB100_TF: 6,
     CHECK_CORE_GEN: 5,
@@ -314,11 +314,14 @@ for (const st of STATIONS) {
     .map((ch) => [ch, scan.split(ch).length - 1])
     .filter(([, n]) => n > 0)
     .map(([ch, n]) => `${ch} x${n}`);
+  // キリル文字は cp932 にも収録されているため符号化判定では落ちない。別途見る。
+  const cyr = [...text.matchAll(/[\u0400-\u04ff]+/g)].map((m) => m[0]);
+  if (cyr.length) hits.push(...[...new Set(cyr)].slice(0, 6).map((w) => `Cyrillic "${w}"`));
   if (hits.length) {
-    log(`  ✗ simplified-Chinese characters in Japanese text: ${hits.join(', ')}`);
+    log(`  ✗ non-Japanese characters in Japanese text: ${hits.join(', ')}`);
     hardFail++;
   } else {
-    log('  ✓ no simplified-Chinese leakage (Chinese agency names allowlisted)');
+    log('  ✓ no simplified-Chinese or Cyrillic leakage (Chinese agency names allowlisted)');
   }
 }
   const budget = Object.values(LENGTH_DEBT).reduce((a, b) => a + b, 0);
