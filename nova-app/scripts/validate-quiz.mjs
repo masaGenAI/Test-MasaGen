@@ -228,16 +228,14 @@ for (const st of STATIONS) {
 {
   const LENGTH_DEBT = {
     MCQS: 716,
-    BANK: 545,
-    SET1: 150,
-    AI300_HARD: 63,
+    BANK: 445,
+    SET1: 77,
     AI103_HARD: 48,
     CHECK_CORE_GEN2: 40,
     CHECK_AX_GEN2: 40,
     CHECK_CORE_GEN3: 25,
     CHECK_AX_GEN3: 24,
     SA_QUIZ: 6,
-    AB100_TF: 6,
     CHECK_CORE_GEN: 5,
     GH600_TF: 5,
     AB410_TF: 5,
@@ -308,6 +306,36 @@ for (const st of STATIONS) {
     log('  ✓ no simplified-Chinese or Cyrillic leakage (Chinese agency names allowlisted)');
   }
 }
+  // ---- 長さの偏り（逆向き）----
+  // 「正解が最長」を潰した結果、今度は「最長は正解ではない」が成り立つと、
+  // 最長を消すだけで4択が3択になる。長さが手がかりにならない状態＝正解が
+  // 最長になる割合が 1/選択肢数 に近いこと、を目標として偏りを可視化する。
+  {
+    const skew = [];
+    const seenDecl = {};
+    for (const [name, at] of decls) {
+      let v; try { v = extract(name, at); } catch (e) { continue; }
+      if (!Array.isArray(v) || v.length < 20) continue;
+      const r0 = v[0]; if (!r0 || typeof r0 !== 'object') continue;
+      const ok = OPT_KEYS.find((k) => Array.isArray(r0[k]));
+      const ak = ANS_KEYS.find((k) => typeof r0[k] === 'number');
+      if (!ok || ak === undefined) continue;
+      const d = (seenDecl[name] = (seenDecl[name] || 0)); seenDecl[name]++;
+      let n = 0, longest = 0, expected = 0;
+      for (const row of v) {
+        const opts = row[ok], a = row[ak];
+        if (!Array.isArray(opts) || typeof a !== 'number') continue;
+        const t = opts.map(optText); if (!t[a]) continue;
+        n++; expected += 1 / t.length;
+        if (len(t[a]) === Math.max(...t.map(len))) longest++;
+      }
+      if (n >= 20) skew.push({ bank: `${name}#${d}`, n, rate: longest / n, want: expected / n });
+    }
+    const lopsided = skew.filter((x) => x.rate < x.want / 3 || x.rate > x.want * 2.2);
+    const items = lopsided.reduce((a, b) => a + b.n, 0);
+    log(`  i length-skew: ${lopsided.length} of ${skew.length} banks lopsided (${items} items) — ` +
+        `answer-is-longest should sit near 1/n; dropping the longest option must not be a free elimination`);
+  }
   const budget = Object.values(LENGTH_DEBT).reduce((a, b) => a + b, 0);
   log(`${fails ? '✗' : '✓'} length-giveaway across ${banks} banks / ${scanned} items — outstanding ${debtNow} (budget ${budget})` + (fails ? ` — ${fails} bank(s) over budget` : ''));
 }
