@@ -228,12 +228,11 @@ for (const st of STATIONS) {
 {
   const LENGTH_DEBT = {
     MCQS: 1119,
-    BANK: 675,
+    BANK: 377,
     SET1: 76,
     EXTRA: 70,
     CHECK_CORE_GEN2: 47,
     CHECK_AX_GEN2: 46,
-    CHECK_CORE_GEN3: 30,
     CHECK_AX_GEN3: 30,
     SET2: 26,
     PL900_HARD: 26,
