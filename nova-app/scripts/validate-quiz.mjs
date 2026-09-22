@@ -218,6 +218,92 @@ for (const st of STATIONS) {
   log(`${fails ? '✗' : '✓'} buildQuestions (Linguistics hub): ${n} items` + (fails ? ` — ${fails} error(s)` : ''));
 }
 
+// ---- 長さギブアウェイ検査（全バンク横断・キーの書き方を問わない） ----------
+// 既存の opts/a 検査は正規表現 `\bopts:` に依存しており、引用符つきキー（"opts" / "o" /
+// "choices"）で一括追加された問題を一度も見ていなかった。ここでは定数を評価して中身から
+// 判定するので、書き方に関係なく全問が対象になる。
+//
+// 既知の未修正件数を LENGTH_DEBT に置き、超えたら失敗させる（ラチェット）。
+// 新しく増やすことは即失敗、既存の借金は修正のたびに数字を下げていく。0 になったら行ごと消す。
+{
+  const LENGTH_DEBT = {
+    BANK: 3025,
+    MCQS: 716,
+    AB100_HARD: 452,
+    GOVDOJO_BANK: 420,
+    AB410_HARD: 259,
+    AI300_HARD: 233,
+    AI103_HARD: 218,
+    SET1: 210,
+    AI200_HARD: 189,
+    GH900_HARD: 181,
+    CHECK_CORE_GEN2: 40,
+    CHECK_AX_GEN2: 40,
+    DP900_HARD: 36,
+    CHECK_CORE_GEN3: 25,
+    CHECK_AX_GEN3: 24,
+    SET5: 19,
+    SA_QUIZ: 6,
+    AB100_TF: 6,
+    CHECK_CORE_GEN: 5,
+    GH600_TF: 5,
+    AB410_TF: 5,
+    AI300_TF: 5,
+    CHECK_AX_GEN: 4,
+    AB620_TF: 4,
+    AB100_EXHIBIT: 4,
+    AI200_EXHIBIT: 4,
+    PL900_EXHIBIT: 3,
+    GH600_EXHIBIT: 3,
+    GH900_EXHIBIT: 3,
+    GH300_EXHIBIT: 3,
+    AB410_EXHIBIT: 2,
+    AI300_EXHIBIT: 2,
+    AB620_EXHIBIT: 1,
+  };
+  const OPT_KEYS = ['opts', 'choices', 'o', 'options'];
+  const ANS_KEYS = ['a', 'ans', 'answer', 'correct'];
+  const optText = (o) => (typeof o === 'string' ? o : (o && (o.ja || o.text || o.t || o.label)) || '');
+  // 同じ名前の定数が各ハブモジュールに1つずつあるため、最初の宣言だけでなく全宣言を見る
+  const decls = [...text.matchAll(/(?:const|var|let)\s+([A-Z][A-Z0-9_]{2,})\s*=\s*\[/g)].map((m) => [m[1], m.index]);
+  let fails = 0, debtNow = 0, scanned = 0, banks = 0;
+  const debtSeen = {};
+  for (const [name, at] of decls) {
+    let v;
+    try { v = extract(name, at); } catch (e) { continue; }
+    if (!Array.isArray(v) || v.length < 5) continue;
+    const r0 = v[0];
+    if (!r0 || typeof r0 !== 'object') continue;
+    const ok = OPT_KEYS.find((k) => Array.isArray(r0[k]));
+    const ak = ANS_KEYS.find((k) => typeof r0[k] === 'number');
+    if (!ok || ak === undefined) continue;
+    banks++;
+    let bad = 0;
+    for (const row of v) {
+      const opts = row[ok], a = row[ak];
+      if (!Array.isArray(opts) || typeof a !== 'number') continue;
+      const t = opts.map(optText);
+      if (!t[a]) continue;
+      scanned++;
+      const cl = len(t[a]);
+      if (t.filter((_, i) => i !== a).every((x) => len(x) < cl)) bad++;
+    }
+    debtNow += bad;
+    debtSeen[name] = (debtSeen[name] || 0) + bad;
+  }
+  for (const [name, bad] of Object.entries(debtSeen)) {
+    const allowed = LENGTH_DEBT[name] || 0;
+    if (bad > allowed) {
+      log(`  ✗ length-giveaway: ${name} has ${bad} item(s) where every distractor is shorter than the correct answer (allowed ${allowed})`);
+      fails++;
+    }
+  }
+  hardFail += fails;
+  totalItems += 0;
+  const budget = Object.values(LENGTH_DEBT).reduce((a, b) => a + b, 0);
+  log(`${fails ? '✗' : '✓'} length-giveaway across ${banks} banks / ${scanned} items — outstanding ${debtNow} (budget ${budget})` + (fails ? ` — ${fails} bank(s) over budget` : ''));
+}
+
 // ---- 実測データの出所検査 -------------------------------------------------
 // FT_STAT は FT_ARCH（実在109件の生データ）から前計算した定数。生データを編集すると
 // 静かにずれるため、毎ビルドで再計算して突き合わせる。あわせて、問題文に直接書いた
