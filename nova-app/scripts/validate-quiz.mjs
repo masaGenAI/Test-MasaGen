@@ -227,16 +227,16 @@ for (const st of STATIONS) {
 // 新しく増やすことは即失敗、既存の借金は修正のたびに数字を下げていく。0 になったら行ごと消す。
 {
   const LENGTH_DEBT = {
-    BANK: 3025,
+    BANK: 2175,
     MCQS: 716,
-    AB100_HARD: 452,
-    GOVDOJO_BANK: 420,
-    AB410_HARD: 259,
     AI300_HARD: 233,
     AI103_HARD: 218,
     SET1: 210,
     AI200_HARD: 189,
     GH900_HARD: 181,
+    AB100_HARD: 112,
+    AB410_HARD: 89,
+    GOVDOJO_BANK: 80,
     CHECK_CORE_GEN2: 40,
     CHECK_AX_GEN2: 40,
     DP900_HARD: 36,
@@ -300,6 +300,27 @@ for (const st of STATIONS) {
   }
   hardFail += fails;
   totalItems += 0;
+
+// ---- 簡体字の混入チェック ----
+// 日本語のつもりで簡体字が混ざると、読めはするが誤字として残る。
+// 新字体（国・数・体など）を誤検出しないよう、簡体字にしか現れない字だけを見る。
+// 中国当局・機関の正式名称は原語のまま引用するのが正しいので除外する。
+{
+  const CHINESE_NAMES = ['网信办', '互联网络', '互联网', '办公室', '算法备案', '赛迪院'];
+  const SIMPLIFIED = [...'办类联备络赛长业误统这为对说样么个开无爱经济纪东车马鸟龙风飞书图华际'];
+  let scan = text;
+  for (const name of CHINESE_NAMES) scan = scan.split(name).join('');
+  const hits = SIMPLIFIED
+    .map((ch) => [ch, scan.split(ch).length - 1])
+    .filter(([, n]) => n > 0)
+    .map(([ch, n]) => `${ch} x${n}`);
+  if (hits.length) {
+    log(`  ✗ simplified-Chinese characters in Japanese text: ${hits.join(', ')}`);
+    hardFail++;
+  } else {
+    log('  ✓ no simplified-Chinese leakage (Chinese agency names allowlisted)');
+  }
+}
   const budget = Object.values(LENGTH_DEBT).reduce((a, b) => a + b, 0);
   log(`${fails ? '✗' : '✓'} length-giveaway across ${banks} banks / ${scanned} items — outstanding ${debtNow} (budget ${budget})` + (fails ? ` — ${fails} bank(s) over budget` : ''));
 }
