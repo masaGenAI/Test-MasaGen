@@ -227,22 +227,15 @@ for (const st of STATIONS) {
 // 新しく増やすことは即失敗、既存の借金は修正のたびに数字を下げていく。0 になったら行ごと消す。
 {
   const LENGTH_DEBT = {
-    BANK: 1155,
     MCQS: 716,
-    AI300_HARD: 233,
-    SET1: 210,
-    AI200_HARD: 189,
-    AB100_HARD: 112,
-    AB410_HARD: 89,
-    GOVDOJO_BANK: 80,
+    BANK: 545,
+    SET1: 150,
+    AI300_HARD: 63,
     AI103_HARD: 48,
     CHECK_CORE_GEN2: 40,
     CHECK_AX_GEN2: 40,
-    DP900_HARD: 36,
     CHECK_CORE_GEN3: 25,
     CHECK_AX_GEN3: 24,
-    SET5: 19,
-    GH900_HARD: 11,
     SA_QUIZ: 6,
     AB100_TF: 6,
     CHECK_CORE_GEN: 5,
@@ -251,15 +244,6 @@ for (const st of STATIONS) {
     AI300_TF: 5,
     CHECK_AX_GEN: 4,
     AB620_TF: 4,
-    AB100_EXHIBIT: 4,
-    AI200_EXHIBIT: 4,
-    PL900_EXHIBIT: 3,
-    GH600_EXHIBIT: 3,
-    GH900_EXHIBIT: 3,
-    GH300_EXHIBIT: 3,
-    AB410_EXHIBIT: 2,
-    AI300_EXHIBIT: 2,
-    AB620_EXHIBIT: 1,
   };
   const OPT_KEYS = ['opts', 'choices', 'o', 'options'];
   const ANS_KEYS = ['a', 'ans', 'answer', 'correct'];
