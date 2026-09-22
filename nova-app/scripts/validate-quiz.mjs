@@ -218,6 +218,69 @@ for (const st of STATIONS) {
   log(`${fails ? '✗' : '✓'} buildQuestions (Linguistics hub): ${n} items` + (fails ? ` — ${fails} error(s)` : ''));
 }
 
+// ---- 実測データの出所検査 -------------------------------------------------
+// FT_STAT は FT_ARCH（実在109件の生データ）から前計算した定数。生データを編集すると
+// 静かにずれるため、毎ビルドで再計算して突き合わせる。あわせて、問題文に直接書いた
+// 数字（補間でなくリテラル）も生データと一致しているか確認する。
+{
+  let fails = 0;
+  try {
+    const ARCH = extract('FT_ARCH');
+    const STAT = extract('FT_STAT');
+    const META = extract('FT_META');
+    const eq = (what, declared, recomputed) => {
+      if (JSON.stringify(declared) !== JSON.stringify(recomputed)) {
+        log(`  ✗ provenance: ${what} — the constant says ${JSON.stringify(declared)}, recomputing from FT_ARCH gives ${JSON.stringify(recomputed)}`);
+        fails++;
+      }
+    };
+    eq('FT_META.nArch', META.nArch, ARCH.length);
+
+    const cloud = {};
+    ARCH.forEach((c) => (c.cl || []).forEach((k) => { cloud[k] = (cloud[k] || 0) + 1; }));
+    ['AWS', 'Google Cloud', 'Azure'].forEach((k) => eq(`cloud presence ${k}`, STAT.cloud[k] || 0, cloud[k] || 0));
+
+    const combo = {};
+    ARCH.forEach((c) => { const k = (c.cl && c.cl.length) ? c.cl.slice().sort().join(' + ') : '特定不可'; combo[k] = (combo[k] || 0) + 1; });
+    (STAT.combo || []).forEach(([k, n]) => eq(`combination "${k}"`, n, combo[k] || 0));
+
+    Object.keys(STAT.byCat || {}).forEach((cat) => {
+      const rows = ARCH.filter((c) => c.c === cat);
+      eq(`category ${cat} count`, STAT.byCat[cat].n, rows.length);
+      Object.keys(STAT.byCat[cat].c || {}).forEach((k) => {
+        eq(`category ${cat} / ${k}`, STAT.byCat[cat].c[k], rows.filter((c) => (c.cl || []).indexOf(k) >= 0).length);
+      });
+    });
+
+    (STAT.layers || []).forEach((l) => {
+      eq(`layer ${l.k} case count`, l.n, ARCH.filter((c) => c.L.some(([k]) => k === l.k)).length);
+    });
+
+    eq('flow-described count', STAT.flowN, ARCH.filter((c) => c.fi === 1).length);
+    eq('distinct orgs', STAT.orgN, new Set(ARCH.map((c) => c.o)).size);
+
+    // 問題文・本文に直接書いた数字。補間でないので、生データが動くとここだけ取り残される。
+    const claims = [
+      ['AWSの登場が75件', () => cloud['AWS']],
+      ['Google Cloudが60件', () => cloud['Google Cloud']],
+      ['Azureが8件', () => cloud['Azure']],
+    ];
+    claims.forEach(([phrase, calc]) => {
+      if (text.indexOf(phrase) < 0) return;                       // 文言を変えたなら検査対象外
+      const want = Number(String(phrase).match(/(\d+)件/)[1]);
+      if (want !== calc()) {
+        log(`  ✗ provenance: 本文に「${phrase}」とあるが、FT_ARCH から数え直すと ${calc()}`);
+        fails++;
+      }
+    });
+  } catch (e) {
+    log(`  ✗ provenance: could not verify (${String(e.message).slice(0, 90)})`);
+    fails++;
+  }
+  hardFail += fails;
+  log(`${fails ? '✗' : '✓'} provenance (measured architecture data)` + (fails ? ` — ${fails} mismatch(es)` : ''));
+}
+
 log(`\nTotal items checked: ${totalItems}`);
 log(`Hard errors: ${hardFail}`);
 log(`Warnings: ${warn}`);
