@@ -227,20 +227,61 @@ for (const st of STATIONS) {
 // 新しく増やすことは即失敗、既存の借金は修正のたびに数字を下げていく。0 になったら行ごと消す。
 {
   const LENGTH_DEBT = {
-    MCQS: 716,
-    BANK: 130,
-    SET1: 77,
-    CHECK_CORE_GEN2: 40,
-    CHECK_AX_GEN2: 40,
-    CHECK_CORE_GEN3: 25,
-    CHECK_AX_GEN3: 24,
+    MCQS: 1119,
+    BANK: 675,
+    SET1: 121,
+    EXTRA: 70,
+    CHECK_CORE_GEN2: 47,
+    CHECK_AX_GEN2: 46,
+    CHECK_CORE_GEN3: 30,
+    CHECK_AX_GEN3: 30,
+    SET2: 26,
+    PL900_HARD: 26,
+    ACAD_QUIZ: 21,
+    GOVDOJO_BANK: 19,
+    SET5: 19,
+    AB410_HARD: 18,
+    BANK_D2: 17,
+    GH600_HARD: 17,
+    AI300_HARD: 17,
+    BANK_EXTRA3: 16,
+    AI200_HARD: 15,
+    GH300_HARD: 15,
+    AB100_HARD: 14,
+    SET4: 11,
+    BANK_D1: 11,
+    SET3: 10,
+    EXAM_SET4: 10,
+    GH900_HARD: 10,
+    BANK_D4: 9,
+    AI103_HARD: 9,
+    CHECK_CORE_GEN: 7,
+    BANK_EXTRA2: 7,
     SA_QUIZ: 6,
-    CHECK_CORE_GEN: 5,
+    BANK_D3: 6,
+    EXAM_SET2: 6,
+    BANK_EXTRA: 6,
+    CHECK_AX_GEN: 5,
+    MOCK1: 5,
+    MOCK4: 5,
+    MOCK5: 5,
+    SCEN_BANK: 5,
     GH600_TF: 5,
     AB410_TF: 5,
     AI300_TF: 5,
-    CHECK_AX_GEN: 4,
+    MOCK3: 4,
     AB620_TF: 4,
+    CHECK_AX_GEN4: 3,
+    EXAM_SET1: 3,
+    EXAM_SET5: 3,
+    AB620_HARD: 3,
+    EXAM_SET3: 2,
+    DP900_HARD: 2,
+    ISO42001F_HARD: 2,
+    MOCK2: 1,
+    PL900_EXHIBIT: 1,
+    AI200_EXHIBIT: 1,
+    GH900_EXHIBIT: 1,
   };
   const OPT_KEYS = ['opts', 'choices', 'o', 'options'];
   const ANS_KEYS = ['a', 'ans', 'answer', 'correct'];
@@ -266,8 +307,11 @@ for (const st of STATIONS) {
       const t = opts.map(optText);
       if (!t[a]) continue;
       scanned++;
-      const cl = len(t[a]);
-      if (t.filter((_, i) => i !== a).every((x) => len(x) < cl)) bad++;
+      // 「全錯乱肢が厳密に短い」ではなく、悪用そのものを判定する。
+      // 正解と同じ長さの錯乱肢があっても、正解が先頭側にあれば
+      // 「最長を選ぶ（同点は上から）」はやはり正解を引き当ててしまう。
+      const L = t.map(len), mx = Math.max(...L);
+      if (L[a] === mx && L.indexOf(mx) === a) bad++;
     }
     debtNow += bad;
     debtSeen[name] = (debtSeen[name] || 0) + bad;
@@ -275,7 +319,7 @@ for (const st of STATIONS) {
   for (const [name, bad] of Object.entries(debtSeen)) {
     const allowed = LENGTH_DEBT[name] || 0;
     if (bad > allowed) {
-      log(`  ✗ length-giveaway: ${name} has ${bad} item(s) where every distractor is shorter than the correct answer (allowed ${allowed})`);
+      log(`  ✗ length-giveaway: ${name} has ${bad} item(s) where picking the longest option lands on the answer (allowed ${allowed})`);
       fails++;
     }
   }
