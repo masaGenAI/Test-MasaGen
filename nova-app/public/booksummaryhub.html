@@ -1965,44 +1965,73 @@ const NAVY = "0B1F3F";
 const SKY  = "9BC8EE";
 
 /* ============================================================
-   SOURCES — 出典（書架の最上位）
-   既存の971冊はすべて flier 由来。書籍側に src が無ければ flier とみなす。
-   YouTube はチャンネルを channels に足すと、出典一覧に枝として並ぶ。
+   SOURCES — 出典のツリー（書架の上位階層）
+   子を持つノードは「開くと子が並ぶ」、持たないノードは「開くとジャンル10書架」。
+   深さの制限はないので、YouTube の下はチャンネル→シリーズ→…と好きなだけ掘れる。
+
+   書籍はどこに属するかを srcPath で示す:
+     flier の本 : src 省略（= ['flier']）
+     Kindle の本: { src:'kindle' }
+     YouTube の本: { srcPath:['yt','ch_xxx','pl_yyy'] }
+   書架はそのノード以下をすべて含むので、チャンネルを開けば配下のシリーズも入る。
 ============================================================ */
 const SOURCES = [
   { id:'flier',  title:'flier',   sub:'ビジネス書の要約サービス', icon:'book' },
   { id:'kindle', title:'Kindle',  sub:'自分で読んだ本の要約',     icon:'book' },
-  { id:'yt',     title:'YouTube', sub:'チャンネル別の学びの記録', icon:'folder', channels:[
-      /* 例: { id:'ch_xxx', title:'チャンネル名', sub:'扱うテーマ' } */
+  { id:'yt',     title:'YouTube', sub:'チャンネル別の学びの記録', icon:'folder', children:[
+      /* チャンネルをここに足す。さらに下の階層が要るなら children を入れ子にする:
+      { id:'ch_xxx', title:'チャンネル名', sub:'扱うテーマ', children:[
+          { id:'pl_yyy', title:'シリーズ名', sub:'このシリーズの主題' },
+      ] },
+      */
   ] },
 ];
 
-/* 現在どの書架を見ているか。ch は YouTube のチャンネルを絞るときだけ入る。 */
-let CURRENT_SRC = { src:'flier', ch:null };
+/* 今どのノードの書架を見ているか。ルートからのパス。 */
+let CURRENT_PATH = ['flier'];
 
-function bookSrc(b){ return b.src || 'flier'; }
-function matchSrc(b){
-  if(bookSrc(b) !== CURRENT_SRC.src) return false;
-  if(CURRENT_SRC.ch) return b.ch === CURRENT_SRC.ch;
+/* 書籍が属するパス。旧い書き方（src / ch）もそのまま読めるようにしておく。 */
+function bookPath(b){
+  if(Array.isArray(b.srcPath) && b.srcPath.length) return b.srcPath;
+  const p = [b.src || 'flier'];
+  if(b.ch) p.push(b.ch);
+  return p;
+}
+/* path が書籍のパスの先頭と一致すれば、その書架に含まれる。 */
+function underPath(b, path){
+  const bp = bookPath(b);
+  if(bp.length < path.length) return false;
+  for(let i = 0; i < path.length; i++) if(bp[i] !== path[i]) return false;
   return true;
 }
+function matchSrc(b){ return underPath(b, CURRENT_PATH); }
 /* 現在の書架に属する書籍だけを返す。既存コードの node.books の代わりに使う。 */
 function srcBooks(node){ return (node.books || []).filter(matchSrc); }
 
-function findSource(id){ return SOURCES.find(x => x.id === id) || null; }
-function findChannel(srcId, chId){
-  const src = findSource(srcId);
-  return src && (src.channels || []).find(c => c.id === chId) || null;
+/* パスをたどってツリーのノードを取り出す。途中で外れたら null。 */
+function srcNodeAt(path){
+  let list = SOURCES, node = null;
+  for(const id of path){
+    node = (list || []).find(x => x.id === id);
+    if(!node) return null;
+    list = node.children;
+  }
+  return node;
 }
-/* 出典（＋チャンネル）単位の冊数。書架の選択状態に依存しないよう引数で受ける。 */
-function countBySource(srcId, chId){
+/* パス上の各ノード（パンくず用）。 */
+function srcTrail(path){
+  const out = [];
+  for(let i = 1; i <= path.length; i++){
+    const n = srcNodeAt(path.slice(0, i));
+    if(n) out.push({ node:n, path:path.slice(0, i) });
+  }
+  return out;
+}
+/* そのパス以下にある冊数。書架の選択状態に依存しないよう引数で受ける。 */
+function countByPath(path){
   let n = 0;
   const walk = (node) => {
-    (node.books || []).forEach(b => {
-      if(bookSrc(b) !== srcId) return;
-      if(chId && b.ch !== chId) return;
-      n++;
-    });
+    (node.books || []).forEach(b => { if(underPath(b, path)) n++; });
     (node.children || []).forEach(walk);
   };
   DATA.forEach(walk);
@@ -2046,7 +2075,8 @@ function resolveRoute(hash){
   const parts = h.split('/').filter(Boolean);
   if(!parts.length){ showView('view-root'); return; }
   const key = parts[0];
-  if(key === 'src'){ if(findSource(parts[1])) openShelf(parts[1], parts[2] || null); else showView('view-root'); return; }
+  if(key === 'src'){ const p = parts.slice(1); if(p.length && srcNodeAt(p)) openSourceNode(p); else showView('view-root'); return; }
+  if(key === 'shelf'){ const p = parts.slice(1); if(p.length && srcNodeAt(p)) openShelf(p); else showView('view-root'); return; }
   if(key === 'cat'){ const cat = DATA.find(c => c.id === parts[1]); if(cat){ openCategory(cat, catColor(DATA.indexOf(cat))); } else showView('view-root'); return; }
   if(key === 'sub'){ const cat = DATA.find(c => c.id === parts[1]); const sub = cat && (cat.children || []).find(s => s.id === parts[2]); if(cat && sub){ openSubcategory(cat, sub, catColor(DATA.indexOf(cat))); } else showView('view-root'); return; }
   if(key === 'book'){ if(BOOK_INDEX[parts[1]]) openBookById(parts[1]); else showView('view-root'); return; }
@@ -2523,67 +2553,118 @@ function sortRows(container, mode){
   rows.forEach(r => container.appendChild(r));
 }
 
-/* ルート画面は出典の一覧。書架（ジャンル10件）はこの下の階層になる。 */
+/* ルート画面は出典ツリーの最上段。ここから下へ掘っていく。 */
 function renderRoot(){
   const list = document.getElementById('rootList');
   list.innerHTML = '';
-  const rows = [];
-  SOURCES.forEach((src, i) => {
-    rows.push({ src, ch:null, depth:0, i });
-    (src.channels || []).forEach(ch => rows.push({ src, ch, depth:1, i }));
-  });
-  rows.forEach(({ src, ch, depth, i }) => {
-    const t = SOURCES.length > 1 ? i / (SOURCES.length - 1) : 0;
+  srcRows(list, SOURCES, []);
+  const total = SOURCES.reduce((a, src) => a + countByPath([src.id]), 0);
+  document.getElementById('footerCount').textContent = `${SOURCES.length} SOURCES / ${total} BOOKS`;
+}
+
+/* 出典ノードを行として並べる。子があればその一覧へ、なければ書架へ進む。 */
+function srcRows(list, nodes, parentPath){
+  (nodes || []).forEach((node, i) => {
+    const t = nodes.length > 1 ? i / (nodes.length - 1) : 0;
     const color = lerpColor(NAVY, SKY, t);
-    const n = countBySource(src.id, ch ? ch.id : null);
-    const title = ch ? ch.title : src.title;
-    const sub = ch ? (ch.sub || '') : src.sub;
+    const path = parentPath.concat(node.id);
+    const n = countByPath(path);
+    const kids = (node.children || []).length;
     const row = document.createElement('button');
     row.className = 'index-row';
-    if(depth) row.style.paddingLeft = '34px';
     row.innerHTML = `
       <span class="row-check-spacer"></span>
       <div class="spine" style="background:${color}"></div>
-      <div class="icon-wrap" style="color:${color}"><svg viewBox="0 0 24 24">${ICONS[ch ? 'book' : src.icon] || ICONS.folder}</svg></div>
+      <div class="icon-wrap" style="color:${color}"><svg viewBox="0 0 24 24">${ICONS[node.icon] || ICONS.folder}</svg></div>
       <div class="row-text">
-        <p class="row-title">${title}</p>
-        <p class="row-sub">${sub}</p>
+        <p class="row-title">${node.title}</p>
+        <p class="row-sub">${node.sub || ''}${kids ? ` ・ ${kids}件` : ''}</p>
       </div>
       <span class="row-meta ${n>0?'filled':''}">${n>0 ? n+' 冊収録' : 'これから'}</span>
       <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
     `;
-    row.addEventListener('click', () => openShelf(src.id, ch ? ch.id : null));
+    row.addEventListener('click', () => openSourceNode(path));
     list.appendChild(row);
   });
-  const total = SOURCES.reduce((a, src) => a + countBySource(src.id, null), 0);
-  document.getElementById('footerCount').textContent = `${SOURCES.length} SOURCES / ${total} BOOKS`;
 }
 
-/* 選んだ出典の書架（ジャンル10件）。旧ルート画面の中身がここに移った。 */
-function openShelf(srcId, chId){
-  const src = findSource(srcId);
-  if(!src){ showView('view-root'); return; }
-  const ch = chId ? findChannel(srcId, chId) : null;
-  CURRENT_SRC = { src: srcId, ch: chId || null };
-  const viewId = `view-shelf-${srcId}${chId ? '-' + chId : ''}`;
+/* 出典ノードを開く。子があれば子の一覧、なければジャンル10書架。 */
+function openSourceNode(path){
+  const node = srcNodeAt(path);
+  if(!node){ showView('view-root'); return; }
+  CURRENT_PATH = path.slice();
+  const kids = node.children || [];
+  const viewId = 'view-src-' + path.join('-');
   const el = ensureView(viewId);
-  const total = countBySource(srcId, chId);
+  const total = countByPath(path);
+  const trail = srcTrail(path).map(x => x.node.title).join(' › ');
+  const backLabel = path.length > 1 ? srcNodeAt(path.slice(0, -1)).title : 'SOURCES';
+  const emptyNote = kids.length
+    ? 'まだ枝がありません。SOURCES の children に足すと、ここに並びます。'
+    : 'まだ1冊も入っていません。要約を追加すると、下の書架に振り分けられます。';
   el.innerHTML = `
     <button class="back-btn" onclick="goBack()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
-      SOURCES
+      ${backLabel}
     </button>
-    <h2>${ch ? ch.title : src.title}</h2>
-    <p class="detail-sub">${ch ? (ch.sub || '') : src.sub} ・ ${total} 冊収録</p>
+    <h2>${node.title}</h2>
+    <p class="detail-sub">${trail}${node.sub ? ' ・ ' + node.sub : ''} ・ ${total} 冊収録</p>
+    ${total === 0 && !kids.length ? `<div class="empty-state" style="margin:18px 0 6px">${emptyNote}</div>` : ''}
+    <div class="index-header-eyebrow"><span>${kids.length ? 'CHANNELS' : 'INDEX'}</span></div>
+    <div class="index-list" id="list-${viewId}"></div>
+    ${kids.length ? `<div class="section-label" style="margin-top:18px">この配下をまとめて見る</div><div class="index-list" id="all-${viewId}"></div>` : ''}
+    ${backBtnBottomHTML(backLabel)}
+  `;
+  const list = document.getElementById(`list-${viewId}`);
+  if(kids.length){
+    srcRows(list, kids, path);
+    /* 子を持つノードでも、配下すべてを1つの書架として読めるようにしておく。 */
+    const allList = document.getElementById(`all-${viewId}`);
+    const row = document.createElement('button');
+    row.className = 'index-row';
+    row.innerHTML = `
+      <span class="row-check-spacer"></span>
+      <div class="spine" style="background:${lerpColor(NAVY, SKY, 0.5)}"></div>
+      <div class="icon-wrap" style="color:${lerpColor(NAVY, SKY, 0.5)}"><svg viewBox="0 0 24 24">${ICONS.folder}</svg></div>
+      <div class="row-text">
+        <p class="row-title">${node.title} 全体</p>
+        <p class="row-sub">配下すべてをジャンル別に読む</p>
+      </div>
+      <span class="row-meta ${total>0?'filled':''}">${total>0 ? total+' 冊収録' : 'これから'}</span>
+      <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+    `;
+    row.addEventListener('click', () => openShelf(path));
+    allList.appendChild(row);
+  } else {
+    renderShelfRows(list);
+  }
+  showView(viewId);
+  pushRoute(viewId, 'src/' + path.join('/'));
+}
+
+/* 子を持つノードの「全体」書架。パスはそのままに、ジャンル10件を出す。 */
+function openShelf(path){
+  const node = srcNodeAt(path);
+  if(!node){ showView('view-root'); return; }
+  CURRENT_PATH = path.slice();
+  const viewId = 'view-shelf-' + path.join('-');
+  const el = ensureView(viewId);
+  const total = countByPath(path);
+  el.innerHTML = `
+    <button class="back-btn" onclick="goBack()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+      ${node.title}
+    </button>
+    <h2>${node.title} 全体</h2>
+    <p class="detail-sub">${srcTrail(path).map(x => x.node.title).join(' › ')} の配下すべて ・ ${total} 冊収録</p>
     ${total === 0 ? `<div class="empty-state" style="margin:18px 0 6px">まだ1冊も入っていません。要約を追加すると、下の書架に振り分けられます。</div>` : ''}
     <div class="index-header-eyebrow"><span>INDEX</span></div>
     <div class="index-list" id="list-${viewId}"></div>
-    ${backBtnBottomHTML('SOURCES')}
+    ${backBtnBottomHTML(node.title)}
   `;
-  const list = document.getElementById(`list-${viewId}`);
-  renderShelfRows(list);
+  renderShelfRows(document.getElementById(`list-${viewId}`));
   showView(viewId);
-  pushRoute(viewId, 'src/' + srcId + (chId ? '/' + chId : ''));
+  pushRoute(viewId, 'shelf/' + path.join('/'));
 }
 
 /* ジャンル10件の行。現在の書架で絞った冊数を出す。 */
