@@ -726,7 +726,7 @@
   <div class="view active" id="view-root">
     <p class="eyebrow">Reading Intelligence Hub</p>
     <h1>Book Summary 統合戦略ハブ</h1>
-    <p class="subtitle">10の知の書架。ビジネス・技術・人文の重要書籍を、要点と実務への応用に落とし込んで蓄積していく統合ダッシュボードです。</p>
+    <p class="subtitle">出典ごとの書架。flier の要約に加え、Kindle で読んだ本や YouTube チャンネルの学びを、同じ10ジャンルの棚に振り分けて蓄積していく統合ダッシュボードです。</p>
 
     <div class="search-wrap">
       <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -737,11 +737,11 @@
 
     <div class="dash-panel" id="dashPanel"></div>
 
-    <div class="index-header-eyebrow"><span>INDEX</span></div>
+    <div class="index-header-eyebrow"><span>SOURCES</span></div>
     <div class="index-list" id="rootList"></div>
 
     <div class="footer-note">
-      <span id="footerCount">10 SECTIONS</span>
+      <span id="footerCount">3 SOURCES</span>
       <span>v0.2 — IN PROGRESS</span>
     </div>
   </div>
@@ -1964,8 +1964,53 @@ function lerpColor(a, b, t){
 const NAVY = "0B1F3F";
 const SKY  = "9BC8EE";
 
+/* ============================================================
+   SOURCES — 出典（書架の最上位）
+   既存の971冊はすべて flier 由来。書籍側に src が無ければ flier とみなす。
+   YouTube はチャンネルを channels に足すと、出典一覧に枝として並ぶ。
+============================================================ */
+const SOURCES = [
+  { id:'flier',  title:'flier',   sub:'ビジネス書の要約サービス', icon:'book' },
+  { id:'kindle', title:'Kindle',  sub:'自分で読んだ本の要約',     icon:'book' },
+  { id:'yt',     title:'YouTube', sub:'チャンネル別の学びの記録', icon:'folder', channels:[
+      /* 例: { id:'ch_xxx', title:'チャンネル名', sub:'扱うテーマ' } */
+  ] },
+];
+
+/* 現在どの書架を見ているか。ch は YouTube のチャンネルを絞るときだけ入る。 */
+let CURRENT_SRC = { src:'flier', ch:null };
+
+function bookSrc(b){ return b.src || 'flier'; }
+function matchSrc(b){
+  if(bookSrc(b) !== CURRENT_SRC.src) return false;
+  if(CURRENT_SRC.ch) return b.ch === CURRENT_SRC.ch;
+  return true;
+}
+/* 現在の書架に属する書籍だけを返す。既存コードの node.books の代わりに使う。 */
+function srcBooks(node){ return (node.books || []).filter(matchSrc); }
+
+function findSource(id){ return SOURCES.find(x => x.id === id) || null; }
+function findChannel(srcId, chId){
+  const src = findSource(srcId);
+  return src && (src.channels || []).find(c => c.id === chId) || null;
+}
+/* 出典（＋チャンネル）単位の冊数。書架の選択状態に依存しないよう引数で受ける。 */
+function countBySource(srcId, chId){
+  let n = 0;
+  const walk = (node) => {
+    (node.books || []).forEach(b => {
+      if(bookSrc(b) !== srcId) return;
+      if(chId && b.ch !== chId) return;
+      n++;
+    });
+    (node.children || []).forEach(walk);
+  };
+  DATA.forEach(walk);
+  return n;
+}
+
 function countBooks(node){
-  let n = (node.books ? node.books.length : 0);
+  let n = srcBooks(node).length;
   if(node.children){ node.children.forEach(c => n += countBooks(c)); }
   return n;
 }
@@ -2001,6 +2046,7 @@ function resolveRoute(hash){
   const parts = h.split('/').filter(Boolean);
   if(!parts.length){ showView('view-root'); return; }
   const key = parts[0];
+  if(key === 'src'){ if(findSource(parts[1])) openShelf(parts[1], parts[2] || null); else showView('view-root'); return; }
   if(key === 'cat'){ const cat = DATA.find(c => c.id === parts[1]); if(cat){ openCategory(cat, catColor(DATA.indexOf(cat))); } else showView('view-root'); return; }
   if(key === 'sub'){ const cat = DATA.find(c => c.id === parts[1]); const sub = cat && (cat.children || []).find(s => s.id === parts[2]); if(cat && sub){ openSubcategory(cat, sub, catColor(DATA.indexOf(cat))); } else showView('view-root'); return; }
   if(key === 'book'){ if(BOOK_INDEX[parts[1]]) openBookById(parts[1]); else showView('view-root'); return; }
@@ -2477,8 +2523,71 @@ function sortRows(container, mode){
   rows.forEach(r => container.appendChild(r));
 }
 
+/* ルート画面は出典の一覧。書架（ジャンル10件）はこの下の階層になる。 */
 function renderRoot(){
   const list = document.getElementById('rootList');
+  list.innerHTML = '';
+  const rows = [];
+  SOURCES.forEach((src, i) => {
+    rows.push({ src, ch:null, depth:0, i });
+    (src.channels || []).forEach(ch => rows.push({ src, ch, depth:1, i }));
+  });
+  rows.forEach(({ src, ch, depth, i }) => {
+    const t = SOURCES.length > 1 ? i / (SOURCES.length - 1) : 0;
+    const color = lerpColor(NAVY, SKY, t);
+    const n = countBySource(src.id, ch ? ch.id : null);
+    const title = ch ? ch.title : src.title;
+    const sub = ch ? (ch.sub || '') : src.sub;
+    const row = document.createElement('button');
+    row.className = 'index-row';
+    if(depth) row.style.paddingLeft = '34px';
+    row.innerHTML = `
+      <span class="row-check-spacer"></span>
+      <div class="spine" style="background:${color}"></div>
+      <div class="icon-wrap" style="color:${color}"><svg viewBox="0 0 24 24">${ICONS[ch ? 'book' : src.icon] || ICONS.folder}</svg></div>
+      <div class="row-text">
+        <p class="row-title">${title}</p>
+        <p class="row-sub">${sub}</p>
+      </div>
+      <span class="row-meta ${n>0?'filled':''}">${n>0 ? n+' 冊収録' : 'これから'}</span>
+      <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+    `;
+    row.addEventListener('click', () => openShelf(src.id, ch ? ch.id : null));
+    list.appendChild(row);
+  });
+  const total = SOURCES.reduce((a, src) => a + countBySource(src.id, null), 0);
+  document.getElementById('footerCount').textContent = `${SOURCES.length} SOURCES / ${total} BOOKS`;
+}
+
+/* 選んだ出典の書架（ジャンル10件）。旧ルート画面の中身がここに移った。 */
+function openShelf(srcId, chId){
+  const src = findSource(srcId);
+  if(!src){ showView('view-root'); return; }
+  const ch = chId ? findChannel(srcId, chId) : null;
+  CURRENT_SRC = { src: srcId, ch: chId || null };
+  const viewId = `view-shelf-${srcId}${chId ? '-' + chId : ''}`;
+  const el = ensureView(viewId);
+  const total = countBySource(srcId, chId);
+  el.innerHTML = `
+    <button class="back-btn" onclick="goBack()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+      SOURCES
+    </button>
+    <h2>${ch ? ch.title : src.title}</h2>
+    <p class="detail-sub">${ch ? (ch.sub || '') : src.sub} ・ ${total} 冊収録</p>
+    ${total === 0 ? `<div class="empty-state" style="margin:18px 0 6px">まだ1冊も入っていません。要約を追加すると、下の書架に振り分けられます。</div>` : ''}
+    <div class="index-header-eyebrow"><span>INDEX</span></div>
+    <div class="index-list" id="list-${viewId}"></div>
+    ${backBtnBottomHTML('SOURCES')}
+  `;
+  const list = document.getElementById(`list-${viewId}`);
+  renderShelfRows(list);
+  showView(viewId);
+  pushRoute(viewId, 'src/' + srcId + (chId ? '/' + chId : ''));
+}
+
+/* ジャンル10件の行。現在の書架で絞った冊数を出す。 */
+function renderShelfRows(list){
   list.innerHTML = '';
   DATA.forEach((cat, i) => {
     const t = i / (DATA.length - 1);
@@ -2500,7 +2609,6 @@ function renderRoot(){
     row.addEventListener('click', () => openCategory(cat, color));
     list.appendChild(row);
   });
-  document.getElementById('footerCount').textContent = `${DATA.length} SECTIONS / ${totalBookCount()} BOOKS`;
 }
 
 function ensureView(id){
@@ -2769,7 +2877,7 @@ function openCategory(cat, color){
   }
   if((cat.type === 'flat' || cat.type === 'mixed') ){
     bodyHTML += `<div class="section-label">${cat.type==='mixed' ? 'このカテゴリ直下の書籍' : '収録書籍'}</div>`;
-    if(cat.books && cat.books.length){
+    if(srcBooks(cat).length){
       bodyHTML += `<div class="index-list" id="list-${viewId}-books"></div>`;
     } else {
       bodyHTML += emptyStateHTML();
@@ -2779,7 +2887,7 @@ function openCategory(cat, color){
     // nothing extra needed; children rows themselves show "Coming soon"
   }
 
-  const hasFlatBooks = cat.books && cat.books.length;
+  const hasFlatBooks = srcBooks(cat).length;
   const progressHTML = hasFlatBooks ? `
     <div class="cat-progress" data-cat="${cat.id}">
       <div class="cat-progress-top">
@@ -2844,9 +2952,9 @@ function openCategory(cat, color){
       subList.appendChild(row);
     });
   }
-  if(cat.books && cat.books.length){
+  if(srcBooks(cat).length){
     const bookList = document.getElementById(`list-${viewId}-books`);
-    cat.books.forEach((book, i) => {
+    srcBooks(cat).forEach((book, i) => {
       const row = document.createElement('button');
       row.className = 'index-row';
       row.dataset.bookId = book.id;
@@ -2871,17 +2979,17 @@ function openSubcategory(cat, sub, color){
       <div class="detail-icon" style="background:${color}"><svg viewBox="0 0 24 24">${ICONS.folder}</svg></div>
     </div>
     <h2>${sub.title}</h2>
-    <p class="detail-sub">${cat.title} ${sub.sub ? '・ '+sub.sub : ''} ・ ${sub.books.length} 冊収録</p>
-    ${sub.books.length > 1 ? `<div class="list-controls"><span class="lc-label">並べ替え</span>${sortSelectHTML('list-'+viewId)}</div>` : ''}
-    ${sub.books.length ? `<div class="index-list" id="list-${viewId}"></div>` : emptyStateHTML()}
+    <p class="detail-sub">${cat.title} ${sub.sub ? '・ '+sub.sub : ''} ・ ${srcBooks(sub).length} 冊収録</p>
+    ${srcBooks(sub).length > 1 ? `<div class="list-controls"><span class="lc-label">並べ替え</span>${sortSelectHTML('list-'+viewId)}</div>` : ''}
+    ${srcBooks(sub).length ? `<div class="index-list" id="list-${viewId}"></div>` : emptyStateHTML()}
     ${backBtnBottomHTML(cat.title)}
   `;
   showView(viewId);
   pushRoute(viewId, 'sub/' + cat.id + '/' + sub.id);
 
-  if(sub.books.length){
+  if(srcBooks(sub).length){
     const list = document.getElementById(`list-${viewId}`);
-    sub.books.forEach((book, i) => {
+    srcBooks(sub).forEach((book, i) => {
       const row = document.createElement('button');
       row.className = 'index-row';
       row.dataset.bookId = book.id;
