@@ -22,6 +22,10 @@
 `.claude/skills/quiz-authoring/` の規約に従う（最低100問、長さの偏り、簡体字混入、重複判定など）。
 差し込む前に `node .claude/skills/quiz-authoring/check-batch.mjs <new.json>` を通す。
 
+## Project Nova を更新したあと・全体を点検するとき
+`.claude/skills/nova-consistency-audit/` の手順に従う（ポータルのタグ・Mastery Track・説明文・コメントに残る古い件数や名称を洗い出す）。
+`python3 .claude/skills/nova-consistency-audit/scripts/stale_scan.py` で MISMATCH が 0 になるまで直す。
+
 ## やってはいけないこと
 - `_tasks` など内部状態に外部から直接触れない。必ず `TaskStore` のメソッド経由
 - 新しい依存ライブラリの追加は事前に相談する
