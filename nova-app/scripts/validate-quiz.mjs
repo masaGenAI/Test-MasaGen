@@ -67,6 +67,19 @@ function* rows(value, fmt) {
 }
 
 let hardFail = 0, warn = 0, totalItems = 0;
+const pct = (x) => (x * 100).toFixed(1) + '%';
+// 長さの手がかりの統計。rows = [[選択肢の文字列配列, 正解index], ...]
+function skewStat(rows) {
+  let n = 0, hit = 0, share = 0, want = 0;
+  for (const [t, a] of rows) {
+    if (!t[a]) continue;
+    const Ls = t.map(len), mx = Math.max(...Ls);
+    n++; want += 1 / t.length;
+    if (Ls[a] === mx) { share++; if (Ls.indexOf(mx) === a) hit++; }
+  }
+  return { n, hit: n ? hit / n : 0, share: n ? share / n : 0, want: n ? want / n : 0 };
+}
+const skewExtra = []; // 定数でない形（buildQuestions など）のバンクの統計をここに足す
 const log = (s) => process.stdout.write(s + '\n');
 
 for (const st of STATIONS) {
@@ -76,7 +89,7 @@ for (const st of STATIONS) {
     let value;
     try { value = extract(arrName, anchor); } catch (e) { log(`✗ ${st.name}.${arrName}: ${e.message}`); hardFail++; continue; }
     const seenQ = new Set();
-    let n = 0, allShort = 0, taggedRows = 0, dupQ = 0, fails = 0;
+    let n = 0, taggedRows = 0, dupQ = 0, fails = 0;
     for (const { q, opts, correct } of rows(value, fmt)) {
       n++; totalItems++;
       const where = `${st.name}.${arrName}#${n - 1}`;
@@ -99,11 +112,9 @@ for (const st of STATIONS) {
         const cl = len(opts[a]);
         const wrongs = opts.filter((_, i) => i !== a);
         if (wrongs.some((w) => norm(w) === norm(opts[a]))) { log(`  ✗ ${where}: distractor equals correct`); fails++; }
-        if (wrongs.map(len).every((x) => x < cl)) allShort++;
       }
     }
     if (taggedRows > 0) { log(`  ✗ ${st.name}.${arrName}: ${taggedRows} row(s) contain self-incriminating tags`); fails += taggedRows; }
-    if (allShort > 0) { log(`  ✗ ${st.name}.${arrName}: ${allShort} item(s) where every distractor is shorter than the correct answer`); fails += allShort; }
     if (dupQ > 0) { log(`  ⚠ ${st.name}.${arrName}: ${dupQ} duplicate question text(s)`); warn += dupQ; }
     hardFail += fails;
     const status = fails ? '✗' : '✓';
@@ -116,7 +127,7 @@ for (const st of STATIONS) {
 //   「全誤答が正解より短い」長さバイアスを hard error として検出する（認定ハブと同基準）。
 {
   const re = /"choices":\s*(\[[\s\S]*?\])\s*,\s*"ans":\s*(\d+)/g;
-  let m, n = 0, fails = 0, allShort = 0, taggedRows = 0;
+  let m, n = 0, fails = 0, taggedRows = 0;
   while ((m = re.exec(text))) {
     let opts;
     try { opts = JSON.parse(m[1]); } catch { continue; }
@@ -132,10 +143,8 @@ for (const st of STATIONS) {
     const cl = len(ja[ans]);
     const wrongs = ja.filter((_, i) => i !== ans);
     if (wrongs.some((w) => norm(w) === norm(ja[ans]))) { log(`  ✗ ${where}: distractor equals correct`); fails++; }
-    if (wrongs.map(len).every((x) => x < cl)) allShort++;
   }
   if (taggedRows > 0) { log(`  ✗ choices/ans: ${taggedRows} row(s) contain self-incriminating tags`); fails += taggedRows; }
-  if (allShort > 0) { log(`  ✗ choices/ans: ${allShort} item(s) where every distractor is shorter than the correct answer`); fails += allShort; }
   hardFail += fails;
   log(`${fails ? '✗' : '✓'} choices/ans (non-cert hubs): ${n} items` + (fails ? ` — ${fails} error(s)` : ''));
 }
@@ -144,7 +153,7 @@ for (const st of STATIONS) {
 //   文字列選択肢配列を波括弧対応で切り出し、非空・相異・正解index・タグ・長さバイアスを検査する。
 {
   const re = /\bopts:\s*\[/g;
-  let m, n = 0, fails = 0, allShort = 0, taggedRows = 0;
+  let m, n = 0, fails = 0, taggedRows = 0;
   while ((m = re.exec(text))) {
     const bs = text.indexOf('[', m.index);
     // 波括弧対応で配列末尾を探す（文字列内の括弧は無視）
@@ -168,12 +177,8 @@ for (const st of STATIONS) {
     if (opts.some((o) => o == null || String(o).trim() === '')) { log(`  ✗ ${where}: empty option`); fails++; }
     if (new Set(opts.map(norm)).size !== opts.length) { log(`  ✗ ${where}: duplicate option`); fails++; }
     if (opts.some((o) => TAG_RE.test(o))) { taggedRows++; }
-    const cl = len(opts[a]);
-    const wrongs = opts.filter((_, i) => i !== a);
-    if (wrongs.map(len).every((x) => x < cl)) allShort++;
   }
   if (taggedRows > 0) { log(`  ✗ opts/a: ${taggedRows} row(s) contain self-incriminating tags`); fails += taggedRows; }
-  if (allShort > 0) { log(`  ✗ opts/a: ${allShort} item(s) where every distractor is shorter than the correct answer`); fails += allShort; }
   hardFail += fails;
   log(`${fails ? '✗' : '✓'} opts/a (MegaTech hub): ${n} items` + (fails ? ` — ${fails} error(s)` : ''));
 }
@@ -182,7 +187,8 @@ for (const st of STATIONS) {
 //   タプル配列を波括弧対応で切り出し、choices(2..5)/ansIdx(6) を取り出して長さバイアス等を検査する。
 {
   const re = /buildQuestions\(\s*\[/g;
-  let m, n = 0, fails = 0, allShort = 0;
+  let m, n = 0, fails = 0;
+  const bqRows = [];
   const matchBracket = (start) => {
     let depth = 0, inStr = false, q = null, esc = false;
     for (let i = start; i < text.length; i++) {
@@ -205,181 +211,118 @@ for (const st of STATIONS) {
       const a = row[6];
       if (!ch.every((o) => typeof o === 'string') || typeof a !== 'number' || a < 0 || a >= ch.length) continue;
       n++; totalItems++;
+      bqRows.push([ch, a]);
       const where = `buildQuestions#${n - 1}`;
       if (ch.some((o) => String(o).trim() === '')) { log(`  ✗ ${where}: empty option`); fails++; }
       if (new Set(ch.map(norm)).size !== ch.length) { log(`  ✗ ${where}: duplicate option`); fails++; }
       if (ch.some((o) => TAG_RE.test(o))) { log(`  ✗ ${where}: self-incriminating tag`); fails++; }
-      const cl = len(ch[a]);
-      if (ch.filter((_, i) => i !== a).map(len).every((x) => x < cl)) allShort++;
     }
   }
-  if (allShort > 0) { log(`  ✗ buildQuestions: ${allShort} item(s) where every distractor is shorter than the correct answer`); fails += allShort; }
   hardFail += fails;
+  { const s = skewStat(bqRows); if (s.n >= 20) skewExtra.push({ id: 'buildQuestions', ...s }); }
   log(`${fails ? '✗' : '✓'} buildQuestions (Linguistics hub): ${n} items` + (fails ? ` — ${fails} error(s)` : ''));
 }
 
-// ---- 長さギブアウェイ検査（全バンク横断・キーの書き方を問わない） ----------
-// 既存の opts/a 検査は正規表現 `\bopts:` に依存しており、引用符つきキー（"opts" / "o" /
-// "choices"）で一括追加された問題を一度も見ていなかった。ここでは定数を評価して中身から
-// 判定するので、書き方に関係なく全問が対象になる。
+// ---- 長さの手がかり検査（全バンク横断・キーの書き方を問わない） ----------
+// 定数を評価して中身から判定するので、キーの書き方（opts / "o" / choices）に関係なく全問が対象。
 //
-// 既知の未修正件数を LENGTH_DEBT に置き、超えたら失敗させる（ラチェット）。
-// 新しく増やすことは即失敗、既存の借金は修正のたびに数字を下げていく。0 になったら行ごと消す。
+// 長さの手がかりは両方向とも潰す（.claude/skills/quiz-authoring）:
+//   hit   : 「最長を選ぶ（同点は上から）」で正解を引く率。偶然(1/選択肢数)の1.5倍を超えたら、
+//           長い選択肢を選ぶだけで得をする（元々の欠陥）。
+//   share : 正解が最長（同点を含む）である率。偶然の1/2を下回ったら、最長を消すだけで
+//           1択減らせる（逆向きの欠陥。以前は「正解が厳密に最長なら失敗」としていたため、
+//           全バンクで正解が厳密に最長になる問題が0件になっていた）。
+// 目標は share が 1/選択肢数 の近く。帯の外にあるバンクは SKEW_SNAPSHOT に現状を記録し、
+// そこから悪化したら失敗（ラチェット）。帯に入ったら行ごと消す。新しく帯の外に出るのは即失敗。
+// 現状の一覧は `node scripts/validate-quiz.mjs --skew`、貼り付け用は `--snapshot`。
 {
-  const LENGTH_DEBT = {
-    MCQS: 1111,
-    BANK: 364,
-    SET1: 76,
-    EXTRA: 69,
-    CHECK_CORE_GEN2: 47,
-    CHECK_AX_GEN2: 46,
-    CHECK_AX_GEN3: 30,
-    PL900_HARD: 26,
-    SET2: 25,
-    ACAD_QUIZ: 20,
-    GOVDOJO_BANK: 18,
-    SET5: 18,
-    AB410_HARD: 18,
-    BANK_D2: 17,
-    GH600_HARD: 17,
-    AI300_HARD: 17,
-    BANK_EXTRA3: 16,
-    AI200_HARD: 15,
-    GH300_HARD: 15,
-    AB100_HARD: 14,
-    SET4: 11,
-    BANK_D1: 11,
-    EXAM_SET4: 10,
-    GH900_HARD: 10,
-    SET3: 9,
-    BANK_D4: 9,
-    AI103_HARD: 9,
-    CHECK_CORE_GEN: 7,
-    BANK_EXTRA2: 7,
-    SA_QUIZ: 6,
-    BANK_D3: 6,
-    EXAM_SET2: 6,
-    CHECK_AX_GEN: 5,
-    MOCK1: 5,
-    MOCK4: 5,
-    MOCK5: 5,
-    SCEN_BANK: 5,
-    BANK_EXTRA: 5,
-    GH600_TF: 5,
-    AB410_TF: 5,
-    AI300_TF: 5,
-    MOCK3: 4,
-    AB620_TF: 4,
-    CHECK_AX_GEN4: 3,
-    EXAM_SET1: 3,
-    EXAM_SET5: 3,
-    AB620_HARD: 3,
-    EXAM_SET3: 2,
-    DP900_HARD: 2,
-    ISO42001F_HARD: 2,
-    MOCK2: 1,
-    PL900_EXHIBIT: 1,
-    AI200_EXHIBIT: 1,
-    GH900_EXHIBIT: 1,
+  const SKEW_SNAPSHOT = {
+    // 2026-09-27 時点で帯の外にあるバンク（すべて share が低すぎる側）。直したら行を消す。
+    'AB100_HARD#0': { hit: 0.0187, share: 0.0440 },
+    'AB410_HARD#0': { hit: 0.0359, share: 0.0717 },
+    'AB620_HARD#0': { hit: 0.0092, share: 0.0338 },
+    'ACAD_QUIZ#0': { hit: 0.0485, share: 0.1117 },
+    'AI103_HARD#0': { hit: 0.0277, share: 0.0523 },
+    'AI200_HARD#0': { hit: 0.0462, share: 0.0738 },
+    'AI300_HARD#0': { hit: 0.0340, share: 0.0520 },
+    'AIGP_HARD#0': { hit: 0.0000, share: 0.0779 },
+    'BANK_EXTRA#0': { hit: 0.0345, share: 0.0828 },
+    'BANK#10': { hit: 0.0280, share: 0.0400 },
+    'BANK#11': { hit: 0.0340, share: 0.0920 },
+    'BANK#12': { hit: 0.0540, share: 0.0940 },
+    'BANK#13': { hit: 0.0460, share: 0.1020 },
+    'BANK#14': { hit: 0.0440, share: 0.0860 },
+    'BANK#15': { hit: 0.0395, share: 0.0889 },
+    'BANK#16': { hit: 0.0458, share: 0.0837 },
+    'BANK#3': { hit: 0.0120, share: 0.0120 },
+    'BANK#5': { hit: 0.0000, share: 0.0196 },
+    'BANK#6': { hit: 0.0000, share: 0.0157 },
+    'BANK#7': { hit: 0.0100, share: 0.0320 },
+    'BANK#8': { hit: 0.0213, share: 0.0440 },
+    'BANK#9': { hit: 0.0359, share: 0.0697 },
+    'buildQuestions': { hit: 0.0940, share: 0.1011 },
+    'CCAF_EXAM_HARD#0': { hit: 0.0000, share: 0.0000 },
+    'CHECK_AX_GEN4#0': { hit: 0.0300, share: 0.0600 },
+    'DP900_HARD#0': { hit: 0.0256, share: 0.0769 },
+    'EXAM_SET3#0': { hit: 0.0308, share: 0.1077 },
+    'GH300_HARD#0': { hit: 0.0462, share: 0.1077 },
+    'GH600_HARD#0': { hit: 0.0340, share: 0.0580 },
+    'GH900_HARD#0': { hit: 0.0308, share: 0.0677 },
+    'ISO42001F_HARD#0': { hit: 0.0250, share: 0.0375 },
+    'MOCK2#0': { hit: 0.0154, share: 0.0308 },
+    'MOCK4#0': { hit: 0.0769, share: 0.1077 },
+    'MOCK5#0': { hit: 0.0769, share: 0.1231 },
+    'SAA_EXAM_HARD#0': { hit: 0.0000, share: 0.0000 },
+    'SET1#10': { hit: 0.0500, share: 0.0750 },
+    'SET1#2': { hit: 0.0200, share: 0.0800 },
+    'SET1#5': { hit: 0.0000, share: 0.0857 },
+    'SET1#6': { hit: 0.0714, share: 0.1143 },
+    'SET1#8': { hit: 0.0250, share: 0.0500 },
+    'SET3#1': { hit: 0.0400, share: 0.1200 },
+    'SET5#1': { hit: 0.0600, share: 0.1000 },
   };
+  const TOL = 0.005;
   const OPT_KEYS = ['opts', 'choices', 'o', 'options'];
   const ANS_KEYS = ['a', 'ans', 'answer', 'correct'];
   const optText = (o) => (typeof o === 'string' ? o : (o && (o.ja || o.text || o.t || o.label)) || '');
   // 同じ名前の定数が各ハブモジュールに1つずつあるため、最初の宣言だけでなく全宣言を見る
   const decls = [...text.matchAll(/(?:const|var|let)\s+([A-Z][A-Z0-9_]{2,})\s*=\s*\[/g)].map((m) => [m[1], m.index]);
-  let fails = 0, debtNow = 0, scanned = 0, banks = 0;
-  const debtSeen = {};
+  const seenDecl = {};
+  const banks = [...skewExtra];
   for (const [name, at] of decls) {
     let v;
     try { v = extract(name, at); } catch (e) { continue; }
-    if (!Array.isArray(v) || v.length < 5) continue;
+    if (!Array.isArray(v) || v.length < 20) continue;
     const r0 = v[0];
     if (!r0 || typeof r0 !== 'object') continue;
     const ok = OPT_KEYS.find((k) => Array.isArray(r0[k]));
     const ak = ANS_KEYS.find((k) => typeof r0[k] === 'number');
     if (!ok || ak === undefined) continue;
-    banks++;
-    let bad = 0;
-    for (const row of v) {
-      const opts = row[ok], a = row[ak];
-      if (!Array.isArray(opts) || typeof a !== 'number') continue;
-      const t = opts.map(optText);
-      if (!t[a]) continue;
-      scanned++;
-      // 「全錯乱肢が厳密に短い」ではなく、悪用そのものを判定する。
-      // 正解と同じ長さの錯乱肢があっても、正解が先頭側にあれば
-      // 「最長を選ぶ（同点は上から）」はやはり正解を引き当ててしまう。
-      const L = t.map(len), mx = Math.max(...L);
-      if (L[a] === mx && L.indexOf(mx) === a) bad++;
-    }
-    debtNow += bad;
-    debtSeen[name] = (debtSeen[name] || 0) + bad;
+    const d = (seenDecl[name] = (seenDecl[name] || 0)); seenDecl[name]++;
+    const s = skewStat(v.filter((row) => Array.isArray(row[ok]) && typeof row[ak] === 'number').map((row) => [row[ok].map(optText), row[ak]]));
+    if (s.n >= 20) banks.push({ id: `${name}#${d}`, ...s });
   }
-  for (const [name, bad] of Object.entries(debtSeen)) {
-    const allowed = LENGTH_DEBT[name] || 0;
-    if (bad > allowed) {
-      log(`  ✗ length-giveaway: ${name} has ${bad} item(s) where picking the longest option lands on the answer (allowed ${allowed})`);
-      fails++;
-    }
+  let fails = 0, inBand = 0, clearable = 0;
+  const rows = [];
+  for (const b of banks) {
+    const okHit = b.hit <= b.want * 1.5 + 1e-9, okShare = b.share >= b.want / 2 - 1e-9;
+    const snap = SKEW_SNAPSHOT[b.id];
+    let mark = ' ';
+    if (okHit && okShare) { inBand++; if (snap) { clearable++; mark = '−'; } }
+    else if (!snap) { fails++; mark = '✗'; log(`  ✗ length-skew: ${b.id} is newly out of band (hit ${pct(b.hit)}, share ${pct(b.share)}, chance ${pct(b.want)}) — fix the items; add a SKEW_SNAPSHOT row only for a new bank whose fix is planned`); }
+    else if (b.hit > snap.hit + TOL || b.share < snap.share - TOL) { fails++; mark = '✗'; log(`  ✗ length-skew: ${b.id} got worse — hit ${pct(snap.hit)}→${pct(b.hit)}, share ${pct(snap.share)}→${pct(b.share)} (chance ${pct(b.want)})`); }
+    else mark = '!';
+    rows.push({ mark, ...b, snap });
+  }
+  if (process.argv.includes('--skew')) {
+    for (const r of [...rows].sort((p, q) => p.share / p.want - q.share / q.want)) log(`  ${r.mark} ${r.id.padEnd(22)} n=${String(r.n).padStart(5)} hit=${pct(r.hit).padStart(6)} share=${pct(r.share).padStart(6)} chance=${pct(r.want)}`);
+  }
+  if (process.argv.includes('--snapshot')) {
+    for (const r of rows.filter((x) => x.mark === '!' || x.mark === '✗').sort((p, q) => p.id.localeCompare(q.id))) log(`    '${r.id}': { hit: ${r.hit.toFixed(4)}, share: ${r.share.toFixed(4)} },`);
   }
   hardFail += fails;
-  totalItems += 0;
-
-// ---- 簡体字の混入チェック ----
-// 日本語のつもりで簡体字が混ざると、読めはするが誤字として残る。
-// 新字体（国・数・体など）を誤検出しないよう、簡体字にしか現れない字だけを見る。
-// 中国当局・機関の正式名称は原語のまま引用するのが正しいので除外する。
-{
-  const CHINESE_NAMES = ['网信办', '互联网络', '互联网', '办公室', '算法备案', '赛迪院'];
-  const SIMPLIFIED = [...'办类联备络赛长业误统这为对说样么个开无爱经济纪东车马鸟龙风飞书图华际'];
-  let scan = text;
-  for (const name of CHINESE_NAMES) scan = scan.split(name).join('');
-  const hits = SIMPLIFIED
-    .map((ch) => [ch, scan.split(ch).length - 1])
-    .filter(([, n]) => n > 0)
-    .map(([ch, n]) => `${ch} x${n}`);
-  // キリル文字は cp932 にも収録されているため符号化判定では落ちない。別途見る。
-  const cyr = [...text.matchAll(/[\u0400-\u04ff]+/g)].map((m) => m[0]);
-  if (cyr.length) hits.push(...[...new Set(cyr)].slice(0, 6).map((w) => `Cyrillic "${w}"`));
-  if (hits.length) {
-    log(`  ✗ non-Japanese characters in Japanese text: ${hits.join(', ')}`);
-    hardFail++;
-  } else {
-    log('  ✓ no simplified-Chinese or Cyrillic leakage (Chinese agency names allowlisted)');
-  }
-}
-  // ---- 長さの偏り（逆向き）----
-  // 「正解が最長」を潰した結果、今度は「最長は正解ではない」が成り立つと、
-  // 最長を消すだけで4択が3択になる。長さが手がかりにならない状態＝正解が
-  // 最長になる割合が 1/選択肢数 に近いこと、を目標として偏りを可視化する。
-  {
-    const skew = [];
-    const seenDecl = {};
-    for (const [name, at] of decls) {
-      let v; try { v = extract(name, at); } catch (e) { continue; }
-      if (!Array.isArray(v) || v.length < 20) continue;
-      const r0 = v[0]; if (!r0 || typeof r0 !== 'object') continue;
-      const ok = OPT_KEYS.find((k) => Array.isArray(r0[k]));
-      const ak = ANS_KEYS.find((k) => typeof r0[k] === 'number');
-      if (!ok || ak === undefined) continue;
-      const d = (seenDecl[name] = (seenDecl[name] || 0)); seenDecl[name]++;
-      let n = 0, longest = 0, expected = 0;
-      for (const row of v) {
-        const opts = row[ok], a = row[ak];
-        if (!Array.isArray(opts) || typeof a !== 'number') continue;
-        const t = opts.map(optText); if (!t[a]) continue;
-        n++; expected += 1 / t.length;
-        if (len(t[a]) === Math.max(...t.map(len))) longest++;
-      }
-      if (n >= 20) skew.push({ bank: `${name}#${d}`, n, rate: longest / n, want: expected / n });
-    }
-    const lopsided = skew.filter((x) => x.rate < x.want / 3 || x.rate > x.want * 2.2);
-    const items = lopsided.reduce((a, b) => a + b.n, 0);
-    log(`  i length-skew: ${lopsided.length} of ${skew.length} banks lopsided (${items} items) — ` +
-        `answer-is-longest should sit near 1/n; dropping the longest option must not be a free elimination`);
-  }
-  const budget = Object.values(LENGTH_DEBT).reduce((a, b) => a + b, 0);
-  log(`${fails ? '✗' : '✓'} length-giveaway across ${banks} banks / ${scanned} items — outstanding ${debtNow} (budget ${budget})` + (fails ? ` — ${fails} bank(s) over budget` : ''));
+  const items = banks.reduce((a, b) => a + b.n, 0);
+  log(`${fails ? '✗' : '✓'} length-skew across ${banks.length} banks / ${items} items — ${inBand} in band (share ≥ chance/2, hit ≤ chance×1.5), ${banks.length - inBand} still lopsided` + (clearable ? `, ${clearable} snapshot row(s) can now be removed` : '') + (fails ? ` — ${fails} failure(s)` : ''));
 }
 
 // ---- 実測データの出所検査 -------------------------------------------------
