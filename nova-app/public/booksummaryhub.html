@@ -763,7 +763,6 @@
 
     <div class="footer-note">
       <span id="footerCount">3 SOURCES</span>
-      <span>v0.2 — IN PROGRESS</span>
     </div>
   </div>
 
@@ -5831,12 +5830,17 @@ function renderRoot(){
   list.innerHTML = '';
   srcRows(list, SOURCES, []);
   const total = SOURCES.reduce((a, src) => a + countByPath([src.id]), 0);
-  document.getElementById('footerCount').textContent = `${SOURCES.length} SOURCES / ${total} ITEMS`;
+  document.getElementById('footerCount').textContent = `${SOURCES.filter(n => hasContent(n, [])).length} SOURCES / ${total} ITEMS`;
 }
 
 /* 出典ノードを行として並べる。子があればその一覧へ、なければ書架へ進む。 */
+/* 1冊も入っていない末端の出典（例: Kindle）は一覧に出さない。データを入れれば自動で現れる。 */
+function hasContent(node, parentPath){
+  return (node.children || []).length > 0 || countByPath(parentPath.concat(node.id)) > 0;
+}
 function srcRows(list, nodes, parentPath){
-  (nodes || []).forEach((node, i) => {
+  nodes = (nodes || []).filter(n => hasContent(n, parentPath));
+  nodes.forEach((node, i) => {
     const t = nodes.length > 1 ? i / (nodes.length - 1) : 0;
     const color = lerpColor(NAVY, SKY, t);
     const path = parentPath.concat(node.id);
