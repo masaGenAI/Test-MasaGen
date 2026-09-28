@@ -238,7 +238,6 @@ for (const st of STATIONS) {
 {
   const SKEW_SNAPSHOT = {
     // 2026-09-27 時点で帯の外にあるバンク（すべて share が低すぎる側）。直したら行を消す。
-    'buildQuestions': { hit: 0.0940, share: 0.1011 },
   };
   const TOL = 0.005;
   const OPT_KEYS = ['opts', 'choices', 'o', 'options'];
