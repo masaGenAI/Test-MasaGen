@@ -240,7 +240,6 @@ for (const st of STATIONS) {
     // 2026-09-27 時点で帯の外にあるバンク（すべて share が低すぎる側）。直したら行を消す。
     'AB100_HARD#0': { hit: 0.0187, share: 0.0440 },
     'AB410_HARD#0': { hit: 0.0359, share: 0.0717 },
-    'AB620_HARD#0': { hit: 0.0092, share: 0.0338 },
     'ACAD_QUIZ#0': { hit: 0.0485, share: 0.1117 },
     'AI103_HARD#0': { hit: 0.0277, share: 0.0523 },
     'AI200_HARD#0': { hit: 0.0462, share: 0.0738 },
@@ -254,9 +253,6 @@ for (const st of STATIONS) {
     'BANK#14': { hit: 0.0440, share: 0.0860 },
     'BANK#15': { hit: 0.0395, share: 0.0889 },
     'BANK#16': { hit: 0.0458, share: 0.0837 },
-    'BANK#3': { hit: 0.0120, share: 0.0120 },
-    'BANK#5': { hit: 0.0000, share: 0.0196 },
-    'BANK#6': { hit: 0.0000, share: 0.0157 },
     'BANK#7': { hit: 0.0100, share: 0.0320 },
     'BANK#8': { hit: 0.0213, share: 0.0440 },
     'BANK#9': { hit: 0.0359, share: 0.0697 },
@@ -310,7 +306,8 @@ for (const st of STATIONS) {
     let mark = ' ';
     if (okHit && okShare) { inBand++; if (snap) { clearable++; mark = '−'; } }
     else if (!snap) { fails++; mark = '✗'; log(`  ✗ length-skew: ${b.id} is newly out of band (hit ${pct(b.hit)}, share ${pct(b.share)}, chance ${pct(b.want)}) — fix the items; add a SKEW_SNAPSHOT row only for a new bank whose fix is planned`); }
-    else if (b.hit > snap.hit + TOL || b.share < snap.share - TOL) { fails++; mark = '✗'; log(`  ✗ length-skew: ${b.id} got worse — hit ${pct(snap.hit)}→${pct(b.hit)}, share ${pct(snap.share)}→${pct(b.share)} (chance ${pct(b.want)})`); }
+    // 悪化の向きは帯の外れ方で決まる：share が低すぎる側なら share の低下、hit が高すぎる側なら hit の上昇
+    else if ((!okShare && b.share < snap.share - TOL) || (!okHit && b.hit > snap.hit + TOL)) { fails++; mark = '✗'; log(`  ✗ length-skew: ${b.id} got worse — hit ${pct(snap.hit)}→${pct(b.hit)}, share ${pct(snap.share)}→${pct(b.share)} (chance ${pct(b.want)})`); }
     else mark = '!';
     rows.push({ mark, ...b, snap });
   }
