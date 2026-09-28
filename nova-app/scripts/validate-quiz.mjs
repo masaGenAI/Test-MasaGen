@@ -238,27 +238,7 @@ for (const st of STATIONS) {
 {
   const SKEW_SNAPSHOT = {
     // 2026-09-27 時点で帯の外にあるバンク（すべて share が低すぎる側）。直したら行を消す。
-    'AB100_HARD#0': { hit: 0.0187, share: 0.0440 },
-    'AB410_HARD#0': { hit: 0.0359, share: 0.0717 },
-    'ACAD_QUIZ#0': { hit: 0.0485, share: 0.1117 },
-    'AI103_HARD#0': { hit: 0.0277, share: 0.0523 },
-    'AI200_HARD#0': { hit: 0.0462, share: 0.0738 },
-    'AI300_HARD#0': { hit: 0.0340, share: 0.0520 },
-    'BANK_EXTRA#0': { hit: 0.0345, share: 0.0828 },
-    'BANK#10': { hit: 0.0280, share: 0.0400 },
-    'BANK#11': { hit: 0.0340, share: 0.0920 },
-    'BANK#12': { hit: 0.0540, share: 0.0940 },
-    'BANK#8': { hit: 0.0213, share: 0.0440 },
-    'BANK#9': { hit: 0.0359, share: 0.0697 },
     'buildQuestions': { hit: 0.0940, share: 0.1011 },
-    'CHECK_AX_GEN4#0': { hit: 0.0300, share: 0.0600 },
-    'SET1#10': { hit: 0.0500, share: 0.0750 },
-    'SET1#2': { hit: 0.0200, share: 0.0800 },
-    'SET1#5': { hit: 0.0000, share: 0.0857 },
-    'SET1#6': { hit: 0.0714, share: 0.1143 },
-    'SET1#8': { hit: 0.0250, share: 0.0500 },
-    'SET3#1': { hit: 0.0400, share: 0.1200 },
-    'SET5#1': { hit: 0.0600, share: 0.1000 },
   };
   const TOL = 0.005;
   const OPT_KEYS = ['opts', 'choices', 'o', 'options'];
