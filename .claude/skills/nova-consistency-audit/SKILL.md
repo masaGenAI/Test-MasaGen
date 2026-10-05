@@ -5,7 +5,7 @@ description: Project Nova（nova-app の ProjectNova.jsx と public/*.html）全
 
 # Project Nova 整合性点検
 
-Project Nova は 60MB を超える単一ファイル（`nova-app/src/ProjectNova.jsx`）に9つのハブを抱えている。
+Project Nova は 60MB を超える単一ファイル（`nova-app/src/ProjectNova.jsx`）に10のハブを抱えている。
 同じ事実（問題数、出典の種類、企業数、人物の肩書など）が、ポータルのタグ・Mastery Track・タブの説明文・
 コメント・画面に出ない計画データに**別々に書き写されている**ため、どこか1か所を更新すると他が古いまま残る。
 実際にこの点検で見つかったもの：
@@ -101,7 +101,7 @@ cd .. && node .claude/skills/nova-consistency-audit/scripts/smoke.mjs [スクリ
 python3 .claude/skills/nova-consistency-audit/scripts/stale_scan.py   # MISMATCH 0 を確認
 ```
 
-`smoke.mjs` はポータルの目次タグと Mastery Track の数字を表示し、9つのハブを開き、TechHub の全タブを順に押し、
+`smoke.mjs` はポータルの目次タグと Mastery Track の数字を表示し、10のハブを開き、TechHub の全タブを順に押し、
 Book-Summary の出典別件数と単位を表示して、実行時エラーを数える。全体で数分かかるので、バックグラウンドで実行してよい。
 表示された数字が `facts.py` と一致すること、実行時エラーが0件であることを確かめる。
 タグや見出しを変えたときは、幅 390px のスクリーンショットでも重なりがないかを見る。
