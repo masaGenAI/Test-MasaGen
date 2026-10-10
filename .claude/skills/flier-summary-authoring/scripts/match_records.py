@@ -9,6 +9,7 @@ import argparse
 import difflib
 import json
 import sys
+import unicodedata
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -20,9 +21,26 @@ def score(pdf_title: str, title: str) -> float:
     a, b = norm(pdf_title), norm(title)
     if not a or not b:
         return 0.0
-    if a in b or b in a:
+    if a == b:
         return 1.0
+    # 片方がもう片方を含むのは、副題やキャッチの区切り（空白・括弧など）で切れるときだけ一致とみなす。
+    # 「ユニクロ」と「ユニクロの仕組み化」のように語の途中で続くものは別の本。
+    short, long_ = sorted((spaced(pdf_title), spaced(title)), key=len)
+    k = long_.find(short)
+    if short and k >= 0:
+        before = long_[k - 1] if k > 0 else " "
+        after = long_[k + len(short)] if k + len(short) < len(long_) else " "
+        if (before in SEP or short[0] in SEP) and (after in SEP or short[-1] in SEP):
+            return 1.0
     return difflib.SequenceMatcher(None, a, b).ratio()
+
+
+SEP = " 　―-:：（(「『～〜　)）」』!?。、"
+
+
+def spaced(s: str) -> str:
+    """NFKC で正規化し、空白は残したまま前後を落とす（区切りの判定用）。"""
+    return unicodedata.normalize("NFKC", s or "").strip()
 
 
 def main() -> None:
