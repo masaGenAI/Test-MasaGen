@@ -101,6 +101,7 @@ def main() -> None:
         src_file = a.work / "txt" / f"{plan.get(i, {}).get('pdf', '')}.txt"
         if src_file.exists():
             src = unicodedata.normalize("NFKC", re.sub(r"\s", "", src_file.read_text(encoding="utf-8")))
+            src = re.sub(r"(\d)・(\d)", r"\1.\2", src)  # 縦書きの小数点は中黒で組まれる（13・9％）
             missing = sorted(n for n in nums(text) if n not in src.replace(",", ""))
             if missing:
                 warn.append(f"抽出テキストに見つからない数字 {missing}（画像で確認）")
