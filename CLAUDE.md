@@ -22,6 +22,10 @@
 `.claude/skills/quiz-authoring/` の規約に従う（最低100問、長さの偏り、簡体字混入、重複判定など）。
 差し込む前に `node .claude/skills/quiz-authoring/check-batch.mjs <new.json>` を通す。
 
+## Book-Summary の flier 書籍要約を作る・直すとき
+`.claude/skills/flier-summary-authoring/` の手順と品質基準に従う（PDF だけを根拠に、合計1,500〜1,900字・要点6〜9個、要約者レビューと著者の主張を書き分ける）。
+差し込む前に `check_summary.py` のエラーを 0 にし、本を追加したら下の整合性点検も行う。
+
 ## Project Nova を更新したあと・全体を点検するとき
 `.claude/skills/nova-consistency-audit/` の手順に従う（ポータルのタグ・Mastery Track・説明文・コメントに残る古い件数や名称を洗い出す）。
 `python3 .claude/skills/nova-consistency-audit/scripts/stale_scan.py` で MISMATCH が 0 になるまで直す。
