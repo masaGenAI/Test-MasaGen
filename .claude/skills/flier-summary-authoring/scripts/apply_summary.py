@@ -19,6 +19,12 @@ FIELDS = ("oneLiner", "overview", "points", "takeaway")
 META = ("title", "author", "publisher", "year", "pages", "price")
 
 
+def natural(i: str) -> tuple:
+    """ai9 < ai10 となる並べ替えキー。"""
+    m = re.match(r"(\D*)(\d*)", i)
+    return (m.group(1), int(m.group(2) or 0))
+
+
 def dump(r: dict) -> str:
     """ハブと同じ書式（区切りの空白なし）で JSON にする。"""
     return json.dumps(r, ensure_ascii=False, separators=(",", ":"))
@@ -52,7 +58,7 @@ def main() -> None:
     html = load_html()
     recs = flier_records(html)
     edits = []  # (start, end, text)
-    for p in plan:
+    for p in sorted(plan, key=lambda x: (x["mode"], x.get("category") or "", natural(x["id"]))):
         o = json.loads((a.work / "out" / f"{p['id']}.json").read_text(encoding="utf-8"))
         pts = [{"h": x["h"], "b": x["b"]} for x in o["points"]]
         if p["mode"] == "replace":
@@ -74,7 +80,8 @@ def main() -> None:
             print(f"new     {p['id']} → {p['category']}: {r['title']}（{body_len(r)}字）")
     if a.dry_run:
         return
-    for s, e, t in sorted(edits, key=lambda x: -x[0]):
+    # 同じ位置への追加は id 順に並ぶよう、後ろの位置から・同じ位置は後に積んだものから差し込む
+    for _, (s, e, t) in sorted(enumerate(edits), key=lambda x: (-x[1][0], -x[0])):
         html = html[:s] + t + html[e:]
     HUB.write_text(html, encoding="utf-8")
     print(f"差し込み {len(edits)}件 → {HUB}")
