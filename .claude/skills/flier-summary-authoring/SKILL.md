@@ -55,6 +55,8 @@ python3 -E -P $SK/match_records.py "$WORK"           # → WORK/plan.json（既�
    python3 -E -P $SK/apply_summary.py "$WORK"
    ```
    `replace` は oneLiner・overview・points・takeaway を置き換え（書誌情報と diagram・クイズは残す）。`new` は指定カテゴリの末尾に追加する。
+   - **新しい棚（サブカテゴリ）に入れるとき**は、先に `DATA` の親グループの `children` に `{ id:"<id>", title:"<表示名>", sub:"<説明>", books:[\n]}` を手で足し、親グループの `sub` の説明も合わせて直す。空の棚にも `apply_summary.py` で追加できる。
+   - **ユーザーが渡した本がすでに別の棚にある**ときは、移す・残す・両方に出すのどれにするかをユーザーに確かめる（同じ id を2か所に置くと冊数が二重に数えられる）。
 8. **ビルドと横断点検**: `cd nova-app && npm run build`（Hard errors 0）。本を**追加**したときは冊数が変わるので、必ず `nova-consistency-audit` スキルで件数の食い違いを直す（`stale_scan.py` の MISMATCH 0、`smoke.mjs` の実行時エラー 0）。
 9. コミットしてプッシュし、デプロイの完了を確かめてから報告する。報告には、書いた冊数、長さ、読み取れず書かなかった数字、要約者レビュー由来として書き分けた箇所を含める。
 

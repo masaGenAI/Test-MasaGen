@@ -30,8 +30,11 @@ def dump(r: dict) -> str:
     return json.dumps(r, ensure_ascii=False, separators=(",", ":"))
 
 
-def category_tail(html: str, cat: str) -> int:
-    """カテゴリ cat の books 配列の最後の記録の終わりの位置を返す。"""
+def category_tail(html: str, cat: str) -> tuple[int, bool]:
+    """カテゴリ cat の books 配列の差し込み位置と、配列が空かどうかを返す。
+
+    空でなければ最後の記録の終わり、空なら `books:[` 直後の改行の後。
+    """
     m = re.search(r'\{\s*id:"%s",[^\n]*books:\[\n' % re.escape(cat), html)
     if not m:
         sys.exit(f"カテゴリ {cat} が DATA に見つからない")
@@ -44,8 +47,8 @@ def category_tail(html: str, cat: str) -> int:
         nl = html.find("\n", end)
         pos = nl + 1
     if last is None:
-        sys.exit(f"カテゴリ {cat} に既存の本がない（手で追加すること）")
-    return last
+        return m.end(), True
+    return last, False
 
 
 def main() -> None:
@@ -58,6 +61,7 @@ def main() -> None:
     html = load_html()
     recs = flier_records(html)
     edits = []  # (start, end, text)
+    new_by_cat: dict[str, list[str]] = {}
     for p in sorted(plan, key=lambda x: (x["mode"], x.get("category") or "", natural(x["id"]))):
         o = json.loads((a.work / "out" / f"{p['id']}.json").read_text(encoding="utf-8"))
         pts = [{"h": x["h"], "b": x["b"]} for x in o["points"]]
@@ -75,13 +79,15 @@ def main() -> None:
             r = {"id": p["id"], **{k: str(o[k]) for k in META if o.get(k)}}
             for k in FIELDS:
                 r[k] = pts if k == "points" else o[k]
-            tail = category_tail(html, p["category"])
-            edits.append((tail, tail, ",\n" + dump(r)))
+            new_by_cat.setdefault(p["category"], []).append(dump(r))
             print(f"new     {p['id']} → {p['category']}: {r['title']}（{body_len(r)}字）")
+    for cat, block in new_by_cat.items():
+        pos, empty = category_tail(html, cat)
+        text = ",\n".join(block)
+        edits.append((pos, pos, text + "\n" if empty else ",\n" + text))
     if a.dry_run:
         return
-    # 同じ位置への追加は id 順に並ぶよう、後ろの位置から・同じ位置は後に積んだものから差し込む
-    for _, (s, e, t) in sorted(enumerate(edits), key=lambda x: (-x[1][0], -x[0])):
+    for s, e, t in sorted(edits, key=lambda x: -x[0]):
         html = html[:s] + t + html[e:]
     HUB.write_text(html, encoding="utf-8")
     print(f"差し込み {len(edits)}件 → {HUB}")
