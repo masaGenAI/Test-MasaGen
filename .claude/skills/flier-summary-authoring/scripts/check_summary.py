@@ -18,6 +18,7 @@ from hub import body_len  # noqa: E402
 
 RANGES = {"oneLiner": (60, 110), "overview": (350, 500), "takeaway": (180, 300)}
 NEW_META = ("title", "author", "publisher", "year", "pages")
+KANJI_DIGITS = str.maketrans("〇一二三四五六七八九", "0123456789")
 
 
 def nums(s: str) -> set[str]:
@@ -102,6 +103,8 @@ def main() -> None:
         if src_file.exists():
             src = unicodedata.normalize("NFKC", re.sub(r"\s", "", src_file.read_text(encoding="utf-8")))
             src = re.sub(r"(\d)・(\d)", r"\1.\2", src)  # 縦書きの小数点は中黒で組まれる（13・9％）
+            # 縦書きでは数字が漢数字で組まれることが多い（二〇〇四年、一五〇〇億）。2字以上の連なりを算用数字に直して照合する
+            src = re.sub(r"[〇一二三四五六七八九]{2,}", lambda m: m.group(0).translate(KANJI_DIGITS), src)
             missing = sorted(n for n in nums(text) if n not in src.replace(",", ""))
             if missing:
                 warn.append(f"抽出テキストに見つからない数字 {missing}（画像で確認）")
