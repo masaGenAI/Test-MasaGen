@@ -10,6 +10,7 @@ import ANYTHING_MEMO_HTML from "../public/anything-memo.html?raw";
 // TechHub「AIフォーサイト」のブリーフと情報源ライブラリ（情報源は月次メンテナンスで nova-app/scripts/foresight_linkcheck.py が更新する）
 import FORESIGHT from "./data/foresight-briefs.json";
 import FORESIGHT_SOURCES from "./data/foresight-sources.json";
+import FORESIGHT_COLLECTION from "./data/foresight-collection.json";
 
 // =============================================================================
 // QUIZ SAVE SLOT — ゲームのセーブのように、クイズの途中経過を1スロット保存/再開する
@@ -154508,9 +154509,14 @@ function FsRefresh({ en }) {
 }
 function FsCollection({ en }) {
   const blank = { title: "", url: "", layer: "", tags: "", memo: "" };
-  const [items, setItems] = useState(() => { try { return JSON.parse(localStorage.getItem(FS_COL_KEY) || "[]") || []; } catch (e) { return []; } });
-  const [form, setForm] = useState(blank); const [edit, setEdit] = useState(null); const [q, setQ] = useState(""); const [ly, setLy] = useState("");
-  const save = (next) => { setItems(next); try { localStorage.setItem(FS_COL_KEY, JSON.stringify(next)); } catch (e) { /* 保存できない環境では画面上だけ保持 */ } };
+  const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k) || "null") || d; } catch (e) { return d; } };
+  const [items, setItems] = useState(() => load(FS_COL_KEY, []));
+  const [hidden, setHidden] = useState(() => load(FS_COL_KEY + "_hidden", []));
+  const [form, setForm] = useState(blank); const [edit, setEdit] = useState(null);
+  const [q, setQ] = useState(""); const [ly, setLy] = useState(""); const [src, setSrc] = useState(""); const [showHidden, setShowHidden] = useState(false);
+  const store = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 保存できない環境では画面上だけ保持 */ } };
+  const save = (next) => { setItems(next); store(FS_COL_KEY, next); };
+  const hide = (id, on) => { const next = on ? [...hidden, id] : hidden.filter((x) => x !== id); setHidden(next); store(FS_COL_KEY + "_hidden", next); };
   const submit = () => {
     if (!form.title.trim()) return;
     const rec = { ...form, title: form.title.trim(), url: form.url.trim(), tags: form.tags.trim() };
@@ -154528,12 +154534,20 @@ function FsCollection({ en }) {
     r.readAsText(file);
   };
   const layerName = (id) => { const l = FORESIGHT.layers.find((x) => x.id === id); return l ? FS_PICK(l.tab, en) : (en ? "Other" : "その他"); };
-  const rows = items.filter((x) => (!ly || (x.layer || "") === ly) && (!q || [x.title, x.memo, x.tags, x.url].join(" ").toLowerCase().includes(q.toLowerCase())));
+  const MINE = en ? "Added by me" : "自分で追加";
+  const all = [
+    ...items.map((x) => ({ ...x, mine: true, label: MINE, date: x.added, tagList: (x.tags || "").split(/[,、]/).map((t) => t.trim()).filter(Boolean) })),
+    ...FORESIGHT_COLLECTION.map((x) => ({ ...x, tagList: x.tags })),
+  ];
+  const labels = [...new Set(all.map((x) => x.label))];
+  const rows = all.filter((x) => (showHidden ? hidden.includes(x.id) : !hidden.includes(x.id)) && (!ly || (x.layer || "") === (ly === "other" ? "" : ly)) && (!src || x.label === src)
+    && (!q || [x.title, x.memo, x.tagList.join(" "), x.url, x.label].join(" ").toLowerCase().includes(q.toLowerCase())));
   const inp = { width: "100%", boxSizing: "border-box" };
+  const small = { fontSize: 12, padding: "5px 12px" };
   return (
     <div>
       <Card style={{ marginBottom: 12, borderColor: C.teal }}>
-        <div style={{ fontSize: 12.5, lineHeight: 1.7, marginBottom: 10 }}>{en ? "Your own clippings: articles, data and ideas worth keeping. Saved in this browser; use Export to back up or move them." : "自分で集めた記事・データ・気になったアイデアを残す場所。この端末のブラウザに保存されます。バックアップや端末の移行には「書き出し」を使ってください。"}</div>
+        <div style={{ fontSize: 12.5, lineHeight: 1.7, marginBottom: 10 }}>{en ? "Your own clippings: Instagram saves, YouTube digests and notes you emailed yourself are already filed by layer. Items you add here are saved in this browser; use Export to back them up." : "自分で集めた情報の置き場所。Instagram の保存、YouTube のダイジェスト、自分宛てのメールのメモをレイヤー別に取り込み済み。ここで追加した項目はこの端末のブラウザに保存されます（バックアップは「書き出し」）。"}</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,240px),1fr))", gap: 8 }}>
           <input className="gh-input" style={inp} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder={en ? "Title (required)" : "タイトル（必須）"} />
           <input className="gh-input" style={inp} value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} placeholder="URL" />
@@ -154553,26 +154567,38 @@ function FsCollection({ en }) {
             <input type="file" accept="application/json" style={{ display: "none" }} onChange={(e) => { if (e.target.files[0]) importJson(e.target.files[0]); e.target.value = ""; }} /></label>
         </div>
       </Card>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 8 }}>
         <input className="gh-input" value={q} onChange={(e) => setQ(e.target.value)} placeholder={en ? "Search your collection" : "コレクションを検索"} style={{ flex: 1, minWidth: 180 }} />
         <select className="gh-select" value={ly} onChange={(e) => setLy(e.target.value)}>
           <option value="">{en ? "All layers" : "すべてのレイヤー"}</option>
           {FORESIGHT.layers.map((l) => <option key={l.id} value={l.id}>{FS_PICK(l.tab, en)}</option>)}
+          <option value="other">{en ? "Other" : "その他"}</option>
         </select>
+        <select className="gh-select" value={src} onChange={(e) => setSrc(e.target.value)}>
+          <option value="">{en ? "All sources" : "すべての出所"}</option>
+          {labels.map((l) => <option key={l} value={l}>{l}</option>)}
+        </select>
+        <button className="gh-btn" onClick={() => setShowHidden((v) => !v)} style={showHidden ? { borderColor: C.gold, color: C.gold } : {}}>{showHidden ? (en ? "Back to list" : "一覧に戻る") : (en ? `Hidden (${hidden.length})` : `非表示（${hidden.length}）`)}</button>
       </div>
-      {!rows.length ? <div style={{ fontSize: 12.5, color: C.dim }}>{items.length ? (en ? "No matching items." : "条件に合う項目はありません。") : (en ? "Nothing collected yet." : "まだ登録がありません。")}</div> : (
+      <div style={{ fontSize: 11.5, color: C.dim, marginBottom: 8 }}>{rows.length} {en ? "items" : "件"}</div>
+      {!rows.length ? <div style={{ fontSize: 12.5, color: C.dim }}>{en ? "No matching items." : "条件に合う項目はありません。"}</div> : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,330px),1fr))", gap: 10 }}>
           {rows.map((x) => (
             <Card key={x.id}>
-              <div style={{ fontSize: 10.5, letterSpacing: ".14em", color: C.gold, textTransform: "uppercase" }}>{layerName(x.layer)} · {x.added}</div>
+              <div style={{ fontSize: 10.5, letterSpacing: ".1em", color: C.gold }}>{layerName(x.layer)} · {x.label}{x.date ? " · " + x.date : ""}</div>
               <div className="gh-display" style={{ fontSize: 15, fontWeight: 700, lineHeight: 1.5, marginTop: 2 }}>
-                {x.url ? <a href={x.url} target="_blank" rel="noopener noreferrer" style={{ color: C.text, textDecoration: "none", borderBottom: `1px solid ${C.line}` }}>{x.title}</a> : x.title}
+                {x.url || x.gmail ? <a href={x.url || x.gmail} target="_blank" rel="noopener noreferrer" style={{ color: C.text, textDecoration: "none", borderBottom: `1px solid ${C.line}` }}>{x.title}</a> : x.title}
               </div>
               {x.memo && <div style={{ fontSize: 12.5, lineHeight: 1.7, marginTop: 6, whiteSpace: "pre-wrap" }}>{x.memo}</div>}
-              {x.tags && <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 }}>{x.tags.split(/[,、]/).map((t) => t.trim()).filter(Boolean).map((t) => <span key={t} style={{ fontSize: 11, padding: "2px 9px", borderRadius: 999, border: `1px solid ${C.line}`, color: C.muted }}>{t}</span>)}</div>}
-              <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
-                <button className="gh-btn" style={{ fontSize: 12, padding: "5px 12px" }} onClick={() => { setForm({ title: x.title, url: x.url || "", layer: x.layer || "", tags: x.tags || "", memo: x.memo || "" }); setEdit(x.id); window.scrollTo({ top: 0, behavior: "smooth" }); }}>{en ? "Edit" : "編集"}</button>
-                <button className="gh-btn" style={{ fontSize: 12, padding: "5px 12px" }} onClick={() => { if (window.confirm(en ? "Delete this item?" : "この項目を削除しますか？")) save(items.filter((y) => y.id !== x.id)); }}>{en ? "Delete" : "削除"}</button>
+              {x.tagList.length > 0 && <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 }}>{x.tagList.map((t) => <span key={t} style={{ fontSize: 11, padding: "2px 9px", borderRadius: 999, border: `1px solid ${C.line}`, color: C.muted }}>{t}</span>)}</div>}
+              <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
+                {x.gmail && x.url && <a className="gh-btn" style={{ ...small, textDecoration: "none" }} href={x.gmail} target="_blank" rel="noopener noreferrer">{en ? "Open email" : "メールを開く"}</a>}
+                {x.mine ? (<>
+                  <button className="gh-btn" style={small} onClick={() => { setForm({ title: x.title, url: x.url || "", layer: x.layer || "", tags: x.tags || "", memo: x.memo || "" }); setEdit(x.id); window.scrollTo({ top: 0, behavior: "smooth" }); }}>{en ? "Edit" : "編集"}</button>
+                  <button className="gh-btn" style={small} onClick={() => { if (window.confirm(en ? "Delete this item?" : "この項目を削除しますか？")) save(items.filter((y) => y.id !== x.id)); }}>{en ? "Delete" : "削除"}</button>
+                </>) : (
+                  <button className="gh-btn" style={small} onClick={() => hide(x.id, !hidden.includes(x.id))}>{hidden.includes(x.id) ? (en ? "Show again" : "表示に戻す") : (en ? "Hide" : "非表示")}</button>
+                )}
               </div>
             </Card>
           ))}
