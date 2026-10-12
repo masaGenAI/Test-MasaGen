@@ -7,6 +7,9 @@ import BOOK_SUMMARY_HTML from "../public/booksummaryhub.html?raw";
 import LEARNING_TRACKER_HTML from "../public/learning-tracker.html?raw";
 // Anything Memo トラッカー（調べ済みノートの一覧・検索・ジャンル別・自動保存）
 import ANYTHING_MEMO_HTML from "../public/anything-memo.html?raw";
+// TechHub「AIフォーサイト」のブリーフと情報源ライブラリ（情報源は月次メンテナンスで nova-app/scripts/foresight_linkcheck.py が更新する）
+import FORESIGHT from "./data/foresight-briefs.json";
+import FORESIGHT_SOURCES from "./data/foresight-sources.json";
 
 // =============================================================================
 // QUIZ SAVE SLOT — ゲームのセーブのように、クイズの途中経過を1スロット保存/再開する
@@ -120197,6 +120200,13 @@ const UI = {
   tab_companies: ["企業研究", "Companies"],
   tab_lexicon: ["用語辞典", "Lexicon"],
   tab_noteissues: ["実務論点マップ", "Practice Issue Map"],
+  tab_fs_macro: ["マクロ・技術", "Macro & Technology"],
+  tab_fs_market: ["市場・エコシステム", "Market & Ecosystem"],
+  tab_fs_client: ["経営アジェンダ", "Client Agenda"],
+  tab_fs_craft: ["フォーサイト技法", "Foresight Craft"],
+  tab_fs_library: ["情報源ライブラリ", "Source Library"],
+  tab_fs_refresh: ["月次メンテナンス", "Monthly Refresh"],
+  tab_fs_collection: ["コレクション", "Collection"],
   tab_architect: ["AIアーキテクト道場", "Architect Academy"],
   tab_archcase: ["アーキテクチャ事例", "Architecture Cases"],
   tab_govdojo: ["セキュリティ・ガバナンス道場", "Security & Governance Dojo"],
@@ -120518,7 +120528,7 @@ function diagramTitle(d, lang) { return lang === "en" ? (DIAGRAM_TITLE_EN[d.titl
 const C = {
   bg: "#141020", surface: "#1E1832", surface2: "#292044", line: "#3A3158",
   wine: "#B84A5E", wineDeep: "#7E2F44", teal: "#5FD3C2", gold: "#D8A94E",
-  text: "#EDE8F4", muted: "#9A90B4", dim: "#6E6488"
+  text: "#EDE8F4", muted: "#9A90B4", dim: "#6E6488", fore: "#8FA2FF"
 };
 
 const GLOBAL_CSS = `
@@ -120527,6 +120537,8 @@ const GLOBAL_CSS = `
 .gh-display{font-family:'Shippori Mincho',serif;letter-spacing:.04em;}
 .gh-btn{background:${C.surface2};border:1px solid ${C.line};color:${C.text};border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;transition:border-color .15s;}
 .gh-btn:hover{border-color:${C.gold};}
+.fs-row{display:grid;grid-template-columns:40px 1.5fr 2.3fr 130px 150px;gap:12px;padding:11px 16px;font-size:12.5px;line-height:1.65;align-items:start;}
+@media (max-width:720px){.fs-row{grid-template-columns:1fr;gap:4px;}}
 .gh-btn:focus-visible{outline:2px solid ${C.gold};outline-offset:2px;}
 .gh-btn-primary{background:${C.wineDeep};border-color:${C.wine};}
 .gh-btn-primary:hover{border-color:${C.gold};}
@@ -154338,6 +154350,264 @@ function CheckEngine({ bank, domains, storeKey, jp, intro, introEn, noTitle, par
 function TabCheckCore() { return <CheckEngine bank={CHECK_CORE_BANK} domains={CHECK_DOMAINS_CORE} storeKey="axcheck_core_stats_v1" jp="理解度チェック — 基礎（論点・全体像・定量データ・統制・事例）" intro="論点マップ・全体像・定量データ・統制の理解を確認します。" />; }
 function TabCheckAx() { return <CheckEngine bank={CHECK_AX_BANK} domains={CHECK_DOMAINS_AX} storeKey="axcheck_ax_stats_v1" jp="理解度チェック — AX実務（価値・提案・競合・業界・AGI）" intro="価値ドライバー・診断・提案の型・業界別・AGIタブの理解を確認します。" />; }
 
+// ============ AIフォーサイト（4レイヤーのブリーフ・情報源ライブラリ・月次メンテナンス・コレクション） ============
+// ブリーフと情報源は src/data/foresight-*.json。情報源の確認状態は月次メンテナンス（scripts/foresight_linkcheck.py）が更新する。
+const FS_VIEWS = { fs_macro: "A", fs_market: "B", fs_client: "C", fs_craft: "D", fs_library: "lib", fs_refresh: "refresh", fs_collection: "col" };
+const FS_STATUS = {
+  ok: [["開いて確認済み", "Verified"], C.teal],
+  reachable: [["応答あり（自動確認を制限）", "Reachable (automated checks limited)"], C.gold],
+  pending: [["ドメイン許可待ち", "Awaiting domain allowance"], C.wine],
+  unverified: [["未確認", "Unverified"], C.dim],
+};
+const FS_SRC = Object.fromEntries(FORESIGHT_SOURCES.map((s) => [s.id, s]));
+const FS_COL_KEY = "techhub_foresight_collection_v1";
+const FS_PICK = (v, en) => (Array.isArray(v) ? v[en ? 1 : 0] || v[0] : v || "");
+
+function FsLabel({ en, ja, isEn }) {
+  return (
+    <div style={{ fontSize: 10.5, letterSpacing: ".14em", color: C.dim, textTransform: "uppercase", margin: "12px 0 5px", fontWeight: 700 }}>
+      {en}{!isEn && <span style={{ color: C.muted, letterSpacing: ".04em", textTransform: "none", marginLeft: 6 }}>{ja}</span>}
+    </div>
+  );
+}
+function FsLegend({ en }) {
+  return (
+    <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: 11.5, color: C.muted, margin: "0 0 10px" }}>
+      {Object.entries(FS_STATUS).map(([k, [l, col]]) => (
+        <span key={k} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+          <i style={{ width: 6, height: 6, borderRadius: "50%", background: col, display: "inline-block" }} />{l[en ? 1 : 0]}
+        </span>
+      ))}
+    </div>
+  );
+}
+function FsBrief({ b, en }) {
+  const [on, setOn] = useState(false);
+  return (
+    <Card>
+      <div onClick={() => setOn((v) => !v)} style={{ cursor: "pointer", display: "flex", gap: 10, alignItems: "flex-start" }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 10.5, letterSpacing: ".18em", color: C.gold, textTransform: "uppercase" }}>{b.en}</div>
+          <div className="gh-display" style={{ fontSize: 15, fontWeight: 700, lineHeight: 1.5, marginTop: 2 }}>{FS_PICK(b.title, en)}</div>
+        </div>
+        <span style={{ fontSize: 10, color: C.dim, flexShrink: 0, paddingTop: 4 }}>{on ? "▲" : "▼"}</span>
+      </div>
+      <div style={{ fontSize: 13, lineHeight: 1.75, marginTop: 10 }}>{FS_PICK(b.q, en)}</div>
+      {on ? (
+        <div>
+          <FsLabel en="Leading Indicators" ja="先行指標" isEn={en} />
+          <ul style={{ margin: 0, paddingLeft: 16, fontSize: 12.5, lineHeight: 1.75 }}>{b.ind.map((x, i) => <li key={i}>{FS_PICK(x, en)}</li>)}</ul>
+          <FsLabel en="Current Read" ja="直近の読み" isEn={en} />
+          {b.read ? (
+            <div style={{ fontSize: 12.5, lineHeight: 1.7, borderLeft: `2px solid ${C.line}`, paddingLeft: 10 }}>
+              {en ? b.read.en : b.read.ja}
+              <div style={{ fontSize: 11, color: C.dim, marginTop: 3 }}>{en ? "As of " : "時点："}{b.read.asOf}{(b.read.src || []).map((id) => FS_SRC[id] ? ` · ${FS_PICK(FS_SRC[id].name, en)}` : "").join("")}</div>
+            </div>
+          ) : <div style={{ fontSize: 12, color: C.dim }}>{en ? "To be filled at the next monthly refresh." : "次回の月次メンテナンスで記入。"}</div>}
+          <FsLabel en="Sources" ja="情報源" isEn={en} />
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {b.src.map((id) => { const s = FS_SRC[id]; if (!s) return null; return (
+              <a key={id} href={s.url} target="_blank" rel="noopener noreferrer"
+                 style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11.5, padding: "3px 10px", borderRadius: 999, border: `1px solid ${C.line}`, background: C.surface2, color: C.text, textDecoration: "none" }}>
+                <i style={{ width: 6, height: 6, borderRadius: "50%", background: (FS_STATUS[s.status] || FS_STATUS.unverified)[1], display: "inline-block" }} />{FS_PICK(s.name, en)}
+              </a>); })}
+          </div>
+          <FsLabel en="Boardroom Question" ja="経営への問い" isEn={en} />
+          <div style={{ fontSize: 12.5, color: C.teal, lineHeight: 1.7, background: C.surface2, borderRadius: 6, padding: "7px 10px" }}>{FS_PICK(b.board, en)}</div>
+          <FsLabel en="So What" ja="提案への示唆" isEn={en} />
+          <div style={{ fontSize: 12.5, color: C.gold, lineHeight: 1.7 }}>{FS_PICK(b.sowhat, en)}</div>
+        </div>
+      ) : null}
+    </Card>
+  );
+}
+function FsLibrary({ en }) {
+  const [q, setQ] = useState(""); const [ly, setLy] = useState(""); const [sub, setSub] = useState(""); const [rg, setRg] = useState(""); const [st, setSt] = useState("");
+  const subs = useMemo(() => [...new Set(FORESIGHT_SOURCES.filter((s) => !ly || s.layer === ly).map((s) => s.layer + "|" + FS_PICK(s.sub, false)))], [ly]);
+  const rows = FORESIGHT_SOURCES.filter((s) => (!ly || s.layer === ly) && (!sub || s.layer + "|" + FS_PICK(s.sub, false) === sub) && (!st || s.status === st)
+    && (!rg || (rg === "jp") === s.jp) && (!q || [FS_PICK(s.name, false), FS_PICK(s.name, true), s.org, FS_PICK(s.desc, false), FS_PICK(s.desc, true)].join(" ").toLowerCase().includes(q.toLowerCase())));
+  return (
+    <div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
+        <input className="gh-input" value={q} onChange={(e) => setQ(e.target.value)} placeholder={en ? "Search name, publisher or content" : "名称・運営・内容で検索"} style={{ flex: 1, minWidth: 180 }} />
+        <select className="gh-select" value={ly} onChange={(e) => { setLy(e.target.value); setSub(""); }}>
+          <option value="">{en ? "All layers" : "すべてのレイヤー"}</option>
+          {FORESIGHT.layers.map((l) => <option key={l.id} value={l.id}>{FS_PICK(l.tab, en)}</option>)}
+        </select>
+        <select className="gh-select" value={sub} onChange={(e) => setSub(e.target.value)}>
+          <option value="">{en ? "All categories" : "すべての区分"}</option>
+          {subs.map((s) => { const src = FORESIGHT_SOURCES.find((x) => x.layer + "|" + FS_PICK(x.sub, false) === s); return <option key={s} value={s}>{FS_PICK(src.sub, en)}</option>; })}
+        </select>
+        <select className="gh-select" value={rg} onChange={(e) => setRg(e.target.value)}>
+          <option value="">{en ? "All regions" : "すべての地域"}</option><option value="jp">{en ? "Japan" : "日本"}</option><option value="intl">{en ? "Global" : "海外"}</option>
+        </select>
+        <select className="gh-select" value={st} onChange={(e) => setSt(e.target.value)}>
+          <option value="">{en ? "All status" : "すべての状態"}</option>
+          {Object.entries(FS_STATUS).map(([k, [l]]) => <option key={k} value={k}>{l[en ? 1 : 0]}</option>)}
+        </select>
+      </div>
+      <FsLegend en={en} />
+      <div style={{ fontSize: 11.5, color: C.dim, marginBottom: 8 }}>{rows.length} {en ? "sources" : "件"}</div>
+      <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 12, overflow: "hidden" }}>
+        {rows.map((s) => { const [l, col] = FS_STATUS[s.status] || FS_STATUS.unverified; return (
+          <div key={s.id} className="fs-row" style={{ borderTop: `1px solid ${C.line}` }}>
+            <div className="gh-display" style={{ fontWeight: 700, color: C.gold, fontSize: 15 }}>{s.layer}</div>
+            <div><a href={s.url} target="_blank" rel="noopener noreferrer" style={{ color: C.text, textDecoration: "none", fontWeight: 700, borderBottom: `1px solid ${C.line}` }}>{FS_PICK(s.name, en)}</a>
+              <div style={{ fontSize: 11, color: C.dim, marginTop: 2 }}>{s.org}{s.org ? " · " : ""}{FS_PICK(s.sub, en)}</div></div>
+            <div>{FS_PICK(s.desc, en)}</div>
+            <div style={{ fontSize: 11.5, color: C.muted }}>{FS_PICK(s.freq, en) || "—"}<br />{FS_PICK(s.region, en) || "—"}{FS_PICK(s.fee, en) ? " · " + FS_PICK(s.fee, en) : ""}</div>
+            <div><span style={{ display: "inline-block", fontSize: 11, fontWeight: 700, padding: "2px 9px", borderRadius: 999, border: `1px solid ${col}`, color: col }}>{l[en ? 1 : 0]}</span></div>
+          </div>); })}
+      </div>
+    </div>
+  );
+}
+function FsRefresh({ en }) {
+  const n = (k) => FORESIGHT_SOURCES.filter((s) => s.status === k).length;
+  const kpi = [[FORESIGHT_SOURCES.length, "SOURCES", C.text], [n("ok"), "VERIFIED", C.teal], [n("reachable"), "REACHABLE", C.gold], [n("pending") + n("unverified"), "PENDING", C.dim]];
+  const steps = [
+    ["Link health", "全リンクを開き、接続不可・移転（リダイレクト）・タイトルの変化を検出する。", "Open every link and detect failures, redirects and title changes."],
+    ["New editions", "年次レポート、白書、決算など定点資料の新しい版を検知する。", "Detect new editions of recurring reports, white papers and earnings."],
+    ["Change report", "「切れた／移転した／新版が出た／状態が変わった」を差分として一覧化する。", "List what broke, moved, was republished or changed status."],
+    ["Review", "差し替え先と、各ブリーフの「直近の読み」の更新案を確認する。", "Review replacements and proposed updates to each brief's Current Read."],
+    ["Publish", "ライブラリとブリーフを更新し、点検日と履歴を記録する。", "Update the library and briefs, and record the check date and log."],
+  ];
+  return (
+    <div>
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
+        {kpi.map(([v, l, col]) => (
+          <div key={l} style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 12, padding: "12px 16px", minWidth: 130 }}>
+            <div className="gh-display" style={{ fontSize: 26, fontWeight: 700, color: col, lineHeight: 1.2 }}>{v}</div>
+            <div style={{ fontSize: 11, color: C.muted, letterSpacing: ".06em" }}>{l}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,330px),1fr))", gap: 10 }}>
+        <Card>
+          <FsLabel en="Cadence" ja={FORESIGHT.meta.cadence[0]} isEn={en} />
+          {en && <div style={{ fontSize: 12.5, color: C.muted, marginBottom: 8 }}>{FORESIGHT.meta.cadence[1]}</div>}
+          {steps.map(([h, ja, enT], i) => (
+            <div key={h} style={{ display: "flex", gap: 12, marginBottom: 12 }}>
+              <span className="gh-display" style={{ fontSize: 20, color: C.gold, lineHeight: 1.1, width: 28, flexShrink: 0 }}>{String(i + 1).padStart(2, "0")}</span>
+              <div style={{ fontSize: 13, lineHeight: 1.7 }}><b>{h}</b><br /><span style={{ color: C.muted }}>{en ? enT : ja}</span></div>
+            </div>
+          ))}
+        </Card>
+        <Card>
+          <FsLabel en="Change Log" ja="点検の履歴" isEn={en} />
+          {FORESIGHT.meta.log.map((r, i) => (
+            <div key={i} style={{ display: "flex", gap: 12, borderTop: `1px solid ${C.line}`, padding: "9px 0", fontSize: 12.5, lineHeight: 1.65 }}>
+              <span style={{ color: C.gold, flexShrink: 0, width: 84 }}>{r.d}</span><span>{en ? r.en : r.ja}</span>
+            </div>
+          ))}
+          <div style={{ fontSize: 11.5, color: C.dim, marginTop: 6 }}>{en ? "Next run: " : "次回の点検："}{FORESIGHT.meta.next}</div>
+        </Card>
+      </div>
+    </div>
+  );
+}
+function FsCollection({ en }) {
+  const blank = { title: "", url: "", layer: "", tags: "", memo: "" };
+  const [items, setItems] = useState(() => { try { return JSON.parse(localStorage.getItem(FS_COL_KEY) || "[]") || []; } catch (e) { return []; } });
+  const [form, setForm] = useState(blank); const [edit, setEdit] = useState(null); const [q, setQ] = useState(""); const [ly, setLy] = useState("");
+  const save = (next) => { setItems(next); try { localStorage.setItem(FS_COL_KEY, JSON.stringify(next)); } catch (e) { /* 保存できない環境では画面上だけ保持 */ } };
+  const submit = () => {
+    if (!form.title.trim()) return;
+    const rec = { ...form, title: form.title.trim(), url: form.url.trim(), tags: form.tags.trim() };
+    if (edit) save(items.map((x) => (x.id === edit ? { ...x, ...rec, updated: new Date().toISOString().slice(0, 10) } : x)));
+    else save([{ ...rec, id: Date.now().toString(36), added: new Date().toISOString().slice(0, 10) }, ...items]);
+    setForm(blank); setEdit(null);
+  };
+  const exportJson = () => {
+    const blob = new Blob([JSON.stringify(items, null, 2)], { type: "application/json" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "ai-foresight-collection.json"; a.click(); URL.revokeObjectURL(a.href);
+  };
+  const importJson = (file) => {
+    const r = new FileReader();
+    r.onload = () => { try { const arr = JSON.parse(r.result); if (Array.isArray(arr)) { const ids = new Set(items.map((x) => x.id)); save([...arr.filter((x) => x && x.title && !ids.has(x.id)), ...items]); } } catch (e) { /* 不正なファイルは読み込まない */ } };
+    r.readAsText(file);
+  };
+  const layerName = (id) => { const l = FORESIGHT.layers.find((x) => x.id === id); return l ? FS_PICK(l.tab, en) : (en ? "Other" : "その他"); };
+  const rows = items.filter((x) => (!ly || (x.layer || "") === ly) && (!q || [x.title, x.memo, x.tags, x.url].join(" ").toLowerCase().includes(q.toLowerCase())));
+  const inp = { width: "100%", boxSizing: "border-box" };
+  return (
+    <div>
+      <Card style={{ marginBottom: 12, borderColor: C.teal }}>
+        <div style={{ fontSize: 12.5, lineHeight: 1.7, marginBottom: 10 }}>{en ? "Your own clippings: articles, data and ideas worth keeping. Saved in this browser; use Export to back up or move them." : "自分で集めた記事・データ・気になったアイデアを残す場所。この端末のブラウザに保存されます。バックアップや端末の移行には「書き出し」を使ってください。"}</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,240px),1fr))", gap: 8 }}>
+          <input className="gh-input" style={inp} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder={en ? "Title (required)" : "タイトル（必須）"} />
+          <input className="gh-input" style={inp} value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} placeholder="URL" />
+          <select className="gh-select" style={inp} value={form.layer} onChange={(e) => setForm({ ...form, layer: e.target.value })}>
+            <option value="">{en ? "Layer: Other" : "レイヤー：その他"}</option>
+            {FORESIGHT.layers.map((l) => <option key={l.id} value={l.id}>{FS_PICK(l.tab, en)}</option>)}
+          </select>
+          <input className="gh-input" style={inp} value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} placeholder={en ? "Tags (comma separated)" : "タグ（カンマ区切り）"} />
+        </div>
+        <textarea className="gh-input" style={{ ...inp, marginTop: 8, minHeight: 72, fontFamily: "inherit", lineHeight: 1.6 }} value={form.memo} onChange={(e) => setForm({ ...form, memo: e.target.value })} placeholder={en ? "Notes: why it matters, the So What" : "メモ：なぜ気になったか、So What"} />
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
+          <button className="gh-btn gh-btn-primary" onClick={submit} disabled={!form.title.trim()}>{edit ? (en ? "Update" : "更新する") : (en ? "Add" : "追加する")}</button>
+          {edit && <button className="gh-btn" onClick={() => { setForm(blank); setEdit(null); }}>{en ? "Cancel" : "取り消す"}</button>}
+          <span style={{ flex: 1 }} />
+          <button className="gh-btn" onClick={exportJson} disabled={!items.length}>{en ? "Export" : "書き出し"}</button>
+          <label className="gh-btn" style={{ display: "inline-flex", alignItems: "center" }}>{en ? "Import" : "読み込み"}
+            <input type="file" accept="application/json" style={{ display: "none" }} onChange={(e) => { if (e.target.files[0]) importJson(e.target.files[0]); e.target.value = ""; }} /></label>
+        </div>
+      </Card>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
+        <input className="gh-input" value={q} onChange={(e) => setQ(e.target.value)} placeholder={en ? "Search your collection" : "コレクションを検索"} style={{ flex: 1, minWidth: 180 }} />
+        <select className="gh-select" value={ly} onChange={(e) => setLy(e.target.value)}>
+          <option value="">{en ? "All layers" : "すべてのレイヤー"}</option>
+          {FORESIGHT.layers.map((l) => <option key={l.id} value={l.id}>{FS_PICK(l.tab, en)}</option>)}
+        </select>
+      </div>
+      {!rows.length ? <div style={{ fontSize: 12.5, color: C.dim }}>{items.length ? (en ? "No matching items." : "条件に合う項目はありません。") : (en ? "Nothing collected yet." : "まだ登録がありません。")}</div> : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,330px),1fr))", gap: 10 }}>
+          {rows.map((x) => (
+            <Card key={x.id}>
+              <div style={{ fontSize: 10.5, letterSpacing: ".14em", color: C.gold, textTransform: "uppercase" }}>{layerName(x.layer)} · {x.added}</div>
+              <div className="gh-display" style={{ fontSize: 15, fontWeight: 700, lineHeight: 1.5, marginTop: 2 }}>
+                {x.url ? <a href={x.url} target="_blank" rel="noopener noreferrer" style={{ color: C.text, textDecoration: "none", borderBottom: `1px solid ${C.line}` }}>{x.title}</a> : x.title}
+              </div>
+              {x.memo && <div style={{ fontSize: 12.5, lineHeight: 1.7, marginTop: 6, whiteSpace: "pre-wrap" }}>{x.memo}</div>}
+              {x.tags && <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 }}>{x.tags.split(/[,、]/).map((t) => t.trim()).filter(Boolean).map((t) => <span key={t} style={{ fontSize: 11, padding: "2px 9px", borderRadius: 999, border: `1px solid ${C.line}`, color: C.muted }}>{t}</span>)}</div>}
+              <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+                <button className="gh-btn" style={{ fontSize: 12, padding: "5px 12px" }} onClick={() => { setForm({ title: x.title, url: x.url || "", layer: x.layer || "", tags: x.tags || "", memo: x.memo || "" }); setEdit(x.id); window.scrollTo({ top: 0, behavior: "smooth" }); }}>{en ? "Edit" : "編集"}</button>
+                <button className="gh-btn" style={{ fontSize: 12, padding: "5px 12px" }} onClick={() => { if (window.confirm(en ? "Delete this item?" : "この項目を削除しますか？")) save(items.filter((y) => y.id !== x.id)); }}>{en ? "Delete" : "削除"}</button>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+function TabForesight({ view }) {
+  const lang = useLang();
+  const en = lang === "en";
+  const v = FS_VIEWS[view] || "A";
+  const L = FORESIGHT.layers.find((l) => l.id === v);
+  return (
+    <div>
+      <SectionTitle jp="AIフォーサイト ── 兆しを読み、経営の論点に変える" en="AI Foresight ── Read the signals, shape the agenda" />
+      <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.8, marginBottom: 14 }}>
+        {en ? "Technology, capital, market consensus, regulation and Japan's structural shifts. Read AI-driven change through four layers and translate it into the language of the client's agenda and our proposals. Sources live in one Source Library, refreshed every month."
+            : "技術の進歩、資本の流れ、市場の通説、規制、そして日本固有の構造。AIをめぐる変化を4つのレイヤーで捉え、顧客の経営アジェンダと提案の言葉に翻訳する。情報源は情報源ライブラリに一元化し、毎月メンテナンスする。"}
+      </div>
+      {L ? (
+        <div>
+          <Card style={{ marginBottom: 12, borderColor: C.teal }}>
+            <div style={{ fontSize: 12.5, lineHeight: 1.8 }}><b style={{ color: C.teal }}>{L.en} ── {FS_PICK(L.name, en)}</b><br />{FS_PICK(L.desc, en)}</div>
+          </Card>
+          <FsLegend en={en} />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,330px),1fr))", gap: 10 }}>
+            {FORESIGHT.briefs.filter((b) => b.layer === v).map((b) => <FsBrief key={b.id} b={b} en={en} />)}
+          </div>
+        </div>
+      ) : v === "lib" ? <FsLibrary en={en} /> : v === "refresh" ? <FsRefresh en={en} /> : <FsCollection en={en} />}
+    </div>
+  );
+}
+
 const TABS = [
   { id: "strategy", k: "tab_strategy" },
   { id: "issues", k: "tab_issues" },
@@ -154368,7 +154638,14 @@ const TABS = [
   { id: "postmortem", k: "tab_postmortem" },
   { id: "companies", k: "tab_companies" },
   { id: "lexicon", k: "tab_lexicon" },
-  { id: "noteissues", k: "tab_noteissues" }
+  { id: "noteissues", k: "tab_noteissues" },
+  { id: "fs_macro", k: "tab_fs_macro" },
+  { id: "fs_market", k: "tab_fs_market" },
+  { id: "fs_client", k: "tab_fs_client" },
+  { id: "fs_craft", k: "tab_fs_craft" },
+  { id: "fs_library", k: "tab_fs_library" },
+  { id: "fs_refresh", k: "tab_fs_refresh" },
+  { id: "fs_collection", k: "tab_fs_collection" }
 ];
 // ============ AIアーキテクト道場（役割/スキル/設計/学習/ユースケース/演習/思考/業界別） ============
 const ARCH_SECTIONS = [
@@ -159167,6 +159444,7 @@ function GafaHub() {
             { g: ["基礎", "CORE"], col: C.gold, ids: ["strategy", "issues", "consult", "tacit", "factbook", "checkcore"] },
             { g: ["AX実務", "AX PRACTICE"], col: C.teal, ids: ["value", "assess", "toolbox", "xform", "gfirm", "slalom", "sglobal", "proposal", "salesdojo", "casework", "livedojo", "industry", "agentshelf", "agi", "checkax"] },
             { g: ["道場・リサーチ", "DOJO & RESEARCH"], col: C.wine, ids: ["dojo", "architect", "archcase", "frontier", "govdojo", "postmortem", "companies", "noteissues", "lexicon"] },
+            { g: ["AIフォーサイト", "AI FORESIGHT"], col: C.fore, ids: ["fs_macro", "fs_market", "fs_client", "fs_craft", "fs_library", "fs_refresh", "fs_collection"] },
           ].map((gr, gi) => (
             <div key={gi} style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
               <span style={{ fontSize: 10.5, fontWeight: 800, color: gr.col, letterSpacing: 2, flexShrink: 0, width: 152, textAlign: "right", opacity: 0.95 }}>{lang === "en" ? gr.g[1] : gr.g[0]}</span>
@@ -159215,6 +159493,7 @@ function GafaHub() {
         {tab === "companies" && <TabCompanies key={resetKey} />}
         {tab === "lexicon" && <TabLexicon key={resetKey} />}
         {tab === "noteissues" && <TabNoteIssues key={resetKey} />}
+        {FS_VIEWS[tab] && <TabForesight key={resetKey + tab} view={tab} />}
         </HubBackCtx.Provider>
       </div>
     </div>

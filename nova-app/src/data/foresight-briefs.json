@@ -1,0 +1,1395 @@
+{
+ "layers": [
+  {
+   "id": "A",
+   "en": "Macro & Technology",
+   "name": [
+    "技術と経済の地殻変動",
+    "Tectonic shifts in technology and the economy"
+   ],
+   "desc": [
+    "能力・コスト・供給制約・資本・普及・ルール・社会。7つのレンズで、AIという汎用技術の現在地と加速度を捉える。",
+    "Capability, cost, supply constraints, capital, adoption, rules and society. Seven lenses on where AI as a general-purpose technology stands and how fast it is moving."
+   ],
+   "tab": [
+    "マクロ・技術",
+    "Macro & Technology"
+   ]
+  },
+  {
+   "id": "B",
+   "en": "Market & Ecosystem",
+   "name": [
+    "プレイヤーの賭け筋",
+    "The players' bets"
+   ],
+   "desc": [
+    "ハイパースケーラー、モデル開発企業、パートナー、調査会社、投資家、そしてコンサルティング業界自身。誰が何に賭け、何を語っているか。",
+    "Hyperscalers, model providers, partners, analysts, investors and the consulting industry itself. Who is betting on what, and what they are saying."
+   ],
+   "tab": [
+    "市場・エコシステム",
+    "Market & Ecosystem"
+   ]
+  },
+  {
+   "id": "C",
+   "en": "Client Agenda",
+   "name": [
+    "経営アジェンダへの翻訳",
+    "Translating change into the client agenda"
+   ],
+   "desc": [
+    "業界規制、投資対効果、オペレーティングモデル、人材、リスクと信頼、サステナビリティ、日本固有の構造。変化を顧客の意思決定の言葉に置き換える。",
+    "Industry regulation, return on investment, operating model, talent, risk and trust, sustainability and Japan's structural shifts. Translating change into the language of client decisions."
+   ],
+   "tab": [
+    "経営アジェンダ",
+    "Client Agenda"
+   ]
+  },
+  {
+   "id": "D",
+   "en": "Foresight Craft",
+   "name": [
+    "兆しを示唆に変える技法",
+    "Turning signals into insight"
+   ],
+   "desc": [
+    "普及の型で読む、確率で考える、シナリオで備える。シグナルを So What と打ち手に変えるための思考の道具。",
+    "Read diffusion patterns, think in probabilities, prepare with scenarios. Tools for turning signals into a So What and a course of action."
+   ],
+   "tab": [
+    "フォーサイト技法",
+    "Foresight Craft"
+   ]
+  }
+ ],
+ "briefs": [
+  {
+   "id": "f01",
+   "layer": "A",
+   "en": "Capability",
+   "title": [
+    "委任できる業務の射程",
+    "How Far Work Can Be Delegated"
+   ],
+   "q": [
+    "AIに単独で任せられる業務は、どこまで長く、複雑になったか。その伸びは持続するか。",
+    "How long and how complex a task can AI now handle on its own, and will that trajectory hold?"
+   ],
+   "ind": [
+    [
+     "フロンティアモデルの総合スコアと首位の入れ替わり",
+     "Frontier-model composite scores and changes in the leader"
+    ],
+    [
+     "自律的に完遂できるタスクの長さ",
+     "Length of tasks completed autonomously"
+    ],
+    [
+     "日本語タスクでの到達点",
+     "Performance ceiling on Japanese-language tasks"
+    ]
+   ],
+   "src": [
+    "s002",
+    "s032",
+    "s033",
+    "s003",
+    "s005",
+    "s006"
+   ],
+   "board": [
+    "12か月後、AIが単独でこなせる業務が今の数倍になる前提に立つと、御社の業務設計と人員計画はどう変わりますか。",
+    "If you assume that within 12 months AI can handle several times the work it can handle alone today, how would your operating model and workforce plan change?"
+   ],
+   "sowhat": [
+    "PoC を現時点の性能で評価して打ち切らない。モデル更新ごとに再評価する前提を、評価設計に組み込む。",
+    "Do not close out a PoC on the basis of today's performance. Build re-evaluation at every model update into the evaluation design."
+   ],
+   "read": {
+    "ja": "METRは、人間の専門家の所要時間で表した課題の長さのうち、成功確率50%となるもの（50%タイムホライズン）の最長を、2026年4月公開のClaude Mythos Preview（初期版）で約1,045分（約17時間、信頼区間は約8.5〜55時間）と報告している。同ページは、16時間を超える測定は現行の課題群では信頼できないとし、2026年9月8日の更新を最後に定期更新を行わないとしている。",
+    "en": "METR reports a 50% time horizon, the task length (measured by human expert completion time) at which an agent is predicted to succeed half the time, of about 1,045 minutes (roughly 17 hours; confidence interval of about 8.5 to 55 hours) for an early version of Claude Mythos Preview, released in April 2026. The page states that measurements above 16 hours are unreliable with its current task suite, and that it is no longer actively updated after its last update on September 8, 2026.",
+    "asOf": "2026-09",
+    "src": [
+     "s033"
+    ]
+   }
+  },
+  {
+   "id": "f02",
+   "layer": "A",
+   "en": "Unit Economics",
+   "title": [
+    "同じ知能の値段",
+    "What the Same Intelligence Costs"
+   ],
+   "q": [
+    "同等性能の AI を使うコストは、どの速度で下がっているか。",
+    "How fast is the cost of running AI of equivalent capability falling?"
+   ],
+   "ind": [
+    [
+     "トークン単価",
+     "Price per token"
+    ],
+    [
+     "同等性能モデルの価格下落率",
+     "Rate of price decline for equivalent-capability models"
+    ],
+    [
+     "推論スループット",
+     "Inference throughput"
+    ]
+   ],
+   "src": [
+    "s007",
+    "s008",
+    "s041",
+    "s009"
+   ],
+   "board": [
+    "利用単価が下がり続ける前提で、ROI 試算と契約期間を設計していますか。",
+    "Are your ROI estimates and contract terms designed on the assumption that unit prices will keep falling?"
+   ],
+   "sowhat": [
+    "長期固定の価格コミットより、単価見直し条項とモデル切替の余地を残したアーキテクチャを推す。",
+    "Favor architectures that preserve price-review clauses and room to switch models over long-term fixed-price commitments."
+   ],
+   "read": {
+    "ja": "Epochは、2025年3月公表の分析で、特定の性能水準に達するための推論価格の下落率が水準により年9倍から900倍の幅にあると報告している（GPT-4相当の博士級科学問題の性能では年40倍）。同分析は、最も速い下落が直近1年に集中しており、今後も続くかは不明確であるとする。",
+    "en": "In an analysis published in March 2025, Epoch reports that the inference price of reaching a given performance milestone has fallen at rates ranging from 9x to 900x per year depending on the milestone (40x per year for GPT-4-level performance on PhD-level science questions). It notes that the fastest declines occurred in the past year, so it is less clear that they will persist.",
+    "asOf": "2025-03",
+    "src": [
+     "s041"
+    ]
+   }
+  },
+  {
+   "id": "f03",
+   "layer": "A",
+   "en": "Supply Constraints",
+   "title": [
+    "成長を律速するボトルネック",
+    "The Bottleneck That Limits Growth"
+   ],
+   "q": [
+    "計算資源、半導体、電力、データセンター。AIの成長を最初に止めるのはどこか。",
+    "Compute, semiconductors, power, data centers: which will be the first to halt AI's growth?"
+   ],
+   "ind": [
+    [
+     "データセンターの電力需要",
+     "Data center power demand"
+    ],
+    [
+     "系統接続の待機状況",
+     "Grid-interconnection queues"
+    ],
+    [
+     "HBM・GPU の需給と価格",
+     "HBM and GPU supply, demand and pricing"
+    ],
+    [
+     "半導体市場の伸び",
+     "Growth of the semiconductor market"
+    ]
+   ],
+   "src": [
+    "s010",
+    "s013",
+    "s042",
+    "s043",
+    "s045",
+    "s046"
+   ],
+   "board": [
+    "御社の AI ロードマップは、計算資源と電力を必要なときに確保できる前提に依存していませんか。",
+    "Does your AI roadmap depend on being able to secure compute and power whenever you need them?"
+   ],
+   "sowhat": [
+    "マルチリージョン・マルチクラウドの選択肢と、推論効率化（小型モデル・蒸留）を計画のオプションに含める。",
+    "Include multi-region and multi-cloud options, and inference-efficiency measures such as small models and distillation, as options in the plan."
+   ],
+   "read": {
+    "ja": "Epochの公開データベース（2026年10月5日更新）は、掲載93拠点の合計をH100換算で1,440万基、IT電力13.8GWとし、世界の導入済みAI計算能力に対する網羅率を43%（90%信頼区間22〜81%）と推定している。TrendForceは2026年9月、AIサーバー需要によりHBMの供給制約が続き、2027年のHBM平均販売価格（混合）が前年比121%上昇する見通しと報告している。",
+    "en": "Epoch's public database (updated October 5, 2026) lists 93 sites totaling 14.4 million H100-equivalents of compute and 13.8 GW of IT power, and estimates its coverage of global deployed AI compute at 43% (90% CI: 22% to 81%). TrendForce reported in September 2026 that HBM supply constraints persist amid AI server demand, with the 2027 blended HBM average selling price forecast to rise 121% year on year.",
+    "asOf": "2026-10",
+    "src": [
+     "s013",
+     "s042"
+    ]
+   }
+  },
+  {
+   "id": "f04",
+   "layer": "A",
+   "en": "Capital Cycle",
+   "title": [
+    "投資と回収のタイムラグ",
+    "The Lag Between Investment and Payback"
+   ],
+   "q": [
+    "AIへの巨額投資は、どの速度で売上と利益に変わっているか。資金はどこから来ているか。",
+    "How quickly is massive AI investment turning into revenue and profit, and where is the money coming from?"
+   ],
+   "ind": [
+    [
+     "民間AI投資額の推移",
+     "Trend in private AI investment"
+    ],
+    [
+     "ハイパースケーラーの設備投資と営業キャッシュフロー",
+     "Hyperscaler capex and operating cash flow"
+    ],
+    [
+     "AI関連売上の開示",
+     "Disclosed AI-related revenue"
+    ],
+    [
+     "企業の設備投資計画",
+     "Corporate capex plans"
+    ]
+   ],
+   "src": [
+    "s015",
+    "s016",
+    "s049",
+    "s048",
+    "s050"
+   ],
+   "board": [
+    "巨額投資が続く局面と調整局面、どちらでも成り立つ投資計画になっていますか。",
+    "Does your investment plan hold up in both a continued-surge phase and a correction phase?"
+   ],
+   "sowhat": [
+    "ベンダーの投資余力と価格戦略の変化を前提条件として明記し、調整局面での契約・調達の打ち手を用意しておく。",
+    "State vendors' investment capacity and shifts in their pricing strategy as explicit assumptions, and prepare contract and procurement responses for a correction phase."
+   ],
+   "read": {
+    "ja": "Stanford AI Index 2026（2026年4月公表）は、2025年の世界の企業AI投資が前年の2倍を超え、うち民間投資は127.5%増で全体の60%を占めるとしている。同報告は、クラウド大手が設備投資を加速させており、Googleは2025年の年間設備投資が1,500億ドルを超えたと報告したとする。",
+    "en": "The Stanford AI Index 2026 (published April 2026) states that global corporate AI investment more than doubled in 2025, with private investment growing 127.5% and accounting for 60% of the total. It adds that major cloud providers accelerated capital expenditure, with Google reporting more than $150 billion in annual capex in 2025.",
+    "asOf": "2026-04",
+    "src": [
+     "s015",
+     "s016"
+    ]
+   }
+  },
+  {
+   "id": "f05",
+   "layer": "A",
+   "en": "Adoption",
+   "title": [
+    "実装の広がりと深さ",
+    "Breadth and Depth of Implementation"
+   ],
+   "q": [
+    "企業と個人のどこで、どの業務に AI が根づき始めているか。",
+    "Where, and in which tasks, is AI starting to take root among companies and individuals?"
+   ],
+   "ind": [
+    [
+     "企業の利用率（調査ごとの定義差に留意）",
+     "Corporate usage rates (note that definitions differ by survey)"
+    ],
+    [
+     "職種・タスク単位の利用の広がり",
+     "Spread of use by occupation and task"
+    ],
+    [
+     "業務への組み込みの深さ",
+     "Depth of integration into operations"
+    ]
+   ],
+   "src": [
+    "s017",
+    "s053",
+    "s018",
+    "s019",
+    "s074",
+    "s052"
+   ],
+   "board": [
+    "同業他社と比べて、御社の活用はどの職種・業務で遅れていますか。",
+    "Compared with peers, in which functions and tasks is your use of AI lagging?"
+   ],
+   "sowhat": [
+    "利用率は調査ごとに定義が異なる。比較時は定義を揃えて示し、数字の独り歩きを防ぐ。",
+    "Usage rates are defined differently in each survey. When comparing, align the definitions and show them, so that a single number does not take on a life of its own."
+   ],
+   "read": {
+    "ja": "米国勢調査局のBTOSでは、事業運営でAIを利用する米国企業の割合は2025年12月から2026年5月まで17〜20%で推移し、2026年5月3日までの調査では全国19.8%（従業員250人以上の企業で37%）である。日本の令和8年版情報通信白書は、生成AIの活用方針を「わからない」と答えた企業を除いた母数で、何らかの業務で生成AIを利用する日本企業の割合を86.4%としており、両者は母数と質問が異なる。",
+    "en": "In the US Census Bureau's BTOS, the share of US businesses using AI in their operations stayed between 17% and 20% from December 2025 to May 2026, and stood at 19.8% nationally in the collection period ending May 3, 2026 (37% for firms with 250 or more employees). Japan's FY2026 White Paper on Information and Communications puts the share of Japanese companies using generative AI in at least one business function at 86.4%, measured among companies that did not answer \"don't know\" on their generative AI policy, so the two figures rest on different bases and questions.",
+    "asOf": "2026-05",
+    "src": [
+     "s018",
+     "s019"
+    ]
+   }
+  },
+  {
+   "id": "f06",
+   "layer": "A",
+   "en": "Rules of the Game",
+   "title": [
+    "規制と地政学の地図",
+    "The Map of Regulation and Geopolitics"
+   ],
+   "q": [
+    "各国の規制、輸出管理、安全性評価は、AIを「どこで・何に」使えるかをどう変えるか。",
+    "How will national regulation, export controls and safety evaluations change where and for what AI can be used?"
+   ],
+   "ind": [
+    [
+     "主要法域の施行スケジュール",
+     "Enforcement timelines in major jurisdictions"
+    ],
+    [
+     "輸出管理の対象と範囲",
+     "Scope and coverage of export controls"
+    ],
+    [
+     "各国AI安全性機関の評価の公表",
+     "Published evaluations by national AI safety institutes"
+    ]
+   ],
+   "src": [
+    "s022",
+    "s056",
+    "s055",
+    "s061",
+    "s058",
+    "s025"
+   ],
+   "board": [
+    "御社が事業を展開する国ごとに、AI の利用条件の違いを把握していますか。",
+    "For each country where you operate, do you understand how the conditions for using AI differ?"
+   ],
+   "sowhat": [
+    "グローバル展開の提案では、法域別の要件マップを最初に示し、共通基盤と地域差分を分けて設計する。",
+    "In proposals for global rollouts, show a jurisdiction-by-jurisdiction requirements map first, and design the common platform separately from regional differences."
+   ],
+   "read": {
+    "ja": "欧州委員会のページは、2026年8月2日からAI Officeと各国当局がAI法の執行を開始したとし、2025年11月に提案した簡素化改正（AIオムニバス）が2026年6月に採択され、7月27日に発効したとしている。日本のAISIは、2026年7月にAIセーフティに関する評価観点ガイド（第1.20版）を公開したと公表している。",
+    "en": "The European Commission's page states that the AI Office and national authorities began enforcing the AI Act on August 2, 2026, and that the targeted amendments proposed in November 2025 (the AI omnibus) were adopted in June 2026 and entered into force on July 27, 2026. Japan's AISI lists the publication of its Guide to Evaluation Perspectives on AI Safety (version 1.20) in July 2026.",
+    "asOf": "2026-08",
+    "src": [
+     "s056",
+     "s025"
+    ]
+   }
+  },
+  {
+   "id": "f07",
+   "layer": "A",
+   "en": "Social License",
+   "title": [
+    "社会からの受容",
+    "Acceptance by Society"
+   ],
+   "q": [
+    "雇用、事故、世論。AIの利用は社会からどこまで受け入れられているか。",
+    "Jobs, accidents, public opinion: how far is society accepting the use of AI?"
+   ],
+   "ind": [
+    [
+     "AIへの期待と懸念の世論",
+     "Public opinion on AI: hopes and concerns"
+    ],
+    [
+     "職種別の影響度の推計",
+     "Estimated impact by occupation"
+    ],
+    [
+     "AIインシデントの報告件数",
+     "Number of reported AI incidents"
+    ]
+   ],
+   "src": [
+    "s029",
+    "s030",
+    "s065",
+    "s063",
+    "s064",
+    "s031"
+   ],
+   "board": [
+    "従業員と顧客は、御社の AI 活用をどう受け止めていますか。それを測る仕組みはありますか。",
+    "How do your employees and customers perceive your use of AI, and do you have a mechanism to measure it?"
+   ],
+   "sowhat": [
+    "導入計画に、従業員への説明と再配置の方針、顧客への透明性の確保を最初から組み込む。",
+    "Build employee communication, a redeployment policy and transparency toward customers into the adoption plan from the start."
+   ],
+   "read": {
+    "ja": "Pewの37か国調査（調査期間は2026年2〜5月、2026年9月公表）は、34か国で「AIにより雇用は増えるより減る」と考える人が多いと報告している。米国の別調査（2026年2月）では、今後20年のAIの社会への影響を「悪い」とみる成人が40%、「良い」とみる成人が16%である。",
+    "en": "Pew Research Center's 37-country survey (fieldwork February to May 2026, published September 2026) reports that in 34 countries people tend to expect AI to lead to fewer jobs rather than more. In a separate US survey conducted in February 2026, 40% of adults expect AI's impact on society over the next 20 years to be negative and 16% expect it to be positive.",
+    "asOf": "2026-09",
+    "src": [
+     "s030",
+     "s029"
+    ]
+   }
+  },
+  {
+   "id": "f08",
+   "layer": "B",
+   "en": "Hyperscaler Bets",
+   "title": [
+    "巨大資本の賭け筋",
+    "Where the Hyperscalers Are Placing Their Bets"
+   ],
+   "q": [
+    "主要クラウド各社は、どこにどれだけ投資し、どの需要を見ているか。",
+    "Where and how much are the major cloud providers investing, and what demand do they see?"
+   ],
+   "ind": [
+    [
+     "決算での設備投資ガイダンス",
+     "Capex guidance in earnings reports"
+    ],
+    [
+     "クラウド事業の成長率",
+     "Cloud business growth rates"
+    ],
+    [
+     "受注残",
+     "Order backlog"
+    ],
+    [
+     "需給逼迫に関する経営陣の発言",
+     "Executive commentary on supply and demand tightness"
+    ]
+   ],
+   "src": [
+    "s071",
+    "s088",
+    "s080",
+    "s090",
+    "s099",
+    "s087",
+    "s068"
+   ],
+   "board": [
+    "主要パートナーの投資の向きと、御社の3か年計画は噛み合っていますか。",
+    "Are our key partners' investment directions aligned with our three-year plan?"
+   ],
+   "sowhat": [
+    "パートナーの次の重点領域（エージェント基盤、データ基盤など）を先取りした提案の切り口を準備する。",
+    "Prepare proposal angles that anticipate partners' next priority areas, such as agent platforms and data foundations."
+   ],
+   "read": null
+  },
+  {
+   "id": "f09",
+   "layer": "B",
+   "en": "Model Providers",
+   "title": [
+    "フロンティア開発の競争軸",
+    "The Axes of Frontier Competition"
+   ],
+   "q": [
+    "モデル開発企業は、性能・価格・安全性・企業向け機能のどこで差をつけようとしているか。",
+    "Where are model developers trying to differentiate: performance, price, safety, or enterprise features?"
+   ],
+   "ind": [
+    [
+     "新モデルの公開頻度と性能差",
+     "Release cadence of new models and performance gaps"
+    ],
+    [
+     "企業向け機能（エージェント・ガバナンス）の拡充",
+     "Expansion of enterprise features (agents, governance)"
+    ],
+    [
+     "価格改定の動き",
+     "Pricing changes"
+    ]
+   ],
+   "src": [
+    "s075",
+    "s076",
+    "s100",
+    "s101",
+    "s089",
+    "s098"
+   ],
+   "board": [
+    "特定のモデル提供者に依存した場合のリスクと、切り替えにかかる費用を見積もっていますか。",
+    "Have we estimated the risk of depending on a single model provider, and the cost of switching?"
+   ],
+   "sowhat": [
+    "モデルを差し替えられる抽象化層と評価基盤を、最初の設計に含める。",
+    "Build an abstraction layer that lets models be swapped, and an evaluation platform, into the initial design."
+   ],
+   "read": {
+    "ja": "Anthropic のニュースルームは、2026年9月22日に Opus 5.5、9月28日に Sonnet 5.5、10月7日に Haiku 5.5 の公開を掲載している。同社は、Opus 5.5 は Opus 5 より実行費用が40%低く、Sonnet 5.5 は Sonnet 5 より30%高速で、多くの用途で費用が最大30%低いとしている。",
+    "en": "Anthropic's newsroom lists the releases of Opus 5.5 (September 22, 2026), Sonnet 5.5 (September 28) and Haiku 5.5 (October 7). The company states that Opus 5.5 costs 40% less to run than Opus 5, and that Sonnet 5.5 runs 30% faster than Sonnet 5 and costs up to 30% less for most work.",
+    "asOf": "2026-10",
+    "src": [
+     "s075"
+    ]
+   }
+  },
+  {
+   "id": "f10",
+   "layer": "B",
+   "en": "Platform Roadmaps",
+   "title": [
+    "パートナー製品の次の一手",
+    "Partners' Next Product Moves"
+   ],
+   "q": [
+    "主要プラットフォームは、次に何を出し、何を変えるか。年次イベントで方向が示される。",
+    "What will the major platforms release next, and what will they change? Annual events signal the direction."
+   ],
+   "ind": [
+    [
+     "年次イベントでの主要発表",
+     "Major announcements at annual events"
+    ],
+    [
+     "価格・ライセンス体系の変更",
+     "Changes to pricing and licensing models"
+    ],
+    [
+     "新サービスの一般提供開始",
+     "General availability of new services"
+    ]
+   ],
+   "src": [
+    "s103",
+    "s104",
+    "s105",
+    "s106",
+    "s107",
+    "s108",
+    "s109",
+    "s110",
+    "s082"
+   ],
+   "board": [
+    "主要パートナーの製品ロードマップを、御社のシステム更新計画と照らし合わせていますか。",
+    "Have we compared our key partners' product roadmaps against our own system renewal plans?"
+   ],
+   "sowhat": [
+    "イベント直後に顧客ごとの影響を整理した短い速報を届ける。継続的な接点が、提案の機会を生む。",
+    "Send customers a short briefing on the impact on each of them right after each event. Continuous contact creates openings for proposals."
+   ],
+   "read": {
+    "ja": "AWS re:Invent 2026 は2026年11月30日から12月4日にラスベガスで開催予定で、ページは1,200を超えるセッションが公開済みとしている。Microsoft Ignite は2026年11月17日から20日の開催と案内されている。",
+    "en": "AWS re:Invent 2026 is scheduled for November 30 to December 4 in Las Vegas, and its page states that more than 1,200 sessions are already live. Microsoft Ignite is listed for November 17 to 20, 2026.",
+    "asOf": "2026-10",
+    "src": [
+     "s103",
+     "s105"
+    ]
+   }
+  },
+  {
+   "id": "f11",
+   "layer": "B",
+   "en": "Analyst Consensus",
+   "title": [
+    "市場の通説と反証",
+    "Market Consensus and Counter-Evidence"
+   ],
+   "q": [
+    "調査会社と他ファームは企業の AI 導入をどう見ているか。顧客の経営陣はそれを読んでいる。",
+    "How do research firms and other consultancies view enterprise AI adoption? Our clients' executives are reading them."
+   ],
+   "ind": [
+    [
+     "ハイプ・サイクル上の位置",
+     "Position on the hype cycle"
+    ],
+    [
+     "PoC から本番への移行率",
+     "Rate of PoC-to-production transition"
+    ],
+    [
+     "ROI を実現している企業の比率",
+     "Share of companies realizing ROI"
+    ]
+   ],
+   "src": [
+    "s112",
+    "s111",
+    "s114",
+    "s116",
+    "s118",
+    "s120",
+    "s121"
+   ],
+   "board": [
+    "御社の経営判断の前提になっている調査はどれで、その前提は今も有効ですか。",
+    "Which research underpins our management decisions, and does that premise still hold?"
+   ],
+   "sowhat": [
+    "楽観と懐疑、両方の調査を並べて前提を揃えてから議論に入る。通説を鵜呑みにしない姿勢が信頼をつくる。",
+    "Lay out both optimistic and skeptical research side by side to align on premises before the discussion begins. Not taking conventional wisdom at face value builds trust."
+   ],
+   "read": {
+    "ja": "IDC のプレスリリース一覧は、2026年9月17日付で、アジア太平洋のAI・生成AI支出が2030年までに5,552億ドルに達するとの予測を掲載している。見出しは、企業がパイロットを超えて展開を拡大することが背景だとする。同日付で、欧州のAI支出も2030年に4,700億ドルに達するとの予測が掲載されている。PoC から本番への移行率そのものは、このページに記載がない。",
+    "en": "IDC's press release list includes a September 17, 2026 forecast that Asia/Pacific AI and GenAI spending will reach $555.2 billion by 2030, with the headline attributing this to enterprises scaling AI beyond pilots. A release of the same date forecasts European AI spending at $470 billion by 2030. The page does not give a PoC-to-production transition rate.",
+    "asOf": "2026-09",
+    "src": [
+     "s114"
+    ]
+   }
+  },
+  {
+   "id": "f12",
+   "layer": "B",
+   "en": "Investor Lens",
+   "title": [
+    "資本市場が見る勝ち筋",
+    "Where Capital Markets See the Winning Position"
+   ],
+   "q": [
+    "投資家は AI のどの層に価値が残ると見ているか。企業向け AI の支出はどこへ向かっているか。",
+    "Which layer of AI do investors believe will retain value? Where is enterprise AI spending heading?"
+   ],
+   "ind": [
+    [
+     "企業向け生成AI支出の内訳",
+     "Breakdown of enterprise generative AI spending"
+    ],
+    [
+     "スタートアップへの資金流入の分野",
+     "Sectors attracting startup funding"
+    ],
+    [
+     "投資家の論考の論点",
+     "Key arguments in investor commentary"
+    ]
+   ],
+   "src": [
+    "s125",
+    "s124",
+    "s126",
+    "s127",
+    "s128"
+   ],
+   "board": [
+    "御社が付加価値を出せるのは、モデル・基盤・アプリケーションのどの層ですか。",
+    "At which layer can we add value: models, infrastructure, or applications?"
+   ],
+   "sowhat": [
+    "顧客の差別化が残る層に投資を集中させ、汎用化する層は調達に寄せる提案にする。",
+    "Concentrate investment on layers where customers can still differentiate, and shift commoditizing layers toward procurement."
+   ],
+   "read": {
+    "ja": "Menlo Ventures は、2025年通年の企業による生成AI支出を370億ドル（前年比3.2倍）と推計し、うちアプリケーション層が190億ドルで過半を占めるとしている。この数値は、米国企業の意思決定者約500人への調査と市場モデルに基づく同社の推計である。同社は、AIソリューションの76%が内製ではなく購入されているとも報告している。",
+    "en": "Menlo Ventures estimates enterprise spending on generative AI in full-year 2025 at $37 billion (3.2x year over year), with the application layer accounting for $19 billion, more than half. The figures are the firm's estimates, based on a survey of about 500 U.S. enterprise decision-makers and a market model. It also reports that 76% of AI solutions are purchased rather than built in-house.",
+    "asOf": "2025-12",
+    "src": [
+     "s125"
+    ]
+   }
+  },
+  {
+   "id": "f13",
+   "layer": "B",
+   "en": "Future of Advisory",
+   "title": [
+    "コンサルティングの再定義",
+    "Redefining Consulting"
+   ],
+   "q": [
+    "AI は、助言ビジネスの価値と価格のつけ方をどう変えるか。",
+    "How will AI change the value and pricing of advisory services?"
+   ],
+   "ind": [
+    [
+     "人月から成果連動への移行",
+     "Shift from person-months to outcome-based fees"
+    ],
+    [
+     "AI に代替される作業領域",
+     "Areas of work displaced by AI"
+    ],
+    [
+     "顧客の内製化の進展",
+     "Progress of clients' in-house capabilities"
+    ]
+   ],
+   "src": [
+    "s129",
+    "s130",
+    "s123",
+    "s069"
+   ],
+   "board": [
+    "外部パートナーに期待する役割は、AI 以前と以後でどう変わりましたか。",
+    "How has the role we expect of external partners changed from before AI to after?"
+   ],
+   "sowhat": [
+    "作業量ではなく、判断と変革への伴走に価値を置いた提案と価格設計を示す。",
+    "Present proposals and pricing that place value on judgment and support through transformation, not on volume of work."
+   ],
+   "read": null
+  },
+  {
+   "id": "f14",
+   "layer": "C",
+   "en": "Regulatory Landscape",
+   "title": [
+    "業界規制という前提条件",
+    "Regulation as a Precondition"
+   ],
+   "q": [
+    "顧客の業界の当局は、AI の利用に何を求め、何を許容しているか。",
+    "What do the regulators in our client's industry require of AI use, and what do they permit?"
+   ],
+   "ind": [
+    [
+     "当局のディスカッションペーパー・ガイドライン",
+     "Regulators' discussion papers and guidelines"
+    ],
+    [
+     "承認・登録の件数（例：AI医療機器）",
+     "Counts of approvals and registrations (e.g., AI-enabled medical devices)"
+    ],
+    [
+     "国際機関の監視・提言",
+     "Monitoring and recommendations from international bodies"
+    ]
+   ],
+   "src": [
+    "s133",
+    "s135",
+    "s137",
+    "s140",
+    "s141",
+    "s146"
+   ],
+   "board": [
+    "御社の業界で、当局の見解待ちになっているユースケースはどれですか。",
+    "In your industry, which use cases are still waiting on a regulatory position?"
+   ],
+   "sowhat": [
+    "当局の公表物を根拠に、「今すぐ実行できる領域」と「見解を待つ領域」を切り分けたロードマップを示す。",
+    "Draw on regulators' published materials to separate what can be executed now from what must await guidance, and present the roadmap on that basis."
+   ],
+   "read": {
+    "ja": "米FDAのAI搭載医療機器リストは掲載1,610件（2026年9月4日更新、最新の最終判断日は2026年6月29日）で、網羅的ではないと注記している。金融庁は2026年3月3日にAIディスカッションペーパー第1.1版を公表し、意見・提案を受け付けるとしている。",
+    "en": "The FDA's list of AI-enabled medical devices held 1,610 entries as of its 4 September 2026 update (latest final decision dated 29 June 2026), with a note that the list is not comprehensive. Japan's FSA published Version 1.1 of its AI Discussion Paper on 3 March 2026 and continues to invite comments.",
+    "asOf": "2026-09",
+    "src": [
+     "s140",
+     "s133"
+    ]
+   }
+  },
+  {
+   "id": "f15",
+   "layer": "C",
+   "en": "Investment Case",
+   "title": [
+    "投資対効果の物差し",
+    "A Yardstick for AI Returns"
+   ],
+   "q": [
+    "日本企業の IT 予算と AI 投資はどこへ向かい、効果は出ているか。",
+    "Where are Japanese companies directing their IT budgets and AI investment, and are the returns showing?"
+   ],
+   "ind": [
+    [
+     "IT 予算の増減",
+     "Changes in IT budgets"
+    ],
+    [
+     "AI 導入率（定義差に留意）",
+     "AI adoption rate (note differences in definition)"
+    ],
+    [
+     "効果を測定できている企業の比率",
+     "Share of companies able to measure impact"
+    ]
+   ],
+   "src": [
+    "s149",
+    "s152",
+    "s155",
+    "s156",
+    "s160",
+    "s161"
+   ],
+   "board": [
+    "AI 投資の効果を、どの指標で、いつ測ると合意していますか。",
+    "By which metric, and when, have you agreed to measure the return on AI investment?"
+   ],
+   "sowhat": [
+    "提案の冒頭で「効果の測り方」を合意する。測れない投資は、続かない投資になる。",
+    "Open every proposal by agreeing how impact will be measured. An investment that cannot be measured is unlikely to be sustained."
+   ],
+   "read": {
+    "ja": "NRIの調査（2025年9月実施、CIO等517社が回答）は、2025年度にIT予算が増加した企業を49.0%（前年度調査59.0%）、生成AIを「導入済み」とした企業を57.7%（2024年度は44.8%）と報告している。生成AIの活用課題は「リテラシーやスキルの不足」が70.3%で最多とする（いずれも設問への有効回答企業に占める割合）。",
+    "en": "NRI's survey (conducted in September 2025; 517 companies, CIOs or equivalent) reports that 49.0% of firms saw IT budgets rise in fiscal 2025 (59.0% in the prior survey) and that 57.7% have adopted generative AI (44.8% in fiscal 2024). Insufficient literacy and skills is the most cited obstacle to using it, at 70.3%. All shares are of valid respondents to each question.",
+    "asOf": "2025-09",
+    "src": [
+     "s155"
+    ]
+   }
+  },
+  {
+   "id": "f16",
+   "layer": "C",
+   "en": "Operating Model",
+   "title": [
+    "業務と組織の再設計",
+    "Redesigning Work and Organization"
+   ],
+   "q": [
+    "AI を前提にしたとき、業務の流れ、意思決定、組織の役割分担はどう変わるか。",
+    "With AI as a premise, how do workflows, decision-making, and the division of roles across the organization change?"
+   ],
+   "ind": [
+    [
+     "AI 推進組織（CoE）の設置状況",
+     "Status of AI promotion units (CoE)"
+    ],
+    [
+     "エージェントを組み込んだ業務の事例",
+     "Cases of work processes with embedded agents"
+    ],
+    [
+     "DX 推進の成熟度",
+     "Maturity of DX promotion"
+    ]
+   ],
+   "src": [
+    "s153",
+    "s167",
+    "s166",
+    "s159",
+    "s158"
+   ],
+   "board": [
+    "AI の導入を、ツールの配布ではなく業務と組織の再設計として進めていますか。",
+    "Are you rolling out AI as a redesign of work and organization rather than as a distribution of tools?"
+   ],
+   "sowhat": [
+    "ツール導入と業務再設計・意思決定ルールの見直しを一体で提案し、責任の所在を明確にする。",
+    "Propose tool adoption together with work redesign and a review of decision rules, and make clear who is accountable."
+   ],
+   "read": null
+  },
+  {
+   "id": "f17",
+   "layer": "C",
+   "en": "Talent & Reskilling",
+   "title": [
+    "人材ポートフォリオの組み替え",
+    "Rebalancing the Talent Portfolio"
+   ],
+   "q": [
+    "どの職種が変わり、どのスキルが必要になり、人材をどう育て直すか。",
+    "Which roles will change, which skills will be needed, and how should we retrain our people?"
+   ],
+   "ind": [
+    [
+     "職種別の需要見通し",
+     "Demand outlook by occupation"
+    ],
+    [
+     "デジタルスキル標準と育成の進み具合",
+     "Progress on the Digital Skills Standards and related training"
+    ],
+    [
+     "AI を使いこなす人材の比率",
+     "Share of workers who use AI effectively"
+    ]
+   ],
+   "src": [
+    "s162",
+    "s163",
+    "s164",
+    "s165",
+    "s157"
+   ],
+   "board": [
+    "3年後に必要な人材の構成と、今の構成の差を把握していますか。",
+    "Do you know the gap between the workforce mix you will need in three years and the one you have today?"
+   ],
+   "sowhat": [
+    "再配置と再教育の計画を、AI 導入の投資計画と同じ表に載せる。人の計画がない導入は定着しない。",
+    "Put the redeployment and reskilling plan in the same table as the AI investment plan. An adoption with no plan for people will not take hold."
+   ],
+   "read": {
+    "ja": "三菱総合研究所の提言（2025年9月25日）は、IPAが2025年に実施した調査で企業の85%以上がDX推進人材の量や質の不足を挙げたと引用し、デジタルスキル標準に基づくスキルベースの人材管理を提言している。マナビDXは、経産省とIPAの審査に合格した講座のみを掲載するとしている。",
+    "en": "A Mitsubishi Research Institute proposal (25 September 2025) cites an IPA survey from 2025 in which over 85% of companies said the quantity or quality of their DX talent is insufficient, and recommends skills-based talent management built on the Digital Skills Standards. Manabi DX states that it lists only courses that have passed METI and IPA review.",
+    "asOf": "2025-09",
+    "src": [
+     "s157",
+     "s165"
+    ]
+   }
+  },
+  {
+   "id": "f18",
+   "layer": "C",
+   "en": "Risk & Trust",
+   "title": [
+    "信頼をつくる統治",
+    "Governance That Builds Trust"
+   ],
+   "q": [
+    "著作権、個人情報、認証の要件は、AI 活用の前提をどう変えるか。",
+    "How do requirements on copyright, personal data, and certification change the premises of AI use?"
+   ],
+   "ind": [
+    [
+     "主要な著作権訴訟の帰趨",
+     "Outcomes of major copyright lawsuits"
+    ],
+    [
+     "国内ガイドラインの改訂",
+     "Revisions to domestic guidelines"
+    ],
+    [
+     "ISO/IEC 42001 の取得動向",
+     "Trends in ISO/IEC 42001 certification"
+    ],
+    [
+     "リスク管理の枠組みの更新",
+     "Updates to risk management frameworks"
+    ]
+   ],
+   "src": [
+    "s170",
+    "s169",
+    "s171",
+    "s172",
+    "s173",
+    "s177",
+    "s176"
+   ],
+   "board": [
+    "取締役会に AI のリスクを報告する仕組みは、すでに機能していますか。",
+    "Is there already a working mechanism for reporting AI risk to the board?"
+   ],
+   "sowhat": [
+    "ガバナンスをブレーキではなく、安全に使える範囲を広げる「舗装」として位置づける。",
+    "Position governance not as a brake but as paving that widens the range in which AI can be used safely."
+   ],
+   "read": {
+    "ja": "経済産業省のAI事業者ガイドライン検討会のページには、2026年3月31日付の第1.2版が掲載されている（ページ最終更新2026年8月24日）。NISTはAI RMF 1.0を改訂中とし、2026年4月7日に重要インフラ向けプロファイルのコンセプトノートを公表したと記している。",
+    "en": "METI's page for the AI Guidelines for Business lists Version 1.2 dated 31 March 2026 (page last updated 24 August 2026). NIST states that AI RMF 1.0 is being revised and that it released a concept note for a critical infrastructure profile on 7 April 2026.",
+    "asOf": "2026-08",
+    "src": [
+     "s169",
+     "s173"
+    ]
+   }
+  },
+  {
+   "id": "f19",
+   "layer": "C",
+   "en": "Sustainability",
+   "title": [
+    "電力と排出という新たな制約",
+    "Power and Emissions as New Constraints"
+   ],
+   "q": [
+    "AI の電力消費と温室効果ガス排出は、企業の開示と投資判断にどう跳ね返るか。",
+    "How will AI's electricity consumption and greenhouse gas emissions feed back into corporate disclosure and investment decisions?"
+   ],
+   "ind": [
+    [
+     "データセンターの電力需要の見通し",
+     "Outlook for data center power demand"
+    ],
+    [
+     "サステナビリティ開示基準の適用時期",
+     "Effective dates of sustainability disclosure standards"
+    ],
+    [
+     "スコープ2排出の算定方法",
+     "Methods for calculating Scope 2 emissions"
+    ]
+   ],
+   "src": [
+    "s179",
+    "s180",
+    "s181",
+    "s182"
+   ],
+   "board": [
+    "AI の利用拡大が、御社の排出量目標と開示にどう影響するかを試算していますか。",
+    "Have you estimated how expanding AI use will affect your emissions targets and disclosures?"
+   ],
+   "sowhat": [
+    "モデル選定と実行場所の選択に、電力効率と排出の観点を加えた評価軸を用意する。",
+    "Add power efficiency and emissions to the criteria for choosing models and where they run."
+   ],
+   "read": {
+    "ja": "SSBJのページでは、サステナビリティ開示基準（2025年3月5日公表）が2026年3月13日に改正されたと示され、SHK制度の方法による排出量を用いる場合の実務対応基準が2026年6月11日付で掲載されている。GHGプロトコルはScope 2ガイダンスの意見募集を2025年10月20日から2026年1月31日まで実施したとしている。",
+    "en": "The SSBJ page shows its sustainability disclosure standards (published 5 March 2025) as amended on 13 March 2026, and lists a practical-application standard, dated 11 June 2026, on using emissions measured under Japan's SHK scheme. The GHG Protocol states that its public consultation on the Scope 2 Guidance ran from 20 October 2025 to 31 January 2026.",
+    "asOf": "2026-06",
+    "src": [
+     "s182",
+     "s180"
+    ]
+   }
+  },
+  {
+   "id": "f20",
+   "layer": "C",
+   "en": "Japan Context",
+   "title": [
+    "日本固有の構造変化",
+    "Structural Shifts Specific to Japan"
+   ],
+   "q": [
+    "労働供給の制約と国の AI 戦略は、日本企業にとっての AI の必然性をどう示しているか。",
+    "How do labor supply constraints and national AI strategy show that AI is a necessity for Japanese companies?"
+   ],
+   "ind": [
+    [
+     "労働供給の見通し",
+     "Outlook for labor supply"
+    ],
+    [
+     "国の AI 基本計画の重点",
+     "Priorities of the national AI Basic Plan"
+    ],
+    [
+     "白書の利用率",
+     "Usage rates reported in the white paper"
+    ]
+   ],
+   "src": [
+    "s168",
+    "s183",
+    "s184",
+    "s185",
+    "s062",
+    "s187"
+   ],
+   "board": [
+    "2030年代の労働供給を前提にしたとき、AI に委ねないという選択肢は残りますか。",
+    "If we plan around labor supply in the 2030s, is not delegating work to AI still an option?"
+   ],
+   "sowhat": [
+    "「効率化」ではなく「事業を継続するための供給力」として、AI の必要性を経営の言葉で示す。",
+    "Present the need for AI in the language of the boardroom: not as efficiency, but as the supply capacity needed to keep the business running."
+   ],
+   "read": {
+    "ja": "内閣府のAI戦略ページは、人工知能基本計画（第Ⅱ期）が2026年7月14日に閣議決定されたと掲載している。首相官邸の記録では、2026年7月10日の人工知能戦略本部で首相が第2期基本計画の案を決定したと述べ、重点領域の一つに「業務の効率化・負担軽減を通じ人手不足の解消につながる領域」を挙げている。",
+    "en": "The Cabinet Office's AI Strategy page lists the second AI Basic Plan as approved by the Cabinet on 14 July 2026. The Prime Minister's Office record states that, at the AI Strategy Headquarters on 10 July 2026, the Prime Minister said the draft of the second plan had been decided, naming among its priority areas those that help resolve labor shortages by streamlining work and reducing burdens.",
+    "asOf": "2026-07",
+    "src": [
+     "s062",
+     "s184"
+    ]
+   }
+  },
+  {
+   "id": "f21",
+   "layer": "D",
+   "en": "Hype vs. Reality",
+   "title": [
+    "期待と実装の時間差",
+    "The Gap Between Expectation and Implementation"
+   ],
+   "q": [
+    "新技術の影響は、短期では過大に、長期では過小に評価される（アマラの法則）。いま市場はどの局面にあるか。",
+    "The impact of a new technology tends to be overestimated in the short run and underestimated in the long run (Amara's Law). Which phase is the market in now?"
+   ],
+   "ind": [
+    [
+     "期待と実績の乖離",
+     "Gap between expectations and actual results"
+    ],
+    [
+     "懐疑的な論調の増加（幻滅期の兆し）",
+     "Rising skepticism in the discourse (an early sign of the trough of disillusionment)"
+    ]
+   ],
+   "src": [
+    "s196",
+    "s112"
+   ],
+   "board": [
+    "短期の期待外れを理由に、長期の基盤投資まで止めていませんか。",
+    "Have you halted long-term investment in foundations because of short-term disappointment?"
+   ],
+   "sowhat": [
+    "幻滅期こそ、データ・人材・ガバナンスという基盤に投資する好機として示す。",
+    "Position the trough of disillusionment as the right moment to invest in the foundations: data, talent and governance."
+   ],
+   "read": null
+  },
+  {
+   "id": "f22",
+   "layer": "D",
+   "en": "Productivity J-Curve",
+   "title": [
+    "成果が遅れて現れる構造",
+    "Why Results Arrive Late"
+   ],
+   "q": [
+    "業務と組織の作り替えが済むまで、生産性は一度下がって見える。",
+    "Until work and organizations have been redesigned, productivity can appear to fall before it rises."
+   ],
+   "ind": [
+    [
+     "補完投資（データ整備・教育・業務再設計）の進捗",
+     "Progress on complementary investment (data readiness, training, process redesign)"
+    ],
+    [
+     "生産性統計の変化",
+     "Changes in productivity statistics"
+    ]
+   ],
+   "src": [
+    "s199",
+    "s215"
+   ],
+   "board": [
+    "ツールの導入だけで、業務と組織の再設計をせずに成果を待っていませんか。",
+    "Are you waiting for results from tool adoption alone, without redesigning work and the organization?"
+   ],
+   "sowhat": [
+    "ツール導入と同時に、業務再設計と人材育成の予算を一体で組んだ提案にする。",
+    "Build proposals that budget for process redesign and talent development together with tool deployment."
+   ],
+   "read": null
+  },
+  {
+   "id": "f23",
+   "layer": "D",
+   "en": "Diffusion Curves",
+   "title": [
+    "普及の速度を読む",
+    "Reading the Speed of Diffusion"
+   ],
+   "q": [
+    "電気、電話、インターネット。過去の技術は、どの速度で社会に行き渡ったか。AIはどこが同じで、どこが違うか。",
+    "Electricity, the telephone, the internet: how fast did past technologies reach society at large? Where is AI similar, and where does it differ?"
+   ],
+   "ind": [
+    [
+     "家庭・企業への普及率の推移",
+     "Adoption rates among households and firms over time"
+    ],
+    [
+     "普及を妨げた補完要素（インフラ・制度・スキル）",
+     "Complementary factors that held adoption back (infrastructure, institutions, skills)"
+    ]
+   ],
+   "src": [
+    "s197",
+    "s198",
+    "s051"
+   ],
+   "board": [
+    "御社の業界で、AI の普及を遅らせている補完要素は何ですか。",
+    "In your industry, which complementary factors are slowing the spread of AI?"
+   ],
+   "sowhat": [
+    "普及の律速は技術ではなく補完要素にあることが多い。データ、制度、スキルの整備を提案の柱に置く。",
+    "The binding constraint on diffusion is often complementary factors, not the technology itself. Make data, institutions and skills the pillars of the proposal."
+   ],
+   "read": null
+  },
+  {
+   "id": "f24",
+   "layer": "D",
+   "en": "Techno-Economic Waves",
+   "title": [
+    "技術革命と金融の波",
+    "Technology Revolutions and Financial Waves"
+   ],
+   "q": [
+    "技術革命は、熱狂的な投資と調整を経て、社会への本格的な展開に向かう。いまはどの段階か。",
+    "A technological revolution moves through speculative investment and a correction before reaching full deployment across society. Which stage are we in now?"
+   ],
+   "ind": [
+    [
+     "投資の過熱と調整の兆し",
+     "Signs of investment overheating and correction"
+    ],
+    [
+     "インフラが後の世代に残す価値",
+     "Value that infrastructure leaves to later generations"
+    ]
+   ],
+   "src": [
+    "s214",
+    "s048"
+   ],
+   "board": [
+    "調整局面が来ても、残るインフラと能力の上に何を築くかを描けていますか。",
+    "If a correction comes, can you describe what you would build on the infrastructure and capabilities that remain?"
+   ],
+   "sowhat": [
+    "過剰投資の局面でも、後に残る資産（データ、基盤、人材）に軸足を置いた投資を勧める。",
+    "Even in a phase of overinvestment, recommend investments weighted toward assets that endure: data, platforms and talent."
+   ],
+   "read": {
+    "ja": "State of AI Report 2026（2026年10月時点）は、米国の大手クラウド事業者4社の2026年設備投資の合計見通しを約7,330億ドルとしている。同レポートは、米国人の71%が地域のAIデータセンターに反対したとするギャラップの3月調査や、第2四半期に約680億ドル相当の45件以上の計画が地元の反対で阻止または遅延したというData Center Watchの報告も紹介している。",
+    "en": "The State of AI Report 2026 (as of October 2026) states that four US hyperscalers guide to roughly $733B in total 2026 capex. It also cites a March Gallup survey in which 71% of Americans opposed a local AI data center, and a Data Center Watch report that at least 45 projects, representing nearly $68B in planned investment, were blocked or delayed by local opposition in Q2.",
+    "asOf": "2026-10",
+    "src": [
+     "s048"
+    ]
+   }
+  },
+  {
+   "id": "f25",
+   "layer": "D",
+   "en": "Probabilistic Thinking",
+   "title": [
+    "確率で語る",
+    "Speaking in Probabilities"
+   ],
+   "q": [
+    "「起きるか、起きないか」ではなく「どれくらいの確率で、いつまでに」で考える。",
+    "Think not in terms of \"will it happen or not\" but \"with what probability, and by when\"."
+   ],
+   "ind": [
+    [
+     "予測市場・予測コミュニティの確率の推移",
+     "Trends in probabilities from prediction markets and forecasting communities"
+    ],
+    [
+     "予測の答え合わせ（的中率の記録）",
+     "Scoring past forecasts (tracking hit rates)"
+    ]
+   ],
+   "src": [
+    "s206",
+    "s207",
+    "s208",
+    "s188"
+   ],
+   "board": [
+    "御社の計画の前提は、確率と時期を伴う形で表現されていますか。",
+    "Are the assumptions behind your plan expressed with probabilities and timing?"
+   ],
+   "sowhat": [
+    "断定的な将来像ではなく、確率と前提を明示した見通しを示す。前提が変わったときに見直せる提案が信頼を得る。",
+    "Offer outlooks that state probabilities and assumptions rather than definitive visions of the future. Proposals that can be revisited when assumptions change earn trust."
+   ],
+   "read": {
+    "ja": "Metaculus のAI質問一覧（2026年10月時点）に埋め込まれたデータでは、「弱い汎用AIが初めて公表されるのはいつか」への1,728人のコミュニティ予測は、中央値が2027年10月ごろ、25〜75パーセンタイルの幅が2026年10月ごろから2030年3月ごろとなっている（数値はページ内データから算出）。",
+    "en": "Data embedded in the Metaculus AI question list (as of October 2026) shows the community prediction of 1,728 forecasters for when the first weakly general AI system will be publicly announced: a median of around October 2027, with a 25th to 75th percentile range of around October 2026 to March 2030 (computed from the page data).",
+    "asOf": "2026-10",
+    "src": [
+     "s206"
+    ]
+   }
+  },
+  {
+   "id": "f26",
+   "layer": "D",
+   "en": "Scenario Thinking",
+   "title": [
+    "複数の未来に備える",
+    "Preparing for Multiple Futures"
+   ],
+   "q": [
+    "強気・基本・弱気の3シナリオと、「何が起きたら見方を変えるか」を先に決めておく。",
+    "Define in advance three scenarios (bull, base and bear) and what would make you change your view."
+   ],
+   "ind": [
+    [
+     "各シナリオの先行指標",
+     "Leading indicators for each scenario"
+    ],
+    [
+     "前提が崩れる条件（反証条件）",
+     "Conditions under which assumptions break (falsification conditions)"
+    ]
+   ],
+   "src": [
+    "s192",
+    "s191",
+    "s210",
+    "s213",
+    "s212"
+   ],
+   "board": [
+    "御社の計画はどのシナリオに賭けていて、外れたときの備えはありますか。",
+    "Which scenario is your plan betting on, and do you have a fallback if it proves wrong?"
+   ],
+   "sowhat": [
+    "単一の予測ではなく、シナリオごとに「先に打つ手」と「様子を見る手」を示す。",
+    "Instead of a single forecast, show for each scenario the moves to make now and the moves to hold until more is known."
+   ],
+   "read": {
+    "ja": "NISTEP のページによると、第12回科学技術予測調査はホライズン・スキャニング、ビジョニング、デルファイ調査、シナリオの4手法で構成され、「2050未来シナリオ報告書」と総合報告書が2026年3月に公表されている。",
+    "en": "According to the NISTEP page, the 12th Science and Technology Foresight Survey combines four methods (horizon scanning, visioning, a Delphi survey and scenarios), and its \"2050 Future Scenarios\" report and general report were published in March 2026.",
+    "asOf": "2026-03",
+    "src": [
+     "s213"
+    ]
+   }
+  },
+  {
+   "id": "f27",
+   "layer": "D",
+   "en": "Signal Discipline",
+   "title": [
+    "毎週の情報摂取を仕組みにする",
+    "Making Weekly Information Intake a System"
+   ],
+   "q": [
+    "大量の情報から、意思決定に効くシグナルだけを継続的に拾うには、何をどの頻度で読むか。",
+    "To keep picking up only the signals that matter for decisions from an overwhelming volume of information, what should you read, and how often?"
+   ],
+   "ind": [
+    [
+     "毎週読むダイジェスト",
+     "A digest to read every week"
+    ],
+    [
+     "毎月確かめる定点指標",
+     "Benchmark indicators to check every month"
+    ],
+    [
+     "年に一度の総括レポート",
+     "An annual review report"
+    ]
+   ],
+   "src": [
+    "s200",
+    "s202",
+    "s190",
+    "s216",
+    "s218",
+    "s220",
+    "s221"
+   ],
+   "board": [
+    "御社の経営陣は、AI の変化を誰から、どの頻度で受け取っていますか。",
+    "From whom, and how often, does your leadership team hear about changes in AI?"
+   ],
+   "sowhat": [
+    "顧客向けに、業界に絞った月次の AI ブリーフィングを提供する。継続的な情報提供が、信頼される相談相手への近道になる。",
+    "Offer clients a monthly AI briefing tailored to their industry. Continuous information service is the shortest path to becoming a trusted advisor."
+   ],
+   "read": null
+  }
+ ],
+ "meta": {
+  "cadence": [
+   "毎月1日に自動点検",
+   "Automated check on the 1st of every month"
+  ],
+  "checked": "2026-10-12",
+  "next": "2026-11-01",
+  "log": [
+   {
+    "d": "2026-10-12",
+    "ja": "初回登録。全219件を自動点検し、切れていたリンクを差し替え、移転したリンクを移転先に更新。各ブリーフの「直近の読み」を情報源のページから作成。",
+    "en": "Initial release. Checked all 219 links, replaced broken ones and updated moved ones; wrote each Current Read from the source pages."
+   }
+  ]
+ }
+}

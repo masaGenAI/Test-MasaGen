@@ -1,0 +1,7229 @@
+[
+ {
+  "id": "s001",
+  "layer": "A",
+  "sub": [
+   "能力",
+   "Capability"
+  ],
+  "name": [
+   "Artificial Analysis LLM Leaderboard",
+   "Artificial Analysis LLM Leaderboard"
+  ],
+  "org": "Artificial Analysis",
+  "url": "https://artificialanalysis.ai/leaderboards/models",
+  "desc": [
+   "知能指数(Intelligence Index)・速度・価格を横並び比較（200超モデル）",
+   "Side-by-side comparison of intelligence (Intelligence Index), speed, and price across 200+ models."
+  ],
+  "freq": [
+   "随時（新モデル公開ごと）",
+   "As needed (with each new model release)"
+  ],
+  "region": [
+   "世界",
+   "Global"
+  ],
+  "fee": [
+   "無料(一部有料)",
+   "Free (some paid)"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s002",
+  "layer": "A",
+  "sub": [
+   "能力",
+   "Capability"
+  ],
+  "name": [
+   "Artificial Analysis Intelligence Index",
+   "Artificial Analysis Intelligence Index"
+  ],
+  "org": "Artificial Analysis",
+  "url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+  "desc": [
+   "複数ベンチを統合した総合知能指数（検索結果上 v4.3.2）の定義とモデル別スコア",
+   "Definition of the composite intelligence index that integrates multiple benchmarks (v4.3.2 per search results) and per-model scores."
+  ],
+  "freq": [
+   "随時（指数改定あり）",
+   "As needed (index revisions occur)"
+  ],
+  "region": [
+   "世界",
+   "Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s003",
+  "layer": "A",
+  "sub": [
+   "能力",
+   "Capability"
+  ],
+  "name": [
+   "LiveBench",
+   "LiveBench"
+  ],
+  "org": "LiveBench チーム",
+  "url": "https://livebench.ai/",
+  "desc": [
+   "汚染対策で定期更新される問題によるLLM総合ベンチ",
+   "General-purpose LLM benchmark using regularly refreshed questions to guard against contamination."
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "世界",
+   "Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s004",
+  "layer": "A",
+  "sub": [
+   "能力",
+   "Capability"
+  ],
+  "name": [
+   "Epoch AI Data on AI",
+   "Epoch AI Data on AI"
+  ],
+  "org": "Epoch AI",
+  "url": "https://epoch.ai/data",
+  "desc": [
+   "主要モデルのベンチ成績・学習計算量・データセットの公開DB（CC BY、ZIP DL可）",
+   "Public database of leading models' benchmark results, training compute, and datasets (CC BY, ZIP download available)."
+  ],
+  "freq": [
+   "随時（データセットごと）",
+   "As needed (per dataset)"
+  ],
+  "region": [
+   "世界",
+   "Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s005",
+  "layer": "A",
+  "sub": [
+   "能力",
+   "Capability"
+  ],
+  "name": [
+   "Nejumi LLM リーダーボード",
+   "Nejumi LLM Leaderboard"
+  ],
+  "org": "W&B Japan",
+  "url": "https://forge.coreweave.com/wandb/wandb-japan/llm-leaderboard3/reports/Nejumi-LLM-Leaderboard3--Vmlldzo4NDkwODEy",
+  "desc": [
+   "日本語LLMの言語処理・安全性・応用力(コーディング等)の総合評価",
+   "Comprehensive evaluation of Japanese LLMs on language processing, safety, and applied skills (e.g., coding)."
+  ],
+  "freq": [
+   "随時（版改定）",
+   "As needed (version updates)"
+  ],
+  "region": [
+   "日本",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s006",
+  "layer": "A",
+  "sub": [
+   "能力",
+   "Capability"
+  ],
+  "name": [
+   "Swallow LLM Leaderboard",
+   "Swallow LLM Leaderboard"
+  ],
+  "org": "東京科学大 Okazaki/Yokota研",
+  "url": "https://swallow-llm.github.io/",
+  "desc": [
+   "日本語理解・生成10タスク、英語10タスク、Japanese MT-Bench（0〜1）。2025-03-10に現名称で再公開",
+   "Scores (0 to 1) on 10 Japanese understanding/generation tasks, 10 English tasks, and Japanese MT-Bench; relaunched under its current name on 2025-03-10."
+  ],
+  "freq": [
+   "随時（新モデル評価時）",
+   "As needed (when new models are evaluated)"
+  ],
+  "region": [
+   "日本",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s007",
+  "layer": "A",
+  "sub": [
+   "コスト",
+   "Cost"
+  ],
+  "name": [
+   "Artificial Analysis Models",
+   "Artificial Analysis Models"
+  ],
+  "org": "Artificial Analysis",
+  "url": "https://artificialanalysis.ai/models",
+  "desc": [
+   "知能・価格（100万トークンあたり）・出力速度・遅延をモデル横断で比較",
+   "Compare intelligence, price per million tokens, output speed and latency across models"
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "世界",
+   "Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s008",
+  "layer": "A",
+  "sub": [
+   "コスト",
+   "Cost"
+  ],
+  "name": [
+   "Artificial Analysis モデル比較ツール",
+   "Artificial Analysis Model Comparison Tool"
+  ],
+  "org": "Artificial Analysis",
+  "url": "https://artificialanalysis.ai/models/comparisons",
+  "desc": [
+   "最大5モデルを知能・価格・速度・遅延で並べて比較",
+   "Compares up to five models side by side on intelligence, price, speed, and latency."
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "世界",
+   "Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s009",
+  "layer": "A",
+  "sub": [
+   "コスト",
+   "Cost"
+  ],
+  "name": [
+   "Artificial Analysis オープンウェイト比較",
+   "Artificial Analysis Open-Weights Comparison"
+  ],
+  "org": "Artificial Analysis",
+  "url": "https://artificialanalysis.ai/models/open-source",
+  "desc": [
+   "オープンウェイトモデルの知能・価格・速度・コンテキスト長",
+   "Intelligence, price, speed, and context length of open-weights models."
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "世界",
+   "Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s010",
+  "layer": "A",
+  "sub": [
+   "供給制約",
+   "Supply constraints"
+  ],
+  "name": [
+   "IEA Energy and AI（要旨）",
+   "IEA Energy and AI (summary)"
+  ],
+  "org": "IEA",
+  "url": "https://www.iea.org/reports/energy-and-ai/executive-summary",
+  "desc": [
+   "データセンターの電力需要の現状と見通し（IEA の基準シナリオ）",
+   "Current and projected data-centre electricity demand (IEA base case)"
+  ],
+  "freq": [
+   "年次〜不定期",
+   "Annual to irregular"
+  ],
+  "region": [
+   "世界",
+   "Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s011",
+  "layer": "A",
+  "sub": [
+   "供給制約",
+   "Supply constraints"
+  ],
+  "name": [
+   "IEA Key Questions on Energy and AI（要旨）",
+   "IEA Key Questions on Energy and AI (summary)"
+  ],
+  "org": "IEA",
+  "url": "https://www.iea.org/reports/key-questions-on-energy-and-ai/executive-summary",
+  "desc": [
+   "AIとエネルギーの主要論点（電力需要の伸び、系統接続、自家発電）",
+   "Key questions on AI and energy: demand growth, grid connection, on-site generation"
+  ],
+  "freq": [
+   "不定期（続報）",
+   "Irregular (follow-ups)"
+  ],
+  "region": [
+   "世界",
+   "Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s012",
+  "layer": "A",
+  "sub": [
+   "供給制約",
+   "Supply constraints"
+  ],
+  "name": [
+   "IEA AI トピックページ",
+   "IEA AI Topic Page"
+  ],
+  "org": "IEA",
+  "url": "https://www.iea.org/topics/artificial-intelligence",
+  "desc": [
+   "AI×エネルギー関連の報告・ニュース一覧",
+   "List of reports and news on AI and energy."
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "世界",
+   "Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s013",
+  "layer": "A",
+  "sub": [
+   "供給制約",
+   "Supply constraints"
+  ],
+  "name": [
+   "Epoch AI Frontier Data Centers Hub",
+   "Epoch AI Frontier Data Centers Hub"
+  ],
+  "org": "Epoch AI",
+  "url": "https://epoch.ai/data/ai-data-centers",
+  "desc": [
+   "衛星画像・許認可から追う大規模AIデータセンターの建設状況と計算能力(FLOP/s)。2025年11月公開、2026年4月更新を示す二次情報あり",
+   "Tracks construction status and compute capacity (FLOP/s) of large AI data centers from satellite imagery and permits; secondary sources indicate a November 2025 launch and an April 2026 update."
+  ],
+  "freq": [
+   "随時（不定期更新）",
+   "As needed (irregular updates)"
+  ],
+  "region": [
+   "世界(主に米)",
+   "Global (mainly US)"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s014",
+  "layer": "A",
+  "sub": [
+   "資本",
+   "Capital"
+  ],
+  "name": [
+   "Stanford AI Index（トップ）",
+   "Stanford AI Index (Home)"
+  ],
+  "org": "Stanford HAI",
+  "url": "https://hai.stanford.edu/ai-index",
+  "desc": [
+   "年次のAI統計集（投資・能力・政策・世論）",
+   "Annual compilation of AI statistics covering investment, capabilities, policy, and public opinion."
+  ],
+  "freq": [
+   "年次(春)",
+   "Annual (spring)"
+  ],
+  "region": [
+   "世界",
+   "Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s015",
+  "layer": "A",
+  "sub": [
+   "資本",
+   "Capital"
+  ],
+  "name": [
+   "AI Index 2026 Economy章",
+   "AI Index 2026: Economy Chapter"
+  ],
+  "org": "Stanford HAI",
+  "url": "https://hai.stanford.edu/ai-index/2026-ai-index-report/economy",
+  "desc": [
+   "AI Index の経済章。企業・民間のAI投資額と国別比較",
+   "AI Index economy chapter: corporate and private AI investment by country"
+  ],
+  "freq": [
+   "年次",
+   "Annual"
+  ],
+  "region": [
+   "世界",
+   "Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s016",
+  "layer": "A",
+  "sub": [
+   "資本",
+   "Capital"
+  ],
+  "name": [
+   "Our World in Data: AI民間投資（grapher）",
+   "Our World in Data: Private AI Investment (grapher)"
+  ],
+  "org": "Our World in Data",
+  "url": "https://ourworldindata.org/grapher/private-investment-in-artificial-intelligence",
+  "desc": [
+   "国別・年別の民間AI投資額",
+   "Private AI investment by country and year"
+  ],
+  "freq": [
+   "年次",
+   "Annual"
+  ],
+  "region": [
+   "世界",
+   "Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s017",
+  "layer": "A",
+  "sub": [
+   "普及",
+   "Adoption"
+  ],
+  "name": [
+   "Anthropic Economic Index",
+   "Anthropic Economic Index"
+  ],
+  "org": "Anthropic",
+  "url": "https://www.anthropic.com/economic-index",
+  "desc": [
+   "Claude利用のタスク・職業・地域別の利用分布（データはJS読込、fetch時は「Loading data」表示。「Last updated: Jun 26, 2026」と表示）",
+   "Distribution of Claude usage by task, occupation, and region (data is loaded via JS and shows \"Loading data\" on fetch; displays \"Last updated: Jun 26, 2026\")."
+  ],
+  "freq": [
+   "不定期（報告書単位）",
+   "Irregular (per report)"
+  ],
+  "region": [
+   "世界",
+   "Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s018",
+  "layer": "A",
+  "sub": [
+   "普及",
+   "Adoption"
+  ],
+  "name": [
+   "US Census「AIを使う企業」分析記事（BTOS）",
+   "US Census: Analysis of Businesses Using AI (BTOS)"
+  ],
+  "org": "米国勢調査局",
+  "url": "https://www.census.gov/library/stories/2026/05/ai-use-businesses.html",
+  "desc": [
+   "米国勢調査局の隔週調査（BTOS）による企業のAI利用率。質問文の変更に注意",
+   "Business AI use rate from the US Census biweekly survey (BTOS); note question changes"
+  ],
+  "freq": [
+   "隔週調査・記事は随時",
+   "Biweekly survey; articles as needed"
+  ],
+  "region": [
+   "米",
+   "US"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s019",
+  "layer": "A",
+  "sub": [
+   "普及",
+   "Adoption"
+  ],
+  "name": [
+   "令和8年版 情報通信白書「生成AIの業務利用状況」",
+   "2026 White Paper on Information and Communications (Reiwa 8): Business Use of Generative AI"
+  ],
+  "org": "総務省",
+  "url": "https://www.soumu.go.jp/johotsusintokei/whitepaper/ja/r08/html/nd121130.html",
+  "desc": [
+   "日本企業と個人の生成AI利用状況。日米独中の比較あり",
+   "Generative AI use by Japanese firms and individuals, with a US, Germany and China comparison"
+  ],
+  "freq": [
+   "年次(7月)",
+   "Annual (July)"
+  ],
+  "region": [
+   "日本",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s020",
+  "layer": "A",
+  "sub": [
+   "普及",
+   "Adoption"
+  ],
+  "name": [
+   "令和8年版 情報通信白書 概要PDF",
+   "2026 White Paper on Information and Communications (Reiwa 8): Summary PDF"
+  ],
+  "org": "総務省",
+  "url": "https://www.soumu.go.jp/main_content/001082851.pdf",
+  "desc": [
+   "特集「AIの進展がもたらす多面的影響」の要約（2026年7月公表）",
+   "Summary of the special feature \"Multifaceted Impacts of AI Advancement\" (published July 2026)."
+  ],
+  "freq": [
+   "年次(7月)",
+   "Annual (July)"
+  ],
+  "region": [
+   "日本",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s021",
+  "layer": "A",
+  "sub": [
+   "普及",
+   "Adoption"
+  ],
+  "name": [
+   "令和8年版 情報通信白書 第2章「企業等におけるAI利用」",
+   "2026 White Paper on Information and Communications (Reiwa 8): Chapter 2, AI Use in Companies"
+  ],
+  "org": "総務省",
+  "url": "https://www.soumu.go.jp/johotsusintokei/whitepaper/ja/r08/pdf/n1210000.pdf",
+  "desc": [
+   "企業のAI活用方針・組織的取組・効果創出ステップ",
+   "Companies' AI policies, organizational initiatives, and steps to achieving results."
+  ],
+  "freq": [
+   "年次",
+   "Annual"
+  ],
+  "region": [
+   "日本",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s022",
+  "layer": "A",
+  "sub": [
+   "ルール",
+   "Rules"
+  ],
+  "name": [
+   "IAPP Global AI Law and Policy Tracker",
+   "IAPP Global AI Law and Policy Tracker"
+  ],
+  "org": "IAPP",
+  "url": "https://iapp.org/resources/article/global-ai-legislation-tracker",
+  "desc": [
+   "各国のAI法・政策の状況一覧（全法域は網羅しない旨の注記あり。一部会員限定）",
+   "Overview of AI laws and policies by country (notes that not all jurisdictions are covered; some content is members-only)."
+  ],
+  "freq": [
+   "随時（本体ページは2025年5月更新との記載あり）",
+   "As needed (main page stated as updated May 2025)"
+  ],
+  "region": [
+   "世界",
+   "Global"
+  ],
+  "fee": [
+   "無料(一部会員)",
+   "Free (some members-only)"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s023",
+  "layer": "A",
+  "sub": [
+   "ルール",
+   "Rules"
+  ],
+  "name": [
+   "IAPP US State AI Governance Legislation Tracker",
+   "IAPP US State AI Governance Legislation Tracker"
+  ],
+  "org": "IAPP",
+  "url": "https://iapp.org/resources/article/us-state-ai-governance-legislation-tracker",
+  "desc": [
+   "米州法のAIガバナンス法案の進捗（2026-04-28更新との記載）",
+   "Progress of AI governance bills in US states (noted as updated 2026-04-28)."
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "米",
+   "US"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s024",
+  "layer": "A",
+  "sub": [
+   "ルール",
+   "Rules"
+  ],
+  "name": [
+   "IAPP EU AI Act 101",
+   "IAPP EU AI Act 101"
+  ],
+  "org": "IAPP",
+  "url": "https://iapp.org/resources/article/eu-ai-act-101",
+  "desc": [
+   "EU AI Actの段階適用と2026-07-27発効のDigital Omnibus on AIによる改正",
+   "The EU AI Act's phased application and the amendments from the Digital Omnibus on AI, effective 2026-07-27."
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "EU",
+   "EU"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s025",
+  "layer": "A",
+  "sub": [
+   "ルール",
+   "Rules"
+  ],
+  "name": [
+   "Japan AISI（AIセーフティ・インスティテュート）",
+   "Japan AISI (AI Safety Institute)"
+  ],
+  "org": "IPA内 AISI事務局",
+  "url": "https://aisi.go.jp/",
+  "desc": [
+   "評価観点ガイド(第1.20版、2026年7月)、AIセーフティ評価環境(OSS)、年次レポート、ファクトシート",
+   "Evaluation perspectives guide (v1.20, July 2026), AI safety evaluation environment (OSS), annual report, and fact sheet."
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "日本",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s026",
+  "layer": "A",
+  "sub": [
+   "ルール",
+   "Rules"
+  ],
+  "name": [
+   "AIセーフティ年次レポート2025",
+   "AI Safety Annual Report 2025"
+  ],
+  "org": "Japan AISI",
+  "url": "https://aisi.go.jp/output/output_information/260428/",
+  "desc": [
+   "2025年度の日本のAIセーフティ動向の年次整理",
+   "Annual overview of Japan's AI safety developments in fiscal 2025."
+  ],
+  "freq": [
+   "年次",
+   "Annual"
+  ],
+  "region": [
+   "日本",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s027",
+  "layer": "A",
+  "sub": [
+   "ルール",
+   "Rules"
+  ],
+  "name": [
+   "AIセーフティ ファクトシート2025（PDF）",
+   "AI Safety Fact Sheet 2025 (PDF)"
+  ],
+  "org": "Japan AISI",
+  "url": "https://aisi.go.jp/assets/pdf/j-aisi_factsheet_2025_ja.pdf",
+  "desc": [
+   "国内外AIセーフティ制度・取組の要約（2026-03-31版）",
+   "Summary of domestic and international AI safety frameworks and initiatives (2026-03-31 edition)."
+  ],
+  "freq": [
+   "年次",
+   "Annual"
+  ],
+  "region": [
+   "日本",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s028",
+  "layer": "A",
+  "sub": [
+   "社会",
+   "Society"
+  ],
+  "name": [
+   "Pew Research: AI トピック",
+   "Pew Research: AI Topic"
+  ],
+  "org": "Pew Research Center",
+  "url": "https://www.pewresearch.org/topic/internet-technology/emerging-technology/artificial-intelligence/",
+  "desc": [
+   "AIへの世論調査一覧",
+   "List of public opinion surveys on AI."
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "米・世界",
+   "US and Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s029",
+  "layer": "A",
+  "sub": [
+   "社会",
+   "Society"
+  ],
+  "name": [
+   "Pew: Americans and AI 2026",
+   "Pew: Americans and AI 2026"
+  ],
+  "org": "Pew Research Center",
+  "url": "https://www.pewresearch.org/internet/2026/06/17/americans-and-ai-2026-chatbots-smart-devices-and-views-on-impact/",
+  "desc": [
+   "米国成人のAIに対する期待と懸念、雇用や規制への見方",
+   "US adults on AI: hopes, concerns, jobs and regulation"
+  ],
+  "freq": [
+   "不定期(年次的)",
+   "Irregular (roughly annual)"
+  ],
+  "region": [
+   "米",
+   "US"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s030",
+  "layer": "A",
+  "sub": [
+   "社会",
+   "Society"
+  ],
+  "name": [
+   "Pew: AIと雇用（世界調査）",
+   "Pew: AI and Jobs (Global Survey)"
+  ],
+  "org": "Pew Research Center",
+  "url": "https://www.pewresearch.org/global/2026/09/17/globally-more-people-expect-ai-to-cause-job-loss-than-growth/",
+  "desc": [
+   "多国間調査によるAIと雇用の見通し",
+   "Multi-country survey on AI and the outlook for jobs"
+  ],
+  "freq": [
+   "不定期",
+   "Irregular"
+  ],
+  "region": [
+   "世界",
+   "Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s031",
+  "layer": "A",
+  "sub": [
+   "社会",
+   "Society"
+  ],
+  "name": [
+   "令和8年版 情報通信白書「仕事においてAIが今後担いうる役割等」",
+   "2026 White Paper on Information and Communications (Reiwa 8): The Future Role of AI at Work"
+  ],
+  "org": "総務省",
+  "url": "https://www.soumu.go.jp/johotsusintokei/whitepaper/ja/r08/html/nd111430.html",
+  "desc": [
+   "仕事でのAIの役割・影響に関する日本の個人調査",
+   "Japanese individual survey on the role and impact of AI in the workplace."
+  ],
+  "freq": [
+   "年次(7月)",
+   "Annual (July)"
+  ],
+  "region": [
+   "日本",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s032",
+  "layer": "A",
+  "sub": [
+   "能力",
+   "Capability"
+  ],
+  "name": [
+   "LMArena",
+   "LMArena"
+  ],
+  "org": "",
+  "url": "https://arena.ai/leaderboard",
+  "desc": [
+   "P（lmarena.ai拒否）。検索要約でドメイン稼働の言及のみ",
+   "P（lmarena.ai拒否）。検索要約でドメイン稼働の言及のみ"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s033",
+  "layer": "A",
+  "sub": [
+   "能力",
+   "Capability"
+  ],
+  "name": [
+   "METR Time Horizons",
+   "METR Time Horizons"
+  ],
+  "org": "",
+  "url": "https://metr.org/time-horizons/",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s034",
+  "layer": "A",
+  "sub": [
+   "能力",
+   "Capability"
+  ],
+  "name": [
+   "ARC Prize Leaderboard",
+   "ARC Prize Leaderboard"
+  ],
+  "org": "",
+  "url": "https://arcprize.org/leaderboard",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s035",
+  "layer": "A",
+  "sub": [
+   "能力",
+   "Capability"
+  ],
+  "name": [
+   "SWE-bench",
+   "SWE-bench"
+  ],
+  "org": "",
+  "url": "https://www.swebench.com/",
+  "desc": [
+   "N。GitHub MCPも対象リポジトリ未許可",
+   "N。GitHub MCPも対象リポジトリ未許可"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s036",
+  "layer": "A",
+  "sub": [
+   "能力",
+   "Capability"
+  ],
+  "name": [
+   "Humanity's Last Exam",
+   "Humanity's Last Exam"
+  ],
+  "org": "",
+  "url": "https://lastexam.ai/",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s037",
+  "layer": "A",
+  "sub": [
+   "能力",
+   "Capability"
+  ],
+  "name": [
+   "Scale SEAL Leaderboards",
+   "Scale SEAL Leaderboards"
+  ],
+  "org": "",
+  "url": "https://labs.scale.com/leaderboard",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s038",
+  "layer": "A",
+  "sub": [
+   "能力",
+   "Capability"
+  ],
+  "name": [
+   "Epoch AI Benchmarking Hub",
+   "Epoch AI Benchmarking Hub"
+  ],
+  "org": "",
+  "url": "https://epoch.ai/benchmarks",
+  "desc": [
+   "N（epoch.ai/data は検索で存在確認済み）",
+   "N（epoch.ai/data は検索で存在確認済み）"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s039",
+  "layer": "A",
+  "sub": [
+   "コスト",
+   "Cost"
+  ],
+  "name": [
+   "OpenRouter Rankings",
+   "OpenRouter Rankings"
+  ],
+  "org": "",
+  "url": "https://openrouter.ai/rankings",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s040",
+  "layer": "A",
+  "sub": [
+   "コスト",
+   "Cost"
+  ],
+  "name": [
+   "MLCommons MLPerf Inference",
+   "MLCommons MLPerf Inference"
+  ],
+  "org": "",
+  "url": "https://mlcommons.org/benchmarks/inference-datacenter/",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s041",
+  "layer": "A",
+  "sub": [
+   "コスト",
+   "Cost"
+  ],
+  "name": [
+   "Epoch データインサイト（LLM推論価格推移）",
+   "Epoch Data Insights (LLM Inference Price Trends)"
+  ],
+  "org": "",
+  "url": "https://epoch.ai/data-insights/llm-inference-price-trends",
+  "desc": [
+   "N",
+   "N"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s042",
+  "layer": "A",
+  "sub": [
+   "供給制約",
+   "Supply constraints"
+  ],
+  "name": [
+   "TrendForce（HBM/DRAM/GPU市況）",
+   "TrendForce (HBM/DRAM/GPU Market Conditions)"
+  ],
+  "org": "",
+  "url": "https://www.trendforce.com/presscenter/news",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s043",
+  "layer": "A",
+  "sub": [
+   "供給制約",
+   "Supply constraints"
+  ],
+  "name": [
+   "SIA 半導体売上/WSTS",
+   "SIA Semiconductor Sales / WSTS"
+  ],
+  "org": "",
+  "url": "https://www.wsts.org/",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s044",
+  "layer": "A",
+  "sub": [
+   "供給制約",
+   "Supply constraints"
+  ],
+  "name": [
+   "SEMI 市場データ",
+   "SEMI Market Data"
+  ],
+  "org": "",
+  "url": "https://www.semi.org/en/products-services/market-data",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s045",
+  "layer": "A",
+  "sub": [
+   "供給制約",
+   "Supply constraints"
+  ],
+  "name": [
+   "電力広域的運営推進機関(OCCTO) 需給見通し",
+   "OCCTO Supply-Demand Outlook (Organization for Cross-regional Coordination of Transmission Operators)"
+  ],
+  "org": "",
+  "url": "https://www.occto.or.jp/",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s046",
+  "layer": "A",
+  "sub": [
+   "供給制約",
+   "Supply constraints"
+  ],
+  "name": [
+   "日本データセンター協会(JDCC)",
+   "Japan Data Center Council (JDCC)"
+  ],
+  "org": "",
+  "url": "https://www.jdcc.or.jp/",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s047",
+  "layer": "A",
+  "sub": [
+   "供給制約",
+   "Supply constraints"
+  ],
+  "name": [
+   "経産省 情報産業（半導体・DC政策）",
+   "METI: Information Industry (Semiconductor and Data Center Policy)"
+  ],
+  "org": "",
+  "url": "https://www.meti.go.jp/policy/mono_info_service/joho/index.html",
+  "desc": [
+   "P",
+   "P"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s048",
+  "layer": "A",
+  "sub": [
+   "資本",
+   "Capital"
+  ],
+  "name": [
+   "State of AI Report",
+   "State of AI Report"
+  ],
+  "org": "",
+  "url": "https://www.stateof.ai/",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s049",
+  "layer": "A",
+  "sub": [
+   "資本",
+   "Capital"
+  ],
+  "name": [
+   "OECD.AI データ(VC投資ほか)",
+   "OECD.AI Data (VC Investment, etc.)"
+  ],
+  "org": "",
+  "url": "https://oecd.ai/en/data",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s050",
+  "layer": "A",
+  "sub": [
+   "資本",
+   "Capital"
+  ],
+  "name": [
+   "日銀短観",
+   "BOJ Tankan"
+  ],
+  "org": "",
+  "url": "https://www.boj.or.jp/statistics/tk/index.htm",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s051",
+  "layer": "A",
+  "sub": [
+   "普及",
+   "Adoption"
+  ],
+  "name": [
+   "Our World in Data AI",
+   "Our World in Data: AI"
+  ],
+  "org": "",
+  "url": "https://ourworldindata.org/artificial-intelligence",
+  "desc": [
+   "N（grapher URLのみB確認）",
+   "N（grapher URLのみB確認）"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s052",
+  "layer": "A",
+  "sub": [
+   "普及",
+   "Adoption"
+  ],
+  "name": [
+   "Ramp AI Index",
+   "Ramp AI Index"
+  ],
+  "org": "",
+  "url": "https://ramp.com/data/ai-index",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s053",
+  "layer": "A",
+  "sub": [
+   "普及",
+   "Adoption"
+  ],
+  "name": [
+   "US Census BTOS 本体",
+   "US Census BTOS (Main Page)"
+  ],
+  "org": "",
+  "url": "https://www.census.gov/hfp/btos/",
+  "desc": [
+   "N（関連記事のみB確認）",
+   "N（関連記事のみB確認）"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s054",
+  "layer": "A",
+  "sub": [
+   "普及",
+   "Adoption"
+  ],
+  "name": [
+   "IPA DX動向（調査一覧）",
+   "IPA DX Trends (Survey List)"
+  ],
+  "org": "",
+  "url": "https://www.ipa.go.jp/digital/chousa/dx-trend/index.html",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s055",
+  "layer": "A",
+  "sub": [
+   "ルール",
+   "Rules"
+  ],
+  "name": [
+   "EU AI Act（artificialintelligenceact.eu）",
+   "EU AI Act (artificialintelligenceact.eu)"
+  ],
+  "org": "",
+  "url": "https://artificialintelligenceact.eu/",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s056",
+  "layer": "A",
+  "sub": [
+   "ルール",
+   "Rules"
+  ],
+  "name": [
+   "EU AI Act 公式（欧州委員会）",
+   "EU AI Act Official (European Commission)"
+  ],
+  "org": "",
+  "url": "https://digital-strategy.ec.europa.eu/en/policies/european-approach-artificial-intelligence",
+  "desc": [
+   "P",
+   "P"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s057",
+  "layer": "A",
+  "sub": [
+   "ルール",
+   "Rules"
+  ],
+  "name": [
+   "CSET",
+   "CSET"
+  ],
+  "org": "",
+  "url": "https://cset.georgetown.edu/",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s058",
+  "layer": "A",
+  "sub": [
+   "ルール",
+   "Rules"
+  ],
+  "name": [
+   "International AI Safety Report",
+   "International AI Safety Report"
+  ],
+  "org": "",
+  "url": "https://internationalaisafetyreport.org/",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s059",
+  "layer": "A",
+  "sub": [
+   "ルール",
+   "Rules"
+  ],
+  "name": [
+   "UK AI Security Institute",
+   "UK AI Security Institute"
+  ],
+  "org": "",
+  "url": "https://www.aisi.gov.uk/",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s060",
+  "layer": "A",
+  "sub": [
+   "ルール",
+   "Rules"
+  ],
+  "name": [
+   "US CAISI (NIST)",
+   "US CAISI (NIST)"
+  ],
+  "org": "",
+  "url": "https://www.nist.gov/caissi",
+  "desc": [
+   "P",
+   "P"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s061",
+  "layer": "A",
+  "sub": [
+   "ルール",
+   "Rules"
+  ],
+  "name": [
+   "BIS 輸出管理",
+   "BIS Export Controls"
+  ],
+  "org": "",
+  "url": "https://www.bis.gov/",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s062",
+  "layer": "A",
+  "sub": [
+   "ルール",
+   "Rules"
+  ],
+  "name": [
+   "内閣府 AI戦略",
+   "Cabinet Office AI Strategy"
+  ],
+  "org": "",
+  "url": "https://www8.cao.go.jp/cstp/ai/index.html",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s063",
+  "layer": "A",
+  "sub": [
+   "社会",
+   "Society"
+  ],
+  "name": [
+   "AI Incident Database",
+   "AI Incident Database"
+  ],
+  "org": "",
+  "url": "https://incidentdatabase.ai/",
+  "desc": [
+   "N。検索でも結果に出ず",
+   "N。検索でも結果に出ず"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s064",
+  "layer": "A",
+  "sub": [
+   "社会",
+   "Society"
+  ],
+  "name": [
+   "OECD AI Incidents Monitor",
+   "OECD AI Incidents Monitor"
+  ],
+  "org": "",
+  "url": "https://oecd.ai/en/incidents?search_terms=%5B%5D&and_condition=false&from_date=1900-10-12&to_date=2026-10-12&properties_config=%7B%22principles%22:%5B%5D,%22industries%22:%5B%5D,%22harm_types%22:%5B%5D,%22harm_levels%22:%5B%5D,%22harmed_entities%22:%5B%5D,%22business_functions%22:%5B%5D,%22ai_tasks%22:%5B%5D,%22autonomy_levels%22:%5B%5D,%22languages%22:%5B%5D%7D&order_by=date&num_results=20",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s065",
+  "layer": "A",
+  "sub": [
+   "社会",
+   "Society"
+  ],
+  "name": [
+   "ILO 生成AIと雇用",
+   "ILO: Generative AI and Employment"
+  ],
+  "org": "",
+  "url": "https://www.ilo.org/topics-and-sectors/artificial-intelligence",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s066",
+  "layer": "A",
+  "sub": [
+   "社会",
+   "Society"
+  ],
+  "name": [
+   "OECD AI and work",
+   "OECD: AI and Work"
+  ],
+  "org": "",
+  "url": "https://www.oecd.org/en/topics/ai-and-work.html",
+  "desc": [
+   "N, S",
+   "N, S"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s067",
+  "layer": "A",
+  "sub": [
+   "普及",
+   "Adoption"
+  ],
+  "name": [
+   "OpenAI 利用実態 (How people use ChatGPT)",
+   "OpenAI Usage Study (How People Use ChatGPT)"
+  ],
+  "org": "",
+  "url": "https://openai.com/index/how-people-are-using-chatgpt/",
+  "desc": [
+   "N",
+   "N"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s068",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Google Cloud Blog",
+   "Google Cloud Blog"
+  ],
+  "org": "Google Cloud",
+  "url": "https://cloud.google.com/blog?hl=en",
+  "desc": [
+   "Gemini Enterprise・エージェント等の製品発表と顧客事例の公式ブログ総合入口",
+   "Main entry point to Google Cloud's official blog, with product announcements (Gemini Enterprise, agents, etc.) and customer stories."
+  ],
+  "freq": [
+   "日次〜週次",
+   "Daily to weekly"
+  ],
+  "region": [
+   "グローバル",
+   "Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s069",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Transform with Google Cloud",
+   "Transform with Google Cloud"
+  ],
+  "org": "Google Cloud",
+  "url": "https://cloud.google.com/transform?hl=en",
+  "desc": [
+   "ITリーダー向けに業界別のAI活用事例・エージェント戦略を載せる記事セクション",
+   "Article section for IT leaders featuring industry-specific AI use cases and agent strategies."
+  ],
+  "freq": [
+   "週次",
+   "Weekly"
+  ],
+  "region": [
+   "グローバル",
+   "Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s070",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Google Cloud ブログ（日本語）",
+   "Google Cloud Blog (Japanese)"
+  ],
+  "org": "Google Cloud Japan",
+  "url": "https://cloud.google.com/blog/ja",
+  "desc": [
+   "国内向けに翻訳された製品アップデート・国内パートナー共催イベント（電通 Gemini Day 等）の告知",
+   "Translated product updates for Japan and announcements of events co-hosted with Japanese partners (e.g., Dentsu Gemini Day)."
+  ],
+  "freq": [
+   "週次",
+   "Weekly"
+  ],
+  "region": [
+   "日本",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s071",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Microsoft Investor Relations",
+   "Microsoft Investor Relations"
+  ],
+  "org": "Microsoft",
+  "url": "https://www.microsoft.com/en-us/investor/default",
+  "desc": [
+   "決算リリース・Webキャスト・年次報告書・SEC提出書類へのIR総合入口（次回 FY27 Q1 は 2026-10-28 と表示）",
+   "Main IR entry point for earnings releases, webcasts, annual reports, and SEC filings (next FY27 Q1 shown as 2026-10-28)."
+  ],
+  "freq": [
+   "四半期ごと",
+   "Quarterly"
+  ],
+  "region": [
+   "グローバル",
+   "Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s072",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Microsoft IR ― Events",
+   "Microsoft IR: Events"
+  ],
+  "org": "Microsoft",
+  "url": "https://www.microsoft.com/en-us/investor/events/default",
+  "desc": [
+   "決算説明会など IR イベントの今後・過去一覧への入口（取得テキストはナビのみで一覧本体は未確認）",
+   "Entry point to upcoming and past IR events such as earnings calls (fetched text contained only navigation; the event list itself is unverified)."
+  ],
+  "freq": [
+   "四半期ごと",
+   "Quarterly"
+  ],
+  "region": [
+   "グローバル",
+   "Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s073",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Microsoft Cloud Blog",
+   "Microsoft Cloud Blog"
+  ],
+  "org": "Microsoft",
+  "url": "https://www.microsoft.com/en-us/microsoft-cloud/blog/",
+  "desc": [
+   "ソブリンAI・金融向けエージェント等、Microsoft Cloud の戦略メッセージとAI導入トレンドを読めるブログ（最新 10/5）",
+   "Blog covering Microsoft Cloud's strategic messaging and AI adoption trends, such as sovereign AI and financial-services agents (latest post 10/5)."
+  ],
+  "freq": [
+   "週次",
+   "Weekly"
+  ],
+  "region": [
+   "グローバル",
+   "Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s074",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Work Trend Index",
+   "Work Trend Index"
+  ],
+  "org": "Microsoft（WorkLab）",
+  "url": "https://www.microsoft.com/en-us/worklab/work-trend-index",
+  "desc": [
+   "職場でのAI/エージェント活用に関する年次調査（最新: 2026-05-05 の年次レポート）と過去版",
+   "Annual survey on AI and agent use in the workplace (latest: annual report of 2026-05-05) and past editions."
+  ],
+  "freq": [
+   "年次＋随時",
+   "Annual plus as needed"
+  ],
+  "region": [
+   "グローバル",
+   "Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s075",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Anthropic Newsroom",
+   "Anthropic Newsroom"
+  ],
+  "org": "Anthropic",
+  "url": "https://www.anthropic.com/news",
+  "desc": [
+   "製品・ポリシー・提携の公式発表（直近は 2026-10-08 の Usage Policy 更新など）",
+   "Official announcements on products, policy, and partnerships (most recent: Usage Policy update on 2026-10-08, etc.)."
+  ],
+  "freq": [
+   "週次〜日次",
+   "Weekly to daily"
+  ],
+  "region": [
+   "グローバル",
+   "Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s076",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Anthropic Research",
+   "Anthropic Research"
+  ],
+  "org": "Anthropic",
+  "url": "https://www.anthropic.com/research",
+  "desc": [
+   "安全性・評価・応用研究の公式一覧（直近は 2026-10-09）",
+   "Official list of research on safety, evaluation, and applications (most recent: 2026-10-09)."
+  ],
+  "freq": [
+   "週次",
+   "Weekly"
+  ],
+  "region": [
+   "グローバル",
+   "Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s077",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Engineering at Anthropic",
+   "Engineering at Anthropic"
+  ],
+  "org": "Anthropic",
+  "url": "https://www.anthropic.com/engineering",
+  "desc": [
+   "Claude Code・エージェント設計など実装側の技術ブログ（取得時の最新表示は 2026-04 付）",
+   "Technical blog on implementation topics such as Claude Code and agent design (latest displayed post dated 2026-04 at time of fetch)."
+  ],
+  "freq": [
+   "月次〜不定期",
+   "Monthly to irregular"
+  ],
+  "region": [
+   "グローバル",
+   "Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s078",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Microsoft FY26 Q4 決算プレスリリース",
+   "Microsoft FY26 Q4 Earnings Press Release"
+  ],
+  "org": "Microsoft",
+  "url": "https://www.microsoft.com/en-us/investor/earnings/fy-2026-q4/press-release-webcast",
+  "desc": [
+   "決算リリースの実例。売上、クラウド事業の成長、設備投資（有形固定資産の取得）の確認先",
+   "Example earnings release: revenue, cloud growth and capital expenditure"
+  ],
+  "freq": [
+   "四半期ごと",
+   "Quarterly"
+  ],
+  "region": [
+   "グローバル",
+   "Global"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s079",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Amazon プレスセンター",
+   "Amazon Press Center"
+  ],
+  "org": "",
+  "url": "https://press.aboutamazon.com/",
+  "desc": [
+   "ENOTFOUND（2回）",
+   "ENOTFOUND（2回）"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s080",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Amazon IR",
+   "Amazon IR"
+  ],
+  "org": "",
+  "url": "https://ir.aboutamazon.com/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s081",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "AWS News Blog",
+   "AWS News Blog"
+  ],
+  "org": "",
+  "url": "https://aws.amazon.com/jp/blogs/aws/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s082",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "AWS What's New",
+   "AWS What's New"
+  ],
+  "org": "",
+  "url": "https://aws.amazon.com/jp/new/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s083",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "AWS What's New（日本）",
+   "AWS What's New (Japan)"
+  ],
+  "org": "",
+  "url": "https://aws.amazon.com/jp/new/",
+  "desc": [
+   "未試行（同ドメイン遮断のため）",
+   "未試行（同ドメイン遮断のため）"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s084",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Microsoft Source",
+   "Microsoft Source"
+  ],
+  "org": "",
+  "url": "https://news.microsoft.com/source/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s085",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Microsoft Source Asia 日本",
+   "Microsoft Source Asia Japan"
+  ],
+  "org": "",
+  "url": "https://news.microsoft.com/source/asia/region/japan-ja/?lang=ja",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s086",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Official Microsoft Blog",
+   "Official Microsoft Blog"
+  ],
+  "org": "",
+  "url": "https://blogs.microsoft.com/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s087",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Azure Blog",
+   "Azure Blog"
+  ],
+  "org": "",
+  "url": "https://azure.microsoft.com/en-us/blog/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s088",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Microsoft IR 決算一覧",
+   "Microsoft IR Earnings List"
+  ],
+  "org": "",
+  "url": "https://www.microsoft.com/en-us/investor/earnings/default",
+  "desc": [
+   "ロードしたがエラー様の画面（Trace Id のみ）で内容不一致",
+   "ロードしたがエラー様の画面（Trace Id のみ）で内容不一致"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s089",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Google AI ブログ",
+   "Google AI Blog"
+  ],
+  "org": "",
+  "url": "https://blog.google/innovation-and-ai/technology/ai/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s090",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Alphabet IR",
+   "Alphabet IR"
+  ],
+  "org": "",
+  "url": "https://abc.xyz/investor/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s091",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Google Cloud プレスコーナー",
+   "Google Cloud Press Corner"
+  ],
+  "org": "",
+  "url": "https://www.googlecloudpresscorner.com/press-releases",
+  "desc": [
+   "旧 URL からの 301 先。ENOTFOUND",
+   "旧 URL からの 301 先。ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s092",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Salesforce Newsroom",
+   "Salesforce Newsroom"
+  ],
+  "org": "",
+  "url": "https://www.salesforce.com/news/?bc=OTH",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s093",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Salesforce IR",
+   "Salesforce IR"
+  ],
+  "org": "",
+  "url": "https://investor.salesforce.com/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s094",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Snowflake ブログ",
+   "Snowflake Blog"
+  ],
+  "org": "",
+  "url": "https://www.snowflake.com/en/blog/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s095",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Snowflake IR",
+   "Snowflake IR"
+  ],
+  "org": "",
+  "url": "https://investors.snowflake.com/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s096",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Databricks ブログ",
+   "Databricks Blog"
+  ],
+  "org": "",
+  "url": "https://www.databricks.com/blog",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s097",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Databricks ニュースルーム",
+   "Databricks Newsroom"
+  ],
+  "org": "",
+  "url": "https://www.databricks.com/company/newsroom",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s098",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "NVIDIA Newsroom",
+   "NVIDIA Newsroom"
+  ],
+  "org": "",
+  "url": "https://nvidianews.nvidia.com/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s099",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "NVIDIA IR",
+   "NVIDIA IR"
+  ],
+  "org": "",
+  "url": "https://investor.nvidia.com/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s100",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "OpenAI News",
+   "OpenAI News"
+  ],
+  "org": "",
+  "url": "https://openai.com/news/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s101",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Meta AI ブログ",
+   "Meta AI Blog"
+  ],
+  "org": "",
+  "url": "https://ai.meta.com/blog/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s102",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Meta IR",
+   "Meta IR"
+  ],
+  "org": "",
+  "url": "https://investor.atmeta.com/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s103",
+  "layer": "B",
+  "sub": [
+   "年次イベント",
+   "Annual events"
+  ],
+  "name": [
+   "AWS re:Invent",
+   "AWS re:Invent"
+  ],
+  "org": "",
+  "url": "https://aws.amazon.com/jp/events/reinvent/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s104",
+  "layer": "B",
+  "sub": [
+   "年次イベント",
+   "Annual events"
+  ],
+  "name": [
+   "Microsoft Build",
+   "Microsoft Build"
+  ],
+  "org": "",
+  "url": "https://build.microsoft.com/en-US/home",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s105",
+  "layer": "B",
+  "sub": [
+   "年次イベント",
+   "Annual events"
+  ],
+  "name": [
+   "Microsoft Ignite",
+   "Microsoft Ignite"
+  ],
+  "org": "",
+  "url": "https://ignite.microsoft.com/en-US/home",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s106",
+  "layer": "B",
+  "sub": [
+   "年次イベント",
+   "Annual events"
+  ],
+  "name": [
+   "Google Cloud Next",
+   "Google Cloud Next"
+  ],
+  "org": "",
+  "url": "https://www.googlecloudevents.com/next-vegas",
+  "desc": [
+   "301 先。ENOTFOUND",
+   "301 先。ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s107",
+  "layer": "B",
+  "sub": [
+   "年次イベント",
+   "Annual events"
+  ],
+  "name": [
+   "Dreamforce",
+   "Dreamforce"
+  ],
+  "org": "",
+  "url": "https://www.salesforce.com/dreamforce/?bc=OTH",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s108",
+  "layer": "B",
+  "sub": [
+   "年次イベント",
+   "Annual events"
+  ],
+  "name": [
+   "Snowflake Summit",
+   "Snowflake Summit"
+  ],
+  "org": "",
+  "url": "https://www.snowflake.com/en/summit/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s109",
+  "layer": "B",
+  "sub": [
+   "年次イベント",
+   "Annual events"
+  ],
+  "name": [
+   "Data + AI Summit",
+   "Data + AI Summit"
+  ],
+  "org": "",
+  "url": "https://www.databricks.com/dataaisummit",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s110",
+  "layer": "B",
+  "sub": [
+   "年次イベント",
+   "Annual events"
+  ],
+  "name": [
+   "NVIDIA GTC",
+   "NVIDIA GTC"
+  ],
+  "org": "",
+  "url": "https://www.nvidia.com/gtc/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s111",
+  "layer": "B",
+  "sub": [
+   "調査会社",
+   "Analyst firms"
+  ],
+  "name": [
+   "Gartner Newsroom",
+   "Gartner Newsroom"
+  ],
+  "org": "",
+  "url": "https://www.gartner.com/en/newsroom",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s112",
+  "layer": "B",
+  "sub": [
+   "調査会社",
+   "Analyst firms"
+  ],
+  "name": [
+   "Gartner Hype Cycle（AI）",
+   "Gartner Hype Cycle (AI)"
+  ],
+  "org": "",
+  "url": "https://www.gartner.com/en/articles/hype-cycle-for-artificial-intelligence",
+  "desc": [
+   "ENOTFOUND（URL 自体も記憶ベースで不確実）",
+   "ENOTFOUND（URL 自体も記憶ベースで不確実）"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s113",
+  "layer": "B",
+  "sub": [
+   "調査会社",
+   "Analyst firms"
+  ],
+  "name": [
+   "ガートナージャパン ニュースルーム",
+   "Gartner Japan Newsroom"
+  ],
+  "org": "",
+  "url": "https://www.gartner.co.jp/ja/newsroom",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": true,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s114",
+  "layer": "B",
+  "sub": [
+   "調査会社",
+   "Analyst firms"
+  ],
+  "name": [
+   "IDC プレス",
+   "IDC Press"
+  ],
+  "org": "",
+  "url": "https://www.idc.com/about/press-releases/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s115",
+  "layer": "B",
+  "sub": [
+   "調査会社",
+   "Analyst firms"
+  ],
+  "name": [
+   "IDC Japan",
+   "IDC Japan"
+  ],
+  "org": "",
+  "url": "https://www.idc.com/jp/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s116",
+  "layer": "B",
+  "sub": [
+   "調査会社",
+   "Analyst firms"
+  ],
+  "name": [
+   "Forrester Blogs",
+   "Forrester Blogs"
+  ],
+  "org": "",
+  "url": "https://www.forrester.com/blogs/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s117",
+  "layer": "B",
+  "sub": [
+   "コンサルファームの調査",
+   "Consulting research"
+  ],
+  "name": [
+   "McKinsey QuantumBlack Insights",
+   "McKinsey QuantumBlack Insights"
+  ],
+  "org": "",
+  "url": "https://www.mckinsey.com/capabilities/quantumblack/our-insights",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "unverified",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s118",
+  "layer": "B",
+  "sub": [
+   "コンサルファームの調査",
+   "Consulting research"
+  ],
+  "name": [
+   "McKinsey State of AI",
+   "McKinsey State of AI"
+  ],
+  "org": "",
+  "url": "https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai",
+  "desc": [
+   "ENOTFOUND（未試行・ドメイン遮断のため。URL は記憶ベース）",
+   "ENOTFOUND（未試行・ドメイン遮断のため。URL は記憶ベース）"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "unverified",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s119",
+  "layer": "B",
+  "sub": [
+   "コンサルファームの調査",
+   "Consulting research"
+  ],
+  "name": [
+   "BCG AI Insights",
+   "BCG AI Insights"
+  ],
+  "org": "",
+  "url": "https://www.bcg.com/capabilities/artificial-intelligence/insights",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s120",
+  "layer": "B",
+  "sub": [
+   "コンサルファームの調査",
+   "Consulting research"
+  ],
+  "name": [
+   "Deloitte Applied AI",
+   "Deloitte Applied AI"
+  ],
+  "org": "",
+  "url": "https://www.deloitte.com/us/en/what-we-do/capabilities/applied-artificial-intelligence.html",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s121",
+  "layer": "B",
+  "sub": [
+   "コンサルファームの調査",
+   "Consulting research"
+  ],
+  "name": [
+   "Accenture Technology Vision 2025",
+   "Accenture Technology Vision 2025"
+  ],
+  "org": "",
+  "url": "https://www.accenture.com/en/insights/technology/technology-trends-2025",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s122",
+  "layer": "B",
+  "sub": [
+   "コンサルファームの調査",
+   "Consulting research"
+  ],
+  "name": [
+   "PwC AI",
+   "PwC AI"
+  ],
+  "org": "",
+  "url": "https://www.pwc.com/gx/en/issues/artificial-intelligence.html",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s123",
+  "layer": "B",
+  "sub": [
+   "コンサルファームの調査",
+   "Consulting research"
+  ],
+  "name": [
+   "Slalom Insights",
+   "Slalom Insights"
+  ],
+  "org": "",
+  "url": "https://www.slalom.com/us/en/insights",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s124",
+  "layer": "B",
+  "sub": [
+   "VC・投資家",
+   "VCs & investors"
+  ],
+  "name": [
+   "Menlo Ventures Perspective",
+   "Menlo Ventures Perspective"
+  ],
+  "org": "",
+  "url": "https://menlovc.com/perspective/",
+  "desc": [
+   "ENOTFOUND。ただし 2025 年版レポート URL は WebSearch 結果に出現（下記）",
+   "ENOTFOUND。ただし 2025 年版レポート URL は WebSearch 結果に出現（下記）"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s125",
+  "layer": "B",
+  "sub": [
+   "VC・投資家",
+   "VCs & investors"
+  ],
+  "name": [
+   "Menlo「2025 State of GenAI in the Enterprise」",
+   "Menlo Ventures \"2025 State of GenAI in the Enterprise\""
+  ],
+  "org": "",
+  "url": "https://menlovc.com/perspective/2025-the-state-of-generative-ai-in-the-enterprise/",
+  "desc": [
+   "WebSearch 結果に出現するが fetch は不可（ENOTFOUND）。存在の傍証のみ",
+   "WebSearch 結果に出現するが fetch は不可（ENOTFOUND）。存在の傍証のみ"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s126",
+  "layer": "B",
+  "sub": [
+   "VC・投資家",
+   "VCs & investors"
+  ],
+  "name": [
+   "Sequoia Stories",
+   "Sequoia Stories"
+  ],
+  "org": "",
+  "url": "https://sequoiacap.com/stories/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s127",
+  "layer": "B",
+  "sub": [
+   "VC・投資家",
+   "VCs & investors"
+  ],
+  "name": [
+   "a16z AI",
+   "a16z AI"
+  ],
+  "org": "",
+  "url": "https://a16z.com/ai/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s128",
+  "layer": "B",
+  "sub": [
+   "VC・投資家",
+   "VCs & investors"
+  ],
+  "name": [
+   "Bond Capital",
+   "Bond Capital"
+  ],
+  "org": "",
+  "url": "https://www.bondcap.com/",
+  "desc": [
+   "ENOTFOUND（Mary Meeker の AI Trends レポートが現行で公開中かも未確認）",
+   "ENOTFOUND（Mary Meeker の AI Trends レポートが現行で公開中かも未確認）"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s129",
+  "layer": "B",
+  "sub": [
+   "コンサル業界の変化",
+   "Future of consulting"
+  ],
+  "name": [
+   "Source Global Research",
+   "Source Global Research"
+  ],
+  "org": "",
+  "url": "https://sourceglobalresearch.com/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s130",
+  "layer": "B",
+  "sub": [
+   "コンサル業界の変化",
+   "Future of consulting"
+  ],
+  "name": [
+   "Consultancy.uk",
+   "Consultancy.uk"
+  ],
+  "org": "",
+  "url": "https://www.consultancy.uk/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s131",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "ITmedia エンタープライズ",
+   "ITmedia Enterprise"
+  ],
+  "org": "",
+  "url": "https://www.itmedia.co.jp/enterprise/",
+  "desc": [
+   "ENOTFOUND",
+   "ENOTFOUND"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s132",
+  "layer": "B",
+  "sub": [
+   "ベンダー・パートナー",
+   "Vendors & partners"
+  ],
+  "name": [
+   "Claude 顧客事例",
+   "Claude Customer Stories"
+  ],
+  "org": "",
+  "url": "https://claude.com/ja/customers",
+  "desc": [
+   "308 先。未取得",
+   "308 先。未取得"
+  ],
+  "freq": [
+   "",
+   ""
+  ],
+  "region": [
+   "",
+   ""
+  ],
+  "fee": [
+   "",
+   ""
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s133",
+  "layer": "C",
+  "sub": [
+   "業界の規制・当局",
+   "Industry regulators"
+  ],
+  "name": [
+   "金融庁 AIディスカッションペーパー",
+   "FSA AI Discussion Paper (Financial Services Agency)"
+  ],
+  "org": "金融庁",
+  "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp.html",
+  "desc": [
+   "金融機関のAI活用実態と論点整理（第1.0版2025-03、第1.1版2026-03-03、本文・概要PDF）",
+   "Survey of AI use at financial institutions and issue framing (v1.0 March 2025, v1.1 2026-03-03; main text and summary PDFs)."
+  ],
+  "freq": [
+   "不定期（版改訂：約1年ごと）",
+   "Irregular (version revisions about every year)"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s134",
+  "layer": "C",
+  "sub": [
+   "業界の規制・当局",
+   "Industry regulators"
+  ],
+  "name": [
+   "金融庁 AI官民フォーラム（第1回議事要旨）",
+   "FSA AI Public-Private Forum (Minutes of 1st Meeting)"
+  ],
+  "org": "金融庁",
+  "url": "https://www.fsa.go.jp/singi/ai_forum/gijiyoshi/20250618.html",
+  "desc": [
+   "2025年6〜12月開催の官民対話。事例・議論の議事要旨と資料（親ページ index は未確認）",
+   "Public-private dialogue held June to December 2025; minutes and materials with cases and discussion (parent index page unverified)."
+  ],
+  "freq": [
+   "会合ごと（2025-06〜12）",
+   "Per meeting (2025-06 to 12)"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s135",
+  "layer": "C",
+  "sub": [
+   "業界の規制・当局",
+   "Industry regulators"
+  ],
+  "name": [
+   "FSB: Monitoring Adoption of AI",
+   "FSB: Monitoring Adoption of AI"
+  ],
+  "org": "FSB（金融安定理事会）",
+  "url": "https://www.fsb.org/2025/10/monitoring-adoption-of-artificial-intelligence-and-related-vulnerabilities-in-the-financial-sector/",
+  "desc": [
+   "当局向けAI導入モニタリング指標と第三者依存（AIサプライチェーン）の事例研究（2025-10）",
+   "Indicators for authorities to monitor AI adoption and a case study on third-party dependencies (AI supply chain) (2025-10)."
+  ],
+  "freq": [
+   "年次〜不定期（2024-11、2025-10、2026-07に関連発言）",
+   "Annual to irregular (related statements in 2024-11, 2025-10, and 2026-07)"
+  ],
+  "region": [
+   "国際",
+   "International"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s136",
+  "layer": "C",
+  "sub": [
+   "業界の規制・当局",
+   "Industry regulators"
+  ],
+  "name": [
+   "FSB Reports to the G20",
+   "FSB Reports to the G20"
+  ],
+  "org": "FSB",
+  "url": "https://www.fsb.org/publications/g20-reports/",
+  "desc": [
+   "G20向け報告の一覧。AI の「責任ある導入（sound practices）」最終化もここ経由で追える見込み",
+   "List of reports to the G20; the finalized \"sound practices\" for responsible AI adoption are also expected to be traceable here."
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "国際",
+   "International"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s137",
+  "layer": "C",
+  "sub": [
+   "業界の規制・当局",
+   "Industry regulators"
+  ],
+  "name": [
+   "BIS Bulletin: AI in central banking",
+   "BIS Bulletin: AI in Central Banking"
+  ],
+  "org": "BIS",
+  "url": "https://www.bis.org/publications/bulletin-84-artificial-intelligence-central-banking",
+  "desc": [
+   "中央銀行・監督当局のAI活用と金融システムへの含意",
+   "Use of AI by central banks and supervisors and its implications for the financial system."
+  ],
+  "freq": [
+   "不定期",
+   "Irregular"
+  ],
+  "region": [
+   "国際",
+   "International"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s138",
+  "layer": "C",
+  "sub": [
+   "業界の規制・当局",
+   "Industry regulators"
+  ],
+  "name": [
+   "Artificial intelligence, growth and financial stability: challenges for central banks",
+   "Artificial intelligence, growth and financial stability: challenges for central banks"
+  ],
+  "org": "BIS",
+  "url": "https://www.bis.org/speeches/20260910-artificial-intelligence-growth-and-financial-stability-challenges-central-banks",
+  "desc": [
+   "2026-09 時点の当局スピーチ。AIと金融安定・成長の論点",
+   "Speech by an authority as of 2026-09 on AI, financial stability, and growth."
+  ],
+  "freq": [
+   "不定期（スピーチ単位）",
+   "Irregular (per speech)"
+  ],
+  "region": [
+   "国際",
+   "International"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s139",
+  "layer": "C",
+  "sub": [
+   "業界の規制・当局",
+   "Industry regulators"
+  ],
+  "name": [
+   "SEC Investor Advisory Committee: AI Disclosure Recommendation（承認版 2025-12-04）",
+   "SEC Investor Advisory Committee: AI Disclosure Recommendation (approved 2025-12-04)"
+  ],
+  "org": "米国SEC",
+  "url": "https://www.sec.gov/files/approved-artificial-intelligence-disclosure-recommendation-120425.pdf",
+  "desc": [
+   "上場企業のAI開示（AIの定義・取締役会監督・重要性ある場合の別建て開示）の助言勧告。拘束力なし",
+   "Advisory recommendation on public-company AI disclosure (definition of AI, board oversight, separate disclosure when material); non-binding."
+  ],
+  "freq": [
+   "単発（IAC会合ごと）",
+   "One-off (per IAC meeting)"
+  ],
+  "region": [
+   "米",
+   "US"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s140",
+  "layer": "C",
+  "sub": [
+   "業界の規制・当局",
+   "Industry regulators"
+  ],
+  "name": [
+   "FDA: AI-Enabled Medical Devices",
+   "FDA: AI-Enabled Medical Devices"
+  ],
+  "org": "米国FDA",
+  "url": "https://www.fda.gov/medical-devices/artificial-intelligence-enabled-medical-devices/list-artificial-intelligence-enabled-medical-devices",
+  "desc": [
+   "米国で販売認可されたAI搭載医療機器の検索可能なリスト（網羅的ではない旨の注記あり）",
+   "Searchable list of FDA-authorised AI-enabled medical devices (noted as non-exhaustive)"
+  ],
+  "freq": [
+   "随時（CDRHニュース上 2026-09-04・09-22 に更新）",
+   "As needed (updated 2026-09-04 and 09-22 per CDRH news)"
+  ],
+  "region": [
+   "米",
+   "US"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s141",
+  "layer": "C",
+  "sub": [
+   "業界の規制・当局",
+   "Industry regulators"
+  ],
+  "name": [
+   "PMDA プログラム医療機器の承認情報",
+   "PMDA: Approval Information on Software as a Medical Device"
+  ],
+  "org": "PMDA",
+  "url": "https://www.pmda.go.jp/review-services/drug-reviews/about-reviews/devices/0052.html",
+  "desc": [
+   "承認済みプログラム医療機器の一覧。「AI活用医療機器」列に○（患者転帰改善を目的としない機能は除外、網羅ではない）",
+   "List of approved software medical devices with a mark in the \"AI-enabled medical device\" column (functions not aimed at improving patient outcomes are excluded; not exhaustive)."
+  ],
+  "freq": [
+   "随時（承認の都度）",
+   "As needed (upon each approval)"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s142",
+  "layer": "C",
+  "sub": [
+   "業界の規制・当局",
+   "Industry regulators"
+  ],
+  "name": [
+   "プログラム医療機器（総合案内）",
+   "Software as a Medical Device (General Guide)"
+  ],
+  "org": "PMDA",
+  "url": "https://www.pmda.go.jp/review-services/drug-reviews/about-reviews/devices/0048.html",
+  "desc": [
+   "SaMD の審査・相談・通知への入口",
+   "Entry point to SaMD review, consultation, and notifications."
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s143",
+  "layer": "C",
+  "sub": [
+   "業界の規制・当局",
+   "Industry regulators"
+  ],
+  "name": [
+   "ヘルスケア領域におけるAIセーフティ評価観点ガイド",
+   "Guide to AI Safety Evaluation Perspectives in Healthcare"
+  ],
+  "org": "Japan AISI",
+  "url": "https://aisi.go.jp/output/output_information/260402/",
+  "desc": [
+   "ヘルスケアAIをライフサイクル5フェーズで評価する観点（2026-04-02公開）",
+   "Perspectives for evaluating healthcare AI across five lifecycle phases (published 2026-04-02)."
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s144",
+  "layer": "C",
+  "sub": [
+   "業界の規制・当局",
+   "Industry regulators"
+  ],
+  "name": [
+   "2026年版ものづくり白書（製造基盤白書）",
+   "2026 White Paper on Manufacturing Industries (Monodzukuri White Paper)"
+  ],
+  "org": "経産省・厚労省・文科省",
+  "url": "https://www.meti.go.jp/report/whitepaper/mono/2026/index.html",
+  "desc": [
+   "製造業の業況・人材・AI/デジタル活用、製造AX拠点構想、ロボティクス（2026-05-29閣議決定）",
+   "Manufacturing business conditions, workforce, AI/digital use, the Manufacturing AX hub initiative, and robotics (approved by Cabinet 2026-05-29)."
+  ],
+  "freq": [
+   "年次（毎年5月ごろ）",
+   "Annual (around May each year)"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s145",
+  "layer": "C",
+  "sub": [
+   "業界の規制・当局",
+   "Industry regulators"
+  ],
+  "name": [
+   "製造基盤白書（ものづくり白書）バックナンバー",
+   "White Paper on Manufacturing Industries (Monodzukuri White Paper) Back Issues"
+  ],
+  "org": "経産省",
+  "url": "https://www.meti.go.jp/report/whitepaper/index_mono.html",
+  "desc": [
+   "歴年版へのindex（年度比較用）",
+   "Index of past editions (for year-over-year comparison)."
+  ],
+  "freq": [
+   "年次",
+   "Annual"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s146",
+  "layer": "C",
+  "sub": [
+   "業界の規制・当局",
+   "Industry regulators"
+  ],
+  "name": [
+   "生成AIの調達・利活用ガイドライン（デジタル庁）",
+   "Guidelines for Procurement and Use of Generative AI (Digital Agency)"
+  ],
+  "org": "デジタル庁",
+  "url": "https://www.digital.go.jp/en/news/decb64eb-f26e-41cb-8d37-f3dd173108b8",
+  "desc": [
+   "政府の生成AI調達・利活用ルール（DS-920。初版2025-05-27、改訂2.0版は検索要約では2026-06決定と記載 ― 要原文確認）",
+   "Government rules for procuring and using generative AI (DS-920; first edition 2025-05-27; revision 2.0 reportedly decided 2026-06 per search summary, original text needs confirmation)."
+  ],
+  "freq": [
+   "不定期（初版→改訂約1年）",
+   "Irregular (first edition, then revision about a year later)"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s147",
+  "layer": "C",
+  "sub": [
+   "業界の規制・当局",
+   "Industry regulators"
+  ],
+  "name": [
+   "先進的AI利活用アドバイザリーボード（第3回）",
+   "Advanced AI Utilization Advisory Board (3rd Meeting)"
+  ],
+  "org": "デジタル庁",
+  "url": "https://www.digital.go.jp/en/councils/ai-advisory-board/80174015-f73b-4d98-811e-c601c26c0ba5",
+  "desc": [
+   "ガイドライン改訂・AIエージェント論点の審議資料（親index未確認）",
+   "Deliberation materials on revising the guidelines and AI agent issues (parent index unverified)."
+  ],
+  "freq": [
+   "会合ごと",
+   "Per meeting"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s148",
+  "layer": "C",
+  "sub": [
+   "業界の規制・当局",
+   "Industry regulators"
+  ],
+  "name": [
+   "【解説】ガバメントAIとは？（源内）",
+   "[Explainer] What Is Government AI? (Gennai)"
+  ],
+  "org": "デジタル庁ニュース",
+  "url": "https://digital-agency-news.digital.go.jp/articles/2025-12-11",
+  "desc": [
+   "政府職員向け生成AI基盤「源内」の解説",
+   "Explainer on Gennai, the generative AI platform for government staff"
+  ],
+  "freq": [
+   "記事単位",
+   "Per article"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s149",
+  "layer": "C",
+  "sub": [
+   "投資判断・ROI",
+   "Investment & ROI"
+  ],
+  "name": [
+   "企業IT動向調査（総合ページ）",
+   "Corporate IT Trends Survey (Main Page)"
+  ],
+  "org": "JUAS",
+  "url": "https://juas.or.jp/library/research_rpt/it_trend/",
+  "desc": [
+   "ユーザー企業のIT投資・予算・生成AI導入率の定点調査",
+   "Recurring survey of user companies' IT investment, budgets, and generative AI adoption."
+  ],
+  "freq": [
+   "年次（毎年4月に報告書）",
+   "Annual (report each April)"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料（全文PDF公開と案内あり）",
+   "Free (full-text PDF stated to be public)"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s150",
+  "layer": "C",
+  "sub": [
+   "投資判断・ROI",
+   "Investment & ROI"
+  ],
+  "name": [
+   "企業IT動向調査2026（2025年度調査）",
+   "Corporate IT Trends Survey 2026 (FY2025 Survey)"
+  ],
+  "org": "JUAS",
+  "url": "https://juas.or.jp/activities/research/it_trend/",
+  "desc": [
+   "企業IT動向調査の最新版。生成AIの導入状況、IT予算の増減と理由",
+   "Latest JUAS IT trends survey: generative AI adoption, IT budget changes and drivers"
+  ],
+  "freq": [
+   "年次",
+   "Annual"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s151",
+  "layer": "C",
+  "sub": [
+   "投資判断・ROI",
+   "Investment & ROI"
+  ],
+  "name": [
+   "企業IT動向調査 報告書2026（全文PDF）",
+   "Corporate IT Trends Survey Report 2026 (Full PDF)"
+  ],
+  "org": "JUAS",
+  "url": "https://juas.or.jp/cms/media/2026/04/JUAS_IT2026.pdf",
+  "desc": [
+   "全文データ（図表の一次出典に使う）",
+   "Full data (use as the primary source for figures and tables)."
+  ],
+  "freq": [
+   "年次",
+   "Annual"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s152",
+  "layer": "C",
+  "sub": [
+   "投資判断・ROI",
+   "Investment & ROI"
+  ],
+  "name": [
+   "DX動向2026",
+   "DX Trends 2026"
+  ],
+  "org": "IPA",
+  "url": "https://www.ipa.go.jp/digital/chousa/dx-trend/dx-trend-2026.html",
+  "desc": [
+   "国内企業のDX・AI活用の動向調査",
+   "Survey of DX and AI adoption among Japanese companies"
+  ],
+  "freq": [
+   "年次（2026版は7月公開）",
+   "Annual (2026 edition published in July)"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s153",
+  "layer": "C",
+  "sub": [
+   "投資判断・ROI",
+   "Investment & ROI"
+  ],
+  "name": [
+   "AIの利活用、AIによるDXの推進",
+   "AI Utilization and AI-Driven DX Promotion"
+  ],
+  "org": "IPA",
+  "url": "https://www.ipa.go.jp/digital/ai/transformation.html",
+  "desc": [
+   "IPAのAI関連調査・ガイド群への入口",
+   "Entry point to IPA's AI-related surveys and guides."
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s154",
+  "layer": "C",
+  "sub": [
+   "投資判断・ROI",
+   "Investment & ROI"
+  ],
+  "name": [
+   "野村総合研究所 AI活用（サービステーマ）",
+   "Nomura Research Institute (NRI): AI Utilization (Service Theme)"
+  ],
+  "org": "NRI",
+  "url": "https://www.nri.com/jp/service/theme/ai/index.html",
+  "desc": [
+   "NRIのAI関連知見・サービスの入口",
+   "Entry point to NRI's AI-related insights and services."
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s155",
+  "layer": "C",
+  "sub": [
+   "投資判断・ROI",
+   "Investment & ROI"
+  ],
+  "name": [
+   "野村総合研究所 IT活用実態調査（2025年）プレスリリース",
+   "NRI IT Utilization Survey (2025) Press Release"
+  ],
+  "org": "NRI",
+  "url": "https://www.nri.com/jp/news/newsrelease/files/000054794.pdf",
+  "desc": [
+   "大手企業のIT・生成AI活用実態調査",
+   "Survey of IT and generative AI use at large Japanese companies"
+  ],
+  "freq": [
+   "年次",
+   "Annual"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s156",
+  "layer": "C",
+  "sub": [
+   "投資判断・ROI",
+   "Investment & ROI"
+  ],
+  "name": [
+   "日本企業のDX推進状況調査結果【2025年度詳細版】",
+   "Survey Results on DX Promotion at Japanese Companies [FY2025 Detailed Edition]"
+  ],
+  "org": "三菱総合研究所",
+  "url": "https://www.mri.co.jp/news/press/20250604.html",
+  "desc": [
+   "日本企業のDX推進と生成AI利用の調査",
+   "Survey of DX progress and generative AI use at Japanese companies"
+  ],
+  "freq": [
+   "年次",
+   "Annual"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s157",
+  "layer": "C",
+  "sub": [
+   "投資判断・ROI",
+   "Investment & ROI"
+  ],
+  "name": [
+   "生成AIが再定義するDX人材戦略（提言）",
+   "How Generative AI Redefines DX Talent Strategy (Proposal)"
+  ],
+  "org": "三菱総合研究所",
+  "url": "https://www.mri.co.jp/knowledge/insight/policy/20250925.html",
+  "desc": [
+   "スキルベース人材管理と育成エコシステムの提言（2025-09-25）",
+   "Proposal on skills-based talent management and a development ecosystem (2025-09-25)."
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s158",
+  "layer": "C",
+  "sub": [
+   "投資判断・ROI",
+   "Investment & ROI"
+  ],
+  "name": [
+   "AIエージェントが顧客になる日（販売戦略）",
+   "The Day AI Agents Become Customers (Sales Strategy)"
+  ],
+  "org": "日本総研",
+  "url": "https://www.jri.co.jp/page.jsp?id=110631",
+  "desc": [
+   "AIエージェントが購買主体になる影響と企業の対応（2025-03-27）。JRIのAIレポートの一例",
+   "Impact of AI agents becoming purchasing decision-makers and how companies should respond (2025-03-27); one example of JRI's AI reports."
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s159",
+  "layer": "C",
+  "sub": [
+   "投資判断・ROI",
+   "Investment & ROI"
+  ],
+  "name": [
+   "Artificial Intelligence and Business Strategy（特集）",
+   "Artificial Intelligence and Business Strategy (Special Feature)"
+  ],
+  "org": "MIT SMR（BCG共同調査含む）",
+  "url": "https://sloanreview.mit.edu/landing_page/artificial-intelligence-and-business-strategy/",
+  "desc": [
+   "AIと事業戦略の記事・年次共同調査（直近: 2025-11-18 \"The Emerging Agentic Enterprise\"。全文レポートは有料ストア）",
+   "Articles and annual joint survey on AI and business strategy (latest: \"The Emerging Agentic Enterprise\", 2025-11-18; full report is sold in the paid store)."
+  ],
+  "freq": [
+   "年次調査＋随時記事",
+   "Annual survey plus articles as needed"
+  ],
+  "region": [
+   "米/国際",
+   "US / International"
+  ],
+  "fee": [
+   "一部無料（レポート全文は有料）",
+   "Partly free (full report is paid)"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s160",
+  "layer": "C",
+  "sub": [
+   "投資判断・ROI",
+   "Investment & ROI"
+  ],
+  "name": [
+   "MIT SMR Reports",
+   "MIT SMR Reports"
+  ],
+  "org": "MIT SMR",
+  "url": "https://sloanreview.mit.edu/reports/",
+  "desc": [
+   "調査レポート一覧（Individual/Organizational Value with AI 等）",
+   "List of research reports (Individual/Organizational Value with AI, etc.)."
+  ],
+  "freq": [
+   "不定期",
+   "Irregular"
+  ],
+  "region": [
+   "米/国際",
+   "US / International"
+  ],
+  "fee": [
+   "一部無料",
+   "Partly free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s161",
+  "layer": "C",
+  "sub": [
+   "投資判断・ROI",
+   "Investment & ROI"
+  ],
+  "name": [
+   "MIT CISR ― Classic Topics: Artificial Intelligence",
+   "MIT CISR: Classic Topics: Artificial Intelligence"
+  ],
+  "org": "MIT CISR",
+  "url": "https://cisr.mit.edu/content/classic-topics-artificial-intelligence-ai",
+  "desc": [
+   "Enterprise AI Maturity Model、AIバリュー創出の短い研究ブリーフ群（2026-08 \"AI Value Creation: Five Provocative Propositions\" 等）",
+   "Enterprise AI Maturity Model and short research briefs on AI value creation (e.g., \"AI Value Creation: Five Provocative Propositions\", 2026-08)."
+  ],
+  "freq": [
+   "月次〜随時（ブリーフ）",
+   "Monthly to as needed (briefs)"
+  ],
+  "region": [
+   "米/国際",
+   "US / International"
+  ],
+  "fee": [
+   "一部無料（会員限定資料あり、未確認）",
+   "Partly free (members-only materials exist; unconfirmed)"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s162",
+  "layer": "C",
+  "sub": [
+   "組織・人材",
+   "Organisation & talent"
+  ],
+  "name": [
+   "WEF Future of Jobs Report 2025",
+   "WEF Future of Jobs Report 2025"
+  ],
+  "org": "WEF",
+  "url": "https://www.weforum.org/publications/the-future-of-jobs-report-2025/",
+  "desc": [
+   "雇用の創出・消失の見通し、必要スキルの変化、データエクスプローラ",
+   "Outlook for job creation and displacement, shifting skills, data explorer"
+  ],
+  "freq": [
+   "2年ごと（次回は2027年初頭ごろ ― 推定）",
+   "Every two years (next around early 2027, estimated)"
+  ],
+  "region": [
+   "国際",
+   "International"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s163",
+  "layer": "C",
+  "sub": [
+   "組織・人材",
+   "Organisation & talent"
+  ],
+  "name": [
+   "OECD: AI and skills",
+   "OECD: AI and Skills"
+  ],
+  "org": "OECD",
+  "url": "https://www.oecd.org/en/publications/ai-and-skills_f843b352-en/full-report.html",
+  "desc": [
+   "AI人材の需要とスキルギャップの分析",
+   "Analysis of AI talent demand and skills gaps"
+  ],
+  "freq": [
+   "不定期（Employment Outlook は年次）",
+   "Irregular (Employment Outlook is annual)"
+  ],
+  "region": [
+   "国際",
+   "International"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s164",
+  "layer": "C",
+  "sub": [
+   "組織・人材",
+   "Organisation & talent"
+  ],
+  "name": [
+   "デジタルスキル標準",
+   "Digital Skills Standards"
+  ],
+  "org": "経産省／IPA",
+  "url": "https://www.meti.go.jp/policy/it_policy/jinzai/skill_standard/main.html",
+  "desc": [
+   "DXリテラシー標準・DX推進スキル標準（生成AI補記含む。ver.1.2は2024-07）",
+   "DX Literacy Standard and DX Promotion Skills Standard (including the generative AI supplement; ver. 1.2 is from 2024-07)."
+  ],
+  "freq": [
+   "不定期（改訂は1〜2年）",
+   "Irregular (revisions every 1 to 2 years)"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s165",
+  "layer": "C",
+  "sub": [
+   "組織・人材",
+   "Organisation & talent"
+  ],
+  "name": [
+   "マナビDX",
+   "Manabi DX"
+  ],
+  "org": "経産省／IPA",
+  "url": "https://manabi-dx.ipa.go.jp/",
+  "desc": [
+   "デジタルスキル標準に紐づく審査済みの講座ポータル",
+   "Portal of vetted courses mapped to the Digital Skill Standards"
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料（講座は有料/無料混在）",
+   "Free (courses are a mix of paid and free)"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s166",
+  "layer": "C",
+  "sub": [
+   "組織・人材",
+   "Organisation & talent"
+  ],
+  "name": [
+   "デジタルトランスフォーメーション銘柄（DX銘柄）",
+   "Digital Transformation Stocks (DX Selection)"
+  ],
+  "org": "経産省",
+  "url": "https://www.meti.go.jp/policy/it_policy/investment/keiei_meigara/dx_meigara.html",
+  "desc": [
+   "DX銘柄の選定企業と、デジタルガバナンス・コードに沿った先進企業像",
+   "DX Stock Selection companies and the benchmark set by the Digital Governance Code"
+  ],
+  "freq": [
+   "年次（4月選定、6月分析）",
+   "Annual (selection in April, analysis in June)"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s167",
+  "layer": "C",
+  "sub": [
+   "組織・人材",
+   "Organisation & talent"
+  ],
+  "name": [
+   "DX推進指標（自己診断ツール）",
+   "DX Promotion Indicators (Self-Assessment Tool)"
+  ],
+  "org": "経産省／IPA",
+  "url": "https://www.meti.go.jp/policy/it_policy/investment/dx-shihyo.html",
+  "desc": [
+   "自社DX成熟度の自己診断。デジタルガバナンス・コード3.0に基づき改訂（検索要約: 2026年2月）",
+   "Self-assessment of a company's DX maturity; revised in line with Digital Governance Code 3.0 (per search summary: February 2026)."
+  ],
+  "freq": [
+   "不定期",
+   "Irregular"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s168",
+  "layer": "C",
+  "sub": [
+   "日本の文脈",
+   "Japan context"
+  ],
+  "name": [
+   "未来予測2040 労働供給制約社会がやってくる",
+   "Future Forecast 2040: The Coming Labor-Supply-Constrained Society"
+  ],
+  "org": "リクルートワークス研究所",
+  "url": "https://www.works-i.com/research/report/forecast2040.html",
+  "desc": [
+   "2040年までの労働供給不足の試算と職種別の不足率",
+   "Projected labour shortfall to 2040 and shortage rates by occupation"
+  ],
+  "freq": [
+   "単発（関連プロジェクトは随時）",
+   "One-off (related projects as needed)"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s169",
+  "layer": "C",
+  "sub": [
+   "法務・リスク・ESG",
+   "Legal, risk & ESG"
+  ],
+  "name": [
+   "AI事業者ガイドライン検討会",
+   "AI Guidelines for Business Review Committee"
+  ],
+  "org": "経産省・総務省",
+  "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/index.html",
+  "desc": [
+   "開発者/提供者/利用者別の統合ガイドライン（第1.0版2024-04、1.1版2025-03、1.2版2026-03-31。AIエージェント・フィジカルAIを追加）。入口はこの index",
+   "Integrated guidelines for developers, providers, and users (v1.0 2024-04, v1.1 2025-03, v1.2 2026-03-31, adding AI agents and physical AI). The entry point is this index."
+  ],
+  "freq": [
+   "年次改訂（毎年3月ごろ）",
+   "Annual revision (around March each year)"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s170",
+  "layer": "C",
+  "sub": [
+   "法務・リスク・ESG",
+   "Legal, risk & ESG"
+  ],
+  "name": [
+   "AIと著作権について",
+   "On AI and Copyright"
+  ],
+  "org": "文化庁",
+  "url": "https://www.bunka.go.jp/seisaku/chosakuken/aiandcopyright.html",
+  "desc": [
+   "「AIと著作権に関する考え方」(2024-03)、チェックリスト＆ガイダンス(2024-07)等への入口。著作権法30条の4の整理",
+   "Entry point to \"General Understanding on AI and Copyright\" (2024-03), the checklist and guidance (2024-07), etc., and the interpretation of Article 30-4 of the Copyright Act."
+  ],
+  "freq": [
+   "不定期",
+   "Irregular"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s171",
+  "layer": "C",
+  "sub": [
+   "法務・リスク・ESG",
+   "Legal, risk & ESG"
+  ],
+  "name": [
+   "生成AIサービスの利用に関する注意喚起等について",
+   "Notice on the Use of Generative AI Services"
+  ],
+  "org": "個人情報保護委員会",
+  "url": "https://www.ppc.go.jp/news/careful_information/230602_AI_utilize_alert/",
+  "desc": [
+   "事業者/行政機関/一般利用者向けの注意点（2023-06-02）。2026年の更新は検索で確認できず",
+   "Cautions for businesses, administrative bodies, and general users (2023-06-02). No 2026 update could be confirmed by search."
+  ],
+  "freq": [
+   "単発（古い）",
+   "One-off (dated)"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s172",
+  "layer": "C",
+  "sub": [
+   "法務・リスク・ESG",
+   "Legal, risk & ESG"
+  ],
+  "name": [
+   "ISO/IEC 42001:2023 ― AI management systems",
+   "ISO/IEC 42001:2023: AI management systems"
+  ],
+  "org": "ISO",
+  "url": "https://www.iso.org/standard/42001",
+  "desc": [
+   "AIマネジメントシステム規格の概要・購入ページ。第三者認証の根拠規格",
+   "Overview and purchase page for the AI management system standard, the basis for third-party certification."
+  ],
+  "freq": [
+   "規格改訂時のみ",
+   "Only when the standard is revised"
+  ],
+  "region": [
+   "国際",
+   "International"
+  ],
+  "fee": [
+   "有料（規格本文）／概要無料",
+   "Paid (standard text) / overview free"
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s173",
+  "layer": "C",
+  "sub": [
+   "法務・リスク・ESG",
+   "Legal, risk & ESG"
+  ],
+  "name": [
+   "AI Risk Management Framework",
+   "AI Risk Management Framework"
+  ],
+  "org": "米国NIST",
+  "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+  "desc": [
+   "AI RMF 1.0(2023-01)、生成AIプロファイル(AI 600-1, 2024-07)。AI Action Plan に伴い改訂中、重要インフラ向けプロファイル構想(2026-04)",
+   "AI RMF 1.0 (2023-01) and Generative AI Profile (AI 600-1, 2024-07). Under revision in line with the AI Action Plan; a critical-infrastructure profile is planned (2026-04)."
+  ],
+  "freq": [
+   "不定期（改訂中）",
+   "Irregular (under revision)"
+  ],
+  "region": [
+   "米/国際",
+   "US / International"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s174",
+  "layer": "C",
+  "sub": [
+   "法務・リスク・ESG",
+   "Legal, risk & ESG"
+  ],
+  "name": [
+   "AI Act（Regulatory framework for AI）",
+   "AI Act (Regulatory framework for AI)"
+  ],
+  "org": "欧州委員会",
+  "url": "https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai",
+  "desc": [
+   "EU AI Act の公式ページ。検索要約: 2026-08-02から透明性義務等の執行開始、Digital Omnibusでハイリスクは2027-12/2028-08に延期（日付は公式ページで要確認）",
+   "Official page on the EU AI Act. Per search summary: enforcement of transparency obligations etc. begins 2026-08-02, and the Digital Omnibus postpones high-risk obligations to 2027-12 / 2028-08 (dates need confirmation on the official page)."
+  ],
+  "freq": [
+   "随時（適用日程の節目ごと）",
+   "As needed (at each application-date milestone)"
+  ],
+  "region": [
+   "欧",
+   "Europe"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s175",
+  "layer": "C",
+  "sub": [
+   "法務・リスク・ESG",
+   "Legal, risk & ESG"
+  ],
+  "name": [
+   "EU AI Act 実施スケジュール",
+   "EU AI Act Implementation Timeline"
+  ],
+  "org": "artificialintelligenceact.eu",
+  "url": "https://artificialintelligenceact.eu/implementation-timeline/",
+  "desc": [
+   "適用日程の解説。Omnibus以前の記述を含み得る（公式ではない・要注意）",
+   "Explanation of application dates. May contain pre-Omnibus statements (unofficial; use with caution)."
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "欧",
+   "Europe"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s176",
+  "layer": "C",
+  "sub": [
+   "法務・リスク・ESG",
+   "Legal, risk & ESG"
+  ],
+  "name": [
+   "AI Status Copyright Case Tracker",
+   "AI Status Copyright Case Tracker"
+  ],
+  "org": "ChatGPT Is Eating the World（個人運営）",
+  "url": "https://chatgptiseatingtheworld.com/category/ai-status-copyright-case-tracker/",
+  "desc": [
+   "米国のAI著作権訴訟を段階別に整理（件数・日付は要確認）",
+   "Organizes US AI copyright lawsuits by stage (counts and dates need confirmation)."
+  ],
+  "freq": [
+   "随時（運営者次第）",
+   "As needed (at the operator's discretion)"
+  ],
+  "region": [
+   "米",
+   "US"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s177",
+  "layer": "C",
+  "sub": [
+   "法務・リスク・ESG",
+   "Legal, risk & ESG"
+  ],
+  "name": [
+   "Case Tracker: AI, Copyrights and Class Actions",
+   "Case Tracker: AI, Copyrights and Class Actions"
+  ],
+  "org": "BakerHostetler（法律事務所）",
+  "url": "https://www.bakerlaw.com/services/artificial-intelligence-ai/case-tracker-artificial-intelligence-copyrights-and-class-actions",
+  "desc": [
+   "米国のAI著作権・集団訴訟の事件概要・状況・主要書面",
+   "Case summaries, status, and key filings for US AI copyright and class action lawsuits."
+  ],
+  "freq": [
+   "随時（自称「ほぼ実時間」）",
+   "As needed (self-described as \"near real time\")"
+  ],
+  "region": [
+   "米",
+   "US"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s178",
+  "layer": "C",
+  "sub": [
+   "法務・リスク・ESG",
+   "Legal, risk & ESG"
+  ],
+  "name": [
+   "AI & Copyright Case Tracker",
+   "AI & Copyright Case Tracker"
+  ],
+  "org": "Taylor Wessing",
+  "url": "https://www.taylorwessing.com/fr/campaigns/de/2025/ai-and-copyright-tracker",
+  "desc": [
+   "欧州のAI×著作権訴訟のトラッカー（欧州外は原則対象外）",
+   "Tracker of European AI and copyright lawsuits (cases outside Europe are generally excluded)."
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "欧",
+   "Europe"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s179",
+  "layer": "C",
+  "sub": [
+   "法務・リスク・ESG",
+   "Legal, risk & ESG"
+  ],
+  "name": [
+   "Energy and AI Observatory",
+   "Energy and AI Observatory"
+  ],
+  "org": "IEA",
+  "url": "https://www.iea.org/data-and-statistics/data-tools/energy-and-ai-observatory",
+  "desc": [
+   "データセンターの電力需要と地域別データ",
+   "Data-centre electricity demand with regional data"
+  ],
+  "freq": [
+   "随時（観測所）／年次報告",
+   "As needed (observatory) / annual report"
+  ],
+  "region": [
+   "国際",
+   "International"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s180",
+  "layer": "C",
+  "sub": [
+   "法務・リスク・ESG",
+   "Legal, risk & ESG"
+  ],
+  "name": [
+   "GHG Protocol ― Scope 2 Guidance",
+   "GHG Protocol: Scope 2 Guidance"
+  ],
+  "org": "GHG Protocol",
+  "url": "https://ghgprotocol.org/scope-2-guidance",
+  "desc": [
+   "Scope 2 改訂（ロケーション/マーケット基準、時間単位マッチング）。意見募集 2025-10-20〜2026-01-31、最終化は未確認",
+   "Scope 2 revision (location-based/market-based methods, hourly matching). Public consultation 2025-10-20 to 2026-01-31; finalization unconfirmed."
+  ],
+  "freq": [
+   "改訂サイクル（数年）",
+   "Revision cycle (several years)"
+  ],
+  "region": [
+   "国際",
+   "International"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s181",
+  "layer": "C",
+  "sub": [
+   "法務・リスク・ESG",
+   "Legal, risk & ESG"
+  ],
+  "name": [
+   "Introduction to the ISSB and IFRS Sustainability Disclosure Standards",
+   "Introduction to the ISSB and IFRS Sustainability Disclosure Standards"
+  ],
+  "org": "IFRS Foundation（ISSB）",
+  "url": "https://www.ifrs.org/sustainability/knowledge-hub/introduction-to-issb-and-ifrs-sustainability-disclosure-standards/",
+  "desc": [
+   "IFRS S1/S2（S2はScope1-3をGHGプロトコルで測定、Scope2はロケーション基準開示が必須）",
+   "IFRS S1/S2 (S2 measures Scope 1 to 3 using the GHG Protocol; location-based Scope 2 disclosure is mandatory)."
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "国際",
+   "International"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s182",
+  "layer": "C",
+  "sub": [
+   "法務・リスク・ESG",
+   "Legal, risk & ESG"
+  ],
+  "name": [
+   "サステナビリティ開示基準",
+   "Sustainability Disclosure Standards"
+  ],
+  "org": "SSBJ",
+  "url": "https://www.ssb-j.jp/jp/ssbj_standards.html",
+  "desc": [
+   "日本の開示基準（2025-03-05公表、2026-03-13にGHG排出開示の改正）。有報での適用時期は公式で要確認",
+   "Japan's disclosure standards (published 2025-03-05; amended for GHG emissions disclosure on 2026-03-13). The application timing in securities reports needs confirmation on the official site."
+  ],
+  "freq": [
+   "随時（基準改正・ハンドブック更新）",
+   "As needed (standard amendments and handbook updates)"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s183",
+  "layer": "C",
+  "sub": [
+   "日本の文脈",
+   "Japan context"
+  ],
+  "name": [
+   "人工知能基本計画（2025年12月閣議決定）",
+   "AI Basic Plan (Cabinet Decision, December 2025)"
+  ],
+  "org": "内閣府（人工知能戦略本部）",
+  "url": "https://www8.cao.go.jp/cstp/ai/ai_plan/aiplan_20251223",
+  "desc": [
+   "AI法に基づく初の基本計画。目標・3原則・4基本方針。検索要約では2026-06〜07に改定（第2期）案の動きあり ― 最終決定は未確認",
+   "First basic plan under the AI Act: goals, three principles, and four basic policies. Per search summary, a revised (second-term) plan was in motion in 2026-06 to 07; final decision unconfirmed."
+  ],
+  "freq": [
+   "年次改定の方針（首相指示・推定含む）",
+   "Annual revision policy (per Prime Minister's instruction; partly estimated)"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s184",
+  "layer": "C",
+  "sub": [
+   "日本の文脈",
+   "Japan context"
+  ],
+  "name": [
+   "人工知能戦略本部",
+   "AI Strategy Headquarters"
+  ],
+  "org": "首相官邸",
+  "url": "https://www.kantei.go.jp/jp/105/actions/202607/10jinkoutchinou.html",
+  "desc": [
+   "戦略本部会合の最新動静（2026-07-10）",
+   "Latest activity of the Headquarters' meetings (2026-07-10)."
+  ],
+  "freq": [
+   "会合ごと",
+   "Per meeting"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s185",
+  "layer": "C",
+  "sub": [
+   "日本の文脈",
+   "Japan context"
+  ],
+  "name": [
+   "令和8年版 情報通信白書（PDF版index）",
+   "2026 White Paper on Information and Communications (Reiwa 8): PDF Index"
+  ],
+  "org": "総務省",
+  "url": "https://www.soumu.go.jp/johotsusintokei/whitepaper/ja/r08/pdf/index.html",
+  "desc": [
+   "白書の特集「AIの進展がもたらす多面的影響」",
+   "White paper feature on the wide-ranging effects of AI"
+  ],
+  "freq": [
+   "年次（7月）",
+   "Annual (July)"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s186",
+  "layer": "C",
+  "sub": [
+   "日本の文脈",
+   "Japan context"
+  ],
+  "name": [
+   "令和8年版 情報通信白書 第3部 AIの進展に伴う課題と対応",
+   "2026 White Paper on Information and Communications (Reiwa 8): Part 3, Challenges and Responses Accompanying AI Advancement"
+  ],
+  "org": "総務省",
+  "url": "https://www.soumu.go.jp/johotsusintokei/whitepaper/ja/r08/html/nd130000.html",
+  "desc": [
+   "AIの課題と人間・AI協働の論点（HTML章）",
+   "Issues of AI and points on human-AI collaboration (HTML chapter)."
+  ],
+  "freq": [
+   "年次",
+   "Annual"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s187",
+  "layer": "C",
+  "sub": [
+   "法務・リスク・ESG",
+   "Legal, risk & ESG"
+  ],
+  "name": [
+   "AISI アウトプット一覧",
+   "AISI Outputs List"
+  ],
+  "org": "Japan AISI",
+  "url": "https://aisi.go.jp/output/",
+  "desc": [
+   "ガイド・ツール・公表物の一覧（AIロボティクス版 2026-07-23 等）",
+   "List of guides, tools, and publications (e.g., AI robotics edition, 2026-07-23)."
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "日",
+   "Japan"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s188",
+  "layer": "D",
+  "sub": [
+   "予測・確率",
+   "Forecasting"
+  ],
+  "name": [
+   "Good Judgment 年次レビュー",
+   "Good Judgment Annual Review"
+  ],
+  "org": "Good Judgment Inc.",
+  "url": "https://goodjudgment.com/good-judgments-2025-in-review/",
+  "desc": [
+   "スーパーフォーキャスターによる年次の総括と予測の答え合わせ",
+   "Annual review by superforecasters, with a scorecard of past forecasts"
+  ],
+  "freq": [
+   "不明（年次レビュー）",
+   "Unknown (annual review)"
+  ],
+  "region": [
+   "米国/英語",
+   "US / English"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s190",
+  "layer": "D",
+  "sub": [
+   "予測・確率",
+   "Forecasting"
+  ],
+  "name": [
+   "Epoch AI Gradient Updates",
+   "Epoch AI Gradient Updates"
+  ],
+  "org": "Epoch AI",
+  "url": "https://epochai.substack.com/s/gradient-updates",
+  "desc": [
+   "研究者による短めで主張のある論考。購読者は Data Insights / The Epoch Brief も受け取れる",
+   "Short, opinionated essays by researchers. Subscribers also receive Data Insights and The Epoch Brief."
+  ],
+  "freq": [
+   "週刊（スニペット）。2026年8月の記事が非公式RSSミラーで出現、要再確認",
+   "Weekly (per snippet). An August 2026 article appeared on an unofficial RSS mirror; needs reconfirmation"
+  ],
+  "region": [
+   "米英/英語",
+   "US and UK / English"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s191",
+  "layer": "D",
+  "sub": [
+   "シナリオ・未来洞察",
+   "Scenarios & foresight"
+  ],
+  "name": [
+   "OECD Strategic Foresight Toolkit",
+   "OECD Strategic Foresight Toolkit"
+  ],
+  "org": "OECD",
+  "url": "https://www.oecd.org/en/publications/foresight-toolkit-for-resilient-public-policy_bcdd9304-en",
+  "desc": [
+   "2030〜2050年の25の潜在的破壊要因と5ステップのフォーサイト手順、ファシリテーションガイド",
+   "25 potential disruptors for 2030 to 2050, a five-step foresight process, and a facilitation guide."
+  ],
+  "freq": [
+   "随時（2025年公開の刊行物）",
+   "As needed (publication released in 2025)"
+  ],
+  "region": [
+   "国際/英語",
+   "International / English"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s192",
+  "layer": "D",
+  "sub": [
+   "シナリオ・未来洞察",
+   "Scenarios & foresight"
+  ],
+  "name": [
+   "Futures Toolkit for policy-makers and analysts",
+   "Futures Toolkit for Policy-Makers and Analysts"
+  ],
+  "org": "英国政府科学局（Government Office for Science）/ GOV.UK",
+  "url": "https://www.gov.uk/government/publications/futures-toolkit-for-policy-makers-and-analysts",
+  "desc": [
+   "12のフューチャーズ手法（ホライズンスキャニング、シナリオ、政策ストレステスト等）と使い方。2024年8月29日更新版",
+   "12 futures methods (horizon scanning, scenarios, policy stress testing, etc.) and how to use them; updated edition of 29 August 2024."
+  ],
+  "freq": [
+   "不定期（最終更新 2024-08-29）",
+   "Irregular (last updated 2024-08-29)"
+  ],
+  "region": [
+   "英国/英語",
+   "UK / English"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s193",
+  "layer": "D",
+  "sub": [
+   "シナリオ・未来洞察",
+   "Scenarios & foresight"
+  ],
+  "name": [
+   "Futures Toolkit 付属リソース",
+   "Futures Toolkit: Supporting Resources"
+  ],
+  "org": "同上",
+  "url": "https://www.gov.uk/government/publications/futures-toolkit-resources-for-government-officials",
+  "desc": [
+   "各手法のファシリテーター用ガイド、ワークシート、事例",
+   "Facilitator guides, worksheets, and examples for each method."
+  ],
+  "freq": [
+   "不定期",
+   "Irregular"
+  ],
+  "region": [
+   "英国/英語",
+   "UK / English"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s195",
+  "layer": "D",
+  "sub": [
+   "シナリオ・未来洞察",
+   "Scenarios & foresight"
+  ],
+  "name": [
+   "IFTF Ten-Year Forecast（アーカイブ）",
+   "IFTF Ten-Year Forecast (Archive)"
+  ],
+  "org": "Institute for the Future",
+  "url": "https://legacy.iftf.org/en/iftf-you/vantage/ten-year-forecast",
+  "desc": [
+   "1978年開始の年次10年予測。旧サイト(legacy)側ページで、現行 iftf.org 側の構成は未確認",
+   "Annual ten-year forecast started in 1978. Page on the legacy site; the structure on the current iftf.org site is unverified."
+  ],
+  "freq": [
+   "年次（2025–2035版は2025年3月18日NYで発表との第三者記述）",
+   "Annual (a third party states the 2025-2035 edition was presented in New York on 2025-03-18)"
+  ],
+  "region": [
+   "米国/英語",
+   "US / English"
+  ],
+  "fee": [
+   "一部有料（会員制プログラム、詳細不明）",
+   "Partly paid (membership program; details unknown)"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s196",
+  "layer": "D",
+  "sub": [
+   "技術普及の型",
+   "Diffusion patterns"
+  ],
+  "name": [
+   "Gartner Hype Cycle 方法論ページ",
+   "Gartner Hype Cycle Methodology Page"
+  ],
+  "org": "Gartner",
+  "url": "https://www.gartner.com/en/research/methodologies/gartner-hype-cycle",
+  "desc": [
+   "5フェーズ（黎明期・過度な期待・幻滅期・啓蒙活動期・生産性の安定期）の定義。検索結果では末尾にドットが付いた形で出現、要確認",
+   "Definitions of the five phases (Innovation Trigger, Peak of Inflated Expectations, Trough of Disillusionment, Slope of Enlightenment, Plateau of Productivity). Appeared in search results with a trailing dot; needs confirmation."
+  ],
+  "freq": [
+   "方法論ページは随時、個別 Hype Cycle は年次",
+   "Methodology page as needed; individual Hype Cycles annual"
+  ],
+  "region": [
+   "米国/英語",
+   "US / English"
+  ],
+  "fee": [
+   "概要は無料、詳細レポートは有料",
+   "Overview free; detailed reports paid"
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s197",
+  "layer": "D",
+  "sub": [
+   "技術普及の型",
+   "Diffusion patterns"
+  ],
+  "name": [
+   "OWID: 家庭への技術普及",
+   "OWID: Technology Adoption in Households"
+  ],
+  "org": "Our World in Data",
+  "url": "https://ourworldindata.org/grapher/technology-adoption-by-households-in-the-united-states",
+  "desc": [
+   "1860〜2019年の米国世帯での技術普及率（Comin & Hobijn 等の統合）",
+   "US household technology adoption rates from 1860 to 2019 (compiled from Comin & Hobijn, etc.)."
+  ],
+  "freq": [
+   "不定期（アーカイブ日付に2026年5月が見える）",
+   "Irregular (an archive date of May 2026 is visible)"
+  ],
+  "region": [
+   "米英中心/英語",
+   "Mainly US and UK / English"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s198",
+  "layer": "D",
+  "sub": [
+   "技術普及の型",
+   "Diffusion patterns"
+  ],
+  "name": [
+   "OWID: 技術とインフラの普及",
+   "OWID: Technology and Infrastructure Adoption"
+  ],
+  "org": "Our World in Data",
+  "url": "https://archive.ourworldindata.org/20260512-161845/grapher/technology-infrastructure-diffusion-us.html",
+  "desc": [
+   "1830〜2001年の米国での技術・インフラ普及曲線（アーカイブ版スナップショット）",
+   "US technology and infrastructure adoption curves from 1830 to 2001 (archived snapshot)."
+  ],
+  "freq": [
+   "不定期",
+   "Irregular"
+  ],
+  "region": [
+   "米国/英語",
+   "US / English"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s199",
+  "layer": "D",
+  "sub": [
+   "技術普及の型",
+   "Diffusion patterns"
+  ],
+  "name": [
+   "Stanford HAI: AI's J-curve",
+   "Stanford HAI: AI's J-curve"
+  ],
+  "org": "Stanford HAI",
+  "url": "https://hai.stanford.edu/news/ais-j-curve-and-upcoming-productivity-boom",
+  "desc": [
+   "AIの生産性効果が遅れて現れる「Jカーブ」の解説",
+   "Explainer on the productivity J-curve: why AI gains show up late"
+  ],
+  "freq": [
+   "不定期（記事は2022年）",
+   "Irregular (article dates from 2022)"
+  ],
+  "region": [
+   "米国/英語",
+   "US / English"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s200",
+  "layer": "D",
+  "sub": [
+   "週次ダイジェスト",
+   "Weekly digests"
+  ],
+  "name": [
+   "Import AI",
+   "Import AI"
+  ],
+  "org": "Jack Clark（Substack）",
+  "url": "https://importai.substack.com/",
+  "desc": [
+   "AI研究の動向を毎週解説するニュースレター",
+   "Weekly newsletter analysing AI research developments"
+  ],
+  "freq": [
+   "週刊（About の記述）",
+   "Weekly (per the About page)"
+  ],
+  "region": [
+   "米国/英語",
+   "US / English"
+  ],
+  "fee": [
+   "無料（有料購読あり）",
+   "Free (paid subscription available)"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s202",
+  "layer": "D",
+  "sub": [
+   "週次ダイジェスト",
+   "Weekly digests"
+  ],
+  "name": [
+   "The Batch（About）",
+   "The Batch (About)"
+  ],
+  "org": "DeepLearning.AI",
+  "url": "https://www.deeplearning.ai/the-batch/about",
+  "desc": [
+   "Andrew Ng の巻頭レターを含む週刊AIニュース（ビジネス・研究・ハード等）。第三者は毎週水曜と記述",
+   "Weekly AI news including Andrew Ng's opening letter (business, research, hardware, etc.). Third parties say it is published every Wednesday."
+  ],
+  "freq": [
+   "週刊",
+   "Weekly"
+  ],
+  "region": [
+   "米国/英語",
+   "US / English"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s205",
+  "layer": "D",
+  "sub": [
+   "週次ダイジェスト",
+   "Weekly digests"
+  ],
+  "name": [
+   "東大 松尾・岩澤研究室（公式サイト）",
+   "University of Tokyo Matsuo-Iwasawa Laboratory (Official Site)"
+  ],
+  "org": "東京大学",
+  "url": "https://weblab.t.u-tokyo.ac.jp/",
+  "desc": [
+   "講座募集・研究成果等。URL は検索の要約文中に「求人サイト上の記載」として出現しただけで、検索結果URLとしては未出現",
+   "Course recruitment, research results, etc. The URL appeared only in a search summary as a mention on a job-listing site, not as a search result URL."
+  ],
+  "freq": [
+   "不明",
+   "Unknown"
+  ],
+  "region": [
+   "日本/日本語",
+   "Japan / Japanese"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s206",
+  "layer": "D",
+  "sub": [
+   "予測・確率",
+   "Forecasting"
+  ],
+  "name": [
+   "Metaculus（AI 質問）",
+   "Metaculus (AI Questions)"
+  ],
+  "org": "Metaculus",
+  "url": "https://www.metaculus.com/questions/?topic=ai",
+  "desc": [
+   "検索結果に出たのは `/notebooks/16708/...` のみ（テンプレ文字列付きで壊れたURL）",
+   "検索結果に出たのは `/notebooks/16708/...` のみ（テンプレ文字列付きで壊れたURL）"
+  ],
+  "freq": [
+   "常時",
+   "Continuous"
+  ],
+  "region": [
+   "国際/英語",
+   "International / English"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s207",
+  "layer": "D",
+  "sub": [
+   "予測・確率",
+   "Forecasting"
+  ],
+  "name": [
+   "Good Judgment Open",
+   "Good Judgment Open"
+  ],
+  "org": "Good Judgment Inc.",
+  "url": "https://www.gjopen.com/",
+  "desc": [
+   "検索では GJO 本体が出ず二次要約のみ",
+   "検索では GJO 本体が出ず二次要約のみ"
+  ],
+  "freq": [
+   "常時",
+   "Continuous"
+  ],
+  "region": [
+   "米国/英語",
+   "US / English"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s208",
+  "layer": "D",
+  "sub": [
+   "予測・確率",
+   "Forecasting"
+  ],
+  "name": [
+   "Manifold",
+   "Manifold"
+  ],
+  "org": "Manifold Markets",
+  "url": "https://manifold.markets/",
+  "desc": [
+   "検索未実施",
+   "検索未実施"
+  ],
+  "freq": [
+   "常時",
+   "Continuous"
+  ],
+  "region": [
+   "国際/英語",
+   "International / English"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s209",
+  "layer": "D",
+  "sub": [
+   "予測・確率",
+   "Forecasting"
+  ],
+  "name": [
+   "Epoch AI（トップ / Trends / Data）",
+   "Epoch AI (Home / Trends / Data)"
+  ],
+  "org": "Epoch AI",
+  "url": "https://epoch.ai/",
+  "desc": [
+   "`/blog/` 配下のみ検索で出現",
+   "`/blog/` 配下のみ検索で出現"
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "米英/英語",
+   "US and UK / English"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s210",
+  "layer": "D",
+  "sub": [
+   "シナリオ・未来洞察",
+   "Scenarios & foresight"
+  ],
+  "name": [
+   "Shell Scenarios 本体",
+   "Shell Scenarios (Main Site)"
+  ],
+  "org": "Shell",
+  "url": "https://www.shell.com/news-and-insights/scenarios.html",
+  "desc": [
+   "ブログのみ S",
+   "ブログのみ S"
+  ],
+  "freq": [
+   "版ごと",
+   "Per edition"
+  ],
+  "region": [
+   "国際/英語",
+   "International / English"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s211",
+  "layer": "D",
+  "sub": [
+   "シナリオ・未来洞察",
+   "Scenarios & foresight"
+  ],
+  "name": [
+   "OECD Strategic Foresight トップ",
+   "OECD Strategic Foresight (Home)"
+  ],
+  "org": "OECD",
+  "url": "https://www.oecd.org/en/topics/policy-issues/strategic-foresight.html",
+  "desc": [
+   "刊行物ページのみ S",
+   "刊行物ページのみ S"
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "国際/英語",
+   "International / English"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "reachable",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s212",
+  "layer": "D",
+  "sub": [
+   "シナリオ・未来洞察",
+   "Scenarios & foresight"
+  ],
+  "name": [
+   "Institute for the Future 現行サイト",
+   "Institute for the Future (Current Site)"
+  ],
+  "org": "IFTF",
+  "url": "https://www.iftf.org/",
+  "desc": [
+   "legacy のみ S",
+   "legacy のみ S"
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "米国/英語",
+   "US / English"
+  ],
+  "fee": [
+   "一部有料",
+   "Partly paid"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s213",
+  "layer": "D",
+  "sub": [
+   "シナリオ・未来洞察",
+   "Scenarios & foresight"
+  ],
+  "name": [
+   "NISTEP 科学技術予測調査",
+   "NISTEP Science and Technology Foresight Survey"
+  ],
+  "org": "文部科学省 科学技術・学術政策研究所",
+  "url": "https://www.nistep.go.jp/research/science-and-technology-foresight-and-science-and-technology-trends/",
+  "desc": [
+   "検索で出たのは nistep.repo.nii.ac.jp 上のPDF（例 https://nistep.repo.nii.ac.jp/record/6657/files/NISTEP-NR183-FullJ.pdf）で、これらは S 相当だが調査ページ自体は U",
+   "検索で出たのは nistep.repo.nii.ac.jp 上のPDF（例 https://nistep.repo.nii.ac.jp/record/6657/files/NISTEP-NR183-FullJ.pdf）で、これらは S 相当だが調査ページ自体は U"
+  ],
+  "freq": [
+   "約5年毎",
+   "About every 5 years"
+  ],
+  "region": [
+   "日本/日本語",
+   "Japan / Japanese"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s214",
+  "layer": "D",
+  "sub": [
+   "技術普及の型",
+   "Diffusion patterns"
+  ],
+  "name": [
+   "Carlota Perez 公式サイト",
+   "Carlota Perez Official Website"
+  ],
+  "org": "Carlota Perez",
+  "url": "https://carlotaperez.org/",
+  "desc": [
+   "検索ではWikipedia/出版社(Elgar)ページのみ出現。公式サイトは出ず",
+   "検索ではWikipedia/出版社(Elgar)ページのみ出現。公式サイトは出ず"
+  ],
+  "freq": [
+   "不定期",
+   "Irregular"
+  ],
+  "region": [
+   "英/英語",
+   "UK / English"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s215",
+  "layer": "D",
+  "sub": [
+   "技術普及の型",
+   "Diffusion patterns"
+  ],
+  "name": [
+   "Stanford Digital Economy Lab",
+   "Stanford Digital Economy Lab"
+  ],
+  "org": "Stanford",
+  "url": "https://digitaleconomy.stanford.edu/",
+  "desc": [
+   "検索ではDEL一次ページが出ず、ニュース二次記事（Fortune 2026-02-15 等）のみ",
+   "検索ではDEL一次ページが出ず、ニュース二次記事（Fortune 2026-02-15 等）のみ"
+  ],
+  "freq": [
+   "随時",
+   "As needed"
+  ],
+  "region": [
+   "米国/英語",
+   "US / English"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s216",
+  "layer": "D",
+  "sub": [
+   "週次ダイジェスト",
+   "Weekly digests"
+  ],
+  "name": [
+   "Interconnects",
+   "Interconnects"
+  ],
+  "org": "Nathan Lambert",
+  "url": "https://www.interconnects.ai/",
+  "desc": [
+   "検索がノイズだらけで一次ページ未出現。podcast listing の最新が2024年末",
+   "検索がノイズだらけで一次ページ未出現。podcast listing の最新が2024年末"
+  ],
+  "freq": [
+   "週1〜2回程度（要確認）",
+   "About once or twice a week (to be confirmed)"
+  ],
+  "region": [
+   "米国/英語",
+   "US / English"
+  ],
+  "fee": [
+   "無料＋有料",
+   "Free and paid"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s217",
+  "layer": "D",
+  "sub": [
+   "週次ダイジェスト",
+   "Weekly digests"
+  ],
+  "name": [
+   "Stratechery",
+   "Stratechery"
+  ],
+  "org": "Ben Thompson",
+  "url": "https://stratechery.com/",
+  "desc": [
+   "検索未実施",
+   "検索未実施"
+  ],
+  "freq": [
+   "平日更新（要確認）",
+   "Updated on weekdays (to be confirmed)"
+  ],
+  "region": [
+   "米国/英語",
+   "US / English"
+  ],
+  "fee": [
+   "有料（一部無料）",
+   "Paid (partly free)"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s218",
+  "layer": "D",
+  "sub": [
+   "週次ダイジェスト",
+   "Weekly digests"
+  ],
+  "name": [
+   "Exponential View",
+   "Exponential View"
+  ],
+  "org": "Azeem Azhar",
+  "url": "https://www.exponentialview.co/",
+  "desc": [
+   "検索ではサイト自体出現せず",
+   "検索ではサイト自体出現せず"
+  ],
+  "freq": [
+   "週刊（第三者記述）",
+   "Weekly (per third-party description)"
+  ],
+  "region": [
+   "英国/英語",
+   "UK / English"
+  ],
+  "fee": [
+   "無料＋有料",
+   "Free and paid"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s219",
+  "layer": "D",
+  "sub": [
+   "週次ダイジェスト",
+   "Weekly digests"
+  ],
+  "name": [
+   "Ben's Bites",
+   "Ben's Bites"
+  ],
+  "org": "Ben Tossell",
+  "url": "https://www.bensbites.com/",
+  "desc": [
+   "検索未実施",
+   "検索未実施"
+  ],
+  "freq": [
+   "要確認",
+   "To be confirmed"
+  ],
+  "region": [
+   "英国/英語",
+   "UK / English"
+  ],
+  "fee": [
+   "要確認",
+   "To be confirmed"
+  ],
+  "jp": false,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s220",
+  "layer": "D",
+  "sub": [
+   "週次ダイジェスト",
+   "Weekly digests"
+  ],
+  "name": [
+   "日経クロステック",
+   "Nikkei XTECH"
+  ],
+  "org": "日経BP",
+  "url": "https://xtech.nikkei.com/",
+  "desc": [
+   "検索結果に本体URL出ず",
+   "検索結果に本体URL出ず"
+  ],
+  "freq": [
+   "日次",
+   "Daily"
+  ],
+  "region": [
+   "日本/日本語",
+   "Japan / Japanese"
+  ],
+  "fee": [
+   "無料＋有料（会員）",
+   "Free and paid (membership)"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s221",
+  "layer": "D",
+  "sub": [
+   "週次ダイジェスト",
+   "Weekly digests"
+  ],
+  "name": [
+   "ITmedia AI+ トップ",
+   "ITmedia AI+ (Top Page)"
+  ],
+  "org": "アイティメディア",
+  "url": "https://www.itmedia.co.jp/aiplus/",
+  "desc": [
+   "記事URLのみ S",
+   "記事URLのみ S"
+  ],
+  "freq": [
+   "日次",
+   "Daily"
+  ],
+  "region": [
+   "日本/日本語",
+   "Japan / Japanese"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s222",
+  "layer": "D",
+  "sub": [
+   "週次ダイジェスト",
+   "Weekly digests"
+  ],
+  "name": [
+   "AINOW",
+   "AINOW"
+  ],
+  "org": "ディップ株式会社",
+  "url": "https://ainow.ai/",
+  "desc": [
+   "現行性不明",
+   "現行性不明"
+  ],
+  "freq": [
+   "要確認",
+   "To be confirmed"
+  ],
+  "region": [
+   "日本/日本語",
+   "Japan / Japanese"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s223",
+  "layer": "D",
+  "sub": [
+   "週次ダイジェスト",
+   "Weekly digests"
+  ],
+  "name": [
+   "Ledge.ai",
+   "Ledge.ai"
+  ],
+  "org": "株式会社レッジ",
+  "url": "https://ledge.ai/",
+  "desc": [
+   "現行性不明",
+   "現行性不明"
+  ],
+  "freq": [
+   "要確認",
+   "To be confirmed"
+  ],
+  "region": [
+   "日本/日本語",
+   "Japan / Japanese"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ },
+ {
+  "id": "s224",
+  "layer": "D",
+  "sub": [
+   "週次ダイジェスト",
+   "Weekly digests"
+  ],
+  "name": [
+   "松尾研究所",
+   "Matsuo Institute"
+  ],
+  "org": "株式会社松尾研究所",
+  "url": "https://matsuo-institute.com/",
+  "desc": [
+   "検索未実施。URL自体、記憶に基づく",
+   "検索未実施。URL自体、記憶に基づく"
+  ],
+  "freq": [
+   "要確認",
+   "To be confirmed"
+  ],
+  "region": [
+   "日本/日本語",
+   "Japan / Japanese"
+  ],
+  "fee": [
+   "無料",
+   "Free"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-12"
+ }
+]
