@@ -333,6 +333,13 @@
     margin:0;
   }
   .point-list{list-style:none;margin:0;padding:0;}
+  .rel-box{margin:24px 0 0;padding:12px 16px;border-radius:12px;border:1px solid var(--hairline);background:var(--paper);}
+  .rel-box .rel-title{font-size:12.5px;font-weight:600;color:var(--muted);letter-spacing:.04em;margin:0 0 6px;}
+  .rel-box ul{list-style:none;margin:0;padding:0;}
+  .rel-box li{margin:6px 0;}
+  .rel-link{all:unset;cursor:pointer;display:block;font-size:13.5px;line-height:1.5;color:inherit;}
+  .rel-link:hover .rel-name,.rel-link:focus-visible .rel-name{text-decoration:underline;}
+  .rel-link .rel-src{display:block;font-size:11.5px;color:var(--muted);}
   .notes-box{margin:28px 0 0;padding:12px 16px;border-radius:12px;border:1px solid var(--hairline);background:var(--paper);}
   .notes-box summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--muted);letter-spacing:.04em;}
   .notes-box .notes-lead{font-size:12px;line-height:1.7;color:var(--muted);margin:10px 0 4px;}
@@ -5487,6 +5494,36 @@ function onPopState(e){
 /* ============================================================
    RENDERERS
 ============================================================ */
+/* ---- 同じ本を扱う flier 要約と YouTube 動画の対応（書名と著者の一致で判定） ----
+   main: 動画の主題がその本 / ref: 動画が紹介書籍として挙げている本。逆向き（動画→flier）は実行時に作る。 */
+const BOOK_VIDEOS = {"ai02":{"main":["yt_youyaku_shigoto_64"]},"ai06":{"main":["yt_youyaku_shigoto_270"]},"ai25":{"main":["yt_youyaku_okane_382"]},"comp10":{"main":["yt_youyaku_shigoto_579"]},"comp12":{"main":["yt_sam_health_40","yt_sam_special_33","yt_youyaku_karada_1020","yt_youyaku_karada_1023","yt_youyaku_karada_702"],"ref":["yt_sam_health_34"]},"comp28":{"main":["yt_youyaku_kokoro_359","yt_youyaku_shigoto_778"],"ref":["yt_youyaku_shigoto_705"]},"comp31":{"main":["yt_sam_life_58","yt_sam_special_95","yt_youyaku_karada_855","yt_youyaku_karada_985"]},"comp35":{"main":["yt_youyaku_shigoto_519"]},"comp39":{"main":["yt_sam_brain_16","yt_youyaku_shigoto_159"]},"fin57":{"main":["yt_sam_life_53","yt_youyaku_karada_988","yt_youyaku_okane_342","yt_youyaku_shigoto_263"],"ref":["yt_youyaku_karada_13","yt_youyaku_okane_211"]},"fin58":{"main":["yt_youyaku_okane_211","yt_youyaku_shigoto_192","yt_youyaku_shigoto_441"]},"health03":{"ref":["yt_youyaku_karada_798","yt_youyaku_karada_856"]},"ling05":{"ref":["yt_youyaku_kokoro_111"]},"ling09":{"main":["yt_youyaku_shigoto_398"]},"ling102":{"main":["yt_youyaku_shigoto_526"]},"ling115":{"main":["yt_youyaku_shigoto_415"]},"ling128":{"main":["yt_sam_brain_65","yt_sam_health_49","yt_sam_health_50","yt_sam_health_51","yt_youyaku_kokoro_356","yt_youyaku_kokoro_358","yt_youyaku_kokoro_361"],"ref":["yt_sam_life_90"]},"ling136":{"main":["yt_youyaku_shigoto_491"]},"ling141":{"main":["yt_youyaku_shigoto_76"]},"ling143":{"main":["yt_youyaku_shigoto_527"]},"ling145":{"main":["yt_youyaku_kokoro_118"]},"ling15":{"main":["yt_youyaku_kokoro_59","yt_youyaku_kokoro_98"]},"ling154":{"main":["yt_youyaku_karada_1027"]},"ling167":{"main":["yt_youyaku_kokoro_306"]},"ling28":{"main":["yt_sam_life_29","yt_youyaku_kokoro_206","yt_youyaku_shigoto_168"]},"ling57":{"main":["yt_youyaku_karada_507","yt_youyaku_kokoro_24"]},"mkt26":{"main":["yt_sam_special_90"]},"mkt51":{"main":["yt_youyaku_kokoro_394"]},"mkt56":{"main":["yt_youyaku_okane_246"]},"pol111":{"main":["yt_youyaku_okane_181"]},"pol117":{"main":["yt_sam_psych_32"]},"pol121":{"main":["yt_youyaku_okane_292"]},"pol131":{"main":["yt_youyaku_okane_275"]},"pol138":{"main":["yt_youyaku_okane_375"]},"pol139":{"main":["yt_sam_life_72","yt_sam_special_66","yt_youyaku_okane_380"]},"pol143":{"main":["yt_youyaku_okane_429"]},"pol55":{"main":["yt_youyaku_okane_330"]},"pol56":{"main":["yt_youyaku_ikikata_415","yt_youyaku_shigoto_574"]},"pol63":{"main":["yt_youyaku_shigoto_384"]},"pol66":{"main":["yt_youyaku_kokoro_167"]},"pol73":{"main":["yt_sam_psych_16","yt_youyaku_kokoro_154"]},"pol75":{"main":["yt_youyaku_okane_358"]},"pol77":{"main":["yt_youyaku_okane_262"]},"pol91":{"main":["yt_youyaku_okane_258"]},"pol94":{"main":["yt_youyaku_okane_402"]},"prod103":{"main":["yt_youyaku_shigoto_130"]},"prod105":{"main":["yt_sam_life_71"]},"prod109":{"main":["yt_youyaku_kokoro_97"]},"prod110":{"main":["yt_youyaku_karada_153"]},"prod114":{"main":["yt_youyaku_shigoto_301"]},"prod117":{"main":["yt_youyaku_karada_610"],"ref":["yt_youyaku_karada_13"]},"prod118":{"main":["yt_youyaku_shigoto_410"]},"prod119":{"main":["yt_youyaku_shigoto_322"]},"prod122":{"main":["yt_youyaku_shigoto_290"]},"prod127":{"main":["yt_youyaku_kokoro_66"]},"prod51":{"main":["yt_sam_brain_1"]},"prod62":{"main":["yt_youyaku_kokoro_247"]},"prod63":{"main":["yt_youyaku_kokoro_265"]},"prod80":{"main":["yt_sam_life_7"]},"prod90":{"main":["yt_youyaku_shigoto_399","yt_youyaku_shigoto_62"]},"prod92":{"main":["yt_youyaku_karada_225"]},"prod93":{"main":["yt_youyaku_shigoto_339"]},"prod97":{"main":["yt_youyaku_karada_23","yt_youyaku_shigoto_389"]},"sales05":{"main":["yt_sam_life_16","yt_sam_special_74"]},"sales39":{"main":["yt_sam_life_11","yt_youyaku_kokoro_212"]},"sci09":{"main":["yt_youyaku_ikikata_313"]},"sci11":{"main":["yt_sam_psych_13","yt_sam_special_83","yt_youyaku_kokoro_312"]},"sci12":{"main":["yt_youyaku_karada_822"]},"sci13":{"main":["yt_sam_special_91","yt_youyaku_kokoro_14"]},"sci19":{"main":["yt_sam_health_52","yt_sam_special_48"],"ref":["yt_youyaku_karada_754","yt_youyaku_shigoto_713"]},"sci33":{"main":["yt_sam_special_57"],"ref":["yt_youyaku_kokoro_154"]},"sci44":{"main":["yt_sam_health_45"]},"sci45":{"main":["yt_sam_special_84","yt_youyaku_karada_120"]},"sci50":{"main":["yt_youyaku_ikikata_242"]},"sci54":{"main":["yt_youyaku_karada_544"],"ref":["yt_youyaku_karada_541"]},"sci56":{"ref":["yt_youyaku_karada_1008","yt_youyaku_karada_740"]},"sci63":{"main":["yt_youyaku_okane_376"],"ref":["yt_youyaku_karada_754","yt_youyaku_karada_798","yt_youyaku_karada_865"]},"sci69":{"main":["yt_youyaku_kokoro_399"]},"su01":{"main":["yt_sam_life_77"]},"su03":{"main":["yt_youyaku_okane_320"]},"su04":{"main":["yt_sam_special_63"]},"su12":{"main":["yt_youyaku_karada_1004"],"ref":["yt_youyaku_karada_788","yt_youyaku_shigoto_567"]},"su34":{"main":["yt_youyaku_shigoto_630"]},"su49":{"main":["yt_sam_life_60","yt_youyaku_shigoto_658"]},"su87":{"main":["yt_youyaku_shigoto_336"]},"su89":{"main":["yt_youyaku_shigoto_628"]}};
+const VIDEO_BOOKS = {};
+Object.keys(BOOK_VIDEOS).forEach(fid => ['main', 'ref'].forEach(k => (BOOK_VIDEOS[fid][k] || []).forEach(v => {
+  (VIDEO_BOOKS[v] || (VIDEO_BOOKS[v] = [])).push(fid);
+})));
+function relSourceLabel(b){
+  const p = bookPaths(b)[0] || [];
+  if(p[0] !== 'yt') return 'flier';
+  const ch = srcNodeAt(p.slice(0, 2));
+  return 'YouTube' + (ch ? '・' + ch.title : '');
+}
+function relItemHTML(id){
+  const e = BOOK_INDEX[id]; if(!e) return '';
+  return '<li><button type="button" class="rel-link" onclick="openBookById(\'' + id + '\')"><span class="rel-name">' + escapeHTML(e.book.title) + '</span><span class="rel-src">' + escapeHTML(relSourceLabel(e.book)) + '</span></button></li>';
+}
+function relatedHTML(book){
+  const blocks = [];
+  const v = BOOK_VIDEOS[book.id];
+  if(v){
+    const m = (v.main || []).map(relItemHTML).join(''), r = (v.ref || []).map(relItemHTML).join('');
+    if(m) blocks.push('<p class="rel-title">この本を解説する動画</p><ul>' + m + '</ul>');
+    if(r) blocks.push('<p class="rel-title">この本を紹介している動画</p><ul>' + r + '</ul>');
+  }
+  const f = (VIDEO_BOOKS[book.id] || []).map(relItemHTML).join('');
+  if(f) blocks.push('<p class="rel-title">この本の flier 要約</p><ul>' + f + '</ul>');
+  return blocks.length ? '<div class="rel-box">' + blocks.join('') + '</div>' : '';
+}
+
 /* ---- 統合した重複書籍（同じ本が2つの棚にあったもの）の旧 id → 残した id ----
    端末に保存した既読・メモ・★評価・タグ・クイズ成績を残した id に引き継ぎ、旧 id へのリンクも転送する。
    BOOK_QUIZ_MOVED は旧 id のクイズを残した id に移した本（残した id の旧クイズ成績は問題が変わるので捨てる）。 */
@@ -6819,6 +6856,8 @@ function openBook(book, color, crumbs){
       <p class="label">実務への示唆</p>
       <p>${book.takeaway}</p>
     </div>` : ''}
+
+    ${relatedHTML(book)}
 
     <div class="book-section-title">自分の記録</div>
     <div class="record-row">
