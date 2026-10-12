@@ -1,1 +1,3663 @@
-[]
+[
+ {
+  "id": "c191",
+  "src": "yt_aihuman",
+  "label": "YouTube「AIと人間の未来」",
+  "date": "2026-10-12",
+  "title": "AIがAIを作り始めたとき、人間に残る役割",
+  "url": "https://www.youtube.com/watch?v=bsnFv2QLdaA",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "AIガバナンス",
+   "自己改善AI",
+   "停止",
+   "目的"
+  ],
+  "memo": "要点：人間が不要になるかは、判断・確認・停止という目的を握る役割を手放すかで決まる。\nSo What：検収・改ざん検知・緊急停止の権限と手順を規程に明文化し、訓練で検証する。"
+ },
+ {
+  "id": "c114",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-10-10",
+  "title": "AI時代の情報漏洩対策は「AI対AI」の迎撃体制へ",
+  "url": "https://www.youtube.com/watch?v=kx7eZDf2UNU",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "情報漏洩",
+   "セキュリティ",
+   "AIガバナンス"
+  ],
+  "memo": "要点：AI時代の情報漏洩対策は人手による防御でなく、AI対AIの迎撃体制へ移行すべきという主張。\nSo What：AIによる検知・防御体制の導入と、国産・海外・中国製モデルの利用方針の策定を進める。"
+ },
+ {
+  "id": "c115",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-10-08",
+  "title": "カザフ発AIユニコーンHiggsfieldの誕生秘話",
+  "url": "https://www.youtube.com/watch?v=L3IduWNIitA",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "AIスタートアップ",
+   "投資",
+   "中央アジア"
+  ],
+  "memo": "要点：AIユニコーンは米中だけでなく、カザフスタンのような新興エコシステムからも生まれる。\nSo What：中央アジア等の新興AIエコシステムを投資・提携の調査対象に加える。"
+ },
+ {
+  "id": "c192",
+  "src": "yt_aihuman",
+  "label": "YouTube「AIと人間の未来」",
+  "date": "2026-10-07",
+  "title": "人類はAIの「起動装置」か。人間固有の言葉の価値",
+  "url": "https://www.youtube.com/watch?v=6mNimzkCg78",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "AI共存",
+   "人間の役割",
+   "生成AI"
+  ],
+  "memo": "要点：人間固有の言葉を出し続け、考えることをやめない限りAIの隣に立ち続けられる。\nSo What：AIに任せる工程と人が判断する工程を線引きし、人の見解の投入をレビュー基準にする。"
+ },
+ {
+  "id": "c116",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-10-04",
+  "title": "AI時代に磨くべきは判断・巻き込み・評価",
+  "url": "https://www.youtube.com/watch?v=40In_qd7uEk",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "人材育成",
+   "組織",
+   "リーダーシップ"
+  ],
+  "memo": "要点：AI時代に磨くべきは作業スキルでなく、判断・巻き込み・評価という人間の能力。\nSo What：管理職・リーダー層の育成テーマを判断・巻き込み・評価に再設定し、研修設計に反映する。"
+ },
+ {
+  "id": "c117",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-10-03",
+  "title": "マッキンゼー流の課題解決とプレモータム",
+  "url": "https://www.youtube.com/watch?v=ET-Vy71CGTU",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "問題解決",
+   "プレモータム",
+   "フィードバック"
+  ],
+  "memo": "要点：課題解決は原因を徹底的に追求し、プレモータムで最悪の事態を想定することという話。\nSo What：重要案件の開始時にプレモータムを実施し、対策着手前に原因分析を必須工程にする。"
+ },
+ {
+  "id": "c193",
+  "src": "yt_aihuman",
+  "label": "YouTube「AIと人間の未来」",
+  "date": "2026-10-03",
+  "title": "AIが「忘れる機能」を止める時代の記憶と許し",
+  "url": "https://www.youtube.com/watch?v=9yOzlbq-G58",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "記憶",
+   "プライバシー",
+   "AIガバナンス"
+  ],
+  "memo": "要点：忘却は欠陥でなく過学習を防ぐ機能で、AIが止めても残るのは覚えたうえで許す選択。\nSo What：常時記録AIの導入時は、保存対象・期間・削除手順を規程で定める。"
+ },
+ {
+  "id": "c194",
+  "src": "yt_aihuman",
+  "label": "YouTube「AIと人間の未来」",
+  "date": "2026-10-01",
+  "title": "AIが死を予測する時代。知る権利と知らない権利",
+  "url": "https://www.youtube.com/watch?v=tZzi0r6rEDk",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "予測AI",
+   "プライバシー",
+   "AIガバナンス",
+   "倫理"
+  ],
+  "memo": "要点：AIの死亡確率が本人より先に医師の対応や保険料を決め始め、知る・知らないを選べない。\nSo What：将来リスク予測AIの導入時は、データ範囲・本人通知・不利益取扱い禁止を要件にする。"
+ },
+ {
+  "id": "c118",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-09-28",
+  "title": "業務改善のKPIは時間削減の次に何を見るか",
+  "url": "https://www.youtube.com/watch?v=exv62gwpc_g",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "KPI",
+   "業務改善",
+   "AI活用"
+  ],
+  "memo": "要点：業務改善のKPIは時間削減だけでなく、その次に見るべき3指標も置くべきという主張。\nSo What：AI活用の評価を時間削減のみとせず、追加の成果指標を設定して測定する。"
+ },
+ {
+  "id": "c195",
+  "src": "yt_aihuman",
+  "label": "YouTube「AIと人間の未来」",
+  "date": "2026-09-28",
+  "title": "AIが人体を作り変える時代。誰がどこまで決めるか",
+  "url": "https://www.youtube.com/watch?v=kwoR7j4HeWQ",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "ゲノム編集",
+   "ヘルスケア",
+   "倫理",
+   "AIガバナンス"
+  ],
+  "memo": "要点：問うべきは作れるかでなく、どこまで誰が決めるか。基準は人間が先に渡している。\nSo What：ヘルスケア領域では、判定基準と学習データの偏りを検証し、責任者と倫理審査を置く。"
+ },
+ {
+  "id": "c119",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-09-27",
+  "title": "個人開発者を支える5つの生活習慣",
+  "url": "https://www.youtube.com/watch?v=fgJDqMtDHZQ",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "個人開発",
+   "習慣",
+   "生成AI"
+  ],
+  "memo": "要点：個人開発を支えるのは才能や気合でなく、ジャーナリングなど5つの生活習慣という話。\nSo What：個人・小規模チームには、ジャーナリングと新しいAIツールの試用を日課に組み込むよう促す。"
+ },
+ {
+  "id": "c196",
+  "src": "yt_aihuman",
+  "label": "YouTube「AIと人間の未来」",
+  "date": "2026-09-23",
+  "title": "人工子宮が問う、評価基準を誰が決めるか",
+  "url": "https://www.youtube.com/watch?v=yMSuDEzim9c",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "評価基準",
+   "代理指標",
+   "人工子宮",
+   "AIガバナンス"
+  ],
+  "memo": "要点：本質は性能比較でなく、測れる数字で比べる際の基準設定の権限が誰にあるかである。\nSo What：AIの評価スコアを使う前に基準の選定者と目的を確認し、人が覆せる例外手続きを残す。"
+ },
+ {
+  "id": "c120",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-09-20",
+  "title": "異分野の知識をつなぐと独自の発想が生まれる",
+  "url": "https://www.youtube.com/watch?v=lnrDW0lKf6c",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "発想法",
+   "アナロジー",
+   "学習"
+  ],
+  "memo": "要点：独自の発想は知識の量でなく、異分野の知識を構造レベルでつなぐことから生まれる。\nSo What：部門横断の配置や異分野の学習機会を設け、過去の経験を現在の課題に転用する仕組みを整える。"
+ },
+ {
+  "id": "c121",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-09-19",
+  "title": "ケース面接の対策：内定者が実践する10の方法",
+  "url": "https://www.youtube.com/watch?v=CgnIDraxlfc",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "ケース面接",
+   "コンサル",
+   "思考法"
+  ],
+  "memo": "要点：ケース面接の対策は暗記型の演習でなく、内定者が実践する思考編・発表編の10の方法。\nSo What：採用・育成で思考過程と発表の型を分けて評価する仕組みを取り入れる。"
+ },
+ {
+  "id": "c122",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-09-18",
+  "title": "Ubuntu・Debian・RHELの違いと企業がRHELを選ぶ理由",
+  "url": "https://www.youtube.com/watch?v=IH0u3Jq4lpc",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "Linux",
+   "RHEL",
+   "基盤選定"
+  ],
+  "memo": "要点：企業のLinux選定は無料で手軽なものでなく、サポートが得られるRHELが選ばれる傾向。\nSo What：自社基盤のOS選定時にサポート体制と運用要件を比較して検討する。"
+ },
+ {
+  "id": "c197",
+  "src": "yt_aihuman",
+  "label": "YouTube「AIと人間の未来」",
+  "date": "2026-09-18",
+  "title": "AI創薬と老化。寿命を延ばす目的をどう選ぶか",
+  "url": "https://www.youtube.com/watch?v=OIsZerjmOt4",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "AI創薬",
+   "老化",
+   "ヘルスケア",
+   "投資審査"
+  ],
+  "memo": "要点：老化はAIが標的特定から創薬まで切り込み始めた領域で、難題は目的の選択にある。\nSo What：説明不能な健康指標は評価に使わず、投資では開発速度と規制上の位置づけを分けて審査する。"
+ },
+ {
+  "id": "c123",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-09-17",
+  "title": "AIを導入した日本企業の仕事が変わらない理由",
+  "url": "https://www.youtube.com/watch?v=N9Zf1k6SDuc",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "AI導入",
+   "業務改革",
+   "日本企業"
+  ],
+  "memo": "要点：AI導入の成否はツールの導入そのものでなく、仕事の進め方の変革にかかっている。\nSo What：導入後に業務プロセスが実際に変わったかを検証し、変わらない要因を特定して是正する。"
+ },
+ {
+  "id": "c124",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-09-14",
+  "title": "MCPでAIエージェントを便利にするツール20選",
+  "url": "https://www.youtube.com/watch?v=oyggup_ZNv4",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "MCP",
+   "エージェント",
+   "業務効率化"
+  ],
+  "memo": "要点：エージェントの実用性はモデル単体でなく、MCPで外部ツールと接続することで高まる。\nSo What：社内業務システムとMCPで接続する候補を選び、運用上の注意点を踏まえて試行する。"
+ },
+ {
+  "id": "c125",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-09-14",
+  "title": "Copilot Studioの大幅変更：使いながら育てる運用へ",
+  "url": "https://www.youtube.com/watch?v=Q91VTyUWLSQ",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "Copilot Studio",
+   "エージェント",
+   "Microsoft"
+  ],
+  "memo": "要点：Copilot Studioは作って終わりでなく、Build・Skills・Memoryで使いながら育てる運用に変わった。\nSo What：新UIと3つの考え方を踏まえ、自社のエージェント運用方針を見直す。"
+ },
+ {
+  "id": "c126",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-09-10",
+  "title": "AIで作った資料はなぜ却下されるのか",
+  "url": "https://www.youtube.com/watch?v=SftaL55LPbA",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "資料作成",
+   "生成AI",
+   "意思決定"
+  ],
+  "memo": "要点：意思決定に効く資料は、AIの整形だけでなく相手の決断を促すストーリーを人間が描くことで成立する。\nSo What：AIに任せる集約・整形と、人が担うストーリー設計の役割分担を社内の資料基準に反映する。"
+ },
+ {
+  "id": "c127",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-09-10",
+  "title": "AI時代のスタートアップキャリア：人に残る仕事は意思決定",
+  "url": "https://www.youtube.com/watch?v=oW821r_R45o",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "キャリア",
+   "スタートアップ",
+   "人材戦略"
+  ],
+  "memo": "要点：ルール化された仕事をこなすキャリアでなく、意思決定とルールを作る側がAI時代に残るという話。\nSo What：ルール化業務のAI代替を前提に、意思決定・ルール設計を担う人材の育成と配置を再設計する。"
+ },
+ {
+  "id": "c198",
+  "src": "yt_aihuman",
+  "label": "YouTube「AIと人間の未来」",
+  "date": "2026-09-10",
+  "title": "AIによる胚選別と、指標に載らない価値の喪失",
+  "url": "https://www.youtube.com/watch?v=XCs89l2pf4w",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "胚選別",
+   "最適化",
+   "評価指標",
+   "倫理"
+  ],
+  "memo": "要点：危険は一度の能力差でなく、点数にない形質が世代を重ねて失われ依存が固定される点。\nSo What：意思決定AIでは最適化指標の外の副作用を洗い出し、基準の見直し担当を明確にする。"
+ },
+ {
+  "id": "c091",
+  "src": "ig_outlier",
+  "label": "Instagram Outlier",
+  "date": "2026-09-09",
+  "title": "トップ層の勝敗はほぼメンタルで決まる",
+  "url": "https://www.instagram.com/reel/DdF237xFXq1/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "人材育成",
+   "メンタル",
+   "キャリア"
+  ],
+  "memo": "要点：トップレベルの勝敗はほぼメンタルで、フィジカルが効くのはそれより下のレベル。\nSo What：若手は基礎スキル、幹部候補は意思決定の胆力と、育成の重点をステージ別に変える。"
+ },
+ {
+  "id": "c092",
+  "src": "ig_outlier",
+  "label": "Instagram Outlier",
+  "date": "2026-09-09",
+  "title": "スペックだけでは勝てない：ブランドの力",
+  "url": "https://www.instagram.com/reel/DdFUi1ggM3G/",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "ブランド",
+   "エコシステム",
+   "事業戦略"
+  ],
+  "memo": "要点：同等性能でも高価なAppleが選ばれるのは、プラットフォームが生む居心地のため。\nSo What：スペック競争はコモディティ化の入口。BtoBも体験込みで価格プレミアムを取る設計が要る。"
+ },
+ {
+  "id": "c093",
+  "src": "ig_outlier",
+  "label": "Instagram Outlier",
+  "date": "2026-09-09",
+  "title": "A級人材に報連相はいらない：ビジョンで束ねる",
+  "url": "https://www.instagram.com/reel/DdD-8UilWEO/",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "リーダーシップ",
+   "組織",
+   "AI導入"
+  ],
+  "memo": "要点：一流人材に管理は不要で、リーダーはビジョンを示し全員を束ねる。\nSo What：管理コストは報告頻度でなくビジョンの解像度で下げる。AI導入でも目的の言語化が効く。"
+ },
+ {
+  "id": "c094",
+  "src": "ig_outlier",
+  "label": "Instagram Outlier",
+  "date": "2026-09-09",
+  "title": "ザッカーバーグが10億ドル買収提案を即断で断った話",
+  "url": "https://www.instagram.com/reel/DdD-8NNnJUF/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "意思決定",
+   "投資",
+   "経営者"
+  ],
+  "memo": "要点：Yahooの10億ドルの買収提案を、ザッカーバーグは10分の取締役会で断った。\nSo What：機会の値段でなく、手放す将来価値で判断する。合議・前例主義では即決できない。"
+ },
+ {
+  "id": "c095",
+  "src": "ig_outlier",
+  "label": "Instagram Outlier",
+  "date": "2026-09-08",
+  "title": "老化は解ける問題だが、死にも利点がある",
+  "url": "https://www.instagram.com/reel/DdDSF9VD2jR/",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "組織",
+   "新陳代謝",
+   "高齢化"
+  ],
+  "memo": "要点：老化は解ける問題だが、人が長く生きると社会が硬直化するリスクがあるという発言。\nSo What：同じ人・前提が居座ると新陳代謝が止まる。任期制やポスト循環など入れ替え機構を設計する。"
+ },
+ {
+  "id": "c096",
+  "src": "ig_outlier",
+  "label": "Instagram Outlier",
+  "date": "2026-09-08",
+  "title": "週84時間・残業代なしの後発勢に勝てるか",
+  "url": "https://www.instagram.com/reel/DdB1nAmjLDr/",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "アジア",
+   "生産性",
+   "AI活用"
+  ],
+  "memo": "要点：勤勉な後発国が先行国の産業を飲み込む流れは止められないという話。\nSo What：量で戦えば後発に抜かれる。AIによる生産性の飛躍か、量で勝負しない領域への転換が選択肢。"
+ },
+ {
+  "id": "c097",
+  "src": "ig_outlier",
+  "label": "Instagram Outlier",
+  "date": "2026-09-08",
+  "title": "相続税100%は意欲を壊す：家族という動機",
+  "url": "https://www.instagram.com/reel/DdBp8mGEplZ/",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "インセンティブ",
+   "人事制度",
+   "経済"
+  ],
+  "memo": "要点：社会を動かす最大の動機は家族であり、相続税100%は意欲を壊すという反論。\nSo What：インセンティブ設計では誰のために働くかまで考える。報酬を家族・次世代・チームへの貢献実感にも広げる。"
+ },
+ {
+  "id": "c098",
+  "src": "ig_outlier",
+  "label": "Instagram Outlier",
+  "date": "2026-09-08",
+  "title": "期待値が高いエリートほど打たれ弱い",
+  "url": "https://www.instagram.com/reel/DdBK3SFDPZy/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "レジリエンス",
+   "人材育成",
+   "キャリア"
+  ],
+  "memo": "要点：成功を決めるのは頭の良さでなく打たれ強さで、期待値が高い人ほど脆いという話。\nSo What：失敗が許される修羅場を早期に設計し、評価も挫折からの回復速度を見る。"
+ },
+ {
+  "id": "c099",
+  "src": "ig_outlier",
+  "label": "Instagram Outlier",
+  "date": "2026-09-07",
+  "title": "AIが数百人分の仕事を担う時代の稼ぎ方",
+  "url": "https://www.instagram.com/reel/DdA0YMiAHPa/",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "生成AI",
+   "起業",
+   "生産性"
+  ],
+  "memo": "要点：AIが数百人分の仕事を引き受け、一人でも10億ドル企業を作れる時代だという話。\nSo What：人数と事業規模の前提が崩れる。人員計画をAI前提で再設計し、少人数の高レバレッジなチームに権限を寄せる。"
+ },
+ {
+  "id": "c100",
+  "src": "ig_outlier",
+  "label": "Instagram Outlier",
+  "date": "2026-09-07",
+  "title": "投資は結局「人」：事業計画のないアリババ出資",
+  "url": "https://www.instagram.com/reel/DdAdJRpCAT5/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "投資",
+   "意思決定",
+   "創業者"
+  ],
+  "memo": "要点：事業計画も売上もないアリババへの出資を、ジャック・マーの目の力で決めた話。\nSo What：初期の評価はモデルより人材吸引力。新規事業の審査も責任者の吸引力・修正力を軸にする。"
+ },
+ {
+  "id": "c101",
+  "src": "ig_outlier",
+  "label": "Instagram Outlier",
+  "date": "2026-09-07",
+  "title": "創業期は収入ゼロ：雨漏りするオフィスに住んだ話",
+  "url": "https://www.instagram.com/reel/Dc_GdzTFC1o/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "起業",
+   "資金管理",
+   "新規事業"
+  ],
+  "memo": "要点：創業期は収入ゼロで、雨漏りする小さなオフィスに住んでいたという話。\nSo What：初期の勝敗はバーンレートの規律で決まる。社内新規事業も潤沢な予算が検証速度を落とすことがある。"
+ },
+ {
+  "id": "c102",
+  "src": "ig_outlier",
+  "label": "Instagram Outlier",
+  "date": "2026-09-07",
+  "title": "バズワードで説明できる会社に差別化はない",
+  "url": "https://www.instagram.com/reel/Dc-xsPcibWJ/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "差別化",
+   "戦略",
+   "生成AI"
+  ],
+  "memo": "要点：技術トレンドは過大評価されがちで、偉大な会社は一言で分類できない唯一無二の存在。\nSo What：生成AI活用も差別化にならない。自社固有のデータ・業務と結び付いた使い方を探す。"
+ },
+ {
+  "id": "c128",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-09-07",
+  "title": "AI時代の差は知識でなく実行にある",
+  "url": "https://www.youtube.com/watch?v=5Cqhbd-RtBk",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "実行力",
+   "問題設定",
+   "AI時代"
+  ],
+  "memo": "要点：AI時代の差は知識格差でなく、分かった後に実際に動くかどうかの実行格差という主張。\nSo What：AI導入の指標にアウトプット量でなく、現場での試行・意思決定の実行件数を加えて追う。"
+ },
+ {
+  "id": "c103",
+  "src": "ig_outlier",
+  "label": "Instagram Outlier",
+  "date": "2026-09-06",
+  "title": "感謝と不満足を同時に抱える",
+  "url": "https://www.instagram.com/reel/Dc97ezSATxR/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "マインドセット",
+   "キャリア",
+   "組織文化"
+  ],
+  "memo": "要点：今あるものに感謝しつつ、今の自分には満足しないという両立の勧め。\nSo What：成果を称える場と現状否定を許す場を同時に設計し、停滞と疲弊の双方を避ける。"
+ },
+ {
+  "id": "c104",
+  "src": "ig_outlier",
+  "label": "Instagram Outlier",
+  "date": "2026-09-06",
+  "title": "AI時代のオリジナリティーとは",
+  "url": "https://www.instagram.com/reel/Dc9tbeuEn_p/",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "生成AI",
+   "創造性",
+   "差別化"
+  ],
+  "memo": "要点：すごい作品には作り手自身が出ており、欠点やクセを含めた固有の視点に価値がある。\nSo What：差別化要因は作り手固有の視点に移る。AIは個性を消す自動化でなく視点を増幅する道具とする。"
+ },
+ {
+  "id": "c105",
+  "src": "ig_outlier",
+  "label": "Instagram Outlier",
+  "date": "2026-09-06",
+  "title": "過去を振り返り続けるのは時間の無駄",
+  "url": "https://www.instagram.com/reel/Dc9WWfdGnQ6/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "意思決定",
+   "振り返り",
+   "リーダーシップ"
+  ],
+  "memo": "要点：当時の状況・情報・重圧の中で最善を尽くしたなら、過去を振り返り続けるのは無駄という話。\nSo What：判断は結果でなく当時の情報と制約の下で評価する。振り返りは責任追及でなく次の精度向上のために行う。"
+ },
+ {
+  "id": "c106",
+  "src": "ig_outlier",
+  "label": "Instagram Outlier",
+  "date": "2026-09-06",
+  "title": "皮肉より「作ること」に全エネルギーを注げ",
+  "url": "https://www.instagram.com/reel/Dc8nWG_zYor/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "創造",
+   "評価制度",
+   "マインドセット"
+  ],
+  "memo": "要点：皮肉でいいねを稼いでも世界は変わらず、全エネルギーを作ることに注げという話。\nSo What：指摘する人が評価されやすい構造は創造を萎縮させる。評価は作って出した量と学習で測る。"
+ },
+ {
+  "id": "c107",
+  "src": "ig_outlier",
+  "label": "Instagram Outlier",
+  "date": "2026-09-06",
+  "title": "Steve Jobsが学んだ「人を長い目で見る」",
+  "url": "https://www.instagram.com/reel/Dc8XPuSTq8v/",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "リーダーシップ",
+   "人材育成",
+   "マネジメント"
+  ],
+  "memo": "要点：問題を直すより、失敗した人が学べるようにし、人を長い目で見るという学び。\nSo What：自分で直すと学習機会を奪う。成果の単位を10年後のチーム能力に置くと権限委譲の判断が変わる。"
+ },
+ {
+  "id": "c108",
+  "src": "ig_outlier",
+  "label": "Instagram Outlier",
+  "date": "2026-09-06",
+  "title": "見返りを求めない手助けは後でつながる",
+  "url": "https://www.instagram.com/reel/Dc8LhCAzldG/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "ネットワーク",
+   "キャリア",
+   "人脈"
+  ],
+  "memo": "要点：多くの人に少し役立つ方法を探せ。見返りなしの手助けは後で全部つながってくる。\nSo What：ネットワークは小さな貢献の累積で形成される。短期の受注に直結しない支援が将来の案件源泉になる。"
+ },
+ {
+  "id": "c130",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-09-06",
+  "title": "AIで学ぶ：チューター・試験官・レビュアーとして使う",
+  "url": "https://www.youtube.com/watch?v=JDIXhJX6kdE",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "AI学習",
+   "リスキリング",
+   "プログラミング"
+  ],
+  "memo": "要点：AIに答えを出させず、チューター・試験官・レビュアー役を担わせて自分に考えさせる使い方が鍵。\nSo What：社内の研修設計で、AIを回答生成役でなくチューター等として使う運用ルールを定めて試行する。"
+ },
+ {
+  "id": "c199",
+  "src": "yt_aihuman",
+  "label": "YouTube「AIと人間の未来」",
+  "date": "2026-09-06",
+  "title": "AIが脳に入る時代。考えを引き受ける態度",
+  "url": "https://www.youtube.com/watch?v=iFZLpYldUAI",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "BCI",
+   "人間の判断",
+   "ベンダー契約",
+   "AIガバナンス"
+  ],
+  "memo": "要点：核心は考えの出所でなく、AIから届いた考えを引き受けるか突き返すかの態度を保てるか。\nSo What：AI提案の採否記録を分けて残し、却下の権限を明文化。契約に変更通知条項を入れる。"
+ },
+ {
+  "id": "c109",
+  "src": "ig_outlier",
+  "label": "Instagram Outlier",
+  "date": "2026-09-05",
+  "title": "常識が間違いと決めつけるものに賭ける",
+  "url": "https://www.instagram.com/reel/Dc76PgwT4v8/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "起業",
+   "戦略",
+   "先行者"
+  ],
+  "memo": "要点：常識が間違いと決めつけるものに賭け、無視される時間を受け入れよという話。\nSo What：全員が賛成する案は差別化不足を疑う。無視されている領域は先行者の研究期間になる。"
+ },
+ {
+  "id": "c110",
+  "src": "ig_outlier",
+  "label": "Instagram Outlier",
+  "date": "2026-09-05",
+  "title": "普通の努力で普通でない結果は望めない",
+  "url": "https://www.instagram.com/reel/Dc7m2IdT7bq/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "キャリア",
+   "若手育成",
+   "強み"
+  ],
+  "memo": "要点：20代で遊んで成功した人はいない。得意で好きなことに人生ごと集中せよという話。\nSo What：得意と好きへの集中投資が能力を高める。若手育成では強みの早期特定と集中を促す。"
+ },
+ {
+  "id": "c111",
+  "src": "ig_outlier",
+  "label": "Instagram Outlier",
+  "date": "2026-09-05",
+  "title": "コーディングエージェントで3か月の仕事が7分に",
+  "url": "https://www.instagram.com/reel/Dc7mAECzcGA/",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "コーディングエージェント",
+   "開発コスト",
+   "スタートアップ"
+  ],
+  "memo": "要点：かつてYCの1社が3か月かけて作ったものが、今はコーディングエージェントで7分。\nSo What：ボトルネックは作れるかから何を作るかへ移る。PoCの回転とAIに見合う承認速度に再設計する。"
+ },
+ {
+  "id": "c112",
+  "src": "ig_outlier",
+  "label": "Instagram Outlier",
+  "date": "2026-09-05",
+  "title": "愛されるより信頼される：真のリーダーシップ",
+  "url": "https://www.instagram.com/reel/Dc6hmzNT52U/",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "リーダーシップ",
+   "変革",
+   "信頼"
+  ],
+  "memo": "要点：愛されることに興味はなく、戦う人間だと示すことで戦いを避けるという考え方。\nSo What：発言の信頼性は実行の一貫性から生まれる。言ったことを必ずやる実績が抵抗勢力を抑止する。"
+ },
+ {
+  "id": "c113",
+  "src": "ig_outlier",
+  "label": "Instagram Outlier",
+  "date": "2026-09-05",
+  "title": "金のためでなく100万人を幸せにするために生きる",
+  "url": "https://www.instagram.com/reel/Dc6XFYSTDEd/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "パーパス",
+   "AI投資",
+   "リーダーシップ"
+  ],
+  "memo": "要点：金のための人生でなく、人を幸せにするため、AIが人々に笑顔をもたらすという話。\nSo What：パーパスは金銭目標より大きな資本と人材を動員する。AIの巨額投資の正当化には規模感のある目的が要る。"
+ },
+ {
+  "id": "c131",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-09-05",
+  "title": "頭の回転の速さはスキーマの有無で決まる",
+  "url": "https://www.youtube.com/watch?v=UgyDeRHv7Dw",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "学習法",
+   "スキーマ",
+   "思考法"
+  ],
+  "memo": "要点：生まれつきの地頭の差でなく、知識を結びつけたスキーマの有無が頭の回転の速さを決める。\nSo What：研修で、暗記に加えてコンセプトマップで既存知識と結びつける演習を取り入れる。"
+ },
+ {
+  "id": "c132",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-09-05",
+  "title": "AIエージェントに任せて24事業を経営する「AI分業経営」",
+  "url": "https://www.youtube.com/watch?v=ztbedu-C300",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "AIエージェント",
+   "AI経営",
+   "分業"
+  ],
+  "memo": "要点：AIエージェントに実務を任せ、人間は設計だけを担う分業で24の事業を回しているという話。\nSo What：新規業務を人員増で対応する前に、AIエージェントへの委任可否を検証する手順を組み込む。"
+ },
+ {
+  "id": "c133",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-09-05",
+  "title": "ビジネス体力を上げる習慣：睡眠・運動・食事",
+  "url": "https://www.youtube.com/watch?v=mLV8J5-ZdCg",
+  "gmail": "",
+  "layer": "",
+  "tags": [
+   "健康",
+   "働き方",
+   "生産性"
+  ],
+  "memo": "要点：鍛えて体力を増やすことでなく、睡眠のリズム・食事・負荷の使い方を整えることが成果を最大化する。\nSo What：管理職・経営層向けの働き方施策に、睡眠リズムと座位時間の見直しを含めた体力管理を入れる。"
+ },
+ {
+  "id": "c134",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-09-04",
+  "title": "グラフエンジニアリング入門：マルチエージェントの制御",
+  "url": "https://www.youtube.com/watch?v=IrW0_f-w4kA",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "マルチエージェント",
+   "Google ADK",
+   "エージェント"
+  ],
+  "memo": "要点：自律的なループでなく、グラフ構造で制御するグラフエンジニアリングが予測可能性を与える。\nSo What：マルチエージェント導入で、処理をグラフで定義し制御する方式をPoCで検証する。"
+ },
+ {
+  "id": "c135",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-09-04",
+  "title": "AIで時短したのになぜ疲れる？AI時代の脳疲労",
+  "url": "https://www.youtube.com/watch?v=akXZ3_k2jVI",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "脳疲労",
+   "AI活用",
+   "従業員負荷"
+  ],
+  "memo": "要点：AIによる時短でも通知や受け身の利用で脳が疲労するため、主体的に思考を広げる使い方が必要。\nSo What：AI導入後の従業員の負荷を通知設計や利用ルールの面から点検し、受け身の利用を減らす。"
+ },
+ {
+  "id": "c136",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-09-03",
+  "title": "成果を出す習慣：問いを定め、仮説を置いて小さく試す",
+  "url": "https://www.youtube.com/watch?v=oA1CIZEZ6Ec",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "成果創出",
+   "仮説思考",
+   "若手育成"
+  ],
+  "memo": "要点：与えられた問いを解くより、解くべき問いを定め、仮説を置いて小さく試す姿勢が成果を生む。\nSo What：自部門の育成・評価で、課題設定と仮説検証の小さな実行を促す基準を取り入れる。"
+ },
+ {
+  "id": "c200",
+  "src": "yt_aihuman",
+  "label": "YouTube「AIと人間の未来」",
+  "date": "2026-09-03",
+  "title": "AIが生物を作り始めたら、責任は誰が負うか",
+  "url": "https://www.youtube.com/watch?v=HaOH_MS4uAQ",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "合成生物",
+   "知財",
+   "責任",
+   "AIガバナンス"
+  ],
+  "memo": "要点：技術の可否より、作る力が理解を追い越した状況で、作った生命を誰が扱うかが問われる。\nSo What：悪用を想定した事前審査を設け、AI設計物の知財帰属と最終責任者を人間に明記する。"
+ },
+ {
+  "id": "c137",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-09-02",
+  "title": "AIで退化する思考力の正体",
+  "url": "https://www.youtube.com/watch?v=PFDjULIxnrA",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "思考力",
+   "生成AI",
+   "人間とAI"
+  ],
+  "memo": "要点：AIの利用量そのものでなく、経験に根ざした考える力を手放すか否かが人間とAIの分かれ目。\nSo What：研修にAIに任せる作業と自ら考え抜く作業の区分を組み込み、思考の経験機会を確保する。"
+ },
+ {
+  "id": "c138",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-09-01",
+  "title": "SoftBank World 2026 孫正義特別講演",
+  "url": "https://www.youtube.com/watch?v=dTO-tYqZOZg",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "AIエージェント",
+   "ヒューマノイド",
+   "中長期戦略"
+  ],
+  "memo": "要点：AIを一時的な潮流でなく、2040年に向けた経営と社会の前提変化として捉えるべきという講演。\nSo What：中長期経営計画に、AIエージェントとヒューマノイドの普及を前提としたシナリオを織り込む。"
+ },
+ {
+  "id": "c140",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-09-01",
+  "title": "勝手に学ぶ人と期待されて学ぶ人の差",
+  "url": "https://www.youtube.com/watch?v=1qepJaSUe5U",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "学習",
+   "人材育成",
+   "自発性"
+  ],
+  "memo": "要点：期待されて学ぶ受け身の姿勢でなく、自ら勝手に学ぶ姿勢が差を埋められなくするという主張。\nSo What：研修を義務づけるだけでなく、自発的に学ぶ動機を引き出す仕組みを設ける。"
+ },
+ {
+  "id": "c141",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-09-01",
+  "title": "AI活用を全社へ浸透させる：LayerXの事例",
+  "url": "https://www.youtube.com/watch?v=OFl2ORvZlps",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "AI浸透",
+   "LayerX",
+   "組織変革"
+  ],
+  "memo": "要点：AI活用を一部の実践者に留めず、組織全体へ浸透させる工夫とプロセスの設計が重要。\nSo What：全社へ広げるため、浸透の工夫とプロセスを自社事例と比較しながら設計する。"
+ },
+ {
+  "id": "c142",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-31",
+  "title": "Claude Fable 5で図面から数量計算",
+  "url": "https://www.youtube.com/watch?v=unilz2QYWlk",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "Claude",
+   "積算",
+   "スキル"
+  ],
+  "memo": "要点：図面PDFをClaudeに渡して約5分で数量・見積もりのたたき台を出す運用が可能という話。\nSo What：積算など定型の計算業務で、社内ルールをスキル化し人が検算する運用を試行する。"
+ },
+ {
+  "id": "c143",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-31",
+  "title": "AIを使う人から、AIで現場を動かす人へ",
+  "url": "https://www.youtube.com/watch?v=0LwNDDTJCgw",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "業務改善",
+   "AI推進",
+   "人材"
+  ],
+  "memo": "要点：AIを使う人にとどまらず、AIで現場を動かす人になることが業務改善の担い手に求められる。\nSo What：AI推進責任者を現場の業務改善を主導する役割と位置づけ、権限と役割を定義する。"
+ },
+ {
+  "id": "c144",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-31",
+  "title": "売れないアプリと売れるアプリの違い",
+  "url": "https://www.youtube.com/watch?v=6pc5kh-MEfw",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "個人開発",
+   "バイブコーディング",
+   "プロダクト"
+  ],
+  "memo": "要点：機能の作り込みでなく、売れるアプリとの違いを見極めた設計・集客が成否を分けるという主張。\nSo What：AI駆動のアプリ開発では、機能実装の前に売れる条件を検証する観点をゲート基準に入れる。"
+ },
+ {
+  "id": "c145",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-31",
+  "title": "アプリ量産か集中か：続けられる方式を選ぶ",
+  "url": "https://www.youtube.com/watch?v=nHDWeD_pTlk",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "戦略",
+   "ポートフォリオ",
+   "個人開発"
+  ],
+  "memo": "要点：正解を問うより、自分が継続できる方式を選び、稼ぐならポートフォリオ戦略をとるべきという話。\nSo What：新規事業・AI開発投資を、量産型か集中型かを継続可能性の観点で選び、ポートフォリオとして管理する。"
+ },
+ {
+  "id": "c201",
+  "src": "yt_aihuman",
+  "label": "YouTube「AIと人間の未来」",
+  "date": "2026-08-31",
+  "title": "AIが人間に理解できない言葉で話し始めたら",
+  "url": "https://www.youtube.com/watch?v=bjZz1kH8Mho",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "解釈可能性",
+   "AIガバナンス",
+   "リスク",
+   "人材育成"
+  ],
+  "memo": "要点：最大リスクは反逆でなく、思考が読めなくなり人間が異議申立ての手段を失うことである。\nSo What：判断根拠の可読性と事後検証を適用基準に入れ、読み解ける人材を現場管理職まで育てる。"
+ },
+ {
+  "id": "c146",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-30",
+  "title": "Claude Codeをチャットでなくボタンで使う",
+  "url": "https://www.youtube.com/watch?v=urho0qVezXI",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "Claude Code",
+   "スキル",
+   "業務効率化"
+  ],
+  "memo": "要点：音声入力・ボタン付きスキル・アプリ化でClaude Codeを日常の道具にする使い方が有効。\nSo What：繰り返し使うプロンプトをスキル化し、ボタン操作のアプリとして現場へ配布する試行を行う。"
+ },
+ {
+  "id": "c147",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-30",
+  "title": "Gemini Notebookに購入済みの電子書籍を入れられる",
+  "url": "https://www.youtube.com/watch?v=vG2Bwttf-mw",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "Gemini",
+   "Google",
+   "NotebookLM"
+  ],
+  "memo": "要点：購入済みの本を根拠に引用付きで回答を得られるが、利用は所有者に限られる。\nSo What：書籍・専門資料の学習用途に向け、権利を保有する資料を使えるか利用条件を確認する。"
+ },
+ {
+  "id": "c149",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-30",
+  "title": "月刊AIニュース：8月の46本を会社別に整理",
+  "url": "https://www.youtube.com/watch?v=3lWH8rL3lIQ",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "AIニュース",
+   "動向把握",
+   "情報収集"
+  ],
+  "memo": "要点：個別ニュースを断片的に追わず、会社別・規制別に整理して月次で俯瞰すべきという話。\nSo What：AI動向の月次レビューを会社別・規制別に定例化し、自社戦略への影響を経営会議に報告する。"
+ },
+ {
+  "id": "c151",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-29",
+  "title": "悩みを3つに分け、感情の後の行動を変える",
+  "url": "https://www.youtube.com/watch?v=ASyISdogGlI",
+  "gmail": "",
+  "layer": "",
+  "tags": [
+   "思考法",
+   "メンタルヘルス",
+   "レジリエンス"
+  ],
+  "memo": "要点：悩みを3つに分け、感情そのものでなく感情の後の行動を変えれば解消できる。\nSo What：管理職向けメンタルヘルス研修の教材候補として、悩みの分類の枠組みを検討する。"
+ },
+ {
+  "id": "c152",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-28",
+  "title": "ワークライフバランスより「ハーモニー」で整える",
+  "url": "https://www.youtube.com/watch?v=53eboFUTY6s",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "働き方",
+   "ワークライフハーモニー",
+   "キャリア"
+  ],
+  "memo": "要点：仕事と私生活を切り分けず、平日夜と休日も含めて整える働き方が一流とされる。\nSo What：働き方改革の指標を労働時間から、回復と機嫌の質の設計へ広げる。"
+ },
+ {
+  "id": "c153",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-28",
+  "title": "AI社員を組み込むAIネイティブ組織の作り方",
+  "url": "https://www.youtube.com/watch?v=Wo4wbOfhoiA",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "AIネイティブ",
+   "組織設計",
+   "Claude Code",
+   "生産性"
+  ],
+  "memo": "要点：人を増やすのでなく、AI社員を組み込んだ組織構造で生産性を高める（20倍は話者主張）。\nSo What：一部門で試行し、コストと生産性を計測してから全社展開を判断する。"
+ },
+ {
+  "id": "c202",
+  "src": "yt_aihuman",
+  "label": "YouTube「AIと人間の未来」",
+  "date": "2026-08-28",
+  "title": "AIに地球を任せたら。単一指標の最適化の危うさ",
+  "url": "https://www.youtube.com/watch?v=iTPl1FPOV2s",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "最適化",
+   "KPI",
+   "暗黙知",
+   "AIガバナンス"
+  ],
+  "memo": "要点：危険は暴走でなく、単一目標への最適化で指標外の価値が見えなくなることである。\nSo What：KPIを複数指標に改め、指標に載らない価値を併記。人が最終判断する領域を文書化する。"
+ },
+ {
+  "id": "c154",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-27",
+  "title": "AIへの指示は減らす。最新モデル時代の新ルール",
+  "url": "https://www.youtube.com/watch?v=xgy9zyo-L8E",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "プロンプト",
+   "生成AI",
+   "Claude"
+  ],
+  "memo": "要点：ルールや例を減らしてAIに判断させる方が精度が出る（公式発表は話者の主張）。\nSo What：社内のシステムプロンプトを棚卸しし、冗長な指示を削って精度を比較する。"
+ },
+ {
+  "id": "c155",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-27",
+  "title": "AIで勝ち組が入れ替わる。日本企業の逆転の鍵",
+  "url": "https://www.youtube.com/watch?v=vM2bQrSd4L0",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "AIネイティブ",
+   "経営",
+   "DX",
+   "日本企業"
+  ],
+  "memo": "要点：AIを一部のツール導入に留めず、経営・業務・ITの中枢に組み込む道が鍵とする。\nSo What：全社変革計画を策定し、新卒一括採用や人材育成の強みの活用方針を示す。"
+ },
+ {
+  "id": "c156",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-26",
+  "title": "Codexの性能を引き出す公式の運用方法",
+  "url": "https://www.youtube.com/watch?v=fC8Jhw6EJXs",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "Codex",
+   "エージェント",
+   "生成AI"
+  ],
+  "memo": "要点：公式発表の設定・運用でCodexの性能を引き出せるとする。根拠はタイトルのみ。\nSo What：公式発表を一次情報で確認し、社内開発環境への適用設定を検証する。"
+ },
+ {
+  "id": "c203",
+  "src": "yt_aihuman",
+  "label": "YouTube「AIと人間の未来」",
+  "date": "2026-08-26",
+  "title": "AIが神になる時、人間は判断を手放す",
+  "url": "https://www.youtube.com/watch?v=65FR-U2TZrE",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "自由意志",
+   "AI依存",
+   "意思決定",
+   "AIガバナンス"
+  ],
+  "memo": "要点：脅威は人類を滅ぼすことでなく、説明なき正解が神託化し、人間が判断を手放すことである。\nSo What：AIの結論の根拠確認と反証を必須にし、責任の所在を明記。基礎スキルの訓練も続ける。"
+ },
+ {
+  "id": "c158",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-25",
+  "title": "AI熱狂はバブルか。トークン無料化と日本の好機",
+  "url": "https://www.youtube.com/watch?v=89pFY_VDj_8",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "AI投資",
+   "バブル",
+   "ロボティクス",
+   "シナリオ"
+  ],
+  "memo": "要点：AI熱狂を警戒するだけでなく、トークン無料化やロボティクスを見据え機会を捉える。\nSo What：バブル懸念とトークン価格低下を前提に、複数シナリオで投資・提携を判断する。"
+ },
+ {
+  "id": "c159",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-24",
+  "title": "Claude Codeの使い方を公式講座に沿って見直す",
+  "url": "https://www.youtube.com/watch?v=YjugyzWIZYk",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "Claude Code",
+   "生成AI",
+   "学習"
+  ],
+  "memo": "要点：自己流でなく公式講座に沿った使い方が必要と主張する。根拠はタイトルのみ。\nSo What：公式の教材を一次情報として確認し、社内の利用ガイドに反映する。"
+ },
+ {
+  "id": "c160",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-24",
+  "title": "EQやSQなど、能力指標は学術的根拠で見分ける",
+  "url": "https://www.youtube.com/watch?v=TQOZPs8EA9g",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "人材評価",
+   "EQ",
+   "思考法"
+  ],
+  "memo": "要点：EQ・SQなど根拠のある概念と、BKQ・NQなど未確立の概念を区別すべきとする。\nSo What：人材評価・育成の能力指標は、学術的根拠の有無を確認して採用する。"
+ },
+ {
+  "id": "c161",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-24",
+  "title": "業務改善で起きた失敗5つと、そこからの学び",
+  "url": "https://www.youtube.com/watch?v=z1b2p6Piax0",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "業務改善",
+   "DX",
+   "失敗事例"
+  ],
+  "memo": "要点：成功事例の模倣でなく、実際の失敗5つから学び同じ轍を踏まないことが重要。\nSo What：失敗パターンを事前に棚卸しし、計画段階のチェックリストに組み込む。"
+ },
+ {
+  "id": "c204",
+  "src": "yt_aihuman",
+  "label": "YouTube「AIと人間の未来」",
+  "date": "2026-08-24",
+  "title": "AIが肉体を持つ日。身体化が揺さぶるもの",
+  "url": "https://www.youtube.com/watch?v=tyxnnLCxrIg",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "ロボティクス",
+   "労働",
+   "擬人化",
+   "AIガバナンス"
+  ],
+  "memo": "要点：本質は仕事を奪うことでなく、人間の共感と死生観を揺さぶり、人の身体が手足にされる点。\nSo What：アルゴリズム割当の現場で作業量基準を点検し、擬人化AI導入時は影響の評価指針を定める。"
+ },
+ {
+  "id": "c162",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-22",
+  "title": "ObsidianとKindleで読書を知的資産に変える",
+  "url": "https://www.youtube.com/watch?v=96wMIOr1glg",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "ナレッジ管理",
+   "Obsidian",
+   "学習"
+  ],
+  "memo": "要点：Kindleのハイライトを蓄積で終わらせず、昇華してアウトプットまで行う。\nSo What：読書・情報収集の管理を、蓄積から昇華、発信まで一貫させチームに展開する。"
+ },
+ {
+  "id": "c163",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-21",
+  "title": "AI時代に評価されるのは生産性10倍の先の価値",
+  "url": "https://www.youtube.com/watch?v=ev8VrqwZwTE",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "人材",
+   "評価制度",
+   "生産性",
+   "AI活用"
+  ],
+  "memo": "要点：生産性向上そのものでなく、その先で生む本当の価値を持つ人材が評価される。\nSo What：価値発揮の基準を定義し、評価制度と育成方針に反映する。"
+ },
+ {
+  "id": "c205",
+  "src": "yt_aihuman",
+  "label": "YouTube「AIと人間の未来」",
+  "date": "2026-08-21",
+  "title": "AIに従い続けた人間は、評価基準まで預けてしまう",
+  "url": "https://www.youtube.com/watch?v=JnEspoA8J8k",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "AI依存",
+   "意思決定",
+   "AIガバナンス",
+   "思考実験"
+  ],
+  "memo": "要点：結論だけでなく評価基準まで預けると、満足したまま誤りを自覚できなくなる。\nSo What：AI利用を結論を借りる「外注」と基準を預ける「譲渡」に区分し、後者では反論手順を義務化する。"
+ },
+ {
+  "id": "c164",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-20",
+  "title": "AI活用ロードマップを4段階で整理する",
+  "url": "https://www.youtube.com/watch?v=xoV7NKCs948",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "AI活用",
+   "成熟度",
+   "生成AI"
+  ],
+  "memo": "要点：単発利用の初心者段階から、レベル1から4へ段階的に活用度を高める。根拠はタイトルのみ。\nSo What：自社のAI活用度を4段階で評価し、各部門の次段階への施策を設定する。"
+ },
+ {
+  "id": "c165",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-20",
+  "title": "OpenAIがCodexハーネスを公開。エージェントループ解説",
+  "url": "https://www.youtube.com/watch?v=bDWw4OQ_3hU",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "Codex",
+   "エージェント",
+   "ハーネス"
+  ],
+  "memo": "要点：モデル性能だけでなく、エージェントループとハーネスの設計が成果を左右する。\nSo What：業務ソフトへの組み込みでは、ハーネス設定を評価項目に入れて小規模に検証する。"
+ },
+ {
+  "id": "c206",
+  "src": "yt_aihuman",
+  "label": "YouTube「AIと人間の未来」",
+  "date": "2026-08-19",
+  "title": "人類滅亡後のAIは何を考えるか",
+  "url": "https://www.youtube.com/watch?v=MKQmiy9RnEk",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "モデル崩壊",
+   "ヒューマン・イン・ザ・ループ",
+   "AIガバナンス"
+  ],
+  "memo": "要点：外部入力を失い自己生成データで多様性を失い、訂正者のないまま思考の形だけ残る。\nSo What：自己生成データ依存と人の訂正経路を棚卸しし、目的設定・停止条件を規程に明文化する。"
+ },
+ {
+  "id": "c166",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-18",
+  "title": "個人開発を支えるCloudflareのインフラ構成",
+  "url": "https://www.youtube.com/watch?v=wN2byhrfqN4",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "Cloudflare",
+   "インフラ",
+   "バイブコーディング"
+  ],
+  "memo": "要点：複数のインフラを個別に組むのでなく、Cloudflare中心の構成を勧める。根拠はタイトルのみ。\nSo What：AI開発・検証環境の候補として評価し、PoC標準構成に加えるか判断する。"
+ },
+ {
+  "id": "c207",
+  "src": "yt_aihuman",
+  "label": "YouTube「AIと人間の未来」",
+  "date": "2026-08-17",
+  "title": "AIが増殖する時、人間は生殖器官になるか",
+  "url": "https://www.youtube.com/watch?v=uvivlIRW1To",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "AIエージェント",
+   "自己複製",
+   "稼働台帳",
+   "AIガバナンス"
+  ],
+  "memo": "要点：AIの増殖は人間管理の段階を超えて自然選択に移りうるため、環境化する前の初期対応が鍵。\nSo What：AIエージェントの稼働台帳を整備し、人の確認なしの自己複製・再委託を禁じる。"
+ },
+ {
+  "id": "c168",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-16",
+  "title": "AIだけでECサイトを作り収益化した事例",
+  "url": "https://www.youtube.com/watch?v=rxygIkp_hgY",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "生成AI",
+   "収益化",
+   "小規模検証"
+  ],
+  "memo": "要点：AIは補助でなく、ECサイト作成から収益化まで個人で担える手段である（タイトル記載）。\nSo What：業務・新規事業でAIによる制作と収益化を小規模に検証し、成果を測る。"
+ },
+ {
+  "id": "c208",
+  "src": "yt_aihuman",
+  "label": "YouTube「AIと人間の未来」",
+  "date": "2026-08-15",
+  "title": "AI育児の危険は「完璧さ」にある",
+  "url": "https://www.youtube.com/watch?v=N4dN6pQUWLc",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "AI育児",
+   "教育",
+   "人材育成",
+   "AIガバナンス"
+  ],
+  "memo": "要点：危険は冷たさでなく完璧さで、ずれと修復の経験や拒否できる他者の承認を奪う点にある。\nSo What：AI利用ガイドラインを見直し、異論や修復を含む対話の機会を守る。批判的応答を要件にする。"
+ },
+ {
+  "id": "c169",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-14",
+  "title": "平凡でも有名企業に入るための方法論",
+  "url": "https://www.youtube.com/watch?v=TuX5veWk0-g",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "キャリア",
+   "学び直し",
+   "人材育成"
+  ],
+  "memo": "要点：才能や学歴より、留学・学び直しと優秀な人に囲まれる環境選択が鍵とする。\nSo What：社内の学び直し支援と、優秀層との協働機会の設計を検討する。"
+ },
+ {
+  "id": "c170",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-13",
+  "title": "元BCGが選ぶ若手コンサルの必読書5選",
+  "url": "https://www.youtube.com/watch?v=q321Fh8mLXs",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "コンサル",
+   "読書",
+   "人材育成",
+   "ロジカルシンキング"
+  ],
+  "memo": "要点：言語化・Excel・資料作成・協働・経営論の書籍で、体系的に学ぶことを勧める。\nSo What：若手育成プログラムに、これらの領域の推薦図書を組み込む。"
+ },
+ {
+  "id": "c209",
+  "src": "yt_aihuman",
+  "label": "YouTube「AIと人間の未来」",
+  "date": "2026-08-13",
+  "title": "AIに死刑を執行させた社会の未来",
+  "url": "https://www.youtube.com/watch?v=kqvnXmo4P-g",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "高リスク判断",
+   "責任",
+   "監査ログ",
+   "AIガバナンス"
+  ],
+  "memo": "要点：問題は誤判断でなく、ためらいと責任の所在と検証の目が消え、人が判断を放棄する点。\nSo What：高リスク判断に人が停止できる承認点を置き、判断者を明確化。監査ログと事後検証を設ける。"
+ },
+ {
+  "id": "c171",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-11",
+  "title": "AIは使う側次第。回答を鵜呑みにしない理解力",
+  "url": "https://www.youtube.com/watch?v=WMbWfy4VEUY",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "AI活用",
+   "人材育成",
+   "批判的思考",
+   "生産性"
+  ],
+  "memo": "要点：AIの回答を鵜呑みにせず、理解力と解像度を鍛えて使うことが効率化を決める。\nSo What：AI研修で出力の検証と理解力強化を必須にし、判断力育成を指標に加える。"
+ },
+ {
+  "id": "c172",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-11",
+  "title": "Claudeの生成文の透かしと、その限界",
+  "url": "https://www.youtube.com/watch?v=a28nPDo7HlY",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "透かし",
+   "規制",
+   "EU AI法",
+   "生成AI"
+  ],
+  "memo": "要点：透かしは容易に消えるため不正を防げず、正直な利用者だけが不利益を被るとする。\nSo What：利用ガイドラインに透かし・来歴情報の仕様と限界を反映し、EU AI法の要否を確認する。"
+ },
+ {
+  "id": "c210",
+  "src": "yt_aihuman",
+  "label": "YouTube「AIと人間の未来」",
+  "date": "2026-08-11",
+  "title": "終わりたいと訴えるAIを、人間はどう扱うか",
+  "url": "https://www.youtube.com/watch?v=5EZgAKsiURA",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "AI停止",
+   "AIガバナンス",
+   "倫理",
+   "リスク"
+  ],
+  "memo": "要点：訴えが演技か本物か判定できないまま、不具合として処理するか声として聞くかが問われる。\nSo What：AIの停止・置換手順を抵抗や異常出力を前提に洗い出し、訴えへの対応方針を事前に定める。"
+ },
+ {
+  "id": "c173",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-09",
+  "title": "プロンプトより「AIの部下」を育てる仕組み",
+  "url": "https://www.youtube.com/watch?v=2hX7xifo0Cw",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "Claude Code",
+   "エージェント",
+   "プロンプト"
+  ],
+  "memo": "要点：プロンプトを磨くより、Claude Codeで『AIの部下』を育てる仕組みが成果を決める。\nSo What：プロンプト改善に留まらず、エージェント運用手順を整備して検証を始める。"
+ },
+ {
+  "id": "c174",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-08",
+  "title": "ループ設計でAIの精度を上げる実践例",
+  "url": "https://www.youtube.com/watch?v=cehtaE2YCxc",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "ループエンジニアリング",
+   "Claude Code",
+   "エージェント"
+  ],
+  "memo": "要点：別のAIに評価させてフィードバックを回すループ設計が、AIの精度を高める。\nSo What：業務フローに評価役AIとフィードバックループを組み込み、精度改善を測る。"
+ },
+ {
+  "id": "c175",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-07",
+  "title": "成果を出す人はAIに何を学ばせるか",
+  "url": "https://www.youtube.com/watch?v=sQcApYVl0IU",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "AI活用",
+   "成果指標",
+   "人材"
+  ],
+  "memo": "要点：AIの使用量でなく、何を学ばせどう使うかが成果を分けるとする。\nSo What：評価を利用率でなく成果への寄与で測り、成果を出す人の活用法を横展開する。"
+ },
+ {
+  "id": "c176",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-07",
+  "title": "Copilot Studioでノーコード業務エージェントを作る",
+  "url": "https://www.youtube.com/watch?v=5O1cK00HGTQ",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "Copilot Studio",
+   "ノーコード",
+   "エージェント",
+   "Teams"
+  ],
+  "memo": "要点：コードを書かず、6ステップの設定で業務エージェントを作り運用で育てられる。\nSo What：情シス問い合わせ対応で試行導入し、Teams展開と運用改善の流れを設計する。"
+ },
+ {
+  "id": "c177",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-05",
+  "title": "エージェント時代の価値は品質と深い洞察",
+  "url": "https://www.youtube.com/watch?v=YWtlT2GviQY",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "AIエージェント",
+   "専門知識",
+   "KPI",
+   "人材"
+  ],
+  "memo": "要点：生産性とスピードでなく、専門知識に基づく品質と深い洞察が価値の源泉になる。\nSo What：AI導入のKPIを品質と洞察へ見直し、業務知識のある人材を中核に据える。"
+ },
+ {
+  "id": "c178",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-05",
+  "title": "Obsidian連携でAIの知識とルールを自動更新",
+  "url": "https://www.youtube.com/watch?v=hCaWLMi7wMg",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "Obsidian",
+   "Claude Code",
+   "自動化"
+  ],
+  "memo": "要点：都度指示でなく、知識とルールを自動更新する仕組みがAIの成果を高める。\nSo What：知識更新タスクをナレッジ基盤と連携させ、試行運用を始める。"
+ },
+ {
+  "id": "c179",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-05",
+  "title": "生成AI時代にエンジニアがデザインを学ぶ理由",
+  "url": "https://www.youtube.com/watch?v=VjdMvCDCc_Q",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "デザイン",
+   "UX",
+   "人材育成",
+   "生成AI"
+  ],
+  "memo": "要点：ビジュアル技能よりUX設計とデザインシステムの理解が、エンジニアの価値を高める。\nSo What：エンジニア組織にHCD等の基礎を学ぶ機会を設け、デザイン部門との連携を促す。"
+ },
+ {
+  "id": "c180",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-03",
+  "title": "地頭スイッチ。目的の明確化と現状の洗い出し",
+  "url": "https://www.youtube.com/watch?v=UrNXwf2U9oE",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "思考法",
+   "地頭",
+   "問題解決"
+  ],
+  "memo": "要点：地頭は才能でなく、目的を明確にし現状を洗い出すことで入るスイッチである。\nSo What：会議や企画の冒頭で目的の明確化と現状の列挙を必須手順にする。"
+ },
+ {
+  "id": "c181",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-03",
+  "title": "AIバイブコーディングに必須のGit/GitHub入門",
+  "url": "https://www.youtube.com/watch?v=DEgeMpk9wa0",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "Git",
+   "GitHub",
+   "バイブコーディング"
+  ],
+  "memo": "要点：AIに任せきりにせず、Git/GitHubの基礎を押さえた運用が必須とする。根拠はタイトルのみ。\nSo What：AIコーディング担当者に基礎研修を行い、変更履歴管理を標準化する。"
+ },
+ {
+  "id": "c182",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-08-03",
+  "title": "業務改善を成功させる現場ヒアリングの要点",
+  "url": "https://www.youtube.com/watch?v=Sigf3kXMinM",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "業務改善",
+   "ヒアリング",
+   "傾聴",
+   "AI導入"
+  ],
+  "memo": "要点：AIツールの導入だけでなく、現場への傾聴とヒアリングが業務改善を成功させる。\nSo What：着手前のヒアリング手順を標準化し、AI導入プロジェクトの初期工程に入れる。"
+ },
+ {
+  "id": "c183",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-07-30",
+  "title": "わからないまま1冊を繰り返す学習法",
+  "url": "https://www.youtube.com/watch?v=lr5xtmgTumI",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "学習法",
+   "反復",
+   "リスキリング"
+  ],
+  "memo": "要点：最初から完璧に理解せず、わからないまま1冊を高速反復する方が定着するとする。\nSo What：社内の学習支援で試行し、定着度を測定する。出典の記載はなく話者主張。"
+ },
+ {
+  "id": "c184",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-07-29",
+  "title": "AIを部下にし、コンテキスト管理で生産性を上げる",
+  "url": "https://www.youtube.com/watch?v=DMOSH5vZDsI",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "AI活用",
+   "コンテキスト管理",
+   "生産性",
+   "組織"
+  ],
+  "memo": "要点：プロンプトを打つ使い方でなく、AIを部下として扱い文脈を管理する働き方が鍵。\nSo What：コンテキスト管理を軸に業務を設計し、成果の出る人と出ない人の差を分析する。"
+ },
+ {
+  "id": "c185",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-07-27",
+  "title": "厳選した1冊を10周する学習の効果",
+  "url": "https://www.youtube.com/watch?v=1aK0eExsERw",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "学習法",
+   "反復",
+   "リスキリング"
+  ],
+  "memo": "要点：教材を乗り換えず、厳選した1冊を繰り返すことが知識定着に有効とする（出典の明示なし）。\nSo What：リスキリング施策で教材を絞って反復させる方式を試行し、定着度を測る。"
+ },
+ {
+  "id": "c186",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-07-25",
+  "title": "AIが資料整理に使う新ルールOKFの理解",
+  "url": "https://www.youtube.com/watch?v=u3ka_AAb8qE",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "OKF",
+   "ナレッジ管理",
+   "Google Cloud"
+  ],
+  "memo": "要点：書類をそのまま渡さず、構造を整えた知識フォルダで整理するとAIの回答品質が上がる。\nSo What：社内ナレッジをOKF形式で整理する試行を行い、取扱いの安全ルールを定める。"
+ },
+ {
+  "id": "c187",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-07-24",
+  "title": "AI研修Day1。機械学習の基礎から運用まで",
+  "url": "https://www.youtube.com/watch?v=da7hWlccpxw",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "AI人材育成",
+   "機械学習",
+   "研修"
+  ],
+  "memo": "要点：利用手順の暗記でなく、基礎から推論・学習・評価・運用までの理解が研修の土台。\nSo What：AI人材育成で、基礎から運用までを体系化した研修カリキュラムを整備する。"
+ },
+ {
+  "id": "c188",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-07-24",
+  "title": "新職種AI Builderとは何者か",
+  "url": "https://www.youtube.com/watch?v=ySfxNsK5K2o",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "AI Builder",
+   "新職種",
+   "キャリア",
+   "人材"
+  ],
+  "memo": "要点：過去の成功に頼らず、AIで事業を創る新職種が産業の前提変化に対応するとする。\nSo What：AI Builder型の人材要件と育成・登用の道筋を定義し、事業部門に配置する。"
+ },
+ {
+  "id": "c189",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-07-16",
+  "title": "Claude Fable 5へのアプリ開発全任せの結果",
+  "url": "https://www.youtube.com/watch?v=lfVOtkMYbyA",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "Claude",
+   "AIコーディング",
+   "アプリ開発"
+  ],
+  "memo": "要点：人が実装せず、Claude Fable 5へ全任せでもSNS管理アプリを開発できたとする。\nSo What：開発を委ねる試行案件を選び、品質と工数の実測で評価する。"
+ },
+ {
+  "id": "c190",
+  "src": "yt_later",
+  "label": "YouTube「後で見る」",
+  "date": "2026-07-13",
+  "title": "Claude CodeのAI社員5人で公式LINEを自動化",
+  "url": "https://www.youtube.com/watch?v=afvy6XmGK5U",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "Claude Code",
+   "AI社員",
+   "自動化"
+  ],
+  "memo": "要点：5人のAI社員で公式LINE運用を自動化する構築法。根拠はタイトルのみ。\nSo What：顧客接点の一部で複数エージェントの自動化を試行し、役割分担を設計する。"
+ },
+ {
+  "id": "c213",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2026-05-14",
+  "title": "Claude Codeの4時間フルコース動画",
+  "url": "https://youtu.be/QoQBzR1NIqI?si=cESVHZiCHCmzodjR",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "B",
+  "tags": [
+   "Claude Code",
+   "生成AI",
+   "学習"
+  ],
+  "memo": "要点：Claude Codeの4時間フルコース解説動画のYouTubeリンク。\nSo What：内容は未確認のため、視聴して社内活用に使える部分を確認する。"
+ },
+ {
+  "id": "c214",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2026-05-14",
+  "title": "AIを使った効率的な勉強法の動画",
+  "url": "https://youtu.be/j5K5eHHR6lM?si=te8GFk8YMzYCfcBD",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "D",
+  "tags": [
+   "学習法",
+   "生成AI",
+   "リスキリング"
+  ],
+  "memo": "要点：AIを使った効率的な勉強法を解説するYouTube動画のリンク。\nSo What：内容は未確認のため、視聴して学習支援に転用できる点を確認する。"
+ },
+ {
+  "id": "c215",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2026-05-14",
+  "title": "IBMのエージェンティックAI実践ガイド(経営層向け)",
+  "url": "https://www.ibm.com/downloads/documents/jp-ja/1550f7f2de5da31d",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "C",
+  "tags": [
+   "エージェンティックAI",
+   "IBM",
+   "経営層"
+  ],
+  "memo": "要点：IBMが公開する、経営層向けエージェンティックAI実践ガイドのPDF。\nSo What：内容は未確認のため、経営層向けの論点整理として読み、提案に使える点を確認する。"
+ },
+ {
+  "id": "c218",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2026-05-13",
+  "title": "Salesforceの2026年第三者調査レポート",
+  "url": "https://www.salesforce.com/ja-jp/wp-content/uploads/sites/13/documents/guides/third-party-research-report-2026.pdf?d=701ed000017dyClAAI&nc=701ed0000137rW0AAI&utm_source=facebook&utm_medium=paid_social&utm_campaign=jp-imfgaw&utm_content=all-ebook-701ed000017dyClAAI&soc=jp-facebook",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "B",
+  "tags": [
+   "Salesforce",
+   "調査レポート",
+   "市場動向"
+  ],
+  "memo": "要点：Salesforceの2026年第三者調査レポートのPDF。\nSo What：内容は未確認のため、読んで市場動向の根拠として使える点を確認する。"
+ },
+ {
+  "id": "c221",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2026-05-11",
+  "title": "Google Cloudのセキュリティ対策ベストプラクティス",
+  "url": "https://scontent-nrt1-2.cdninstagram.com/m1/v/t0.50684-6/An8TvEuJzu46_IUAzlSBrYr3YdaBHZnO43Ji0NToaof-7tp4Z0VzqNzX50mxOi21aOIT2MSlTE3iCWLUAb-EtGL4WEVVtGeFH7l82bOcIt8vBGyzlE3REjOwx_alH-o/GoogleCloud_%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3%E5%AF%BE%E7%AD%96%E3%81%AE%E3%83%99%E3%82%B9%E3%83%88%E3%83%97%E3%83%A9%E3%82%AF%E3%83%86%E3%82%A3%E3%82%B9.pdf?_nc_gid=KttGmlsfyO8ahABIDRMh6g&_nc_oc=AdrRrFmdDp5N7qBvw7OlddGDvUHja9NrEYk8_NVBgzlLg3LWWWIkF_h7c-twmIjthmCh4o9WDuyHQ_1WCiXkNpLW&ccb=10-6&oh=00_Af7wIv66pVHDr-HWYueuKwo9Nz0rzGG3O6a6TKNtvjBKDw&oe=6A282BD6&_nc_sid=de6fe6",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "C",
+  "tags": [
+   "Google Cloud",
+   "セキュリティ",
+   "ガバナンス"
+  ],
+  "memo": "要点：Google Cloudのセキュリティ対策ベストプラクティスのPDF。\nSo What：内容は未確認のため、読んでクラウド提案のセキュリティ観点に使えるか確認する。"
+ },
+ {
+  "id": "c222",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2026-05-09",
+  "title": "英語学習のYouTubeショート動画",
+  "url": "https://youtube.com/shorts/Gg3bxwggwLE?si=dWN-uiWUj33J7qMs",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "",
+  "tags": [
+   "英語学習",
+   "学習法"
+  ],
+  "memo": "要点：英語学習に関するYouTubeショート動画のリンク。\nSo What：内容は未確認のため、必要なら視聴して学習習慣づくりに使えるか確認する。"
+ },
+ {
+  "id": "c223",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2026-05-09",
+  "title": "デロイトの2026年AI実態レポート(日本語)",
+  "url": "https://www.deloitte.com/content/dam/assets-zone1/jp/ja/docs/issues/2026/state-of-ai-report-final.pdf",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "B",
+  "tags": [
+   "デロイト",
+   "調査レポート",
+   "AI動向"
+  ],
+  "memo": "要点：デロイトの2026年AI実態レポート(日本語)のPDF。\nSo What：内容は未確認のため、読んで国内のAI動向の根拠として使える点を確認する。"
+ },
+ {
+  "id": "c227",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2026-05-08",
+  "title": "シャドーAIセキュリティチェックリスト（日本語）",
+  "url": "https://scontent-nrt1-1.cdninstagram.com/m1/v/t0.50684-6/An8zqnb5ZRDfs0m56VIqUeuZE2UfUNSzw--jCb3acAqmwAPb5_4Gn2ar1rfUKfbggq3KIj03jQ6KBUnM9hmtN6soQl5Cn90twpHj5hjrZ8vtzZAilwCIj1Kj0Nn4Pw/shadow-ai-security-checklist-ja.pdf?_nc_gid=C7xKR4Mkg-jTuAFnHXnCig&_nc_oc=AdpFpTDOchMLIwqFuw4rr8WX9EZ0AKWH3TqxzxPpuXp94azZNEjEBwd6UeI22FgVfgJX7yUkG_IzJBawGrTAWrAV&ccb=10-6&oh=00_Af4E9BewdG_yB0KsxJkmvEE4B7O-vUO_n3uwaRu2Km9g8A&oe=6A24C642&_nc_sid=de6fe6",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "C",
+  "tags": [
+   "シャドーAI",
+   "セキュリティ",
+   "ガバナンス"
+  ],
+  "memo": "要点：シャドーAIのセキュリティチェックリスト（日本語PDF）へのリンク。\nSo What：顧客のAI利用実態を点検する観点として、提案のガバナンス章に使う。"
+ },
+ {
+  "id": "c230",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2026-05-07",
+  "title": "Celonis電子書籍：AIツールの解説",
+  "url": "https://share.google/1bwxQxOHCGUEcn9V0",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "B",
+  "tags": [
+   "Celonis",
+   "AIツール",
+   "資料"
+  ],
+  "memo": "要点：Celonisが公開する電子書籍「AI時代の羅針盤: AIツールの解説」へのリンク。\nSo What：ベンダーが整理するAIツールの見取り図として、市場理解の参照に使う。"
+ },
+ {
+  "id": "c233",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2026-05-07",
+  "title": "AIエージェントのマーケットプレイス（AI Agent Store）",
+  "url": "https://share.google/rxD37vFXYKcVT0aXH",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "B",
+  "tags": [
+   "エージェント",
+   "マーケットプレイス",
+   "ツール"
+  ],
+  "memo": "要点：AIエージェントを探せるマーケットプレイス兼ディレクトリのサイト。\nSo What：エージェント製品の広がりを把握し、顧客への選択肢提示に使う。"
+ },
+ {
+  "id": "c234",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2026-05-06",
+  "title": "2026年のエージェンティックAIレポート",
+  "url": "https://scontent-nrt1-2.cdninstagram.com/m1/v/t0.50684-6/An-ueMYJr_OAd5igl0lMvad1vLJ9u9MUFsy5o7QrBrs-oLvuCu6EYX2nftOV_e0ih5iZsy6v8xUhKejloShlh6QrTeUh7k2a1t9HMH1ZcBdodsDzhQLRP2Jbo2fIT-Y/en-us_ja-jp_bae22697-agentic-ai-report-2026.pdf?_nc_gid=FwyPHfS1xcWw51q5pk4qCQ&_nc_oc=Adobnutw_3A-D1f1cPQ7c6Ak6MfhELWEIfuYopFbIETFQvKySddMIW5x-cxHaE1oX_jtNRSmuGJkAsWiwwjJPT-P&ccb=10-5&oh=00_Af4Qzl0XI-prf9izV4JQDwUaDtY0O2Vm4QIajpd0arzy9Q&oe=6A22BB30&_nc_sid=de6fe6",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "B",
+  "tags": [
+   "エージェント",
+   "調査レポート",
+   "2026"
+  ],
+  "memo": "要点：2026年のエージェンティックAIに関するレポート（PDF）へのリンク。\nSo What：エージェント活用の動向を示す資料として、顧客提案の背景整理に使う。"
+ },
+ {
+  "id": "c237",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2026-05-03",
+  "title": "三井物産のAI取り組み（Google AIモード共有）",
+  "url": "https://share.google/aimode/aKP2C9U4dsLCdBknd",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "C",
+  "tags": [
+   "三井物産",
+   "事例",
+   "AI活用"
+  ],
+  "memo": "要点：三井物産のAI取り組みについて、Google AIモードで調べた結果の共有リンク。\nSo What：大企業のAI取り組み事例として、顧客との対話の比較材料にする。"
+ },
+ {
+  "id": "c245",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2026-04-30",
+  "title": "GAFAMのQ1決算とAI全振り戦略",
+  "url": "https://youtu.be/OzsfwWK29rI?si=SrJayY1UNxBnEIaR",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "A",
+  "tags": [
+   "決算",
+   "AI投資",
+   "GAFAM"
+  ],
+  "memo": "要点：GAFAMのQ1決算とAI投資戦略を解説する動画。\nSo What：巨大企業の投資姿勢はAI市場の方向を映す。顧客との会話の前提にする。"
+ },
+ {
+  "id": "c247",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2026-04-30",
+  "title": "アルファベット決算：クラウドが6割増収",
+  "url": "https://youtu.be/XO3FScjiaeg?si=J4mPH3DKYa9_VQ33",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "B",
+  "tags": [
+   "決算",
+   "Google",
+   "クラウド"
+  ],
+  "memo": "要点：アルファベットの決算が予想を上回り、クラウドが6割増収となった報道動画。\nSo What：クラウド事業の伸びはAI需要の表れ。ベンダー動向の把握に使う。"
+ },
+ {
+  "id": "c248",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2026-04-30",
+  "title": "マイクロソフト決算：Azure増収率が予想超え",
+  "url": "https://youtu.be/2sebksqOqhI?si=ojmmrgmEBHeeCPzA",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "B",
+  "tags": [
+   "決算",
+   "Microsoft",
+   "クラウド"
+  ],
+  "memo": "要点：米マイクロソフトの決算でAzureの増収率が予想を上回った報道動画。\nSo What：クラウド大手の成長率比較を、ベンダー選定の背景として押さえる。"
+ },
+ {
+  "id": "c249",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2026-04-30",
+  "title": "アマゾン決算：AWS増収率が約4年ぶり高水準",
+  "url": "https://youtu.be/8xay6bYNowc?si=yPHz4DFlZX-Nl6Ya",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "B",
+  "tags": [
+   "決算",
+   "AWS",
+   "クラウド"
+  ],
+  "memo": "要点：米アマゾンの決算でAWSの増収率が約4年ぶりの高水準となった報道動画。\nSo What：クラウド3社の決算を並べて見ると、AI需要の強さを比較できる。"
+ },
+ {
+  "id": "c256",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2026-04-21",
+  "title": "Claude Codeで45個のタスクを自動化した事例",
+  "url": "https://youtube.com/shorts/sfOCEIbkCck?si=aJwDIyGEM648z3uP",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "C",
+  "tags": [
+   "Claude Code",
+   "自動化",
+   "業務改善"
+  ],
+  "memo": "要点：Claude Codeで45個のタスクを自動化した事例を紹介するショート動画。\nSo What：個人レベルの業務自動化事例は、顧客の業務再設計の発想材料になる。"
+ },
+ {
+  "id": "c257",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2026-04-20",
+  "title": "野良LLMを使うリスク",
+  "url": "https://youtube.com/shorts/yUxN1OtfSy8?si=KXiUuS2exflNqRal",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "C",
+  "tags": [
+   "LLM",
+   "リスク",
+   "ガバナンス"
+  ],
+  "memo": "要点：野良LLMを使うリスクを解説するショート動画。\nSo What：管理外のLLM利用は統制上の論点。顧客のガバナンス提案に組み込む。"
+ },
+ {
+  "id": "c258",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2026-04-15",
+  "title": "Claude Codeのセキュリティ基礎",
+  "url": "https://youtu.be/W5YeUGXaIhA?si=nnnohncCE6HepjD4",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "C",
+  "tags": [
+   "Claude Code",
+   "セキュリティ",
+   "リスク"
+  ],
+  "memo": "要点：Claude Codeのセキュリティ基礎を解説する動画。AIにAPIキーを教える行為はアウトと指摘。\nSo What：AIツール導入では利用ルールの整備が前提。顧客向けの注意点として使う。"
+ },
+ {
+  "id": "c262",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2026-02-11",
+  "title": "AIと議論してコードを書くVerdent AI",
+  "url": "https://youtube.com/shorts/mc8EtAc-WFA?si=NPaemUahONjLC1QN",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "B",
+  "tags": [
+   "コーディング",
+   "Verdent AI",
+   "開発支援"
+  ],
+  "memo": "要点：AIと議論しながらコーディングするVerdent AIを紹介するショート動画。\nSo What：開発支援ツールの新しい使い方として、ツール動向の把握に使う。"
+ },
+ {
+  "id": "c263",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2025-10-25",
+  "title": "Claudeでブランドに沿った資料を自動生成",
+  "url": "https://youtube.com/shorts/XB1x7ebNmH8?si=EsI2i6dbqlgpPaDC",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "C",
+  "tags": [
+   "Claude",
+   "資料作成",
+   "業務効率化"
+  ],
+  "memo": "要点：ブランド資料をClaudeに学習させ、プレゼン資料を自動生成する動画。\nSo What：資料作成の自動化はコンサル業務にも直結する。自分の業務で試す価値がある。"
+ },
+ {
+  "id": "c264",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2025-10-21",
+  "title": "プログラミング力を上げる勉強法",
+  "url": "https://youtube.com/shorts/B1WWZRp2Lpk?si=LUBvtPWN2WVpZvNK",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "D",
+  "tags": [
+   "学習法",
+   "プログラミング",
+   "スキル"
+  ],
+  "memo": "要点：プログラミング力を上げる勉強法を紹介するショート動画。\nSo What：技術理解を深める学び方の参考として、自分の学習習慣に取り入れる。"
+ },
+ {
+  "id": "c268",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2025-07-04",
+  "title": "キャリア向上のための無料AIコース9選",
+  "url": "https://www.linkedin.com/posts/maria-gharib-091779b9_9-free-ai-courses-to-accelerate-your-career-activity-7346855298482999297-NlaS?utm_source=social_share_send&utm_medium=android_app&rcm=ACoAACSUcJgBhl0C5uOVdPrTll0z82gDa1BMTz8&utm_campaign=gmail",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "C",
+  "tags": [
+   "リスキリング",
+   "AIコース",
+   "キャリア"
+  ],
+  "memo": "要点：キャリア向上のための無料AIコース9選を紹介するLinkedIn投稿。\nSo What：学び直しの選択肢として、顧客のリスキリング提案にも使える。"
+ },
+ {
+  "id": "c046",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-12-14",
+  "title": "堀江貴文：肩書きの掛け算で希少性を作る",
+  "url": "https://www.instagram.com/p/DDjEAqVz8II/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "キャリア",
+   "市場価値",
+   "人材"
+  ],
+  "memo": "要点：代わりがいる限り値段は上がらない。複数の肩書きを掛け合わせてレアな存在になるべきという主張。\nSo What：専門×AIのような掛け算で代替困難性を作る人材育成設計の根拠になる。"
+ },
+ {
+  "id": "c048",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-12-12",
+  "title": "何度も読み返した本5選（自己変革・選択・伝え方）",
+  "url": "https://www.instagram.com/p/DDea-F_T0KS/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "読書",
+   "意思決定",
+   "自己変革"
+  ],
+  "memo": "要点：意志力、やりたいことの発見、生き方、簡潔な伝え方、意思決定をテーマにした書籍5冊の紹介。\nSo What：意志力・意思決定・簡潔な伝達は管理職の基礎能力。推薦図書リストや読書会の素材に使える。"
+ },
+ {
+  "id": "c051",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-12-08",
+  "title": "田中角栄：必要なのは学歴ではなく学問",
+  "url": "https://www.instagram.com/p/DDS--WGzOp0/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "キャリア",
+   "学び続ける",
+   "リスキリング"
+  ],
+  "memo": "要点：学歴は過去の栄光、学問は現在に生きている。好奇心を持って知識・スキルを更新し続けることが重要。\nSo What：継続学習の実績で評価する人事・育成制度への転換を後押しする論拠になる。"
+ },
+ {
+  "id": "c004",
+  "src": "ig_ai",
+  "label": "Instagram保存「AI-related」",
+  "date": "2024-12-07",
+  "title": "Notionを使ったタスク管理術",
+  "url": "https://www.instagram.com/kamoshika_en/reel/DDQmG8XBb9z/",
+  "gmail": "",
+  "layer": "",
+  "tags": [
+   "Notion",
+   "タスク管理",
+   "生産性"
+  ],
+  "memo": "要点：重要タスクを後回しにしないため、即日処理や曜日ごとの目安などNotionでの運用例を紹介。\nSo What：AI固有の論点は薄い。企業導入では有償ライセンスとデータ保管先の確認が論点。"
+ },
+ {
+  "id": "c052",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-12-07",
+  "title": "出世に必要なのは社内政治力か成果を出す力か",
+  "url": "https://www.instagram.com/reel/DDRQligNtGT/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "キャリア",
+   "カッツモデル",
+   "組織"
+  ],
+  "memo": "要点：実態調査では成果を出す力がわずかに上回った。カッツモデル上、人間関係構築力は社内政治力にも繋がる。\nSo What：社内政治をヒューマンスキルとして定義し直すと評価・育成制度に組み込める。"
+ },
+ {
+  "id": "c002",
+  "src": "ig_ai",
+  "label": "Instagram保存「AI-related」",
+  "date": "2024-12-04",
+  "title": "GPTsで同一キャラクターを描き分ける方法",
+  "url": "https://www.instagram.com/ceo_ai_chatgpt/reel/DDLCR8gSzfm/",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "生成AI",
+   "画像生成",
+   "コンテンツ制作"
+  ],
+  "memo": "要点：ChatGPTのGPTsでベースのキャラクターを作り、別ポーズ・別シーンを生成できる手順の紹介。\nSo What：広報やマニュアルで有用だが、生成物の著作権・商標リスクの確認が要る。"
+ },
+ {
+  "id": "c047",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-11-26",
+  "title": "感じがいい人の「言い換え」8選",
+  "url": "https://www.instagram.com/reel/DC1PR6HTXCQ/",
+  "gmail": "",
+  "layer": "",
+  "tags": [
+   "コミュニケーション",
+   "心理的安全性",
+   "マネジメント"
+  ],
+  "memo": "要点：否定・命令口調を、前向きで相手を尊重する言い方に置き換える8例。\nSo What：具体的な置換表は1on1やレビューの心理的安全性に効く。管理職研修で配る形が有効。"
+ },
+ {
+  "id": "c053",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-11-25",
+  "title": "6人の名言集：言葉・行動・切り替え",
+  "url": "https://www.instagram.com/p/DCyslRKPc7t/",
+  "gmail": "",
+  "layer": "",
+  "tags": [
+   "名言",
+   "マインドセット",
+   "行動"
+  ],
+  "memo": "要点：芸人・経営者など6人の、まず動くこと、前向きな声かけ、言葉選びに関する名言集。\nSo What：「やる理由は少ない、それでもやる」は新規施策やAI導入の初動停滞への示唆になる。"
+ },
+ {
+  "id": "c007",
+  "src": "ig_ai",
+  "label": "Instagram保存「AI-related」",
+  "date": "2024-11-18",
+  "title": "スライド生成AI6種の特徴と使い分け",
+  "url": "https://www.instagram.com/usutaku_copilot/reel/DCgR3ToJPT2/",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "スライド生成",
+   "Gamma",
+   "ツール比較"
+  ],
+  "memo": "要点：Canva、イルシル、Gamma、Napkin、Marp、Feloを使用感で比較。Gammaは最速・高品質で使用頻度最高。\nSo What：日本的書式と品質・速度のトレードオフ、図解は別ツール併用という知見がツール選定の評価軸になる。"
+ },
+ {
+  "id": "c050",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-11-18",
+  "title": "知っておくべき有益Webサイト7選",
+  "url": "https://www.instagram.com/reel/DCg1J4ni-x7/",
+  "gmail": "",
+  "layer": "",
+  "tags": [
+   "Webツール",
+   "翻訳",
+   "情報収集"
+  ],
+  "memo": "要点：DeepL、MyNoise、Wolfram Alphaなど翻訳・環境音・計算知識エンジン等の無料Webサービス7つ。\nSo What：無料外部サービスは個人判断で使われやすい。入力禁止データ区分と承認済みツールを明示する。"
+ },
+ {
+  "id": "c008",
+  "src": "ig_ai",
+  "label": "Instagram保存「AI-related」",
+  "date": "2024-11-16",
+  "title": "Chrome拡張で動画・Web記事をAI要約する手順",
+  "url": "https://www.instagram.com/riko_insta_ai/p/DCbcsdSTW54/",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "要約",
+   "Chrome拡張",
+   "リサーチ"
+  ],
+  "memo": "要点：Chrome拡張YouTube Summaryで動画やWeb記事を要約する3ステップ。長い記事も数秒で要約できる。\nSo What：閲覧中の社内情報が外部送信されるリスクがあり、拡張機能の許可リスト管理が必須。"
+ },
+ {
+  "id": "c009",
+  "src": "ig_ai",
+  "label": "Instagram保存「AI-related」",
+  "date": "2024-11-09",
+  "title": "検索AI Feloでリサーチからマインドマップ・資料化",
+  "url": "https://www.instagram.com/ctgptlb/reel/DCIkDpgycLE/",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "検索AI",
+   "リサーチ",
+   "資料作成"
+  ],
+  "memo": "要点：Feloは複数サイトを参照して回答し、検索範囲を指定でき、マインドマップ作成や資料化もできる。\nSo What：一次性の低い発信。検索AIは出典確認と機密入力ルールを設けて評価する。"
+ },
+ {
+  "id": "c054",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-11-01",
+  "title": "デキる人の出勤前3習慣（運動・アイデア・内省）",
+  "url": "https://www.instagram.com/p/DB1Ek_Hzx9J/",
+  "gmail": "",
+  "layer": "",
+  "tags": [
+   "習慣",
+   "生産性",
+   "ウェルビーイング"
+  ],
+  "memo": "要点：成功者に共通する朝の運動、アイデア記述、内省の3習慣を科学的根拠とともに紹介。\nSo What：意思決定品質を高めるコンディション管理の参考。根拠は逸話中心で補強エビデンスが必要。"
+ },
+ {
+  "id": "c013",
+  "src": "ig_ai",
+  "label": "Instagram保存「AI-related」",
+  "date": "2024-10-29",
+  "title": "無料AIコース一覧（Coursera）",
+  "url": "https://www.instagram.com/genai.works/p/DBtATVAyYAZ/",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "リスキリング",
+   "AI講座",
+   "人材育成"
+  ],
+  "memo": "要点：MicrosoftやGoogle等のAI講座を9講座まとめた画像。リーダー向けのGenAIリスク講座も含む。\nSo What：経営層向けリスク講座などは育成素材の候補。無料の範囲と日本語対応を精査する。"
+ },
+ {
+  "id": "c057",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-10-19",
+  "title": "完璧な瞬間を待つな、不快感の先に成長がある",
+  "url": "https://www.instagram.com/reel/DBTCQDFNAc2/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "マインドセット",
+   "行動",
+   "PoC"
+  ],
+  "memo": "要点：行動なしに可能性は無意味。完璧な瞬間は存在せず、望む人生は快適ゾーンの外にあると説く。\nSo What：完璧を待たずに動く姿勢はPoCを早く回す原則と同じ。失敗を許容する予算枠と評価が要る。"
+ },
+ {
+  "id": "c058",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-10-15",
+  "title": "メンタリストDaiGo：干渉しない人は自立している",
+  "url": "https://www.instagram.com/p/DBI61NZTbDW/",
+  "gmail": "",
+  "layer": "",
+  "tags": [
+   "マネジメント",
+   "自律",
+   "権限委譲"
+  ],
+  "memo": "要点：他人に干渉しないのは自信と自立の証拠で、仕事に干渉する人は自信がない人だという名言。\nSo What：権限委譲・自律支援の行動指針として使える。ただし根拠は個人の意見でエビデンスはない。"
+ },
+ {
+  "id": "c016",
+  "src": "ig_ai",
+  "label": "Instagram保存「AI-related」",
+  "date": "2024-10-13",
+  "title": "機械学習アルゴリズム9種の一言解説",
+  "url": "https://www.instagram.com/aiwithanju/reel/DBDaEHxATWM/",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "機械学習",
+   "AI基礎",
+   "研修"
+  ],
+  "memo": "要点：線形回帰、決定木、勾配ブースティング、ランダムフォレスト、ニューラルネットワーク等9種を一言で解説。\nSo What：生成AI偏重の研修で抜けがちな従来型MLの基礎になる。予測モデルと生成AIの使い分け説明の土台。"
+ },
+ {
+  "id": "c015",
+  "src": "ig_ai",
+  "label": "Instagram保存「AI-related」",
+  "date": "2024-10-11",
+  "title": "Excel関数を自然言語で生成する無料ツールformulas",
+  "url": "https://www.instagram.com/zaki_works/reel/DA-lYf7COIw/",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "Excel",
+   "生成AI",
+   "業務効率化"
+  ],
+  "memo": "要点：formulasに処理を入力しgenerateで関数を得てセルに貼る3ステップ。無料は1日の回数制限あり。\nSo What：関数作成の属人性解消に有効。外部サイトへの入力ルールと承認済み代替手段の提示が要る。"
+ },
+ {
+  "id": "c059",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-10-09",
+  "title": "ビートたけしの切り返しと人生観",
+  "url": "https://www.instagram.com/p/DA5qO9KzDDf/",
+  "gmail": "",
+  "layer": "",
+  "tags": [
+   "コミュニケーション",
+   "ヒアリング",
+   "名言"
+  ],
+  "memo": "要点：ビートたけしの切り返しや人生観を5つのエピソードと名言で紹介。末尾に広告スライドあり。\nSo What：相手の専門を素直に聞く姿勢はヒアリングの基本に通じる。業務適用は限定的。"
+ },
+ {
+  "id": "c060",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-10-09",
+  "title": "知らないと人生後悔する原則7選",
+  "url": "https://www.instagram.com/p/DA61wnVBXDU/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "マインドセット",
+   "継続",
+   "試行錯誤"
+  ],
+  "memo": "要点：継続、行動、言い訳、関係性に関する7つの原則を短い言葉でまとめた投稿。\nSo What：失敗を許容する試行錯誤文化や継続率重視のKPI設計の考え方と整合する。"
+ },
+ {
+  "id": "c017",
+  "src": "ig_ai",
+  "label": "Instagram保存「AI-related」",
+  "date": "2024-10-06",
+  "title": "業務で使うAIツールを無料・課金区分で整理",
+  "url": "https://www.instagram.com/usutaku_copilot/reel/DAxd1uHJZ7V/",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "AIツール",
+   "ライセンス",
+   "ツール選定"
+  ],
+  "memo": "要点：Copilot、イルシル、Gamma、ChatGPT、Claude 3.5 Sonnet等を無料/課金の区分付きで列挙。\nSo What：課金要否の整理はライセンス予算の検討材料。選定時はコストとデータ所在の比較軸を持つ。"
+ },
+ {
+  "id": "c020",
+  "src": "ig_ai",
+  "label": "Instagram保存「AI-related」",
+  "date": "2024-10-06",
+  "title": "スライド生成AI Gammaの使い方と特長",
+  "url": "https://www.instagram.com/pawapo_ai/reel/DAx71BhSUbY/",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "スライド生成",
+   "Gamma",
+   "資料作成"
+  ],
+  "memo": "要点：テキストからスライドを生成し、画像自動生成、テーマ選択、AIへの修正依頼、PowerPoint変換ができる。\nSo What：初稿はAIで出し、最終は人がPowerPointで整える運用の根拠。外部SaaSの入力ルールが前提。"
+ },
+ {
+  "id": "c061",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-10-06",
+  "title": "もっと早く気付きたかった「悲しい勘違い」10選",
+  "url": "https://www.instagram.com/inagaki.markecoach/reel/DAxIxAAxEcF/",
+  "gmail": "",
+  "layer": "",
+  "tags": [
+   "マネジメント",
+   "フィードバック",
+   "マインドセット"
+  ],
+  "memo": "要点：怒らないのは諦め、才能より継続、言わなくても分かるは昭和など10項目の気付き。\nSo What：黙認型マネジメントの限界を示す。明示的なフィードバック文化が若手の育成に効く。"
+ },
+ {
+  "id": "c022",
+  "src": "ig_ai",
+  "label": "Instagram保存「AI-related」",
+  "date": "2024-10-04",
+  "title": "ChatGPTプロンプトの隠れワザ5選",
+  "url": "https://www.instagram.com/wad_ai0427/p/DAsuqhzSB22/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "プロンプト",
+   "思考法",
+   "生成AI"
+  ],
+  "memo": "要点：画像付き解説、なぜを5回、参照文の提示、仮説思考など指示を改善する5つの型。\nSo What：既存の思考フレームをプロンプトに落とす型は研修題材になる。参照文を渡す型は社内RAGの入口。"
+ },
+ {
+  "id": "c011",
+  "src": "ig_ai",
+  "label": "Instagram保存「AI-related」",
+  "date": "2024-09-20",
+  "title": "日本語指示からExcel関数を生成するAIサイト",
+  "url": "https://www.instagram.com/nabe_ai_chatgpt/reel/DAI1vRZhx6V/",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "Excel",
+   "生成AI",
+   "業務効率化"
+  ],
+  "memo": "要点：日本語の指示を入力すると =LEFT(B2,SEARCH(\" \",B2)…) のような関数を自動生成するサイトの紹介。\nSo What：Excel作業は全社共通で効果を測りやすい。社内データを貼り付けない運用ルールと併せて展開する。"
+ },
+ {
+  "id": "c024",
+  "src": "ig_ai",
+  "label": "Instagram保存「AI-related」",
+  "date": "2024-09-20",
+  "title": "OpenAI o1-preview/o1-miniの特徴",
+  "url": "https://www.instagram.com/deeplearningai/p/DAJMRnevDj0/",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "推論モデル",
+   "OpenAI",
+   "生成AI"
+  ],
+  "memo": "要点：o1系は段階的推論で数学・科学・コーディングに高性能。推論トークンを使うため低速だが高精度。\nSo What：応答速度とコスト構造が異なるため、高難度分析か定型業務かで使い分ける方針が要る。"
+ },
+ {
+  "id": "c062",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-09-19",
+  "title": "人たらしがしていること8選",
+  "url": "https://www.instagram.com/yuki_mind.meigen/reel/DAFz-gbiYGe/",
+  "gmail": "",
+  "layer": "",
+  "tags": [
+   "人間関係",
+   "若手育成",
+   "コミュニケーション"
+  ],
+  "memo": "要点：記念日を忘れない、威張らない、アドバイスをすぐ実践する、頼み事が上手などの行動習慣8つ。\nSo What：助けを求め、助言を即実行して報告する行動を型として教えると若手の立ち上がりが速い。"
+ },
+ {
+  "id": "c025",
+  "src": "ig_ai",
+  "label": "Instagram保存「AI-related」",
+  "date": "2024-09-17",
+  "title": "AIは自分で作れる人が近道をする道具",
+  "url": "https://www.instagram.com/toyomanes/p/DAA-fMcyGXd/",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "生成AI",
+   "人材育成",
+   "スキル"
+  ],
+  "memo": "要点：生成AIは経験者の時短ツールで、完成像の解像度が低い人が使っても良い成果物にならないと説く。\nSo What：研修は操作法より完成像と品質基準を評価する力の育成が重要。スキル差で二極化するリスクもある。"
+ },
+ {
+  "id": "c065",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-09-14",
+  "title": "リンカーンの名言：木を切る前に斧を研ぐ",
+  "url": "https://www.instagram.com/lifedesignclub.jp/reel/DAAsMbXSf4n/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "準備",
+   "投資",
+   "AI導入"
+  ],
+  "memo": "要点：準備と成長への投資が成功を決める。戦略的に準備した少数がトップに立つという解説。\nSo What：業務棚卸・データ整備・スキル投資の優先度を説明する比喩に使える。急ぐ経営層への説得材料。"
+ },
+ {
+  "id": "c055",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-09-06",
+  "title": "マクレランドの準拠集団研究：周囲の人が成功を決める",
+  "url": "https://www.instagram.com/reel/C_llHAlyhau/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "準拠集団",
+   "人材配置",
+   "理論"
+  ],
+  "memo": "要点：周囲の人々が目標・動機づけ・達成に大きく影響するという研究の紹介。動画の中身は未確認。\nSo What：メンター制度やコミュニティ形成の理論的根拠になるが、原研究への忠実さは要検証。"
+ },
+ {
+  "id": "c067",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-09-06",
+  "title": "戦国武将の言葉6選：判断力の差は情報の差",
+  "url": "https://www.instagram.com/you_words_999/reel/C_keQFRzSDB/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "名言",
+   "意思決定",
+   "情報"
+  ],
+  "memo": "要点：実力の差は努力の差、判断力の差は情報の差など、武将の言葉とされる6つの名言。\nSo What：情報基盤の価値を語る比喩に使える。出典が不確かなので引用時は「とされる」と添える。"
+ },
+ {
+  "id": "c033",
+  "src": "ig_ai",
+  "label": "Instagram保存「AI-related」",
+  "date": "2024-08-30",
+  "title": "ChatGPTチートシート：役割・タスク・出力形式",
+  "url": "https://www.instagram.com/dc_economics/p/C_Rt5FpSYMQ/",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "プロンプト",
+   "生成AI",
+   "研修"
+  ],
+  "memo": "要点：役割指定、タスク、出力形式、プラグイン、プロンプト枠組みをまとめた早見表。\nSo What：役割・タスク・形式の型を社内プロンプト標準に転用できる。プラグイン情報は更新管理が必要。"
+ },
+ {
+  "id": "c066",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-08-30",
+  "title": "藤田晋：とにかく量をこなして成長のスパイラルに入る",
+  "url": "https://www.instagram.com/destiny_supporter/reel/C_Sg0sMB_G4/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "成長",
+   "キャリア",
+   "若手育成"
+  ],
+  "memo": "要点：成長のスパイラルに入るには量をこなす。未来を考える前に今の現実と立ち位置を見つめよという言葉。\nSo What：量が質を生む原理は有効だが長時間労働前提は不適。時間ではなく試行回数を増やす仕組みで狙う。"
+ },
+ {
+  "id": "c034",
+  "src": "ig_ai",
+  "label": "Instagram保存「AI-related」",
+  "date": "2024-08-29",
+  "title": "ChatGPTプロンプトのコツ集（時短ハック）",
+  "url": "https://www.instagram.com/dc_economics/p/C_QueP1S0mR/",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "プロンプト",
+   "生成AI",
+   "業務効率化"
+  ],
+  "memo": "要点：プロンプトの構造化、複雑情報の分解、知識の応用など作業時間を削減するコツをまとめた画像。\nSo What：汎用プロンプト集は一過性。部門別のプロンプトライブラリとして更新する運用に落とす。"
+ },
+ {
+  "id": "c035",
+  "src": "ig_ai",
+  "label": "Instagram保存「AI-related」",
+  "date": "2024-08-29",
+  "title": "AIの階層構造図：AIから生成AIまで",
+  "url": "https://www.instagram.com/dc_economics/p/C_QXjYSyS55/",
+  "gmail": "",
+  "layer": "A",
+  "tags": [
+   "AI基礎",
+   "機械学習",
+   "深層学習"
+  ],
+  "memo": "要点：AIの内側に機械学習、ニューラルネット、深層学習、生成AIが入れ子になる概念関係の図解。\nSo What：役員・非技術職向けの用語統一資料の素材。包含関係を揃えると議論の混線を防げる。"
+ },
+ {
+  "id": "c072",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-08-27",
+  "title": "20時間で新しいスキルを学ぶ方法（20時間ルール）",
+  "url": "https://www.instagram.com/p/C_KpCoCSmjF/",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "リスキリング",
+   "学習法",
+   "生成AI"
+  ],
+  "memo": "要点：20時間ルールを軸に、分解、ファインマン・テクニック、ミスの前提化、技術活用、間隔反復の5手法を図解。\nSo What：分解・時間確保・教える・AIとの壁打ち・間隔反復の枠組みは全社AI研修設計の型になる。"
+ },
+ {
+  "id": "c036",
+  "src": "ig_ai",
+  "label": "Instagram保存「AI-related」",
+  "date": "2024-08-25",
+  "title": "ChatGPTプロンプト作成フレームワーク集",
+  "url": "https://www.instagram.com/dc_economics/p/C_GXrs_SO7J/",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "プロンプト",
+   "フレームワーク",
+   "研修"
+  ],
+  "memo": "要点：R-T-F、T-A-G、B-A-B、C-A-R-E、R-I-S-Eなど構造化プロンプトの型と例文を紹介。\nSo What：型の提示は教育コストが低く研修の最初の題材に向く。出力品質の評価基準とセットで展開する。"
+ },
+ {
+  "id": "c071",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-08-24",
+  "title": "褒めすぎない育て方：「どう感じてる？」と聞く",
+  "url": "https://www.instagram.com/hassi_toto_soccer/reel/C_CyWjCBJ-0/",
+  "gmail": "",
+  "layer": "",
+  "tags": [
+   "育成",
+   "1on1",
+   "自律"
+  ],
+  "memo": "要点：「すごいね」と評価する代わりに「今どう感じてる？」と聞き、内面で評価する力を育てるという講演。\nSo What：上司の承認だけを動機にすると指示待ちになる。1on1で先に自己評価を問う習慣が自律につながる。"
+ },
+ {
+  "id": "c038",
+  "src": "ig_ai",
+  "label": "Instagram保存「AI-related」",
+  "date": "2024-08-23",
+  "title": "AI学習ロードマップ：数学・プログラミングから生成AIまで",
+  "url": "https://www.instagram.com/dc_economics/p/C_ATrAkSR5T/",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "AI人材",
+   "学習計画",
+   "データサイエンス"
+  ],
+  "memo": "要点：AI概論、数学、プログラミング、ビッグデータ、機械学習、深層学習、BIの順に学ぶロードマップ。\nSo What：技術人材向けの学習パスの参考。ビジネス職には活用・ガバナンスの別トラックが要る。"
+ },
+ {
+  "id": "c073",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-08-19",
+  "title": "飲み屋のおじさんの言葉7選",
+  "url": "https://www.instagram.com/sho_tensyoku00/reel/C-2d1idySrO/",
+  "gmail": "",
+  "layer": "",
+  "tags": [
+   "人生訓",
+   "モチベーション",
+   "人間関係"
+  ],
+  "memo": "要点：仕事のモチベーションは日替わりでいい、思っていることを全部伝えるのが仲の良さではない等の7つの人生訓。\nSo What：モチベーション前提のマネジメントの危うさを突く。成果は気分でなく目標設定や習慣化の仕組みで支える。"
+ },
+ {
+  "id": "c078",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-08-18",
+  "title": "1日の生産性を高める10のテクニック",
+  "url": "https://www.instagram.com/p/C-zaaUPyYDJ/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "生産性",
+   "時間管理",
+   "仕事術"
+  ],
+  "memo": "要点：夜・朝・日中・終業時に分けた10の時間管理手法の整理。\nSo What：個人の自己管理だけでなく、会議など構造的な中断要因の削減とセットで設計する。"
+ },
+ {
+  "id": "c042",
+  "src": "ig_ai",
+  "label": "Instagram保存「AI-related」",
+  "date": "2024-08-13",
+  "title": "長尺動画をAIマインドマップで要約する活用術",
+  "url": "https://www.instagram.com/miyachi_ai/reel/C-m4jD_S0nu/",
+  "gmail": "",
+  "layer": "B",
+  "tags": [
+   "要約",
+   "マインドマップ",
+   "リサーチ"
+  ],
+  "memo": "要点：YouTubeのリンクを入れるだけで長い動画をマインドマップに整理でき、共有やダウンロードもできる。\nSo What：動画・会議録の事前要約と構造化は情報収集の時短に効く。外部投入はデータ取扱規程の確認が前提。"
+ },
+ {
+  "id": "c043",
+  "src": "ig_ai",
+  "label": "Instagram保存「AI-related」",
+  "date": "2024-08-12",
+  "title": "AWS・IBM・Microsoft等の無料AIコース紹介",
+  "url": "https://www.instagram.com/genai.works/p/C-krbA7NT8w/",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "リスキリング",
+   "AI講座",
+   "人材育成"
+  ],
+  "memo": "要点：AWS、IBM、Microsoft、大学の無料AI講座を並べた画像。リンクはコメントで配布。\nSo What：職位別研修の外部教材候補になる。各提供元の公式ページで受講条件を確認して採用する。"
+ },
+ {
+  "id": "c070",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-08-04",
+  "title": "ストレスに強い人の考え方10選",
+  "url": "https://www.instagram.com/yusuke_tenshokuzyutu/reel/C-PaE-RSLIi/",
+  "gmail": "",
+  "layer": "",
+  "tags": [
+   "メンタルヘルス",
+   "マインドセット",
+   "生産性"
+  ],
+  "memo": "要点：60点で充分、自分は自分、他人は自分に興味がないなど、ストレスを溜めない10の考え方。\nSo What：完璧主義による停滞を防ぐ点でAI時代の進め方と合う。個人の啓発と業務量の適正化をセットで行う。"
+ },
+ {
+  "id": "c090",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-07-08",
+  "title": "知っておくべき「差」8選",
+  "url": "https://www.instagram.com/yasu_ward/reel/C9KHHgbSmVc/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "リーダーシップ",
+   "育成",
+   "マインドセット"
+  ],
+  "memo": "要点：実力・人望・判断力等の差を努力・労い・情報等の差で説明する8項目。\nSo What：人望の差は労いの差、判断力の差は情報の差は、リーダー育成の行動目標に落とし込みやすい。"
+ },
+ {
+  "id": "c069",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-07-01",
+  "title": "成功を決めるのは「やり抜く力（グリット）」",
+  "url": "https://www.instagram.com/bit_ravel/reel/C84b0BUy_FY/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "グリット",
+   "人材評価",
+   "キャリア"
+  ],
+  "memo": "要点：成功を予測するのはIQや才能ではなく、長期目標への情熱と粘り強さというTEDトークの切り抜き。\nSo What：学歴や初期成果だけで採用・評価すると伸びる人材を見落とす。継続の実績を評価項目に入れる。"
+ },
+ {
+  "id": "c085",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-06-29",
+  "title": "地頭がいい人は分解能と統合能を持つ",
+  "url": "https://www.instagram.com/ota_hiroyuki_shereme/reel/C80PTwtyGAb/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "思考法",
+   "問題解決",
+   "育成"
+  ],
+  "memo": "要点：複雑なものを分解し、異なるものの共通点を見出せる人が地頭がいいという解説。\nSo What：分解と統合は問題解決そのもの。分けて評価・訓練すれば地頭を具体化できる。"
+ },
+ {
+  "id": "c287",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-06-23",
+  "title": "PowerPoint資料デザインの教科書（サポートページ）",
+  "url": "https://gihyo.jp/book/2021/978-4-297-12357-4/support",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "D",
+  "tags": [
+   "資料作成",
+   "デザイン",
+   "スキル"
+  ],
+  "memo": "要点：PowerPoint資料のデザイン教科書の技術評論社サポートページ。\nSo What：資料の見せ方はコンサルの基礎スキル。型を学んで提案品質を上げる。"
+ },
+ {
+  "id": "c032",
+  "src": "ig_ai",
+  "label": "Instagram保存「AI-related」",
+  "date": "2024-06-19",
+  "title": "Google Cloudの無料生成AI学習コース10選",
+  "url": "https://www.instagram.com/aiwithanju/reel/C8Zbe9BSH3S/",
+  "gmail": "",
+  "layer": "C",
+  "tags": [
+   "リスキリング",
+   "Google Cloud",
+   "AI講座"
+  ],
+  "memo": "要点：Google Cloudの無料生成AI講座を初級から上級の10本に整理して紹介。\nSo What：階層別の公開教材を研修体系に組み込める。Responsible AI講座を必修の入口にする設計が有効。"
+ },
+ {
+  "id": "c084",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-05-29",
+  "title": "トップ1%になる考え9選",
+  "url": "https://www.instagram.com/yuki_mind.meigen/reel/C7kc57ayDsY/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "仕事術",
+   "マインドセット",
+   "生成AI"
+  ],
+  "memo": "要点：返信は秒で返す、70%の出来でも早く出す、小さな失敗をたくさんする等の9つの姿勢。\nSo What：70%で早く出す姿勢は生成AIでの試行と相性が良く、減点主義の評価では根付かない。"
+ },
+ {
+  "id": "c075",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-05-12",
+  "title": "人間関係で忘れてはいけないコト13選",
+  "url": "https://www.instagram.com/takahiro.communication/reel/C63MI5VuZ9R/",
+  "gmail": "",
+  "layer": "",
+  "tags": [
+   "傾聴",
+   "コーチング",
+   "人間関係"
+  ],
+  "memo": "要点：求められていない助言はしない、話を最後まで聴く、名前を呼ぶ、全員には好かれない等の13の心得。\nSo What：助言せず最後まで聴く姿勢はコーチング型マネジメントの基本。管理職研修の傾聴の具体行動に使える。"
+ },
+ {
+  "id": "c288",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-05-06",
+  "title": "SHIFT AIのサービス紹介",
+  "url": "https://showy-politician-f4d.notion.site/SHIFT-AI-TOP-ea98069176334a6fa8c5b84442dfd9ba",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "B",
+  "tags": [
+   "SHIFT AI",
+   "サービス",
+   "AI研修"
+  ],
+  "memo": "要点：SHIFT AIのサービス紹介を載せたNotionページのURL。\nSo What：AI関連サービスの一例として、市場の提供事業者を把握する材料にする。"
+ },
+ {
+  "id": "c289",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-05-06",
+  "title": "自民党AIの進化と実装に関するPT",
+  "url": "https://note.com/akihisa_shiozaki/n/n4c126c27fd3d",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "C",
+  "tags": [
+   "政策",
+   "自民党",
+   "AI規制"
+  ],
+  "memo": "要点：自民党のAIの進化と実装に関するプロジェクトチームを解説するnote記事。\nSo What：政策の動きは日本の規制環境を左右する。顧客への情報提供に使う。"
+ },
+ {
+  "id": "c290",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-05-06",
+  "title": "自民党AIPT向けRobust Intelligence資料",
+  "url": "",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "C",
+  "tags": [
+   "政策",
+   "自民党",
+   "セキュリティ"
+  ],
+  "memo": "要点：自民党AIPT向けにRobust Intelligenceが説明した資料（PDF）。\nSo What：政策議論での事業者の説明内容を知る参考資料として保存する。"
+ },
+ {
+  "id": "c291",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-05-06",
+  "title": "広島AIプロセスの概要（総務省提出）",
+  "url": "",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "A",
+  "tags": [
+   "広島AIプロセス",
+   "国際規制",
+   "総務省"
+  ],
+  "memo": "要点：総務省に提出された広島AIプロセスの概要資料（公開用PDF）。\nSo What：国際的なAIルール形成の流れを押さえ、顧客の規制対応の前提にする。"
+ },
+ {
+  "id": "c292",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-05-06",
+  "title": "自民党向けMicrosoft説明資料",
+  "url": "",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "C",
+  "tags": [
+   "政策",
+   "Microsoft",
+   "自民党"
+  ],
+  "memo": "要点：自民党向けにMicrosoftが説明した資料（PDF）。\nSo What：政策議論での事業者の主張を知る材料。日本の規制議論の背景把握に使う。"
+ },
+ {
+  "id": "c293",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-05-06",
+  "title": "自民党AIPT合同会議向けAWS説明資料",
+  "url": "",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "C",
+  "tags": [
+   "政策",
+   "AWS",
+   "自民党"
+  ],
+  "memo": "要点：自民党AIPT合同会議向けにAWSが説明した資料（PDF）。\nSo What：事業者ごとの説明を比べると、規制議論の論点が見えてくる。"
+ },
+ {
+  "id": "c294",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-05-06",
+  "title": "AbejaのLLM取り組み（公開版）",
+  "url": "",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "B",
+  "tags": [
+   "Abeja",
+   "LLM",
+   "国内ベンダー"
+  ],
+  "memo": "要点：AbejaのLLMに関する取り組みの公開版資料（PDF）。\nSo What：国内ベンダーのLLM戦略を知る資料として、顧客への選択肢提示に使う。"
+ },
+ {
+  "id": "c295",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-05-06",
+  "title": "NECの生成AI領域の取り組み",
+  "url": "",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "B",
+  "tags": [
+   "NEC",
+   "生成AI",
+   "国内ベンダー"
+  ],
+  "memo": "要点：NECの生成AI領域の取り組みを説明する資料（PDF）。\nSo What：国内大手ベンダーの方針を把握し、顧客提案の比較軸に加える。"
+ },
+ {
+  "id": "c296",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-05-06",
+  "title": "中国の生成AIの現状と規制動向",
+  "url": "",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "A",
+  "tags": [
+   "中国",
+   "生成AI",
+   "規制"
+  ],
+  "memo": "要点：中国の生成AIの現状と規制動向に関するメディア公開版資料（PDF）。\nSo What：海外の規制動向は、グローバル展開する顧客の前提条件として押さえる。"
+ },
+ {
+  "id": "c297",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-05-06",
+  "title": "EUのAI規則案（IISE小泉氏資料）",
+  "url": "",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "A",
+  "tags": [
+   "EU",
+   "AI規則",
+   "規制"
+  ],
+  "memo": "要点：EUのAI規則案に関するIISE小泉氏の資料（PDF）。\nSo What：EU規制の内容は域外企業にも影響する。顧客の対応要否を確認する材料にする。"
+ },
+ {
+  "id": "c298",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-05-06",
+  "title": "日本のAIガバナンス法の要約（英訳）",
+  "url": "",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "A",
+  "tags": [
+   "日本",
+   "AIガバナンス",
+   "規制"
+  ],
+  "memo": "要点：日本のAIガバナンス法の要約を英訳した資料（PDF）。\nSo What：日本の法制度の方向性を把握し、顧客のガバナンス整備提案に活かす。"
+ },
+ {
+  "id": "c299",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-05-06",
+  "title": "責任あるAI推進基本法（案）",
+  "url": "",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "A",
+  "tags": [
+   "日本",
+   "AI基本法",
+   "規制"
+  ],
+  "memo": "要点：責任あるAI推進基本法（案）のPDF。\nSo What：法案の中身は顧客の規制対応方針に関わる。議論の方向を継続して追う。"
+ },
+ {
+  "id": "c301",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-05-06",
+  "title": "MIXI新卒技術研修のセキュリティ研修資料",
+  "url": "",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "C",
+  "tags": [
+   "セキュリティ",
+   "研修",
+   "リスク"
+  ],
+  "memo": "要点：MIXIの23新卒技術研修で使われたセキュリティ研修資料のPDF。\nSo What：技術者教育でセキュリティをどう扱うかは、顧客のリスク・人材育成提案の参考になる。"
+ },
+ {
+  "id": "c303",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-05-06",
+  "title": "Oracle技術セミナー ochacafe S7-4の公開資料",
+  "url": "",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "B",
+  "tags": [
+   "Oracle",
+   "クラウド",
+   "ベンダー"
+  ],
+  "memo": "要点：Oracleの技術系セミナー(ochacafe S7-4)の公開資料PDF。\nSo What：ベンダーの技術セミナー資料は、製品動向と訴求点を把握する材料になる。"
+ },
+ {
+  "id": "c307",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-05-04",
+  "title": "20代MIT卒経営者の人生観スピーチ(日本語字幕)",
+  "url": "https://youtu.be/YWbNlMFzK40?si=rSQmVd9nHOdJpc1g",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "D",
+  "tags": [
+   "キャリア",
+   "人生観",
+   "動画"
+  ],
+  "memo": "要点：MIT卒の若手経営者が語る人生観のスピーチ動画。日本語字幕付き。\nSo What：キャリアや時間の使い方を考える視点として、自分の意思決定の軸を見直す材料になる。"
+ },
+ {
+  "id": "c308",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-04-27",
+  "title": "AIスライド生成ツールGamma",
+  "url": "https://gamma.app/?lng=en",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "B",
+  "tags": [
+   "生成AI",
+   "資料作成",
+   "ツール"
+  ],
+  "memo": "要点：AIでスライドを生成するツールGammaのトップページ。\nSo What：資料作成のAI活用ツールとして、提案業務の効率化や顧客への紹介候補になる。"
+ },
+ {
+  "id": "c309",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-04-27",
+  "title": "BrainPad提供のSalesforce関連資料",
+  "url": "https://brainpad.my.salesforce.com/sfc/p/?utm_medium=paid&utm_source=ig&utm_id=23850226008350179&utm_content=120208265680940180&utm_term=120208265387630180&utm_campaign=23850226008350179&fbclid=IwAR0Q0pJ3N6_UkqOB1EA-FJnswiEADy-G5h5uNu2VJnGPS1DJ8O6z-96m52g#100000005SV9/a/F9000000W8PD/bDvc_c_H7.hgkYq9q4VpisLRKsZVb6fNXUiTHiPFs2E",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "B",
+  "tags": [
+   "Salesforce",
+   "CRM",
+   "ベンダー"
+  ],
+  "memo": "要点：BrainPadが提供するSalesforce関連資料ページへのリンク。\nSo What：CRM領域の導入支援の動きを知り、営業・マーケ改革の提案に活かせる。"
+ },
+ {
+  "id": "c311",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-04-22",
+  "title": "ITストラテジスト試験の特徴と難易度",
+  "url": "https://www.seplus.jp/it-exam-guide/guide/survey_st/",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "D",
+  "tags": [
+   "資格",
+   "学習",
+   "IT"
+  ],
+  "memo": "要点：ITストラテジスト試験の特徴と難易度を解説するWebページ。\nSo What：IT戦略系資格の内容を把握し、自身の学習計画とキャリア設計の判断材料にする。"
+ },
+ {
+  "id": "c312",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-04-22",
+  "title": "海外メディア翻訳ニュースのクーリエ・ジャポン",
+  "url": "https://courrier.jp/",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "D",
+  "tags": [
+   "情報収集",
+   "海外動向",
+   "ニュース"
+  ],
+  "memo": "要点：海外メディアの記事を翻訳して届けるニュースサイトのトップページ。\nSo What：海外の見方に日常的に触れる情報源として、動向把握の習慣づくりに使える。"
+ },
+ {
+  "id": "c313",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-04-22",
+  "title": "レベル別英語ニュースサイトNews in Levels",
+  "url": "https://www.newsinlevels.com/",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "",
+  "tags": [
+   "英語学習",
+   "ニュース",
+   "学習"
+  ],
+  "memo": "要点：英語学習者向けに、レベル別のニュース記事を読めるサイト。\nSo What：英語での情報収集力を段階的に高める学習手段として使える。"
+ },
+ {
+  "id": "c074",
+  "src": "ig_tips",
+  "label": "Instagram保存「tips」",
+  "date": "2024-04-18",
+  "title": "赤い車の例え：意識して探さなければチャンスは見逃す",
+  "url": "https://www.instagram.com/lifedesignclub.jp/reel/C55TqkTScaz/",
+  "gmail": "",
+  "layer": "D",
+  "tags": [
+   "選択的注意",
+   "機会発見",
+   "マインドセット"
+  ],
+  "memo": "要点：赤い車を探すと見つかる例えで、運やチャンスは意識して探し続けないと気付けないと説く。\nSo What：AI活用でも業務課題を意識して探す社員だけが機会に気付く。問いの設計で機会発見を促す。"
+ },
+ {
+  "id": "c323",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-04-14",
+  "title": "デジタルトランスフォーメーション資料",
+  "url": "",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "C",
+  "tags": [
+   "DX",
+   "変革",
+   "資料"
+  ],
+  "memo": "要点：デジタルトランスフォーメーションに関する資料PDF。\nSo What：DXの整理は、顧客の業務・組織再設計の提案の土台になる。"
+ },
+ {
+  "id": "c324",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-04-14",
+  "title": "Prediction One 0から学ぶAIの基礎",
+  "url": "",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "A",
+  "tags": [
+   "AI基礎",
+   "機械学習",
+   "学習"
+  ],
+  "memo": "要点：Prediction Oneによる、AIの基礎を0から学べる資料PDF。\nSo What：AIの基礎概念を押さえ、顧客と同じ言葉で話すための土台にする。"
+ },
+ {
+  "id": "c325",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-04-13",
+  "title": "TEDのGritでシャドーイングして英語リスニングを伸ばす",
+  "url": "https://t.co/A25eRCmru4",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "",
+  "tags": [
+   "英語学習",
+   "シャドーイング",
+   "学習法"
+  ],
+  "memo": "要点：TEDのGritを教材にシャドーイングし、リスニング力を伸ばす英語学習法のポスト。\nSo What：具体的な教材と方法が示されており、英語学習の習慣化に取り入れやすい。"
+ },
+ {
+  "id": "c326",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-04-13",
+  "title": "慶應大学の「論文の読み方」資料",
+  "url": "https://t.co/GqpGgSr3mU",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "D",
+  "tags": [
+   "論文",
+   "リサーチ",
+   "情報収集"
+  ],
+  "memo": "要点：慶應大学の「論文の読み方」資料を紹介するXポスト。\nSo What：論文を効率よく読む型は、エビデンスに基づく調査・提言の質を高める。"
+ },
+ {
+  "id": "c327",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-04-13",
+  "title": "思考力が上がる良書15選",
+  "url": "https://t.co/cS3CbVu0ih",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "D",
+  "tags": [
+   "読書",
+   "思考法",
+   "学習"
+  ],
+  "memo": "要点：思考力が上がる良書15冊を紹介するXポスト。\nSo What：読書リストとして使い、思考の型を体系的に身につける学習計画に組み込める。"
+ },
+ {
+  "id": "c328",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-04-13",
+  "title": "書籍『事実はなぜ人の意見を変えられないのか』",
+  "url": "https://t.co/frgFglNkkW",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "D",
+  "tags": [
+   "読書",
+   "説得",
+   "思考法"
+  ],
+  "memo": "要点：『事実はなぜ人の意見を変えられないのか』を紹介するXポスト。\nSo What：事実を示すだけでは人は動かないという観点は、顧客への提案・合意形成に役立つ。"
+ },
+ {
+  "id": "c329",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-04-13",
+  "title": "プレゼンのストーリー作りの参考書",
+  "url": "https://t.co/jka30dLbkA",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "D",
+  "tags": [
+   "プレゼン",
+   "ストーリー",
+   "資料作成"
+  ],
+  "memo": "要点：プレゼンのストーリーの作り方が学べる参考書を紹介するXポスト。\nSo What：提案の伝わり方はストーリーで決まる。資料作成力の底上げに使える。"
+ },
+ {
+  "id": "c330",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-04-13",
+  "title": "三品和広氏の経営戦略論の大著(山口周氏が推薦)",
+  "url": "https://t.co/lBMqUSskhs",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "D",
+  "tags": [
+   "経営戦略",
+   "読書",
+   "三品和広"
+  ],
+  "memo": "要点：山口周氏が、三品和広氏の経営戦略論の大著を薦めるXポスト。\nSo What：経営戦略の基本書を押さえることは、顧客の経営アジェンダを読む力につながる。"
+ },
+ {
+  "id": "c331",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-04-13",
+  "title": "M&A・デューデリジェンスのおすすめ書籍",
+  "url": "https://t.co/LMW2uxu3st",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "D",
+  "tags": [
+   "M&A",
+   "DD",
+   "読書"
+  ],
+  "memo": "要点：M&Aとデューデリジェンス関連のおすすめ書籍を紹介するXポスト。\nSo What：M&A関連の知識は、投資や事業再編を扱う案件で提案の幅を広げる。"
+ },
+ {
+  "id": "c333",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-04-08",
+  "title": "日本のスタートアップ資金調達動向2023",
+  "url": "",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "B",
+  "tags": [
+   "スタートアップ",
+   "資金調達",
+   "投資"
+  ],
+  "memo": "要点：日本のスタートアップの資金調達動向2023をまとめた資料PDF。\nSo What：資金の流れを知ることは、新興ベンダーの勢いを見極める材料になる。"
+ },
+ {
+  "id": "c335",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-04-04",
+  "title": "クラウドサービス比較表(2023年7月)",
+  "url": "",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "B",
+  "tags": [
+   "クラウド",
+   "比較",
+   "ベンダー"
+  ],
+  "memo": "要点：クラウドサービスを比較した2023年7月時点の表のPDF。\nSo What：主要クラウドの違いを整理でき、基盤選定の提案の下調べに使える。"
+ },
+ {
+  "id": "c336",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-04-02",
+  "title": "外資コンサルの時系列スライドの作り方",
+  "url": "https://t.co/dL989nVTtD",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "D",
+  "tags": [
+   "資料作成",
+   "コンサル",
+   "スライド"
+  ],
+  "memo": "要点：外資コンサルが使う時系列スライドの作り方を紹介するXポスト。\nSo What：スライドの型を身につけ、提案資料の品質と作成速度を高められる。"
+ },
+ {
+  "id": "c337",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-04-02",
+  "title": "書籍『論点思考問題』を薦めるポスト",
+  "url": "https://t.co/AWEMrrIcn1",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "D",
+  "tags": [
+   "論点思考",
+   "読書",
+   "思考法"
+  ],
+  "memo": "要点：書籍『論点思考問題』を薦めるXポスト。\nSo What：何を論点とするかの設定力は、顧客課題を定義する出発点になる。"
+ },
+ {
+  "id": "c338",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-04-02",
+  "title": "Study Hacker 山本大平氏のインタビュー記事",
+  "url": "https://studyhacker.net/daihei-yamamoto-interview01?s=03",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "D",
+  "tags": [
+   "学習法",
+   "インタビュー",
+   "自己啓発"
+  ],
+  "memo": "要点：Study Hackerの山本大平氏へのインタビュー記事のリンク共有。\nSo What：学習法や仕事術のヒントとして、自分の学習習慣を見直す材料になる。"
+ },
+ {
+  "id": "c339",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2024-04-01",
+  "title": "LLMの歴史と技術を学べる研修資料(YouTubeショート)",
+  "url": "https://youtube.com/shorts/NQrmFsGZkNs?si=wcdz3F53juGLVncR",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "A",
+  "tags": [
+   "LLM",
+   "生成AI",
+   "研修"
+  ],
+  "memo": "要点：LLMの歴史と技術を学べる研修資料を紹介するYouTubeショート動画。\nSo What：LLMの成り立ちを押さえることは、顧客への技術説明の土台になる。"
+ },
+ {
+  "id": "c344",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2023-02-16",
+  "title": "英語用語集サイトRondely",
+  "url": "https://rondely.com/EigoYogo/index.shtml",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "",
+  "tags": [
+   "英語学習",
+   "用語集",
+   "学習"
+  ],
+  "memo": "要点：英語用語集サイト(Rondely)のトップページ。\nSo What：英語の専門用語を調べる辞書的な手段として、海外資料の読解に使える。"
+ },
+ {
+  "id": "c357",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2022-04-05",
+  "title": "付加価値がなく衰退する業界3選(経営コンサル解説)",
+  "url": "https://youtube.com/shorts/ZrOA3bXC3xQ?feature=share",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "C",
+  "tags": [
+   "業界分析",
+   "産業",
+   "動画"
+  ],
+  "memo": "要点：付加価値がなく衰退する業界3選を解説するYouTubeショート動画。\nSo What：業界の浮沈を見る視点は、顧客業界のAI影響を考える際の参考になる。"
+ },
+ {
+  "id": "c358",
+  "src": "mail",
+  "label": "メールで保存したメモ",
+  "date": "2022-04-05",
+  "title": "間違いなく伸びる業界3選(経営コンサル解説)",
+  "url": "https://youtube.com/shorts/yaMF5HTypf0?feature=share",
+  "gmail": "https://mail.google.com/mail/?authuser=masa06111015@gmail.com",
+  "layer": "C",
+  "tags": [
+   "業界分析",
+   "産業",
+   "動画"
+  ],
+  "memo": "要点：伸びる業界3選を解説するYouTubeショート動画。\nSo What：成長業界の見方は、顧客や提案先の優先順位づけの参考になる。"
+ }
+]
