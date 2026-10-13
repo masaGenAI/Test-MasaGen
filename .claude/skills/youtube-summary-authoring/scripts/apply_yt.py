@@ -24,25 +24,27 @@ J = lambda o: json.dumps(o, ensure_ascii=False, separators=(",", ":"))
 # 1) 記録（既存と同じ項目順）
 ORDER = ["id", "title", "author", "publisher", "year", "oneLiner", "overview", "points", "takeaway", "url",
          "srcNote", "srcPaths", "themes", "shelf", "notes", "kind", "refBooks"]
-dec = json.JSONDecoder()
 start = h.index("const YT_BOOKS = [")
+body_s = h.index("\n", start) + 1
 end = h.index("\n];", start)
+# YT_BOOKS は1行1件。行単位で組み直す（20MB の文字列を件数分コピーしないため）
+lines = h[body_s:end].split("\n")
+pos = {}
+for n, line in enumerate(lines):
+    m = re.match(r'\{"id":"([^"]+)"', line)
+    if m: pos[m.group(1)] = n
 new_lines, replaced = [], 0
 for rid in ok:
     o = json.load(open(os.path.join(W, "out", rid + ".json"), encoding="utf-8"))
     r = dict(skel[rid])
     r.update({"oneLiner": o["oneLiner"], "overview": o["overview"],
               "points": [{"h": p["h"], "b": p["b"]} for p in o["points"]], "takeaway": o["takeaway"]})
-    rec = {k: r[k] for k in ORDER if k in r and r[k] not in (None,)}
-    i = h.find('{"id":"' + rid + '"', start, end)
-    if i >= 0:
-        _, e = dec.raw_decode(h, i)
-        h = h[:i] + J(rec) + h[e:]; replaced += 1
-        end = h.index("\n];", start)
+    rec = {k: r[k] for k in ORDER if k in r and r[k] is not None}
+    if rid in pos:
+        lines[pos[rid]] = J(rec) + ","; replaced += 1
     else:
         new_lines.append(J(rec) + ",")
-if new_lines:
-    h = h[:end] + "\n" + "\n".join(new_lines) + h[end:]
+h = h[:body_s] + "\n".join(lines + new_lines) + h[end:]
 
 # 2) 出典ツリー
 def node_js(n, ind):
