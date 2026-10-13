@@ -75,7 +75,8 @@ def run(W, only=None):
         allowed = nums(json.dumps(inp, ensure_ascii=False)) | nums(subs)
         extra = sorted(nums(text) - allowed)
         if extra: e.append(f"根拠にない数値 {extra[:8]}")
-        bc = bad_chars(text)
+        src_chars = set(json.dumps(inp, ensure_ascii=False)) | set(subs)
+        bc = [ch for ch in bad_chars(text) if ch not in src_chars]  # 入力にある字（人名の「傪」など）は許す
         if bc: e.append(f"簡体字・キリル文字 {''.join(sorted(set(bc)))}")
         if KEIGO.search(re.sub(r"「[^」]*」|『[^』]*』", "", text)):  # 引用（「」『』）の中の敬体は対象外
             e.append("敬体（です・ます）")
