@@ -7225,5 +7225,38 @@
   "jp": true,
   "status": "ok",
   "checked": "2026-10-12"
+ },
+ {
+  "id": "s225",
+  "layer": "D",
+  "sub": [
+   "週次ダイジェスト",
+   "Weekly digests"
+  ],
+  "name": [
+   "Generative Future（梶谷健人）",
+   "Generative Future (Kento Kajitani)"
+  ],
+  "org": "note",
+  "url": "https://note.com/kajiken0630/m/m0517d42a809a",
+  "desc": [
+   "生成AIと事業・組織・プロダクトの未来を論じるマガジン。全文は TechHub の実務論点マップに要約を収録",
+   "Magazine on generative AI and the future of business, organisations and products; summaries are in TechHub's Practice Issue Map"
+  ],
+  "freq": [
+   "随時（月数本）",
+   "Several posts a month"
+  ],
+  "region": [
+   "日本",
+   "Japan"
+  ],
+  "fee": [
+   "一部有料",
+   "Partly paid"
+  ],
+  "jp": true,
+  "status": "ok",
+  "checked": "2026-10-13"
  }
 ]
