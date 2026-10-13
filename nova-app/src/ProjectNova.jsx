@@ -154509,19 +154509,31 @@ function FsRefresh({ en }) {
   );
 }
 const FS_THEME_OF = Object.fromEntries(FORESIGHT_THEMES.flatMap((t) => t.items.map((id) => [id, t.id])));
+function FsTreeItem({ x, en }) {
+  const [on, setOn] = useState(false);
+  return (
+    <div style={{ borderTop: `1px solid ${C.line}`, padding: "8px 0" }}>
+      <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+        <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 700, lineHeight: 1.55 }}>
+          {x.url || x.gmail ? <a href={x.url || x.gmail} target="_blank" rel="noopener noreferrer" style={{ color: C.text, textDecoration: "none", borderBottom: `1px solid ${C.line}` }}>{x.title}</a> : x.title}
+        </div>
+        <button onClick={() => setOn((v) => !v)} aria-expanded={on} aria-label={en ? "Show details" : "詳細を表示"}
+                style={{ border: "none", background: "none", color: C.dim, cursor: "pointer", fontSize: 10, padding: "4px 2px", flexShrink: 0 }}>{on ? "▲" : "▼"}</button>
+      </div>
+      {on && (
+        <div>
+          <div style={{ fontSize: 11, color: C.dim, marginTop: 2 }}>{x.label}{x.date ? " · " + x.date : ""}{x.tagList.length ? " · " + x.tagList.join(" / ") : ""}</div>
+          {x.memo && <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.65, marginTop: 4, whiteSpace: "pre-wrap" }}>{x.memo}</div>}
+        </div>
+      )}
+    </div>
+  );
+}
 function FsCollectionTree({ rows, en, open, setOpen, layerName }) {
   const byTheme = {}; const mine = [];
   rows.forEach((x) => { if (x.mine) mine.push(x); else { const t = FS_THEME_OF[x.id]; (byTheme[t] = byTheme[t] || []).push(x); } });
   const groups = [...FORESIGHT.layers.map((l) => l.id), ""];
-  const item = (x) => (
-    <div key={x.id} style={{ borderTop: `1px solid ${C.line}`, padding: "9px 0" }}>
-      <div style={{ fontSize: 13, fontWeight: 700, lineHeight: 1.55 }}>
-        {x.url || x.gmail ? <a href={x.url || x.gmail} target="_blank" rel="noopener noreferrer" style={{ color: C.text, textDecoration: "none", borderBottom: `1px solid ${C.line}` }}>{x.title}</a> : x.title}
-      </div>
-      <div style={{ fontSize: 11, color: C.dim, marginTop: 2 }}>{x.label}{x.date ? " · " + x.date : ""}{x.tagList.length ? " · " + x.tagList.join(" / ") : ""}</div>
-      {x.memo && <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.65, marginTop: 4, whiteSpace: "pre-wrap" }}>{x.memo}</div>}
-    </div>
-  );
+  const item = (x) => <FsTreeItem key={x.id} x={x} en={en} />;
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
       {mine.length > 0 && (
