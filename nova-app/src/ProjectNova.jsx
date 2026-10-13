@@ -152952,6 +152952,206 @@ function TabXform() {
           ))}
         </div>
       </FoldSection>
+      <FoldSection title={en ? "VI. DATA TALENT — from writing code to framing, checking and acting" : "VI. データ人材の再設計 — 書く力から、問い・検証・施策化へ"} color={C.fore}>
+        <XfTalent en={en} />
+      </FoldSection>
+    </div>
+  );
+}
+
+// ============ 変革の実務 VI. データ人材の再設計 ============
+// 出所: YouTube「はやたす【データ分析・データサイエンス】」通常動画7本のダイジェスト（2026-07-13〜10-13、自動字幕の全文から抽出）。
+// 数値は話者の経験・目安・伝聞（エビデンス強度は6本がC、1本がB）で、独自検証はしていない。#番号は実務論点マップの hayatasu<番号> に対応する。
+const XT_AI_TASKS = [["ライブラリの文法", "Library syntax"], ["グラフ描画のコード", "Plotting code"], ["アルゴリズムの実装", "Algorithm implementation"], ["環境構築", "Environment setup"], ["スクレイピング", "Scraping"], ["前処理", "Pre-processing"], ["エラー対処", "Error fixing"]];
+const XT_HUMAN = [["問題設定", "Framing the problem"], ["データの読み解き（中央値など）", "Reading the data (medians and the like)"], ["分析設計・判断", "Analysis design and judgment"], ["施策化（業界知識）", "Turning it into action (industry knowledge)"], ["AI出力の検証", "Checking AI output"]];
+const XT_DRILL = [
+  { lv: ["売上", "Sales"], v: ["3月のピークから月約70万円減", "Down about ¥700k a month from the March peak"] },
+  { lv: ["客数と客単価に分ける", "Split into customers × spend"], v: ["客数 4,385人→3,729人（約15%減）。客単価 910円→874円", "Customers 4,385 → 3,729 (about −15%); spend per customer ¥910 → ¥874"] },
+  { lv: ["時間帯で分ける", "Split by time of day"], v: ["ランチ客数 約1,800人→約1,280人（3割減）", "Lunch customers about 1,800 → 1,280 (−30%)"] },
+  { lv: ["曜日で分ける", "Split by weekday"], v: ["平日は3割減、土日は1割減", "Weekdays −30%, weekends −10%"] },
+  { lv: ["出来事の前後で比べる", "Compare before and after an event"], v: ["近隣のコンビニ開業の前後で月平均約52万円減。減少分はほぼランチ", "About ¥520k a month lower after a nearby convenience store opened — almost all of it at lunch"] },
+];
+const XT_STEPS = [["問い", "Question"], ["仮説", "Hypothesis"], ["分けて比べる", "Split and compare"], ["示唆", "Implication"], ["打ち手", "Action"]];
+const XT_CERTS = [
+  { t: ["G検定", "JDLA Deep Learning for General (G-kentei)"], col: C.teal, ref: 2,
+    f: [["JDLA運営・累計合格15万人超", "Run by JDLA; over 150,000 have passed"], ["145問前後／100分・13,200円（学生5,500円）", "About 145 questions in 100 min; ¥13,200 (students ¥5,500)"], ["合格率8割前後・学習10〜50時間（話者目安）", "Pass rate around 80%; 10–50 hours of study (speaker's estimate)"]] },
+  { t: ["生成AIパスポート", "Generative AI Passport"], col: C.gold, ref: 6,
+    f: [["60問／60分・42問正解（70%）で合格・11,000円", "60 questions in 60 min; pass at 42 (70%); ¥11,000"], ["自宅受験（IBT）で調べ物は禁止", "Taken online at home; looking things up is not allowed"], ["0から30時間以内、G検定保有者は5〜10時間（話者目安）", "Under 30 hours from zero, 5–10 hours with G-kentei (speaker's estimate)"]] },
+  { t: ["統計検定2級", "Statistics Certificate, Grade 2"], col: C.fore, ref: 3,
+    f: [["CBT 35問前後／90分・60点以上で合格", "About 35 questions in 90 min (CBT); pass at 60/100"], ["受験料7,000円（学生5,000円）", "¥7,000 (students ¥5,000)"], ["一般電卓1台、1問あたり2分半", "One basic calculator; about 2.5 minutes a question"]] },
+];
+const XT_STAT_PLAN = [
+  { w: 0, t: ["予約", "Book"], col: C.wine },
+  { w: 2, t: ["範囲を一周", "One pass of the syllabus"], col: C.muted },
+  { w: 4, t: ["過去問演習（紙の年度版）", "Past papers (printed annual editions)"], col: C.gold },
+  { w: 2, t: ["弱点潰しと本番再現", "Fix weak spots, rehearse the real thing"], col: C.teal },
+];
+const XT_ROUTE = [
+  { m: 1, t: ["Excel", "Excel"] }, { m: 1, t: ["SQL", "SQL"] }, { m: 1, t: ["BIツール", "BI tool"] },
+  { m: 1, t: ["改善提案レポート", "Improvement report"] }, { m: 1.5, t: ["ポートフォリオ", "Portfolio"], s: ["1〜2か月", "1–2 months"] },
+];
+const XT_REPORT = [["テーマ", "Theme"], ["背景", "Background"], ["課題仮説", "Problem hypothesis"], ["データ", "Data"], ["結果", "Results"], ["提案", "Proposal"], ["インパクト", "Impact"]];
+
+function XfTalent({ en }) {
+  const [lv, setLv] = useState(0);
+  const [churn, setChurn] = useState(1);
+  const [cert, setCert] = useState(0);
+  const card = { background: C.surface2, borderRadius: 10, padding: "11px 13px" };
+  const h = (t) => <div style={{ fontSize: 12.5, fontWeight: 800, color: C.text, margin: "16px 0 4px" }}>{t}</div>;
+  const lead = (ja, e) => <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.65, marginBottom: 8 }}>{en ? e : ja}</div>;
+  const refs = (r) => <div style={{ marginTop: 6 }}><BprRefs refs={r} en={en} pre="hayatasu" /></div>;
+  const c = XT_CERTS[cert];
+  return (
+    <div>
+      {lead("AIが書く時代に、データ人材の育成目標をどこへ置き直すか。研修・資格・登用を、書く力から「問い・検証・施策化」へ組み替える。",
+        "Once AI writes the code, where should data-talent development aim? Rebuild training, certification and promotion around framing, checking and acting — not writing.")}
+      <div style={{ fontSize: 11, color: C.dim, lineHeight: 1.8, background: C.surface2, border: `1px solid ${C.line}`, borderRadius: 8, padding: "9px 12px", marginBottom: 8 }}>
+        {en ? "Source: a digest of all 7 regular videos (13 Jul – 13 Oct 2026) from the YouTube channel はやたす [data analysis / data science], taken from the full auto-generated captions. Figures are the speaker's own estimates, demos or hearsay (six videos rated C, one B) and were not independently verified."
+            : "出所：YouTube「はやたす【データ分析・データサイエンス】」の通常動画7本（2026-07-13〜10-13）を自動字幕の全文から要約したダイジェスト。数値は話者の目安・実演・伝聞（エビデンス強度は6本がC、1本がB）で、独自検証はしていません。"}
+      </div>
+
+      {h(en ? "1. What to hand to AI, what people must train" : "1. AIに任せる作業と、人が鍛える5つの力")}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,260px),1fr))", gap: 10 }}>
+        <div style={{ ...card, borderTop: `3px solid ${C.muted}` }}>
+          <div style={{ fontSize: 11, color: C.muted, fontWeight: 800, marginBottom: 6 }}>{en ? "FINE TO HAND TO AI — 7" : "AIに任せてよい作業 7"}</div>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>{XT_AI_TASKS.map((x, i) => <span key={i} style={{ fontSize: 11.5, color: C.muted, border: `1px dashed ${C.line}`, borderRadius: 999, padding: "3px 10px" }}>{x[en ? 1 : 0]}</span>)}</div>
+        </div>
+        <div style={{ ...card, borderTop: `3px solid ${C.teal}` }}>
+          <div style={{ fontSize: 11, color: C.teal, fontWeight: 800, marginBottom: 6 }}>{en ? "PEOPLE MUST TRAIN — 5" : "人が鍛える考える力 5"}</div>
+          <ol style={{ margin: 0, paddingLeft: 18, fontSize: 12, color: C.text, lineHeight: 1.75 }}>{XT_HUMAN.map((x, i) => <li key={i}>{x[en ? 1 : 0]}</li>)}</ol>
+        </div>
+      </div>
+      <div style={{ fontSize: 12, color: C.text, lineHeight: 1.65, marginTop: 8 }}>
+        <span style={{ color: C.teal, fontWeight: 800 }}>{en ? "Training target  " : "研修の到達基準  "}</span>
+        {en ? "Not 'can write Python' but 'can read AI-written code and isolate its errors'. Lambda functions, try-except and classes only need to be readable; spending three months perfecting the basics is, in the speaker's words, a mistake. Use free environments such as Google Colab so nobody stalls on setup."
+            : "「Pythonが書ける」ではなく「AIが書いたコードを読み、エラーを切り分けられる」。ラムダ式・例外処理・クラスは読めればよく、基礎の完璧化に3か月かけるのは誤り（話者）。環境構築で止まらないよう、Googleコラボなど無料の環境から始める。"}
+      </div>
+      <div style={{ fontSize: 11.5, color: C.dim, lineHeight: 1.6, marginTop: 4 }}>
+        {en ? "Hearsay cited by the speaker: a Kaggle gold medallist ran over 1,500 trials with AI, yet most of the accuracy gain came from human ideas." : "話者の伝聞：Kaggle金メダル者はAIで1,500回以上試行したが、精度向上の大半は人間の発想だった。"}
+      </div>
+      {refs([7, 1])}
+
+      {h(en ? "2. Five steps of analysis — drill down a real case" : "2. 分析の5ステップ — 実例で掘り下げる")}
+      {lead("集計表を眺めて終えず、仮説と比較を足して次の行動まで決める。動画ではカフェのPOSデータ（2〜7月、約3万8,000行）をExcel×Copilotで分析した。段を押して掘り下げてください。",
+        "Don't stop at the pivot table: add a hypothesis and a comparison, and carry it through to the next action. The video analyses a café's POS data (Feb–Jul, about 38,000 rows) with Excel and Copilot. Tap a level to drill down.")}
+      <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 8 }}>
+        {XT_STEPS.map((s, i) => (
+          <span key={i} style={{ fontSize: 11, fontWeight: 800, color: i === 2 ? C.gold : C.muted, background: C.surface2, border: `1px solid ${i === 2 ? C.gold : C.line}`, borderRadius: 6, padding: "3px 9px" }}>{i + 1}. {s[en ? 1 : 0]}{i < XT_STEPS.length - 1 ? " →" : ""}</span>
+        ))}
+      </div>
+      <div style={{ display: "grid", gap: 5 }}>
+        {XT_DRILL.map((d, i) => {
+          const shown = i <= lv, on = i === lv;
+          return (
+            <button key={i} className="gh-btn" onClick={() => setLv(i)} aria-pressed={on}
+              style={{ textAlign: "left", marginLeft: `${i * 4}%`, width: `${100 - i * 4}%`, padding: "8px 11px", borderColor: on ? C.gold : C.line, opacity: shown ? 1 : 0.45 }}>
+              <div style={{ display: "flex", gap: 10, alignItems: "baseline", flexWrap: "wrap" }}>
+                <span style={{ fontSize: 10.5, color: on ? C.gold : C.dim, fontWeight: 800, minWidth: 120 }}>{d.lv[en ? 1 : 0]}</span>
+                <span style={{ fontSize: 12, color: shown ? C.text : C.dim, lineHeight: 1.55 }}>{shown ? d.v[en ? 1 : 0] : (en ? "tap to drill down" : "押して掘り下げる")}</span>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+      <div style={{ ...DGM_DETAIL, borderLeftColor: lv === XT_DRILL.length - 1 ? C.teal : C.gold }}>
+        <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.7 }}>
+          {lv === XT_DRILL.length - 1
+            ? (en ? "From 'sales are down' to 'weekday lunch customers fell away after a nearby convenience store opened' — a finding you can act on. Write it up as one page that separates fact from inference and ends with the proposed action. If Copilot isn't licensed, a pivot table does the same job."
+                : "「売上が落ちた」から「近隣のコンビニ開業後に平日ランチの客が減った」まで絞れれば、打ち手が決められる。事実と推測を分けた結論＋打ち手の1枚報告にまとめる。Copilotが使えなければピボットテーブルで代替できる。")
+            : (en ? "Each level splits the number one more way and compares. Keep going until the change sits in one place." : "段ごとに数字を1つの軸で分けて比べる。変化が1か所に集まるまで続ける。")}
+        </div>
+      </div>
+      {refs([4])}
+
+      {h(en ? "3. The accuracy trap" : "3. 評価指標の罠")}
+      {lead("解約率が低いと、「全員継続」と答えるだけのモデルでも適中率は高く見える。動画の例示は解約率1%で適中率99%。解約率を動かして確かめてください。",
+        "When churn is rare, a model that simply predicts 'everyone stays' looks highly accurate. The video's example: 1% churn gives 99% accuracy. Move the churn rate to see it.")}
+      <div style={{ ...card, display: "grid", gap: 8 }}>
+        <label style={{ fontSize: 12, color: C.muted, display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+          {en ? "Churn rate" : "解約率"} <b style={{ color: C.text, minWidth: 38 }}>{churn}%</b>
+          <input type="range" min="1" max="50" value={churn} onChange={(e) => setChurn(Number(e.target.value))} style={{ flex: "1 1 160px" }} />
+        </label>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,180px),1fr))", gap: 8 }}>
+          <div style={{ background: C.surface, borderRadius: 8, padding: "8px 11px" }}>
+            <div style={{ fontSize: 11, color: C.dim }}>{en ? "Accuracy of 'everyone stays'" : "「全員継続」予測の適中率"}</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: C.gold }}>{100 - churn}%</div>
+          </div>
+          <div style={{ background: C.surface, borderRadius: 8, padding: "8px 11px" }}>
+            <div style={{ fontSize: 11, color: C.dim }}>{en ? "Churners it catches" : "見つけられた解約者"}</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: "#E27069" }}>0%</div>
+          </div>
+        </div>
+        <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.6 }}>
+          {en ? "A high accuracy can still mean the model finds nobody you care about. This is why 'checking AI output' sits among the five abilities people must train." : "適中率が高くても、知りたい相手を1人も見つけていないことがある。「AI出力の検証」が人の5つの力に入っている理由。"}
+        </div>
+      </div>
+      {refs([7])}
+
+      {h(en ? "4. Certifications — a floor, not the finish" : "4. 資格は足切り、評価は成果物")}
+      {lead("AI資格は取れば評価される加点要素から、持たなければ昇格の土俵に乗れない足切り条件に変わりつつある（話者）。取得負荷は数十時間と低く、差は取得後の業務成果物で決まる。資格を選ぶと要点が出ます。",
+        "AI certificates are shifting from a plus to a threshold — without one you may not be considered for promotion (speaker). They take only tens of hours, so the difference comes from what people deliver afterwards. Pick one to see the essentials.")}
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+        {XT_CERTS.map((x, i) => (
+          <button key={i} className="gh-btn" onClick={() => setCert(i)} aria-pressed={cert === i}
+            style={{ padding: "5px 12px", fontSize: 12, borderColor: cert === i ? x.col : C.line, color: cert === i ? x.col : C.muted, fontWeight: cert === i ? 800 : 400 }}>{x.t[en ? 1 : 0]}</button>
+        ))}
+      </div>
+      <div style={{ ...DGM_DETAIL, borderLeftColor: c.col }}>
+        <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12, color: C.text, lineHeight: 1.75 }}>{c.f.map((x, i) => <li key={i}>{x[en ? 1 : 0]}</li>)}</ul>
+        {cert === 1 ? (
+          <div style={{ marginTop: 8 }}>
+            <div style={{ fontSize: 11, color: C.muted, marginBottom: 4 }}>{en ? "Where to spend study time (speaker's estimate)" : "学習時間の配分（話者目安）"}</div>
+            <div style={{ display: "flex", height: 22, borderRadius: 6, overflow: "hidden", fontSize: 10.5, fontWeight: 800 }}>
+              <div style={{ flex: "0 0 55%", background: C.gold, color: C.bg, display: "flex", alignItems: "center", paddingLeft: 8 }}>{en ? "Ch.3 trends + Ch.4 risk & law: over half" : "第3章 最新動向＋第4章 リスク・法規：半分超"}</div>
+              <div style={{ flex: 1, background: C.line, color: C.muted, display: "flex", alignItems: "center", paddingLeft: 8 }}>{en ? "Ch.1, 2, 5" : "第1・2・5章"}</div>
+            </div>
+            <div style={{ fontSize: 11, color: C.dim, lineHeight: 1.6, marginTop: 4 }}>{en ? "Chapter 3 covers RAG, AI agents and MCP; chapter 4 copyright, personal data, AI principles and the June 2025 AI law. The syllabus was revised in February 2026 (official, as relayed by the speaker). Re-study only chapters scoring under 70%." : "第3章はRAG・AIエージェント・MCP、第4章は著作権・個人情報・AI社会原則・2025年6月のAI関連法。2026年2月にシラバス改定（公式発表を話者が紹介）。章別得点率70%未満だけを復習する。"}</div>
+          </div>
+        ) : null}
+        {cert === 2 ? (
+          <div style={{ marginTop: 8 }}>
+            <div style={{ fontSize: 11, color: C.muted, marginBottom: 4 }}>{en ? "Eight-week plan — book the date first" : "8週間計画 — 最初に受験日を予約する"}</div>
+            <div style={{ display: "flex", borderRadius: 6, overflow: "hidden", fontSize: 10.5, fontWeight: 800 }}>
+              {XT_STAT_PLAN.map((x, i) => (
+                <div key={i} style={{ flex: `${x.w || 0.6} 1 0`, background: x.col, color: C.bg, padding: "5px 6px", minWidth: x.w ? 0 : 44, lineHeight: 1.35 }}>
+                  {x.t[en ? 1 : 0]}<div style={{ fontWeight: 400, fontSize: 9.5 }}>{x.w ? (en ? `${x.w} wk` : `${x.w}週`) : (en ? "day 1" : "初日")}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ fontSize: 11, color: C.dim, lineHeight: 1.6, marginTop: 4 }}>{en ? "Most of the study time goes to past papers. The biggest cause of failure, per the speaker, is trying to perfect the basics before attempting questions." : "学習時間の過半を過去問に充てる。話者によれば最大の敗因は「基礎を完璧にしてから解こう」とすること。"}</div>
+          </div>
+        ) : null}
+        {cert === 0 ? (
+          <div style={{ fontSize: 11, color: C.dim, lineHeight: 1.6, marginTop: 6 }}>{en ? "Reported but unverified (speaker's hearsay): Mitsubishi Corporation will require G-kentei for manager-level promotion from 2027; over 350 companies recommended it as of 2023." : "未確認の伝聞（話者）：三菱商事が2027年から課長級昇格にG検定を必須化と報道。推奨企業は350社超（2023年時点）。"}</div>
+        ) : null}
+        <div style={{ marginTop: 6 }}><BprRefs refs={[c.ref]} en={en} pre="hayatasu" /></div>
+      </div>
+      <div style={{ fontSize: 12, color: C.text, lineHeight: 1.65, marginTop: 8 }}>
+        <span style={{ color: C.teal, fontWeight: 800 }}>{en ? "Two-stage design  " : "二段構えの設計  "}</span>
+        {en ? "Use the certificate only as an entry condition; judge people on one deliverable built from their own department's data. Shift reskilling budget from exam subsidies toward that coached deliverable."
+            : "資格は登用の入口条件にとどめ、評価の本体は自部署の業務データを使った成果物1件で行う。リスキリング予算は受験料補助から、この成果物づくりの伴走へ振り向ける。"}
+      </div>
+
+      {h(en ? "5. Moving someone into a data role — the route" : "5. データ職への配置転換ルート")}
+      {lead("未経験からの最短ルートは約6か月・1日1〜2時間（話者目安）。Pythonと統計は着任後に学べばよく、先に課題発見から提案までを示す成果物を積む。",
+        "The shortest route from no experience is about six months at one to two hours a day (speaker's estimate). Python and statistics can wait until after the move; first build deliverables that run from finding a problem to proposing a fix.")}
+      <div style={{ display: "flex", borderRadius: 8, overflow: "hidden", fontSize: 11, fontWeight: 800 }}>
+        {XT_ROUTE.map((x, i) => (
+          <div key={i} style={{ flex: `${x.m} 1 0`, minWidth: 0, background: i === 3 ? C.gold : C.surface2, color: i === 3 ? C.bg : C.text, borderRight: `1px solid ${C.bg}`, padding: "7px 6px", lineHeight: 1.35 }}>
+            {x.t[en ? 1 : 0]}<div style={{ fontWeight: 400, fontSize: 9.5, opacity: 0.8 }}>{x.s ? x.s[en ? 1 : 0] : (en ? "1 month" : "1か月")}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{ fontSize: 10.5, color: C.dim, marginTop: 3 }}>{en ? "six months at the shortest (speaker's estimate)" : "最短6か月（話者目安）"}</div>
+      <div style={{ fontSize: 11, color: C.gold, fontWeight: 800, margin: "10px 0 5px" }}>{en ? "THE IMPROVEMENT REPORT — SEVEN PARTS" : "改善提案レポートの7要素"}</div>
+      <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+        {XT_REPORT.map((x, i) => <span key={i} style={{ fontSize: 11.5, color: C.text, background: C.surface2, border: `1px solid ${C.line}`, borderRadius: 6, padding: "3px 9px" }}>{i + 1}. {x[en ? 1 : 0]}</span>)}
+      </div>
+      <div style={{ fontSize: 12, color: C.text, lineHeight: 1.65, marginTop: 8 }}>
+        <span style={{ color: C.teal, fontWeight: 800 }}>{en ? "Make it a gate  " : "制度に落とす  "}</span>
+        {en ? "Make this report the required submission for internal transfer into a data role." : "このレポートを、社内のデータ職登用審査の提出物として制度化する。"}
+      </div>
+      {refs([5])}
     </div>
   );
 }
@@ -154819,12 +155019,12 @@ function bprLoad(key, init) {
 function bprSave(key, v) {
   try { localStorage.setItem(key, JSON.stringify(v)); } catch (e) { /* 保存できない環境では画面上だけで保持する */ }
 }
-function BprRefs({ refs, en }) {
+function BprRefs({ refs, en, pre = "bpr" }) {
   return (
     <span style={{ display: "inline-flex", gap: 5, flexWrap: "wrap", alignItems: "center" }}>
       <span style={{ fontSize: 10.5, color: C.dim }}>{en ? "Videos" : "根拠動画"}</span>
       {refs.map((n) => {
-        const v = NOTE_ARTICLES.find((a) => a.id === "bpr" + n);
+        const v = NOTE_ARTICLES.find((a) => a.id === pre + n);
         if (!v) return null;
         return (
           <a key={n} href={v.u} target="_blank" rel="noopener noreferrer" title={v.t}
@@ -221725,7 +221925,7 @@ const BOOTCAMP_QUEST = {
     { id: "Q-MNOTE", name: ["実務論点マップ​（論点クイズ）", "Practice issue map quiz"], qn: MQB.NOTEISSUE_BANK.length, s: 9, e: 9, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, cats: mqDoms(MQB.NOTEISSUE_BANK, MQB.NOTEISSUE_DOMAINS) },
     { id: "Q-MSLQ", name: ["Slalom変革道場​（スキルクイズ）", "Slalom dojo skill quiz"], qn: MQB.SLALOM_BANK.length, s: 11, e: 12, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, cats: mqDoms(MQB.SLALOM_BANK, MQB.SLALOM_DOMAINS) },
   ],
-  practice: [{"id": "Q-P1", "name": ["基礎", "Core Reading"], "qn": 4, "unit": 1, "s": 9, "e": 9, "hub": "megatech", "cats": [{"n": ["戦略", "Strategy"], "q": 1}, {"n": ["論点マップ", "Issue Map"], "q": 1}, {"n": ["全体像（サービスマップ）", "Service Map"], "q": 1}, {"n": ["定量データ（ファクトブック）", "Factbook"], "q": 1}]}, {"id": "Q-P10", "name": ["暗黙知の形式知化", "Tacit → Explicit"], "qn": 9, "unit": 1, "s": 9, "e": 10, "hub": "megatech", "cats": [{"n": ["I 学問的土台 SECI×CTA", "I SECI x CTA"], "q": 1}, {"n": ["II 表出化の4特徴", "II Externalization"], "q": 1}, {"n": ["III 3+1 Step", "III 3+1 Steps"], "q": 1}, {"n": ["IV 8視点フレーム", "IV 8 Viewpoints"], "q": 1}, {"n": ["V CTA 5技法マッピング", "V CTA Techniques"], "q": 1}, {"n": ["VI OK&NG問答集", "VI OK & NG"], "q": 1}, {"n": ["VII 世界の関連手法13", "VII World Catalog"], "q": 1}, {"n": ["VIII 手法の選び方", "VIII Method Picker"], "q": 1}, {"n": ["IX 実装難易度スコアラー", "IX Difficulty Scorer"], "q": 1}]}, {"id": "Q-P11", "name": ["AX手法箱", "Method Toolbox"], "qn": 5, "unit": 1, "s": 10, "e": 11, "hub": "megatech", "cats": [{"n": ["I 業務可視化の記法5", "I Process Notations"], "q": 1}, {"n": ["II 発掘・優先順位付け", "II Discovery & Scoring"], "q": 1}, {"n": ["III PoC設計・効果測定", "III PoC & Benefits"], "q": 1}, {"n": ["IV Evals設計", "IV Evals Design"], "q": 1}, {"n": ["V データレディネス評価", "V Data Readiness"], "q": 1}]}, {"id": "Q-P2", "name": ["価値と診断", "Value & Assessment"], "qn": 5, "unit": 1, "s": 9, "e": 10, "hub": "megatech", "cats": [{"n": ["価値ドライバー", "Value Drivers"], "q": 1}, {"n": ["AX成熟度診断", "Maturity Assessment"], "q": 1}, {"n": ["ADOPT DESIGN（定着の設計図）", "Adoption Design"], "q": 1}, {"n": ["効果不振の診断ツリー", "Underperformance Triage"], "q": 1}, {"n": ["近未来レーダー", "Near-future Radar"], "q": 1}]}, {"id": "Q-P3", "name": ["提案の型 I〜XI", "Proposal Kit I-XI"], "qn": 11, "unit": 1, "s": 10, "e": 11, "hub": "megatech", "cats": [{"n": ["I 骨子7ステップ", "I Skeleton"], "q": 1}, {"n": ["II 案件検査10項目", "II Deal Check"], "q": 1}, {"n": ["III CFOに耐える計算", "III CFO Math"], "q": 1}, {"n": ["IV バトルカード", "IV Battlecards"], "q": 1}, {"n": ["V 想定問答12", "V Objections"], "q": 1}, {"n": ["VI 契約形態の型", "VI Contract Forms"], "q": 1}, {"n": ["VII フル提案書12P", "VII Sample Deck"], "q": 1}, {"n": ["VIII GOV GATE", "VIII GOV GATE"], "q": 1}, {"n": ["IX FIN GATE", "IX FIN GATE"], "q": 1}, {"n": ["X LAYER MAP", "X Layer Map"], "q": 1}, {"n": ["XI 契約・ステークホルダー", "XI Contracts & Stakeholders"], "q": 1}]}, {"id": "Q-P4", "name": ["商談実戦", "Deal Practice"], "qn": 4, "unit": 1, "s": 12, "e": 12, "hub": "megatech", "cats": [{"n": ["商談ドリル10", "Sales Drills"], "q": 1}, {"n": ["ディスカバリー質問8業種", "Discovery Questions"], "q": 1}, {"n": ["ケース演習10（AI採点）", "Case Work"], "q": 1}, {"n": ["模擬商談LIVE 5ペルソナ", "Live Deal Dojo"], "q": 1}]}, {"id": "Q-P5", "name": ["業界別（深掘り＋ツール）", "Industry Maps"], "qn": 8, "unit": 1, "s": 13, "e": 14, "hub": "megatech", "cats": [{"n": ["製造", "Manufacturing"], "q": 1}, {"n": ["金融", "Finance"], "q": 1}, {"n": ["小売・消費財", "Retail"], "q": 1}, {"n": ["物流・運輸", "Logistics"], "q": 1}, {"n": ["ヘルスケア・製薬", "Pharma"], "q": 1}, {"n": ["公共・自治体", "Public"], "q": 1}, {"n": ["エネルギー・公益", "Energy"], "q": 1}, {"n": ["建設・不動産", "Construction"], "q": 1}]}, {"id": "Q-P6", "name": ["エージェント棚", "Agent Shelf"], "qn": 4, "unit": 1, "s": 14, "e": 14, "hub": "megatech", "cats": [{"n": ["金融・保険", "Finance & Insurance"], "q": 1}, {"n": ["製造・建設・インフラ", "Mfg & Infra"], "q": 1}, {"n": ["小売・流通", "Retail & Dist."], "q": 1}, {"n": ["サービス・IT", "Service & IT"], "q": 1}]}, {"id": "Q-P7", "name": ["先端メニュー 15ドメイン", "Frontier Menu"], "qn": 15, "unit": 1, "s": 15, "e": 16, "hub": "megatech", "cats": [{"n": ["エージェントハーネス", "Agent Harness"], "q": 1}, {"n": ["エッジ・軽量化", "Edge & Quantization"], "q": 1}, {"n": ["トークン最適化", "Token Optimization"], "q": 1}, {"n": ["暗黙知の顕在化", "Tacit Knowledge"], "q": 1}, {"n": ["AI駆動開発", "AI-driven Dev"], "q": 1}, {"n": ["AgentOps・運用", "AgentOps"], "q": 1}, {"n": ["Physical AI", "Physical AI"], "q": 1}, {"n": ["Spatial AI", "Spatial AI"], "q": 1}, {"n": ["ロボット活用", "Robotics"], "q": 1}, {"n": ["データセンター・GPU", "DC & GPU"], "q": 1}, {"n": ["音声AI・対話", "Voice AI"], "q": 1}, {"n": ["ドキュメントAI・IDP", "Document AI"], "q": 1}, {"n": ["ドメイン特化モデル", "Custom Models"], "q": 1}, {"n": ["クリエイティブ・マーケAI", "Creative AI"], "q": 1}, {"n": ["AIサービス事業化", "AI Service Biz"], "q": 1}]}, {"id": "Q-P12", "name": ["統制の実務", "Governance Practice"], "qn": 2, "unit": 1, "s": 16, "e": 16, "hub": "megatech", "cats": [{"n": ["リスク評価実務（8行シート）", "Risk Sheet Practice"], "q": 1}, {"n": ["論点体系 S11×G16", "Issue Taxonomy S/G"], "q": 1}]}, {"id": "Q-P13", "name": ["変革の実務", "Transformation Practice"], "qn": 5, "unit": 1, "s": 11, "e": 11, "hub": "megatech", "cats": [{"n": ["I 役割の正体（3つの帽子）", "I Three Hats"], "q": 1}, {"n": ["II オペレーティングモデル6要素", "II Operating Model"], "q": 1}, {"n": ["III ADKAR 定着診断", "III ADKAR"], "q": 1}, {"n": ["IV デリバリーリードの5習慣", "IV Delivery Habits"], "q": 1}, {"n": ["V ベネフィット実現", "V Benefit Realization"], "q": 1}]}, {"id": "Q-P18", "name": ["業務再設計（BPR）", "Process Redesign (BPR)"], "qn": 7, "unit": 1, "s": 11, "e": 11, "hub": "megatech", "cats": [{"n": ["I 改善ロードマップ", "I Roadmap"], "q": 1}, {"n": ["II 消せる仕事10類型", "II Removable Work"], "q": 1}, {"n": ["III システム化の判定", "III System or Excel"], "q": 1}, {"n": ["IV 定着の構造", "IV Adoption"], "q": 1}, {"n": ["V KPIの付け替え", "V KPI Swap"], "q": 1}, {"n": ["VI 着手前の関門", "VI Gates"], "q": 1}, {"n": ["VII 横断8論点", "VII Eight Shifts"], "q": 1}]}, {"id": "Q-P14", "name": ["ファーム実務", "Global Firm Practice"], "qn": 4, "unit": 1, "s": 11, "e": 12, "hub": "megatech", "cats": [{"n": ["I 案件の入口2型", "I Deal Origination"], "q": 1}, {"n": ["II ラダーと昇進", "II Ladder & Promotion"], "q": 1}, {"n": ["III 面接想定問答5", "III Interview Q&A"], "q": 1}, {"n": ["IV 最初の90日", "IV First 90 Days"], "q": 1}]}, {"id": "Q-P15", "name": ["グローバル事例", "Global Cases"], "qn": 5, "unit": 1, "s": 12, "e": 12, "hub": "megatech", "cats": [{"n": ["I 事例11件（課題・打ち手・指標）", "I Eleven Cases"], "q": 1}, {"n": ["II 4つの型", "II Four Patterns"], "q": 1}, {"n": ["III 日本法人", "III The Japan Entity"], "q": 1}, {"n": ["VI 調査数値の扱い", "VI Handling Survey Figures"], "q": 1}, {"n": ["VIII 日本への翻訳の落とし穴", "VIII Translating to Japan"], "q": 1}]}, {"id": "Q-P16", "name": ["Slalom変革道場", "Slalom Dojo"], "qn": 5, "unit": 1, "s": 11, "e": 12, "hub": "megatech", "cats": [{"n": ["求められるスキル", "Skills"], "q": 1}, {"n": ["会社とTransformation", "Firm & practice"], "q": 1}, {"n": ["Slalomの事例", "Slalom cases"], "q": 1}, {"n": ["場面演習", "Scenario drills"], "q": 1}, {"n": ["90日計画・自己評価", "90 days & self-check"], "q": 1}]}, {"id": "Q-P17", "name": ["実務論点マップ", "Practice Issue Map"], "qn": 4, "unit": 1, "s": 9, "e": 9, "hub": "megatech", "cats": [{"n": ["論点マップ", "Issue map"], "q": 1}, {"n": ["統治の論点", "Governance"], "q": 1}, {"n": ["一次ソースと検証", "Sources & checks"], "q": 1}, {"n": ["記事エクスプローラ", "Articles"], "q": 1}]}, {"id": "Q-P8", "name": ["失敗学・事象", "Postmortems & Phenomena"], "qn": 13, "unit": 1, "s": 17, "e": 17, "hub": "megatech", "cats": [{"n": ["事象ファイル24", "Phenomena File"], "q": 1}, {"n": ["Zillow", "Zillow"], "q": 1}, {"n": ["Watson Health", "Watson Health"], "q": 1}, {"n": ["Air Canada", "Air Canada"], "q": 1}, {"n": ["McDonald's", "McDonald's"], "q": 1}, {"n": ["NYC MyCity", "NYC MyCity"], "q": 1}, {"n": ["Samsung", "Samsung"], "q": 1}, {"n": ["Amazon採用AI", "Amazon HR"], "q": 1}, {"n": ["英A-level", "UK A-levels"], "q": 1}, {"n": ["Avianca判例", "Avianca"], "q": 1}, {"n": ["Klarna", "Klarna"], "q": 1}, {"n": ["Bardデモ", "Bard demo"], "q": 1}, {"n": ["Deloitte豪", "Deloitte AU"], "q": 1}]}, {"id": "Q-P9", "name": ["リサーチ", "Research"], "qn": 5, "unit": 1, "s": 18, "e": 19, "hub": "megatech", "cats": [{"n": [`企業研究${MQB.COMPANIES.length}社`, `${MQB.COMPANIES.length} Companies`], "q": 1}, {"n": ["提供モデルの型", "Delivery Models"], "q": 1}, {"n": ["日本市場ビュー", "JP Market"], "q": 1}, {"n": ["AGI・ASI仮説トレ", "AGI/ASI Gym"], "q": 1}, {"n": ["PLAYBOOK 5ガイド", "Playbook Guides"], "q": 1}]}],
+  practice: [{"id": "Q-P1", "name": ["基礎", "Core Reading"], "qn": 4, "unit": 1, "s": 9, "e": 9, "hub": "megatech", "cats": [{"n": ["戦略", "Strategy"], "q": 1}, {"n": ["論点マップ", "Issue Map"], "q": 1}, {"n": ["全体像（サービスマップ）", "Service Map"], "q": 1}, {"n": ["定量データ（ファクトブック）", "Factbook"], "q": 1}]}, {"id": "Q-P10", "name": ["暗黙知の形式知化", "Tacit → Explicit"], "qn": 9, "unit": 1, "s": 9, "e": 10, "hub": "megatech", "cats": [{"n": ["I 学問的土台 SECI×CTA", "I SECI x CTA"], "q": 1}, {"n": ["II 表出化の4特徴", "II Externalization"], "q": 1}, {"n": ["III 3+1 Step", "III 3+1 Steps"], "q": 1}, {"n": ["IV 8視点フレーム", "IV 8 Viewpoints"], "q": 1}, {"n": ["V CTA 5技法マッピング", "V CTA Techniques"], "q": 1}, {"n": ["VI OK&NG問答集", "VI OK & NG"], "q": 1}, {"n": ["VII 世界の関連手法13", "VII World Catalog"], "q": 1}, {"n": ["VIII 手法の選び方", "VIII Method Picker"], "q": 1}, {"n": ["IX 実装難易度スコアラー", "IX Difficulty Scorer"], "q": 1}]}, {"id": "Q-P11", "name": ["AX手法箱", "Method Toolbox"], "qn": 5, "unit": 1, "s": 10, "e": 11, "hub": "megatech", "cats": [{"n": ["I 業務可視化の記法5", "I Process Notations"], "q": 1}, {"n": ["II 発掘・優先順位付け", "II Discovery & Scoring"], "q": 1}, {"n": ["III PoC設計・効果測定", "III PoC & Benefits"], "q": 1}, {"n": ["IV Evals設計", "IV Evals Design"], "q": 1}, {"n": ["V データレディネス評価", "V Data Readiness"], "q": 1}]}, {"id": "Q-P2", "name": ["価値と診断", "Value & Assessment"], "qn": 5, "unit": 1, "s": 9, "e": 10, "hub": "megatech", "cats": [{"n": ["価値ドライバー", "Value Drivers"], "q": 1}, {"n": ["AX成熟度診断", "Maturity Assessment"], "q": 1}, {"n": ["ADOPT DESIGN（定着の設計図）", "Adoption Design"], "q": 1}, {"n": ["効果不振の診断ツリー", "Underperformance Triage"], "q": 1}, {"n": ["近未来レーダー", "Near-future Radar"], "q": 1}]}, {"id": "Q-P3", "name": ["提案の型 I〜XI", "Proposal Kit I-XI"], "qn": 11, "unit": 1, "s": 10, "e": 11, "hub": "megatech", "cats": [{"n": ["I 骨子7ステップ", "I Skeleton"], "q": 1}, {"n": ["II 案件検査10項目", "II Deal Check"], "q": 1}, {"n": ["III CFOに耐える計算", "III CFO Math"], "q": 1}, {"n": ["IV バトルカード", "IV Battlecards"], "q": 1}, {"n": ["V 想定問答12", "V Objections"], "q": 1}, {"n": ["VI 契約形態の型", "VI Contract Forms"], "q": 1}, {"n": ["VII フル提案書12P", "VII Sample Deck"], "q": 1}, {"n": ["VIII GOV GATE", "VIII GOV GATE"], "q": 1}, {"n": ["IX FIN GATE", "IX FIN GATE"], "q": 1}, {"n": ["X LAYER MAP", "X Layer Map"], "q": 1}, {"n": ["XI 契約・ステークホルダー", "XI Contracts & Stakeholders"], "q": 1}]}, {"id": "Q-P4", "name": ["商談実戦", "Deal Practice"], "qn": 4, "unit": 1, "s": 12, "e": 12, "hub": "megatech", "cats": [{"n": ["商談ドリル10", "Sales Drills"], "q": 1}, {"n": ["ディスカバリー質問8業種", "Discovery Questions"], "q": 1}, {"n": ["ケース演習10（AI採点）", "Case Work"], "q": 1}, {"n": ["模擬商談LIVE 5ペルソナ", "Live Deal Dojo"], "q": 1}]}, {"id": "Q-P5", "name": ["業界別（深掘り＋ツール）", "Industry Maps"], "qn": 8, "unit": 1, "s": 13, "e": 14, "hub": "megatech", "cats": [{"n": ["製造", "Manufacturing"], "q": 1}, {"n": ["金融", "Finance"], "q": 1}, {"n": ["小売・消費財", "Retail"], "q": 1}, {"n": ["物流・運輸", "Logistics"], "q": 1}, {"n": ["ヘルスケア・製薬", "Pharma"], "q": 1}, {"n": ["公共・自治体", "Public"], "q": 1}, {"n": ["エネルギー・公益", "Energy"], "q": 1}, {"n": ["建設・不動産", "Construction"], "q": 1}]}, {"id": "Q-P6", "name": ["エージェント棚", "Agent Shelf"], "qn": 4, "unit": 1, "s": 14, "e": 14, "hub": "megatech", "cats": [{"n": ["金融・保険", "Finance & Insurance"], "q": 1}, {"n": ["製造・建設・インフラ", "Mfg & Infra"], "q": 1}, {"n": ["小売・流通", "Retail & Dist."], "q": 1}, {"n": ["サービス・IT", "Service & IT"], "q": 1}]}, {"id": "Q-P7", "name": ["先端メニュー 15ドメイン", "Frontier Menu"], "qn": 15, "unit": 1, "s": 15, "e": 16, "hub": "megatech", "cats": [{"n": ["エージェントハーネス", "Agent Harness"], "q": 1}, {"n": ["エッジ・軽量化", "Edge & Quantization"], "q": 1}, {"n": ["トークン最適化", "Token Optimization"], "q": 1}, {"n": ["暗黙知の顕在化", "Tacit Knowledge"], "q": 1}, {"n": ["AI駆動開発", "AI-driven Dev"], "q": 1}, {"n": ["AgentOps・運用", "AgentOps"], "q": 1}, {"n": ["Physical AI", "Physical AI"], "q": 1}, {"n": ["Spatial AI", "Spatial AI"], "q": 1}, {"n": ["ロボット活用", "Robotics"], "q": 1}, {"n": ["データセンター・GPU", "DC & GPU"], "q": 1}, {"n": ["音声AI・対話", "Voice AI"], "q": 1}, {"n": ["ドキュメントAI・IDP", "Document AI"], "q": 1}, {"n": ["ドメイン特化モデル", "Custom Models"], "q": 1}, {"n": ["クリエイティブ・マーケAI", "Creative AI"], "q": 1}, {"n": ["AIサービス事業化", "AI Service Biz"], "q": 1}]}, {"id": "Q-P12", "name": ["統制の実務", "Governance Practice"], "qn": 2, "unit": 1, "s": 16, "e": 16, "hub": "megatech", "cats": [{"n": ["リスク評価実務（8行シート）", "Risk Sheet Practice"], "q": 1}, {"n": ["論点体系 S11×G16", "Issue Taxonomy S/G"], "q": 1}]}, {"id": "Q-P13", "name": ["変革の実務", "Transformation Practice"], "qn": 6, "unit": 1, "s": 11, "e": 11, "hub": "megatech", "cats": [{"n": ["I 役割の正体（3つの帽子）", "I Three Hats"], "q": 1}, {"n": ["II オペレーティングモデル6要素", "II Operating Model"], "q": 1}, {"n": ["III ADKAR 定着診断", "III ADKAR"], "q": 1}, {"n": ["IV デリバリーリードの5習慣", "IV Delivery Habits"], "q": 1}, {"n": ["V ベネフィット実現", "V Benefit Realization"], "q": 1}, {"n": ["VI データ人材の再設計", "VI Data Talent"], "q": 1}]}, {"id": "Q-P18", "name": ["業務再設計（BPR）", "Process Redesign (BPR)"], "qn": 7, "unit": 1, "s": 11, "e": 11, "hub": "megatech", "cats": [{"n": ["I 改善ロードマップ", "I Roadmap"], "q": 1}, {"n": ["II 消せる仕事10類型", "II Removable Work"], "q": 1}, {"n": ["III システム化の判定", "III System or Excel"], "q": 1}, {"n": ["IV 定着の構造", "IV Adoption"], "q": 1}, {"n": ["V KPIの付け替え", "V KPI Swap"], "q": 1}, {"n": ["VI 着手前の関門", "VI Gates"], "q": 1}, {"n": ["VII 横断8論点", "VII Eight Shifts"], "q": 1}]}, {"id": "Q-P14", "name": ["ファーム実務", "Global Firm Practice"], "qn": 4, "unit": 1, "s": 11, "e": 12, "hub": "megatech", "cats": [{"n": ["I 案件の入口2型", "I Deal Origination"], "q": 1}, {"n": ["II ラダーと昇進", "II Ladder & Promotion"], "q": 1}, {"n": ["III 面接想定問答5", "III Interview Q&A"], "q": 1}, {"n": ["IV 最初の90日", "IV First 90 Days"], "q": 1}]}, {"id": "Q-P15", "name": ["グローバル事例", "Global Cases"], "qn": 5, "unit": 1, "s": 12, "e": 12, "hub": "megatech", "cats": [{"n": ["I 事例11件（課題・打ち手・指標）", "I Eleven Cases"], "q": 1}, {"n": ["II 4つの型", "II Four Patterns"], "q": 1}, {"n": ["III 日本法人", "III The Japan Entity"], "q": 1}, {"n": ["VI 調査数値の扱い", "VI Handling Survey Figures"], "q": 1}, {"n": ["VIII 日本への翻訳の落とし穴", "VIII Translating to Japan"], "q": 1}]}, {"id": "Q-P16", "name": ["Slalom変革道場", "Slalom Dojo"], "qn": 5, "unit": 1, "s": 11, "e": 12, "hub": "megatech", "cats": [{"n": ["求められるスキル", "Skills"], "q": 1}, {"n": ["会社とTransformation", "Firm & practice"], "q": 1}, {"n": ["Slalomの事例", "Slalom cases"], "q": 1}, {"n": ["場面演習", "Scenario drills"], "q": 1}, {"n": ["90日計画・自己評価", "90 days & self-check"], "q": 1}]}, {"id": "Q-P17", "name": ["実務論点マップ", "Practice Issue Map"], "qn": 4, "unit": 1, "s": 9, "e": 9, "hub": "megatech", "cats": [{"n": ["論点マップ", "Issue map"], "q": 1}, {"n": ["統治の論点", "Governance"], "q": 1}, {"n": ["一次ソースと検証", "Sources & checks"], "q": 1}, {"n": ["記事エクスプローラ", "Articles"], "q": 1}]}, {"id": "Q-P8", "name": ["失敗学・事象", "Postmortems & Phenomena"], "qn": 13, "unit": 1, "s": 17, "e": 17, "hub": "megatech", "cats": [{"n": ["事象ファイル24", "Phenomena File"], "q": 1}, {"n": ["Zillow", "Zillow"], "q": 1}, {"n": ["Watson Health", "Watson Health"], "q": 1}, {"n": ["Air Canada", "Air Canada"], "q": 1}, {"n": ["McDonald's", "McDonald's"], "q": 1}, {"n": ["NYC MyCity", "NYC MyCity"], "q": 1}, {"n": ["Samsung", "Samsung"], "q": 1}, {"n": ["Amazon採用AI", "Amazon HR"], "q": 1}, {"n": ["英A-level", "UK A-levels"], "q": 1}, {"n": ["Avianca判例", "Avianca"], "q": 1}, {"n": ["Klarna", "Klarna"], "q": 1}, {"n": ["Bardデモ", "Bard demo"], "q": 1}, {"n": ["Deloitte豪", "Deloitte AU"], "q": 1}]}, {"id": "Q-P9", "name": ["リサーチ", "Research"], "qn": 5, "unit": 1, "s": 18, "e": 19, "hub": "megatech", "cats": [{"n": [`企業研究${MQB.COMPANIES.length}社`, `${MQB.COMPANIES.length} Companies`], "q": 1}, {"n": ["提供モデルの型", "Delivery Models"], "q": 1}, {"n": ["日本市場ビュー", "JP Market"], "q": 1}, {"n": ["AGI・ASI仮説トレ", "AGI/ASI Gym"], "q": 1}, {"n": ["PLAYBOOK 5ガイド", "Playbook Guides"], "q": 1}]}],
   cons: [
     { id: "Q-CG", name: ["基礎暗記・用語辞典", "Basics/Glossary 131"], qn: 131, s: 1, e: 1, hub: "consulting", qmile: true, mile: BOOTCAMP_QMILE, mk: "cons", mi: 7, cats: [{n:["ロジカル","Logical"],q:22},{n:["クリティカル","Critical"],q:25},{n:["ラテラル","Lateral"],q:16},{n:["クリエイティブ","Creative"],q:17},{n:["構造化","Structuring"],q:21},{n:["DX","DX"],q:15},{n:["AI","AI"],q:15}] },
     { id: "Q-C0", name: ["ロジカル​シンキング", "Logical Thinking"], qn: 230, s: 1, e: 1, hub: "consulting", qmile: true, mile: BOOTCAMP_QMILE, mk: "cons", mi: 0, cats: [{n:["Lv1 基礎","Lv1 basics"],q:10},{n:["Lv2 標準","Lv2 core"],q:119},{n:["Lv3 応用","Lv3 applied"],q:67},{n:["Lv4 発展","Lv4 advanced"],q:34}] },
