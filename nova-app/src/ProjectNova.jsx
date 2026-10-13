@@ -11,6 +11,7 @@ import ANYTHING_MEMO_HTML from "../public/anything-memo.html?raw";
 import FORESIGHT from "./data/foresight-briefs.json";
 import FORESIGHT_SOURCES from "./data/foresight-sources.json";
 import FORESIGHT_COLLECTION from "./data/foresight-collection.json";
+import FORESIGHT_THEMES from "./data/foresight-collection-themes.json";
 
 // =============================================================================
 // QUIZ SAVE SLOT — ゲームのセーブのように、クイズの途中経過を1スロット保存/再開する
@@ -154507,13 +154508,66 @@ function FsRefresh({ en }) {
     </div>
   );
 }
+const FS_THEME_OF = Object.fromEntries(FORESIGHT_THEMES.flatMap((t) => t.items.map((id) => [id, t.id])));
+function FsCollectionTree({ rows, en, open, setOpen, layerName }) {
+  const byTheme = {}; const mine = [];
+  rows.forEach((x) => { if (x.mine) mine.push(x); else { const t = FS_THEME_OF[x.id]; (byTheme[t] = byTheme[t] || []).push(x); } });
+  const groups = [...FORESIGHT.layers.map((l) => l.id), ""];
+  const item = (x) => (
+    <div key={x.id} style={{ borderTop: `1px solid ${C.line}`, padding: "9px 0" }}>
+      <div style={{ fontSize: 13, fontWeight: 700, lineHeight: 1.55 }}>
+        {x.url || x.gmail ? <a href={x.url || x.gmail} target="_blank" rel="noopener noreferrer" style={{ color: C.text, textDecoration: "none", borderBottom: `1px solid ${C.line}` }}>{x.title}</a> : x.title}
+      </div>
+      <div style={{ fontSize: 11, color: C.dim, marginTop: 2 }}>{x.label}{x.date ? " · " + x.date : ""}{x.tagList.length ? " · " + x.tagList.join(" / ") : ""}</div>
+      {x.memo && <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.65, marginTop: 4, whiteSpace: "pre-wrap" }}>{x.memo}</div>}
+    </div>
+  );
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+      {mine.length > 0 && (
+        <div>
+          <div className="gh-display" style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>{en ? "Added by me" : "自分で追加"} <span style={{ fontSize: 12, color: C.dim }}>{mine.length}</span></div>
+          <Card>{mine.map(item)}</Card>
+        </div>
+      )}
+      {groups.map((g) => {
+        const themes = FORESIGHT_THEMES.filter((t) => t.layer === g && byTheme[t.id]);
+        if (!themes.length) return null;
+        const n = themes.reduce((a, t) => a + byTheme[t.id].length, 0);
+        return (
+          <div key={g || "other"}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 8 }}>
+              <span className="gh-display" style={{ fontSize: 17, fontWeight: 700, color: C.fore }}>{layerName(g)}</span>
+              <span style={{ fontSize: 12, color: C.dim }}>{themes.length} {en ? "themes" : "テーマ"} · {n} {en ? "items" : "件"}</span>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,330px),1fr))", gap: 10 }}>
+              {themes.map((t) => { const its = byTheme[t.id]; const on = !!open[t.id]; return (
+                <Card key={t.id} style={on ? { gridColumn: "1 / -1" } : {}}>
+                  <div onClick={() => setOpen((o) => ({ ...o, [t.id]: !o[t.id] }))} style={{ cursor: "pointer", display: "flex", gap: 10, alignItems: "flex-start" }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 10.5, letterSpacing: ".14em", color: C.gold, textTransform: "uppercase" }}>{t.title[1]}</div>
+                      <div className="gh-display" style={{ fontSize: 15, fontWeight: 700, lineHeight: 1.5, marginTop: 2 }}>{en ? t.title[1] : t.title[0]}</div>
+                    </div>
+                    <span style={{ fontSize: 12, color: C.dim, flexShrink: 0, paddingTop: 2 }}>{its.length}{en ? "" : "件"} {on ? "▲" : "▼"}</span>
+                  </div>
+                  {!en && <div style={{ fontSize: 12.5, lineHeight: 1.75, marginTop: 8 }}>{t.summary}</div>}
+                  {!en && <div style={{ fontSize: 12.5, color: C.gold, lineHeight: 1.7, marginTop: 6 }}>So What：{t.sowhat}</div>}
+                  {on && <div style={{ marginTop: 10 }}>{its.map(item)}</div>}
+                </Card>); })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 function FsCollection({ en }) {
   const blank = { title: "", url: "", layer: "", tags: "", memo: "" };
   const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k) || "null") || d; } catch (e) { return d; } };
   const [items, setItems] = useState(() => load(FS_COL_KEY, []));
   const [hidden, setHidden] = useState(() => load(FS_COL_KEY + "_hidden", []));
   const [form, setForm] = useState(blank); const [edit, setEdit] = useState(null);
-  const [q, setQ] = useState(""); const [ly, setLy] = useState(""); const [src, setSrc] = useState(""); const [showHidden, setShowHidden] = useState(false);
+  const [q, setQ] = useState(""); const [ly, setLy] = useState(""); const [src, setSrc] = useState(""); const [showHidden, setShowHidden] = useState(false); const [view, setView] = useState(FORESIGHT_THEMES.length ? "struct" : "list"); const [openTh, setOpenTh] = useState({});
   const store = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 保存できない環境では画面上だけ保持 */ } };
   const save = (next) => { setItems(next); store(FS_COL_KEY, next); };
   const hide = (id, on) => { const next = on ? [...hidden, id] : hidden.filter((x) => x !== id); setHidden(next); store(FS_COL_KEY + "_hidden", next); };
@@ -154578,10 +154632,14 @@ function FsCollection({ en }) {
           <option value="">{en ? "All sources" : "すべての出所"}</option>
           {labels.map((l) => <option key={l} value={l}>{l}</option>)}
         </select>
+        <div style={{ display: "inline-flex", border: `1px solid ${C.line}`, borderRadius: 8, overflow: "hidden" }}>
+          {[["struct", en ? "By theme" : "テーマ別"], ["list", en ? "List" : "一覧"]].map(([k, l]) => (
+            <button key={k} onClick={() => setView(k)} style={{ border: "none", cursor: "pointer", padding: "8px 14px", fontSize: 12.5, fontWeight: 700, background: view === k ? C.fore : C.surface2, color: view === k ? C.bg : C.muted }}>{l}</button>))}
+        </div>
         <button className="gh-btn" onClick={() => setShowHidden((v) => !v)} style={showHidden ? { borderColor: C.gold, color: C.gold } : {}}>{showHidden ? (en ? "Back to list" : "一覧に戻る") : (en ? `Hidden (${hidden.length})` : `非表示（${hidden.length}）`)}</button>
       </div>
       <div style={{ fontSize: 11.5, color: C.dim, marginBottom: 8 }}>{rows.length} {en ? "items" : "件"}</div>
-      {!rows.length ? <div style={{ fontSize: 12.5, color: C.dim }}>{en ? "No matching items." : "条件に合う項目はありません。"}</div> : (
+      {view === "struct" && rows.length ? <FsCollectionTree rows={rows} en={en} open={openTh} setOpen={setOpenTh} layerName={layerName} /> : !rows.length ? <div style={{ fontSize: 12.5, color: C.dim }}>{en ? "No matching items." : "条件に合う項目はありません。"}</div> : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,330px),1fr))", gap: 10 }}>
           {rows.map((x) => (
             <Card key={x.id}>
