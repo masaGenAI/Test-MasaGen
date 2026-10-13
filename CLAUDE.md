@@ -26,6 +26,10 @@
 `.claude/skills/flier-summary-authoring/` の手順と品質基準に従う（PDF だけを根拠に、合計1,500〜1,900字・要点6〜9個、要約者レビューと著者の主張を書き分ける）。
 差し込む前に `check_summary.py` のエラーを 0 にし、本を追加したら下の整合性点検も行う。
 
+## Book-Summary の YouTube 要約を追加・直すとき
+`.claude/skills/youtube-summary-authoring/` の手順と基準に従う（既存の実測値に合わせた長さ・体裁・帰属、根拠の量に応じた段、水増し禁止）。
+差し込みは `apply_yt.py` 経由で行い、`check_yt.py` の不合格を 0 にしてから入れる。
+
 ## Project Nova を更新したあと・全体を点検するとき
 `.claude/skills/nova-consistency-audit/` の手順に従う（ポータルのタグ・Mastery Track・説明文・コメントに残る古い件数や名称を洗い出す）。
 `python3 .claude/skills/nova-consistency-audit/scripts/stale_scan.py` で MISMATCH が 0 になるまで直す。
