@@ -77,7 +77,7 @@ def run(W, only=None):
         if extra: e.append(f"根拠にない数値 {extra[:8]}")
         bc = bad_chars(text)
         if bc: e.append(f"簡体字・キリル文字 {''.join(sorted(set(bc)))}")
-        if KEIGO.search(text.replace("「", "").replace("」", "」")) and not re.search(r"「[^」]*(です|ます)[^」]*」", text):
+        if KEIGO.search(re.sub(r"「[^」]*」|『[^』]*』", "", text)):  # 引用（「」『』）の中の敬体は対象外
             e.append("敬体（です・ます）")
         pad = [w for w in PAD if w in text]
         if pad: e.append(f"水増し表現 {pad}")
