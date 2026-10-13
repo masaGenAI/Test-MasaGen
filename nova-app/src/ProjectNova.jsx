@@ -154562,8 +154562,8 @@ function FsCollectionTree({ rows, en, open, setOpen, layerName }) {
                     </div>
                     <span style={{ fontSize: 12, color: C.dim, flexShrink: 0, paddingTop: 2 }}>{its.length}{en ? "" : "件"} {on ? "▲" : "▼"}</span>
                   </div>
-                  {!en && <div style={{ fontSize: 12.5, lineHeight: 1.75, marginTop: 8 }}>{t.summary}</div>}
-                  {!en && <div style={{ fontSize: 12.5, color: C.gold, lineHeight: 1.7, marginTop: 6 }}>So What：{t.sowhat}</div>}
+                  {on && !en && <div style={{ fontSize: 12.5, lineHeight: 1.75, marginTop: 8 }}>{t.summary}</div>}
+                  {on && !en && <div style={{ fontSize: 12.5, color: C.gold, lineHeight: 1.7, marginTop: 6 }}>So What：{t.sowhat}</div>}
                   {on && <div style={{ marginTop: 10 }}>{its.map(item)}</div>}
                 </Card>); })}
             </div>
