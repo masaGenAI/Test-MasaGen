@@ -39,7 +39,8 @@ def bad_chars(s):
             except UnicodeEncodeError: bad.append(ch)
     return bad
 PAD = ["と考えられる", "とも言える", "と言えるだろう", "ではないだろうか", "なお、", "非常に重要", "言うまでもなく"]
-KEIGO = re.compile(r"(です|ます|でした|ました|ません)[。」]")
+# 「励ます」「示す」のような普通の動詞を拾わないよう、ます の前はかなの連用形に限る
+KEIGO = re.compile(r"(です|でした|ました|ません|[しいりきみちにびけせてえめれげぎ]ます)[。」]")
 
 def run(W, only=None):
     """合格した id の一覧と、(id, 理由) の一覧を返す。"""
