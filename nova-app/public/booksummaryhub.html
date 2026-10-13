@@ -1978,7 +1978,7 @@ const SKY  = "9BC8EE";
 ============================================================ */
 const SOURCES = [
   { id:'flier',  title:'flier',   sub:'ビジネス書の要約サービス', icon:'book' },
-  { id:'kindle', title:'Kindle',  sub:'自分で読んだ本の要約',     icon:'book' },
+  { id:'kindle', title:'Kindle',  sub:'自分で読んだ本の要約',     icon:'book', always:true },
   { id:'yt', title:'YouTube', sub:'チャンネル別の学びの記録', icon:'folder', children:[
       { id:"sam", title:"サムの本解説", sub:"書籍を1本1冊で解説するチャンネル", icon:"folder", children:[
         { id:"psych", title:"心理学", sub:"判断・説得・やる気の心理" },
@@ -5932,9 +5932,9 @@ function renderRoot(){
 }
 
 /* 出典ノードを行として並べる。子があればその一覧へ、なければ書架へ進む。 */
-/* 1冊も入っていない末端の出典（例: Kindle）は一覧に出さない。データを入れれば自動で現れる。 */
+/* 1冊も入っていない末端の出典は一覧に出さない。ただし always の付いた枠（Kindle）は空でも「これから」として出す。 */
 function hasContent(node, parentPath){
-  return (node.children || []).length > 0 || countByPath(parentPath.concat(node.id)) > 0;
+  return !!node.always || (node.children || []).length > 0 || countByPath(parentPath.concat(node.id)) > 0;
 }
 function srcRows(list, nodes, parentPath){
   nodes = (nodes || []).filter(n => hasContent(n, parentPath));
@@ -6110,7 +6110,9 @@ function openSourceNode(path){
   const backLabel = path.length > 1 ? srcNodeAt(path.slice(0, -1)).title : 'SOURCES';
   const emptyNote = kids.length
     ? 'まだ枝がありません。SOURCES の children に足すと、ここに並びます。'
-    : 'まだ1冊も入っていません。要約を追加すると、下の書架に振り分けられます。';
+    : (path[0] === 'kindle'
+      ? 'まだ1冊も入っていません。Kindle で読んだ本の要約を追加すると、flier と同じ10ジャンルの書架に振り分けてここに並びます。'
+      : 'まだ1冊も入っていません。要約を追加すると、10ジャンルの書架に振り分けてここに並びます。');
   el.innerHTML = `
     <button class="back-btn" onclick="goBack()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
@@ -6201,7 +6203,7 @@ function openShelf(path){
     </button>
     <h2>${node.title} 全体</h2>
     <p class="detail-sub">${srcTrail(path).map(x => x.node.title).join(' › ')} の配下すべて ・ ${total} ${unitFor(path)}収録</p>
-    ${total === 0 ? `<div class="empty-state" style="margin:18px 0 6px">まだ1冊も入っていません。要約を追加すると、下の書架に振り分けられます。</div>` : ''}
+    ${total === 0 ? `<div class="empty-state" style="margin:18px 0 6px">まだ1冊も入っていません。要約を追加すると、10ジャンルの書架に振り分けてここに並びます。</div>` : ''}
     <div class="index-header-eyebrow"><span>INDEX</span></div>
     <div class="index-list" id="list-${viewId}"></div>
     ${backBtnBottomHTML(node.title)}
