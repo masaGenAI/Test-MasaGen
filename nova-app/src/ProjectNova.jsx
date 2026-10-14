@@ -214013,10 +214013,10 @@ const TrainingHubModule = (function () {
   const TC = {
     ink: "#0E1E38", sub: "#5B6B85", faint: "#A9B4C6", line: "#DEE5EF", panel: "#F4F7FB", bg: "#FFFFFF",
     accent: "#1E7A6E", accentSoft: "#E3F2EF", dot: "#7CC4B8",
-    squat: "#1F6FB0", run: "#1E7A6E", walk: "#5B4FC4", rest: "#64748B", dinner: "#975A16", skip: "#C2410C", other: "#0E7490",
+    squat: "#1F6FB0", run: "#1E7A6E", walk: "#5B4FC4", aero: "#B83280", rest: "#64748B", dinner: "#975A16", skip: "#C2410C", skipset: "#7C6F64", other: "#0E7490",
     warnBg: "#FFF4E5",
   };
-  const KIND_COLOR = { squat: TC.squat, run: TC.run, walk: TC.walk };
+  const KIND_COLOR = { squat: TC.squat, run: TC.run, walk: TC.walk, aero: TC.aero };
 
   // ---- メニューの元データ（ユーザーのプランそのまま。Set調整で上書きした値はこれに重ねる） ----
   const EX_NAME = { squat: "スクワット", chest: "チェストプレス", lat: "ラットプルダウン", torso: "ロータリートルソー" };
@@ -214034,10 +214034,11 @@ const TrainingHubModule = (function () {
     "ランニング5分なら、その後のウォーキング35分",
     "ランニング10分なら、その後のウォーキング30分",
   ];
-  const sq = { id: "squat", w: null, reps: "8〜12回", sets: 3 };
-  const ch = (sets) => ({ id: "chest", w: 72, reps: "8〜10回", sets });
-  const la = (sets) => ({ id: "lat", w: 41, reps: "10〜12回", sets });
-  const to = { id: "torso", w: 50, reps: "左右各10回", sets: 3 };
+  // 各種目は重量ごとの段（plan）で持つ。2026-10 にユーザー指定のメニューへ変更（全Set共通）
+  const sq = { id: "squat", plan: "20kg×10回、50kg×10回、60kg×20回、65kg×10回（5回×2セット）" };
+  const ch = () => ({ id: "chest", plan: "79kg×5回、72kg×35回、66kg×10回" });
+  const la = () => ({ id: "lat", plan: "41kg×40回、36kg×10回" });
+  const to = { id: "torso", plan: "50kg×20回×左右2セット、45kg×10回×左右1セット" };
   const BASE = {
     S1: { id: "S1", n: 1, kind: "squat", title: "スクワット＋上半身＋ウォーキング", items: [sq, ch(5), la(5), to], aero: { total: 60, steps: AERO_WALK } },
     S2: { id: "S2", n: 2, kind: "run", title: "上半身＋ランニング", items: [ch(3), la(3), to], aero: { total: 60, steps: AERO_RUN } },
@@ -214051,7 +214052,11 @@ const TrainingHubModule = (function () {
       "最後5分：傾斜・速度を下げてウォーキング",
     ] } },
   };
+  // 有酸素だけの日（Set1〜5 の巡回には入れない。記録しても次の Set は進まない）
+  BASE.A = { id: "A", n: 0, label: "有酸素", kind: "aero", title: "有酸素のみ", items: [], aero: { total: 60, steps: AERO_WALK } };
   const SET_IDS = ["S1", "S2", "S3", "S4", "S5"];
+  const PICK_IDS = [...SET_IDS, "A"];
+  const setName = (s) => (s ? (s.label || `Set${s.n}`) : "?");
   // 1巡：Set1 → Set2 → 休養日 → Set3 → Set4 → Set5 → 休養日
   const CYCLE = ["S1", "S2", "R", "S3", "S4", "S5", "R"];
 
@@ -214094,11 +214099,11 @@ const TrainingHubModule = (function () {
     return { ...b, items: b.items.map((it) => ({ ...it, ...((a.items || {})[it.id] || {}) })), aero: { ...b.aero, ...(a.aero || {}) } };
   };
   // 記録した日のメニュー（あとで Set調整を変えても、その日にやった内容は変わらない）
-  const snap = (set) => ({ items: set.items.map(({ id, w, reps, sets }) => ({ id, w, reps, sets })), aero: set.aero });
+  const snap = (set) => ({ items: set.items.map((it) => ({ ...it })), aero: set.aero });
   const recSet = (rec, adj) => (rec && rec.set && BASE[rec.set]
     ? (rec.menu ? { ...BASE[rec.set], ...rec.menu } : effSet(adj, rec.set))
     : null);
-  const fmtItem = (it) => `${it.w != null ? `${it.w}kg目安・` : ""}${it.reps} × ${it.sets}セット`;
+  const fmtItem = (it) => (it.plan ? it.plan : `${it.w != null ? `${it.w}kg目安・` : ""}${it.reps} × ${it.sets}セット`);
   const baseItem = (setId, exId) => BASE[setId].items.find((x) => x.id === exId);
 
   // ---- 日付（端末の暦日で扱う。toISOString は UTC になり日本時間の朝に前日へずれる） ----
@@ -214115,11 +214120,13 @@ const TrainingHubModule = (function () {
   // ---- 順番の計算 ----
   // 完了：その Set の次へ進む（予定と違う Set をやった場合もそこに合わせ直す）
   // 休養・会食：計画上の休養日が来ていればそれを消化する。そうでなければ進めない（続きの Set から再開）
-  // 未実施・その他：進めない
+  // 未実施・その他：進めない　Skip：予定を飛ばして次へ進む
   const stepCycle = (pos, rec) => {
     if (!rec || !rec.s) return pos;
     if (rec.s === "done" && rec.set) { const i = CYCLE.indexOf(rec.set); return i < 0 ? pos : (i + 1) % CYCLE.length; }
     if ((rec.s === "rest" || rec.s === "dinner") && CYCLE[pos] === "R") return (pos + 1) % CYCLE.length;
+    // Skip：予定の Set（または休養日）を飛ばして次へ進む。未実施は進めない
+    if (rec.s === "skipset") return (pos + 1) % CYCLE.length;
     return pos;
   };
   // 休養日の位置なら、その次の Set（予定を変えて筋トレした日の既定値に使う）
@@ -214188,7 +214195,7 @@ const TrainingHubModule = (function () {
     return (
       <div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
-          <span style={chip(KIND_COLOR[set.kind], "#fff")}>Set{set.n}</span>
+          <span style={chip(KIND_COLOR[set.kind], "#fff")}>{setName(set)}</span>
           <span style={{ fontSize: 14, fontWeight: 800, color: TC.ink }}>{set.title}</span>
         </div>
         <ol style={{ margin: 0, paddingLeft: 20, color: TC.ink, fontSize: 13, lineHeight: 1.8 }}>
@@ -214239,11 +214246,11 @@ const TrainingHubModule = (function () {
   function MenuPicker({ value, expected, onPick }) {
     return (
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-        {SET_IDS.map((id) => {
+        {PICK_IDS.map((id) => {
           const s = BASE[id];
           return (
             <button key={id} onClick={() => onPick(id)} aria-pressed={value === id} style={{ ...btn(value === id, KIND_COLOR[s.kind]), position: "relative" }}>
-              Set{s.n}
+              {setName(s)}
               {expected === id ? <span style={{ fontSize: 10, fontWeight: 700, marginLeft: 5, opacity: value === id ? 0.9 : 0.75 }}>予定</span> : null}
             </button>
           );
@@ -214270,11 +214277,11 @@ const TrainingHubModule = (function () {
   // 記録の表示名
   const statusText = (r) => {
     if (!r || !r.s) return "";
-    if (r.s === "done") return `Set${BASE[r.set] ? BASE[r.set].n : "?"} 完了`;
+    if (r.s === "done") return `${setName(BASE[r.set])} 完了`;
     if (r.s === "other") return `その他${r.other ? `：${r.other}` : ""}`;
-    return { skip: "未実施", rest: "休養", dinner: "会食" }[r.s] || "";
+    return { skip: "未実施", skipset: "Skip", rest: "休養", dinner: "会食" }[r.s] || "";
   };
-  const planText = (p) => (p === "R" ? "休養日" : p === "dinner" ? "会食" : `Set${BASE[p].n}`);
+  const planText = (p) => (p === "R" ? "休養日" : p === "dinner" ? "会食" : setName(BASE[p]));
 
   // ---- 今日のトレーニング（その場で記録する） ----
   function TodayCard({ days, adj, todayK, proj, onPut, openEditor }) {
@@ -214311,7 +214318,7 @@ const TrainingHubModule = (function () {
       else if (pick === "other") { if (other.trim()) onPut(todayK, { s: "other", other: other.trim() }); }
       else onPut(todayK, { s: "rest" });
     };
-    const primary = set ? `✓ Set${set.n} 完了` : pick === "other" ? "✓ その他を記録" : "✓ 休養";
+    const primary = set ? `✓ ${setName(set)} 完了` : pick === "other" ? "✓ その他を記録" : "✓ 休養";
     return (
       <div style={{ ...card, borderColor: TC.ink }}>
         {head}
@@ -214340,6 +214347,7 @@ const TrainingHubModule = (function () {
           <button onClick={commit} disabled={pick === "other" && !other.trim()}
                   style={{ ...btn(true, pick === "other" ? TC.other : undefined), opacity: pick === "other" && !other.trim() ? 0.5 : 1 }}>{primary}</button>
           {expected !== "R" ? <button onClick={() => onPut(todayK, { s: "skip" })} style={btn(false)}>未実施</button> : null}
+          <button onClick={() => onPut(todayK, { s: "skipset" })} style={btn(false)} title="予定を飛ばして、次回は次のSetから">Skip</button>
           {expected !== "R" ? <button onClick={() => onPut(todayK, { s: "rest" })} style={btn(false)}>休養</button> : null}
           <button onClick={() => onPut(todayK, { s: "dinner" })} style={btn(false)}>会食</button>
           <button onClick={() => setPick(pick === "other" ? (expected === "R" ? null : expected) : "other")} aria-pressed={pick === "other"}
@@ -214381,6 +214389,7 @@ const TrainingHubModule = (function () {
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
               <button onClick={() => { if (!worked) pickSet(nextSet || "S1"); }} style={btn(worked)}>完了</button>
               <button onClick={() => onPut({ s: "skip" })} style={btn(r.s === "skip", TC.skip)}>未実施</button>
+              <button onClick={() => onPut({ s: "skipset" })} style={btn(r.s === "skipset", TC.skipset)} title="予定を飛ばして、次回は次のSetから">Skip</button>
               <button onClick={() => onPut({ s: "rest" })} style={btn(r.s === "rest", TC.rest)}>休養</button>
               <button onClick={() => onPut({ s: "dinner" })} style={btn(r.s === "dinner", TC.dinner)}>会食</button>
               <button onClick={() => onPut({ s: "other" })} style={btn(r.s === "other", TC.other)}>その他</button>
@@ -214959,7 +214968,7 @@ const TrainingHubModule = (function () {
         {xs.map((x, i) => <li key={i}>{x}</li>)}
       </ul>
     );
-    const anyAdj = SET_IDS.some((id) => adj && adj[id]);
+    const anyAdj = PICK_IDS.some((id) => adj && adj[id]);
     return (
       <div>
         <div style={{ ...card, background: TC.panel }}>
@@ -214980,6 +214989,10 @@ const TrainingHubModule = (function () {
             ) : null}
           </React.Fragment>
         ))}
+        <div style={card}>
+          <SetMenu set={effSet(adj, "A")} base={BASE.A} />
+          <div style={{ ...cap, marginTop: 8, marginBottom: 0 }}>有酸素だけの日に選ぶメニューです。Set1〜5 の巡回には入らず、記録しても次の Set は進みません。</div>
+        </div>
         <div style={card}>
           <div style={h2}>負荷・回復の調整</div>
           {list(LOAD_RULES)}
@@ -215018,7 +215031,7 @@ const TrainingHubModule = (function () {
     const [sid, setSid] = useState("S1");
     const set = effSet(adj, sid);
     const base = BASE[sid];
-    const others = (exId) => SET_IDS.filter((id) => id !== sid && BASE[id].items.some((x) => x.id === exId));
+    const others = (exId) => PICK_IDS.filter((id) => id !== sid && BASE[id].items.some((x) => x.id === exId));
     // 1種目の1項目を変える。元のプランと同じ値に戻したら差分を消す
     const setItem = (setId, exId, patch) => putAdj((a) => {
       const b = baseItem(setId, exId);
@@ -215051,15 +215064,15 @@ const TrainingHubModule = (function () {
           </div>
         </div>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
-          {SET_IDS.map((id) => (
+          {PICK_IDS.map((id) => (
             <button key={id} onClick={() => setSid(id)} aria-pressed={sid === id} style={btn(sid === id, KIND_COLOR[BASE[id].kind])}>
-              Set{BASE[id].n}{adj && adj[id] ? " ●" : ""}
+              {setName(BASE[id])}{adj && adj[id] ? " ●" : ""}
             </button>
           ))}
         </div>
         <div style={card}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
-            <span style={chip(KIND_COLOR[set.kind], "#fff")}>Set{set.n}</span>
+            <span style={chip(KIND_COLOR[set.kind], "#fff")}>{setName(set)}</span>
             <span style={{ fontSize: 14, fontWeight: 800, color: TC.ink }}>{set.title}</span>
           </div>
           {set.items.map((it) => {
@@ -215072,6 +215085,13 @@ const TrainingHubModule = (function () {
                   <b style={{ fontSize: 13.5, color: TC.ink }}>{EX_NAME[it.id]}</b>
                   {changed ? <span style={{ fontSize: 11.5, color: TC.sub }}>元のプラン：{fmtItem(b)}</span> : null}
                 </div>
+                {b.plan ? (
+                <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center" }}>
+                  <label style={{ fontSize: 12, color: TC.sub }}>重量×回数&nbsp;
+                    <Field value={it.plan} width="min(100%, 480px)" placeholder={b.plan} onCommit={(v) => setItem(sid, it.id, { plan: String(v).trim() || b.plan })} />
+                  </label>
+                </div>
+                ) : (
                 <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center" }}>
                   <label style={{ fontSize: 12, color: TC.sub }}>重量&nbsp;
                     <Field value={it.w} width={72} inputMode="decimal" placeholder="指定なし" suffix="kg"
@@ -215085,13 +215105,14 @@ const TrainingHubModule = (function () {
                            onCommit={(v) => { const n = parseInt(v, 10); if (n >= 1 && n <= 10) setItem(sid, it.id, { sets: n }); }} />
                   </label>
                 </div>
+                )}
                 <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 }}>
                   {os.length ? (
-                    <button onClick={() => os.forEach((id) => setItem(id, it.id, { w: it.w, reps: it.reps }))} style={{ ...btn(false), ...small }}>
-                      重量・回数を{os.map((id) => `Set${BASE[id].n}`).join("・")}にもそろえる
+                    <button onClick={() => os.forEach((id) => setItem(id, it.id, b.plan ? { plan: it.plan } : { w: it.w, reps: it.reps }))} style={{ ...btn(false), ...small }}>
+                      重量・回数を{os.map((id) => setName(BASE[id])).join("・")}にもそろえる
                     </button>
                   ) : null}
-                  {changed ? <button onClick={() => setItem(sid, it.id, { w: b.w, reps: b.reps, sets: b.sets })} style={{ ...btn(false), ...small }}>元に戻す</button> : null}
+                  {changed ? <button onClick={() => setItem(sid, it.id, b.plan ? { plan: b.plan } : { w: b.w, reps: b.reps, sets: b.sets })} style={{ ...btn(false), ...small }}>元に戻す</button> : null}
                 </div>
               </div>
             );
@@ -215126,12 +215147,12 @@ const TrainingHubModule = (function () {
         </div>
         {adj && adj[sid] ? (
           <div style={{ textAlign: "right", marginBottom: 14 }}>
-            <button onClick={() => { if (window.confirm(`Set${set.n}の調整をすべて元のプランに戻しますか？`)) putAdj((a) => { delete a[sid]; return a; }); }}
-                    style={{ ...btn(false), ...small, color: TC.skip }}>Set{set.n}をすべて元のプランに戻す</button>
+            <button onClick={() => { if (window.confirm(`${setName(set)}の調整をすべて元のプランに戻しますか？`)) putAdj((a) => { delete a[sid]; return a; }); }}
+                    style={{ ...btn(false), ...small, color: TC.skip }}>{setName(set)}をすべて元のプランに戻す</button>
           </div>
         ) : null}
         <div style={card}>
-          <div style={{ ...cap, marginBottom: 8 }}>いまのSet{set.n}（記録画面に表示される内容）</div>
+          <div style={{ ...cap, marginBottom: 8 }}>いまの{setName(set)}（記録画面に表示される内容）</div>
           <SetMenu set={set} base={base} />
         </div>
       </div>
@@ -215151,7 +215172,8 @@ const TrainingHubModule = (function () {
     const badge = (k) => {
       const r = days[k];
       if (r && r.s) {
-        if (r.s === "done") { const s = BASE[r.set]; return <span style={chip(s ? KIND_COLOR[s.kind] : TC.ink, "#fff")}>✓Set{s ? s.n : "?"}</span>; }
+        if (r.s === "done") { const s = BASE[r.set]; return <span style={chip(s ? KIND_COLOR[s.kind] : TC.ink, "#fff")}>✓{setName(s)}</span>; }
+        if (r.s === "skipset") return <span style={chip(TC.skipset, "#fff")}>Skip</span>;
         if (r.s === "other") return <span style={chip(TC.other, "#fff")}>その他</span>;
         if (r.s === "skip") return <span style={chip(TC.bg, TC.skip, `1.5px solid ${TC.skip}`)}>未実施</span>;
         if (r.s === "rest") return <span style={chip(TC.rest, "#fff")}>休養</span>;
@@ -215211,7 +215233,9 @@ const TrainingHubModule = (function () {
           <span style={chip(TC.other, "#fff")}>その他</span>
           <span style={chip(TC.rest, "#fff")}>休養</span>
           <span style={chip(TC.dinner, "#fff")}>会食</span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 5, whiteSpace: "nowrap" }}><span style={chip(TC.aero, "#fff")}>有酸素</span><span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: 1.2, color: TC.ink, marginRight: 4 }}>CARDIO</span></span>
           <span style={chip(TC.bg, TC.skip, `1.5px solid ${TC.skip}`)}>未実施</span>
+          <span style={chip(TC.skipset, "#fff")}>Skip</span>
           <span style={chip("transparent", TC.sub, `1px dashed ${TC.faint}`)}>点線</span><span>このまま進めた場合の予定</span>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><span style={{ width: 6, height: 6, borderRadius: 3, background: TC.dinner }} />食事の記録あり</span>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><span style={{ width: 6, height: 6, borderRadius: 3, background: TC.sub }} />メモあり</span>
@@ -215230,7 +215254,7 @@ const TrainingHubModule = (function () {
     const total = per.reduce((a, b) => a + b.n, 0);
     const others = [
       ["その他", cnt((r) => r.s === "other")], ["休養", cnt((r) => r.s === "rest")],
-      ["会食", cnt((r) => r.s === "dinner")], ["未実施", cnt((r) => r.s === "skip")],
+      ["会食", cnt((r) => r.s === "dinner")], ["未実施", cnt((r) => r.s === "skip")], ["Skip", cnt((r) => r.s === "skipset")], ["有酸素", cnt((r) => r.s === "done" && r.set === "A")],
     ];
     return (
       <div style={card}>
