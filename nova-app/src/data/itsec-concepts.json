@@ -1,0 +1,1658 @@
+[
+ {
+  "id": "epp",
+  "layer": "endpoint",
+  "name": "EPP",
+  "full": "Endpoint Protection Platform（エンドポイント保護基盤・次世代AVを含む）",
+  "def": "PC・サーバ・スマートデバイスなどの端末を監視し、マルウェアやランサムウェアの侵入を防止する対策。デジタル庁はゼロトラストの「リソースの状態を確認する」機能の一つに位置づけている。",
+  "how": "端末上のファイルやプロセスの振る舞いを常時監視し、クラウド側の機械学習も使って脅威を検出・遮断する。例えばMicrosoft Defender Antivirusは、ローカルとクラウドの機械学習、振る舞い分析、ヒューリスティックで悪意あるコードを止め、新たな脅威をほぼ即時にブロックする。",
+  "diff": "EDRが侵入後の検知と対処を担うのに対し、EPPは侵入そのものを防ぐ側にあたる。例えばMicrosoft Defender for Endpointは、予防的な防御と侵入後の検知・対応を一つの端末向け基盤で提供する。",
+  "ai": "Microsoftの次世代保護には、端末上で動くローカルAIエージェントへの攻撃を、エージェントの動作ループを監視してブロックする機能が含まれる。AIを動かす端末の防御もEPPの対象になる。",
+  "related": [
+   "edr",
+   "xdr",
+   "mdm-uem",
+   "patch-vuln"
+  ],
+  "sources": [
+   {
+    "t": "ゼロトラストアーキテクチャ適用方針に対応した機能のマッピング（参考資料2）",
+    "pub": "デジタル庁",
+    "url": "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/ad619888-36bb-4f67-a61f-b44779bad1e9/786ed561/20230921_meeting_network_solution_02.pdf"
+   },
+   {
+    "t": "Next-generation protection overview",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/defender-endpoint/next-generation-protection"
+   },
+   {
+    "t": "What is Microsoft Defender XDR?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/defender-xdr/microsoft-365-defender"
+   }
+  ]
+ },
+ {
+  "id": "edr",
+  "layer": "endpoint",
+  "name": "EDR",
+  "full": "Endpoint Detection and Response（エンドポイントでの検知と対応）",
+  "def": "端末（パソコン・サーバ・スマートデバイス等）の操作や動作を監視し、サイバー攻撃を受けたことを発見し次第対処する仕組み。侵入されることを前提に、侵入後の検知と封じ込めを担う。",
+  "how": "プロセス、ネットワーク通信、ログイン、レジストリやファイルの変更などの挙動データを継続的に収集する。例えばMicrosoft Defender for Endpointは、同じ攻撃手法や同一攻撃者の警告を一つのインシデントにまとめ、6か月分のデータを遡って調べ、端末の隔離などで対処する。",
+  "diff": "EPPは侵入の防止、EDRは侵入後の検知と対処が主な役割。EDRが端末の挙動を見るのに対し、XDRは端末に加えてID・メール・アプリなど複数領域の信号を関連付ける。",
+  "ai": "生成AIを使う端末の挙動も事後に追跡できるため、AIツールを経由した不審な操作の調査材料になる。AI導入の際は、対象端末へのEDR展開状況を確認項目に入れる。",
+  "related": [
+   "epp",
+   "xdr",
+   "mdr",
+   "patch-vuln"
+  ],
+  "sources": [
+   {
+    "t": "ゼロトラストアーキテクチャ適用方針に対応した機能のマッピング（参考資料2）",
+    "pub": "デジタル庁",
+    "url": "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/ad619888-36bb-4f67-a61f-b44779bad1e9/786ed561/20230921_meeting_network_solution_02.pdf"
+   },
+   {
+    "t": "Overview of endpoint detection and response",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/defender-endpoint/overview-endpoint-detection-response"
+   }
+  ]
+ },
+ {
+  "id": "xdr",
+  "layer": "endpoint",
+  "name": "XDR",
+  "full": "Extended Detection and Response（拡張された検知と対応）",
+  "def": "端末・ID・メール・アプリケーションなど複数の領域にまたがって、検知、予防、調査、対応を連携させる統合防御。例えばMicrosoft Defender XDRは、侵入前と侵入後の両方を対象とする統合防御スイートである。",
+  "how": "各製品の警告や不審なイベントを結び付けて一つのインシデントにまとめ、侵入経路と影響を受けた資産を一画面で追えるようにする。Microsoft Defender XDRは、複数の製品の高信頼な信号を相関させて攻撃を自動で封じ込め、過去30日分の生データを製品横断で検索できる。",
+  "diff": "EDRは端末の挙動に特化する。XDRはそこにID・メール・クラウドアプリの信号を足して相関させる。SIEMが組織全体のログを集めて分析しアラートを出すのに対し、XDRは各製品の検知と対処まで一体で行う。",
+  "ai": "端末・ID・クラウドアプリの信号をまとめて追えるため、生成AIサービスの利用に絡む不審なサインインや端末の挙動を、横断的に調べる土台になる。",
+  "related": [
+   "edr",
+   "mdr",
+   "siem",
+   "conditional-access"
+  ],
+  "sources": [
+   {
+    "t": "What is Microsoft Defender XDR?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/defender-xdr/microsoft-365-defender"
+   },
+   {
+    "t": "ゼロトラストアーキテクチャ適用方針に対応した機能のマッピング（参考資料2）",
+    "pub": "デジタル庁",
+    "url": "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/ad619888-36bb-4f67-a61f-b44779bad1e9/786ed561/20230921_meeting_network_solution_02.pdf"
+   }
+  ]
+ },
+ {
+  "id": "mdr",
+  "layer": "endpoint",
+  "name": "MDR",
+  "full": "Managed Detection and Response（監視・対応の運用代行サービス）",
+  "def": "検知と対応の運用を専門アナリストが代行するサービス。例えばMicrosoft Defender Experts MDRでは、アナリストが24時間体制でインシデントのキューを管理し、調査を代行して、自ら対処するか顧客の対応を案内する。",
+  "how": "顧客のセキュリティ運用センター（SOC）を置き換えるのではなく補う位置づけで、アラートの処理量を減らし、組織に影響する脅威に人手を回せるようにする。同サービスのPlan 2は、Microsoft Sentinelに集めた一部の他社製品のログまで対象を広げる。",
+  "diff": "EDRやXDRは検知と対処のためのツールで、MDRはそれを使って人が運用するサービス。同サービスは侵害が起きた後のインシデント対応作業そのものは含まず、別のサービスが用意されている。",
+  "ai": "生成AIの導入で監視対象が増えても、自社のSOCに人員が足りない場合の選択肢になる。契約前に、対象となる製品・ログの範囲と、自社との役割分担を確認する。",
+  "related": [
+   "edr",
+   "xdr",
+   "soc",
+   "siem"
+  ],
+  "sources": [
+   {
+    "t": "What is Microsoft Defender Experts MDR?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/defender-xdr/dex-xdr-overview"
+   },
+   {
+    "t": "ゼロトラストアーキテクチャ適用方針に対応した機能のマッピング（参考資料2）",
+    "pub": "デジタル庁",
+    "url": "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/ad619888-36bb-4f67-a61f-b44779bad1e9/786ed561/20230921_meeting_network_solution_02.pdf"
+   }
+  ]
+ },
+ {
+  "id": "mdm-uem",
+  "layer": "endpoint",
+  "name": "MDM／UEM",
+  "full": "Mobile Device Management／Unified Endpoint Management（モバイル端末管理／統合エンドポイント管理）",
+  "def": "スマートフォンやタブレット等のモバイル端末を総合的に管理するツール。デジタル庁の資料ではEMM(MDM)と表記され、ゼロトラストで端末を識別できる状態にする機能に位置づけられる。",
+  "how": "例えばMicrosoft Intuneは、Android、iOS/iPadOS、Linux、macOS、Windowsの端末を同じクラウドサービスで登録・設定・更新し、紛失時は端末を消去できる。端末の準拠状態を条件付きアクセスへ渡し、準拠しない端末からのアクセスを止められる。",
+  "diff": "MDMは端末全体を管理し、MAMは業務アプリとその中のデータだけを管理する。MAMは私物端末（BYOD）向けで、退職時に組織のデータだけを選択的に消去できる。",
+  "ai": "端末の準拠状態を条件付きアクセスに連携すれば、管理下の端末だけに業務データや生成AIサービスの利用を許す運用ができる。私物端末はMAMでアプリ内のデータに絞って守る。",
+  "related": [
+   "epp",
+   "edr",
+   "conditional-access",
+   "patch-vuln"
+  ],
+  "sources": [
+   {
+    "t": "ゼロトラストアーキテクチャ適用方針に対応した機能のマッピング（参考資料2）",
+    "pub": "デジタル庁",
+    "url": "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/ad619888-36bb-4f67-a61f-b44779bad1e9/786ed561/20230921_meeting_network_solution_02.pdf"
+   },
+   {
+    "t": "What is Microsoft Intune?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/intune/intune-service/fundamentals/what-is-intune"
+   }
+  ]
+ },
+ {
+  "id": "patch-vuln",
+  "layer": "endpoint",
+  "name": "パッチ管理・脆弱性管理",
+  "full": "Patch Management／Vulnerability Management",
+  "def": "脆弱性管理は、脆弱性と設定の不備を洗い出して評価し、修正し、追跡する活動。パッチ管理は、その修正の主な手段である更新プログラムを、端末やサーバへ計画的に配布・適用する運用を指す。",
+  "how": "例えばMicrosoft Defender Vulnerability Managementは、ソフトウェアや証明書、ブラウザ拡張などを継続的に棚卸しし、実際に悪用されている脆弱性や重要な資産を優先して対処を促す。適用はIntuneの更新リングで段階的に展開し、緊急の更新は延期設定を上書きして即時に配布できる。",
+  "diff": "パッチ管理は更新を当てる作業、脆弱性管理はどれを直すべきかを見つけて優先順位を付ける作業を含む。更新を当てられない場合は、構成変更や脆弱なアプリのブロックなど別の緩和策を取る。",
+  "ai": "生成AI関連のクライアントソフトやブラウザ拡張も棚卸しの対象に入れる。AI導入で増える端末上のソフトを台帳から漏らさないことが、更新漏れを防ぐ前提になる。",
+  "related": [
+   "edr",
+   "epp",
+   "mdm-uem",
+   "zero-trust"
+  ],
+  "sources": [
+   {
+    "t": "What is Microsoft Defender Vulnerability Management",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/defender-vulnerability-management/defender-vulnerability-management"
+   },
+   {
+    "t": "Windows update management overview",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/intune/device-updates/windows/"
+   },
+   {
+    "t": "Microsoft 製品の脆弱性対策について（2026年6月）",
+    "pub": "IPA",
+    "url": "https://www.ipa.go.jp/security/security-alert/2026/0610-ms.html"
+   }
+  ]
+ },
+ {
+  "id": "iam",
+  "layer": "identity",
+  "name": "IAM",
+  "full": "Identity and Access Management（IDとアクセスの管理）",
+  "def": "適切な人、マシン、ソフトウェアが、適切な資源に、適切なタイミングでアクセスできるようにする仕組み。まず本人であることを証明させ、そのうえで資源へのアクセスを許可または拒否する。",
+  "how": "IDの作成と管理、フェデレーション、ユーザーの付与と剥奪（プロビジョニング）、認証、認可、アクセス制御、レポートと監視で構成される。IDは人だけでなく、ワークロード、デバイス、AIエージェントにも発行される。",
+  "diff": "認証は本人確認、認可は何をしてよいかの判断で、別の処理である。IAMはその両方を含む枠組みで、IdP、SSO、MFAはその構成要素、PAMは特権に特化した領域にあたる。",
+  "ai": "Microsoft Entra Agent IDのように、AIエージェントへ独立したIDを与えて認証・認可・統制する仕組みが現れている。生成AI導入では、AIにどのIDで何をさせるかをIAMの設計対象に含める。",
+  "related": [
+   "idp-idaas",
+   "sso",
+   "mfa",
+   "pam",
+   "least-privilege"
+  ],
+  "sources": [
+   {
+    "t": "Identity and access management fundamental concepts",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/entra/fundamentals/identity-fundamental-concepts"
+   },
+   {
+    "t": "Step 1: Understand Identity definitions",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/microsoft-365/education/guide/2-baseline/identity/baseline-identity"
+   },
+   {
+    "t": "ゼロトラストアーキテクチャ適用方針に対応した機能のマッピング（参考資料2）",
+    "pub": "デジタル庁",
+    "url": "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/ad619888-36bb-4f67-a61f-b44779bad1e9/786ed561/20230921_meeting_network_solution_02.pdf"
+   }
+  ]
+ },
+ {
+  "id": "idp-idaas",
+  "layer": "identity",
+  "name": "IdP／IDaaS",
+  "full": "Identity Provider／Identity as a Service（IDプロバイダ／クラウド型ID管理）",
+  "def": "IdPは、IDの情報を作成・維持・管理し、認証、認可、監査のサービスを提供する仕組み。IDaaSは、複数のシステムごとに設定されたIDを統合管理し、アクセス権限も適切に管理する、クラウド型の形態を指す。",
+  "how": "アプリは利用者の認証をIdPに任せ、利用者は共通のIDで各アプリにサインインする。IdPがポリシーの設定、利用者の挙動の監視、不審な動きの検知を中央で担い、アプリ側が個別のIDとパスワードを持つ必要は減る。",
+  "diff": "IdPは認証を担う役割、IDaaSはそれをクラウドサービスとして使う提供形態を指す。IAMはIdPを含む上位の枠組みで、アプリはIdPの認証結果を受け取って使う側にあたる。",
+  "ai": "Azureの設計指針は、独自のID基盤を作らず信頼できるIdPを使うよう勧める。生成AIサービスの認証もIdPに集約し、サービスごとの個別アカウントを増やさない。",
+  "related": [
+   "iam",
+   "sso",
+   "mfa",
+   "id-lifecycle"
+  ],
+  "sources": [
+   {
+    "t": "Identity and access management fundamental concepts",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/entra/fundamentals/identity-fundamental-concepts"
+   },
+   {
+    "t": "Architecture strategies for identity and access management",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/azure/well-architected/security/identity-access"
+   },
+   {
+    "t": "ゼロトラストアーキテクチャ適用方針に対応した機能のマッピング（参考資料2）",
+    "pub": "デジタル庁",
+    "url": "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/ad619888-36bb-4f67-a61f-b44779bad1e9/786ed561/20230921_meeting_network_solution_02.pdf"
+   }
+  ]
+ },
+ {
+  "id": "sso",
+  "layer": "identity",
+  "name": "SSO",
+  "full": "Single Sign-On（シングルサインオン）",
+  "def": "利用者が一度サインインすれば、割り当てられた複数のアプリケーションへ再度サインインせずにアクセスできる仕組み。認証はIdPが行い、アプリは認証結果を受け取って利用を許可する。",
+  "how": "アプリが利用者をIdPへ送り、IdPが資格情報を確認して本人であることをアプリに伝える。連携方式はXML形式のSAML 2.0と、OAuth 2.0上のJSONトークンを使うOIDCが代表的で、非対応のアプリにはIdPが資格情報を保管して代行入力する方式もある。",
+  "diff": "SSOは再認証を減らして管理を一元化する仕組み、MFAは認証の強度を上げる仕組みで、目的が違い併用する。SAMLは従来型のWebアプリ、OIDCは新しいWebアプリ・モバイル・APIに向く。",
+  "ai": "生成AIサービスをSSO配下に置けば、利用ポリシーの適用やアクセス停止をIdP側で一括して行える。企業向けの生成AIサービスを選ぶ際は、SSO対応を要件に含める。",
+  "related": [
+   "idp-idaas",
+   "mfa",
+   "iam",
+   "id-lifecycle"
+  ],
+  "sources": [
+   {
+    "t": "What is single sign-on in Microsoft Entra ID?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/what-is-single-sign-on"
+   },
+   {
+    "t": "Identity and access management fundamental concepts",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/entra/fundamentals/identity-fundamental-concepts"
+   }
+  ]
+ },
+ {
+  "id": "mfa",
+  "layer": "identity",
+  "name": "MFA",
+  "full": "Multi-Factor Authentication（多要素認証）",
+  "def": "サインイン時にパスワードに加えて別の種類の本人確認を求める認証方式。要素は「知っていること」「持っているもの」「本人の特徴（生体）」に分かれ、2種類以上を組み合わせる。",
+  "how": "パスワードだけでは、弱い場合や他所で漏えいした場合に攻撃者が使えてしまう。第2の要素は攻撃者が入手・複製しにくいため安全性が上がる。方法の例は、認証アプリ、FIDO2パスキー、ハードウェアキー、SMSや音声通話である。",
+  "diff": "MFAは認証の強さ、SSOは認証の回数を減らす仕組みで目的が違う。条件付きアクセスは、どの場面でMFAを求めるかを決める側にあたり、社内ネットワークでは通常のサインイン、社外や私物端末では追加要素を求められる。",
+  "ai": "デジタル庁は、本人確認のリスクが高い場合の施策として全利用者のMFA必須化を挙げている。生成AIサービスの管理者や、社内データと連携する利用者には、まずMFAを必須にする。",
+  "related": [
+   "sso",
+   "conditional-access",
+   "iam",
+   "pam"
+  ],
+  "sources": [
+   {
+    "t": "How it works: Microsoft Entra multifactor authentication",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-mfa-howitworks"
+   },
+   {
+    "t": "ゼロトラストアーキテクチャ適用方針（DS-210）",
+    "pub": "デジタル庁",
+    "url": "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/e2a06143-ed29-4f1d-9c31-0f06fca67afc/5efa5c3b/20220630_resources_standard_guidelines_guidelines_04.pdf"
+   },
+   {
+    "t": "Identity and access management fundamental concepts",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/entra/fundamentals/identity-fundamental-concepts"
+   }
+  ]
+ },
+ {
+  "id": "conditional-access",
+  "layer": "identity",
+  "name": "条件付きアクセス",
+  "full": "Conditional Access",
+  "def": "利用者がリソースへアクセスする際に、利用者、場所、端末、アプリ、リスクなどの信号を集めて、許可、追加要件の要求、拒否を決める仕組み。「もし〜なら〜せよ」という形でポリシーを書く。",
+  "how": "例えばMicrosoft Entra条件付きアクセスは、第一要素の認証後にポリシーを評価する。判断はブロックか、MFA、準拠端末、パスワード変更などを求める許可で、管理者ロールへのMFA要求やレガシー認証のブロックなどが典型例である。",
+  "diff": "MFAは追加の本人確認という手段で、条件付きアクセスはそれを求めるかどうかを状況で決める制御。ロールによる認可が「誰が何をできるか」を決めるのに対し、端末や場所などの状況で入口を絞る。",
+  "ai": "Microsoft Entra条件付きアクセスは、AIエージェントのIDも対象にでき（プレビュー）、ゼロトラストの原則をAIワークロードへ広げる。利用者側でも「準拠端末のみ許可」などの条件を組める。",
+  "related": [
+   "mfa",
+   "mdm-uem",
+   "iam",
+   "least-privilege"
+  ],
+  "sources": [
+   {
+    "t": "What is Conditional Access?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/entra/identity/conditional-access/overview"
+   },
+   {
+    "t": "What is Microsoft Intune?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/intune/intune-service/fundamentals/what-is-intune"
+   }
+  ]
+ },
+ {
+  "id": "pam",
+  "layer": "identity",
+  "name": "PAM",
+  "full": "Privileged Access Management（特権アクセス管理）",
+  "def": "管理者などの特権アカウントと、重要なシステムへの特権アクセスを管理・統制する仕組み。人の特権アカウントに加え、アプリケーションやサービスのアカウントも対象になる。",
+  "how": "必要な間だけ権限を与えるジャストインタイム（JIT）、開始日と終了日を持つ期限付きの割り当て、承認、有効化時のMFA、理由の入力、アクセスレビュー、監査履歴で統制する。例えばMicrosoft Entra Privileged Identity Managementがこれらを備える。",
+  "diff": "通常のIAMは全利用者のアクセスを扱うのに対し、PAMは影響の大きい管理者権限に絞り、常時付与を避けて時間や承認で制限する。最小権限の原則を特権に適用する運用手段とも位置づけられる。",
+  "ai": "AI基盤の管理者権限や、AIが呼び出すサービスアカウントも特権になり得る。これらを常時付与とせず、必要なときだけ有効化する運用を設計に含める。",
+  "related": [
+   "iam",
+   "least-privilege",
+   "mfa",
+   "id-lifecycle"
+  ],
+  "sources": [
+   {
+    "t": "What is Microsoft Entra Privileged Identity Management?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-configure"
+   },
+   {
+    "t": "Step 1: Understand Identity definitions",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/microsoft-365/education/guide/2-baseline/identity/baseline-identity"
+   },
+   {
+    "t": "Architecture strategies for identity and access management",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/azure/well-architected/security/identity-access"
+   }
+  ]
+ },
+ {
+  "id": "id-lifecycle",
+  "layer": "identity",
+  "name": "IDライフサイクル管理",
+  "full": "Identity Lifecycle Management（プロビジョニング・SCIM）",
+  "def": "入社、異動、退職に合わせて、アカウントとアクセス権の作成、変更、無効化・削除を一貫して管理する活動。付与（プロビジョニング）と剥奪（デプロビジョニング）の両方を含む。",
+  "how": "例えばMicrosoft Entraのプロビジョニングサービスは、アプリ側のSCIM 2.0のAPIを通じてユーザーとグループを作成・更新・削除する。割り当てやグループの所属で対象を決め、対象から外れた利用者は既定で無効化し、削除されたIDはアプリ側でも削除する。",
+  "diff": "SSOは「どのIDでサインインするか」を扱い、SCIMによるプロビジョニングは「アカウントそのものの作成と無効化」を扱う。SCIMはその連携に使う標準のプロトコルである。",
+  "ai": "Azureの設計指針は、IDのアクセスをリソースの寿命より長く残さず、アクセスレビューで退職者の権限を外すよう求める。生成AIサービスのアカウントも同じ棚卸しの対象にする。",
+  "related": [
+   "iam",
+   "idp-idaas",
+   "sso",
+   "pam"
+  ],
+  "sources": [
+   {
+    "t": "How Application Provisioning works in Microsoft Entra ID",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/entra/identity/app-provisioning/how-provisioning-works"
+   },
+   {
+    "t": "Architecture strategies for identity and access management",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/azure/well-architected/security/identity-access"
+   },
+   {
+    "t": "What is Microsoft Entra?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/entra/fundamentals/what-is-entra"
+   }
+  ]
+ },
+ {
+  "id": "least-privilege",
+  "layer": "identity",
+  "name": "最小権限の原則",
+  "full": "Principle of Least Privilege",
+  "def": "各ユーザーに、担当する作業に必要な最小限の権限だけを与える運用原則。デジタル庁は、リソース間のアクセスがこの原則を満たすようアクセス制御ルールで評価し、施行する考え方をゼロトラストとして示す。",
+  "how": "ロールには作業を完了できる権限だけを割り当て、適用範囲（スコープ）も職務の範囲に絞る。読み取りだけで足りるかを問い、最小の権限から始めて必要に応じて追加する。個別のリソースや個人に紐づく許可は避け、組み込みロールとグループで管理する。",
+  "diff": "JITは権限を持つ時間を絞り、最小権限は権限の大きさを絞る。両者を組み合わせると、IDが侵害された際の影響範囲を小さくできる。",
+  "ai": "Microsoft Entra Agent IDの例では、AIエージェントごとに統制されたIDを与え、最小権限でアクセスさせ、行動の監査証跡を残す。生成AIにデータを連携させる際も、読み取り専用から始める。",
+  "related": [
+   "pam",
+   "iam",
+   "conditional-access",
+   "zero-trust"
+  ],
+  "sources": [
+   {
+    "t": "Architecture strategies for identity and access management",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/azure/well-architected/security/identity-access"
+   },
+   {
+    "t": "ゼロトラストアーキテクチャ適用方針（DS-210）",
+    "pub": "デジタル庁",
+    "url": "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/e2a06143-ed29-4f1d-9c31-0f06fca67afc/5efa5c3b/20220630_resources_standard_guidelines_guidelines_04.pdf"
+   },
+   {
+    "t": "What is Microsoft Entra Privileged Identity Management?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-configure"
+   }
+  ]
+ },
+ {
+  "id": "firewall",
+  "layer": "network",
+  "name": "ファイアウォール／NGFW",
+  "full": "Firewall / Next-Generation Firewall（ファイアウォール／次世代ファイアウォール）",
+  "def": "外部のネットワークと内部のネットワークを結ぶ箇所に導入し、外部からの不正な侵入を防ぐシステム、またはそれを導入した機器。ネットワーク境界の基本的な防御にあたる。",
+  "how": "ルールに従って通信を通すか遮断するかを決める。クラウド型の例であるAzure FirewallはL3からL7までを検査し、FQDNやURLの単位で通信先を制限できる。Premiumは侵入の検知・防止（IDPS）やTLS検査も備え、MicrosoftはこれをNGFWと位置づける。",
+  "diff": "一般的なファイアウォールがネットワークレベルで監視するのに対し、WAFはWebアプリケーションの通信をアプリケーションレベルで監視する。DDoS対策は通信の許可判断とは別に、過負荷攻撃を緩和する。",
+  "ai": "社内から外部の生成AIサービスへ出る通信を、通信先のFQDNやURLの単位で許可・拒否する土台になる。利用者単位の制御やデータ持ち出し対策は、SWGやCASBが担う。",
+  "related": [
+   "waf",
+   "ids-ips",
+   "ddos",
+   "swg",
+   "fwaas",
+   "segmentation"
+  ],
+  "sources": [
+   {
+    "t": "用語集（は行）：ファイアウォール、プロキシサーバ",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/glossary/ja_06/"
+   },
+   {
+    "t": "What is Azure network security?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/azure/networking/security/network-security"
+   },
+   {
+    "t": "Azure Firewall performance",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/azure/firewall/firewall-performance"
+   }
+  ]
+ },
+ {
+  "id": "ids-ips",
+  "layer": "network",
+  "name": "IDS／IPS",
+  "full": "Intrusion Detection System / Intrusion Prevention System（侵入検知システム／侵入防止システム）",
+  "def": "IDSは、ネットワークから届くパケットを識別して不正侵入やアタックを検知し、管理者に知らせるシステム。IPSは検知に加えて、不正なパケットを自動的に遮断する機能を持つ。",
+  "how": "パケットを識別して不正なアクセスを見つけ、IDSはメールやアラームなど事前に決めた方法で管理者に連絡する。IPSは自動で遮断する。製品例のAzure Firewall PremiumのIDPSは、バイト列や既知の悪性命令列などのパターンで攻撃を検知し、記録・報告し、設定により遮断もする。",
+  "diff": "IDSは検知して知らせるまで、IPSは遮断まで行う点が違う。ファイアウォールの許可・拒否のルールとは別に、通信のパターンから攻撃を見分ける役割を持つ。",
+  "ai": "生成AIやRAGの基盤をクラウドに置く場合、基盤の入口や内部通信の不審な挙動を見張る層として使える。誤検知で正当な通信を止めない運用も、導入時に決めておく。",
+  "related": [
+   "firewall",
+   "waf",
+   "ddos"
+  ],
+  "sources": [
+   {
+    "t": "用語集（さ行）：侵入検知システム、侵入防止システム",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/glossary/ja_03/"
+   },
+   {
+    "t": "Azure Firewall Premium features implementation guide",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/azure/firewall/premium-features"
+   }
+  ]
+ },
+ {
+  "id": "waf",
+  "layer": "network",
+  "name": "WAF",
+  "full": "Web Application Firewall（Webアプリケーションファイアウォール）",
+  "def": "Webアプリケーションに対する外部との通信を監視し、脆弱性への攻撃や情報の窃取などを防御するファイアウォール。一般的なファイアウォールと違い、アプリケーションレベルで監視する。",
+  "how": "リクエストの中身をルールと照らして許可・遮断し、SQLインジェクションなどを防ぐ。製品例のAzure WAFはApplication GatewayやFront Doorに組み込む。既知の脆弱性を各アプリで直すのでなく、WAFで一括して対処できる点が利点とされる。",
+  "diff": "ファイアウォールはネットワークレベル、WAFはアプリケーションレベルで監視する。Azure DDoS ProtectionはL3/L4を守るため、Webアプリの防御（L7）にはWAFを追加する必要がある。",
+  "ai": "社内外に公開する生成AIのチャットUIやAPIを持つ場合、入口でWebの典型的な攻撃を防ぐ層になる。プロンプトなどAI固有の入力への対策は、別に検討する。",
+  "related": [
+   "firewall",
+   "ddos",
+   "ids-ips"
+  ],
+  "sources": [
+   {
+    "t": "用語集（あ行）：ウェブアプリケーションファイアウォール",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/glossary/ja_01/"
+   },
+   {
+    "t": "What is Azure Web Application Firewall?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/azure/web-application-firewall/overview"
+   },
+   {
+    "t": "What is Azure DDoS Protection?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/azure/ddos-protection/ddos-protection-overview"
+   }
+  ]
+ },
+ {
+  "id": "vpn",
+  "layer": "network",
+  "name": "VPN（リモートアクセスVPN）",
+  "full": "Virtual Private Network（仮想専用網）",
+  "def": "インターネットなどの共有網上で、暗号化やトラフィック制御により専用線接続のような状況を実現する技術、またはその機器。リモートアクセスVPNは、在宅などの端末から組織のネットワークへ接続する用途を指す。",
+  "how": "テレワーク端末からオフィスネットワークにVPN接続し、社内のファイルサーバやクラウドサービスに接続して業務を行う。クラウド利用もオフィスのセキュリティ機器を経由するため、オフィス内と同等の水準を保てる。端末にデータを保存できるので、紛失や持ち出しへの対策が要る。",
+  "diff": "Microsoftは従来のVPNを、証明書などだけで広いネットワークアクセスを与えるものと位置づける。IDと状況を見てアプリ単位で許可するZTNAへ、段階的に置き換える進め方を示している。",
+  "ai": "社内に置いた生成AIや社内データ連携基盤へ、リモートから届く経路になる。VPNは広い範囲に届きやすいため、AI基盤の区画分離やZTNAでの絞り込みを併せて検討する。",
+  "related": [
+   "ztna",
+   "segmentation",
+   "swg",
+   "fixed-ip",
+   "forward-proxy"
+  ],
+  "sources": [
+   {
+    "t": "用語集英字：DDoS攻撃、DNS、IDS、IPS、VPN機器",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/glossary/en/"
+   },
+   {
+    "t": "テレワークセキュリティガイドライン 第5版（令和3年5月）",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_content/000752925.pdf"
+   },
+   {
+    "t": "Secure networks with SASE, Zero Trust, and AI",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/security/zero-trust/deploy/networks"
+   }
+  ]
+ },
+ {
+  "id": "forward-proxy",
+  "layer": "network",
+  "name": "プロキシ（フォワードプロキシ）",
+  "full": "Forward Proxy（フォワードプロキシ）",
+  "def": "企業・組織の内部ネットワークとインターネットの間に置き、直接インターネットに接続できない内部のコンピュータに代わって、代理としてインターネットと接続するコンピュータまたはソフトウェア。",
+  "how": "利用者のブラウザなどが通信をプロキシ経由にする設定を持ち、外部サイトへの通信はプロキシが代理で行う。製品例のAzure Firewall explicit proxyは、設定を手動またはPACファイルで配り、HTTPとHTTPSを扱う。テレワークでは、クラウド上のプロキシで認証とアクセス制御を行う構成が示される。",
+  "diff": "プロキシが内部から外部への通信を代理する仕組みなのに対し、SWGはこれをクラウド型にして、アクセス先のURLやIPアドレスの安全性を評価し、安全でなければ遮断する形を指す。",
+  "ai": "生成AIサービスへの通信をプロキシに集めると、許可したサービスだけに通し、利用の記録を残す出口を作れる。ローカルブレイクアウトの場合は、クラウドのプロキシで同等の統制をかける。",
+  "related": [
+   "swg",
+   "dns-filtering",
+   "firewall",
+   "fixed-ip"
+  ],
+  "sources": [
+   {
+    "t": "用語集（は行）：ファイアウォール、プロキシサーバ",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/glossary/ja_06/"
+   },
+   {
+    "t": "Azure Firewall explicit proxy",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/azure/firewall/explicit-proxy"
+   },
+   {
+    "t": "テレワークセキュリティガイドライン 第5版（令和3年5月）",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_content/000752925.pdf"
+   }
+  ]
+ },
+ {
+  "id": "dns-filtering",
+  "layer": "network",
+  "name": "DNSフィルタリング",
+  "full": "DNS Filtering（DNSフィルタリング）",
+  "def": "DNSの名前解決の段階で、悪意のあるドメインをブロックする仕組み。DNSはドメイン名をIPアドレスに変換する仕組みで、通信の入口にあたる名前解決を止めて被害を防ぐ。",
+  "how": "ドメインのリストに対し、許可・ブロック・アラートのルールを設定する。製品例のAzure DNS resolver policyは、仮想ネットワーク単位でDNSクエリを絞り込んで記録し、MSRC由来の既知の悪性ドメインを名前解決でブロックできる。Microsoftは、攻撃のほぼすべてがDNSクエリから始まると説明する。",
+  "diff": "SWGの構成要素では、Webフィルタリング（悪意のあるWebページのブロック）とDNSフィルタリング（悪意のあるドメインのブロック）が別項目として並ぶ。DNSは判断の単位がドメインである。",
+  "ai": "未承認の生成AIサービスのドメインを、名前解決の段階で止める手段として使える。サービス単位の遮断が中心になり、許可したサービス内の利用内容はCASBなど別の仕組みで見る。",
+  "related": [
+   "swg",
+   "forward-proxy",
+   "firewall"
+  ],
+  "sources": [
+   {
+    "t": "DNS resolver policy",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/azure/dns/dns-security-policy"
+   },
+   {
+    "t": "ゼロトラスト導入指南書 〜情報系・制御系システムへのゼロトラスト導入〜（2021年6月）",
+    "pub": "IPA 産業サイバーセキュリティセンター",
+    "url": "https://www.ipa.go.jp/jinzai/ics/core_human_resource/final_project/2021/ngi93u0000002klo-att/000092243.pdf"
+   },
+   {
+    "t": "用語集英字：DDoS攻撃、DNS、IDS、IPS、VPN機器",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/glossary/en/"
+   }
+  ]
+ },
+ {
+  "id": "fixed-ip",
+  "layer": "network",
+  "name": "固定IP（IPアドレス制限）",
+  "full": "Static IP address / IP address allow list（静的IPアドレスと許可リスト）",
+  "def": "接続元として使うIPアドレスを、変わらない値に固定すること。受け側はそのIPアドレスだけを許可する「IPアドレス制限（許可リスト）」でアクセス元を絞れる。動的IPは停止や再割当で変わりうる。",
+  "how": "設定できるクラウドサービスや管理者権限は、IPアドレス制限でアクセス元を絞ることが推奨される（総務省）。Azureの静的IPは、相手側のファイアウォール規則の更新や、IPアドレスベースのセキュリティを使う他のサービスとの通信に使われる。",
+  "diff": "クラウド型プロキシやVPN経由では接続先に見えるIPが各サービスの出口に変わり、最新の一覧を保つのは困難とMicrosoftは述べる。端末準拠の条件や、元のIPを伝えるソースIP復元で補う。Conditional Accessでは、ネットワークの場所は他の条件と並ぶ判断材料の一つである。",
+  "ai": "社内システムが外部の生成AIのAPIを呼ぶとき、相手が送信元IPの許可リストを求めるなら出口IPの固定が前提になる。IPだけに頼らず、認証や端末の状態と組み合わせる。",
+  "related": [
+   "nat",
+   "vpn",
+   "forward-proxy",
+   "ztna",
+   "swg",
+   "firewall"
+  ],
+  "sources": [
+   {
+    "t": "テレワークセキュリティガイドライン 第5版（令和3年5月）",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_content/000752925.pdf"
+   },
+   {
+    "t": "Public IP addresses",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/azure/virtual-network/ip-services/public-ip-addresses"
+   },
+   {
+    "t": "Conditional Access: Network assignment",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/entra/identity/conditional-access/concept-assignment-network"
+   }
+  ]
+ },
+ {
+  "id": "nat",
+  "layer": "network",
+  "name": "NAT",
+  "full": "Network Address Translation（ネットワークアドレス変換）",
+  "def": "内部のプライベートIPアドレスと、インターネットで使うグローバルIPアドレスを相互に変換する仕組み。送信元を書き換えるSNATでは、複数の内部機器が同じ公開IPアドレスで外部へ接続できる。",
+  "how": "SNATは送信元のIPとポートを公開IPとポートの組に書き換え、ポート番号で接続を区別する。Azure NAT Gatewayは外向きの通信専用で、外部から始まる接続は受け付けず、応答のパケットだけを通す。ポートが尽きると新しい接続は失敗する。",
+  "diff": "NATはアドレスを書き換える仕組みで、通信の可否を判断するファイアウォールとは役割が違う。SNATでは複数の機器が公開IPを共有するため、通信先には個々の機器でなく出口のIPアドレスだけが見える。",
+  "ai": "社内システムが外部の生成AIのAPIを呼ぶとき、通信先に見える送信元はNATの出口IPになる。相手が送信元IPの許可リストを求める場合は、この出口IPを固定する。",
+  "related": [
+   "fixed-ip",
+   "firewall",
+   "segmentation"
+  ],
+  "sources": [
+   {
+    "t": "用語集（か行）：グローバルIPアドレス",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/glossary/ja_02/"
+   },
+   {
+    "t": "Source Network Address Translation (SNAT) with Azure NAT Gateway",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/azure/nat-gateway/nat-gateway-snat"
+   },
+   {
+    "t": "What is Azure NAT Gateway?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/azure/nat-gateway/nat-overview"
+   }
+  ]
+ },
+ {
+  "id": "segmentation",
+  "layer": "network",
+  "name": "ネットワークセグメンテーション／マイクロセグメンテーション",
+  "full": "Network Segmentation / Micro-segmentation（ネットワークの分割／微細な分割）",
+  "def": "ネットワークをセグメント（区画）に分け、区画ごとに通信を制御して被害の広がりを抑える設計。ワークロードやアプリ単位まで細かく分けたものがマイクロセグメンテーションで、攻撃者の横方向の移動を制限する。",
+  "how": "Azureの例では、アプリやコンポーネントごとにサブネットや仮想ネットワークを分け、必要な相手からの通信だけをNSGのルールで許可し、ハブに置いたAzure Firewallで検査する。分割が意図どおりかは、フローログを分析するTraffic Analyticsで検証する。",
+  "diff": "マクロセグメンテーションは機能やセキュリティ要件による大きな区画で、マイクロはその内側を細かく分ける。Microsoftは、従来のIPベースよりIDベースのセグメンテーションを採ることを原則に挙げる。",
+  "ai": "生成AI基盤、参照データ、業務システムを別の区画に置いて必要な通信だけを許可すると、侵害時にAI基盤から業務データへ広がるのを抑えられる。",
+  "related": [
+   "firewall",
+   "ztna",
+   "vpn",
+   "nat"
+  ],
+  "sources": [
+   {
+    "t": "Secure networks with SASE, Zero Trust, and AI",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/security/zero-trust/deploy/networks"
+   },
+   {
+    "t": "用語集（ら行）：ルータ",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/glossary/ja_09/"
+   }
+  ]
+ },
+ {
+  "id": "ddos",
+  "layer": "network",
+  "name": "DDoS対策",
+  "full": "DDoS Protection（分散型サービス拒否攻撃への対策）",
+  "def": "DDoS攻撃は、複数のコンピュータから大量のサービス要求を送りつけ、サーバやネットワークに過大な負荷をかけて使用不能にする攻撃。DDoS対策は、この攻撃を検知して緩和する仕組みを指す。",
+  "how": "製品例のAzure DDoS Protectionは、トラフィックのパターンを24時間監視し、攻撃の兆候を検知すると自動で緩和する。通信量の学習から閾値を自動調整し、保護対象は公開IPアドレスを持つリソースである。冗長な設計や対応計画の整備も併用する。",
+  "diff": "DoS攻撃は1台のコンピュータから行うのに対し、DDoS攻撃はボットに感染させた第三者のコンピュータなど複数台が一斉に行う。製品面ではDDoS ProtectionがL3/L4を守り、Webアプリ層（L7）はWAFで補う。",
+  "ai": "公開する生成AIのチャットUIやAPIは、可用性を狙う攻撃の対象になりうる。公開エンドポイントを持つ場合は、L3/L4の緩和とL7のWAFの両方を設計に含める。",
+  "related": [
+   "waf",
+   "firewall",
+   "ids-ips"
+  ],
+  "sources": [
+   {
+    "t": "用語集英字：DDoS攻撃、DNS、IDS、IPS、VPN機器",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/glossary/en/"
+   },
+   {
+    "t": "What is Azure DDoS Protection?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/azure/ddos-protection/ddos-protection-overview"
+   }
+  ]
+ },
+ {
+  "id": "swg",
+  "layer": "sase",
+  "name": "SWG",
+  "full": "Secure Web Gateway（セキュアWebゲートウェイ）",
+  "def": "外部へのWebアクセス等を安全に行うためのクラウド型プロキシ。アクセス先のURLやIPアドレスから安全性を確認・評価し、安全でないと評価した場合はアクセスを遮断する。",
+  "how": "Webフィルタリング、DNSフィルタリング、DLP、マルウェア検出、不正侵入防止、サンドボックスなどをクラウド型で提供する（IPA）。製品例のMicrosoft Entra Internet Accessは、ユーザー・端末・場所・リスクの文脈をConditional Accessと連携させ、IDに基づいてWebアクセスを制御する。",
+  "diff": "従来はVPNゲートウェイ経由で社内LANを通ってから外へ出る必要があった。SWGならその機能をクラウドへ移せる。CASBがSaaS利用の可視化とデータ制御に絞るのに対し、SWGはWebアクセス全般を扱う。",
+  "ai": "製品例のMicrosoft Entra Internet Accessは、機能にシャドーAIの検出、プロンプトインジェクション対策、DLPを挙げる。生成AIへのWebアクセスを入口で統制する手段になる。",
+  "related": [
+   "forward-proxy",
+   "dns-filtering",
+   "casb",
+   "sse",
+   "sase",
+   "fwaas"
+  ],
+  "sources": [
+   {
+    "t": "「ゼロトラストアーキテクチャ適用方針」の6つの適用方針に対応したゼロトラストアーキテクチャ機能のマッピング（参考資料2）",
+    "pub": "デジタル庁",
+    "url": "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/ad619888-36bb-4f67-a61f-b44779bad1e9/786ed561/20230921_meeting_network_solution_02.pdf"
+   },
+   {
+    "t": "ゼロトラスト導入指南書 〜情報系・制御系システムへのゼロトラスト導入〜（2021年6月）",
+    "pub": "IPA 産業サイバーセキュリティセンター",
+    "url": "https://www.ipa.go.jp/jinzai/ics/core_human_resource/final_project/2021/ngi93u0000002klo-att/000092243.pdf"
+   },
+   {
+    "t": "What is Global Secure Access?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/entra/global-secure-access/overview-what-is-global-secure-access"
+   }
+  ]
+ },
+ {
+  "id": "casb",
+  "layer": "sase",
+  "name": "CASB",
+  "full": "Cloud Access Security Broker（クラウドアクセスセキュリティブローカー）",
+  "def": "利用者と複数のSaaSなどの間に単一の制御点を置き、クラウド利用の可視化と制御を行う仕組み。SaaSの利用状況の可視化、アクセス制御、データの持ち出し制御、脅威検知などを担う。",
+  "how": "IPAは、可視化・データセキュリティ・コンプライアンス・脅威防御の4要素で整理する。製品例のMicrosoft Defender for Cloud Appsは、ネットワーク通信とアプリのカタログから利用中のSaaSを特定し、90以上の指標でリスクを評価し、ポリシーで継続的に監視する。",
+  "diff": "SWGがWebアクセス全般の安全確認と遮断を担うのに対し、CASBはSaaSの利用に絞って可視化し、アクセスやデータの持ち出しを制御する。",
+  "ai": "未承認の生成AIサービスもSaaSの一種として、利用の発見、リスク評価、利用制御の対象にできる。データごとの持ち出し制御は、機微な情報をAIに渡さない運用にも関わる。",
+  "related": [
+   "swg",
+   "shadow-it",
+   "ztna",
+   "sse"
+  ],
+  "sources": [
+   {
+    "t": "「ゼロトラストアーキテクチャ適用方針」の6つの適用方針に対応したゼロトラストアーキテクチャ機能のマッピング（参考資料2）",
+    "pub": "デジタル庁",
+    "url": "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/ad619888-36bb-4f67-a61f-b44779bad1e9/786ed561/20230921_meeting_network_solution_02.pdf"
+   },
+   {
+    "t": "ゼロトラスト導入指南書 〜情報系・制御系システムへのゼロトラスト導入〜（2021年6月）",
+    "pub": "IPA 産業サイバーセキュリティセンター",
+    "url": "https://www.ipa.go.jp/jinzai/ics/core_human_resource/final_project/2021/ngi93u0000002klo-att/000092243.pdf"
+   },
+   {
+    "t": "Microsoft Defender for Cloud Apps overview",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/defender-cloud-apps/what-is-defender-for-cloud-apps"
+   }
+  ]
+ },
+ {
+  "id": "ztna",
+  "layer": "sase",
+  "name": "ZTNA",
+  "full": "Zero Trust Network Access（ゼロトラストネットワークアクセス）",
+  "def": "広い範囲に届きやすいVPNに代わり、IDと状況（端末の状態やリスクなど）を見て、アプリ単位できめ細かく接続を許可する方式。ゼロトラストの考え方に基づき、常に確認する。",
+  "how": "Microsoftの例では、利用者がアプリへの接続を求めると、Entra IDのシングルサインオンとConditional Accessをエッジで評価し、承認されたアプリだけが利用者に見える。端末の状態やリスクの信号で判断し、リスクを検知すると継続的アクセス評価で再評価や切断を行う。",
+  "diff": "VPNは接続後に広いネットワークへ届きやすい。Microsoftは、VPNと同等の広いアクセスを与えるQuick Accessから始め、重要なアプリからアプリ単位の接続へ移す段階的な移行を示している。",
+  "ai": "社内データに接続する生成AIアプリや、AI基盤の管理画面へのリモートアクセスを、アプリ単位かつIDに基づいて絞る手段になる。",
+  "related": [
+   "vpn",
+   "sse",
+   "sase",
+   "segmentation",
+   "fixed-ip",
+   "casb"
+  ],
+  "sources": [
+   {
+    "t": "Secure networks with SASE, Zero Trust, and AI",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/security/zero-trust/deploy/networks"
+   },
+   {
+    "t": "What is Global Secure Access?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/entra/global-secure-access/overview-what-is-global-secure-access"
+   },
+   {
+    "t": "Tutorial: VPN replacement with Quick Access",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/entra/global-secure-access/tutorial-private-access-vpn-replacement"
+   }
+  ]
+ },
+ {
+  "id": "fwaas",
+  "layer": "sase",
+  "name": "FWaaS",
+  "full": "Firewall as a Service（クラウド提供のファイアウォール）",
+  "def": "クラウドサービスとして提供されるファイアウォール機能。リモートやモバイルなど拠点外からの通信、契約したクラウドサービスと外部の通信、私物端末（BYOD）の通信まで、同じセキュリティ設定で保護できる。",
+  "how": "通信をクラウドのエッジに集めて同一のポリシーで検査する。Microsoftの整理では、FWaaSはSWGやCASBと並ぶSSEの機能に挙がり、エッジでTLS検査、URLフィルタリング、DLP、脅威インテリジェンスなどが適用される。",
+  "diff": "物理的なファイアウォール機器は、ネットワークルールの設定と、それに基づく制御が同じ機器で行われる。FWaaSはその機能をクラウドに置くため、設置場所に縛られない。",
+  "ai": "拠点・在宅・モバイルを問わず、生成AIサービスへの通信に同じルールをかけたいときの選択肢になる。出口を一本化して統制する設計の検討材料にもなる。",
+  "related": [
+   "firewall",
+   "swg",
+   "sse",
+   "sase"
+  ],
+  "sources": [
+   {
+    "t": "「ゼロトラストアーキテクチャ適用方針」の6つの適用方針に対応したゼロトラストアーキテクチャ機能のマッピング（参考資料2）",
+    "pub": "デジタル庁",
+    "url": "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/ad619888-36bb-4f67-a61f-b44779bad1e9/786ed561/20230921_meeting_network_solution_02.pdf"
+   },
+   {
+    "t": "Secure networks with SASE, Zero Trust, and AI",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/security/zero-trust/deploy/networks"
+   },
+   {
+    "t": "ゼロトラストアーキテクチャ 適用方針（DS-210）",
+    "pub": "デジタル庁",
+    "url": "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/e2a06143-ed29-4f1d-9c31-0f06fca67afc/5efa5c3b/20220630_resources_standard_guidelines_guidelines_04.pdf"
+   }
+  ]
+ },
+ {
+  "id": "sd-wan",
+  "layer": "sase",
+  "name": "SD-WAN",
+  "full": "Software-Defined Wide Area Network（ソフトウェア制御の広域ネットワーク）",
+  "def": "Software-Defined WANの略。拠点間やクラウドとの広域ネットワークをソフトウェアで制御する機能で、柔軟なネットワーク構成や、通信量の制御（トラフィックコントロール）などを実現する。",
+  "how": "拠点側の機器（SD-WAN CPE）が経路の最適化と選択を担い、IPsecなどで拠点をクラウドのハブに接続する。MicrosoftのAzure Virtual WANは、自らがクラウド型のSD-WANであり、拠点側のSD-WANやSASEとの相互接続も想定している。",
+  "diff": "SASEは、CASBやSWGなどのセキュリティ機能と、SD-WANなどのネットワーク機能をクラウドから提供する枠組みで、SD-WANはそのネットワーク側に位置づく。",
+  "ai": "拠点、データセンター、クラウドに分散した生成AI基盤や業務システムへの経路を、一元的に制御する土台になる。",
+  "related": [
+   "sase",
+   "sse",
+   "vpn",
+   "fwaas"
+  ],
+  "sources": [
+   {
+    "t": "「ゼロトラストアーキテクチャ適用方針」の6つの適用方針に対応したゼロトラストアーキテクチャ機能のマッピング（参考資料2）",
+    "pub": "デジタル庁",
+    "url": "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/ad619888-36bb-4f67-a61f-b44779bad1e9/786ed561/20230921_meeting_network_solution_02.pdf"
+   },
+   {
+    "t": "ゼロトラスト導入指南書 〜情報系・制御系システムへのゼロトラスト導入〜（2021年6月）",
+    "pub": "IPA 産業サイバーセキュリティセンター",
+    "url": "https://www.ipa.go.jp/jinzai/ics/core_human_resource/final_project/2021/ngi93u0000002klo-att/000092243.pdf"
+   },
+   {
+    "t": "SD-WAN connectivity architecture with Azure Virtual WAN",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/azure/virtual-wan/sd-wan-connectivity-architecture"
+   }
+  ]
+ },
+ {
+  "id": "sse",
+  "layer": "sase",
+  "name": "SSE",
+  "full": "Security Service Edge（セキュリティサービスエッジ）",
+  "def": "働く場所が分散し、アプリとデータがクラウドへ移る中で必要になる、IDを意識したクラウド提供のネットワーク境界を指すネットワークセキュリティの新しい分類。SWG、CASB、FWaaSなどを含む。",
+  "how": "Microsoftの例では、インターネットとSaaSを守るEntra Internet Access（IDベースのSWG）と、社内リソースへの接続を担うEntra Private Access（ZTNA）に、CASBのDefender for Cloud Appsを組み合わせてSSEを構成する。Microsoftの広域ネットワークのエッジから提供される。",
+  "diff": "SSEはセキュリティ機能の側を指す。SASEはSD-WANなどのネットワーク機能も合わせた枠組みで、MicrosoftはSSEの機能をSASEの枠組みに組み込む形で説明する。",
+  "ai": "製品例のGlobal Secure Accessは、インターネット向けに生成AIアプリの利用検出（シャドーAI）、プロンプトインジェクション対策、DLPを機能に挙げる。AI利用の統制をネットワークの入口に集める発想につながる。",
+  "related": [
+   "sase",
+   "swg",
+   "casb",
+   "ztna",
+   "fwaas"
+  ],
+  "sources": [
+   {
+    "t": "What is Global Secure Access?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/entra/global-secure-access/overview-what-is-global-secure-access"
+   },
+   {
+    "t": "Secure networks with SASE, Zero Trust, and AI",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/security/zero-trust/deploy/networks"
+   }
+  ]
+ },
+ {
+  "id": "sase",
+  "layer": "sase",
+  "name": "SASE",
+  "full": "Secure Access Service Edge（セキュアアクセスサービスエッジ）",
+  "def": "セキュリティとネットワークの技術を単一のクラウドプラットフォームに集約し、安全で迅速なクラウド移行を可能にするフレームワーク（Gartner社の定義、IPAの紹介）。利用者は場所を問わず、SASE経由でシステムを使う。",
+  "how": "通信がSaaSやIaaSに入る前に、CASB、SDP、SWGなどでセキュリティ対策を行い、WANやインターネットのネットワーク機能（CDN、SD-WANなど）もクラウドから提供する。Microsoftの整理では、通信をエッジに集めてTLS検査、URLフィルタリング、DLPなどを適用する。",
+  "diff": "ゼロトラストは「暗黙に信頼しない」考え方、SASEは機能をクラウドで束ねる枠組みで、Microsoftは両者を組み合わせて説明する。SSEはSASEのうちセキュリティ機能の側を指す。",
+  "ai": "生成AIへの通信を統制するには、その通信がSASEを経由する構成にする必要がある。IPAの検証では、SASEを通らない通信は検知できないという気づきが示された。",
+  "related": [
+   "sse",
+   "swg",
+   "casb",
+   "sd-wan",
+   "ztna",
+   "fwaas"
+  ],
+  "sources": [
+   {
+    "t": "ゼロトラスト導入指南書 〜情報系・制御系システムへのゼロトラスト導入〜（2021年6月）",
+    "pub": "IPA 産業サイバーセキュリティセンター",
+    "url": "https://www.ipa.go.jp/jinzai/ics/core_human_resource/final_project/2021/ngi93u0000002klo-att/000092243.pdf"
+   },
+   {
+    "t": "Secure networks with SASE, Zero Trust, and AI",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/security/zero-trust/deploy/networks"
+   },
+   {
+    "t": "ゼロトラストアーキテクチャ 適用方針（DS-210）",
+    "pub": "デジタル庁",
+    "url": "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/e2a06143-ed29-4f1d-9c31-0f06fca67afc/5efa5c3b/20220630_resources_standard_guidelines_guidelines_04.pdf"
+   }
+  ]
+ },
+ {
+  "id": "shadow-it",
+  "layer": "sase",
+  "name": "シャドーIT",
+  "full": "Shadow IT（シャドーIT）",
+  "def": "許可していないハードウェア、ソフトウェア、クラウドサービス等が勝手に利用される状態。管理者によるセキュリティ統制が行えなくなり、守るべき業務情報の情報漏えいリスクが増す。",
+  "how": "利用中のアプリを洗い出し、リスクを評価し、承認・非承認に分けて管理する。Microsoft Defender for Cloud Appsの例では、Defender for Endpointとの連携、ファイアウォールやプロキシのログ収集で利用を発見し、非承認のアプリはファイアウォール、プロキシ、SWGでブロックする。",
+  "diff": "シャドーAIは生成AIアプリやツールに限った無許可利用で、主なリスクはAIへのデータ漏えいやコンプライアンス違反。シャドーITはITサービス全般を指し、データの散逸が主なリスクとなる。",
+  "ai": "シャドーAIの検出は、ChatGPTやClaudeなどへの通信をネットワーク通信の分析で見つけ、利用者や通信量、リスクスコアを可視化する（Global Secure Accessの例）。禁止だけでなく、承認済みの代替手段の用意と一体で進める。",
+  "related": [
+   "casb",
+   "swg",
+   "dns-filtering",
+   "sase"
+  ],
+  "sources": [
+   {
+    "t": "テレワークセキュリティガイドライン 第5版（令和3年5月）",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_content/000752925.pdf"
+   },
+   {
+    "t": "Tutorial: Discover and manage shadow IT",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/defender-cloud-apps/tutorial-shadow-it"
+   },
+   {
+    "t": "Shadow AI discovery in Global Secure Access",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/entra/global-secure-access/concept-shadow-ai-discovery"
+   }
+  ]
+ },
+ {
+  "id": "shared-responsibility",
+  "layer": "cloud",
+  "name": "責任共有モデル",
+  "full": "Shared Responsibility Model",
+  "how": "Microsoft の整理では、データ、構成、ID・ユーザーはどの形態でも利用者の責任。物理ホスト、物理ネットワーク、データセンターは IaaS から事業者の責任になる。OS、ネットワーク制御、アプリケーションは形態により事業者との共有になる。",
+  "diff": "Google は、責任の線引きにとどまらず、事業者がガイダンスやツールを手厚く提供する「共有運命（shared fate）」へ移る動きを紹介している。",
+  "ai": "Microsoft は生成AIにも広げ、AI プラットフォーム、AI アプリケーション、AI の利用の三層で整理する。利用層では、利用規定の更新と教育が利用者側の務めになる。",
+  "related": [
+   "cspm",
+   "cnapp",
+   "encryption-kms",
+   "ismap",
+   "soc2"
+  ],
+  "sources": [
+   {
+    "t": "Shared responsibility in the cloud",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/security/fundamentals/shared-responsibility"
+   },
+   {
+    "t": "Artificial intelligence (AI) shared responsibility model",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/security/fundamentals/shared-responsibility-ai"
+   },
+   {
+    "t": "What Is Cloud Security?",
+    "pub": "Google Cloud",
+    "url": "https://cloud.google.com/learn/what-is-cloud-security"
+   }
+  ],
+  "def": "クラウド事業者と利用者がセキュリティ上の責任をどう分担するかを示す考え方。分担は IaaS、PaaS、SaaS のどれを使うかで変わり、データと ID は常に利用者の責任に残る。"
+ },
+ {
+  "id": "cspm",
+  "layer": "cloud",
+  "name": "CSPM",
+  "full": "Cloud Security Posture Management（クラウドセキュリティ態勢管理）",
+  "how": "定めたポリシーが、違反する設定を示す推奨事項に変換され、対応が進むとセキュアスコアが上がる。マルチクラウドにも接続でき、攻撃パス分析で危険な経路も確認できる（例：Microsoft Defender for Cloud）。",
+  "diff": "CWPP が稼働中のワークロードを脅威から守るのに対し、CSPM は構成と態勢の点検が中心。両方を束ねたものが CNAPP。",
+  "ai": "Defender for Cloud の AI SPM は、生成AIワークロードを検出して AI BOM を示し、態勢を評価する。",
+  "related": [
+   "cwpp",
+   "cnapp",
+   "shared-responsibility",
+   "vuln-pentest"
+  ],
+  "sources": [
+   {
+    "t": "What is Microsoft Defender for Cloud?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/defender-for-cloud-introduction"
+   }
+  ],
+  "def": "クラウド資源の構成を継続的に点検し、セキュリティポリシーに反する設定ミスや弱点を見つけて、改善の推奨事項として示す仕組み。クラウド上の資源を安全な状態（態勢）に保つ。"
+ },
+ {
+  "id": "cwpp",
+  "layer": "cloud",
+  "name": "CWPP",
+  "full": "Cloud Workload Protection Platform（クラウドワークロード保護）",
+  "how": "ワークロードごとの推奨事項で必要な制御を示し、脅威を検知するとアラートで性質と重大度を知らせる。例では、サーバ向けに脆弱性評価やファイル整合性監視、コンテナ向けに環境強化と実行時保護、ストレージ向けにマルウェアスキャンを提供する。",
+  "diff": "CSPM が設定の正しさを点検するのに対し、CWPP は稼働中のワークロードの脅威検知と防御を担う。CNAPP は両者を統合する。",
+  "ai": "Defender for Cloud の AI Services プランは、生成AIアプリケーションへの脅威をリアルタイムに特定し、対応を助ける。",
+  "related": [
+   "cspm",
+   "cnapp",
+   "edr"
+  ],
+  "sources": [
+   {
+    "t": "What is Microsoft Defender for Cloud?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/defender-for-cloud-introduction"
+   }
+  ],
+  "def": "仮想マシン、コンテナ、ストレージ、データベース、サーバーレス関数など、クラウド上で動くワークロードを脅威から守る仕組み。ワークロード固有の推奨事項とアラートを提供する。"
+ },
+ {
+  "id": "cnapp",
+  "layer": "cloud",
+  "name": "CNAPP",
+  "full": "Cloud-Native Application Protection Platform（クラウドネイティブアプリケーション保護プラットフォーム）",
+  "how": "Defender for Cloud は CSPM、DevSecOps、CWPP の三つを中核に置く。コード段階の誤設定や露出した秘密情報を、クラウドの状況と結び付けて修復の優先順位を付ける。Google はセキュリティ運用との統合が進むと説明する。",
+  "diff": "CSPM や CWPP を単機能で個別に導入すると製品が増える。CNAPP はそれらの統合でポイント製品の数を減らす方向にある。",
+  "ai": "Defender for Cloud は生成AIワークロード向けの態勢管理と脅威保護を備える。Google の SCC Enterprise も AI ワークロード向けの予防・検出制御を挙げる。",
+  "related": [
+   "cspm",
+   "cwpp",
+   "shared-responsibility",
+   "siem"
+  ],
+  "sources": [
+   {
+    "t": "What is Microsoft Defender for Cloud?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/defender-for-cloud-introduction"
+   },
+   {
+    "t": "Security Command Center Enterprise 発表",
+    "pub": "Google Cloud",
+    "url": "https://cloud.google.com/blog/ja/products/identity-security/introducing-security-command-center-enterprise?hl=ja"
+   }
+  ],
+  "def": "複数のクラウドセキュリティ機能を統合し、クラウド上のアプリケーションを開発から運用までのライフサイクル全体で守るプラットフォーム。CSPM や CWPP などを一つの体験にまとめる。"
+ },
+ {
+  "id": "dlp",
+  "layer": "data",
+  "name": "DLP",
+  "full": "Data Loss Prevention（データ損失防止）",
+  "how": "ポリシーで対象の場所と条件を決め、キーワード、正規表現、機械学習などで内容を解析する。一致すると、警告表示、共有のブロック、隔離などを実行し、操作は監査ログに記録される（例：Microsoft Purview）。",
+  "diff": "情報分類・機密ラベルは機密度を示す印を付ける仕組みで、DLP はその印や内容を条件に共有や持ち出しを制御する。両者は組み合わせて使う。",
+  "ai": "Purview の DLP は Microsoft 365 Copilot を監視場所に含め、ブラウザやネットワーク経由で ChatGPT、Gemini、DeepSeek などへの機密情報の送信も対象にできる。",
+  "related": [
+   "data-classification",
+   "encryption-kms",
+   "casb",
+   "swg",
+   "siem"
+  ],
+  "sources": [
+   {
+    "t": "Learn about data loss prevention",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/purview/dlp-learn-about-dlp"
+   }
+  ],
+  "def": "クレジットカード番号や医療記録などの機密情報が、権限のない相手へ流出・共有されるのを防ぐ仕組み。ポリシーに基づいて機密情報を特定・監視し、不適切な操作に保護を自動で働かせる。"
+ },
+ {
+  "id": "encryption-kms",
+  "layer": "data",
+  "name": "暗号化と鍵管理（KMS・HSM）",
+  "full": "Key Management Service / Hardware Security Module（鍵管理サービス／ハードウェアセキュリティモジュール）",
+  "how": "クラウドでは、事業者が管理する鍵と、利用者が作成・管理する顧客管理鍵を選べる。鍵暗号化鍵が他の暗号鍵を守り、ソフトウェア保護の鍵管理から単一テナントの HSM まで保護水準が段階的に用意される（例：Azure）。",
+  "diff": "標準の鍵管理サービスはソフトウェアで鍵を保護するのに対し、HSM 型は認証済みのハードウェア内で鍵を保護する。単一テナント型は利用者が鍵の信頼の起点を握る。",
+  "ai": "生成AIに渡す社内データを置く基盤でも、保存時の暗号化に顧客管理鍵を使える。鍵を自社で持つかどうかは、規制や契約の要件から決める論点になる。",
+  "related": [
+   "data-classification",
+   "dlp",
+   "immutable-backup",
+   "shared-responsibility"
+  ],
+  "sources": [
+   {
+    "t": "Key management in Azure",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/security/fundamentals/key-management"
+   },
+   {
+    "t": "What is Azure Key Vault Managed HSM?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/key-vault/managed-hsm/overview"
+   }
+  ],
+  "def": "データを暗号化する鍵の作成・保管・利用権限を一元管理するのが鍵管理（KMS）。HSM は鍵を専用ハードウェア内で保護する装置で、クラウドではサービスとしても提供される。"
+ },
+ {
+  "id": "data-classification",
+  "layer": "data",
+  "name": "情報分類・機密ラベル",
+  "full": "Data Classification / Sensitivity Labels（情報の分類と機密ラベル）",
+  "how": "管理者が組織に合う区分（例：Public、General、Confidential、Highly Confidential）を作り、利用者の操作か自動判定でラベルを付ける。ラベルはファイルのメタデータに保存され、保存先が変わっても付いて回る（例：Microsoft Purview）。",
+  "diff": "DLP はラベルや内容を条件に共有・持ち出しを止める側で、ラベルは機密度を示して保護の出発点になる。保持ラベルは保存期間の制御用で、機密ラベルとは別に付ける。",
+  "ai": "Microsoft 365 Copilot とエージェントは機密ラベルを認識する。暗号化を伴うラベルでは、利用者にコピー権限（EXTRACT）がある項目のデータだけを返す。",
+  "related": [
+   "dlp",
+   "encryption-kms",
+   "zero-trust"
+  ],
+  "sources": [
+   {
+    "t": "Learn about sensitivity labels",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/purview/sensitivity-labels"
+   }
+  ],
+  "def": "情報を機密度に応じた区分（公開、社外秘など）に分け、ラベルとして付与する取り組み。ラベルに応じて暗号化、透かし、共有制限などの保護を適用でき、ラベルは情報に付いて回る。"
+ },
+ {
+  "id": "immutable-backup",
+  "layer": "data",
+  "name": "イミュータブルバックアップ・ランサムウェア対策",
+  "full": "Immutable Backup（削除・改変できないバックアップ）",
+  "how": "Azure Backup のイミュータブル保管庫は、復旧ポイントの喪失につながる操作（期限前の削除、保持期間の短縮）を禁止し、ロックすると WORM ストレージで無効化もできなくなる。総務省は物理的隔離、自動暗号化、ネットワーク上の隔離の併用を挙げる。",
+  "diff": "通常のバックアップは権限があれば復旧ポイントを削除できる。イミュータブル設定は、ロック後は無効化できない点が違う。復旧訓練も別途必要。",
+  "ai": "生成AIの導入で増える社内データ（検索用の文書や索引など）も、復旧対象と保持期間を決めてバックアップの範囲に含める。",
+  "related": [
+   "encryption-kms",
+   "csirt",
+   "nist-csf"
+  ],
+  "sources": [
+   {
+    "t": "Immutable vault for Azure Backup",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/backup/backup-azure-immutable-vault-concept"
+   },
+   {
+    "t": "データ復旧・バックアップの管理",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/security/business/admin/13/"
+   }
+  ],
+  "def": "保持期間中は削除も改変もできないよう保護したバックアップ。ランサムウェアや悪意ある操作でバックアップごと消されそうになっても、復旧に使う復旧ポイントを残せるようにする。"
+ },
+ {
+  "id": "siem",
+  "layer": "ops",
+  "name": "SIEM",
+  "full": "Security Information and Event Management（セキュリティ情報イベント管理）",
+  "how": "エージェントやコネクタでログを集め、共通形式に正規化する。相関ルールや機械学習で関連するイベントを結び付けて異常を見つけ、重大度に応じた優先度付きのアラートを出す。アナリストは検索や可視化で調査する。",
+  "diff": "SOC は SIEM を使う人とチーム、SOAR は検知後の対応を自動化する仕組み。SIEM はデータの収集・分析・検知を担う技術基盤。",
+  "ai": "Google の解説では SIEM の検知に機械学習モデルが使われる。生成AIの利用ログも取り込めば、他システムのログと同じ基盤で相関分析し、不審な利用を調べられる。",
+  "related": [
+   "soar",
+   "soc",
+   "log-management",
+   "threat-intel",
+   "edr"
+  ],
+  "sources": [
+   {
+    "t": "What is SIEM & how does it work?",
+    "pub": "Google Cloud",
+    "url": "https://cloud.google.com/discover/what-is-siem"
+   },
+   {
+    "t": "ゼロトラストアーキテクチャ適用方針（DS-210）",
+    "pub": "デジタル庁",
+    "url": "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/e2a06143-ed29-4f1d-9c31-0f06fca67afc/5efa5c3b/20220630_resources_standard_guidelines_guidelines_04.pdf"
+   }
+  ],
+  "def": "ネットワーク、端末、クラウド、アプリケーションなど各所のログとイベントを集約・分析し、脅威の検知、インシデント調査、コンプライアンス対応に使うセキュリティ基盤。"
+ },
+ {
+  "id": "soar",
+  "layer": "ops",
+  "name": "SOAR",
+  "full": "Security Orchestration, Automation and Response（セキュリティのオーケストレーション・自動化・対応）",
+  "how": "条件に応じて、あらかじめ定義した対応手順（プレイブック）を自動または手動で実行する。例として、端末でマルウェアを検知したら隔離、証拠収集、他システムの同種指標の検索、チケット作成までを自動で行い、担当者の確認につなぐ。",
+  "diff": "SIEM が収集・分析・検知を担うのに対し、SOAR は検知後の対応を調整・自動化する。SOAR は SIEM が検知した脅威への対応を自動化する形で併用される。",
+  "ai": "アラートが多い SOC で、定型の調査や対応を自動化し、人が高度な脅威の調査に集中できるようにする。生成AI関連のアラートも同じ手順に乗せられる。",
+  "related": [
+   "siem",
+   "soc",
+   "csirt",
+   "xdr"
+  ],
+  "sources": [
+   {
+    "t": "What is SIEM & how does it work?",
+    "pub": "Google Cloud",
+    "url": "https://cloud.google.com/discover/what-is-siem"
+   },
+   {
+    "t": "Automation in Microsoft Sentinel: Security orchestration, automation, and response (SOAR)",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/sentinel/automation/automation"
+   }
+  ],
+  "def": "複数のセキュリティツールを連携させ（オーケストレーション）、アラート対応の定型作業を自動化（オートメーション）して、検知から対応（レスポンス）までを速める仕組み。"
+ },
+ {
+  "id": "soc",
+  "layer": "ops",
+  "name": "SOC",
+  "full": "Security Operation Center（セキュリティオペレーションセンター）",
+  "how": "ログやアラートを分析して不審なアクセスを調べ、必要に応じて対処する。デジタル庁の方針は、不審なアクセスを認めた際に組織内外の SOC と共同で対処し、ログ連携やダッシュボードの共有で双方が監視する手法を挙げる。",
+  "diff": "SIEM は SOC が使うツール。総務省の用語集は CSIRT を監視と原因解析の体制と説明しており、SOC と CSIRT は役割が重なる。",
+  "ai": "生成AIアプリの利用ログや制御状況を監視対象に加え、アラートの扱いを運用手順に組み込む。自社で運用するか外部に委託するかも判断点になる。",
+  "related": [
+   "siem",
+   "soar",
+   "csirt",
+   "threat-intel"
+  ],
+  "sources": [
+   {
+    "t": "What is SIEM & how does it work?",
+    "pub": "Google Cloud",
+    "url": "https://cloud.google.com/discover/what-is-siem"
+   },
+   {
+    "t": "ゼロトラストアーキテクチャ適用方針（DS-210）",
+    "pub": "デジタル庁",
+    "url": "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/e2a06143-ed29-4f1d-9c31-0f06fca67afc/5efa5c3b/20220630_resources_standard_guidelines_guidelines_04.pdf"
+   },
+   {
+    "t": "用語集英字（GSOC）",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/glossary/en/"
+   }
+  ],
+  "def": "セキュリティの専門担当者が情報システムを監視し、脅威の検知、調査、対応を行うチームまたは組織。SIEM などの技術基盤を主な道具として使い、攻撃の兆候を分析する。"
+ },
+ {
+  "id": "log-management",
+  "layer": "ops",
+  "name": "ログ管理・監査ログ",
+  "full": "Log Management / Audit Log（ログ管理・監査ログ）",
+  "how": "取得するログの種類と保存期間は、扱うデータや想定する攻撃から決める。時刻は NTP で同期し、機器とは別のログ管理システムに保管して改ざんを防ぐ。ログには個人情報などが含まれうるため、機密情報として扱う。",
+  "diff": "SIEM はログ管理を中核に含みつつ、相関分析と検知、対応まで担う。ログ管理は取得・保管・検索の土台で、SIEM はその上に検知を載せる。",
+  "ai": "生成AIの利用でも、誰がいつどのデータを扱ったかを追えるログが調査や監査に要る。取得対象と保存期間、ログ内の機密情報の扱いを事前に決める。",
+  "related": [
+   "siem",
+   "soc",
+   "csirt",
+   "dlp"
+  ],
+  "sources": [
+   {
+    "t": "監査ログの管理",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/security/business/admin/12/"
+   },
+   {
+    "t": "What is SIEM & how does it work?",
+    "pub": "Google Cloud",
+    "url": "https://cloud.google.com/discover/what-is-siem"
+   }
+  ],
+  "def": "ファイアウォール、認証、サーバ、アプリケーションなどの通信・操作記録（監査ログ）を取得・保管し、事故の早期発見や、原因究明、影響範囲の調査、再発防止策の検討に使う取り組み。"
+ },
+ {
+  "id": "threat-intel",
+  "layer": "ops",
+  "name": "脅威インテリジェンス",
+  "full": "Cyber Threat Intelligence（サイバー脅威インテリジェンス）",
+  "how": "方針策定、収集・加工、分析、配布、評価のサイクルで回す。利用者別に、経営層向けの戦略的、攻撃手法の理解やペネトレーションテストに使う運用、SOC 向けの IoC などの戦術的の三つに分けて整理する（IPA）。",
+  "diff": "悪性 IP やハッシュ値などの IoC は戦術的インテリジェンスの一種で、脅威インテリジェンスの一部にすぎない。IPA は戦略・運用レベルでの活用も課題として挙げる。",
+  "ai": "生成AIを狙う攻撃や悪用の動向も脅威情報に含め、自組織への影響と対応の優先順位を判断する材料にする。",
+  "related": [
+   "siem",
+   "soc",
+   "vuln-pentest",
+   "csirt"
+  ],
+  "sources": [
+   {
+    "t": "脅威インテリジェンスガイドライン～全体概要～",
+    "pub": "IPA",
+    "url": "https://www.ipa.go.jp/jinzai/ics/core_human_resource/final_project/2024/f55m8k0000003510-att/f55m8k00000035jl.pdf"
+   },
+   {
+    "t": "脅威インテリジェンス 導入・運用ガイドライン 2024",
+    "pub": "IPA",
+    "url": "https://www.ipa.go.jp/jinzai/ics/core_human_resource/final_project/2024/f55m8k0000003510-att/f55m8k000000358r.pdf"
+   }
+  ],
+  "def": "サイバー攻撃に関する脅威情報を収集・加工・分析して得たインテリジェンスに基づき、組織がセキュリティ上の意思決定を行う一連の流れ。特定のツールやサービスを指す言葉ではない。"
+ },
+ {
+  "id": "vuln-pentest",
+  "layer": "ops",
+  "name": "脆弱性診断・ペネトレーションテスト",
+  "full": "Vulnerability Assessment / Penetration Test（脆弱性診断・侵入テスト）",
+  "how": "脆弱性診断は、サーバやネットワーク機器、Web アプリ・Web API、スマートフォンアプリなどが対象で、基準に照らして直ちに攻撃に結び付かない点も洗い出す。ペネトレーションテストは想定される攻撃シナリオで目的を達成できるかを確かめ、被害の程度も確認する。",
+  "diff": "診断は網羅性、ペネトレーションテストは攻撃の成否と被害の確認が軸。デジタル庁は、診断で想定しにくい脆弱性を攻撃者の目線のテストで確かめる必要があるとする。",
+  "ai": "Microsoft のクラウドセキュリティベンチマーク v2（プレビュー）は、定期的なレッドチーム演習に加え、AI の継続的なレッドチーミング（AI-7）を管理策に挙げる。",
+  "related": [
+   "threat-intel",
+   "cspm",
+   "csirt",
+   "cis-controls"
+  ],
+  "sources": [
+   {
+    "t": "脆弱性診断・ペネトレーションテスト実施",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/security/business/admin/07/"
+   },
+   {
+    "t": "政府情報システムにおける脆弱性診断導入ガイドライン（DS-221）",
+    "pub": "デジタル庁",
+    "url": "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/e2a06143-ed29-4f1d-9c31-0f06fca67afc/b08708cd/20240131_resources_standard_guidelines_guidelines_05.pdf"
+   },
+   {
+    "t": "Mapping of Microsoft cloud security benchmark (MCSB) v2 (preview) to CIS Controls",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-v2-cis-controls-mapping"
+   }
+  ],
+  "def": "脆弱性診断は対象システム全体を網羅的に検査して弱点を洗い出す作業。ペネトレーションテストは攻撃者と同じ視点で攻撃し、実際に成功するかをリスクベースで確認する検査。"
+ },
+ {
+  "id": "csirt",
+  "layer": "ops",
+  "name": "インシデントレスポンス（CSIRT）",
+  "full": "Computer Security Incident Response Team（コンピュータセキュリティインシデント対応チーム）",
+  "how": "検知、初動処理（関係部署への連絡、被害拡大の防止、セキュリティ対策機関への情報提供）、分析、復旧、再発防止の流れを事前に手順化する。経営層への情報伝達の遅れが初動を誤らせた例があるため、伝達ルールを定めておく。",
+  "diff": "総務省の用語集では、CERT はインシデントに対応する活動を行う組織で、国際連携の対処にも使われる呼称。CSIRT は組織内の体制を指し、SOC とは監視面で重なる。",
+  "ai": "生成AIによる情報漏えいや誤出力の事案も、既存の対応手順に載せる。判断者と連絡先、経営層へ上げる基準を事前に決めておく。",
+  "related": [
+   "soc",
+   "soar",
+   "log-management",
+   "immutable-backup",
+   "nist-csf"
+  ],
+  "sources": [
+   {
+    "t": "用語集(な行)（ナショナルサート／CSIRT）",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/glossary/ja_05/"
+   },
+   {
+    "t": "インシデントレスポンス体制整備",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/security/business/admin/16/"
+   }
+  ],
+  "def": "企業や行政機関で、情報システムに問題が起きていないか監視し、起きたときは原因解析や影響範囲の調査を行う体制。インシデントレスポンスは、事故の検知から復旧までを進める対応活動を指す。"
+ },
+ {
+  "id": "zero-trust",
+  "layer": "framework",
+  "name": "ゼロトラスト",
+  "full": "Zero Trust（NIST SP 800-207 の考え方）",
+  "how": "NIST は、防御の重点を静的なネットワーク境界から利用者、資産、資源へ移す。デジタル庁は、資源の識別、身元確認と当人認証、ネットワーク保護、資源の状態確認、ポリシー評価、資源とアクセスの観測の六つを適用方針に示す。",
+  "diff": "境界型防御は内側を信頼する前提で、ゼロトラストはその前提を外す。デジタル庁は、ゼロトラストが境界型やネットワーク対策を否定せず、特定製品を指すものでもないと説明する。",
+  "ai": "生成AIサービスへのアクセスも、利用者や端末の状態を評価して許可する対象にできる。ゼロトラストは製品ではなく考え方なので、段階的に進める。",
+  "related": [
+   "perimeter-defense",
+   "nist-csf",
+   "dlp",
+   "data-classification",
+   "ztna"
+  ],
+  "sources": [
+   {
+    "t": "Zero Trust Architecture（NIST SP 800-207）",
+    "pub": "NIST",
+    "url": "https://www.nist.gov/publications/zero-trust-architecture"
+   },
+   {
+    "t": "ゼロトラストアーキテクチャ適用方針（DS-210）",
+    "pub": "デジタル庁",
+    "url": "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/e2a06143-ed29-4f1d-9c31-0f06fca67afc/5efa5c3b/20220630_resources_standard_guidelines_guidelines_04.pdf"
+   },
+   {
+    "t": "What is Zero Trust?",
+    "pub": "Google Cloud",
+    "url": "https://cloud.google.com/learn/what-is-zero-trust"
+   }
+  ],
+  "def": "ネットワーク上の位置や資産の所有者だけを根拠に暗黙の信頼を与えず、利用者と端末の認証・認可を経て、資源ごとにアクセスを許可する考え方。リモート利用者、BYOD、クラウド資産の増加への対応策として生まれた。"
+ },
+ {
+  "id": "perimeter-defense",
+  "layer": "framework",
+  "name": "境界型防御",
+  "full": "Perimeter-based Security（境界型セキュリティ）",
+  "how": "ネットワークを用いて境界を設け、通信を制御する。送信元・宛先アドレスと特定ポートだけを許可するポリシーも、この考え方に当たる。セキュアなネットワークの構築が中心で、デジタル庁はこれを従来のセキュリティの基本とする。",
+  "diff": "ゼロトラストは境界の内部も侵害されうると想定して資源ごとに評価する。境界型は、侵入された後の内部での自由な移動を止めにくい点が弱みとされる。",
+  "ai": "クラウドの生成AIサービスは社内境界の外にある。デジタル庁は、クラウド利用が広がると境界型だけでは不十分になる恐れを指摘している。",
+  "related": [
+   "zero-trust",
+   "firewall",
+   "vpn"
+  ],
+  "sources": [
+   {
+    "t": "ゼロトラストアーキテクチャ適用方針（DS-210）",
+    "pub": "デジタル庁",
+    "url": "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/e2a06143-ed29-4f1d-9c31-0f06fca67afc/5efa5c3b/20220630_resources_standard_guidelines_guidelines_04.pdf"
+   },
+   {
+    "t": "What is Zero Trust?",
+    "pub": "Google Cloud",
+    "url": "https://cloud.google.com/learn/what-is-zero-trust"
+   }
+  ],
+  "def": "境界で内側と外側を遮断し、外部からの攻撃や内部からの情報流出を防ごうとする従来の考え方。「信頼できないもの」が内部に入らず、内部には「信頼できるもの」のみが存在する前提に立つ。"
+ },
+ {
+  "id": "nist-csf",
+  "layer": "framework",
+  "name": "NIST CSF 2.0",
+  "full": "NIST Cybersecurity Framework 2.0",
+  "how": "コアは Govern、Identify、Protect、Detect、Respond、Recover の六つの機能で、同時並行かつ継続的に回す。組織プロファイルで現在の状態と目標を記述し、その差から優先順位を付ける。",
+  "diff": "CSF は達成すべき成果を示すだけで、具体的な行動は指定しない。実現手段は、SP 800-53 など 50 以上の文書への情報参照で補う。",
+  "ai": "NIST は CSF コアを AI 向けに更新する予定は今のところないとしつつ、第三者 AI ツールのリスク監視（GV.SC-07）や AI を含むソフトの棚卸し（ID.AM-02）など既存の成果が使えると説明する。",
+  "related": [
+   "cis-controls",
+   "isms",
+   "cyber-mgmt-guideline",
+   "zero-trust"
+  ],
+  "sources": [
+   {
+    "t": "Frequently Asked Questions（Cybersecurity Framework）",
+    "pub": "NIST",
+    "url": "https://www.nist.gov/cyberframework/faqs"
+   },
+   {
+    "t": "NIST Releases Version 2.0 of Landmark Cybersecurity Framework",
+    "pub": "NIST",
+    "url": "https://www.nist.gov/news-events/news/2024/02/nist-releases-version-20-landmark-cybersecurity-framework"
+   }
+  ],
+  "def": "サイバーセキュリティリスクを管理・低減するための成果（アウトカム）を体系化した NIST のフレームワーク。業種や規模を問わず使え、多くの組織は自主的に利用する。"
+ },
+ {
+  "id": "isms",
+  "layer": "framework",
+  "name": "ISMS（ISO/IEC 27001）",
+  "full": "Information Security Management System（情報セキュリティマネジメントシステム）",
+  "how": "規格は要求事項に加えて情報リスクを管理するための管理策の一覧を示すが、特定の管理策は義務付けない。組織は独立した第三者の審査を受けて認証を得る。クラウド事業者の認証書は、自社の認証取得の参考にできる。",
+  "diff": "SOC 2 は監査人が統制の設計と運用の有効性を評価した報告書。ISMS は管理の仕組みを規格に照らして認証する点が異なる。",
+  "ai": "認証は対象サービスの範囲ごとに取得されるため、使う生成AIサービスが範囲に入っているかを確認する。自社の認証は別途必要になる。",
+  "related": [
+   "soc2",
+   "ismap",
+   "nist-csf",
+   "cyber-mgmt-guideline"
+  ],
+  "sources": [
+   {
+    "t": "ISO/IEC 27001 - Compliance",
+    "pub": "Google Cloud",
+    "url": "https://cloud.google.com/security/compliance/iso-27001"
+   },
+   {
+    "t": "用語集(さ行)（情報セキュリティマネジメント）",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/glossary/ja_03/"
+   }
+  ],
+  "def": "組織が情報セキュリティを運用・管理する仕組み（情報セキュリティマネジメントシステム）。国際規格 ISO/IEC 27001 として標準化されており、規格は ISMS の要求事項を定める。"
+ },
+ {
+  "id": "cis-controls",
+  "layer": "framework",
+  "name": "CIS Controls",
+  "full": "CIS Critical Security Controls（CIS クリティカルセキュリティコントロール）",
+  "how": "管理策には番号が付き、「3.11」のような節番号で参照される。Microsoft のクラウドセキュリティベンチマークは、自社の管理策を CIS Controls v8.1 の番号に対応付けている（例：保存時の暗号化は 3.11）。",
+  "diff": "CIS Benchmarks は個別製品の設定基準（Level 1・2）で、各推奨事項が CIS Controls を参照する。CSF は成果の枠組みで、CIS Controls は具体的な管理策側。",
+  "ai": "Microsoft の AI セキュリティ管理策（承認済みモデルの利用 AI-1、AI のレッドチーミング AI-7 など）も、CIS Controls v8.1 の番号に対応付けられている。",
+  "related": [
+   "nist-csf",
+   "isms",
+   "vuln-pentest"
+  ],
+  "sources": [
+   {
+    "t": "Center for Internet Security (CIS) Benchmarks",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/compliance/regulatory/offering-cis-benchmark"
+   },
+   {
+    "t": "Mapping of Microsoft cloud security benchmark (MCSB) v2 (preview) to CIS Controls",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-v2-cis-controls-mapping"
+   }
+  ],
+  "def": "非営利団体 CIS（Center for Internet Security）がコンセンサス方式で策定する、サイバー防御のための管理策群。NIST CSF や ISO 27000 シリーズなどの規格に対応付けられている。"
+ },
+ {
+  "id": "soc2",
+  "layer": "framework",
+  "name": "SOC 2",
+  "full": "System and Organization Controls 2（サービス組織の内部統制報告書）",
+  "how": "監査人がシステムの記述と統制を評価する。Type I は特定時点の統制の設計、Type II は一定期間にわたる設計と運用の有効性を対象とする。報告期間の終了後から利用者の期末までの空白は、経営者のブリッジレターで補う。",
+  "diff": "ISMS 認証が管理の仕組みへの認証であるのに対し、SOC 2 は利用者が委託先のリスクを評価するための報告書。例外事項への回答も報告書に載る。",
+  "ai": "AI サービスの調達では、報告書の対象範囲にそのサービスが入るか、対象期間、例外事項、利用者側で実施すべき統制（User Entity Responsibilities）を確認する。",
+  "related": [
+   "isms",
+   "ismap",
+   "shared-responsibility"
+  ],
+  "sources": [
+   {
+    "t": "SOC 2: compliance",
+    "pub": "Google Cloud",
+    "url": "https://cloud.google.com/security/compliance/soc-2"
+   },
+   {
+    "t": "System and Organization Controls (SOC) 2 Type 2",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/compliance/regulatory/offering-soc-2"
+   }
+  ],
+  "def": "米国公認会計士協会（AICPA）の枠組みに基づき、サービス提供組織の統制を、セキュリティ、可用性、処理の完全性、機密保持、プライバシーの基準で第三者が評価した報告書。"
+ },
+ {
+  "id": "ismap",
+  "layer": "framework",
+  "name": "ISMAP",
+  "full": "Information system Security Management and Assessment Program（政府情報システムのためのセキュリティ評価制度）",
+  "how": "事業者が ISMAP 管理基準（JIS Q 27000 シリーズ、政府統一基準、NIST SP800-53 を取り込み）で統制を構築し、登録監査機関の外部監査と、運用支援機関（IPA）の審査を受ける。登録の可否は運営委員会が判断し、毎年繰り返す。",
+  "diff": "ISMAP-LIU は低リスクの業務・情報に使う SaaS 向けの枠組み。ISMS 認証や SOC 2 報告書が民間の第三者評価なのに対し、ISMAP は政府調達用のリスト登録制度。",
+  "ai": "政府機関等は原則として ISMAP クラウドサービスリストから調達する。公共向けにクラウド型の生成AIサービスを提案する際は、登録の有無が確認点になる。",
+  "related": [
+   "isms",
+   "soc2",
+   "shared-responsibility"
+  ],
+  "sources": [
+   {
+    "t": "はじめてのISMAP",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_content/001002781.pdf"
+   },
+   {
+    "t": "政府情報システムのためのセキュリティ評価制度（ISMAP）基本規程",
+    "pub": "ISMAP運営委員会（総務省掲載）",
+    "url": "https://www.soumu.go.jp/main_content/000843478.pdf"
+   }
+  ],
+  "def": "政府が求めるセキュリティ要求を満たすクラウドサービスを事前に評価・登録し、政府のクラウド調達におけるセキュリティ水準の確保と円滑な導入を図る制度。登録されたサービスは ISMAP クラウドサービスリストで公開される。"
+ },
+ {
+  "id": "cyber-mgmt-guideline",
+  "layer": "framework",
+  "name": "サイバーセキュリティ経営ガイドライン",
+  "full": "サイバーセキュリティ経営ガイドライン Ver 3.0（経済産業省・IPA）",
+  "how": "3原則は、経営者のリーダーシップ、サプライチェーン全体への目配り、平時と緊急時の社内外とのコミュニケーション。10項目は、方針策定、管理体制、資源確保、リスク対応、PDCA、緊急対応・復旧体制、サプライチェーン、情報共有などを指示する。",
+  "diff": "個別の技術対策を並べる管理策集（CIS Controls など）ではなく、経営者の責務と指示事項を示す文書。IPA は実践のためのプラクティス集を別に公開している。",
+  "ai": "生成AI導入に伴うリスクの方針、体制、緊急対応を、10項目の枠で経営層に説明し、承認を得る材料にできる。",
+  "related": [
+   "nist-csf",
+   "isms",
+   "csirt",
+   "cis-controls"
+  ],
+  "sources": [
+   {
+    "t": "サイバーセキュリティ経営ガイドラインVer3.0のポイント",
+    "pub": "経済産業省（IPA掲載資料）",
+    "url": "https://www.ipa.go.jp/security/seminar/ssf7ph00000081a1-att/METI_report.pdf"
+   },
+   {
+    "t": "サイバーセキュリティ経営ガイドライン Ver 3.0実践のためのプラクティス集",
+    "pub": "IPA",
+    "url": "https://www.ipa.go.jp/security/economics/csm-practice.html"
+   }
+  ],
+  "def": "経営者を対象に、経営者が認識すべき3原則と、責任者（CISO等）に指示すべき重要10項目をまとめた経済産業省・IPA のガイドライン。Ver 3.0 は令和5年3月24日に公表された。"
+ }
+]

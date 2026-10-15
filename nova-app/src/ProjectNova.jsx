@@ -12,6 +12,7 @@ import FORESIGHT from "./data/foresight-briefs.json";
 import FORESIGHT_SOURCES from "./data/foresight-sources.json";
 import FORESIGHT_COLLECTION from "./data/foresight-collection.json";
 import FORESIGHT_THEMES from "./data/foresight-collection-themes.json";
+import ITSEC from "./data/itsec-concepts.json";
 
 // =============================================================================
 // QUIZ SAVE SLOT — ゲームのセーブのように、クイズの途中経過を1スロット保存/再開する
@@ -120213,6 +120214,7 @@ const UI = {
   tab_architect: ["AIアーキテクト道場", "Architect Academy"],
   tab_archcase: ["アーキテクチャ事例", "Architecture Cases"],
   tab_govdojo: ["セキュリティ・ガバナンス道場", "Security & Governance Dojo"],
+  tab_itsec: ["ITセキュリティ基盤", "IT Security Foundations"],
   tab_frontier: ["先端メニュー", "Frontier Menu"],
   tab_agentshelf: ["エージェント棚", "Agent Shelf"],
   tab_postmortem: ["失敗学", "Postmortems"],
@@ -155506,6 +155508,133 @@ function TabBpr() {
   );
 }
 
+// ============ ITセキュリティ基盤（広義） — AI固有でないセキュリティ・ガバナンスの基本概念 ============
+// 出典: デジタル庁・IPA・総務省・NIST・Microsoft Learn・Google Cloud の公開資料（各概念の sources に取得確認済みURL）。
+// AI固有の論点（AI利用規程・リスク階層・LLM脅威など）は「セキュリティ・ガバナンス道場」、こちらはその土台になる広義のIT。
+const ITSEC_LAYERS = [
+  { id: "endpoint", t: ["エンドポイント", "Endpoint"], d: ["PC・スマホ・サーバーそのものを守る", "Protect the devices themselves"], col: "#5FD3C2" },
+  { id: "identity", t: ["ID・アクセス", "Identity & access"], d: ["誰が何にアクセスしてよいかを決める", "Decide who may reach what"], col: "#8FA2FF" },
+  { id: "network", t: ["ネットワーク境界", "Network perimeter"], d: ["社内外の通信の出入口で守る", "Guard the doors in and out"], col: "#D8A94E" },
+  { id: "sase", t: ["クラウドアクセス・SASE", "Cloud access & SASE"], d: ["場所を問わずクラウド経由で守る", "Protect from the cloud, wherever users are"], col: "#E28C4E" },
+  { id: "cloud", t: ["クラウド基盤", "Cloud platform"], d: ["IaaS/PaaS の設定と稼働を守る", "Secure cloud configuration and workloads"], col: "#72BA88" },
+  { id: "data", t: ["データ保護", "Data protection"], d: ["情報そのものの持ち出し・改ざん・消失を防ぐ", "Stop leaks, tampering and loss of the data itself"], col: "#C27BD6" },
+  { id: "ops", t: ["監視・運用", "Detection & operations"], d: ["検知し、調べ、対応する", "Detect, investigate, respond"], col: "#B84A5E" },
+  { id: "framework", t: ["ガバナンス・フレームワーク", "Governance frameworks"], d: ["全体を管理する考え方と認証・基準", "Models, standards and certifications"], col: "#9A90B4" },
+];
+const ITSEC_SPLIT = [
+  { t: ["AI固有のセキュリティ・ガバナンス", "AI-specific security & governance"], col: C.gold,
+    where: ["道場・リサーチ › セキュリティ・ガバナンス道場（AI利用規程・リスク階層化・SoA と第三者審査・LLM脅威と統制・インシデント対応・業種横断）／実務論点マップの「AIセキュリティ」", "Dojo & Research › Security & Governance Dojo; the AI-security corpus in the Practice Issue Map"],
+    eg: ["プロンプトインジェクション、学習データ・出力の権利、モデルのリスク区分（EU AI Act 等）、AI利用ガイドライン", "Prompt injection, training-data and output rights, model risk tiers (EU AI Act), AI use policies"] },
+  { t: ["広義のITセキュリティ・ガバナンス（このタブ）", "General IT security & governance (this tab)"], col: C.teal,
+    where: ["道場・リサーチ › ITセキュリティ基盤", "Dojo & Research › IT Security Foundations"],
+    eg: ["EDR・SWG・CASB・ZTNA・SASE・固定IP・SIEM・DLP・ISMS など、AIの有無に関係なく企業ITを守る仕組み", "EDR, SWG, CASB, ZTNA, SASE, static IPs, SIEM, DLP, ISMS — controls that protect enterprise IT with or without AI"] },
+];
+
+function ItSecCard({ c, en, open, onToggle, onJump }) {
+  const L = ITSEC_LAYERS.find((l) => l.id === c.layer) || ITSEC_LAYERS[0];
+  const row = (label, text, col) => text ? (
+    <div style={{ fontSize: 12, lineHeight: 1.75, color: C.muted, marginTop: 6 }}><span style={{ color: col || C.text, fontWeight: 700 }}>{label}　</span>{text}</div>
+  ) : null;
+  return (
+    <div id={"itsec-" + c.id} style={{ background: C.surface2, borderRadius: 10, borderLeft: `3px solid ${L.col}`, padding: "10px 13px", border: open ? `1px solid ${L.col}` : `1px solid ${C.line}` }}>
+      <button onClick={onToggle} aria-expanded={open} style={{ all: "unset", cursor: "pointer", display: "block", width: "100%" }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: C.text }}>{c.name}</span>
+          {c.full ? <span style={{ fontSize: 11, color: C.dim }}>{c.full}</span> : null}
+          <span style={{ marginLeft: "auto", fontSize: 11, color: C.dim }}>{open ? "▲" : "▼"}</span>
+        </div>
+        <div style={{ fontSize: 12.5, color: C.text, lineHeight: 1.7, marginTop: 4 }}>{c.def}</div>
+      </button>
+      {open ? (
+        <div>
+          {row(en ? "How it works" : "仕組み", c.how, L.col)}
+          {row(en ? "vs. similar" : "似た概念との違い", c.diff, C.gold)}
+          {row(en ? "With AI" : "AI導入との接点", c.ai, C.teal)}
+          {c.related && c.related.length ? (
+            <div style={{ display: "flex", gap: 5, flexWrap: "wrap", alignItems: "center", marginTop: 8 }}>
+              <span style={{ fontSize: 10.5, color: C.dim }}>{en ? "Related" : "関連"}</span>
+              {c.related.map((r) => {
+                const t = ITSEC.find((x) => x.id === r);
+                return t ? <button key={r} className="gh-btn" onClick={() => onJump(r)} style={{ padding: "1px 9px", fontSize: 11 }}>{t.name}</button> : null;
+              })}
+            </div>
+          ) : null}
+          <div style={{ marginTop: 8, display: "grid", gap: 3 }}>
+            {(c.sources || []).map((s, i) => (
+              <a key={i} href={s.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: C.teal, textDecoration: "none", wordBreak: "break-all" }}>↗ {s.t}（{s.pub}）</a>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function TabItSec() {
+  const lang = useLang();
+  const en = lang === "en";
+  const [layer, setLayer] = useState("ALL");
+  const [q, setQ] = useState("");
+  const [open, setOpen] = useState({});
+  const list = ITSEC.filter((c) => (layer === "ALL" || c.layer === layer) &&
+    (!q.trim() || (c.name + c.full + c.def + c.how + c.diff + c.ai).toLowerCase().includes(q.trim().toLowerCase())));
+  const jump = (id) => {
+    const c = ITSEC.find((x) => x.id === id); if (!c) return;
+    setLayer("ALL"); setQ(""); setOpen((o) => ({ ...o, [id]: true }));
+    setTimeout(() => { const el = document.getElementById("itsec-" + id); if (el) el.scrollIntoView({ behavior: "smooth", block: "center" }); }, 60);
+  };
+  const nSrc = new Set(ITSEC.flatMap((c) => (c.sources || []).map((s) => s.url))).size;
+  return (
+    <div>
+      <SectionTitle jp="ITセキュリティ基盤 — AIの手前にある、広義のセキュリティ・ガバナンス" en="IT Security Foundations — the general security and governance layer beneath AI" />
+      <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.7, marginBottom: 10 }}>
+        {en ? `AI deployments ride on ordinary enterprise security: endpoints, identity, network and cloud access, data protection, monitoring and governance frameworks. ${ITSEC.length} core concepts, each with what it is, how it works, how it differs from look-alikes, and where it meets AI adoption — grounded in ${nSrc} public sources (Digital Agency, IPA, MIC, NIST, Microsoft Learn, Google Cloud).`
+            : `AI導入は、エンドポイント・ID・ネットワークとクラウドアクセス・データ保護・監視・フレームワークという企業ITのセキュリティの上に乗る。主要${ITSEC.length}概念を「何か・仕組み・似た概念との違い・AI導入との接点」で整理した。根拠はデジタル庁・IPA・総務省・NIST・Microsoft Learn・Google Cloud の公開資料${nSrc}件。`}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,280px),1fr))", gap: 8, marginBottom: 14 }}>
+        {ITSEC_SPLIT.map((s, i) => (
+          <div key={i} style={{ background: C.surface2, borderRadius: 10, borderTop: `3px solid ${s.col}`, padding: "10px 12px" }}>
+            <div style={{ fontSize: 12.5, fontWeight: 800, color: s.col }}>{s.t[en ? 1 : 0]}</div>
+            <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.65, marginTop: 4 }}>{en ? "Where: " : "掲載場所："}{s.where[en ? 1 : 0]}</div>
+            <div style={{ fontSize: 11.5, color: C.dim, lineHeight: 1.65, marginTop: 2 }}>{en ? "e.g. " : "例："}{s.eg[en ? 1 : 0]}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{ fontSize: 11, color: C.dim, marginBottom: 6 }}>{en ? "LAYERS — tap to filter (outside in: devices → people → network → cloud → data → operations → governance)" : "層 — 押すと絞り込み（外側の端末から、人・ネットワーク・クラウド・データ・運用・統治の順）"}</div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(46%,170px),1fr))", gap: 6, marginBottom: 10 }}>
+        <button className="gh-btn" onClick={() => setLayer("ALL")} aria-pressed={layer === "ALL"} style={{ textAlign: "left", borderColor: layer === "ALL" ? C.text : C.line }}>
+          <div style={{ fontSize: 12.5, fontWeight: 800 }}>{en ? "All layers" : "すべて"}</div>
+          <div style={{ fontSize: 10.5, color: C.dim }}>{ITSEC.length}{en ? " concepts" : "概念"}</div>
+        </button>
+        {ITSEC_LAYERS.map((l) => {
+          const n = ITSEC.filter((c) => c.layer === l.id).length;
+          if (!n) return null;
+          return (
+            <button key={l.id} className="gh-btn" onClick={() => setLayer(l.id)} aria-pressed={layer === l.id}
+              style={{ textAlign: "left", borderLeft: `3px solid ${l.col}`, borderColor: layer === l.id ? l.col : C.line, background: layer === l.id ? C.surface : C.surface2 }}>
+              <div style={{ fontSize: 12.5, fontWeight: 800, color: layer === l.id ? l.col : C.text }}>{l.t[en ? 1 : 0]} <span style={{ fontSize: 10.5, color: C.dim, fontWeight: 400 }}>{n}</span></div>
+              <div style={{ fontSize: 10.5, color: C.dim, lineHeight: 1.5 }}>{l.d[en ? 1 : 0]}</div>
+            </button>
+          );
+        })}
+      </div>
+      <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 10 }}>
+        <input className="gh-input" value={q} onChange={(e) => setQ(e.target.value)} placeholder={en ? "search (e.g. EDR, 固定IP, CASB)" : "検索（例：EDR、固定IP、CASB）"} style={{ flex: "1 1 220px" }} />
+        <span style={{ fontSize: 11, color: C.muted }}>{list.length}{en ? " shown" : "件"}</span>
+        <button className="gh-btn" onClick={() => setOpen(Object.fromEntries(list.map((c) => [c.id, true])))} style={{ padding: "4px 10px", fontSize: 11 }}>{en ? "Expand all" : "すべて開く"}</button>
+        <button className="gh-btn" onClick={() => setOpen({})} style={{ padding: "4px 10px", fontSize: 11 }}>{en ? "Collapse" : "閉じる"}</button>
+      </div>
+      <div style={{ display: "grid", gap: 7 }}>
+        {list.map((c) => <ItSecCard key={c.id} c={c} en={en} open={!!open[c.id]} onToggle={() => setOpen((o) => ({ ...o, [c.id]: !o[c.id] }))} onJump={jump} />)}
+      </div>
+      <div style={{ fontSize: 11, color: C.dim, lineHeight: 1.7, marginTop: 14 }}>
+        {en ? "Definitions are paraphrased from the linked public sources; product pages are cited only as examples. Concept names are kept in Japanese/English as used in practice. Content is in Japanese."
+            : "定義・仕組みはリンク先の公開資料の記載を言い換えたもので、製品ページは例として引用している。"}
+      </div>
+    </div>
+  );
+}
+
 const TABS = [
   { id: "strategy", k: "tab_strategy" },
   { id: "issues", k: "tab_issues" },
@@ -155534,6 +155663,7 @@ const TABS = [
   { id: "archcase", k: "tab_archcase" },
   { id: "frontier", k: "tab_frontier" },
   { id: "govdojo", k: "tab_govdojo" },
+  { id: "itsec", k: "tab_itsec" },
   { id: "postmortem", k: "tab_postmortem" },
   { id: "companies", k: "tab_companies" },
   { id: "lexicon", k: "tab_lexicon" },
@@ -160237,6 +160367,10 @@ function GovDojo() {
   return (
     <div>
       <SectionTitle jp="AIセキュリティ・ガバナンス道場 — 読むだけでなく、判断を訓練する" en="AI Security & Governance Dojo — train judgment, not just reading" />
+      <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.7, background: C.surface2, border: `1px solid ${C.line}`, borderRadius: 8, padding: "8px 12px", marginBottom: 12 }}>
+        {en ? "Scope: AI-specific security and governance (AI use policy, risk tiering, SoA and vendor review, LLM threats, AI incidents). General IT security that AI sits on — EDR, SWG, CASB, ZTNA, SASE, static IPs, SIEM, DLP, ISMS — is in the IT Security Foundations tab next to this one."
+            : "対象：AI固有のセキュリティ・ガバナンス（AI利用規程・リスク階層化・SoA と第三者審査・LLM脅威・AIインシデント）。AIが乗る広義のITセキュリティ（EDR・SWG・CASB・ZTNA・SASE・固定IP・SIEM・DLP・ISMS など）は、隣の「ITセキュリティ基盤」タブにまとめています。"}
+      </div>
       <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
         {modes.map(([k, label]) => (
           <button key={k} className="gh-btn" onClick={() => setMode(k)} style={mode === k ? { borderColor: C.gold, color: C.gold, fontWeight: 700 } : {}}>{en ? label[1] : label[0]}</button>
@@ -160343,7 +160477,7 @@ function GafaHub() {
           {[
             { g: ["基礎", "CORE"], col: C.gold, ids: ["strategy", "issues", "consult", "tacit", "factbook", "checkcore"] },
             { g: ["AX実務", "AX PRACTICE"], col: C.teal, ids: ["value", "assess", "toolbox", "xform", "bpr", "gfirm", "slalom", "sglobal", "proposal", "salesdojo", "casework", "livedojo", "industry", "agentshelf", "agi", "checkax"] },
-            { g: ["道場・リサーチ", "DOJO & RESEARCH"], col: C.wine, ids: ["dojo", "architect", "archcase", "frontier", "govdojo", "postmortem", "companies", "noteissues", "lexicon"] },
+            { g: ["道場・リサーチ", "DOJO & RESEARCH"], col: C.wine, ids: ["dojo", "architect", "archcase", "frontier", "govdojo", "itsec", "postmortem", "companies", "noteissues", "lexicon"] },
             { g: ["AIフォーサイト", "AI FORESIGHT"], col: C.fore, ids: ["fs_macro", "fs_market", "fs_client", "fs_craft", "fs_library", "fs_refresh", "fs_collection"] },
           ].map((gr, gi) => (
             <div key={gi} style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
@@ -160390,6 +160524,7 @@ function GafaHub() {
         {tab === "archcase" && <TabArchCases key={resetKey} />}
         {tab === "frontier" && <TabFrontier key={resetKey} />}
         {tab === "govdojo" && <GovDojo key={resetKey} />}
+        {tab === "itsec" && <TabItSec key={resetKey} />}
         {tab === "postmortem" && <TabPostmortem key={resetKey} />}
         {tab === "companies" && <TabCompanies key={resetKey} />}
         {tab === "lexicon" && <TabLexicon key={resetKey} />}
@@ -221949,7 +222084,7 @@ const BOOTCAMP_QUEST = {
     { id: "Q-MNOTE", name: ["実務論点マップ​（論点クイズ）", "Practice issue map quiz"], qn: MQB.NOTEISSUE_BANK.length, s: 9, e: 9, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, cats: mqDoms(MQB.NOTEISSUE_BANK, MQB.NOTEISSUE_DOMAINS) },
     { id: "Q-MSLQ", name: ["Slalom変革道場​（スキルクイズ）", "Slalom dojo skill quiz"], qn: MQB.SLALOM_BANK.length, s: 11, e: 12, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, cats: mqDoms(MQB.SLALOM_BANK, MQB.SLALOM_DOMAINS) },
   ],
-  practice: [{"id": "Q-P1", "name": ["基礎", "Core Reading"], "qn": 4, "unit": 1, "s": 9, "e": 9, "hub": "megatech", "cats": [{"n": ["戦略", "Strategy"], "q": 1}, {"n": ["論点マップ", "Issue Map"], "q": 1}, {"n": ["全体像（サービスマップ）", "Service Map"], "q": 1}, {"n": ["定量データ（ファクトブック）", "Factbook"], "q": 1}]}, {"id": "Q-P10", "name": ["暗黙知の形式知化", "Tacit → Explicit"], "qn": 9, "unit": 1, "s": 9, "e": 10, "hub": "megatech", "cats": [{"n": ["I 学問的土台 SECI×CTA", "I SECI x CTA"], "q": 1}, {"n": ["II 表出化の4特徴", "II Externalization"], "q": 1}, {"n": ["III 3+1 Step", "III 3+1 Steps"], "q": 1}, {"n": ["IV 8視点フレーム", "IV 8 Viewpoints"], "q": 1}, {"n": ["V CTA 5技法マッピング", "V CTA Techniques"], "q": 1}, {"n": ["VI OK&NG問答集", "VI OK & NG"], "q": 1}, {"n": ["VII 世界の関連手法13", "VII World Catalog"], "q": 1}, {"n": ["VIII 手法の選び方", "VIII Method Picker"], "q": 1}, {"n": ["IX 実装難易度スコアラー", "IX Difficulty Scorer"], "q": 1}]}, {"id": "Q-P11", "name": ["AX手法箱", "Method Toolbox"], "qn": 5, "unit": 1, "s": 10, "e": 11, "hub": "megatech", "cats": [{"n": ["I 業務可視化の記法5", "I Process Notations"], "q": 1}, {"n": ["II 発掘・優先順位付け", "II Discovery & Scoring"], "q": 1}, {"n": ["III PoC設計・効果測定", "III PoC & Benefits"], "q": 1}, {"n": ["IV Evals設計", "IV Evals Design"], "q": 1}, {"n": ["V データレディネス評価", "V Data Readiness"], "q": 1}]}, {"id": "Q-P2", "name": ["価値と診断", "Value & Assessment"], "qn": 5, "unit": 1, "s": 9, "e": 10, "hub": "megatech", "cats": [{"n": ["価値ドライバー", "Value Drivers"], "q": 1}, {"n": ["AX成熟度診断", "Maturity Assessment"], "q": 1}, {"n": ["ADOPT DESIGN（定着の設計図）", "Adoption Design"], "q": 1}, {"n": ["効果不振の診断ツリー", "Underperformance Triage"], "q": 1}, {"n": ["近未来レーダー", "Near-future Radar"], "q": 1}]}, {"id": "Q-P3", "name": ["提案の型 I〜XI", "Proposal Kit I-XI"], "qn": 11, "unit": 1, "s": 10, "e": 11, "hub": "megatech", "cats": [{"n": ["I 骨子7ステップ", "I Skeleton"], "q": 1}, {"n": ["II 案件検査10項目", "II Deal Check"], "q": 1}, {"n": ["III CFOに耐える計算", "III CFO Math"], "q": 1}, {"n": ["IV バトルカード", "IV Battlecards"], "q": 1}, {"n": ["V 想定問答12", "V Objections"], "q": 1}, {"n": ["VI 契約形態の型", "VI Contract Forms"], "q": 1}, {"n": ["VII フル提案書12P", "VII Sample Deck"], "q": 1}, {"n": ["VIII GOV GATE", "VIII GOV GATE"], "q": 1}, {"n": ["IX FIN GATE", "IX FIN GATE"], "q": 1}, {"n": ["X LAYER MAP", "X Layer Map"], "q": 1}, {"n": ["XI 契約・ステークホルダー", "XI Contracts & Stakeholders"], "q": 1}]}, {"id": "Q-P4", "name": ["商談実戦", "Deal Practice"], "qn": 4, "unit": 1, "s": 12, "e": 12, "hub": "megatech", "cats": [{"n": ["商談ドリル10", "Sales Drills"], "q": 1}, {"n": ["ディスカバリー質問8業種", "Discovery Questions"], "q": 1}, {"n": ["ケース演習10（AI採点）", "Case Work"], "q": 1}, {"n": ["模擬商談LIVE 5ペルソナ", "Live Deal Dojo"], "q": 1}]}, {"id": "Q-P5", "name": ["業界別（深掘り＋ツール）", "Industry Maps"], "qn": 8, "unit": 1, "s": 13, "e": 14, "hub": "megatech", "cats": [{"n": ["製造", "Manufacturing"], "q": 1}, {"n": ["金融", "Finance"], "q": 1}, {"n": ["小売・消費財", "Retail"], "q": 1}, {"n": ["物流・運輸", "Logistics"], "q": 1}, {"n": ["ヘルスケア・製薬", "Pharma"], "q": 1}, {"n": ["公共・自治体", "Public"], "q": 1}, {"n": ["エネルギー・公益", "Energy"], "q": 1}, {"n": ["建設・不動産", "Construction"], "q": 1}]}, {"id": "Q-P6", "name": ["エージェント棚", "Agent Shelf"], "qn": 4, "unit": 1, "s": 14, "e": 14, "hub": "megatech", "cats": [{"n": ["金融・保険", "Finance & Insurance"], "q": 1}, {"n": ["製造・建設・インフラ", "Mfg & Infra"], "q": 1}, {"n": ["小売・流通", "Retail & Dist."], "q": 1}, {"n": ["サービス・IT", "Service & IT"], "q": 1}]}, {"id": "Q-P7", "name": ["先端メニュー 15ドメイン", "Frontier Menu"], "qn": 15, "unit": 1, "s": 15, "e": 16, "hub": "megatech", "cats": [{"n": ["エージェントハーネス", "Agent Harness"], "q": 1}, {"n": ["エッジ・軽量化", "Edge & Quantization"], "q": 1}, {"n": ["トークン最適化", "Token Optimization"], "q": 1}, {"n": ["暗黙知の顕在化", "Tacit Knowledge"], "q": 1}, {"n": ["AI駆動開発", "AI-driven Dev"], "q": 1}, {"n": ["AgentOps・運用", "AgentOps"], "q": 1}, {"n": ["Physical AI", "Physical AI"], "q": 1}, {"n": ["Spatial AI", "Spatial AI"], "q": 1}, {"n": ["ロボット活用", "Robotics"], "q": 1}, {"n": ["データセンター・GPU", "DC & GPU"], "q": 1}, {"n": ["音声AI・対話", "Voice AI"], "q": 1}, {"n": ["ドキュメントAI・IDP", "Document AI"], "q": 1}, {"n": ["ドメイン特化モデル", "Custom Models"], "q": 1}, {"n": ["クリエイティブ・マーケAI", "Creative AI"], "q": 1}, {"n": ["AIサービス事業化", "AI Service Biz"], "q": 1}]}, {"id": "Q-P12", "name": ["統制の実務", "Governance Practice"], "qn": 2, "unit": 1, "s": 16, "e": 16, "hub": "megatech", "cats": [{"n": ["リスク評価実務（8行シート）", "Risk Sheet Practice"], "q": 1}, {"n": ["論点体系 S11×G16", "Issue Taxonomy S/G"], "q": 1}]}, {"id": "Q-P13", "name": ["変革の実務", "Transformation Practice"], "qn": 6, "unit": 1, "s": 11, "e": 11, "hub": "megatech", "cats": [{"n": ["I 役割の正体（3つの帽子）", "I Three Hats"], "q": 1}, {"n": ["II オペレーティングモデル6要素", "II Operating Model"], "q": 1}, {"n": ["III ADKAR 定着診断", "III ADKAR"], "q": 1}, {"n": ["IV デリバリーリードの5習慣", "IV Delivery Habits"], "q": 1}, {"n": ["V ベネフィット実現", "V Benefit Realization"], "q": 1}, {"n": ["VI データ人材の再設計", "VI Data Talent"], "q": 1}]}, {"id": "Q-P18", "name": ["業務再設計（BPR）", "Process Redesign (BPR)"], "qn": 7, "unit": 1, "s": 11, "e": 11, "hub": "megatech", "cats": [{"n": ["I 改善ロードマップ", "I Roadmap"], "q": 1}, {"n": ["II 消せる仕事10類型", "II Removable Work"], "q": 1}, {"n": ["III システム化の判定", "III System or Excel"], "q": 1}, {"n": ["IV 定着の構造", "IV Adoption"], "q": 1}, {"n": ["V KPIの付け替え", "V KPI Swap"], "q": 1}, {"n": ["VI 着手前の関門", "VI Gates"], "q": 1}, {"n": ["VII 横断8論点", "VII Eight Shifts"], "q": 1}]}, {"id": "Q-P14", "name": ["ファーム実務", "Global Firm Practice"], "qn": 4, "unit": 1, "s": 11, "e": 12, "hub": "megatech", "cats": [{"n": ["I 案件の入口2型", "I Deal Origination"], "q": 1}, {"n": ["II ラダーと昇進", "II Ladder & Promotion"], "q": 1}, {"n": ["III 面接想定問答5", "III Interview Q&A"], "q": 1}, {"n": ["IV 最初の90日", "IV First 90 Days"], "q": 1}]}, {"id": "Q-P15", "name": ["グローバル事例", "Global Cases"], "qn": 5, "unit": 1, "s": 12, "e": 12, "hub": "megatech", "cats": [{"n": ["I 事例11件（課題・打ち手・指標）", "I Eleven Cases"], "q": 1}, {"n": ["II 4つの型", "II Four Patterns"], "q": 1}, {"n": ["III 日本法人", "III The Japan Entity"], "q": 1}, {"n": ["VI 調査数値の扱い", "VI Handling Survey Figures"], "q": 1}, {"n": ["VIII 日本への翻訳の落とし穴", "VIII Translating to Japan"], "q": 1}]}, {"id": "Q-P16", "name": ["Slalom変革道場", "Slalom Dojo"], "qn": 5, "unit": 1, "s": 11, "e": 12, "hub": "megatech", "cats": [{"n": ["求められるスキル", "Skills"], "q": 1}, {"n": ["会社とTransformation", "Firm & practice"], "q": 1}, {"n": ["Slalomの事例", "Slalom cases"], "q": 1}, {"n": ["場面演習", "Scenario drills"], "q": 1}, {"n": ["90日計画・自己評価", "90 days & self-check"], "q": 1}]}, {"id": "Q-P17", "name": ["実務論点マップ", "Practice Issue Map"], "qn": 4, "unit": 1, "s": 9, "e": 9, "hub": "megatech", "cats": [{"n": ["論点マップ", "Issue map"], "q": 1}, {"n": ["統治の論点", "Governance"], "q": 1}, {"n": ["一次ソースと検証", "Sources & checks"], "q": 1}, {"n": ["記事エクスプローラ", "Articles"], "q": 1}]}, {"id": "Q-P8", "name": ["失敗学・事象", "Postmortems & Phenomena"], "qn": 13, "unit": 1, "s": 17, "e": 17, "hub": "megatech", "cats": [{"n": ["事象ファイル24", "Phenomena File"], "q": 1}, {"n": ["Zillow", "Zillow"], "q": 1}, {"n": ["Watson Health", "Watson Health"], "q": 1}, {"n": ["Air Canada", "Air Canada"], "q": 1}, {"n": ["McDonald's", "McDonald's"], "q": 1}, {"n": ["NYC MyCity", "NYC MyCity"], "q": 1}, {"n": ["Samsung", "Samsung"], "q": 1}, {"n": ["Amazon採用AI", "Amazon HR"], "q": 1}, {"n": ["英A-level", "UK A-levels"], "q": 1}, {"n": ["Avianca判例", "Avianca"], "q": 1}, {"n": ["Klarna", "Klarna"], "q": 1}, {"n": ["Bardデモ", "Bard demo"], "q": 1}, {"n": ["Deloitte豪", "Deloitte AU"], "q": 1}]}, {"id": "Q-P9", "name": ["リサーチ", "Research"], "qn": 5, "unit": 1, "s": 18, "e": 19, "hub": "megatech", "cats": [{"n": [`企業研究${MQB.COMPANIES.length}社`, `${MQB.COMPANIES.length} Companies`], "q": 1}, {"n": ["提供モデルの型", "Delivery Models"], "q": 1}, {"n": ["日本市場ビュー", "JP Market"], "q": 1}, {"n": ["AGI・ASI仮説トレ", "AGI/ASI Gym"], "q": 1}, {"n": ["PLAYBOOK 5ガイド", "Playbook Guides"], "q": 1}]}],
+  practice: [{"id": "Q-P1", "name": ["基礎", "Core Reading"], "qn": 4, "unit": 1, "s": 9, "e": 9, "hub": "megatech", "cats": [{"n": ["戦略", "Strategy"], "q": 1}, {"n": ["論点マップ", "Issue Map"], "q": 1}, {"n": ["全体像（サービスマップ）", "Service Map"], "q": 1}, {"n": ["定量データ（ファクトブック）", "Factbook"], "q": 1}]}, {"id": "Q-P10", "name": ["暗黙知の形式知化", "Tacit → Explicit"], "qn": 9, "unit": 1, "s": 9, "e": 10, "hub": "megatech", "cats": [{"n": ["I 学問的土台 SECI×CTA", "I SECI x CTA"], "q": 1}, {"n": ["II 表出化の4特徴", "II Externalization"], "q": 1}, {"n": ["III 3+1 Step", "III 3+1 Steps"], "q": 1}, {"n": ["IV 8視点フレーム", "IV 8 Viewpoints"], "q": 1}, {"n": ["V CTA 5技法マッピング", "V CTA Techniques"], "q": 1}, {"n": ["VI OK&NG問答集", "VI OK & NG"], "q": 1}, {"n": ["VII 世界の関連手法13", "VII World Catalog"], "q": 1}, {"n": ["VIII 手法の選び方", "VIII Method Picker"], "q": 1}, {"n": ["IX 実装難易度スコアラー", "IX Difficulty Scorer"], "q": 1}]}, {"id": "Q-P11", "name": ["AX手法箱", "Method Toolbox"], "qn": 5, "unit": 1, "s": 10, "e": 11, "hub": "megatech", "cats": [{"n": ["I 業務可視化の記法5", "I Process Notations"], "q": 1}, {"n": ["II 発掘・優先順位付け", "II Discovery & Scoring"], "q": 1}, {"n": ["III PoC設計・効果測定", "III PoC & Benefits"], "q": 1}, {"n": ["IV Evals設計", "IV Evals Design"], "q": 1}, {"n": ["V データレディネス評価", "V Data Readiness"], "q": 1}]}, {"id": "Q-P2", "name": ["価値と診断", "Value & Assessment"], "qn": 5, "unit": 1, "s": 9, "e": 10, "hub": "megatech", "cats": [{"n": ["価値ドライバー", "Value Drivers"], "q": 1}, {"n": ["AX成熟度診断", "Maturity Assessment"], "q": 1}, {"n": ["ADOPT DESIGN（定着の設計図）", "Adoption Design"], "q": 1}, {"n": ["効果不振の診断ツリー", "Underperformance Triage"], "q": 1}, {"n": ["近未来レーダー", "Near-future Radar"], "q": 1}]}, {"id": "Q-P3", "name": ["提案の型 I〜XI", "Proposal Kit I-XI"], "qn": 11, "unit": 1, "s": 10, "e": 11, "hub": "megatech", "cats": [{"n": ["I 骨子7ステップ", "I Skeleton"], "q": 1}, {"n": ["II 案件検査10項目", "II Deal Check"], "q": 1}, {"n": ["III CFOに耐える計算", "III CFO Math"], "q": 1}, {"n": ["IV バトルカード", "IV Battlecards"], "q": 1}, {"n": ["V 想定問答12", "V Objections"], "q": 1}, {"n": ["VI 契約形態の型", "VI Contract Forms"], "q": 1}, {"n": ["VII フル提案書12P", "VII Sample Deck"], "q": 1}, {"n": ["VIII GOV GATE", "VIII GOV GATE"], "q": 1}, {"n": ["IX FIN GATE", "IX FIN GATE"], "q": 1}, {"n": ["X LAYER MAP", "X Layer Map"], "q": 1}, {"n": ["XI 契約・ステークホルダー", "XI Contracts & Stakeholders"], "q": 1}]}, {"id": "Q-P4", "name": ["商談実戦", "Deal Practice"], "qn": 4, "unit": 1, "s": 12, "e": 12, "hub": "megatech", "cats": [{"n": ["商談ドリル10", "Sales Drills"], "q": 1}, {"n": ["ディスカバリー質問8業種", "Discovery Questions"], "q": 1}, {"n": ["ケース演習10（AI採点）", "Case Work"], "q": 1}, {"n": ["模擬商談LIVE 5ペルソナ", "Live Deal Dojo"], "q": 1}]}, {"id": "Q-P5", "name": ["業界別（深掘り＋ツール）", "Industry Maps"], "qn": 8, "unit": 1, "s": 13, "e": 14, "hub": "megatech", "cats": [{"n": ["製造", "Manufacturing"], "q": 1}, {"n": ["金融", "Finance"], "q": 1}, {"n": ["小売・消費財", "Retail"], "q": 1}, {"n": ["物流・運輸", "Logistics"], "q": 1}, {"n": ["ヘルスケア・製薬", "Pharma"], "q": 1}, {"n": ["公共・自治体", "Public"], "q": 1}, {"n": ["エネルギー・公益", "Energy"], "q": 1}, {"n": ["建設・不動産", "Construction"], "q": 1}]}, {"id": "Q-P6", "name": ["エージェント棚", "Agent Shelf"], "qn": 4, "unit": 1, "s": 14, "e": 14, "hub": "megatech", "cats": [{"n": ["金融・保険", "Finance & Insurance"], "q": 1}, {"n": ["製造・建設・インフラ", "Mfg & Infra"], "q": 1}, {"n": ["小売・流通", "Retail & Dist."], "q": 1}, {"n": ["サービス・IT", "Service & IT"], "q": 1}]}, {"id": "Q-P7", "name": ["先端メニュー 15ドメイン", "Frontier Menu"], "qn": 15, "unit": 1, "s": 15, "e": 16, "hub": "megatech", "cats": [{"n": ["エージェントハーネス", "Agent Harness"], "q": 1}, {"n": ["エッジ・軽量化", "Edge & Quantization"], "q": 1}, {"n": ["トークン最適化", "Token Optimization"], "q": 1}, {"n": ["暗黙知の顕在化", "Tacit Knowledge"], "q": 1}, {"n": ["AI駆動開発", "AI-driven Dev"], "q": 1}, {"n": ["AgentOps・運用", "AgentOps"], "q": 1}, {"n": ["Physical AI", "Physical AI"], "q": 1}, {"n": ["Spatial AI", "Spatial AI"], "q": 1}, {"n": ["ロボット活用", "Robotics"], "q": 1}, {"n": ["データセンター・GPU", "DC & GPU"], "q": 1}, {"n": ["音声AI・対話", "Voice AI"], "q": 1}, {"n": ["ドキュメントAI・IDP", "Document AI"], "q": 1}, {"n": ["ドメイン特化モデル", "Custom Models"], "q": 1}, {"n": ["クリエイティブ・マーケAI", "Creative AI"], "q": 1}, {"n": ["AIサービス事業化", "AI Service Biz"], "q": 1}]}, {"id": "Q-P12", "name": ["統制の実務", "Governance Practice"], "qn": 2, "unit": 1, "s": 16, "e": 16, "hub": "megatech", "cats": [{"n": ["リスク評価実務（8行シート）", "Risk Sheet Practice"], "q": 1}, {"n": ["論点体系 S11×G16", "Issue Taxonomy S/G"], "q": 1}]}, {"id": "Q-P13", "name": ["変革の実務", "Transformation Practice"], "qn": 6, "unit": 1, "s": 11, "e": 11, "hub": "megatech", "cats": [{"n": ["I 役割の正体（3つの帽子）", "I Three Hats"], "q": 1}, {"n": ["II オペレーティングモデル6要素", "II Operating Model"], "q": 1}, {"n": ["III ADKAR 定着診断", "III ADKAR"], "q": 1}, {"n": ["IV デリバリーリードの5習慣", "IV Delivery Habits"], "q": 1}, {"n": ["V ベネフィット実現", "V Benefit Realization"], "q": 1}, {"n": ["VI データ人材の再設計", "VI Data Talent"], "q": 1}]}, {"id": "Q-P19", "name": ["ITセキュリティ基盤", "IT Security Foundations"], "qn": 8, "unit": 1, "s": 12, "e": 12, "hub": "megatech", "cats": [{"n": ["エンドポイント", "Endpoint"], "q": 1}, {"n": ["ID・アクセス", "Identity"], "q": 1}, {"n": ["ネットワーク境界", "Network"], "q": 1}, {"n": ["クラウドアクセス・SASE", "SASE"], "q": 1}, {"n": ["クラウド基盤", "Cloud"], "q": 1}, {"n": ["データ保護", "Data"], "q": 1}, {"n": ["監視・運用", "Operations"], "q": 1}, {"n": ["ガバナンス・フレームワーク", "Frameworks"], "q": 1}]}, {"id": "Q-P18", "name": ["業務再設計（BPR）", "Process Redesign (BPR)"], "qn": 7, "unit": 1, "s": 11, "e": 11, "hub": "megatech", "cats": [{"n": ["I 改善ロードマップ", "I Roadmap"], "q": 1}, {"n": ["II 消せる仕事10類型", "II Removable Work"], "q": 1}, {"n": ["III システム化の判定", "III System or Excel"], "q": 1}, {"n": ["IV 定着の構造", "IV Adoption"], "q": 1}, {"n": ["V KPIの付け替え", "V KPI Swap"], "q": 1}, {"n": ["VI 着手前の関門", "VI Gates"], "q": 1}, {"n": ["VII 横断8論点", "VII Eight Shifts"], "q": 1}]}, {"id": "Q-P14", "name": ["ファーム実務", "Global Firm Practice"], "qn": 4, "unit": 1, "s": 11, "e": 12, "hub": "megatech", "cats": [{"n": ["I 案件の入口2型", "I Deal Origination"], "q": 1}, {"n": ["II ラダーと昇進", "II Ladder & Promotion"], "q": 1}, {"n": ["III 面接想定問答5", "III Interview Q&A"], "q": 1}, {"n": ["IV 最初の90日", "IV First 90 Days"], "q": 1}]}, {"id": "Q-P15", "name": ["グローバル事例", "Global Cases"], "qn": 5, "unit": 1, "s": 12, "e": 12, "hub": "megatech", "cats": [{"n": ["I 事例11件（課題・打ち手・指標）", "I Eleven Cases"], "q": 1}, {"n": ["II 4つの型", "II Four Patterns"], "q": 1}, {"n": ["III 日本法人", "III The Japan Entity"], "q": 1}, {"n": ["VI 調査数値の扱い", "VI Handling Survey Figures"], "q": 1}, {"n": ["VIII 日本への翻訳の落とし穴", "VIII Translating to Japan"], "q": 1}]}, {"id": "Q-P16", "name": ["Slalom変革道場", "Slalom Dojo"], "qn": 5, "unit": 1, "s": 11, "e": 12, "hub": "megatech", "cats": [{"n": ["求められるスキル", "Skills"], "q": 1}, {"n": ["会社とTransformation", "Firm & practice"], "q": 1}, {"n": ["Slalomの事例", "Slalom cases"], "q": 1}, {"n": ["場面演習", "Scenario drills"], "q": 1}, {"n": ["90日計画・自己評価", "90 days & self-check"], "q": 1}]}, {"id": "Q-P17", "name": ["実務論点マップ", "Practice Issue Map"], "qn": 4, "unit": 1, "s": 9, "e": 9, "hub": "megatech", "cats": [{"n": ["論点マップ", "Issue map"], "q": 1}, {"n": ["統治の論点", "Governance"], "q": 1}, {"n": ["一次ソースと検証", "Sources & checks"], "q": 1}, {"n": ["記事エクスプローラ", "Articles"], "q": 1}]}, {"id": "Q-P8", "name": ["失敗学・事象", "Postmortems & Phenomena"], "qn": 13, "unit": 1, "s": 17, "e": 17, "hub": "megatech", "cats": [{"n": ["事象ファイル24", "Phenomena File"], "q": 1}, {"n": ["Zillow", "Zillow"], "q": 1}, {"n": ["Watson Health", "Watson Health"], "q": 1}, {"n": ["Air Canada", "Air Canada"], "q": 1}, {"n": ["McDonald's", "McDonald's"], "q": 1}, {"n": ["NYC MyCity", "NYC MyCity"], "q": 1}, {"n": ["Samsung", "Samsung"], "q": 1}, {"n": ["Amazon採用AI", "Amazon HR"], "q": 1}, {"n": ["英A-level", "UK A-levels"], "q": 1}, {"n": ["Avianca判例", "Avianca"], "q": 1}, {"n": ["Klarna", "Klarna"], "q": 1}, {"n": ["Bardデモ", "Bard demo"], "q": 1}, {"n": ["Deloitte豪", "Deloitte AU"], "q": 1}]}, {"id": "Q-P9", "name": ["リサーチ", "Research"], "qn": 5, "unit": 1, "s": 18, "e": 19, "hub": "megatech", "cats": [{"n": [`企業研究${MQB.COMPANIES.length}社`, `${MQB.COMPANIES.length} Companies`], "q": 1}, {"n": ["提供モデルの型", "Delivery Models"], "q": 1}, {"n": ["日本市場ビュー", "JP Market"], "q": 1}, {"n": ["AGI・ASI仮説トレ", "AGI/ASI Gym"], "q": 1}, {"n": ["PLAYBOOK 5ガイド", "Playbook Guides"], "q": 1}]}],
   cons: [
     { id: "Q-CG", name: ["基礎暗記・用語辞典", "Basics/Glossary 131"], qn: 131, s: 1, e: 1, hub: "consulting", qmile: true, mile: BOOTCAMP_QMILE, mk: "cons", mi: 7, cats: [{n:["ロジカル","Logical"],q:22},{n:["クリティカル","Critical"],q:25},{n:["ラテラル","Lateral"],q:16},{n:["クリエイティブ","Creative"],q:17},{n:["構造化","Structuring"],q:21},{n:["DX","DX"],q:15},{n:["AI","AI"],q:15}] },
     { id: "Q-C0", name: ["ロジカル​シンキング", "Logical Thinking"], qn: 230, s: 1, e: 1, hub: "consulting", qmile: true, mile: BOOTCAMP_QMILE, mk: "cons", mi: 0, cats: [{n:["Lv1 基礎","Lv1 basics"],q:10},{n:["Lv2 標準","Lv2 core"],q:119},{n:["Lv3 応用","Lv3 applied"],q:67},{n:["Lv4 発展","Lv4 advanced"],q:34}] },
