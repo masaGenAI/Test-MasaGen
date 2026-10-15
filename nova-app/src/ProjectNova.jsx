@@ -155570,12 +155570,11 @@ function ItSecCard({ c, en, open, onToggle, onJump }) {
   );
 }
 
-function TabItSec() {
-  const lang = useLang();
-  const en = lang === "en";
-  const [layer, setLayer] = useState("ALL");
+function ItSecGlossary({ en, initLayer = "ALL", initOpen = null }) {
+  const [layer, setLayer] = useState(initLayer);
   const [q, setQ] = useState("");
-  const [open, setOpen] = useState({});
+  const [open, setOpen] = useState(initOpen ? { [initOpen]: true } : {});
+  useEffect(() => { if (initOpen) { const el = document.getElementById("itsec-" + initOpen); if (el) el.scrollIntoView({ block: "center" }); } }, []);
   const list = ITSEC.filter((c) => (layer === "ALL" || c.layer === layer) &&
     (!q.trim() || (c.name + c.full + c.def + c.how + c.diff + c.ai).toLowerCase().includes(q.trim().toLowerCase())));
   const jump = (id) => {
@@ -155583,23 +155582,8 @@ function TabItSec() {
     setLayer("ALL"); setQ(""); setOpen((o) => ({ ...o, [id]: true }));
     setTimeout(() => { const el = document.getElementById("itsec-" + id); if (el) el.scrollIntoView({ behavior: "smooth", block: "center" }); }, 60);
   };
-  const nSrc = new Set(ITSEC.flatMap((c) => (c.sources || []).map((s) => s.url))).size;
   return (
     <div>
-      <SectionTitle jp="ITセキュリティ基盤 — AIの手前にある、広義のセキュリティ・ガバナンス" en="IT Security Foundations — the general security and governance layer beneath AI" />
-      <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.7, marginBottom: 10 }}>
-        {en ? `AI deployments ride on ordinary enterprise security: endpoints, identity, network and cloud access, data protection, monitoring and governance frameworks. ${ITSEC.length} core concepts, each with what it is, how it works, how it differs from look-alikes, and where it meets AI adoption — grounded in ${nSrc} public sources (Digital Agency, IPA, MIC, NIST, Microsoft Learn, Google Cloud).`
-            : `AI導入は、エンドポイント・ID・ネットワークとクラウドアクセス・データ保護・監視・フレームワークという企業ITのセキュリティの上に乗る。主要${ITSEC.length}概念を「何か・仕組み・似た概念との違い・AI導入との接点」で整理した。根拠はデジタル庁・IPA・総務省・NIST・Microsoft Learn・Google Cloud の公開資料${nSrc}件。`}
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,280px),1fr))", gap: 8, marginBottom: 14 }}>
-        {ITSEC_SPLIT.map((s, i) => (
-          <div key={i} style={{ background: C.surface2, borderRadius: 10, borderTop: `3px solid ${s.col}`, padding: "10px 12px" }}>
-            <div style={{ fontSize: 12.5, fontWeight: 800, color: s.col }}>{s.t[en ? 1 : 0]}</div>
-            <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.65, marginTop: 4 }}>{en ? "Where: " : "掲載場所："}{s.where[en ? 1 : 0]}</div>
-            <div style={{ fontSize: 11.5, color: C.dim, lineHeight: 1.65, marginTop: 2 }}>{en ? "e.g. " : "例："}{s.eg[en ? 1 : 0]}</div>
-          </div>
-        ))}
-      </div>
       <div style={{ fontSize: 11, color: C.dim, marginBottom: 6 }}>{en ? "LAYERS — tap to filter (outside in: devices → people → network → cloud → data → operations → governance)" : "層 — 押すと絞り込み（外側の端末から、人・ネットワーク・クラウド・データ・運用・統治の順）"}</div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(46%,170px),1fr))", gap: 6, marginBottom: 10 }}>
         <button className="gh-btn" onClick={() => setLayer("ALL")} aria-pressed={layer === "ALL"} style={{ textAlign: "left", borderColor: layer === "ALL" ? C.text : C.line }}>
@@ -155634,6 +155618,113 @@ function TabItSec() {
     </div>
   );
 }
+// 判定演習の問題（ITSEC の各概念だけを根拠に作成。d は層 IT1〜IT8）
+const ITSEC_BANK = [
+];
+const ITSEC_DOMAINS = ITSEC_LAYERS.map((l, i) => ({ id: "IT" + (i + 1), ja: l.t[0], en: l.t[1] }));
+
+function ItSecOverview({ en, go }) {
+  const nSrc = new Set(ITSEC.flatMap((c) => (c.sources || []).map((s) => s.url))).size;
+  return (
+    <div>
+      <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.7, marginBottom: 10 }}>
+        {en ? `AI deployments ride on ordinary enterprise security: endpoints, identity, network and cloud access, data protection, monitoring and governance frameworks. ${ITSEC.length} core concepts, each with what it is, how it works, how it differs from look-alikes, and where it meets AI adoption — grounded in ${nSrc} public sources (Digital Agency, IPA, MIC, NIST, Microsoft Learn, Google Cloud).`
+            : `AI導入は、エンドポイント・ID・ネットワークとクラウドアクセス・データ保護・監視・フレームワークという企業ITのセキュリティの上に乗る。主要${ITSEC.length}概念を「何か・仕組み・似た概念との違い・AI導入との接点」で整理し、${ITSEC_BANK.length}問の判定演習と模試で確かめる。根拠はデジタル庁・IPA・総務省・NIST・Microsoft Learn・Google Cloud の公開資料${nSrc}件。`}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,280px),1fr))", gap: 8, marginBottom: 14 }}>
+        {ITSEC_SPLIT.map((s, i) => (
+          <div key={i} style={{ background: C.surface2, borderRadius: 10, borderTop: `3px solid ${s.col}`, padding: "10px 12px" }}>
+            <div style={{ fontSize: 12.5, fontWeight: 800, color: s.col }}>{s.t[en ? 1 : 0]}</div>
+            <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.65, marginTop: 4 }}>{en ? "Where: " : "掲載場所："}{s.where[en ? 1 : 0]}</div>
+            <div style={{ fontSize: 11.5, color: C.dim, lineHeight: 1.65, marginTop: 2 }}>{en ? "e.g. " : "例："}{s.eg[en ? 1 : 0]}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{ fontSize: 13, fontWeight: 800, color: C.text, margin: "6px 0 8px" }}>{en ? "Eight layers, from the device outward to governance" : "8つの層 — 端末から統治まで"}</div>
+      <div style={{ display: "grid", gap: 6 }}>
+        {ITSEC_LAYERS.map((l, i) => {
+          const cs = ITSEC.filter((c) => c.layer === l.id);
+          return (
+            <button key={l.id} className="gh-btn" onClick={() => go("glossary", l.id)}
+              style={{ display: "flex", gap: 12, alignItems: "baseline", textAlign: "left", borderLeft: `4px solid ${l.col}`, flexWrap: "wrap", padding: "9px 12px" }}>
+              <span style={{ fontSize: 11, color: l.col, fontWeight: 800, minWidth: 28 }}>{String(i + 1).padStart(2, "0")}</span>
+              <span style={{ minWidth: 150 }}>
+                <span style={{ display: "block", fontSize: 13, fontWeight: 800, color: C.text }}>{l.t[en ? 1 : 0]}</span>
+                <span style={{ display: "block", fontSize: 11, color: C.dim }}>{l.d[en ? 1 : 0]}</span>
+              </span>
+              <span style={{ flex: "1 1 260px", fontSize: 11.5, color: C.muted, lineHeight: 1.6 }}>{cs.map((c) => c.name).join(" ・ ")}</span>
+            </button>
+          );
+        })}
+      </div>
+      <div style={{ fontSize: 11.5, color: C.dim, lineHeight: 1.7, marginTop: 12 }}>
+        {en ? "How to use: read the glossary layer by layer, check the look-alike pairs in Compare, then test judgment in Drills and the timed mock exam."
+            : "使い方：用語解説を層ごとに読み、比較で似た概念の違いを押さえ、判定演習と模試で判断を確かめる。"}
+      </div>
+    </div>
+  );
+}
+
+function ItSecCompare({ en, go }) {
+  return (
+    <div>
+      <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.7, marginBottom: 10 }}>
+        {en ? "The pairs that get confused in proposals and RFPs — each concept's contrast with its nearest look-alike, grouped by layer. Tap a name to open its full entry."
+            : "提案書やRFPで取り違えやすい組み合わせ。各概念の「似た概念との違い」を層ごとに並べた。名前を押すと用語解説が開く。"}
+      </div>
+      {ITSEC_LAYERS.map((l) => {
+        const cs = ITSEC.filter((c) => c.layer === l.id && c.diff);
+        if (!cs.length) return null;
+        return (
+          <div key={l.id} style={{ marginBottom: 12 }}>
+            <div style={{ fontSize: 12, fontWeight: 800, color: l.col, borderLeft: `3px solid ${l.col}`, paddingLeft: 8, marginBottom: 6 }}>{l.t[en ? 1 : 0]}</div>
+            <div style={{ display: "grid", gap: 5 }}>
+              {cs.map((c) => (
+                <div key={c.id} style={{ display: "flex", gap: 10, background: C.surface2, borderRadius: 8, padding: "7px 11px", flexWrap: "wrap" }}>
+                  <button onClick={() => go("glossary", null, c.id)} style={{ all: "unset", cursor: "pointer", fontSize: 12.5, fontWeight: 800, color: C.text, minWidth: 120 }}>{c.name}</button>
+                  <span style={{ flex: "1 1 280px", fontSize: 12, color: C.muted, lineHeight: 1.65 }}>{c.diff}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function ItSecQuiz({ en }) {
+  return <CheckEngine bank={ITSEC_BANK} domains={ITSEC_DOMAINS} storeKey="itsec_stats_v1" noTitle
+    intro="広義ITセキュリティの8層の判定問題です。"
+    introEn="Judgment questions across eight layers of general IT security. " />;
+}
+
+function TabItSec() {
+  const lang = useLang();
+  const en = lang === "en";
+  const [mode, setMode] = useState("home");
+  const [focus, setFocus] = useState({ layer: "ALL", id: null, n: 0 });
+  const __opBack = useLocalHistory([[mode, setMode]]);
+  useRegisterBack(__opBack.back, __opBack.canBack);
+  const go = (m, layer, id) => { setFocus((f) => ({ layer: layer || "ALL", id: id || null, n: f.n + 1 })); setMode(m); };
+  const modes = [["home", ["概要", "Overview"]], ["glossary", ["用語解説", "Glossary"]], ["quiz", ["判定演習", "Drills"]], ["compare", ["比較", "Compare"]], ["exam", ["模試", "Mock exam"]]];
+  return (
+    <div>
+      <SectionTitle jp="ITセキュリティ基盤 — AIの手前にある、広義のセキュリティ・ガバナンス" en="IT Security Foundations — the general security and governance layer beneath AI" />
+      <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+        {modes.map(([k, label]) => (
+          <button key={k} className="gh-btn" onClick={() => setMode(k)} style={mode === k ? { borderColor: C.gold, color: C.gold, fontWeight: 700 } : {}}>{en ? label[1] : label[0]}</button>
+        ))}
+      </div>
+      {mode === "home" && <ItSecOverview en={en} go={go} />}
+      {mode === "glossary" && <ItSecGlossary key={focus.n} en={en} initLayer={focus.layer} initOpen={focus.id} />}
+      {mode === "quiz" && <ItSecQuiz en={en} />}
+      {mode === "compare" && <ItSecCompare en={en} go={go} />}
+      {mode === "exam" && <GovExam en={en} bank={ITSEC_BANK} />}
+    </div>
+  );
+}
+
 
 const TABS = [
   { id: "strategy", k: "tab_strategy" },
@@ -159849,8 +159940,8 @@ function GovScenarios({ en }) {
   );
 }
 
-function GovExam({ en }) {
-  const N = Math.min(20, GOVDOJO_BANK.length);
+function GovExam({ en, bank = GOVDOJO_BANK }) {
+  const N = Math.min(20, bank.length);
   const SECS = N * 45;
   const [set, setSet] = useState(null);
   const [answers, setAnswers] = useState({});
@@ -159858,7 +159949,7 @@ function GovExam({ en }) {
   const [timed, setTimed] = useState(false);
   const [left, setLeft] = useState(0);
   const startExam = (useTimer) => {
-    const idx = GOVDOJO_BANK.map((_, i) => i); for (let i = idx.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [idx[i], idx[j]] = [idx[j], idx[i]]; }
+    const idx = bank.map((_, i) => i); for (let i = idx.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [idx[i], idx[j]] = [idx[j], idx[i]]; }
     setSet(idx.slice(0, N)); setAnswers({}); setSubmitted(false); setTimed(!!useTimer); setLeft(useTimer ? SECS : 0);
   };
   useEffect(() => {
@@ -159868,7 +159959,7 @@ function GovExam({ en }) {
     return () => clearTimeout(id);
   }, [set, submitted, timed, left]);
   const fmt = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
-  if (!GOVDOJO_BANK.length) return <div style={{ fontSize: 12.5, color: C.muted }}>{en ? "Preparing…" : "問題を準備中…"}</div>;
+  if (!bank.length) return <div style={{ fontSize: 12.5, color: C.muted }}>{en ? "Preparing…" : "問題を準備中…"}</div>;
   if (!set) return (
     <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 12, padding: 22, textAlign: "center" }}>
       <div style={{ fontSize: 14.5, fontWeight: 700, color: C.text, marginBottom: 6 }}>{en ? "Mock exam" : "模擬試験"}</div>
@@ -159879,7 +159970,7 @@ function GovExam({ en }) {
       </div>
     </div>
   );
-  const correct = set.filter(qi => answers[qi] === GOVDOJO_BANK[qi].a).length;
+  const correct = set.filter(qi => answers[qi] === bank[qi].a).length;
   const answeredCount = set.filter(qi => answers[qi] !== undefined).length;
   const low = timed && !submitted && left <= 60;
   return (
@@ -159903,7 +159994,7 @@ function GovExam({ en }) {
         </div>
       )}
       {set.map((qi, n) => {
-        const Q = GOVDOJO_BANK[qi]; const opts = en ? Q.oEn : Q.o; const a = answers[qi];
+        const Q = bank[qi]; const opts = en ? Q.oEn : Q.o; const a = answers[qi];
         return (
           <div key={qi} style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 10, padding: 15, marginBottom: 10 }}>
             <div style={{ fontSize: 13.5, fontWeight: 600, color: C.text, lineHeight: 1.55, marginBottom: 10 }}><span style={{ color: C.teal, fontWeight: 700, marginRight: 6 }}>Q{n + 1}.</span>{en ? Q.qEn : Q.q}<StarButton id={"q#" + novaQHash(Q.q || Q.qEn || "")} text={Q.q || Q.qEn} scope={"TechHub"} /></div>
