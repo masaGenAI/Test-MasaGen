@@ -7875,7 +7875,7 @@ function openBook(book, color, crumbs){
       ${(Array.isArray(book.srcPaths) && book.srcPaths.length > 1)
         ? `<span><b>収録リスト:</b> ${book.srcPaths.map(p => { const n = srcNodeAt(p); return n ? n.title : p[p.length-1]; }).join(' ・ ')}</span>`
         : ''}
-      ${book.url ? `<span><a href="${book.url}" target="_blank" rel="noopener noreferrer"><b>${/note\.com/.test(book.url) ? '出典の記事を開く' : '出典の動画を開く'}</b></a></span>` : ''}
+      ${book.url ? `<span><a href="${book.url}" target="_blank" rel="noopener noreferrer"><b>${/note\.com/.test(book.url) ? '出典の記事を開く' : /read\.amazon/.test(book.url) ? 'Kindle for Web で開く' : '出典の動画を開く'}</b></a></span>` : ''}
     </div>
   `;
 
