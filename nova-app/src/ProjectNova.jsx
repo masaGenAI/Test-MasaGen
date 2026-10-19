@@ -214499,7 +214499,9 @@ const BookSummaryModule = (function () {
         "try{Object.defineProperty(window,'localStorage',{configurable:true,get:function(){return fake;}});}catch(e){}" +
         "}catch(e){}})();<" +
         "/script>";
-      const html = BOOK_SUMMARY_HTML.replace("<head>", "<head>" + bridge);
+      // iframe は blob: の文書なので相対 URL が解決できない。図解などの静的ファイル（public/ 配下）は親ページの場所から読む
+      const assetBase = "<script>window.__NOVA_ASSET_BASE__=" + JSON.stringify(new URL(".", window.location.href).href) + ";</" + "script>";
+      const html = BOOK_SUMMARY_HTML.replace("<head>", "<head>" + bridge + assetBase);
 
       const onMsg = (ev) => {
         const d = ev.data;
