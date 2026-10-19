@@ -160012,24 +160012,24 @@ function GovQuiz({ en }) {
     introEn="Applied judgement questions across six AI-governance domains. " />;
 }
 
-function GovScenarios({ en }) {
+function GovScenarios({ en, list = GOVDOJO_SCENARIOS }) {
   const [openId, setOpenId] = useState(null);
   const [step, setStep] = useState(0);
   const [picked, setPicked] = useState(null);
   const [score, setScore] = useState(0);
   const [firstTry, setFirstTry] = useState(true);
-  const sc = GOVDOJO_SCENARIOS.find(s => s.id === openId);
+  const sc = list.find(s => s.id === openId);
   const start = id => { setOpenId(id); setStep(0); setPicked(null); setScore(0); setFirstTry(true); };
   if (!sc) {
     return (
       <div>
         <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.8, marginBottom: 14 }}>{en ? "Branching drills. At each step, decide the action and get feedback. Choose the case:" : "分岐型ドリル。各ステップで対応を選び、フィードバックを得る。ケースを選ぶ:"}</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 12 }}>
-          {GOVDOJO_SCENARIOS.map(s => (
+          {list.map(s => (
             <button key={s.id} onClick={() => start(s.id)} style={{ textAlign: "left", background: C.surface, border: `1px solid ${C.line}`, borderRadius: 12, padding: 16, cursor: "pointer", color: C.text }}>
               <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 8 }}>
                 <span style={{ fontSize: 10.5, color: C.muted, border: `1px solid ${C.line}`, borderRadius: 5, padding: "1px 7px" }}>{s.industry}</span>
-                <GovTierChip tier={s.tier} />
+                {GOVDOJO_TIER[s.tier] ? <GovTierChip tier={s.tier} /> : null}
               </div>
               <div style={{ fontSize: 14.5, fontWeight: 700, marginBottom: 6, lineHeight: 1.4 }}>{s.title}</div>
               <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.55 }}>{s.setup.slice(0, 64)}…</div>
@@ -160049,7 +160049,7 @@ function GovScenarios({ en }) {
       <button className="gh-btn" onClick={() => setOpenId(null)} style={{ marginBottom: 14, fontSize: 11.5 }}>{en ? "← All cases" : "← ケース一覧へ"}</button>
       <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 8 }}>
         <span style={{ fontSize: 10.5, color: C.muted, border: `1px solid ${C.line}`, borderRadius: 5, padding: "1px 7px" }}>{sc.industry}</span>
-        <GovTierChip tier={sc.tier} />
+        {GOVDOJO_TIER[sc.tier] ? <GovTierChip tier={sc.tier} /> : null}
       </div>
       <div style={{ fontSize: 17, fontWeight: 700, color: C.text, marginBottom: 8 }}>{sc.title}</div>
       <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.75, background: C.surface, border: `1px solid ${C.line}`, borderRadius: 10, padding: "12px 15px", marginBottom: 16 }}>{sc.setup}</div>
@@ -160479,11 +160479,11 @@ const GTX_XREF = [
   { th: ["職務権限との関係", "Delegation of authority"], s: "S3", g: "G2", r: ["技術的上限 ↔ 規程上の原則", "Technical cap ↔ policy"] },
 ];
 const GTX_VCOL = { "両方": "#D6B152", "利用者側": "#5FD3C2", "提供者側": "#8FA8E8" };
-function GovTaxonomy({ en }) {
-  const [sel, setSel] = useState({ side: "s", id: "S3" });
-  const list = sel.side === "s" ? GTX_SEC : GTX_GOV;
+function GovTaxonomy({ en, sec = GTX_SEC, gov = GTX_GOV, xref = GTX_XREF, intro, labels }) {
+  const [sel, setSel] = useState({ side: "s", id: (sec[2] || sec[0]).id });
+  const list = sel.side === "s" ? sec : gov;
   const cur = list.find((x) => x.id === sel.id) || list[0];
-  const xrefs = GTX_XREF.filter((x) => (sel.side === "s" ? x.s : x.g) === cur.id);
+  const xrefs = xref.filter((x) => (sel.side === "s" ? x.s : x.g) === cur.id);
   const chip = (x, side) => {
     const on = sel.side === side && sel.id === x.id;
     const col = side === "s" ? C.wine : C.teal;
@@ -160497,16 +160497,16 @@ function GovTaxonomy({ en }) {
   return (
     <div>
       <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.7, marginBottom: 10 }}>
-        {en ? "The issue taxonomy in two systems — security (technology and threats, S1-S11) and governance (organization, rules and law, G1-G16). Click any topic for its mid-issues, the questions worth asking, and the framework family behind it. The bridge table at the bottom pairs topics that the two systems handle from opposite ends. Framework names are given without version dates here; versions and effective dates move, so check the world-regulation tab and the primary source before quoting any date to a client." : "論点体系を2系統で持つ — セキュリティ（技術・脅威、S1〜S11）とガバナンス（組織・制度・法令、G1〜G16）。各論点をクリックすると中論点・検討すべき問い・参照フレームワーク群が出る。下の対応表は、同じテーマを両系統が逆側から扱う組み合わせ。ここではフレームワーク名を版・日付なしで示す — 版数と適用日は動くため、顧客に日付を伝える前に世界規制タブと一次情報で確認すること。"}
+        {labels ? labels.intro[en ? 1 : 0] : (en ? "The issue taxonomy in two systems — security (technology and threats, S1-S11) and governance (organization, rules and law, G1-G16). Click any topic for its mid-issues, the questions worth asking, and the framework family behind it. The bridge table at the bottom pairs topics that the two systems handle from opposite ends. Framework names are given without version dates here; versions and effective dates move, so check the world-regulation tab and the primary source before quoting any date to a client." : "論点体系を2系統で持つ — セキュリティ（技術・脅威、S1〜S11）とガバナンス（組織・制度・法令、G1〜G16）。各論点をクリックすると中論点・検討すべき問い・参照フレームワーク群が出る。下の対応表は、同じテーマを両系統が逆側から扱う組み合わせ。ここではフレームワーク名を版・日付なしで示す — 版数と適用日は動くため、顧客に日付を伝える前に世界規制タブと一次情報で確認すること。")}
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,300px),1fr))", gap: 12, marginBottom: 10 }}>
         <div>
-          <div style={{ fontSize: 11.5, fontWeight: 800, color: C.wine, marginBottom: 6, letterSpacing: 1 }}>{en ? "SECURITY — S1-S11" : "セキュリティ論点 S1〜S11"}</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>{GTX_SEC.map((x) => chip(x, "s"))}</div>
+          <div style={{ fontSize: 11.5, fontWeight: 800, color: C.wine, marginBottom: 6, letterSpacing: 1 }}>{labels ? labels.sec[en ? 1 : 0] : (en ? "SECURITY — S1-S11" : "セキュリティ論点 S1〜S11")}</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>{sec.map((x) => chip(x, "s"))}</div>
         </div>
         <div>
-          <div style={{ fontSize: 11.5, fontWeight: 800, color: C.teal, marginBottom: 6, letterSpacing: 1 }}>{en ? "GOVERNANCE — G1-G16" : "ガバナンス論点 G1〜G16"}</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>{GTX_GOV.map((x) => chip(x, "g"))}</div>
+          <div style={{ fontSize: 11.5, fontWeight: 800, color: C.teal, marginBottom: 6, letterSpacing: 1 }}>{labels ? labels.gov[en ? 1 : 0] : (en ? "GOVERNANCE — G1-G16" : "ガバナンス論点 G1〜G16")}</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>{gov.map((x) => chip(x, "g"))}</div>
         </div>
       </div>
       <div style={{ background: C.surface2, borderRadius: 10, padding: "12px 14px", borderLeft: `3px solid ${sel.side === "s" ? C.wine : C.teal}` }}>
@@ -160540,11 +160540,11 @@ function GovTaxonomy({ en }) {
       </div>
       <div style={{ fontSize: 12.5, fontWeight: 800, color: C.text, margin: "14px 0 6px" }}>{en ? "The bridge — where the two systems meet" : "両系統の対応表 — 同じテーマを技術と制度の両側から"}</div>
       <div style={{ ...DGM_WRAP, display: "flex", justifyContent: "center" }}>
-        <svg viewBox={`0 0 400 ${GTX_XREF.length * 24 + 22}`} style={{ width: "100%", maxWidth: 420 }} role="img" aria-label={en ? "cross-reference bridge" : "論点の対応表"}>
+        <svg viewBox={`0 0 400 ${xref.length * 24 + 22}`} style={{ width: "100%", maxWidth: 420 }} role="img" aria-label={en ? "cross-reference bridge" : "論点の対応表"}>
           <text x="34" y="12" textAnchor="middle" fill={C.wine} fontSize="9.5" fontWeight="800">{en ? "SEC" : "技術"}</text>
           <text x="200" y="12" textAnchor="middle" fill={C.dim} fontSize="9.5" fontWeight="800">{en ? "theme" : "テーマ"}</text>
           <text x="366" y="12" textAnchor="middle" fill={C.teal} fontSize="9.5" fontWeight="800">{en ? "GOV" : "制度"}</text>
-          {GTX_XREF.map((x, i) => {
+          {xref.map((x, i) => {
             const y = 22 + i * 24;
             return (
               <g key={i} className="gh-node" onClick={() => setSel({ side: "s", id: x.s })} role="button" tabIndex={0}
