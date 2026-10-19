@@ -13,6 +13,9 @@ import FORESIGHT_SOURCES from "./data/foresight-sources.json";
 import FORESIGHT_COLLECTION from "./data/foresight-collection.json";
 import FORESIGHT_THEMES from "./data/foresight-collection-themes.json";
 import ITSEC from "./data/itsec-concepts.json";
+import ITSEC_TAX from "./data/itsec-taxonomy.json";
+import ITSEC_SCEN from "./data/itsec-scenarios.json";
+import ITSEC_PRAC from "./data/itsec-practice.json";
 
 // =============================================================================
 // QUIZ SAVE SLOT — ゲームのセーブのように、クイズの途中経過を1スロット保存/再開する
@@ -155851,6 +155854,42 @@ function ItSecQuiz({ en }) {
     introEn="Judgment questions across eight layers of general IT security. " />;
 }
 
+function ItSecPractice({ en }) {
+  const jump = (id) => { const c = ITSEC.find((x) => x.id === id); return c ? c.name : id; };
+  return (
+    <div>
+      <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.7, marginBottom: 10 }}>
+        {en ? "The working method: how to take stock, measure maturity and gaps, set priorities, check products and vendors, and what to confirm on the general-IT side before bringing in generative AI. Each item names the concepts it rests on."
+            : "現状把握から、成熟度とギャップの測り方、優先順位、製品・委託先の確認点、生成AIを入れる前に広義ITで確かめることまでの進め方。各項目に、根拠になる概念を添えた。"}
+      </div>
+      {ITSEC_PRAC.map((sec, i) => (
+        <FoldSection key={i} title={`${i + 1}. ${sec.t[en ? 1 : 0]}`} color={[C.gold, C.teal, C.wine, C.fore, C.muted][i % 5]} defaultOpen={i === 0}>
+          <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.7, marginBottom: 8 }}>{sec.lead[en ? 1 : 0]}</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,300px),1fr))", gap: 8 }}>
+            {sec.items.map((it, k) => (
+              <div key={k} style={{ background: C.surface2, borderRadius: 10, padding: "10px 12px" }}>
+                <div style={{ fontSize: 12.5, fontWeight: 800, color: C.text, marginBottom: 4 }}>{it.t[en ? 1 : 0]}</div>
+                <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.65 }}>{it.d[en ? 1 : 0]}</div>
+                {it.c && it.c.length ? <div style={{ fontSize: 10.5, color: C.dim, marginTop: 6 }}>{en ? "Concepts: " : "関連概念："}{it.c.map(jump).join(" ・ ")}</div> : null}
+              </div>
+            ))}
+          </div>
+        </FoldSection>
+      ))}
+    </div>
+  );
+}
+
+function ItSecTaxonomy({ en }) {
+  if (!ITSEC_TAX.sec.length) return <div style={{ fontSize: 12.5, color: C.muted }}>{en ? "Preparing…" : "準備中…"}</div>;
+  const ns = ITSEC_TAX.sec.length, ng = ITSEC_TAX.gov.length;
+  const withC = (list) => list.map((x) => ({ ...x, fw: x.fw + (x.c && x.c.length ? (en ? " — concepts: " : " ／ 関連概念：") + x.c.map((id) => (ITSEC.find((c) => c.id === id) || { name: id }).name).join("・") : "") }));
+  return <GovTaxonomy en={en} sec={withC(ITSEC_TAX.sec)} gov={withC(ITSEC_TAX.gov)} xref={ITSEC_TAX.xref}
+    labels={{ sec: [`技術・脅威の論点 T1〜T${ns}`, `TECHNOLOGY & THREATS — T1-T${ns}`], gov: [`統制・制度の論点 C1〜C${ng}`, `CONTROLS & RULES — C1-C${ng}`],
+      intro: [`広義ITセキュリティの論点体系。技術・脅威側（T1〜T${ns}）と統制・制度側（C1〜C${ng}）の2系統で、各論点の中論点・検討すべき問い・参照する概念と規格を示す。下の対応表は、同じテーマを技術と制度の両面から見たときのつながり。`,
+        `The issue taxonomy for general IT security in two systems — technology and threats (T1-T${ns}) and controls and rules (C1-C${ng}). Each topic shows its mid-issues, the questions worth asking, and the concepts and standards behind it; the bridge below links the two sides.`] }} />;
+}
+
 function TabItSec() {
   const lang = useLang();
   const en = lang === "en";
@@ -155859,7 +155898,7 @@ function TabItSec() {
   const __opBack = useLocalHistory([[mode, setMode]]);
   useRegisterBack(__opBack.back, __opBack.canBack);
   const go = (m, layer, id) => { setFocus((f) => ({ layer: layer || "ALL", id: id || null, n: f.n + 1 })); setMode(m); };
-  const modes = [["home", ["概要", "Overview"]], ["glossary", ["用語解説", "Glossary"]], ["quiz", ["判定演習", "Drills"]], ["compare", ["比較", "Compare"]], ["exam", ["模試", "Mock exam"]]];
+  const modes = [["home", ["概要", "Overview"]], ["glossary", ["用語解説", "Glossary"]], ["quiz", ["判定演習", "Drills"]], ["scenario", ["シナリオ", "Scenarios"]], ["practice", ["導入・評価の実務", "Practice"]], ["taxonomy", ["論点体系", "Issue taxonomy"]], ["compare", ["比較", "Compare"]], ["exam", ["模試", "Mock exam"]]];
   return (
     <div>
       <SectionTitle jp="ITセキュリティ基盤 — AIの手前にある、広義のセキュリティ・ガバナンス" en="IT Security Foundations — the general security and governance layer beneath AI" />
@@ -155871,6 +155910,9 @@ function TabItSec() {
       {mode === "home" && <ItSecOverview en={en} go={go} />}
       {mode === "glossary" && <ItSecGlossary key={focus.n} en={en} initLayer={focus.layer} initOpen={focus.id} />}
       {mode === "quiz" && <ItSecQuiz en={en} />}
+      {mode === "scenario" && (ITSEC_SCEN.length ? <GovScenarios en={en} list={ITSEC_SCEN} /> : <div style={{ fontSize: 12.5, color: C.muted }}>{en ? "Preparing…" : "準備中…"}</div>)}
+      {mode === "practice" && <ItSecPractice en={en} />}
+      {mode === "taxonomy" && <ItSecTaxonomy en={en} />}
       {mode === "compare" && <ItSecCompare en={en} go={go} />}
       {mode === "exam" && <GovExam en={en} bank={ITSEC_BANK} />}
     </div>

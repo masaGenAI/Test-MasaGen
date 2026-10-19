@@ -178,6 +178,200 @@
   ]
  },
  {
+  "id": "app-control",
+  "layer": "endpoint",
+  "name": "アプリケーション制御",
+  "full": "Application Control（アプリケーション制御・許可リスト）",
+  "def": "端末上で実行してよいコードをポリシーで定め、許可されていないものを動かさない対策。アンチウイルスが悪性と判断したものを止めるのではなく、許可したものだけを動かす考え方をとる。",
+  "how": "Windowsには App Control for Business と AppLocker がある。対象はアプリだけでなく、スクリプト、MSI、バッチファイル、PowerShell の対話セッションにも及び、カーネルで動くコードも制限できる。署名済みのコードや、クラウドの評価サービスが安全と予測したコードだけを通す方式もある。",
+  "diff": "EPPやアンチウイルスは悪性かどうかを判定して止めるのに対し、アプリケーション制御は許可したコードだけを動かす。出典は、アンチウイルスの代わりにはならず併用すべきとしている。",
+  "ai": "端末で動くAIクライアントや開発用ツールを許可リストの対象に含めるかを、導入方針として決められる。許可した実行ファイルだけが動く状態は、未承認ツールの持ち込みを抑える手段になる。",
+  "related": [
+   "epp",
+   "edr",
+   "least-privilege",
+   "shadow-it"
+  ],
+  "sources": [
+   {
+    "t": "Application Control for Windows",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/appcontrol"
+   }
+  ]
+ },
+ {
+  "id": "device-control",
+  "layer": "endpoint",
+  "name": "デバイス制御",
+  "full": "Device Control（周辺機器の利用制御）",
+  "def": "USBメモリ、プリンター、Bluetooth機器などの周辺機器を、端末にインストールして使えるかどうかをポリシーで制御する対策。データの持ち出しやマルウェアの侵入口を絞る。",
+  "how": "Windows標準のデバイスインストール制限は、機器のIDやセットアップクラスで許可と拒否を決める。Defender for Endpoint の例では、機器の種類、読み取り・書き込み・実行、ユーザーグループ、ネットワークの場所、ファイル種別まで細かく指定でき、BitLocker で暗号化された媒体だけを許可する設定もある。",
+  "diff": "DLPが文書の機密度などの中身で持ち出しを止めるのに対し、デバイス制御は機器の種類や属性で止める。出典も、機密度に基づくUSBへのコピー防止は Endpoint DLP を使うとしている。",
+  "ai": "AIに渡す前の元データがUSBや印刷で持ち出される経路を塞ぐ手段になる。生成AIの入力制御とは別に、端末の物理的な出口を管理する層として位置づけられる。",
+  "related": [
+   "dlp",
+   "disk-encryption",
+   "mdm-uem",
+   "epp"
+  ],
+  "sources": [
+   {
+    "t": "Device control in Microsoft Defender for Endpoint",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/defender-endpoint/device-control-overview"
+   }
+  ]
+ },
+ {
+  "id": "disk-encryption",
+  "layer": "endpoint",
+  "name": "ディスク暗号化",
+  "full": "Full Disk Encryption（端末のディスク全体の暗号化。例：BitLocker）",
+  "def": "端末のボリューム全体を暗号化し、紛失、盗難、不適切な廃棄によってデータが読まれることを防ぐ対策。Windowsの標準機能が BitLocker で、TPM と組み合わせて使うのが基本になる。",
+  "how": "TPM と組み合わせると、端末が停止中に改ざんされていないことも確認できる。起動時に PIN や起動キーを求めて多要素にもできる。デバイス暗号化では BitLocker が自動で有効になり、回復キーを Microsoft Entra ID や AD DS などに保管する。",
+  "diff": "暗号化と鍵管理（KMS・HSM）が鍵の生成と保管を扱う枠組みなのに対し、ディスク暗号化は端末のボリュームを守る個別の対策。DLPのように中身で持ち出しを判定するものではない。",
+  "ai": "AIの検証用データや社内文書を端末に取り込む運用では、端末の紛失時にそれらが読まれない状態を前提にしておく。回復キーの保管先も管理対象になる。",
+  "related": [
+   "encryption-kms",
+   "device-control",
+   "mdm-uem",
+   "secure-boot"
+  ],
+  "sources": [
+   {
+    "t": "BitLocker overview",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/windows/security/operating-system-security/data-protection/bitlocker/"
+   },
+   {
+    "t": "Device control in Microsoft Defender for Endpoint",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/defender-endpoint/device-control-overview"
+   }
+  ]
+ },
+ {
+  "id": "secure-boot",
+  "layer": "endpoint",
+  "name": "セキュアブート／Measured Boot",
+  "full": "Secure Boot / Trusted Boot / Measured Boot（起動時の完全性検証）",
+  "def": "OSが起動する前に動くブートキットやルートキットを防ぐため、起動過程の各部品が改ざんされていないことを検証する仕組み。OS上のセキュリティ機能が働く前の段階を守る。",
+  "how": "Windowsでは、Secure Boot が信頼できるブートローダーだけを読み込み、Trusted Boot がカーネルなど起動部品の署名を検証する。ELAM はドライバーを検査し、Measured Boot は起動の記録を TPM に保存して、信頼できるサーバーに送ることで端末の健全性を評価できる。",
+  "diff": "端末コンプライアンスが設定や状態のルールを評価するのに対し、Measured Boot は起動の記録で、感染した端末が自分で正常と申告しても見抜けるようにする。",
+  "ai": "AIや機密データを扱う端末が改ざんされていないことの前提として使う。信頼できる起動を確認した端末だけを社内ネットワークに入れる設計に結び付けられる。",
+  "related": [
+   "device-compliance",
+   "disk-encryption",
+   "edr",
+   "zero-trust"
+  ],
+  "sources": [
+   {
+    "t": "Secure the Windows boot process",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/windows/security/operating-system-security/system-security/secure-the-windows-10-boot-process"
+   },
+   {
+    "t": "BitLocker overview",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/windows/security/operating-system-security/data-protection/bitlocker/"
+   }
+  ]
+ },
+ {
+  "id": "device-compliance",
+  "layer": "endpoint",
+  "name": "デバイスコンプライアンス",
+  "full": "Device Compliance（端末の準拠状況の評価）",
+  "def": "管理下の端末が、組織の定めた設定要件を満たしているかを評価し、準拠か非準拠かを判定する仕組み。判定結果をアクセス制御に使えば、要件を満たす端末だけに業務資源を使わせられる。",
+  "how": "Intune の例では、OSの最小バージョン、ジェイルブレイクやルート化がないこと、脅威レベルなどのルールを端末に配る。非準拠なら通知、リモートロック、リタイアなどの措置をとる。結果は Entra ID に報告され、条件付きアクセスが準拠済み端末だけを許可する。",
+  "diff": "条件付きアクセスはアクセスを許可するかどうかを決める制御で、デバイスコンプライアンスはその判断に使う端末状態の評価である。MDM／UEMは端末を管理する基盤で、評価はその機能の一つ。",
+  "ai": "生成AIの業務利用を許す端末を、準拠済みの端末に限定する設計に使える。個人端末からのAIサービス利用を止めたいときの判断材料になる。",
+  "related": [
+   "conditional-access",
+   "mdm-uem",
+   "secure-boot",
+   "zero-trust"
+  ],
+  "sources": [
+   {
+    "t": "Use compliance policies to set rules for devices you manage with Intune",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/intune/intune-service/protect/device-compliance-get-started"
+   }
+  ]
+ },
+ {
+  "id": "vdi",
+  "layer": "endpoint",
+  "name": "VDI",
+  "full": "Virtual Desktop Infrastructure（仮想デスクトップ）",
+  "def": "デスクトップやアプリをデータセンターやクラウド側のサーバーで動かし、利用者の端末には画面だけを届ける方式。実際の処理とデータを端末の外に置いて、利用者の手元の機器を問わず同じ環境を使わせられる。",
+  "how": "Azure Virtual Desktop の例では、Windows の完全なデスクトップか個別アプリ（RemoteApp）を配信し、専用クライアントやHTML5のWebクライアントで接続する。接続は逆方向の接続でサービスへ張るため、受信ポートを開ける必要がない。管理者はイメージと仮想マシンを管理する。",
+  "diff": "MDMが端末側の設定を管理するのに対し、VDIは配信する側のOSとアプリを管理する。端末の種類を問わず同じ環境を使わせやすいが、画面配信用の基盤の運用が要る。",
+  "ai": "AIツールを使う作業環境を隔離して配布する選択肢になる。ただしVDIの導入自体が持ち出し対策になるわけではなく、コピーや印刷の制御は別途設計する。",
+  "related": [
+   "mdm-uem",
+   "ztna",
+   "dlp",
+   "device-compliance"
+  ],
+  "sources": [
+   {
+    "t": "What is Azure Virtual Desktop?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/virtual-desktop/overview"
+   }
+  ]
+ },
+ {
+  "id": "asset-inventory",
+  "layer": "endpoint",
+  "name": "IT資産管理",
+  "full": "IT Asset Inventory / Discovery（IT資産の棚卸し・可視化）",
+  "def": "組織のネットワーク上にある端末、ネットワーク機器、IoTを漏れなく把握し、台帳にまとめる活動。管理されていない機器は、守る対象に入らないまま脆弱性の抜け穴になる。",
+  "how": "Defender for Endpoint のデバイス検出の例では、導入済みの端末がネットワークの通信を受動的に観察し、必要に応じて能動的に探索して、未管理の端末、ルーターなどの機器、プリンターなどのIoTを見つけて一覧に加える。SNMPによる認証付きスキャンで、ネットワーク機器の脆弱性も評価できる。",
+  "diff": "MDM／UEMは登録済みの端末を管理するのに対し、資産の棚卸しは未登録の機器の発見を含む。シャドーITが主にクラウドサービスの無断利用を指すのに対し、こちらは機器が中心。",
+  "ai": "AIの利用や開発が行われている端末、サーバー、機器を洗い出す土台になる。把握できない資産は、AI導入のリスク評価の対象からも漏れる。",
+  "related": [
+   "mdm-uem",
+   "patch-vuln",
+   "shadow-it",
+   "cspm"
+  ],
+  "sources": [
+   {
+    "t": "Microsoft Defender for Endpoint device discovery overview",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/defender-endpoint/device-discovery"
+   }
+  ]
+ },
+ {
+  "id": "config-baseline",
+  "layer": "endpoint",
+  "name": "セキュリティベースライン",
+  "full": "Security Baseline / Configuration Hardening（推奨設定の適用と構成管理）",
+  "def": "OSやアプリについて、セキュリティ上推奨される設定の組をあらかじめ決め、全端末に同じ状態で適用して維持する取り組み。設定の不備と端末ごとのばらつきを減らし、強化（ハードニング）した状態をそろえる。",
+  "how": "Intune のセキュリティベースラインは、推奨値を設定済みのテンプレートをグループに配り、組織の事情に合わせて調整できる。既定では例えばリムーバブルドライブのBitLockerや、デバイス解除時のパスワードを有効にする。版が更新される点と、他のポリシーとの競合の確認が運用上の要点になる。",
+  "diff": "パッチ管理は更新プログラムを当てる作業で、ベースラインは設定を揃える作業である。出典は、Intune のベースラインはCISやNISTに厳密に準拠するものではなく、出発点として調整して使うとしている。",
+  "ai": "出典のベースライン一覧には、端末上で動くAIエージェント向けのもの（プレビュー）も載っている。AIの実行環境の設定も、他の端末と同様に基準を決めて管理する。",
+  "related": [
+   "patch-vuln",
+   "mdm-uem",
+   "cis-controls",
+   "device-compliance"
+  ],
+  "sources": [
+   {
+    "t": "Use security baselines to help secure Windows devices you manage with Microsoft Intune",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/intune/intune-service/protect/security-baselines"
+   }
+  ]
+ },
+ {
   "id": "iam",
   "layer": "identity",
   "name": "IAM",
@@ -429,6 +623,202 @@
     "t": "What is Microsoft Entra Privileged Identity Management?",
     "pub": "Microsoft Learn",
     "url": "https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-configure"
+   }
+  ]
+ },
+ {
+  "id": "passkey",
+  "layer": "identity",
+  "name": "パスキー／FIDO2",
+  "full": "Passkeys / FIDO2（フィッシング耐性のあるパスワードレス認証）",
+  "def": "パスワードの代わりに、公開鍵暗号を使う認証情報で本人確認する方式。FIDO標準に基づき、秘密鍵は端末側に残り、登録したサイトやアプリでしか使えないため、フィッシングで盗まれにくい。",
+  "how": "サインイン時にサーバーが乱数（チャレンジ）を送り、利用者が生体認証やPINで端末の秘密鍵を解錠すると、署名が返る。サーバーは公開鍵で署名を検証して、トークンを発行する。端末に固定する型と、クラウドで同期する型があり、同期型は構成証明（アテステーション）に対応しない。",
+  "diff": "一般のMFAはSMSコードなどをパスワードに足す方式で、フィッシングで盗まれ得る。パスキーは認証情報が接続先に紐づくため、偽サイトに渡せない。MFAの一つの実現手段でもある。",
+  "ai": "出典は、AIを使った攻撃ツールでフィッシングが高度化し大規模化していると述べる。AIサービスの管理者や機密データを扱う利用者から、フィッシング耐性のある認証に移す根拠になる。",
+  "related": [
+   "mfa",
+   "sso",
+   "idp-idaas",
+   "pam"
+  ],
+  "sources": [
+   {
+    "t": "Authentication methods in Microsoft Entra ID - passkeys (FIDO2)",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-passkeys-fido2"
+   }
+  ]
+ },
+ {
+  "id": "itdr",
+  "layer": "identity",
+  "name": "ITDR",
+  "full": "Identity Threat Detection and Response（IDに対する脅威の検知と対応）",
+  "def": "IDを狙う攻撃を、サインインや権限変更などの行動の分析で検知し、調査と対処まで行う取り組み。人のIDに加え、サービスアカウントやアプリなどの非人間IDも保護の対象にする。",
+  "how": "Defender for Identity の例では、オンプレミスのAD、Entra ID、他のIAMから信号を集め、行動分析と既知の攻撃パターンで、偵察、認証情報の侵害、横展開、ドメイン支配などを検知する。対処として、侵害されたアカウントの無効化、セッションの失効、認証情報のリセットなどがある。",
+  "diff": "IAMやPAMが権限を与え制限する側なのに対し、ITDRは不審な行動を検知して対処する側にあたる。侵害されたアカウントを無効化するなど、ID単位の封じ込めまで扱う。",
+  "ai": "出典は、人間のIDに加え、サービスアカウント、サービスプリンシパル、AIエージェントのIDも保護対象としている。AIが使う非人間IDの異常な動きの検知にも使える。",
+  "related": [
+   "iam",
+   "pam",
+   "siem",
+   "workload-identity"
+  ],
+  "sources": [
+   {
+    "t": "Microsoft Defender for Identity overview",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/defender-for-identity/what-is"
+   },
+   {
+    "t": "What Is Identity Security?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/defender-xdr/identity-security/identity-security-overview"
+   },
+   {
+    "t": "A Defender's Guide to Privileged Account Monitoring",
+    "pub": "Google Cloud",
+    "url": "https://cloud.google.com/blog/topics/threat-intelligence/privileged-account-monitoring"
+   }
+  ]
+ },
+ {
+  "id": "federation",
+  "layer": "identity",
+  "name": "IDフェデレーション",
+  "full": "Identity Federation（IDの連携・信頼関係）",
+  "def": "組織やシステムの間で認証の信頼関係を結び、利用者が自組織や外部のIDプロバイダーで持つアカウントのまま、別組織のアプリや別のシステムへサインインして使えるようにする仕組み。",
+  "how": "相手のIdPとSAMLやWS-Fedなどで信頼を設定し、利用者はアプリから自分のIdPへ転送されて認証し、結果を受けて戻る。設定は双方に要り、発行元URIと認証エンドポイント、署名証明書を登録する。メタデータURLがあれば証明書を自動更新できるが、なければ手動更新になる。",
+  "diff": "SSOは利用者が一度の認証で複数アプリを使う体験を指し、フェデレーションはそれを組織をまたいで成立させる信頼関係。出典はゲスト用のB2Bアカウントがフェデレーションでも不要にならないとする。",
+  "ai": "取引先や委託先がAI関連の環境に入るとき、相手のIDを使わせる方法として選べる。この場合も、自社側でゲストの権限と有効期間を管理する必要がある。",
+  "related": [
+   "sso",
+   "idp-idaas",
+   "iam",
+   "id-lifecycle"
+  ],
+  "sources": [
+   {
+    "t": "SAML/WS-Fed identity provider federation",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/entra/external-id/direct-federation-overview"
+   },
+   {
+    "t": "Identity and access management fundamental concepts",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/entra/fundamentals/identity-fundamental-concepts"
+   },
+   {
+    "t": "What is single sign-on in Microsoft Entra ID?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/what-is-single-sign-on"
+   }
+  ]
+ },
+ {
+  "id": "rbac-abac",
+  "layer": "identity",
+  "name": "RBAC／ABAC",
+  "full": "Role-Based / Attribute-Based Access Control（ロールベース・属性ベースのアクセス制御）",
+  "def": "RBACは役割（ロール）に権限をまとめて与える方式。ABACは利用者、資源、環境の属性に基づいて可否を決める方式。どちらもアクセス制御（認可）の設計モデルである。",
+  "how": "Azure RBAC では、プリンシパル、ロール定義、スコープの3つからなるロール割り当てで権限を与え、効果は割り当ての合計になる。Azure ABAC はそこに条件を加え、例えば特定のタグを持つBlobだけを読めるようにする。割り当ての数も減らせる。",
+  "diff": "RBACは業務に沿って単純に実装でき、ABACは属性で細かく絞れる。出典は両者を併用すると高度な認可になるとする。最小権限は原則で、RBACとABACはそれを実現する方式。",
+  "ai": "AIが参照する社内データを、ロールだけでなく機密区分やプロジェクトなどの属性で絞る設計に使える。AIが人の権限を超えて資料を引かない前提になる。",
+  "related": [
+   "iam",
+   "least-privilege",
+   "data-classification",
+   "pam"
+  ],
+  "sources": [
+   {
+    "t": "What is Azure role-based access control (Azure RBAC)?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/role-based-access-control/overview"
+   },
+   {
+    "t": "What is Azure attribute-based access control (Azure ABAC)?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/role-based-access-control/conditions-overview"
+   }
+  ]
+ },
+ {
+  "id": "workload-identity",
+  "layer": "identity",
+  "name": "非人間ID／ワークロードID",
+  "full": "Non-Human Identity / Workload Identity（アプリ・サービスなどに割り当てるID）",
+  "def": "アプリ、サービス、スクリプト、コンテナーなどのソフトウェアが、他のサービスや資源へ認証してアクセスするために割り当てるID。人ではなく機械のIDで、デバイスIDと並ぶ非人間IDの一種にあたる。",
+  "how": "Entra では、アプリケーション、サービスプリンシパル、マネージドIDがこれにあたる。マネージドIDは資格情報の管理を不要にし、ワークロードIDフェデレーションは GitHub Actions などでシークレットなしの認証を可能にする。条件付きアクセスやID保護、アクセスレビューも適用できる。",
+  "diff": "人のIDは1人が複数の資源に1つのIDで入るのに対し、ワークロードは資源ごとに複数の資格情報を持ち、作成と失効の把握が難しい。出典は攻撃者が非人間IDを狙う傾向を指摘している。",
+  "ai": "出典はAIエージェントを別種の機械IDとし、人間の保証人、ライフサイクル管理、一括の方針適用を持つ専用IDを用意している。AIがAPIを呼ぶ際のIDの棚卸しと権限設計の中心になる。",
+  "related": [
+   "iam",
+   "secrets-management",
+   "pam",
+   "id-lifecycle"
+  ],
+  "sources": [
+   {
+    "t": "What are workload identities?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/entra/workload-id/workload-identities-overview"
+   },
+   {
+    "t": "Identity and access management fundamental concepts",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/entra/fundamentals/identity-fundamental-concepts"
+   }
+  ]
+ },
+ {
+  "id": "secrets-management",
+  "layer": "identity",
+  "name": "シークレット管理",
+  "full": "Secrets Management（パスワード・APIキー・証明書の安全な保管と配布）",
+  "def": "トークン、パスワード、証明書、APIキーなどの機密情報を、アプリのコードや設定ファイルに書かず、専用の保管庫で一元的に保管してアクセスを制御する取り組み。漏えいの機会を減らす。",
+  "how": "Azure Key Vault の例では、アプリは保管庫へURIでアクセスして必要な秘密を取り出す。アクセスは Entra ID で認証し、Azure RBAC などで認可する。保管庫は HSM の鍵で保存時に暗号化され、利用記録をログに残して監視できる。アプリ単位で保管庫を分けて、アクセスを絞れる。",
+  "diff": "暗号化と鍵管理（KMS・HSM）がデータ暗号化の鍵を守るのに対し、シークレット管理はアプリが使う認証情報全般を預かる。Key Vault は両方に使えるが、目的が異なる。",
+  "ai": "AIアプリが外部のAPIキーやモデルの接続情報をコードに埋め込まず、保管庫から取る設計にする。キーは非人間IDに紐づけ、最小限の権限に限る。",
+  "related": [
+   "workload-identity",
+   "encryption-kms",
+   "least-privilege",
+   "log-management"
+  ],
+  "sources": [
+   {
+    "t": "About Azure Key Vault",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/key-vault/general/overview"
+   }
+  ]
+ },
+ {
+  "id": "access-review",
+  "layer": "identity",
+  "name": "アクセスレビュー",
+  "full": "Access Review / Access Recertification（アクセス権の定期的な見直し）",
+  "def": "利用者に与えられたアクセス権が今も必要かを、責任者や本人が定期的に確認し、不要なものを外す活動。過剰な権限が残ることや、統制不備として監査で指摘されることを防ぐ。",
+  "how": "Entra の例では、グループのメンバー、アプリの割り当て、ロール、アクセスパッケージを対象に、レビューを作る。週次から年次まで繰り返しでき、レビュー担当者が承認か拒否を選ぶ。特権ロールの人数や、外部ゲストの残存を確認する場面に向く。",
+  "diff": "IDライフサイクル管理が入社、異動、退職の変化に合わせて自動で付与と剥奪を行うのに対し、アクセスレビューは自動化で拾えない権限を人が再確認する。PAMの時間制限とも補い合う。",
+  "ai": "AI基盤の管理者ロールや、AIに権限を持たせたサービスプリンシパルも、レビューの対象に含める。出典は、特権ロールに割り当てたサービスプリンシパルのレビューも可能と述べている。",
+  "related": [
+   "id-lifecycle",
+   "pam",
+   "least-privilege",
+   "workload-identity"
+  ],
+  "sources": [
+   {
+    "t": "What are access reviews?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/entra/id-governance/access-reviews-overview"
+   },
+   {
+    "t": "What are workload identities?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/entra/workload-id/workload-identities-overview"
    }
   ]
  },
@@ -748,6 +1138,186 @@
   ]
  },
  {
+  "id": "email-auth",
+  "layer": "network",
+  "name": "送信ドメイン認証（SPF・DKIM・DMARC）",
+  "full": "Email authentication（SPF・DKIM・DMARC によるメール送信元の検証）",
+  "def": "メールの送信元ドメインが偽装されていないかを、受信側が検証する技術の総称。SPF・DKIM・DMARCを組み合わせて、なりすましメールやフィッシングを見分ける。",
+  "how": "SPFはDNSのTXTレコードで、そのドメインのメールを送ってよい送信元を示す。DKIMは電子署名をメールヘッダーに付け、受信側が改ざんの有無を確かめる。DMARCはFromアドレスのドメインとの一致を確認し、失敗時の扱いと報告先を指定する。",
+  "diff": "SPFはMAIL FROMのドメインしか見ず、DKIMは署名ドメインがFromと違ってもよい。この穴をDMARCの一致確認が埋めるため、三つは単独でなく組み合わせて使う。",
+  "ai": "AIエージェントやSaaS連携でメールを自動送信する場合、その送信サービスをSPFに加えるか自社ドメインでDKIM署名させないと、認証に失敗しうる。",
+  "related": [
+   "tls-pki",
+   "dns-filtering",
+   "threat-intel"
+  ],
+  "sources": [
+   {
+    "t": "Email authentication in cloud organizations",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/defender-office-365/email-authentication-about"
+   },
+   {
+    "t": "用語集（さ行）送信ドメイン認証",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/glossary/ja_03/"
+   },
+   {
+    "t": "用語集（英字）SSL・TLS・DKIM・WPA・Wi-Fi・API の項",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/glossary/en/"
+   }
+  ]
+ },
+ {
+  "id": "tls-pki",
+  "layer": "network",
+  "name": "TLS／PKI（電子証明書）",
+  "full": "Transport Layer Security / Public Key Infrastructure（通信の暗号化と公開鍵基盤）",
+  "def": "TLSは通信を暗号化し、なりすましを防ぐプロトコル。PKIは、第三者の認証局が電子証明書を登録・発行・失効させ、公開鍵とその持ち主の結びつきを保証する仕組み。SSLの後継にあたる。",
+  "how": "サーバはCAの署名が付いたサーバ証明書を示し、クライアントは自分が信頼するルート証明書にたどり着けるかで接続先の真正性を確かめる。確認後に通信を暗号化する。認証局は証明書の登録・発行・失効を担い、AD CSのような社内用の認証局を自前で運用する方法もある。",
+  "diff": "暗号化と鍵管理（KMS）が保管データの鍵の運用を主に扱うのに対し、TLS／PKIは通信相手が本物かを証明書で確かめたうえで通信を暗号化する。",
+  "ai": "生成AIのAPIやエージェント間の通信もTLSで保護される。接続先の真正性は証明書の検証に依存するため、発行・更新・失効の管理が運用上の要件になる。",
+  "related": [
+   "encryption-kms",
+   "tls-inspection",
+   "email-auth",
+   "wireless-lan-security"
+  ],
+  "sources": [
+   {
+    "t": "用語集（英字）SSL・TLS・DKIM・WPA・Wi-Fi・API の項",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/glossary/en/"
+   },
+   {
+    "t": "用語集（な行）認証局",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/glossary/ja_05/"
+   },
+   {
+    "t": "Deploy Password-Based 802.1X Authenticated Wireless Access（サーバ証明書・CA・PKI の説明）",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/windows-server/networking/core-network-guide/cncg/wireless/a-deploy-8021x-wireless-access"
+   }
+  ]
+ },
+ {
+  "id": "tls-inspection",
+  "layer": "network",
+  "name": "TLS検査（TLS復号）",
+  "full": "TLS inspection（暗号化通信の復号と検査）",
+  "def": "暗号化されたHTTPS通信をファイアウォールやプロキシがいったん終端して復号し、中身を検査してから再暗号化して送る仕組み。暗号化に隠れた不正通信を見つけるために使う。",
+  "how": "Azure Firewall Premiumの例では、Webサーバとの接続とクライアントとの接続の2本のTLSを張り、顧客が用意したCA証明書で即席のサーバ証明書を作る。復号後にIDPSやURLフィルタリングが働く。金融や医療などのカテゴリは復号の対象外にできる。",
+  "diff": "IDS／IPSやWAFは通信の中身を見る機能で、TLS検査はそれが暗号化された通信の中身を見られるようにする前処理に当たる。復号しなければ暗号化トンネルの中は見えない。",
+  "ai": "生成AIサービスへの通信もHTTPSなので、復号しないと送信内容を検査できない。一方でMicrosoft 365など信頼する宛先は復号から外す推奨もあり、対象範囲の設計が要る。",
+  "related": [
+   "swg",
+   "ids-ips",
+   "waf",
+   "firewall",
+   "tls-pki"
+  ],
+  "sources": [
+   {
+    "t": "Azure Firewall Premium features implementation guide",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/azure/firewall/premium-features"
+   },
+   {
+    "t": "Microsoft 365 network connectivity principles",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/microsoft-365/enterprise/microsoft-365-network-connectivity-principles"
+   }
+  ]
+ },
+ {
+  "id": "private-connectivity",
+  "layer": "network",
+  "name": "閉域接続・プライベートエンドポイント",
+  "full": "Private connectivity（閉域網・専用線・Private Link による非公開接続）",
+  "def": "クラウドや拠点への通信を公衆インターネットに通さず、通信事業者の閉域網や専用線、仮想ネットワーク内のプライベートIPアドレスで結ぶ接続方式の総称。IP-VPNもこの一種。",
+  "how": "ExpressRouteは接続事業者を介してオンプレミスとクラウドを私設接続で結び、any-to-any（IP-VPN）や専用イーサネットを選べる。プライベートエンドポイントは、仮想ネットワークのプライベートIPを持つNICとして、PaaSなどのサービスを自網内に取り込む。",
+  "diff": "VPNが公衆網に暗号化トンネルを張るのに対し、閉域接続は経路自体が公衆網に出ない。プライベートエンドポイントは公開側のアクセスを自動では止めず、別の制御が要る。",
+  "ai": "AI検索や機械学習のサービスはプライベートエンドポイントの対象リソースに挙がっており、社内データを扱うAI基盤をインターネットに公開しない設計に使える。",
+  "related": [
+   "vpn",
+   "segmentation",
+   "sd-wan",
+   "fixed-ip",
+   "api-gateway"
+  ],
+  "sources": [
+   {
+    "t": "What is a private endpoint?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/azure/private-link/private-endpoint-overview"
+   },
+   {
+    "t": "What is Azure ExpressRoute?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/azure/expressroute/expressroute-introduction"
+   }
+  ]
+ },
+ {
+  "id": "nac",
+  "layer": "network",
+  "name": "NAC",
+  "full": "Network Access Control（ネットワークアクセス制御）",
+  "def": "ネットワークに接続しようとする端末を認証し、登録済みか、ポリシーに適合しているかを確認したうえで、接続の可否を制御する仕組み。有線LAN、Wi-Fi、VPNの入口で使う。",
+  "how": "IEEE 802.1XはLANポートやWi-Fiへの接続時に認証を求め、失敗すれば接続を拒否する。NAC製品はIntuneなどに端末の登録と準拠の状態を問い合わせ、不適合なら登録や修復へ誘導し、適合後に接続を許可する。",
+  "diff": "条件付きアクセスがクラウドアプリへのアクセスを判断するのに対し、NACは社内Wi-FiやVPNなどネットワークに接続する時点で判断する。両者は連携して使われる。",
+  "ai": "社内ネットワークやVPNに入れる端末を管理下に限る土台になり、未管理の端末から社内データを経由してAIに触れる経路を狭められる。",
+  "related": [
+   "mdm-uem",
+   "conditional-access",
+   "wireless-lan-security",
+   "segmentation",
+   "ztna"
+  ],
+  "sources": [
+   {
+    "t": "Network access control (NAC) integration with Intune",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/intune/device-security/integrate-network-access-control"
+   },
+   {
+    "t": "Deploy Password-Based 802.1X Authenticated Wireless Access（IEEE 802.1X の説明）",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/windows-server/networking/core-network-guide/cncg/wireless/a-deploy-8021x-wireless-access"
+   }
+  ]
+ },
+ {
+  "id": "wireless-lan-security",
+  "layer": "network",
+  "name": "無線LANセキュリティ（WPA・802.1X）",
+  "full": "Wireless LAN security（無線LANの認証と暗号化）",
+  "def": "無線LAN（Wi-Fi）への不正接続と通信の盗み見を防ぐため、接続時の認証と通信の暗号化を組み合わせる仕組み。WPA系の方式とIEEE 802.1Xが中心になる。",
+  "how": "WPAはWEPの弱点を補う暗号化方式で、家庭向けのWPA-PSKと企業向けのWPA-EAPがある。企業向けは802.1XとEAPで利用者を認証サーバに照会し、鍵を動的に管理する。暗号化はAESが推奨され、WEPは使わない。",
+  "diff": "事前共有鍵（PSK）方式は共通のパスワードで接続するのに対し、企業向けの802.1X／EAP方式は利用者や端末ごとに認証する。代わりに認証サーバや証明書の運用が要る。",
+  "ai": "社内Wi-Fiの入口を利用者・端末単位の認証で絞れるため、AIサービスや社内データへ届く端末を管理下に限定する土台になる。",
+  "related": [
+   "nac",
+   "tls-pki",
+   "vpn",
+   "segmentation"
+  ],
+  "sources": [
+   {
+    "t": "用語集（英字）SSL・TLS・DKIM・WPA・Wi-Fi・API の項",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/glossary/en/"
+   },
+   {
+    "t": "Deploy Password-Based 802.1X Authenticated Wireless Access",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/windows-server/networking/core-network-guide/cncg/wireless/a-deploy-8021x-wireless-access"
+   }
+  ]
+ },
+ {
   "id": "swg",
   "layer": "sase",
   "name": "SWG",
@@ -1014,6 +1584,192 @@
   ]
  },
  {
+  "id": "rbi",
+  "layer": "sase",
+  "name": "RBI",
+  "full": "Remote Browser Isolation（リモートブラウザ分離）",
+  "def": "Webの閲覧処理を利用者の端末から切り離し、クラウド上などの隔離環境のブラウザで実行して、描画結果だけを端末に送る技術。フィッシングやブラウザ経由の攻撃から端末を守る目的で導入される。",
+  "how": "ページの描画とJavaScriptの実行は隔離環境のブラウザが担い、端末には画面の映像（ピクセルストリーム）だけが届く。キー入力やクリックは隔離側へ転送される。通常はプロキシで全Web通信を分離基盤に通し、外部への出口を制限する。",
+  "diff": "SWGが通信を検査して許可と遮断を決めるのに対し、RBIは悪意あるコードを端末で動かさない。実行場所で分けると、クラウド型、オンプレミス型、端末内のコンテナや仮想マシンを使うローカル型がある。",
+  "ai": "AIが示した外部リンクや未知のサイトを閲覧する場面で、端末にコードを実行させない手段になる。映像経由の情報の出入りは残るため、DLPなどとの併用が要る。",
+  "related": [
+   "swg",
+   "sase",
+   "enterprise-browser",
+   "dns-filtering"
+  ],
+  "sources": [
+   {
+    "t": "(QR) Coding My Way Out of Here: C2 in Browser Isolation Environments",
+    "pub": "Google Cloud Blog（Mandiant）",
+    "url": "https://cloud.google.com/blog/topics/threat-intelligence/c2-browser-isolation-environments"
+   }
+  ]
+ },
+ {
+  "id": "sspm",
+  "layer": "sase",
+  "name": "SSPM",
+  "full": "SaaS Security Posture Management（SaaSセキュリティ態勢管理）",
+  "def": "SaaSアプリの設定を継続的に評価し、セキュリティ上の不備や設定ミスを見つけて、改善の手順を示す仕組み。SaaSを対象にした態勢管理にあたり、SSPMと略される。",
+  "how": "SaaSをコネクタで接続すると、設定の評価結果が推奨事項として示され、Secure Scoreで確認できる。製品例のMicrosoft Defender for Cloud Appsは、CIS Microsoft 365 Foundations Benchmarkなど複数の観点で推奨事項を整理し、OAuthアプリの攻撃経路も可視化する。",
+  "diff": "CASBがSaaSの利用や操作を監視・制御するのに対し、SSPMは各SaaSの設定そのものの安全性を評価する。クラウド基盤の設定を見るCSPMに近い考え方をSaaSに当てはめたもの。",
+  "ai": "SaaSに組み込まれた生成AI機能や、外部アプリ連携で与えた権限の設定も、継続的に点検する対象にできる。",
+  "related": [
+   "casb",
+   "casb-deployment",
+   "cspm",
+   "shadow-it",
+   "least-privilege"
+  ],
+  "sources": [
+   {
+    "t": "SaaS security posture management (SSPM) overview",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/defender-cloud-apps/posture-overview"
+   }
+  ]
+ },
+ {
+  "id": "api-gateway",
+  "layer": "sase",
+  "name": "APIゲートウェイ／APIセキュリティ",
+  "full": "API gateway / API security（APIの入口での認証・認可と制御）",
+  "def": "APIの利用者とバックエンドの間に置く入口で、認証・認可、リクエストの検証、流量の制限などをまとめて適用する仕組み。APIは、ソフトウェアが別のソフトウェアに公開する入出力の窓口。",
+  "how": "ゲートウェイでJWTを検証し、有効なトークンを持つ呼び出し元だけを通す。リクエストの形式を検証し、レート制限やクォータでバックエンドを守る。クライアント証明書によるmTLSやIP制限も使える。購読キーは認証手段として頼らない。",
+  "diff": "WAFがWebアプリへの攻撃パターンを検査するのに対し、APIゲートウェイは呼び出し元の認証・認可と利用量の制御が中心。ゲートウェイの前段にWAFを置く構成が推奨される。",
+  "ai": "AI向けのゲートウェイでは、マネージドIDで認証してAPIキーを不要にし、トークン使用量の上限設定や、プロンプトと応答のログ取得ができる（Azure API Managementの例）。",
+  "related": [
+   "waf",
+   "least-privilege",
+   "tls-pki",
+   "private-connectivity"
+  ],
+  "sources": [
+   {
+    "t": "Secure your Azure API Management deployment",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/azure/api-management/secure-api-management"
+   },
+   {
+    "t": "AI gateway in Azure API Management",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/azure/api-management/genai-gateway-capabilities"
+   },
+   {
+    "t": "用語集（英字）SSL・TLS・DKIM・WPA・Wi-Fi・API の項",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/glossary/en/"
+   }
+  ]
+ },
+ {
+  "id": "local-breakout",
+  "layer": "sase",
+  "name": "ローカルブレイクアウト",
+  "full": "Local breakout（拠点や端末から直接インターネットへ出る通信経路）",
+  "def": "拠点やテレワーク端末のインターネット向け通信を、本社などの中央拠点に集めず、利用者に近い出口から直接インターネットへ送る構成。SaaS利用の遅延と社内回線の負荷を減らすために採る。",
+  "how": "従来は通信を本社へ集めて検査し、プロキシ経由で出していた。ローカルブレイクアウトでは利用者の場所から最寄りの入口へ直接出し、DNSの名前解決も近くで行う（Microsoft 365の例）。中央の検査を通らない分は、端末側とクラウド側の対策で補う。",
+  "diff": "VPNで本社へ戻す構成は検査を集約できるが、遅延が増える。ローカルブレイクアウトは遅延を抑える代わりに検査の位置が分散し、SWGやCASBなどで補う設計になる。",
+  "ai": "生成AIサービスへの通信も、本社経由かローカル出口かで遅延と検査位置が変わる。どこで検査とDLPを効かせるかを、出口の設計と併せて決める。",
+  "related": [
+   "sd-wan",
+   "swg",
+   "vpn",
+   "ztna",
+   "sase"
+  ],
+  "sources": [
+   {
+    "t": "Microsoft 365 network connectivity principles",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/microsoft-365/enterprise/microsoft-365-network-connectivity-principles"
+   }
+  ]
+ },
+ {
+  "id": "casb-deployment",
+  "layer": "sase",
+  "name": "CASBの導入方式（API型・プロキシ型）",
+  "full": "CASB deployment modes（API connector / reverse proxy）",
+  "def": "CASBがSaaSを可視化・制御するときの接続方式の違い。SaaSのAPIに接続するAPI連携型と、利用者の通信を経由させるリバースプロキシ型が代表的で、組み合わせて使う。",
+  "how": "API連携型（アプリコネクタ）はSaaS提供元のAPIで可視性と制御を得るが、API制限のため全ファイルの走査に数時間から数日かかることがある。リバースプロキシ型は条件付きアクセスと連携して通信を経由させ、ダウンロード遮断などをセッション中に実行する。",
+  "diff": "API型は接続したSaaSの状態や操作の把握が中心で、プロキシ型はセッション中の即時制御が中心。プロキシ型はブラウザ操作が対象で、ネイティブのクライアントは対象外になりうる。",
+  "ai": "SaaS型の生成AIも、APIで接続できれば設定や共有の状況を確認できる。ブラウザ利用ならアップロード遮断などのセッション制御を検討できる。対応可否は製品ごとに確認する。",
+  "related": [
+   "casb",
+   "sspm",
+   "enterprise-browser",
+   "conditional-access",
+   "shadow-it"
+  ],
+  "sources": [
+   {
+    "t": "Cloud app visibility and control",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/entra/identity/enterprise-apps/cloud-app-security"
+   },
+   {
+    "t": "Conditional Access app control in Microsoft Defender for Cloud Apps",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/defender-cloud-apps/proxy-intro-aad"
+   }
+  ]
+ },
+ {
+  "id": "enterprise-browser",
+  "layer": "sase",
+  "name": "セキュアブラウザ（エンタープライズブラウザ）",
+  "full": "Enterprise / secure browser（業務用ブラウザへの制御の組み込み）",
+  "def": "業務で使うブラウザ自体にセキュリティ制御を組み込み、アップロードやコピー、印刷などの操作を管理する方式。通信を別のプロキシに通さず、ブラウザの内側で制御するのが特徴。",
+  "how": "製品例のMicrosoft Edge for Businessは、仕事用プロファイルのセッションでダウンロードやアップロード、コピーと貼り付け、印刷の監視や遮断をブラウザ内で行う。Chrome Enterpriseの例では、セッションCookieの端末への紐付けや、ダウンロード保存先の強制などを提供する。",
+  "diff": "RBIは閲覧の実行場所を隔離環境へ移すが、セキュアブラウザは手元のブラウザに制御を入れる。Microsoftは、リバースプロキシに比べて遅延やアプリ互換の問題を避けられると説明する。",
+  "ai": "BYODや委託先の端末にも、ブラウザ内でデータのダウンロードや貼り付けを制御できる。ブラウザ上のAIサービスへの持ち出し対策に使える場面がある。",
+  "related": [
+   "casb-deployment",
+   "rbi",
+   "dlp",
+   "mdm-uem",
+   "casb"
+  ],
+  "sources": [
+   {
+    "t": "In-browser protection with Microsoft Edge for Business (Preview)",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/defender-cloud-apps/in-browser-protection"
+   },
+   {
+    "t": "5 Ways our Enterprise Browser Keeps Reinforcing Security",
+    "pub": "Google Cloud Blog（Chrome Enterprise）",
+    "url": "https://cloud.google.com/blog/products/chrome-enterprise/5-ways-our-enterprise-browser-keeps-reinforcing-security"
+   }
+  ]
+ },
+ {
+  "id": "tenant-restrictions",
+  "layer": "sase",
+  "name": "テナント制限",
+  "full": "Tenant restrictions（外部テナントのアカウント利用の制限）",
+  "def": "自組織のネットワークや端末から、外部組織や個人のアカウントでSaaSにサインインすることを制限する仕組み。許可する外部テナントだけを指定し、それ以外を既定で拒否する。",
+  "how": "Microsoft Entra IDの例では、クロステナントアクセス設定で外部アカウントと外部アプリを既定でブロックし、取引先など許可するテナントだけを例外にする。プロキシやGlobal Secure Access、Windowsのポリシーが要求にヘッダーを付け、Entra IDが適用する。",
+  "diff": "固定IPによる制限がSaaS側で接続元を絞るのに対し、テナント制限は自組織の端末やネットワークから、どのテナントのアカウントでサインインできるかを絞る。",
+  "ai": "従業員が個人や外部組織のアカウントを使って業務の環境からSaaSに触れる経路を狭められる。制御できるのは対応するIDの範囲に限られる。",
+  "related": [
+   "fixed-ip",
+   "shadow-it",
+   "casb",
+   "conditional-access",
+   "id-lifecycle"
+  ],
+  "sources": [
+   {
+    "t": "Set up tenant restrictions v2",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/entra/external-id/tenant-restrictions-v2"
+   }
+  ]
+ },
+ {
   "id": "shared-responsibility",
   "layer": "cloud",
   "name": "責任共有モデル",
@@ -1121,6 +1877,212 @@
   "def": "複数のクラウドセキュリティ機能を統合し、クラウド上のアプリケーションを開発から運用までのライフサイクル全体で守るプラットフォーム。CSPM や CWPP などを一つの体験にまとめる。"
  },
  {
+  "id": "ciem",
+  "layer": "cloud",
+  "name": "CIEM",
+  "full": "Cloud Infrastructure Entitlement Management（クラウドインフラのエンタイトルメント管理）",
+  "def": "クラウド上の人やアプリ、サービスアカウントなどのIDに付与された権限を洗い出し、過剰・未使用・誤設定の権限を見つけて、最小権限の原則に近づけるための仕組み。複数クラウドをまたいで見る。",
+  "how": "例えば Microsoft Defender for Cloud は、Azure・AWS・GCP の権限を一つの画面で追跡し、実効権限から機密リソースに届くIDを特定する。休眠アカウントの削除や管理者権限の限定、利用実績に基づく権限の適正化を推奨し、過剰権限のIDからの横展開も攻撃経路として示す。",
+  "diff": "IAM が権限を付与・管理する仕組みそのものなのに対し、CIEM は付与済みの権限が過剰でないかを複数クラウド横断で検査する。CSPM の一機能として提供される例がある。",
+  "ai": "対象はユーザーだけでなく、サービスプリンシパル、マネージドID、サービスアカウントなどの非人間IDにも及ぶ。AIエージェントや推論基盤が使うIDの権限棚卸しにも使える。",
+  "related": [
+   "iam",
+   "least-privilege",
+   "cspm",
+   "workload-identity",
+   "pam"
+  ],
+  "sources": [
+   {
+    "t": "Cloud infrastructure entitlement management (CIEM)",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/permissions-management"
+   }
+  ]
+ },
+ {
+  "id": "private-link",
+  "layer": "cloud",
+  "name": "プライベートリンク",
+  "full": "Private Link / Private Endpoint（プライベートリンク／プライベートエンドポイント）",
+  "def": "クラウドの PaaS サービスや、他社が提供するサービスに、公開インターネットを経由せず、自社の仮想ネットワーク内のプライベートなアドレス経由で接続する仕組み。",
+  "how": "例えば Azure Private Link では、仮想ネットワーク内にプライベートエンドポイントを作り、ストレージや SQL Database への通信を Microsoft のバックボーンネットワーク上で行う。エンドポイントはサービス全体ではなく特定のリソースに対応し、他のリソースへの接続は遮断されるため、データ流出のリスクを下げる。",
+  "diff": "VPN がネットワーク間に暗号化トンネルを張るのに対し、Private Link は特定のクラウドサービスへの接続口を自社ネットワーク内に置く。オンプレミスからは VPN や ExpressRoute 経由で使える。",
+  "ai": "生成AIサービスやAI用データストアへの通信を公開インターネットから切り離し、社内ネットワークからの接続に限定する手段になる。",
+  "related": [
+   "vpn",
+   "segmentation",
+   "api-security",
+   "ztna"
+  ],
+  "sources": [
+   {
+    "t": "What is Azure Private Link?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/private-link/private-link-overview"
+   }
+  ]
+ },
+ {
+  "id": "iac-security",
+  "layer": "cloud",
+  "name": "IaCセキュリティ",
+  "full": "Infrastructure as Code Security（コードで定義するインフラ構成のセキュリティ）",
+  "def": "クラウド構成をコード（テンプレート）で定義するIaCについて、配備前にコードを検査して設定ミスを見つけ、安全でない構成が本番環境に出るのを防ぐ取り組み。開発の早い段階で直せる。",
+  "how": "ARM、Bicep、Terraform、CloudFormation などのテンプレートを、リポジトリやパイプライン上で静的に検査する。Microsoft Security DevOps は Template Analyzer、Checkov、Terrascan を使い、GitHub Actions や Azure DevOps の拡張から実行して、結果を Defender for Cloud で確認できる。",
+  "diff": "CSPM が稼働中のクラウド資源の設定を点検するのに対し、IaCセキュリティは配備前のテンプレートを点検して、誤設定が本番へ入るのを防ぐ。",
+  "ai": "AI基盤のネットワーク、権限、ストレージもIaCで構築するなら、公開設定や権限の誤りをコードの段階で検査できる。",
+  "related": [
+   "cspm",
+   "devsecops-pipeline",
+   "container-security",
+   "landing-zone-guardrails"
+  ],
+  "sources": [
+   {
+    "t": "Scan your connected GitHub repository or Azure DevOps project",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/iac-vulnerabilities"
+   },
+   {
+    "t": "Overview of Microsoft Defender for Cloud DevOps security",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/defender-for-devops-introduction"
+   }
+  ]
+ },
+ {
+  "id": "container-security",
+  "layer": "cloud",
+  "name": "コンテナ／Kubernetesセキュリティ",
+  "full": "Container and Kubernetes Security（コンテナ・Kubernetes のセキュリティ）",
+  "def": "コンテナイメージ、レジストリ、Kubernetes クラスタ、ノード、実行中のワークロードを、構成の不備、脆弱性、実行時の脅威という三つの面から守る、クラウドネイティブ環境向けの取り組み。",
+  "how": "例えば Microsoft Defender for Containers は、構成の継続監視、レジストリ内イメージや実行中コンテナの脆弱性評価、クラスタ・ノード・ワークロードの実行時の脅威検知を行う。脆弱なイメージの配備を監査・拒否するゲート付きデプロイや、特権コンテナの作成禁止といったポリシーも使える。",
+  "diff": "従来のホスト（VM）中心の保護と違い、イメージの脆弱性、クラスタのAPI設定、コンテナ内の実行時の挙動を別々の層として扱う。",
+  "ai": "生成AIの推論基盤やエージェントを Kubernetes 上で動かす場合も、イメージの脆弱性検査と不要な特権の禁止が出発点になる。",
+  "related": [
+   "cwpp",
+   "cnapp",
+   "sbom-supply-chain",
+   "iac-security"
+  ],
+  "sources": [
+   {
+    "t": "Introduction to Microsoft Defender for Containers",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/defender-for-containers-introduction"
+   }
+  ]
+ },
+ {
+  "id": "devsecops-pipeline",
+  "layer": "cloud",
+  "name": "DevSecOps／CI/CDパイプラインの保護",
+  "full": "DevSecOps and CI/CD Pipeline Security（開発・運用へのセキュリティの組み込みと、ビルド・配備基盤の保護）",
+  "def": "セキュリティ検査を開発から配備までのパイプラインに自動で組み込み（シフトレフト）、あわせてビルド・配備の基盤そのものを攻撃から守る、二面を持つ考え方と実践。脆弱性や設定ミスを早い段階で見つける。",
+  "how": "例えば Microsoft クラウドセキュリティベンチマークは、SAST、シークレットスキャン、IaCスキャン、DAST を CI/CD に組み込み、シークレットは Key Vault などで一元管理するよう示す。パイプラインの変更権限を制限し、配備前にイメージを検査し、DevOps の監査ログを集約して不正な変更を検知する。",
+  "diff": "最終段階で検査する従来型と違い、各工程に検査と継続監視を埋め込む。アプリのコードだけでなく、パイプラインの認証情報や承認の仕組みも保護対象にする。",
+  "ai": "AIアプリの配備も同じパイプラインを通るため、パイプラインの乗っ取りはAIアプリ全体の改ざんにつながる。",
+  "related": [
+   "iac-security",
+   "sbom-supply-chain",
+   "secrets-management",
+   "container-security"
+  ],
+  "sources": [
+   {
+    "t": "DevOps Security (Microsoft cloud security benchmark v2)",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-v2-devops-security"
+   },
+   {
+    "t": "Overview of Microsoft Defender for Cloud DevOps security",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/defender-for-devops-introduction"
+   }
+  ]
+ },
+ {
+  "id": "landing-zone-guardrails",
+  "layer": "cloud",
+  "name": "ランディングゾーンとガードレール",
+  "full": "Landing Zone and Guardrails（クラウド導入基盤と、逸脱を防ぐ・検知する自動ルール）",
+  "def": "クラウドを組織で使い始める前に整える共通基盤（ランディングゾーン）と、その上で規則からの逸脱を防ぎ、検知する自動ルール（ガードレール）を合わせた考え方。現場への権限委譲と統制を両立させる。",
+  "how": "例えば Azure では、ポリシーを管理グループ、サブスクリプションなどの階層に割り当て、配下へ継承させる。非準拠の変更を拒否したり、記録だけにしたり、関連する設定を自動で配備したりする効果を選べる。まず監査から始め、影響を確かめて強制へ移すのが推奨される。",
+  "diff": "RBAC が誰に操作を許すかを決めるのに対し、ポリシーはリソースの状態が規則に合うかを評価する。権限があっても非準拠なら作成や更新は拒否される。",
+  "ai": "AI用のサブスクリプションに、許可リージョンの限定や診断ログ送信の必須化を適用すれば、現場が新しいAI環境を作っても最低限の統制が保たれる。",
+  "related": [
+   "shared-responsibility",
+   "cspm",
+   "iac-security",
+   "least-privilege"
+  ],
+  "sources": [
+   {
+    "t": "Azure landing zone design principles",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/design-principles"
+   },
+   {
+    "t": "What is Azure Policy?",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/governance/policy/overview"
+   }
+  ]
+ },
+ {
+  "id": "sbom-supply-chain",
+  "layer": "cloud",
+  "name": "SBOM・ソフトウェアサプライチェーン管理",
+  "full": "Software Bill of Materials / Software Supply Chain Security（ソフトウェア部品表／サプライチェーンのセキュリティ）",
+  "def": "ソフトウェアを構成する部品と供給関係を記録した一覧（SBOM）を整え、依存先の脆弱性や出所を管理して、サプライチェーン経由の攻撃や混入のリスクを減らす取り組み。",
+  "how": "NIST は SBOM を、ソフトウェアの構築に使う部品の詳細と供給関係の正式な記録と説明し、SPDX、CycloneDX、SWID を標準形式に挙げる。Microsoft のベンチマークは、直接・推移的な依存の一覧を維持し、新たな CVE と継続的に照合して、危険な依存の取り込みを防ぐよう示す。",
+  "diff": "SBOM は部品の一覧であり、安全に作られたことを保証しない。NIST は、脆弱性管理やベンダーのリスク評価を置き換えず補完するものと位置づける。",
+  "ai": "AIアプリが依存するライブラリやコンテナイメージの把握に使える。外部から導入するAI関連ソフトウェアの部品情報を、調達時に求める観点にもなる。",
+  "related": [
+   "container-security",
+   "devsecops-pipeline",
+   "patch-vuln",
+   "iac-security"
+  ],
+  "sources": [
+   {
+    "t": "Software Security in Supply Chains: Software Bill of Materials (SBOM)",
+    "pub": "NIST",
+    "url": "https://www.nist.gov/itl/executive-order-14028-improving-nations-cybersecurity/software-supply-chain-security-guidance-20"
+   },
+   {
+    "t": "DevOps Security (Microsoft cloud security benchmark v2)",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-v2-devops-security"
+   }
+  ]
+ },
+ {
+  "id": "api-security",
+  "layer": "cloud",
+  "name": "APIセキュリティ",
+  "full": "API Security（APIセキュリティ）",
+  "def": "公開APIや社内APIを、認証・認可、利用量の制限、入力の検証、公開範囲の絞り込み、棚卸しなどで守る取り組み。OWASP API Security Top 10 が脅威の整理に使われる。",
+  "how": "例えば Azure API Management のようなゲートウェイで、OAuth 2 トークンの検証、レート制限とクォータ、スキーマに基づく要求・応答の検証、未定義エンドポイントの拒否を一か所で強制する。バックエンドの認証にはマネージドIDを使い、APIの一覧とバージョンも管理する。",
+  "diff": "WAF が従来型のWeb攻撃やボットを防ぐのに対し、APIセキュリティはオブジェクト単位の認可や利用量の制限など、APIの仕様に沿った制御が中心になる。両者は補完関係にある。",
+  "ai": "生成AI向けのAPIでは、トークン数の上限設定（トークン制限）や消費量メトリクスの出力で、利用とコストを管理できる。",
+  "related": [
+   "waf",
+   "ddos",
+   "secrets-management",
+   "private-link",
+   "workload-identity"
+  ],
+  "sources": [
+   {
+    "t": "Recommendations to mitigate OWASP API Security Top 10 threats using API Management",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/api-management/mitigate-owasp-api-threats"
+   }
+  ]
+ },
+ {
   "id": "dlp",
   "layer": "data",
   "name": "DLP",
@@ -1220,6 +2182,266 @@
    }
   ],
   "def": "保持期間中は削除も改変もできないよう保護したバックアップ。ランサムウェアや悪意ある操作でバックアップごと消されそうになっても、復旧に使う復旧ポイントを残せるようにする。"
+ },
+ {
+  "id": "dspm",
+  "layer": "data",
+  "name": "DSPM",
+  "full": "Data Security Posture Management（データセキュリティ態勢管理）",
+  "def": "複数クラウドのデータストアを自動で探索し、機密データの所在、アクセス権、保護状況を把握して、データ流出につながるリスクを継続的に見つけ、優先順位を付ける仕組み。",
+  "how": "例えば Defender for Cloud は、複数クラウドのオブジェクトストアやデータベースを探索し、データをサンプリングして機密情報の種類を判定する。データの露出や流れを評価し、インターネットに露出した VM から機密データへ至る攻撃経路も示す。Purview の DSPM は、どんなデータがどこにあり、誰が触れられ、どう保護されているかに答える。",
+  "diff": "DLP が持ち出しの操作を検知・遮断するのに対し、DSPM は機密データの所在と保護の穴を見つける領域。インフラや端末でなくデータそのものを起点にする点が CSPM と異なる。",
+  "ai": "Purview の DSPM は、AIアプリとエージェントの活動を可視化し、機密データを含むやり取りや過剰な共有を追跡する。",
+  "related": [
+   "dlp",
+   "data-classification",
+   "cspm",
+   "ediscovery-legal-hold"
+  ],
+  "sources": [
+   {
+    "t": "Overview - About data security posture management",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/concept-data-security-posture"
+   },
+   {
+    "t": "Learn about Data Security Posture Management",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/purview/data-security-posture-management-learn-about"
+   }
+  ]
+ },
+ {
+  "id": "tokenization",
+  "layer": "data",
+  "name": "トークナイゼーション",
+  "full": "Tokenization（トークン化）",
+  "def": "クレジットカード番号などの機密な値を、意味を持たない代替値（トークン）に置き換えて扱う手法。同じ文字種・長さの代替値にすれば、既存システムの書式制約にも合わせられる。",
+  "how": "例えば Google Cloud の Cloud DLP は、書式保持暗号化（FPE）で入力値を同じ文字種・長さのトークンに置き換え、書式制約のあるレガシーシステムとの互換を保つ。復元できることを示す接頭辞も付けられる。鍵で生成した一方向ハッシュに置き換える方式もあり、この場合は元に戻せない。",
+  "diff": "マスキングが一部の文字を固定文字で隠すのに対し、トークン化は値全体を代替値に置き換える。書式を保ったまま保存・処理でき、方式によっては復元もできる。",
+  "ai": "生成AIに渡す前に個人情報や口座番号をトークンに置き換えれば、モデルや外部サービスへ生の値を送らずに処理を進められる。",
+  "related": [
+   "data-masking",
+   "pseudonymization",
+   "encryption-kms",
+   "dlp"
+  ],
+  "sources": [
+   {
+    "t": "Taking charge of your data: using Cloud DLP to de-identify and obfuscate sensitive information",
+    "pub": "Google Cloud",
+    "url": "https://cloud.google.com/blog/products/identity-security/taking-charge-of-your-data-using-cloud-dlp-to-de-identify-and-obfuscate-sensitive-information"
+   }
+  ]
+ },
+ {
+  "id": "data-masking",
+  "layer": "data",
+  "name": "データマスキング",
+  "full": "Data Masking（データマスキング）",
+  "def": "機密データの一部または全部を伏せ字や別の値で隠し、権限のない利用者や、開発・テストの担当者に、実データをそのまま見せないようにする手法。動的に表示だけ隠す方法と、値を加工して置き換える方法がある。",
+  "how": "動的マスキングは、データベースの保存値は変えず、問い合わせ結果だけを権限のない利用者向けに隠す（例：Azure SQL Database）。規則で対象の列と関数を定め、クレジットカードは下4桁だけ、メールは先頭1文字だけを見せる。UNMASK 権限を持つ利用者や管理者には元の値が見える。",
+  "diff": "動的マスキングは保存値を変えず、結果の見せ方だけを制御する。値全体を代替値に置き換えるトークン化とは、元データの扱いが異なる。",
+  "ai": "本番データを使ったAIの検証や障害調査で、開発者にはマスキング済みの結果だけを見せれば、個人情報の露出を抑えられる。",
+  "related": [
+   "tokenization",
+   "pseudonymization",
+   "data-classification",
+   "dlp"
+  ],
+  "sources": [
+   {
+    "t": "Dynamic data masking",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/azure-sql/database/dynamic-data-masking-overview"
+   },
+   {
+    "t": "Taking charge of your data: using Cloud DLP to de-identify and obfuscate sensitive information",
+    "pub": "Google Cloud",
+    "url": "https://cloud.google.com/blog/products/identity-security/taking-charge-of-your-data-using-cloud-dlp-to-de-identify-and-obfuscate-sensitive-information"
+   }
+  ]
+ },
+ {
+  "id": "pseudonymization",
+  "layer": "data",
+  "name": "仮名加工情報・匿名加工情報",
+  "full": "Pseudonymously / Anonymously Processed Information（個人情報保護法上の加工情報）",
+  "def": "個人情報保護法の区分。仮名加工情報は他の情報と照合しない限り個人を識別できないよう加工した情報（第2条第5項）、匿名加工情報は識別できず元に復元できないよう加工した情報（同第6項）。",
+  "how": "匿名加工情報は個人情報に該当せず、本人の同意なく第三者へ提供できる。仮名加工情報は、作成者が元の情報を通常保有するため原則として個人情報に当たり、第三者提供は原則禁止だが、利用目的は関連性の範囲を超えて変更できる。作成時の義務はガイドライン（仮名加工情報・匿名加工情報編）に定められる。",
+  "diff": "匿名加工情報は復元できず個人情報に当たらないのに対し、仮名加工情報は照合すれば識別でき原則個人情報に当たる。マスキングやトークン化は技術手法であり、法的な区分ではない。",
+  "ai": "個人情報を含むデータをAIの分析や学習に使う前に、どちらの加工情報として扱えるかを検討する。区分によって第三者提供と利用目的の扱いが変わる。",
+  "related": [
+   "tokenization",
+   "data-masking",
+   "cross-border-transfer",
+   "data-classification"
+  ],
+  "sources": [
+   {
+    "t": "匿名加工情報と仮名加工情報の違いは何ですか",
+    "pub": "個人情報保護委員会",
+    "url": "https://www.ppc.go.jp/all_faq_index/faq1-q14-1/"
+   }
+  ]
+ },
+ {
+  "id": "cross-border-transfer",
+  "layer": "data",
+  "name": "データ所在地・越境移転",
+  "full": "Data Residency and Cross-Border Data Transfer（データの所在地と越境移転）",
+  "def": "データを保存・処理する地理的な場所（データ所在地）と、国境を越えるデータ移動への規制。日本の個人情報保護法は、個人データを外国にある第三者へ提供する場合に規律を置く（第28条）。",
+  "how": "原則として、外国への提供を認める旨の本人の同意を事前に得る。提供先の国が同等水準の制度を持つ国として規則で定められている場合や、提供先が基準適合体制を整備している場合は同意が不要。同意の際は提供先の国名、その国の制度、提供先の措置を本人に示す。基準適合体制による提供では、年1回程度以上の実施状況の確認が必要になる。",
+  "diff": "データ所在地はどこに置くかの選択（クラウドではリージョンで選ぶ）であり、越境移転規制は外国の第三者への提供に課される法的規律。両方を確認する必要がある。",
+  "ai": "海外のリージョンで動く生成AIサービスに個人データを渡す場合、外国にある第三者への提供や委託に当たるかを確認する。委託の場合も同様に第28条の対象とされている。",
+  "related": [
+   "pseudonymization",
+   "data-classification",
+   "shared-responsibility",
+   "encryption-kms"
+  ],
+  "sources": [
+   {
+    "t": "個人情報の保護に関する法律についてのガイドライン（外国にある第三者への提供編）",
+    "pub": "個人情報保護委員会",
+    "url": "https://www.ppc.go.jp/personalinfo/legal/guidelines_offshore/"
+   },
+   {
+    "t": "外国にある第三者に個人データの取扱いを委託する場合（Q12-1）",
+    "pub": "個人情報保護委員会",
+    "url": "https://www.ppc.go.jp/all_faq_index/faq1-q12-1/"
+   },
+   {
+    "t": "Data controls",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/azure-sovereign-clouds/data-controls"
+   }
+  ]
+ },
+ {
+  "id": "data-disposal",
+  "layer": "data",
+  "name": "データ消去・廃棄",
+  "full": "Data Sanitization and Disposal（データの消去・廃棄）",
+  "def": "不要になった記憶媒体やデータを、対象データへのアクセスが所定の労力では不可能になる状態まで処理して消去・廃棄すること。NIST はこの処理を媒体のサニタイズと呼ぶ。",
+  "how": "NIST SP 800-88 は、情報の機微度に応じた消去・廃棄の技術と統制を決める、サニタイズ計画の指針を示す。例えば Azure Data Box は、データのアップロード完了後に端末内のデータをブロック消去し、NIST SP 800-88 に沿った消去証明書をポータルから取得できる。",
+  "diff": "データ保持が残す期間を決めるのに対し、データ消去・廃棄は期間が満了したあと、対象を確実にアクセス不能にする終端の工程になる。",
+  "ai": "AIの学習や検証のために複製したデータ、使い終えた環境の中のデータも対象になる。複製の所在を把握していないと消去できない。",
+  "related": [
+   "data-retention",
+   "immutable-backup",
+   "encryption-kms",
+   "data-classification"
+  ],
+  "sources": [
+   {
+    "t": "Guidelines for Media Sanitization (NIST SP 800-88)",
+    "pub": "NIST",
+    "url": "https://www.nist.gov/publications/guidelines-media-sanitization-3"
+   },
+   {
+    "t": "Azure Data Box security and data protection",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/databox/data-box-security"
+   }
+  ]
+ },
+ {
+  "id": "encryption-states",
+  "layer": "data",
+  "name": "保存時・転送時の暗号化",
+  "full": "Encryption at Rest / in Transit（保存データの暗号化・通信の暗号化）",
+  "def": "保存されたデータを守る保存時の暗号化と、ネットワーク上を流れるデータを守る転送時の暗号化。処理中のデータを守る利用中の暗号化を加えた三状態で整理することもある。",
+  "how": "例えば Azure は、保存時に AES-256 によるサーバー側暗号化を使い、サービス管理鍵や顧客管理鍵などの鍵モデルを選べる。転送時は TLS で保護し、TLS 1.2 以上への移行を進めている。VPN は IPsec で暗号化される。利用中の暗号化にはコンフィデンシャルコンピューティングが使われる。",
+  "diff": "鍵を誰がどこで管理するかを扱う鍵管理（KMS・HSM）とは別の軸で、こちらはどの状態のデータを守るかという分類になる。両方を組み合わせて使う。",
+  "ai": "生成AIにデータを渡す通信の経路と、RAG用に置くデータの保存先の両方で暗号化が必要になる。処理中のデータには、コンフィデンシャルコンピューティングという選択肢がある。",
+  "related": [
+   "encryption-kms",
+   "data-classification",
+   "vpn",
+   "private-link"
+  ],
+  "sources": [
+   {
+    "t": "Azure encryption overview",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/security/fundamentals/encryption-overview"
+   },
+   {
+    "t": "Data controls",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/azure-sovereign-clouds/data-controls"
+   }
+  ]
+ },
+ {
+  "id": "data-retention",
+  "layer": "data",
+  "name": "データ保持とライフサイクル管理",
+  "full": "Data Retention and Lifecycle Management（保持ポリシー・保持ラベル）",
+  "def": "法令や社内規程に従ってデータを一定期間保持し、期間後に削除するルールを定めて運用すること。残すべきものを確実に残し、不要になった古い情報は削除してリスクを減らす。",
+  "how": "例えば Microsoft Purview は、保持（削除を防ぎ eDiscovery に残す）と削除の二つの操作を組み合わせ、保持のみ、削除のみ、保持後に削除を設定する。サイトやメールボックス単位の保持ポリシーと、文書・メール単位の保持ラベルがあり、期間満了時に処分レビューを挟める。",
+  "diff": "イミュータブルバックアップが障害や攻撃からの復旧用の複製を守るのに対し、データ保持は法令や規程のために元のコンテンツを残し、期限後に削除する。",
+  "ai": "保持ポリシーの対象に Copilot やAIアプリのやり取りも含められる。プロンプトや応答の保存期間を、社内規程に合わせて決める根拠になる。",
+  "related": [
+   "ediscovery-legal-hold",
+   "data-disposal",
+   "immutable-backup",
+   "data-classification"
+  ],
+  "sources": [
+   {
+    "t": "Learn about retention policies and retention labels",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/purview/retention"
+   }
+  ]
+ },
+ {
+  "id": "irm",
+  "layer": "data",
+  "name": "IRM（情報権限管理）",
+  "full": "Information Rights Management（情報権限管理）",
+  "def": "ファイルやメールを暗号化し、閲覧・編集・印刷・転送などの利用権限をデータ自体に付けて、共有先や社外、管理外のストレージに出ても保護が続くようにする仕組み。権限管理をデータに持たせる。",
+  "how": "例えば Azure Rights Management は、暗号化、ID、認可ポリシーでファイルとメールを保護する。暗号化設定は機密ラベルで適用でき、ファイルが管理外のストレージに移っても保護が残る。「転送不可」は転送、印刷、コピーを制限する。利用状況の監査や、Office ファイルのアクセス取り消しもできる。",
+  "diff": "DLP がポリシーで持ち出しを検知・遮断するのに対し、IRM は保護をデータ自体に付ける。ただし画面撮影などの共有は完全には防げず、他の統制との併用が前提とされる。",
+  "ai": "機密ラベルで暗号化した資料は、権限のない相手に渡っても読めない。社内文書を生成AIの参照元にする前に、保護が付いたまま扱われるかを確認する観点になる。",
+  "related": [
+   "data-classification",
+   "dlp",
+   "encryption-kms",
+   "conditional-access"
+  ],
+  "sources": [
+   {
+    "t": "Learn about the Azure Rights Management encryption service",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/purview/azure-rights-management-learn-about"
+   }
+  ]
+ },
+ {
+  "id": "ediscovery-legal-hold",
+  "layer": "data",
+  "name": "eDiscovery／リーガルホールド",
+  "full": "Electronic Discovery and Legal Hold（電子証拠開示・訴訟ホールド）",
+  "def": "調査や訴訟の証拠になりうる電子的に保存された情報を特定し、保全・収集して提出できる状態にする手続き。保全のために対象データの削除を止める措置がリーガルホールド。",
+  "how": "例えば Microsoft Purview eDiscovery は、ケース単位で検索、保留（ホールド）、書き出しを管理する。メールや Teams、SharePoint などの対象場所にホールドを置いて削除を防ぎ、検索結果をレビューセットに集めてタグ付けや分析をしてから書き出す。",
+  "diff": "データ保持が全社的なルールで期間を決めるのに対し、リーガルホールドは特定の調査や訴訟のために対象を保全する、事案単位の措置になる。",
+  "ai": "eDiscovery は Copilot やAIアプリのデータの検索と削除にも対応する。AIとのやり取りが証拠開示の対象になる場合に備え、保存と保全の方針を決めておく。",
+  "related": [
+   "data-retention",
+   "log-management",
+   "dspm",
+   "irm"
+  ],
+  "sources": [
+   {
+    "t": "Learn about eDiscovery",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/purview/edisc"
+   }
+  ]
  },
  {
   "id": "siem",
@@ -1428,6 +2650,183 @@
    }
   ],
   "def": "企業や行政機関で、情報システムに問題が起きていないか監視し、起きたときは原因解析や影響範囲の調査を行う体制。インシデントレスポンスは、事故の検知から復旧までを進める対応活動を指す。"
+ },
+ {
+  "id": "ueba",
+  "layer": "ops",
+  "name": "UEBA",
+  "full": "User and Entity Behavior Analytics（ユーザーとエンティティの行動分析）",
+  "def": "ユーザーに加えてホスト、IPアドレス、アプリケーションなどのエンティティについて、通常の行動の基準（ベースライン）を学び、そこからの逸脱を異常として検出する分析手法。",
+  "how": "機械学習で行動プロファイルを作り、現在の活動を本人の過去、ピアグループ（所属グループなどから動的に決まる仲間）、組織全体と比べる。場所、デバイス、頻度の逸脱を踏まえて異常にリスクスコアを付け、調査の優先順位付けに使う。",
+  "diff": "SIEM の上で動く分析機能であり、SIEM そのものではない。例として Microsoft Sentinel は UEBA を内蔵し、その結果を調査やハンティングのクエリに取り込める。",
+  "ai": "アプリケーションもエンティティとして扱うため、生成AIの利用アカウントや連携アプリの普段と違う動きを検知する考え方に応用できる。",
+  "related": [
+   "siem",
+   "soc",
+   "threat-hunting",
+   "iam"
+  ],
+  "sources": [
+   {
+    "t": "Advanced threat detection with User and Entity Behavior Analytics (UEBA) in Microsoft Sentinel",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/azure/sentinel/identify-threats-with-entity-behavior-analytics"
+   }
+  ]
+ },
+ {
+  "id": "asm",
+  "layer": "ops",
+  "name": "ASM／EASM",
+  "full": "Attack Surface Management / External Attack Surface Management（攻撃対象領域管理）",
+  "def": "インターネット側から見える自組織の資産（ドメイン、IPアドレス、ホストなど）を継続的に発見して棚卸しし、ファイアウォールの外側に広がる攻撃対象領域の弱点を把握する活動。",
+  "how": "既知の正当な資産を発見の起点（シード）にし、観測できる接続関係をたどってドメイン、IPアドレスブロック、ホスト、メール連絡先、ASN などを再帰的に探索する。見つけた資産は分類してインベントリ化し、脆弱性やセキュリティ衛生の観点で見る。",
+  "diff": "脆弱性診断が対象を決めて調べるのに対し、ASM は既知の資産から関係をたどり、IT部門が把握していない資産を見つけるところから始める。",
+  "ai": "生成AI向けに急ごしらえした検証用サイトやAPIの公開口など、IT部門が把握していない外部公開資産を洗い出す手段になる。",
+  "related": [
+   "vuln-pentest",
+   "patch-vuln",
+   "shadow-it",
+   "cspm"
+  ],
+  "sources": [
+   {
+    "t": "Microsoft Defender External Attack Surface Management overview（例：Microsoft の EASM）",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/azure/external-attack-surface-management/overview"
+   }
+  ]
+ },
+ {
+  "id": "threat-hunting",
+  "layer": "ops",
+  "name": "脅威ハンティング",
+  "full": "Threat Hunting（脅威ハンティング）",
+  "def": "アナリストが仮説を立ててデータを検索し、その仮説を検証することで、アラートに現れていない未検知の脅威や悪意ある挙動を能動的に探す活動。結果は新しい検知や調査につなげる。",
+  "how": "仮説は不審な挙動、新しい攻撃キャンペーン、検知の抜けなどから立てる。KQL などのクエリでログを調べ、証拠をブックマークに残し、新しい検知ルール、脅威インテリジェンス、インシデントとして反映する。成果は検証済み仮説の数などで測る。",
+  "diff": "SIEM の検知ルールが既知のパターンに反応するのに対し、ハンティングはアラートのない脅威を探す。得た知見は検知ルールとして SIEM に戻す。",
+  "ai": "生成AIや連携アプリの認証、API呼び出しなどのログが集まっていれば、普段と違う利用パターンを仮説にして調べられる。",
+  "related": [
+   "siem",
+   "soc",
+   "mitre-attack",
+   "ueba",
+   "threat-intel"
+  ],
+  "sources": [
+   {
+    "t": "Conduct end-to-end proactive threat hunting in Microsoft Sentinel（例：Microsoft Sentinel）",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/sentinel/hunts"
+   },
+   {
+    "t": "Hunting in the Microsoft Defender portal",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/defender-xdr/hunting-overview"
+   }
+  ]
+ },
+ {
+  "id": "digital-forensics",
+  "layer": "ops",
+  "name": "デジタルフォレンジック",
+  "full": "Digital Forensics（デジタルフォレンジック）",
+  "def": "デジタルデータの回復と調査を通じて、刑事・民事の手続を支える科学。コンピュータ、仮想マシン、記憶媒体のデータを取得して分析する分野をコンピュータフォレンジックと呼ぶ。",
+  "how": "法的要請に耐えるには、証拠の取得、保全、アクセスの各段階で証拠の管理の連鎖（チェーン・オブ・カストディ）を保つ。例ではディスクのスナップショットを不変（WORM）ストレージに保存し、ハッシュ値を別の鍵保管庫に記録し、アクセスを記録する。",
+  "diff": "インシデントレスポンス（CSIRT）が封じ込めと復旧を進めるのに対し、フォレンジックは取得したデータを証拠として保全し分析する側面を担う。",
+  "ai": "生成AI関連のインシデントでプロンプトや出力のログを証拠にするなら、保存期間、改ざん防止、閲覧者の限定を事前に決めておく必要がある。",
+  "related": [
+   "csirt",
+   "log-management",
+   "soc",
+   "immutable-backup"
+  ],
+  "sources": [
+   {
+    "t": "Computer forensics chain of custody in Azure（例：Azure での構成）",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/architecture/example-scenario/forensics/"
+   }
+  ]
+ },
+ {
+  "id": "bcp-dr",
+  "layer": "ops",
+  "name": "BCP／DR",
+  "full": "Business Continuity Plan / Disaster Recovery（事業継続計画・災害復旧）",
+  "def": "BCP は障害や災害が起きても事業を続けるための計画で、リスク評価に基づく。DR はまれで致命的な停止（自然災害、重大な人為ミス、ランサムウェア等）からの復旧を計画する部分。",
+  "how": "業務を重要度で分類し、リスクを特定して高可用性（HA）で扱うものと DR で扱うものに分け、軽減策を設計する。DR では許容できるデータ損失の最大期間（RPO）とダウンタイムの最大継続時間（RTO）を決め、手順書を整備し、訓練で検証する。",
+  "diff": "HA は日常的な一時障害への耐性、DR はまれな致命的停止への対応。バックアップは DR の手段の一つで、復元にはデータ損失と時間がかかる。",
+  "ai": "生成AIサービスを業務に組み込んだ場合、そのサービスが止まったときの手作業への切り戻しと、業務の重要度に応じた RTO・RPO を決めておく。",
+  "related": [
+   "immutable-backup",
+   "csirt",
+   "shared-responsibility",
+   "risk-assessment"
+  ],
+  "sources": [
+   {
+    "t": "ビジネス継続性、高可用性、ディザスター リカバリーとは（例：Azure の信頼性ガイダンス）",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/ja-jp/azure/reliability/concept-business-continuity-high-availability-disaster-recovery"
+   }
+  ]
+ },
+ {
+  "id": "mitre-attack",
+  "layer": "ops",
+  "name": "MITRE ATT&CK",
+  "full": "MITRE ATT&CK（攻撃者の戦術・技術の知識ベース）",
+  "def": "攻撃者が一般的に使う戦術（tactics）と技術（techniques）をまとめた、誰でも参照できる公開のナレッジベース。実際の観測に基づいて作成・維持され、脅威モデルの作成などに使われる。",
+  "how": "検知ルール、ハンティングクエリ、ブックマーク、インシデントに技術を対応づけ、どの技術に検知があるかを行列で見える化して検知の抜けを見つける。例では Microsoft Sentinel が ATT&CK のバージョン 18 に合わせ、有効な検知と未設定の検知を重ねて表示する。",
+  "diff": "CIS Controls や NIST CSF が防御側の対策や成果を整理するのに対し、ATT&CK は攻撃者の行動の側から整理し、脅威モデルや検知の点検に使う。",
+  "ai": "生成AIやAIエージェントを狙う攻撃でも、認証情報の窃取や権限昇格などの既存の技術に当てはめれば、検知の抜けを点検できる。",
+  "related": [
+   "threat-hunting",
+   "siem",
+   "threat-intel",
+   "vuln-pentest"
+  ],
+  "sources": [
+   {
+    "t": "View MITRE ATT&CK framework coverage in Microsoft Sentinel（例：Microsoft Sentinel）",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/sentinel/mitre-coverage"
+   },
+   {
+    "t": "Hunting in the Microsoft Defender portal",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/defender-xdr/hunting-overview"
+   }
+  ]
+ },
+ {
+  "id": "security-awareness",
+  "layer": "ops",
+  "name": "セキュリティ教育・標的型メール訓練",
+  "full": "Security Awareness Training / Phishing Simulation（教育と疑似メール訓練）",
+  "def": "従業員に攻撃の手口と正しい対処を教える教育と、疑似的な攻撃メールを送って、不審なメールを受信したときに適切に対処できるかを確かめる訓練を合わせた取り組みで、標的型攻撃メール訓練が代表例。",
+  "how": "想定する攻撃、確認する内容、対象者を決めてから実施する。指標は開封率のほか、適切な対処の達成率、報告が担当部門に届くまでの時間、CSIRT の対応フローの問題の有無。受信者は送信元でなく内部の担当部門へ報告する。操作に応じて研修を割り当てる製品もある。",
+  "diff": "脆弱性診断が機器やシステムの欠陥を調べるのに対し、人の対処と報告の経路が有事に機能するかを確かめる。実在組織を装う訓練は避ける。",
+  "ai": "生成AIの利用ルール（承認済みツール、入力してよい情報）を教育内容に含め、誤用を見つけたときの報告経路も訓練で確かめる。",
+  "related": [
+   "csirt",
+   "vuln-pentest",
+   "shadow-it",
+   "dlp"
+  ],
+  "sources": [
+   {
+    "t": "組織における標的型攻撃メール訓練は実施目的を明確に",
+    "pub": "IPA",
+    "url": "https://www.ipa.go.jp/security/anshin/attention/2017/mgdayori20170731.html"
+   },
+   {
+    "t": "Get started using Attack simulation training（例：Microsoft Defender for Office 365）",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/attack-simulation-training-get-started"
+   }
+  ]
  },
  {
   "id": "zero-trust",
@@ -1654,5 +3053,217 @@
    }
   ],
   "def": "経営者を対象に、経営者が認識すべき3原則と、責任者（CISO等）に指示すべき重要10項目をまとめた経済産業省・IPA のガイドライン。Ver 3.0 は令和5年3月24日に公表された。"
+ },
+ {
+  "id": "risk-assessment",
+  "layer": "framework",
+  "name": "リスクアセスメント・リスク対応",
+  "full": "Risk Assessment / Risk Treatment（リスクの評価と対応）",
+  "def": "守るべき情報資産の脅威、脆弱性、影響からリスクの大きさを見積もり、リスク基準と比べて受容できるかを判断する工程と、その結果に応じた回避・低減・移転・受容の選択。",
+  "how": "手法は、既存基準を使うベースライン、経験に頼る非形式的、資産ごとに資産価値・脅威・脆弱性を見る詳細リスク分析、およびその組合せ。詳細分析は資産の洗い出し、リスク値の算定、対策の決定の順に進む。受容など例外は経営陣の承認を得る。",
+  "diff": "脆弱性診断は技術的な欠陥を見つける手段で、リスクアセスメントはその結果を資産の重要度や脅威と合わせ、対応の優先順位を決める工程。",
+  "ai": "生成AIでは、入力データの機密度や連携先の範囲を情報資産として洗い出す。金融庁のガイドラインは新規商品・サービスの提供時にもリスク評価を求める。",
+  "related": [
+   "isms",
+   "nist-csf",
+   "security-policy",
+   "third-party-risk",
+   "data-classification"
+  ],
+  "sources": [
+   {
+    "t": "リスク分析シート（中小企業の情報セキュリティ対策ガイドライン 付録）",
+    "pub": "IPA",
+    "url": "https://www.ipa.go.jp/security/sme/f55m8k000000587z-att/outline_guidance_risk.pdf"
+   },
+   {
+    "t": "政府機関等の対策基準策定のためのガイドライン（令和３年度版）",
+    "pub": "内閣官房 内閣サイバーセキュリティセンター（IPA掲載）",
+    "url": "https://www.ipa.go.jp/security/vuln/scap/ug65p9000001994c-att/guider3_2.pdf"
+   },
+   {
+    "t": "金融分野におけるサイバーセキュリティに関するガイドライン",
+    "pub": "金融庁",
+    "url": "https://www.fsa.go.jp/news/r6/sonota/20241004/18.pdf"
+   }
+  ]
+ },
+ {
+  "id": "security-policy",
+  "layer": "framework",
+  "name": "情報セキュリティポリシー",
+  "full": "Information Security Policy（基本方針・対策基準・実施手順）",
+  "def": "組織の方針と守り方を文書にした規程の体系で、経営層が策定に関わる。基本方針、対策基準（守るべき基準）、実施手順（個別の業務やシステムでの具体的な手順）の関係で整理される。",
+  "how": "基本方針に基づき、リスク評価の結果を踏まえて対策基準を定め、それを個別の業務・システムで実行するための実施手順を整備する。責任者が委員会の審議を経て決め、環境の変化に応じて見直す。金融庁のガイドラインは規程類の見直しを少なくとも年1回求める。",
+  "diff": "国の統一基準が機関等の守る共通の遵守事項であるのに対し、対策基準は自組織の特性に合わせて具体策を定める文書。同等以上の水準なら別の対策でもよい。",
+  "ai": "生成AIの利用ルール（利用可能なツール、入力してよい情報、承認手続）は、新しい文書を別に作るより、既存の対策基準と実施手順への追記で整合を保てる。",
+  "related": [
+   "isms",
+   "risk-assessment",
+   "cyber-mgmt-guideline",
+   "data-classification",
+   "fsa-cyber-guideline"
+  ],
+  "sources": [
+   {
+    "t": "政府機関等の対策基準策定のためのガイドライン（令和３年度版）",
+    "pub": "内閣官房 内閣サイバーセキュリティセンター（IPA掲載）",
+    "url": "https://www.ipa.go.jp/security/vuln/scap/ug65p9000001994c-att/guider3_2.pdf"
+   },
+   {
+    "t": "金融分野におけるサイバーセキュリティに関するガイドライン",
+    "pub": "金融庁",
+    "url": "https://www.fsa.go.jp/news/r6/sonota/20241004/18.pdf"
+   },
+   {
+    "t": "情報セキュリティポリシーの策定｜国民のためのサイバーセキュリティサイト",
+    "pub": "総務省",
+    "url": "https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/security/business/executive/02/"
+   }
+  ]
+ },
+ {
+  "id": "third-party-risk",
+  "layer": "framework",
+  "name": "第三者リスク管理（委託先・サプライチェーン）",
+  "full": "Third-Party Risk Management / Cyber Supply Chain Risk Management（C-SCRM）",
+  "def": "委託先、クラウド事業者、製品・サービスの提供元など、サードパーティやサプライチェーンに由来するサイバーセキュリティリスクを、選定から契約終了まで一貫して管理する取り組み。",
+  "how": "サードパーティを台帳で管理し（提供サービス、システムへのアクセスレベル、扱うデータの種類と場所）、重要度に応じてリスクを評価する。取引前にデューデリジェンスを行い、契約に責任分界、監査権限、再委託、インシデント報告、データの扱いを明記し、継続的に監視する。",
+  "diff": "責任共有モデルがクラウド事業者と利用者の責任の分担を示すのに対し、第三者リスク管理は取引先の選定、契約、監視、終了までの管理の仕組み全体を指す。",
+  "ai": "AIモデルやSaaSの調達でも、データの所在・保管・廃棄の取決め、再委託の手続、第三者保証報告書（SOC 2 等）の確認を評価項目にできる。",
+  "related": [
+   "shared-responsibility",
+   "soc2",
+   "ismap",
+   "appi-safety",
+   "cyber-mgmt-guideline"
+  ],
+  "sources": [
+   {
+    "t": "金融分野におけるサイバーセキュリティに関するガイドライン（2.6 サードパーティリスク管理）",
+    "pub": "金融庁",
+    "url": "https://www.fsa.go.jp/news/r6/sonota/20241004/18.pdf"
+   },
+   {
+    "t": "Cybersecurity Supply Chain Risk Management Practices for Systems and Organizations",
+    "pub": "NIST",
+    "url": "https://www.nist.gov/publications/cybersecurity-supply-chain-risk-management-practices-systems-and-organizations"
+   },
+   {
+    "t": "個人情報の保護に関する法律についてのガイドライン（通則編）",
+    "pub": "個人情報保護委員会",
+    "url": "https://www.ppc.go.jp/personalinfo/legal/guidelines_tsusoku/"
+   }
+  ]
+ },
+ {
+  "id": "appi-safety",
+  "layer": "framework",
+  "name": "個人情報保護法の安全管理措置",
+  "full": "個人情報の保護に関する法律に基づく安全管理措置（個人情報保護委員会ガイドライン）",
+  "def": "個人情報取扱事業者が、個人データの漏えい等を防ぐために講じる必要かつ適切な措置。内容は、本人の権利利益の侵害の大きさや事業の規模・性質、取扱状況などに応じて決める。",
+  "how": "ガイドラインの別添は、基本方針の策定、取扱いの規律の整備、組織的・人的・物理的・技術的の4つの措置、外的環境の把握を示す。手法例は全てを講じる必要はない。委託先の選定、契約、取扱状況の把握による監督も求められる。",
+  "diff": "ISMS が事業者の任意の認証であるのに対し、こちらは個人データを扱う事業者に法が求める措置。漏えい等が起きたときの委員会への報告も定められている。",
+  "ai": "個人データを外部のAIサービスに扱わせる場合は、委託先の監督と、外国で扱うときの外的環境の把握（その国の制度の確認）が論点になる。",
+  "related": [
+   "data-classification",
+   "third-party-risk",
+   "encryption-kms",
+   "dlp",
+   "isms"
+  ],
+  "sources": [
+   {
+    "t": "個人情報の保護に関する法律についてのガイドライン（通則編）",
+    "pub": "個人情報保護委員会",
+    "url": "https://www.ppc.go.jp/personalinfo/legal/guidelines_tsusoku/"
+   }
+  ]
+ },
+ {
+  "id": "fsa-cyber-guideline",
+  "layer": "framework",
+  "name": "金融分野のサイバーセキュリティガイドライン",
+  "full": "金融分野におけるサイバーセキュリティに関するガイドライン（金融庁、令和6年10月4日）",
+  "def": "金融庁が、金融機関等のサイバーセキュリティ管理態勢について監督上の着眼点を示した文書。ガバナンス、特定、防御、検知、対応・復旧、サードパーティリスク管理の順に構成され、令和6年10月4日から適用された。",
+  "how": "各項目を、サイバーハイジーンなど基礎の「基本的な対応事項」と、大手等が参照すべき先進的な「対応が望ましい事項」に分ける。いずれも一律の対応ではなく、自組織のリスクを特定・評価して見合った措置を取るリスクベース・アプローチが前提。",
+  "diff": "サイバーセキュリティ経営ガイドラインが経営者向けの3原則と10項目を示すのに対し、こちらは金融機関等を対象に、金融庁が検査・モニタリングで用いる着眼点を具体化する。",
+  "ai": "金融機関以外でも、リスク評価を年1回行うこと、新商品・サービスで評価すること、サードパーティ管理の水準を測る参照例になる。",
+  "related": [
+   "cyber-mgmt-guideline",
+   "nist-csf",
+   "third-party-risk",
+   "risk-assessment",
+   "security-policy"
+  ],
+  "sources": [
+   {
+    "t": "金融分野におけるサイバーセキュリティに関するガイドライン",
+    "pub": "金融庁",
+    "url": "https://www.fsa.go.jp/news/r6/sonota/20241004/18.pdf"
+   },
+   {
+    "t": "「金融分野におけるサイバーセキュリティに関するガイドライン」等の公表（パブリックコメント結果）",
+    "pub": "金融庁",
+    "url": "https://www.fsa.go.jp/news/r6/sonota/20241004/20241004.html"
+   }
+  ]
+ },
+ {
+  "id": "nist-sp800-53",
+  "layer": "framework",
+  "name": "NIST SP 800-53",
+  "full": "Security and Privacy Controls for Information Systems and Organizations（NIST SP 800-53 Rev.5）",
+  "def": "米国 NIST が公表する、情報システムと組織向けのセキュリティ・プライバシー管理策のカタログ。Rev.5 でセキュリティとプライバシーの管理策が一つの統合カタログになった。",
+  "how": "Rev.5 は管理策の記述を、満たす主体（システムか組織か）に依らない成果ベースに改め、管理策の選定プロセスを本体から分離した。サプライチェーンリスク管理（SCRM）の管理策ファミリーが新設され、カタログ全体にもその観点が組み込まれた。",
+  "diff": "NIST CSF が組織のサイバーリスク管理の枠組みを示すのに対し、SP 800-53 は個々の管理策を収めたカタログ。",
+  "ai": "米国政府系の顧客やクラウド・AIベンダーの説明がこの管理策名で示されたとき、自社の管理策との対応づけに使える。SCRM が独立した点は調達管理の参考になる。",
+  "related": [
+   "nist-csf",
+   "cis-controls",
+   "third-party-risk",
+   "isms"
+  ],
+  "sources": [
+   {
+    "t": "Security and Privacy Controls for Information Systems and Organizations: NIST Publishes SP 800-53, Revision 5",
+    "pub": "NIST",
+    "url": "https://www.nist.gov/news-events/news/2020/09/security-and-privacy-controls-information-systems-and-organizations-nist"
+   }
+  ]
+ },
+ {
+  "id": "iso-cloud-privacy",
+  "layer": "framework",
+  "name": "ISO/IEC 27017・27018・27701",
+  "full": "クラウドのセキュリティ管理策（27017）、クラウド上のPII保護（27018）、プライバシー情報マネジメント（27701）",
+  "def": "ISO/IEC 27001・27002 を土台に、クラウド固有の管理策の指針（27017）、パブリッククラウドの PII 保護（27018）、プライバシー情報マネジメントシステム（27701）を加える規格群。",
+  "how": "27017 は 27002 の37管理策にクラウド向けの指針を足し、責任分担、契約終了時の資産の返却・削除、顧客環境の分離などの管理策を加える。27018 は PII の処理者であるクラウド事業者向け。27701 は 27001 の拡張で、単独では認証を取れない。",
+  "diff": "ISMS（27001）が組織の情報セキュリティ全般を対象にするのに対し、これらはクラウドと個人情報の取扱いに特化した拡張。27701 の認証は GDPR 適合の証明とはみなせない。",
+  "ai": "AIやSaaSの事業者選定で、認証の有無と対象サービスの範囲を確認する材料になる。認証は自社の利用構成の適合を保証せず、自社側の評価は別に必要。",
+  "related": [
+   "isms",
+   "shared-responsibility",
+   "third-party-risk",
+   "appi-safety",
+   "soc2"
+  ],
+  "sources": [
+   {
+    "t": "ISO/IEC 27017:2015（例：Azure の適合ページ）",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/compliance/offerings/offering-iso-27017"
+   },
+   {
+    "t": "ISO/IEC 27018:2019（例：Azure の適合ページ）",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/compliance/offerings/offering-iso-27018"
+   },
+   {
+    "t": "ISO/IEC 27701:2019（例：Azure の適合ページ）",
+    "pub": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/compliance/offerings/offering-iso-27701"
+   }
+  ]
  }
 ]
