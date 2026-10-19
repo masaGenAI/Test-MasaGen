@@ -1973,7 +1973,7 @@ const SKY  = "9BC8EE";
 
    書籍はどこに属するかを srcPath で示す:
      flier の本 : src 省略（= ['flier']）
-     Kindle の本: { srcPaths:[['kindle','chrome']] } または [['kindle','self']]（KINDLE_BOOKS に入れる）
+     Kindle の本: { srcPaths:[['kindle','chrome']] } / [['kindle','self']] / [['kindle','app']]（KINDLE_BOOKS に入れる。app はアプリ専用の本）
      YouTube の本: { srcPaths:[['yt','ch_xxx','pl_yyy'], ...] }  ※複数リスト掲載あり
    書架はそのノード以下をすべて含むので、チャンネルを開けば配下のシリーズも入る。
 ============================================================ */
@@ -1982,6 +1982,7 @@ const SOURCES = [
   { id:'kindle', title:'Kindle',  sub:'自分で読んだ本の要約', icon:'folder', always:true, children:[
       { id:'chrome', title:'Claude in Chrome', sub:'Kindle の画面を Claude に読ませて作った要約', always:true },
       { id:'self',   title:'Self summary',     sub:'自分で書いた要約', always:true },
+      { id:'app',    title:'Kindle アプリ',     sub:'Kindle for Web で開けず、アプリでしか読めない本の要約（準備中）', always:true },
   ] },
   { id:'yt', title:'YouTube', sub:'チャンネル別の学びの記録', icon:'folder', children:[
       { id:"sam", title:"サムの本解説", sub:"書籍を1本1冊で解説するチャンネル", icon:"folder", children:[
@@ -5978,6 +5979,7 @@ Object.assign(THEME_NOTE, {"yt/gariben":{"AI・テクノロジー":{"c":"=COUNTI
    Kindle で読んだ本の要約。srcPaths の2段目で枝を分ける:
      ['kindle','chrome'] … Kindle の画面を Claude in Chrome に読ませて作った要約
      ['kindle','self']   … 自分で書いた要約
+     ['kindle','app']    … Kindle アプリでしか読めない本の要約（枠のみ。要約は未収録）
    本文は要約の作り手が本から読み取った内容で、本の原文ではない。
    ============================================================ */
 const KINDLE_BOOKS = [
