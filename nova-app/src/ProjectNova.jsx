@@ -221985,7 +221985,7 @@ const novaStats = () => {
     books: cnt('"oneLiner":'), yt: cnt('{"id":"yt_'), note: cnt('{"id":"note_'),
     mega: sum(BOOTCAMP_QUEST.mega), cons: sum(BOOTCAMP_QUEST.cons),
     tabs: MegaTechHubModule.TAB_COUNT, ling: LinguisticsHubModule.FIELD_STATS,
-    la: { people: (LIBERAL_ARTS_HTML.match(/"born":\d+/g) || []).length, inst: (LIBERAL_ARTS_HTML.match(/"family":"/g) || []).length, domains: (LIBERAL_ARTS_HTML.match(/"ready":(true|false)/g) || []).length },
+    la: { people: (LIBERAL_ARTS_HTML.match(/"born":\d+/g) || []).length, inst: (LIBERAL_ARTS_HTML.match(/"people":\[/g) || []).length, trivia: (LIBERAL_ARTS_HTML.match(/"f":"/g) || []).length, domains: (LIBERAL_ARTS_HTML.match(/"ready":(true|false)/g) || []).length },
   };
   return __novaStats;
 };
@@ -222069,8 +222069,8 @@ const NOVA_STATIONS = [
     Icon: IconLiberal,
     ja: "Liberal Arts",
     en: "Liberal Arts",
-    get tagJa() { const l = novaStats().la; return l.people ? `${l.domains}領域・音楽は人物${l.people}人・楽器${l.inst}件（海外と日本）` : "準備中"; },
-    get tagEn() { const l = novaStats().la; return l.people ? `${l.domains} fields · music: ${l.people} people, ${l.inst} instruments (overseas & Japan)` : "Coming soon"; },
+    get tagJa() { const l = novaStats().la; return l.people ? `${l.domains}領域・人物${l.people}人・項目${l.inst}件・うんちく${l.trivia}件（海外と日本）` : "準備中"; },
+    get tagEn() { const l = novaStats().la; return l.people ? `${l.domains} fields · ${l.people} people, ${l.inst} items, ${l.trivia} trivia (overseas & Japan)` : "Coming soon"; },
   },
   {
     id: "anythingmemo",
