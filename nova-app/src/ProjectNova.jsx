@@ -222069,8 +222069,8 @@ const NOVA_STATIONS = [
     Icon: IconLiberal,
     ja: "Liberal Arts",
     en: "Liberal Arts",
-    get tagJa() { const l = novaStats().la; return l.people ? `${l.domains}領域・人物${l.people}人・項目${l.inst}件・うんちく${l.trivia}件（海外と日本）` : "準備中"; },
-    get tagEn() { const l = novaStats().la; return l.people ? `${l.domains} fields · ${l.people} people, ${l.inst} items, ${l.trivia} trivia (overseas & Japan)` : "Coming soon"; },
+    get tagJa() { const l = novaStats().la; return l.people ? `${l.domains}領域・うんちく${l.trivia}問` : "準備中"; },
+    get tagEn() { const l = novaStats().la; return l.people ? `${l.domains} fields · ${l.trivia} trivia` : "Coming soon"; },
   },
   {
     id: "anythingmemo",
