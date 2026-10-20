@@ -126,6 +126,8 @@
   .trv{margin:0;padding:0;list-style:none;font-size:13px;line-height:1.7}
   .trv li{margin:6px 0;padding-left:2.6em;position:relative}
   .trv li::before{content:"へぇ";position:absolute;left:0;top:3px;padding:0 6px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:10px;font-weight:700;line-height:1.7}
+  @media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr);}}
+  .grid>div{min-width:0}
   .trvtag{display:inline-block;margin:0 0 6px;padding:2px 10px;border-radius:999px;background:var(--accent);color:#fff;font-size:11px;font-weight:700}
   .note{margin:10px 0 0;padding:8px 12px;border-radius:10px;background:var(--paper);border:1px solid var(--line);font-size:12px;color:var(--muted)}
 </style>
