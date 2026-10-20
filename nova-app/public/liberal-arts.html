@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>リベラルアーツ</title>
+<style>
+  :root{
+    --bg:#F7F8FA; --paper:#FFFFFF; --ink:#16181D; --muted:#667085; --line:#E1E5EC; --soft:#F0F3F8;
+    --accent:#8A5A2B; --accent-soft:#F6EBDD; --navy:#1E3A6E;
+    --c-baroque:#B7791F; --c-classical:#2F7D6D; --c-romantic:#B83280; --c-national:#2B6CB0; --c-late:#6B46C1; --c-impress:#3182CE; --c-modern:#C05621;
+    --k-person:#2B6CB0; --k-work:#B83280; --k-term:#2F7D6D; --k-place:#B7791F; --k-event:#6B46C1;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#12151B; --paper:#1B2029; --ink:#E7EAF1; --muted:#98A2B3; --line:#2B313D; --soft:#232936;
+      --accent:#E0B27A; --accent-soft:#2F2619; --navy:#C6D6EC;
+    }
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Yu Gothic",sans-serif;line-height:1.7;-webkit-text-size-adjust:100%;}
+  button{font:inherit;color:inherit;cursor:pointer;}
+  .wrap{max-width:1180px;margin:0 auto;padding:18px 16px 60px;}
+  .eyebrow{font-size:11px;letter-spacing:.14em;color:var(--accent);font-weight:700;}
+  h1{margin:2px 0 4px;font-size:26px;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;}
+  .lead{margin:0 0 14px;color:var(--muted);font-size:13px;}
+  .domains{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 16px;}
+  .dchip{border:1px solid var(--line);background:var(--paper);border-radius:100px;padding:5px 13px;font-size:13px;font-weight:600;}
+  .dchip.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .dchip.soon{color:var(--muted);font-weight:500;}
+  .dchip small{font-size:10px;margin-left:5px;opacity:.7;}
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:14px;}
+  .tab{border:0;background:none;padding:8px 14px;font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;}
+  .tab.on{color:var(--accent);border-bottom-color:var(--accent);}
+  .grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;align-items:start;}
+  @media (max-width:900px){.grid{grid-template-columns:1fr;}}
+  .panel{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 16px;}
+  .panel h2{margin:0 0 8px;font-size:14px;}
+  .hint{font-size:12px;color:var(--muted);}
+  /* 年表 */
+  .tl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--paper);}
+  .tl-wrap svg{display:block;}
+  .bar{cursor:pointer;}
+  .bar rect{transition:opacity .12s;}
+  .bar:hover rect.life,.bar:focus rect.life{opacity:.8;}
+  .bar.sel rect.life{stroke:var(--ink);stroke-width:2;}
+  .bar text{font-size:11.5px;fill:var(--ink);paint-order:stroke;stroke:var(--paper);stroke-width:3px;stroke-linejoin:round;pointer-events:none;}
+  .bar:focus{outline:none;}
+  .axis text{font-size:10px;fill:var(--muted);}
+  .axis line{stroke:var(--line);}
+  .band-t{font-size:11px;font-weight:700;}
+  /* 時代別の一覧 */
+  .era-h{display:flex;align-items:baseline;gap:8px;margin:14px 0 6px;font-size:13px;font-weight:800;}
+  .era-h i{display:inline-block;width:10px;height:10px;border-radius:3px;}
+  .era-h span{font-size:11px;font-weight:500;color:var(--muted);}
+  .plist{display:flex;flex-wrap:wrap;gap:6px;}
+  .pbtn{border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:5px 10px;font-size:13px;display:inline-flex;gap:7px;align-items:baseline;}
+  .pbtn b{font-size:11px;color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums;}
+  .pbtn:hover{border-color:var(--accent);}
+  .pbtn.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .pbtn.on b{color:#fff;opacity:.85;}
+  .pbtn.seen::after{content:"✓";font-size:11px;color:var(--k-term);margin-left:2px;}
+  .pbtn.on.seen::after{color:#fff;}
+  /* カード */
+  .card h3{margin:0;font-size:22px;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;}
+  .card .sub{font-size:12px;color:var(--muted);margin:2px 0 8px;}
+  .tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 10px;border-radius:100px;color:#fff;margin-right:6px;}
+  .tagline{font-size:14px;font-weight:700;margin:8px 0 10px;}
+  .sec{font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--accent);margin:14px 0 4px;}
+  .works{list-style:none;margin:0;padding:0;display:grid;gap:4px;}
+  .works li{font-size:13px;border-left:3px solid var(--line);padding:2px 0 2px 10px;}
+  .works b{font-weight:700;}
+  .works span{color:var(--muted);}
+  .anec{margin:0;padding-left:18px;font-size:13px;}
+  .anec li{margin:3px 0;}
+  .rel{display:flex;flex-wrap:wrap;gap:6px;}
+  .rchip{border:1px solid var(--line);background:var(--paper);border-radius:100px;padding:3px 11px;font-size:12.5px;display:inline-flex;align-items:center;gap:6px;}
+  .rchip::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--kc,var(--muted));}
+  .rchip:hover,.rchip.on{border-color:var(--kc,var(--accent));background:var(--soft);}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:var(--muted);margin:6px 0 0;}
+  .legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;}
+  .word{margin-top:10px;border:1px solid var(--line);border-left:4px solid var(--kc,var(--accent));border-radius:10px;padding:10px 12px;background:var(--soft);}
+  .word h4{margin:0 0 2px;font-size:14px;}
+  .word p{margin:3px 0;font-size:12.5px;}
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+  .btn{border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:7px 14px;font-size:13px;font-weight:600;}
+  .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .empty{color:var(--muted);font-size:13px;padding:30px 10px;text-align:center;}
+  /* クイズ */
+  .qbox{max-width:760px;}
+  .qmeta{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);margin-bottom:8px;flex-wrap:wrap;gap:8px;}
+  .qq{font-size:15px;font-weight:600;line-height:1.8;margin:6px 0 12px;}
+  .opts{display:grid;gap:8px;}
+  .opt{text-align:left;border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:10px 14px;font-size:14px;}
+  .opt:hover:not(:disabled){border-color:var(--accent);}
+  .opt.ok{border-color:#2F7D6D;background:rgba(47,125,109,.12);}
+  .opt.ng{border-color:#C0392B;background:rgba(192,57,43,.1);}
+  .opt:disabled{cursor:default;}
+  .exp{margin-top:12px;padding:10px 14px;border-radius:10px;background:var(--soft);font-size:13px;}
+  .src{font-size:11px;color:var(--muted);margin-top:18px;}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:100px;padding:2px;background:var(--paper);}
+  .seg button{border:0;background:none;padding:3px 12px;font-size:12px;border-radius:100px;color:var(--muted);}
+  .seg button.on{background:var(--accent);color:#fff;}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+/*__LA_DATA__*/
+</script>
+<script>
+(function(){
+'use strict';
+var D = window.LA_DATA;
+if(!D){ document.getElementById('app').innerHTML = '<p style="padding:40px;text-align:center;color:#667085">リベラルアーツは準備中です。</p>'; return; }
+var ERA_ORDER = ['バロック','古典派','ロマン派','国民楽派','後期ロマン派','印象派','近現代'];
+var ERA_COLOR = {'バロック':'var(--c-baroque)','古典派':'var(--c-classical)','ロマン派':'var(--c-romantic)','国民楽派':'var(--c-national)','後期ロマン派':'var(--c-late)','印象派':'var(--c-impress)','近現代':'var(--c-modern)'};
+var KIND_LABEL = {person:'人物',work:'作品',term:'用語',place:'地名',event:'出来事'};
+var KIND_COLOR = {person:'var(--k-person)',work:'var(--k-work)',term:'var(--k-term)',place:'var(--k-place)',event:'var(--k-event)'};
+var ST = load();
+var S = {domain:'music', tab:'explore', sel:null, word:null, q:null, qmode:'all', qOnly:null};
+
+function load(){ try{ var v = JSON.parse(localStorage.getItem('lah:v1')||'null'); if(v && v.seen) return v; }catch(e){} return {seen:{}, quiz:{asked:0,right:0}}; }
+function save(){ try{ localStorage.setItem('lah:v1', JSON.stringify(ST)); }catch(e){} }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function el(id){ return document.getElementById(id); }
+
+/* ---------- データの整形 ---------- */
+var M = D.music;
+var byName = {}, byId = {}, gloss = {}, inv = {};
+M.people.forEach(function(p){ byName[p.name]=p; byId[p.id]=p; });
+M.glossary.forEach(function(g){ gloss[g.t]=g; });
+M.people.forEach(function(p){ (p.related||[]).forEach(function(w){ (inv[w]=inv[w]||[]).push(p.id); }); });
+var people = M.people.slice().sort(function(a,b){ return a.born-b.born || a.died-b.died; });
+
+/* ---------- 画面の骨組み ---------- */
+function render(){
+  var d = D.domains.filter(function(x){return x.id===S.domain;})[0];
+  var h = '<div class="eyebrow">LIBERAL ARTS</div><h1>リベラルアーツ</h1>'+
+    '<p class="lead">領域を選ぶと、年代・時代ごとに人物が並びます。人物を選ぶと、代表作や逸話と、つながる言葉が出ます。言葉を押すと意味と関連する人物へ進めます。</p>';
+  h += '<div class="domains" role="tablist">'+D.domains.map(function(x){
+    return '<button class="dchip'+(x.id===S.domain?' on':'')+(x.ready?'':' soon')+'" data-d="'+x.id+'">'+esc(x.ja)+(x.ready?'':'<small>準備中</small>')+'</button>';
+  }).join('')+'</div>';
+  h += '<div class="tabs"><button class="tab'+(S.tab==='explore'?' on':'')+'" data-t="explore">年表と人物</button><button class="tab'+(S.tab==='quiz'?' on':'')+'" data-t="quiz">クイズ</button></div>';
+  h += '<div id="main"></div>';
+  h += '<p class="src">※ 試作版。人物・作品・逸話は音楽史の概説に広く載っている内容にとどめていますが、出典の照合はこれからです。真偽が定まらない逸話は「伝わる」と書いています。</p>';
+  el('app').innerHTML = h;
+  el('app').querySelectorAll('[data-d]').forEach(function(b){ b.onclick=function(){ S.domain=b.dataset.d; S.sel=null; S.word=null; S.q=null; render(); }; });
+  el('app').querySelectorAll('[data-t]').forEach(function(b){ b.onclick=function(){ S.tab=b.dataset.t; S.q=null; render(); }; });
+  if(S.tab==='explore') renderExplore(d); else renderQuiz(d);
+}
+
+/* ---------- 年表と人物 ---------- */
+function renderExplore(d){
+  var m = el('main');
+  if(!d.ready){ m.innerHTML = '<div class="panel empty"><b>'+esc(d.ja)+'</b> は準備中です。<br>「クイズ」タブでは、この領域のサンプル問題を試せます。</div>'; return; }
+  m.innerHTML = '<div class="grid"><div><div class="panel"><h2>年表（生没年の棒をタップ）</h2><div class="tl-wrap" id="tl"></div><div class="hint" style="margin-top:6px">色は時代区分。棒が重なっているのは、同じ時代に生きていた人です。</div></div>'+
+    '<div class="panel" style="margin-top:12px"><h2>時代ごとの一覧</h2><div id="list"></div></div></div><div><div class="panel card" id="card"></div></div></div>';
+  drawTimeline(); drawList(); drawCard();
+}
+function eraRange(era){
+  var xs = people.filter(function(p){return p.era===era;}).map(function(p){return p.born;});
+  return xs.length ? Math.min.apply(null,xs)+'〜'+Math.max.apply(null,xs)+'年生まれ' : '';
+}
+function drawList(){
+  var h='';
+  ERA_ORDER.forEach(function(e){
+    var ps = people.filter(function(p){return p.era===e;}); if(!ps.length) return;
+    h += '<div class="era-h"><i style="background:'+ERA_COLOR[e]+'"></i>'+esc(e)+'<span>'+eraRange(e)+'</span></div><div class="plist">'+ps.map(function(p){
+      return '<button class="pbtn'+(S.sel===p.id?' on':'')+(ST.seen[p.id]?' seen':'')+'" data-p="'+p.id+'"><b>'+p.born+'</b>'+esc(p.name)+'</button>';
+    }).join('')+'</div>';
+  });
+  el('list').innerHTML = h;
+  el('list').querySelectorAll('[data-p]').forEach(function(b){ b.onclick=function(){ pick(b.dataset.p, true); }; });
+}
+function drawTimeline(){
+  var y0 = 1670, y1 = 1960, W = 1040, L = 6, rowH = 22, top = 34, n = people.length, H = top + n*rowH + 14;
+  var X = function(y){ return L + (y-y0)/(y1-y0)*(W-L-8); };
+  var s = '<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="作曲家の生没年の年表">';
+  var bands = [['バロック',y0,1750],['古典派',1750,1820],['ロマン派',1820,1900],['近現代',1900,y1]];
+  bands.forEach(function(b,i){
+    s += '<rect x="'+X(b[1]).toFixed(1)+'" y="0" width="'+(X(b[2])-X(b[1])).toFixed(1)+'" height="'+H+'" fill="'+ERA_COLOR[b[0]]+'" opacity="'+(i%2?0.07:0.12)+'"/>'+
+         '<text class="band-t" x="'+(X(b[1])+6).toFixed(1)+'" y="14" fill="'+ERA_COLOR[b[0]]+'">'+b[0]+'</text>';
+  });
+  s += '<g class="axis">';
+  for(var y=1700;y<=1950;y+=50){ s += '<line x1="'+X(y).toFixed(1)+'" y1="20" x2="'+X(y).toFixed(1)+'" y2="'+H+'"/><text x="'+(X(y)+3).toFixed(1)+'" y="30">'+y+'</text>'; }
+  s += '</g>';
+  people.forEach(function(p,i){
+    var yy = top + i*rowH, x0 = X(p.born), x1 = X(p.died), sel = S.sel===p.id;
+    var labelRight = x1 + 6, anchor = 'start';
+    if(labelRight + 120 > W){ labelRight = x0 - 6; anchor = 'end'; }
+    s += '<g class="bar'+(sel?' sel':'')+'" data-p="'+p.id+'" tabindex="0" role="button" aria-label="'+esc(p.name)+' '+p.born+'〜'+p.died+'">'+
+      '<rect x="0" y="'+(yy-2)+'" width="'+W+'" height="'+rowH+'" fill="transparent"/>'+
+      '<rect class="life" x="'+x0.toFixed(1)+'" y="'+(yy+3)+'" width="'+Math.max(4,x1-x0).toFixed(1)+'" height="12" rx="6" fill="'+ERA_COLOR[p.era]+'"/>'+
+      '<text x="'+labelRight.toFixed(1)+'" y="'+(yy+13)+'" text-anchor="'+anchor+'">'+esc(p.name)+' <tspan fill="var(--muted)" font-size="10">'+p.born+'–'+p.died+'</tspan></text></g>';
+  });
+  s += '</svg>';
+  el('tl').innerHTML = s;
+  el('tl').querySelectorAll('.bar').forEach(function(g){
+    g.onclick=function(){ pick(g.dataset.p, true); };
+    g.onkeydown=function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); pick(g.dataset.p, true); } };
+  });
+}
+function pick(id, scroll){
+  S.sel = id; S.word = null; ST.seen[id] = 1; save();
+  drawList(); drawTimeline(); drawCard();
+  if(scroll && window.matchMedia('(max-width:900px)').matches) el('card').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ---------- 人物カードと関連語 ---------- */
+function kindOf(w){ if(byName[w]) return 'person'; return gloss[w] ? gloss[w].kind : 'term'; }
+function drawCard(){
+  var c = el('card'), p = byId[S.sel];
+  if(!p){ c.innerHTML = '<div class="empty">左の年表か一覧から、作曲家を選んでください。<br>例：ショパン、バッハ、ドビュッシー</div>'; return; }
+  var h = '<div><span class="tag" style="background:'+ERA_COLOR[p.era]+'">'+esc(p.era)+'</span><span class="hint">'+p.born+'〜'+p.died+'年 ・ '+esc(p.country)+'</span></div>'+
+    '<h3>'+esc(p.name)+'</h3><div class="sub">'+esc(p.full||'')+(p.en?' / '+esc(p.en):'')+'</div><div class="tagline">'+esc(p.tagline)+'</div>';
+  h += '<div class="sec">代表作</div><ul class="works">'+(p.works||[]).map(function(w){ return '<li><b>'+esc(w.t)+'</b>'+(w.n?' <span>— '+esc(w.n)+'</span>':'')+'</li>'; }).join('')+'</ul>';
+  h += '<div class="sec">逸話</div><ul class="anec">'+(p.anecdotes||[]).map(function(a){ return '<li>'+esc(a)+'</li>'; }).join('')+'</ul>';
+  h += '<div class="sec">関連する言葉（タップで意味と、つながる人物）</div><div class="rel">'+(p.related||[]).map(function(w){
+    var k = kindOf(w); return '<button class="rchip'+(S.word===w?' on':'')+'" style="--kc:'+KIND_COLOR[k]+'" data-w="'+esc(w)+'">'+esc(w)+'</button>';
+  }).join('')+'</div>';
+  h += '<div class="legend">'+Object.keys(KIND_LABEL).map(function(k){ return '<span><i style="background:'+KIND_COLOR[k]+'"></i>'+KIND_LABEL[k]+'</span>'; }).join('')+'</div>';
+  h += '<div id="word"></div>';
+  h += '<div class="btnrow"><button class="btn pri" id="qthis">この人物でクイズ</button></div>';
+  c.innerHTML = h;
+  c.querySelectorAll('[data-w]').forEach(function(b){ b.onclick=function(){ openWord(b.dataset.w); }; });
+  el('qthis').onclick=function(){ S.tab='quiz'; S.qOnly=p.id; S.q=null; render(); };
+  if(S.word) openWord(S.word, true);
+}
+function openWord(w, keep){
+  if(byName[w] && byName[w].id!==S.sel && !keep){ pick(byName[w].id, true); return; }
+  S.word = w;
+  var c = el('card'); c.querySelectorAll('.rchip').forEach(function(b){ b.classList.toggle('on', b.dataset.w===w); });
+  var g = gloss[w], k = kindOf(w), ps = (inv[w]||[]).map(function(id){return byId[id];}).filter(function(x){return x && x.id!==S.sel;});
+  var own = byName[w];
+  var h = '<div class="word" style="--kc:'+KIND_COLOR[k]+'"><h4>'+esc(w)+' <span class="hint">'+KIND_LABEL[k]+(g&&g.en?' ・ '+esc(g.en):'')+'</span></h4>';
+  if(g) h += '<p>'+esc(g.d)+'</p>';
+  else if(own) h += '<p>'+esc(own.tagline)+'</p>';
+  else h += '<p class="hint">この言葉の解説は準備中です。</p>';
+  if(ps.length) h += '<p class="hint">この言葉でつながる人物</p><div class="rel">'+ps.map(function(x){ return '<button class="rchip" style="--kc:'+KIND_COLOR.person+'" data-go="'+x.id+'">'+esc(x.name)+'</button>'; }).join('')+'</div>';
+  h += '</div>';
+  el('word').innerHTML = h;
+  el('word').querySelectorAll('[data-go]').forEach(function(b){ b.onclick=function(){ pick(b.dataset.go, true); }; });
+}
+
+/* ---------- クイズ ---------- */
+function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function sample(a,n){ return shuffle(a).slice(0,n); }
+function maskName(text, p){
+  var names = [p.name, p.full||''].filter(Boolean);
+  if(p.full){ var parts = p.full.split(/[・･]/); names.push(parts[parts.length-1]); }
+  names.sort(function(a,b){return b.length-a.length;});
+  var t = text; names.forEach(function(n){ if(n) t = t.split(n).join('この作曲家'); });
+  return t;
+}
+function nearPeople(p, n){
+  var others = people.filter(function(x){return x.id!==p.id;});
+  var near = others.slice().sort(function(a,b){ return Math.abs(a.born-p.born)-Math.abs(b.born-p.born); }).slice(0,8);
+  return sample(near, n);
+}
+function makeCardQ(p){
+  var kinds = [];
+  if((p.anecdotes||[]).length) kinds.push('anec');
+  if((p.works||[]).length>=2) kinds.push('works');
+  kinds.push('era');
+  var onlyWords = (p.related||[]).filter(function(w){ return (inv[w]||[]).length===1 && !byName[w]; });
+  if(onlyWords.length) kinds.push('word');
+  var k = kinds[Math.floor(Math.random()*kinds.length)];
+  var ds = nearPeople(p,3), q, opts;
+  var sum = p.name+'（'+p.born+'〜'+p.died+'・'+p.era+'）'+p.tagline;
+  if(k==='anec'){
+    var a = p.anecdotes[Math.floor(Math.random()*p.anecdotes.length)];
+    q = '次の逸話に当てはまる作曲家はだれか。\n「'+maskName(a,p)+'」';
+  } else if(k==='works'){
+    var ws = sample(p.works,Math.min(3,p.works.length)).map(function(w){return '『'+w.t+'』';}).join('、');
+    q = ws+'を作曲した人物はだれか。';
+  } else if(k==='word'){
+    var w = onlyWords[Math.floor(Math.random()*onlyWords.length)];
+    q = '「'+w+'」と最も深く関わる作曲家はだれか。';
+  } else {
+    var eras = [p.era].concat(sample(ERA_ORDER.filter(function(e){return e!==p.era;}),3));
+    opts = shuffle(eras);
+    return {q:p.name+'（'+p.born+'〜'+p.died+'年）が属する時代区分はどれか。', o:opts, a:opts.indexOf(p.era), e:sum, pid:p.id, d:'音楽'};
+  }
+  opts = shuffle([p.name].concat(ds.map(function(x){return x.name;})));
+  return {q:q, o:opts, a:opts.indexOf(p.name), e:sum, pid:p.id, d:'音楽'};
+}
+function pool(d){
+  var items = (D.sample||[]).filter(function(x){return x.d===d.ja;});
+  return items;
+}
+function nextQ(d){
+  var staticQs = pool(d), gen = null;
+  if(d.id==='music'){
+    if(S.qOnly){ gen = makeCardQ(byId[S.qOnly]); }
+    else if(S.qmode!=='sample'){ gen = makeCardQ(people[Math.floor(Math.random()*people.length)]); }
+  }
+  var useStatic = staticQs.length && (S.qmode==='sample' || (!gen) || (S.qmode==='all' && Math.random()<0.25));
+  if(useStatic && !(d.id==='music' && S.qOnly)){
+    var it = staticQs[Math.floor(Math.random()*staticQs.length)];
+    var o = it.o.slice(), correct = o[it.a], order = shuffle(o.map(function(_,i){return i;}));
+    return {q:it.q, o:order.map(function(i){return o[i];}), a:order.indexOf(it.a), e:it.e, d:it.d, st:1};
+  }
+  return gen;
+}
+function renderQuiz(d){
+  var m = el('main'), mus = d.id==='music';
+  if(!mus && !pool(d).length){ m.innerHTML='<div class="panel empty"><b>'+esc(d.ja)+'</b> のクイズは準備中です。</div>'; return; }
+  if(!S.q) S.q = nextQ(d);
+  var q = S.q;
+  var h = '<div class="panel qbox"><div class="qmeta"><span>'+esc(d.ja)+(S.qOnly&&byId[S.qOnly]?' ・ '+esc(byId[S.qOnly].name)+' だけ':'')+' ・ これまで '+ST.quiz.right+'/'+ST.quiz.asked+' 問正解</span>';
+  if(mus) h += '<span class="seg"><button data-m="all" class="'+(S.qmode==='all'&&!S.qOnly?'on':'')+'">ぜんぶ</button><button data-m="card" class="'+(S.qmode==='card'&&!S.qOnly?'on':'')+'">人物カードから</button><button data-m="sample" class="'+(S.qmode==='sample'&&!S.qOnly?'on':'')+'">用語・教養の問題</button></span>';
+  h += '</div><div class="qq">'+esc(q.q).replace(/\n/g,'<br>')+'</div><div class="opts">'+q.o.map(function(o,i){ return '<button class="opt" data-i="'+i+'">'+esc(o)+'</button>'; }).join('')+'</div><div id="fb"></div></div>';
+  m.innerHTML = h;
+  m.querySelectorAll('[data-m]').forEach(function(b){ b.onclick=function(){ S.qmode=b.dataset.m; S.qOnly=null; S.q=null; renderQuiz(d); }; });
+  m.querySelectorAll('.opt').forEach(function(b){ b.onclick=function(){ answer(+b.dataset.i, d); }; });
+}
+function answer(i, d){
+  var q = S.q, ok = i===q.a;
+  ST.quiz.asked++; if(ok) ST.quiz.right++; save();
+  el('main').querySelectorAll('.opt').forEach(function(b,k){ b.disabled=true; if(k===q.a) b.classList.add('ok'); else if(k===i) b.classList.add('ng'); });
+  var h = '<div class="exp"><b>'+(ok?'正解':'不正解')+'</b>　'+esc(q.e)+'</div><div class="btnrow"><button class="btn pri" id="nx">次の問題</button>'+(q.pid?'<button class="btn" id="seec">この人物のカードを見る</button>':'')+'</div>';
+  el('fb').innerHTML = h;
+  el('nx').onclick=function(){ S.q=null; renderQuiz(d); };
+  if(q.pid) el('seec').onclick=function(){ S.tab='explore'; S.sel=q.pid; S.word=null; ST.seen[q.pid]=1; save(); render(); };
+}
+
+render();
+})();
+</script>
+</body>
+</html>

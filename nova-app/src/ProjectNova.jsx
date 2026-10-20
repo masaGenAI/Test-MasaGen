@@ -7,6 +7,7 @@ import BOOK_SUMMARY_HTML from "../public/booksummaryhub.html?raw";
 import LEARNING_TRACKER_HTML from "../public/learning-tracker.html?raw";
 // Anything Memo トラッカー（調べ済みノートの一覧・検索・ジャンル別・自動保存）
 import ANYTHING_MEMO_HTML from "../public/anything-memo.html?raw";
+import LIBERAL_ARTS_HTML from "../public/liberal-arts.html?raw";
 // TechHub「AIフォーサイト」のブリーフと情報源ライブラリ（情報源は月次メンテナンスで nova-app/scripts/foresight_linkcheck.py が更新する）
 import FORESIGHT from "./data/foresight-briefs.json";
 import FORESIGHT_SOURCES from "./data/foresight-sources.json";
@@ -214673,6 +214674,57 @@ const AnythingMemoModule = (function () {
   }
   return AnythingMemoModule;
 })();
+// ================= LiberalArtsModule（source: liberal-arts.html, Blob-embedded） =================
+// 領域（音楽など）→ 年表 → 人物カード → 関連する言葉、とたどるリベラルアーツ。既読と成績は端末に保存する。
+const LiberalArtsModule = (function () {
+  const LAH_STORE_KEY = "lah:store:v1";
+  function LiberalArtsModule() {
+    const ref = useRef(null);
+    useEffect(() => {
+      const iframe = ref.current;
+      if (!iframe) return;
+      let mirror = {};
+      try { mirror = JSON.parse(window.localStorage.getItem(LAH_STORE_KEY) || "{}") || {}; } catch (e) { mirror = {}; }
+      const seedJson = JSON.stringify(mirror).replace(/</g, "\\u003c");
+      const bridge =
+        "<script>(function(){try{" +
+        "var mem=" + seedJson + ";" +
+        "function post(op,k,v){try{parent.postMessage({__lah:1,op:op,k:k,v:v},'*');}catch(e){}}" +
+        "var fake={" +
+        "getItem:function(k){return Object.prototype.hasOwnProperty.call(mem,k)?String(mem[k]):null;}," +
+        "setItem:function(k,v){mem[k]=String(v);post('set',String(k),String(v));}," +
+        "removeItem:function(k){delete mem[k];post('rm',String(k));}," +
+        "clear:function(){mem={};post('clr');}," +
+        "key:function(i){var ks=Object.keys(mem);return i>=0&&i<ks.length?ks[i]:null;}" +
+        "};" +
+        "Object.defineProperty(fake,'length',{get:function(){return Object.keys(mem).length;}});" +
+        "try{Object.defineProperty(window,'localStorage',{configurable:true,get:function(){return fake;}});}catch(e){}" +
+        "}catch(e){}})();<" +
+        "/script>";
+      const html = LIBERAL_ARTS_HTML.replace("<head>", "<head>" + bridge);
+      const onMsg = (ev) => {
+        const d = ev.data;
+        if (!d || d.__lah !== 1) return;
+        try {
+          let m = JSON.parse(window.localStorage.getItem(LAH_STORE_KEY) || "{}") || {};
+          if (d.op === "set") m[d.k] = d.v;
+          else if (d.op === "rm") delete m[d.k];
+          else if (d.op === "clr") m = {};
+          window.localStorage.setItem(LAH_STORE_KEY, JSON.stringify(m));
+        } catch (e) { /* ignore */ }
+      };
+      window.addEventListener("message", onMsg);
+      const blob = new Blob([html], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      iframe.src = url;
+      return () => { window.removeEventListener("message", onMsg); URL.revokeObjectURL(url); };
+    }, []);
+    return (
+      <iframe ref={ref} title="リベラルアーツ" style={{ width: "100%", height: "calc(100vh - 46px)", border: "none", display: "block" }} />
+    );
+  }
+  return LiberalArtsModule;
+})();
 // ================= TrainingHubModule（トレーニング記録カレンダー） =================
 // Set1〜Set5 を決まった順番で回し、その日に実施できたかをカレンダーに記録する。
 // 「次にやる Set」は保存した記録を日付順にたどって毎回計算し直すので、
@@ -221770,6 +221822,7 @@ const NOVA = {
   tracker: "#4f46e5",
   amt: "#2f6bff",
   training: "#1E7A6E",
+  liberalarts: "#8A5A2B",
 };
 
 const NOVA_SERIF = '"Fraunces", Georgia, "Hiragino Mincho ProN", serif';
@@ -221852,6 +221905,16 @@ function IconLanguage({ color, size }) {
   );
 }
 
+function IconLiberal({ color, size }) {
+  return (
+    <svg viewBox="0 0 40 40" width={size} height={size} fill="none">
+      <path d="M6 14L20 7l14 7-14 7-14-7Z" stroke={color} strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M12 18v8c0 2 3.6 4.5 8 4.5s8-2.5 8-4.5v-8" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M34 14v9" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function IconLinguistics({ color, size }) {
   return (
     <svg viewBox="0 0 40 40" width={size} height={size} fill="none">
@@ -221922,6 +221985,7 @@ const novaStats = () => {
     books: cnt('"oneLiner":'), yt: cnt('{"id":"yt_'), note: cnt('{"id":"note_'),
     mega: sum(BOOTCAMP_QUEST.mega), cons: sum(BOOTCAMP_QUEST.cons),
     tabs: MegaTechHubModule.TAB_COUNT, ling: LinguisticsHubModule.FIELD_STATS,
+    la: { people: (LIBERAL_ARTS_HTML.match(/"born":\d+/g) || []).length, domains: (LIBERAL_ARTS_HTML.match(/"ready":(true|false)/g) || []).length },
   };
   return __novaStats;
 };
@@ -221998,6 +222062,15 @@ const NOVA_STATIONS = [
     en: "Learning Tracker",
     tagJa: "進捗トラッカー",
     tagEn: "Progress tracker",
+  },
+  {
+    id: "liberalarts",
+    accent: NOVA.liberalarts,
+    Icon: IconLiberal,
+    ja: "Liberal Arts",
+    en: "Liberal Arts",
+    get tagJa() { const l = novaStats().la; return l.people ? `${l.domains}領域・音楽の人物${l.people}人から` : "準備中"; },
+    get tagEn() { const l = novaStats().la; return l.people ? `${l.domains} fields · ${l.people} musicians so far` : "Coming soon"; },
   },
   {
     id: "anythingmemo",
@@ -222168,7 +222241,7 @@ const NOVA_RESPONSIVE_CSS = `
 const NOVA_HUB_LABEL = {
   finance: ["Finance Hub", "Finance Hub"], megatech: ["TechHub", "TechHub"], consulting: ["Consulting Hub", "Consulting Hub"],
   certification: ["Certification Hub", "Certification Hub"], languagehub: ["Language Hub", "Language Hub"], booksummary: ["Book-Summary", "Book-Summary"],
-  tracker: ["Learning Tracker", "Learning Tracker"], anythingmemo: ["Anything Memo", "Anything Memo"], linguisticshub: ["Linguistics Hub", "Linguistics Hub"],
+  tracker: ["Learning Tracker", "Learning Tracker"], anythingmemo: ["Anything Memo", "Anything Memo"], linguisticshub: ["Linguistics Hub", "Linguistics Hub"], liberalarts: ["Liberal Arts", "Liberal Arts"],
 };
 // 完了チェックの保存キーを「ハブ・対象・種別」に解釈する。
 const NOVA_CERT_NAME = (p) => {
@@ -223959,7 +224032,7 @@ function ProjectNova() {
 
   // ディープリンク：URLハッシュ ↔ アクティブなハブ（リロード/ブックマークで同じ位置へ）
   useEffect(() => {
-    const HUBS = ["finance", "megatech", "consulting", "certification", "languagehub", "booksummary", "tracker", "anythingmemo", "linguisticshub"];
+    const HUBS = ["finance", "megatech", "consulting", "certification", "languagehub", "booksummary", "tracker", "anythingmemo", "linguisticshub", "liberalarts"];
     const apply = () => { const h = (window.location.hash || "").replace(/^#\/?/, ""); setActive(HUBS.includes(h) ? h : null); };
     apply();
     window.addEventListener("hashchange", apply);
@@ -224057,6 +224130,7 @@ function ProjectNova() {
   else if (active === "booksummary") rawHub = <BookSummaryModule />;
   else if (active === "tracker") rawHub = <LearningTrackerModule />;
   else if (active === "anythingmemo") rawHub = <AnythingMemoModule />;
+  else if (active === "liberalarts") rawHub = <LiberalArtsModule />;
   else if (active === "training") rawHub = <TrainingHubModule />;
   else if (active === "linguisticshub") rawHub = <LinguisticsHubModule />;
   const hubEl = rawHub ? (
