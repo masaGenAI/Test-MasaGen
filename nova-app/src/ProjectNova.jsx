@@ -222069,7 +222069,7 @@ const NOVA_STATIONS = [
     Icon: IconLiberal,
     ja: "Liberal Arts",
     en: "Liberal Arts",
-    get tagJa() { const l = novaStats().la; return l.people ? `${l.domains}領域・うんちく${l.trivia}問` : "準備中"; },
+    get tagJa() { const l = novaStats().la; return l.people ? `${l.domains}領域・雑学${l.trivia}問` : "準備中"; },
     get tagEn() { const l = novaStats().la; return l.people ? `${l.domains} fields · ${l.trivia} trivia` : "Coming soon"; },
   },
   {
