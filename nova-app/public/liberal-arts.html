@@ -80,6 +80,8 @@
   .staff .figsvg{padding:8px 10px;overflow-x:auto;justify-content:flex-start;}
   .staff .figsvg svg{height:96px;max-width:none;}
   .fig figcaption{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.6;}
+  .portrait{display:inline-block;width:64px;height:76px;margin-right:12px;vertical-align:middle;}
+  .portrait svg{width:100%;height:100%;display:block;}
   .avatar{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:var(--ac,var(--accent));color:#fff;font-size:17px;font-weight:700;margin-right:10px;vertical-align:middle;font-family:inherit;}
   .card h3{margin:0;font-size:22px;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;}
   .card .sub{font-size:12px;color:var(--muted);margin:2px 0 8px;}
@@ -348,7 +350,109 @@ function motifFigures(id){
   var ms = MOTIFS[id]; if(!ms) return '';
   return '<div class="sec">楽譜で見る</div>'+ms.map(function(m){ return '<figure class="fig staff"><div class="figsvg">'+staffSvg(m)+'</div><figcaption><b>'+esc(m.t)+'</b>　'+esc(m.n)+'</figcaption></figure>'; }).join('');
 }
+/* ---------- 似顔絵風のイメージ（特徴をもとにした簡略図。実物の肖像ではない） ---------- */
+var PORTRAIT = {
+  vivaldi:{hair:'long',hc:'#B4542A',face:'long',cloth:'#2B2B33',collar:'priest',sb:0},
+  bach:{hair:'wig',hc:'#ECE8E1',face:'round',cloth:'#2D3F66',collar:'cravat'},
+  handel:{hair:'wig',hc:'#E9E5DE',face:'round',cloth:'#7A2E2E',collar:'cravat',big:1},
+  haydn:{hair:'wig',hc:'#E8E4DC',face:'normal',cloth:'#4A6A55',collar:'cravat'},
+  mozart:{hair:'wig',hc:'#F0ECE6',face:'normal',cloth:'#B23A3A',collar:'cravat',young:1},
+  beethoven:{hair:'wild',hc:'#6A6A70',face:'normal',cloth:'#2B2B33',collar:'cravat',frown:1},
+  schubert:{hair:'curly',hc:'#3A2A20',face:'round',cloth:'#2B2B33',collar:'bow',glasses:'round',sb:1,young:1},
+  paganini:{hair:'long',hc:'#1E1A1A',face:'long',cloth:'#1E1E26',collar:'collar',skin:'#EBD9C5',gaunt:1},
+  berlioz:{hair:'wild',hc:'#7A4A2E',face:'normal',cloth:'#2B2B33',collar:'bow',sb:1},
+  mendelssohn:{hair:'short',hc:'#2E2420',face:'normal',cloth:'#2B2B33',collar:'bow',sb:1,young:1},
+  chopin:{hair:'curly',hc:'#6B4A2E',face:'long',cloth:'#2B2B33',collar:'bow',skin:'#F1DDC8',young:1},
+  schumann:{hair:'swept',hc:'#4B4440',face:'normal',cloth:'#2B2B33',collar:'collar'},
+  liszt:{hair:'long',hc:'#7A6A5A',face:'long',cloth:'#1E1E26',collar:'collar'},
+  wagner:{hair:'bald',hc:'#8A7F76',face:'normal',cloth:'#2B2B33',collar:'cravat',hat:'beret',chin:1},
+  verdi:{hair:'bald',hc:'#EEE9E2',face:'round',cloth:'#2B2B33',collar:'collar',beard:'full',bc:'#EEE9E2',hat:'soft'},
+  brahms:{hair:'short',hc:'#8A7860',face:'round',cloth:'#3A3A44',collar:'collar',beard:'full',bc:'#8A7860',big:1},
+  tchaikovsky:{hair:'swept',hc:'#ECE8E1',face:'normal',cloth:'#2B2B33',collar:'bow',beard:'goatee',bc:'#ECE8E1'},
+  dvorak:{hair:'short',hc:'#2E2420',face:'round',cloth:'#3A3A44',collar:'collar',beard:'full',bc:'#2E2420',big:1},
+  mussorgsky:{hair:'wild',hc:'#5A4538',face:'round',cloth:'#4A3A34',collar:'collar',beard:'full',bc:'#5A4538'},
+  grieg:{hair:'wild',hc:'#F0ECE6',face:'normal',cloth:'#3A3A44',collar:'bow',beard:'mustache',bc:'#F0ECE6'},
+  mahler:{hair:'swept',hc:'#2E2420',face:'long',cloth:'#2B2B33',collar:'tie',glasses:'round',receding:1},
+  debussy:{hair:'short',hc:'#2E2420',face:'normal',cloth:'#2B2B33',collar:'bow',beard:'goatee',bc:'#2E2420'},
+  ravel:{hair:'swept',hc:'#2A2220',face:'normal',cloth:'#3A4A66',collar:'tie'},
+  stravinsky:{hair:'bald',hc:'#B8B2A8',face:'long',cloth:'#2B2B33',collar:'tie',glasses:'round',chin:1},
+  yatsuhashi:{hair:'bald',hc:'#8A7F76',face:'round',cloth:'#5A5A66',collar:'kimono',closed:1},
+  takitaro:{hair:'short',hc:'#1E1A1A',face:'normal',cloth:'#2B2B33',collar:'stand',young:1},
+  yamada:{hair:'swept',hc:'#2A2220',face:'normal',cloth:'#2B2B33',collar:'tie',beard:'mustache',bc:'#2A2220'},
+  miyagi:{hair:'short',hc:'#2A2220',face:'round',cloth:'#4A4A5A',collar:'kimono',glasses:'dark'},
+  ifukube:{hair:'short',hc:'#E9E5DE',face:'normal',cloth:'#2B2B33',collar:'tie'},
+  takemitsu:{hair:'short',hc:'#2A2220',face:'long',cloth:'#2B2B33',collar:'tie',glasses:'round'},
+  hisaishi:{hair:'short',hc:'#2A2220',face:'normal',cloth:'#3A3A44',collar:'collar',glasses:'rect'},
+  sakamoto:{hair:'swept',hc:'#8A8580',face:'long',cloth:'#2B2B33',collar:'collar'}
+};
+function portraitSvg(id, p){
+  var c = PORTRAIT[id]; if(!c) return null;
+  var skin = c.skin || '#F2D2B1', ink = '#2A211C';
+  var rx = c.face==='round' ? 29 : c.face==='long' ? 23.5 : 26, ry = c.face==='long' ? 34 : 31;
+  if(c.big) rx += 2;
+  var s = '', back = '', front = '';
+  // 髪（後ろ）
+  if(c.hair==='wig'){
+    var w = c.big ? 8 : 0;
+    back += pa('M'+(24-w)+' 58 C'+(16-w)+' 14 '+(104+w)+' 14 '+(96+w)+' 58 C'+(104+w)+' 76 96 90 88 90 L32 90 C24 90 '+(16-w)+' 76 '+(24-w)+' 58Z', c.hc, '#B9B2A6', 1);
+    [[30,66],[28,80],[90,66],[92,80]].forEach(function(q){ back += ci(q[0]+(q[0]<60?-w:w),q[1],7,c.hc,'#B9B2A6'); });
+  } else if(c.hair==='long'){
+    back += pa('M30 36 C20 64 22 100 32 116 L88 116 C98 100 100 64 90 36Z', c.hc);
+  } else if(c.hair==='wild'){
+    back += pa('M26 56 L18 30 L32 34 L30 12 L44 28 L54 8 L62 26 L74 8 L80 28 L92 12 L90 34 L102 30 L94 56 L90 74 L30 74Z', c.hc);
+  } else if(c.hair==='curly'){
+    for(var i=0;i<9;i++){ var a=Math.PI*(1.02+i*0.12); back += ci(60+Math.cos(a)*33, 56+Math.sin(a)*35, 9, c.hc); }
+    back += ci(30,64,8,c.hc)+ci(90,64,8,c.hc);
+  }
+  if(c.hair==='short' || c.hair==='swept') back += el2(60,52,rx+3.5,ry+2.5,c.hc);
+  // 肩・首
+  s += pa('M8 142 Q12 104 44 98 L76 98 Q108 104 112 142Z', c.cloth);
+  s += rc(51,82,18,20,skin);
+  if(c.collar==='cravat') s += pa('M44 98 L60 116 L76 98 L68 90 L60 96 L52 90Z', '#F6F1E7', '#CFC6B4', 1)+pa('M52 100 Q60 108 68 100','none','#CFC6B4',1);
+  else if(c.collar==='bow') s += pa('M50 98 L60 102 L50 108Z', ink)+pa('M70 98 L60 102 L70 108Z', ink)+ci(60,102,2,ink)+pa('M46 100 L52 94 L60 100 L68 94 L74 100','none','#F6F1E7',3);
+  else if(c.collar==='collar') s += pa('M46 98 L60 112 L74 98','none','#F6F1E7',4);
+  else if(c.collar==='priest') s += rc(55,96,10,7,'#F6F1E7',1);
+  else if(c.collar==='tie') s += pa('M46 98 L60 116 L74 98 L66 92 L60 100 L54 92Z','#F6F1E7')+pa('M57 100 L63 100 L65 124 L60 128 L55 124Z','#8B2E2E');
+  else if(c.collar==='kimono') s += pa('M42 98 L60 130 M78 98 L60 130','none','#D8D2C4',5)+pa('M42 98 L60 126 L78 98','none','#F6F1E7',2);
+  else if(c.collar==='stand') s += rc(48,94,24,8,'#1B1B22',2)+ci(60,100,1.6,'#C9A227');
+  // 耳・顔
+  s += ci(60-rx-1,60,5,skin,'#C9A98A')+ci(60+rx+1,60,5,skin,'#C9A98A');
+  s += el2(60,58,rx,ry,skin,'#C9A98A');
+  if(c.gaunt) s += pa('M40 64 Q46 76 52 78 M80 64 Q74 76 68 78','none','#D6BBA0',1.4);
+  // 髪（前）
+  if(c.hair==='wig') front += pa('M33 46 C34 24 86 24 87 46 C78 36 42 36 33 46Z', c.hc, '#B9B2A6', 1);
+  else if(c.hair==='long') front += pa('M33 50 C32 24 88 24 87 50 C80 38 66 34 60 34 C52 34 40 38 33 50Z', c.hc);
+  else if(c.hair==='wild') front += pa('M33 48 C34 28 86 28 87 48 L80 38 L70 44 L62 34 L52 44 L42 36Z', c.hc);
+  else if(c.hair==='curly') front += ci(44,36,8,c.hc)+ci(60,32,8,c.hc)+ci(76,36,8,c.hc)+ci(36,46,6,c.hc)+ci(84,46,6,c.hc);
+  else if(c.hair==='short') front += pa('M33 50 C31 26 89 26 87 50 C80 42 66 38 60 38 C52 38 42 42 33 50Z', c.hc);
+  else if(c.hair==='swept') front += pa('M34 48 C32 28 88 24 86 46 C78 36 44 34 34 48Z', c.hc)+pa('M40 36 Q60 28 80 36','none','rgba(255,255,255,.35)',1.4);
+  else if(c.hair==='bald'){ front += pa('M34 52 C32 44 34 40 38 38 L38 56Z', c.hc)+pa('M86 52 C88 44 86 40 82 38 L82 56Z', c.hc); if(c.hat!=='beret' && c.hat!=='soft') front += pa('M44 34 Q60 28 76 34','none','rgba(255,255,255,.45)',1.6); }
+  if(c.receding) front += rc(40,50,0.1,0.1,'none');
+  if(c.sb) front += rc(34,52,5,22,c.hc,2)+rc(81,52,5,22,c.hc,2);
+  // 目鼻口
+  var ey = c.frown?54:56;
+  if(c.closed) s += pa('M44 56 Q49 59 54 56','none',ink,1.6)+pa('M66 56 Q71 59 76 56','none',ink,1.6);
+  else s += el2(49,ey,2.3,2.7,ink)+el2(71,ey,2.3,2.7,ink);
+  s += pa(c.frown?'M42 47 L55 51':'M42 49 Q49 46 55 49','none',c.hc==='#ECE8E1'||c.hc==='#F0ECE6'||c.hc==='#E9E5DE'||c.hc==='#EEE9E2'?'#9A948B':ink,1.8);
+  s += pa(c.frown?'M78 47 L65 51':'M65 49 Q71 46 78 49','none',c.hc==='#ECE8E1'||c.hc==='#F0ECE6'||c.hc==='#E9E5DE'||c.hc==='#EEE9E2'?'#9A948B':ink,1.8);
+  s += pa('M60 58 L57 68 Q60 71 64 68','none','#B08A6A',1.5);
+  s += pa(c.frown?'M52 78 Q60 74 68 78':'M52 77 Q60 81 68 77','none','#8A4B3A',1.8);
+  // ひげ
+  if(c.beard==='full') front += pa('M34 62 C34 92 46 104 60 104 C74 104 86 92 86 62 C84 76 76 82 60 82 C44 82 36 76 34 62Z', c.bc)+pa('M46 73 Q60 67 74 73 Q66 78 60 76 Q54 78 46 73Z', c.bc);
+  else if(c.beard==='goatee') front += pa('M50 84 Q60 100 70 84 Q60 90 50 84Z', c.bc)+pa('M46 73 Q60 67 74 73 Q66 78 60 76 Q54 78 46 73Z', c.bc);
+  else if(c.beard==='mustache') front += pa('M42 73 Q60 66 78 73 Q68 80 60 76 Q52 80 42 73Z', c.bc);
+  // めがね
+  if(c.glasses==='round') front += '<circle cx="49" cy="'+ey+'" r="8" fill="none" stroke="'+ink+'" stroke-width="1.6"/><circle cx="71" cy="'+ey+'" r="8" fill="none" stroke="'+ink+'" stroke-width="1.6"/>'+ln(57,ey,63,ey,1.6,ink);
+  else if(c.glasses==='rect') front += '<rect x="40" y="'+(ey-6)+'" width="17" height="12" rx="2" fill="none" stroke="'+ink+'" stroke-width="1.6"/><rect x="63" y="'+(ey-6)+'" width="17" height="12" rx="2" fill="none" stroke="'+ink+'" stroke-width="1.6"/>'+ln(57,ey,63,ey,1.6,ink);
+  else if(c.glasses==='dark') front += '<rect x="40" y="'+(ey-6)+'" width="17" height="12" rx="5" fill="'+ink+'"/><rect x="63" y="'+(ey-6)+'" width="17" height="12" rx="5" fill="'+ink+'"/>'+ln(57,ey,63,ey,1.6,ink);
+  // 帽子
+  if(c.hat==='beret') front += el2(60,32,34,11,'#2B2B33')+ci(60,22,3,'#2B2B33');
+  else if(c.hat==='soft') front += pa('M26 36 Q60 44 94 36 Q92 30 60 30 Q28 30 26 36Z','#1E1E26')+pa('M38 34 C38 14 82 14 82 34Z','#1E1E26');
+  return '<svg viewBox="0 0 120 142" role="img" aria-label="'+esc(p.name)+'の似顔絵風イメージ"><circle cx="60" cy="70" r="66" fill="'+(ERA_COLOR[p.era]||'#999')+'" opacity=".14"/>'+back+s+front+'</svg>';
+}
 function avatar(p){
+  var svg = portraitSvg(p.id, p);
+  if(svg) return '<span class="portrait">'+svg+'</span>';
   var ch = (p.name||'?').charAt(0), col = ERA_COLOR[p.era] || 'var(--accent)';
   return '<span class="avatar" style="--ac:'+col+'" aria-hidden="true">'+esc(ch)+'</span>';
 }
@@ -367,7 +471,7 @@ function render(){
   h += '<div class="seg2" id="regseg" role="tablist" aria-label="地域">'+['海外','日本'].map(function(r){ return '<button data-r="'+r+'" class="'+(S.region===r?'on':'')+'">'+r+'</button>'; }).join('')+'</div>';
   h += '<div class="tabs"><button class="tab'+(S.tab==='explore'?' on':'')+'" data-t="explore">年表と人物</button><button class="tab'+(S.tab==='quiz'?' on':'')+'" data-t="quiz">クイズ</button></div>';
   h += '<div id="main"></div>';
-  h += '<p class="src">※ 試作版。人物・作品・逸話は音楽史の概説に広く載っている内容にとどめていますが、出典の照合はこれからです。真偽が定まらない逸話は「伝わる」と書いています。</p>';
+  h += '<p class="src">※ 試作版。人物・作品・逸話は音楽史の概説に広く載っている内容にとどめていますが、出典の照合はこれからです。真偽が定まらない逸話は「伝わる」と書いています。人物の絵は、髪型・ひげ・めがね・時代の装いなど広く知られた特徴をもとにした似顔絵風のイメージで、実物の肖像ではありません。</p>';
   el('app').innerHTML = h;
   el('app').querySelectorAll('[data-d]').forEach(function(b){ b.onclick=function(){ S.domain=b.dataset.d; S.sel=null; S.word=null; S.q=null; render(); }; });
   el('app').querySelectorAll('#regseg [data-r]').forEach(function(b){ b.onclick=function(){ if(S.region===b.dataset.r) return; setRegion(b.dataset.r); S.sel=null; S.isel=null; S.word=null; S.q=null; S.qOnly=null; S.view='people'; render(); }; });
