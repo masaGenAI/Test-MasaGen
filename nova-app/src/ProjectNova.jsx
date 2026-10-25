@@ -220193,9 +220193,19 @@ const FIELD_DIAGRAMS = {
   "psycho:neurolinguistics": NeuroBrainDiagram,
   "historical:historical-ling": SoundChangeDiagram,
 };
-// 専用の図がない分野は、データで描く図（SpecDiagram）を図解タブに出す
+// 専用の図がない分野は、データで描く図（SpecDiagram）を図解タブに出す。専用の図がある分野は、その下に続けて出す
 Object.keys(FIELD_FIGS).forEach((k) => {
-  if (!FIELD_DIAGRAMS[k]) FIELD_DIAGRAMS[k] = () => <SpecDiagram figs={FIELD_FIGS[k]} />;
+  const Base = FIELD_DIAGRAMS[k];
+  FIELD_DIAGRAMS[k] = Base
+    ? () => (
+        <>
+          <Base />
+          <div style={{ marginTop: 16 }}>
+            <SpecDiagram figs={FIELD_FIGS[k]} />
+          </div>
+        </>
+      )
+    : () => <SpecDiagram figs={FIELD_FIGS[k]} />;
 });
 
 const STARS = { 1: "★", 2: "★★", 3: "★★★", 4: "★★★★" };
