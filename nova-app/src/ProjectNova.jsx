@@ -167595,6 +167595,8 @@ function ConsultingThinkingHub() {
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   };
   const [stats, setStats] = useState({});
+  // 模試の採点のように続けて記録するとき、古い stats から組み立て直して前の解答を消さないよう最新値を持つ
+  const statsRef = useRef({});
   const [srCards, setSrCards] = useState({});
   useEffect(() => { (async () => { try { const r = await window.storage.get(SR_KEY); setSrCards(r && r.value ? JSON.parse(r.value) : {}); } catch (e) { /* ignore */ } })(); }, [tab]);
   const srDue = useMemo(() => dueCards(srCards, Date.now()).length, [srCards]);
@@ -167606,25 +167608,36 @@ function ConsultingThinkingHub() {
     (async () => {
       try {
         const r = await window.storage.get(STORAGE_KEY);
-        if (r && r.value) setStats(JSON.parse(r.value));
+        if (r && r.value) { const v = JSON.parse(r.value); statsRef.current = v; setStats(v); }
       } catch (e) { /* first run */ }
       setLoaded(true);
     })();
   }, []);
 
   const persist = async (next) => {
+    statsRef.current = next;
     setStats(next);
     try { await window.storage.set(STORAGE_KEY, JSON.stringify(next)); } catch (e) { /* ignore */ }
+    // ポータルの弱点レーダー用に、応用クイズの分野別の解答数・正答数を別キーに残す
+    const dom = {};
+    Object.keys(next).forEach((k) => {
+      const q = /^\d+$/.test(k) ? Q[+k] : null;
+      if (!q || !next[k]) return;
+      const d = dom[q.d] || (dom[q.d] = { a: 0, c: 0 });
+      d.a += 1;
+      if (next[k].ok) d.c += 1;
+    });
+    try { await window.storage.set("consulting_dom_stats_v1", JSON.stringify(dom)); } catch (e) { /* ignore */ }
   };
   const recordAnswer = (qid, ok) => {
-    const next = { ...stats, [qid]: { ok, t: Date.now() } };
+    const next = { ...statsRef.current, [qid]: { ok, t: Date.now() } };
     persist(next);
   };
   const resetAll = async () => {
     persist({});
   };
   const importAll = (obj) => {
-    persist({ ...stats, ...obj });
+    persist({ ...statsRef.current, ...obj });
   };
 
   const tabDefs = [
@@ -224493,6 +224506,7 @@ const BOOTCAMP_QDAILY = {
 
 // ポータルに「4 MONTH · BOOTCAMP」ガントトラッカー（Finance除外）を描画。
 const WEAK_SOURCES = [
+  { hub: ["Consulting Hub", "Consulting Hub"], key: "consulting_dom_stats_v1", kind: "ca", labels: { 0: ["ロジカルシンキング", "Logical Thinking"], 1: ["クリティカルシンキング", "Critical Thinking"], 2: ["ラテラルシンキング", "Lateral Thinking"], 3: ["クリエイティブシンキング", "Creative Thinking"], 4: ["構造化", "Structuring"], 5: ["DX", "Digital Transformation"], 6: ["AI", "AI"], 7: ["論点思考", "Issue Thinking"], 8: ["仮説思考", "Hypothesis Thinking"] } },
   { hub: ["TechHub 基礎", "TechHub Core"], key: "axcheck_core_stats_v1", kind: "ca", labels: { K1: ["論点マップ", "Issue Map"], K2: ["全体像", "Service Map"], K3: ["定量データ", "Data"], K4: ["統制・エージェント", "Governance"], K5: ["事例", "Cases"] } },
   { hub: ["TechHub AX実務", "TechHub AX"], key: "axcheck_ax_stats_v1", kind: "ca", labels: { X1: ["価値ドライバー", "Value"], X2: ["提案・計算", "Proposal"], X3: ["競合・問答", "Objections"], X4: ["業界別", "Industries"], X5: ["AGI・診断", "AGI & Assess"], X6: ["実務・事例", "Practice"] } },
   { hub: ["AICX", "AICX"], key: "aics_study_v2", kind: "prog", labels: { D1: ["生成AI基礎", "GenAI basics"], D2: ["業務プロセス", "Process"], D3: ["データ", "Data"], D4: ["ワークフロー", "Workflow"], D5: ["組織変革", "Change"], D6: ["5D・推進", "5D"] } },
@@ -224648,7 +224662,7 @@ function NovaWeakRadar({ lang }) {
                 );
               })()}
               <div style={{ fontSize: 10.5, color: NOVA.faint, marginTop: 10, lineHeight: 1.6 }}>
-                {en ? "Records live in this device's storage only; the radar covers the hubs whose formats it can read (TechHub checks, AICX, the nine governance stations, the governance dojo, PL-900) plus the review queues of 14 certification banks." : "記録はこの端末内のみ。対応形式のハブ（TechHub理解度チェック・AICX・ガバナンス9資格・ガバナンス道場・PL-900）と、資格14バンクの誤答キューを対象にしています。"}
+                {en ? "Records live in this device's storage only; the radar covers the hubs whose formats it can read (Consulting Hub applied quizzes and mocks, TechHub checks, AICX, the nine governance stations, the governance dojo, PL-900) plus the review queues of 14 certification banks." : "記録はこの端末内のみ。対応形式のハブ（Consulting Hub の応用クイズ・模試、TechHub理解度チェック・AICX・ガバナンス9資格・ガバナンス道場・PL-900）と、資格14バンクの誤答キューを対象にしています。"}
               </div>
             </>
           )}
