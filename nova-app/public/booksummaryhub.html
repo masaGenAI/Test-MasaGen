@@ -8928,6 +8928,7 @@ function openBook(book, color, crumbs){
       <p class="label">実務への示唆</p>
       <p>${book.takeaway}</p>
     </div>` : ''}
+    ${!book.listOnly ? `<p class="notes-lead" style="margin-top:10px">※ 数値・料金・サービス名・「〜年時点」などは、${book.year ? book.year + '年の' : ''}発行（公開）時点の${/youtube\.com/.test(book.url || '') ? '動画' : /note\.com/.test(book.url || '') ? '記事' : '書籍'}の内容です。最新の値は別途確認してください。</p>` : ''}
 
     ${relatedHTML(book)}
 
