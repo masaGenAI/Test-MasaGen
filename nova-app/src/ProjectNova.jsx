@@ -221048,12 +221048,26 @@ function QuizView({ fieldKey, ja, en, allQuestions, breadcrumbItems, onNavigate,
   );
 }
 
-/* 全問題をフラット化し、模擬試験用にランダム抽出する */
-function buildExamQuestions(count) {
+/* 模擬試験の出題候補。scope は "all" かカテゴリID、mode は
+   all（すべて）/ unsolved（まだ正解していない）/ wrong（一度でも間違えた）/ bm（ブックマーク） */
+function examPool(scope, mode, progress) {
   const flat = [];
   Object.entries(QUIZ_DATA).forEach(([fieldKey, questions]) => {
-    questions.forEach((q) => flat.push({ ...q, fieldKey }));
+    if (scope !== "all" && fieldKey.split(":")[0] !== scope) return;
+    questions.forEach((q) => {
+      const k = `${fieldKey}:${q.id}`;
+      if (mode === "unsolved" && progress[k]) return;
+      if (mode === "wrong" && !progress[`wrong:${k}`]) return;
+      if (mode === "bm" && !progress[`bm:${k}`]) return;
+      flat.push({ ...q, fieldKey });
+    });
   });
+  return flat;
+}
+
+/* 出題候補をシャッフルして count 問を取り出す */
+function buildExamQuestions(count, scope = "all", mode = "all", progress = {}) {
+  const flat = examPool(scope, mode, progress);
   for (let i = flat.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [flat[i], flat[j]] = [flat[j], flat[i]];
@@ -221071,7 +221085,7 @@ function fieldKeyToLabel(fieldKey, lang) {
   return lang === "ja" ? target.ja : target.en;
 }
 
-function MockExamView({ examQuestions, onFinish, onExit }) {
+function MockExamView({ examQuestions, onFinish, onExit, onProgressUpdate }) {
   const { lang, t } = useContext(AppContext);
   const [qIndex, setQIndex] = useState(0);
   const [selected, setSelected] = useState(null);
@@ -221096,6 +221110,11 @@ function MockExamView({ examQuestions, onFinish, onExit }) {
     setSelected(idx);
     setRevealed(true);
     setAnswers((a) => ({ ...a, [qIndex]: idx === current.answer }));
+    // 分野ごとのクイズと同じキーで記録し、模擬試験の解答も進捗と復習に反映する
+    if (onProgressUpdate) {
+      const k = `${rawCurrent.fieldKey}:${rawCurrent.id}`;
+      onProgressUpdate(idx === current.answer ? k : `wrong:${k}`, true);
+    }
   }
 
   function next() {
@@ -221410,8 +221429,9 @@ function LinguisticsHub() {
   const [fieldTab, setFieldTab] = useState("quiz");
   const [examQuestions, setExamQuestions] = useState(null);
 
+  const [examCfg, setExamCfg] = useState({ count: 20, scope: "all", mode: "all" });
   const startExam = () => {
-    setExamQuestions(buildExamQuestions(20));
+    setExamQuestions(buildExamQuestions(examCfg.count, examCfg.scope, examCfg.mode, progress));
     setView({ level: "exam" });
   };
   const exitExam = () => {
@@ -221434,11 +221454,13 @@ function LinguisticsHub() {
           setProgress(loadedProgress);
         }
         // 連続学習日数(streak)の計算
-        const today = new Date().toISOString().slice(0, 10);
+        const today = novaLocalDay();
         const lastVisit = loadedProgress["meta:lastVisitDate"];
         let newStreak = loadedProgress["meta:streak"] || 0;
         if (lastVisit !== today) {
-          const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+          const y = new Date();
+          y.setDate(y.getDate() - 1);
+          const yesterday = novaLocalDay(y);
           newStreak = lastVisit === yesterday ? newStreak + 1 : 1;
           const next = { ...loadedProgress, "meta:lastVisitDate": today, "meta:streak": newStreak };
           setProgress(next);
@@ -221567,6 +221589,12 @@ function LinguisticsHub() {
     return allOverviewFlat.filter((x) => [x.title, x.titleEn, x.body, x.bodyEn].some((v) => (v || "").toLowerCase().includes(q))).slice(0, 20);
   }, [globalGlossaryQuery, allOverviewFlat]);
 
+  const examPoolSizes = useMemo(() => {
+    const out = {};
+    ["all", "unsolved", "wrong", "bm"].forEach((m) => (out[m] = examPool(examCfg.scope, m, progress).length));
+    return out;
+  }, [examCfg.scope, progress]);
+
   const goToSearchResult = (item) => {
     if (item.subId) goSub(item.catId, item.fieldId, item.subId);
     else goField(item.catId, item.fieldId);
@@ -221669,32 +221697,85 @@ function LinguisticsHub() {
           {/* ホーム: 用語横断検索 + カテゴリ一覧 */}
           {view.level === "home" && (
             <div>
-              <button
-                onClick={startExam}
-                style={{
-                  width: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "16px 20px",
-                  borderRadius: 8,
-                  border: "1px solid #0B2545",
-                  background: "linear-gradient(90deg, #0B2545, #4C8BF5)",
-                  color: "#ffffff",
-                  cursor: "pointer",
-                  marginBottom: 28,
-                }}
-              >
-                <span>
-                  <span className="lh-serif" style={{ fontSize: 16, fontWeight: 600, display: "block" }}>
-                    {t("模擬試験を始める", "Start Mock Exam")}
+              <div style={{ border: "1px solid var(--lh-border)", borderRadius: 8, padding: "14px 16px", marginBottom: 28, background: "var(--lh-soft)" }}>
+                <div className="lh-serif" style={{ fontSize: 15, fontWeight: 600, color: "var(--lh-text)", marginBottom: 10 }}>
+                  {t("模擬試験・横断復習", "Mock exam & cross-field review")}
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center", marginBottom: 10, fontSize: 12.5, color: "var(--lh-muted)" }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    {t("範囲", "Scope")}
+                    <select
+                      value={examCfg.scope}
+                      onChange={(e) => setExamCfg({ ...examCfg, scope: e.target.value })}
+                      style={{ fontSize: 12.5, padding: "4px 6px", borderRadius: 6, border: "1px solid var(--lh-border2)", background: "var(--lh-bg)", color: "var(--lh-text)" }}
+                    >
+                      <option value="all">{t("全カテゴリ", "All categories")}</option>
+                      {CATEGORIES.map((c) => (
+                        <option key={c.id} value={c.id}>{lang === "en" ? c.en : c.ja}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                    {t("問題数", "Questions")}
+                    {[10, 20, 40].map((n) => (
+                      <button
+                        key={n}
+                        onClick={() => setExamCfg({ ...examCfg, count: n })}
+                        style={{ fontSize: 12, padding: "3px 10px", borderRadius: 999, cursor: "pointer", border: "1px solid " + (examCfg.count === n ? "#0B2545" : "var(--lh-border2)"), background: examCfg.count === n ? "#0B2545" : "transparent", color: examCfg.count === n ? "#fff" : "var(--lh-text)" }}
+                      >
+                        {n}
+                      </button>
+                    ))}
                   </span>
-                  <span style={{ fontSize: 12, opacity: 0.85 }}>
-                    {t("全分野からランダムに20問出題・タイム計測", "20 random questions across all fields, timed")}
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 }}>
+                  {[
+                    ["all", "すべての問題", "All questions"],
+                    ["unsolved", "まだ正解していない問題", "Not yet answered correctly"],
+                    ["wrong", "一度でも間違えた問題", "Ever answered wrong"],
+                    ["bm", "ブックマークした問題", "Bookmarked"],
+                  ].map(([m, ja, en]) => (
+                    <button
+                      key={m}
+                      onClick={() => setExamCfg({ ...examCfg, mode: m })}
+                      style={{ fontSize: 12, padding: "4px 10px", borderRadius: 6, cursor: "pointer", border: "1px solid " + (examCfg.mode === m ? "#4C8BF5" : "var(--lh-border2)"), background: examCfg.mode === m ? "#eef3fd" : "transparent", color: examCfg.mode === m ? "#0B2545" : "var(--lh-text)" }}
+                    >
+                      {t(ja, en)} · {examPoolSizes[m]}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={startExam}
+                  disabled={examPoolSizes[examCfg.mode] === 0}
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "14px 18px",
+                    borderRadius: 8,
+                    border: "1px solid #0B2545",
+                    background: examPoolSizes[examCfg.mode] === 0 ? "var(--lh-soft2)" : "linear-gradient(90deg, #0B2545, #4C8BF5)",
+                    color: examPoolSizes[examCfg.mode] === 0 ? "var(--lh-muted2)" : "#ffffff",
+                    cursor: examPoolSizes[examCfg.mode] === 0 ? "default" : "pointer",
+                  }}
+                >
+                  <span>
+                    <span className="lh-serif" style={{ fontSize: 16, fontWeight: 600, display: "block" }}>
+                      {t("模擬試験を始める", "Start Mock Exam")}
+                    </span>
+                    <span style={{ fontSize: 12, opacity: 0.85 }}>
+                      {examPoolSizes[examCfg.mode] === 0
+                        ? t("この条件に当てはまる問題はまだありません", "No questions match these settings yet")
+                        : t(
+                            `対象${examPoolSizes[examCfg.mode]}問から${Math.min(examCfg.count, examPoolSizes[examCfg.mode])}問をランダムに出題・タイム計測。解答は分野ごとの進捗にも記録されます`,
+                            `${Math.min(examCfg.count, examPoolSizes[examCfg.mode])} random questions from ${examPoolSizes[examCfg.mode]}, timed. Answers also count toward field progress`
+                          )}
+                    </span>
                   </span>
-                </span>
-                <ChevronRight size={18} strokeWidth={2} />
-              </button>
+                  <ChevronRight size={18} strokeWidth={2} />
+                </button>
+              </div>
 
               <div style={{ marginBottom: 28 }}>
                 <input
@@ -222134,6 +222215,7 @@ function LinguisticsHub() {
             examQuestions={examQuestions}
             onFinish={startExam}
             onExit={exitExam}
+            onProgressUpdate={setQuizAnswer}
           />
         )}
 
