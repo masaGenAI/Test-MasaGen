@@ -2976,7 +2976,7 @@ function SectionView({ section, lang }) {
 
       <div style={{ padding: "20px 24px 60px" }}>
         {tab === "progress" && <ProgressTab section={section} lang={lang} progress={progress} />}
-        {tab === "quiz" && (section.data.quiz[0] && section.data.quiz[0].debit ? <JournalView section={section} lang={lang} bankKey="quiz" /> : <QuizTab section={section} lang={lang} progress={progress} saveProgress={saveProgress} />)}
+        {tab === "quiz" && (section.data.quiz[0] && section.data.quiz[0].debit ? <JournalView section={section} lang={lang} bankKey="quiz" progress={progress} saveProgress={saveProgress} /> : <QuizTab section={section} lang={lang} progress={progress} saveProgress={saveProgress} />)}
         {tab === "mock" && (section.data.mock[0] && section.data.mock[0].debit ? <JournalView section={section} lang={lang} bankKey="mock" /> : <MockView section={section} lang={lang} />)}
         {tab === "journal" && <JournalView section={section} lang={lang} />}
         {tab === "calc" && (section.data.calc[0] && section.data.calc[0].debit ? <JournalView section={section} lang={lang} bankKey="calc" /> : <CalcView section={section} lang={lang} />)}
@@ -3004,7 +3004,7 @@ function ProgressTab({ section, lang, progress }) {
     const ans = qs.filter((q) => progress[q.id]).length;
     const cor = qs.filter((q) => progress[q.id]?.correct).length;
     return { ...d, total: qs.length, ans, cor };
-  });
+  }).filter((d) => d.total > 0); // 問題のない領域（簿記2級の一部など）は 0/0 の空行になるので出さない
   return (
     <div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 22 }}>
@@ -3228,7 +3228,7 @@ function MockView({ section, lang }) {
 // =============================================================================
 // CALC
 // =============================================================================
-function JournalView({ section, lang, bankKey }) {
+function JournalView({ section, lang, bankKey, progress, saveProgress }) {
   const JS = section.data[bankKey || "journal"];
   const [domFilter, setDomFilter] = useState("all");
   const [idx, setIdx] = useState(0);
@@ -3268,6 +3268,8 @@ function JournalView({ section, lang, bankKey }) {
     const eq = (a, b) => a.length === b.length && [...a].sort().join("#") === [...b].sort().join("#");
     const ok = eq(dU, dC) && eq(cU, cC);
     setState({ ...state, [j.id]: { ...st, graded: true, correct: ok } });
+    // 仕訳形式のクイズ（簿記3級・2級）も通常のクイズと同じ保存先に記録し、進捗タブに反映する
+    if (saveProgress) saveProgress({ ...(progress || {}), [j.id]: { picked: -1, correct: ok } });
   };
 
   const answered = pool.filter((q) => (state[q.id] || {}).graded);
