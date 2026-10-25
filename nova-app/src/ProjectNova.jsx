@@ -224001,9 +224001,9 @@ const BOOTCAMP_HUBS = [
     udemy: ["○未: Amazon Bedrock 生成AIウェブアプリ構築（RAG編/エージェント編）", "○未: Google Cloud Vertex AI ML/MLOps入門"], books: ["○未: LangChain/LangGraphによるRAG・AIエージェント実践入門", "○未: 世界一やさしいRAG構築入門（Azure OpenAI）", "○未: AIエージェントの教科書"] },
   { id: "HUB-CONSULTING", isHub: true, hub: "consulting", s: 1, e: 7, label: ["Consulting Hub", "Consulting Hub"], sub: ["9ドメイン＋用語・ケース", "9 domains + glossary & cases"],
     note: ["9つの思考ドメイン（論点思考・仮説思考を含む）。資格と別ドメイン＝実質の追加負荷。毎日20問ずつ積む。", "9 thinking domains incl. issue and hypothesis thinking — the real added load; ~20 Q/day."],
-    pace: ["約2,377問（応用2,170＋用語167・紛らわしい/ケース40）。資格と別ドメインの追加負荷。", "~2,377 Q; ~20 Q/day."],
-    mile: [{ k: "c1", label: ["M1: 用語＋ロジカル/批判/水平（W1–2）", "M1: Glossary + Logical/Critical/Lateral"] }, { k: "c2", label: ["M2: 創造/構造化/DX（W3–4）", "M2: Creative/Structuring/DX"] }, { k: "c3", label: ["M3: AI＋紛らわしい・ケース（W4–5）", "M3: AI + confusables/cases"] }, { k: "c4", label: ["M4: 論点思考/仮説思考（W5–7）", "M4: Issue/Hypothesis thinking"] }],
-    plan: [["W1–2", "用語辞典（167）＋ロジカル / クリティカル / ラテラル（690問）"], ["W3–4", "クリエイティブ / 構造化 / DX（690問）"], ["W4–5", "AI（330問）＋紛らわしい・ケース（40）"], ["W5–7", "論点思考 / 仮説思考（460問）。以降は誤答の復習"]],
+    pace: ["約2,377問（応用2,170＋基礎暗記の辞典167・紛らわしい/ケース40）。資格と別ドメインの追加負荷。", "~2,377 Q; ~20 Q/day."],
+    mile: [{ k: "c1", label: ["M1: 基礎暗記＋ロジカル/批判/水平（W1–2）", "M1: Glossary + Logical/Critical/Lateral"] }, { k: "c2", label: ["M2: 創造/構造化/DX（W3–4）", "M2: Creative/Structuring/DX"] }, { k: "c3", label: ["M3: AI＋紛らわしい・ケース（W4–5）", "M3: AI + confusables/cases"] }, { k: "c4", label: ["M4: 論点思考/仮説思考（W5–7）", "M4: Issue/Hypothesis thinking"] }],
+    plan: [["W1–2", "基礎暗記の辞典（167語）＋ロジカル / クリティカル / ラテラル（690問）"], ["W3–4", "クリエイティブ / 構造化 / DX（690問）"], ["W4–5", "AI（330問）＋紛らわしい・ケース（40）"], ["W5–7", "論点思考 / 仮説思考（460問）。以降は誤答の復習"]],
     udemy: ["ハブ内の2,170問で完結（外部講座は任意）"], books: ["○未: ロジカルシンキング / シン・ロジカルシンキング", "○未: 考える技術・書く技術（＋スライド編）", "○未: 仮説思考（内田和成）"] },
 ];
 // 資格の学習タスク（MegaTech/コンサルの分野チェックリストと粒度を揃える）。
