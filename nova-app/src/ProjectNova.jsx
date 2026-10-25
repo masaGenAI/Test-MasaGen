@@ -140712,6 +140712,7 @@ const DAILY_GOAL = 20;
 // CloudDojoは元々ライトモード設計（白背景×濃い文字）のため、無理にダーク化せず
 // 全画面オーバーレイとして表示し、ハブの暗いテーマとの色の衝突を避ける。
 function CloudDojoWrapper() {
+  const lang = useLang();
   const [open, setOpen] = useState(false);
   const __opBack = useLocalHistory([[open, setOpen]]);
   useRegisterBack(__opBack.back, __opBack.canBack);
@@ -140726,6 +140727,11 @@ function CloudDojoWrapper() {
         <div style={{ fontSize: 12.5, color: C.muted, marginBottom: 24, lineHeight: 1.8 }}>
           AWS・Azure・GCP・OCIを482問のクイズと図解で。全画面表示で開きます。
         </div>
+        {lang === "en" && (
+          <div style={{ fontSize: 12.5, color: "#7A4B00", background: "#FFF7E6", borderRadius: 8, padding: "8px 12px", margin: "0 auto 18px", maxWidth: 520 }}>
+            Cloud Dojo is available in Japanese only: its 482 questions, diagrams and glossary have not been translated.
+          </div>
+        )}
         <button className="gh-btn gh-btn-primary" onClick={() => setOpen(true)} style={{ fontSize: 14, padding: "10px 24px" }}>
           クラウド道場を開く →
         </button>
@@ -212052,6 +212058,7 @@ const HUB = {
 const HUB_STATIONS = [
   {
     id: "clf",
+    jaOnly: true, // 問題・画面とも日本語のみ（英語モードでその旨を出す）
     code: "CLF-C02",
     ja: "AWS Certified Cloud Practitioner",
     en: "AWS Certified Cloud Practitioner",
@@ -212104,6 +212111,7 @@ const HUB_STATIONS = [
   },
   {
     id: "pl900",
+    jaOnly: true, // 問題・画面とも日本語のみ（英語モードでその旨を出す）
     code: "PL-900",
     ja: "Microsoft Power Platform Fundamentals",
     en: "Microsoft Power Platform Fundamentals",
@@ -212672,6 +212680,9 @@ function HubApp() {
           <span style={{ color: HUB.ink, fontSize: 13, fontWeight: 700 }}>{st.code}</span>
           <span style={{ color: HUB.sub, fontSize: 12 }}>{lang === "ja" ? st.ja : st.en}</span>
         </div>
+        {lang === "en" && st.jaOnly && (
+          <div style={{ fontSize: 12.5, color: "#7A4B00", background: "#FFF7E6", padding: "7px 14px" }}>This station is available in Japanese only: its questions and screens have not been translated.</div>
+        )}
         <Comp />
       </div>
     );
@@ -212797,6 +212808,7 @@ function HubApp() {
                       e.currentTarget.style.transform = "translateY(0)";
                     }}
                   >
+                    {lang === "en" && st.jaOnly && <span style={{ position: "absolute", top: 8, right: 8, fontSize: 10, fontWeight: 700, color: "#7A4B00", background: "#FFF7E6", borderRadius: 999, padding: "2px 8px" }}>Japanese only</span>}
                     <div
                       style={{
                         position: "absolute",
