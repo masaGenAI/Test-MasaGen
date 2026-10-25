@@ -3358,6 +3358,11 @@ function JournalView({ section, lang, bankKey, progress, saveProgress }) {
               {j.debit.map((d, i) => <span key={"d" + i}>{L("（借）", "(Dr) ", lang)}{L(d.acct.ja, d.acct.en, lang)} {d.amt.toLocaleString("en-US")}<br /></span>)}
               {j.credit.map((c, i) => <span key={"c" + i}>{L("（貸）", "(Cr) ", lang)}{L(c.acct.ja, c.acct.en, lang)} {c.amt.toLocaleString("en-US")}<br /></span>)}
             </div>
+            {j.exp && (
+              <div style={{ marginTop: 10, fontSize: 13.5, lineHeight: 1.85, color: C.slate, whiteSpace: "pre-wrap" }}>
+                <span style={{ fontWeight: 700 }}>{L("解説", "Explanation", lang)}:</span> {L(j.exp.ja, j.exp.en, lang)}
+              </div>
+            )}
             <button onClick={() => setState({ ...state, [j.id]: { rows: Array.from({ length: nRows }, () => ({ da: "", dm: "", ca: "", cm: "" })), graded: false, correct: false } })}
               style={{ marginTop: 10, padding: "6px 14px", borderRadius: 8, border: `1.5px solid ${section.accentActive}`, background: "#fff", color: section.accentActive, cursor: "pointer", fontSize: 12.5, fontWeight: 600 }}>
               {L("もう一度", "Retry", lang)}
