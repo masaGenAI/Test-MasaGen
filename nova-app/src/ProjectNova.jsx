@@ -1302,7 +1302,7 @@ function FigFrame({ children, id, lang, hint, terms, topic }) {
             {en ? "Write what you would say about this element in your own words." : "この要素について、自分の言葉で説明を書いてみる。"}
           </div>
           <textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={2}
-                    placeholder={en ? "e.g. what it is for, when it breaks" : "例：何のためにあるか、どこで崩れるか"}
+                    aria-label={en ? "e.g. what it is for, when it breaks" : "例：何のためにあるか、どこで崩れるか"} placeholder={en ? "e.g. what it is for, when it breaks" : "例：何のためにあるか、どこで崩れるか"}
                     style={{ width: "100%", boxSizing: "border-box", fontSize: 12, fontFamily: "inherit", padding: "6px 8px",
                              borderRadius: 6, border: "1px solid rgba(128,128,128,.4)", background: "transparent", color: "inherit", resize: "vertical" }} />
           <div style={{ display: "flex", gap: 6, marginTop: 6, flexWrap: "wrap" }}>
@@ -1450,7 +1450,7 @@ function FlowDiagram({ graph, lang, terms }) {
         <button onClick={() => setZoom((z) => Math.min(2.2, +(z * 1.2).toFixed(3)))} style={btn} title="zoom in">＋</button>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
-        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={en ? "🔍 search nodes" : "🔍 ノード検索"}
+        <input value={query} onChange={(e) => setQuery(e.target.value)} aria-label={en ? "🔍 search nodes" : "🔍 ノード検索"} placeholder={en ? "🔍 search nodes" : "🔍 ノード検索"}
           style={{ fontSize: 11.5, border: "1px solid #cbd5e1", borderRadius: 7, padding: "4px 9px", width: 150, color: "#334155" }} />
         {matchSet ? <span style={{ fontSize: 10.5, color: "#64748b", fontWeight: 700 }}>{matchSet.size}{en ? " hit" : "件"}</span> : null}
         <span style={{ flex: 1 }} />
@@ -2466,7 +2466,7 @@ function CmpTable({ compare, C, lang, t }) {
   });
   return (
     <div>
-      <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t.compareSearch}
+      <input value={q} onChange={(e) => setQ(e.target.value)} aria-label={t.compareSearch} placeholder={t.compareSearch}
         style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 14, boxSizing: "border-box" }} />
       {list.map((c, ci) => <CmpOne key={ci} c={c} C={C} en={en} />)}
       {list.length === 0 && <div style={{ textAlign: "center", color: "#8499ad", padding: 20 }}>{t.noMatch}</div>}
@@ -2488,7 +2488,7 @@ function GlossaryView({ GLOSSARY, GLOSSARY_CATS, DOM_HUE, C, lang, t }) {
   if (sortAz) list = list.slice().sort((a, b) => String(a[1]).localeCompare(String(b[1]), en ? "en" : "ja"));
   return (
     <div>
-      <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t.glossarySearch}
+      <input value={q} onChange={(e) => setQ(e.target.value)} aria-label={t.glossarySearch} placeholder={t.glossarySearch}
         style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 10, boxSizing: "border-box" }} />
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14, alignItems: "center" }}>
         {(GLOSSARY_CATS || []).map((k) => (
@@ -3826,7 +3826,7 @@ function GlossaryView({ section, lang }) {
   const filtered = GLOSSARY.filter((g) => !q || g.term.toLowerCase().includes(q.toLowerCase()) || g.ja.includes(q) || g.en.toLowerCase().includes(q.toLowerCase()));
   return (
     <div>
-      <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={L("用語を検索…", "Search terms…", lang)}
+      <input value={q} onChange={(e) => setQ(e.target.value)} aria-label={L("用語を検索…", "Search terms…", lang)} placeholder={L("用語を検索…", "Search terms…", lang)}
         style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${C.border}`, fontSize: 14, marginBottom: 14, boxSizing: "border-box" }} />
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: 10 }}>
         {filtered.map((g, i) => (
@@ -136895,7 +136895,7 @@ function McqView() {
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
                 <input className="gh-input" value={searchInput} onChange={(e) => setSearchInput(e.target.value)}
                        onKeyDown={(e) => { if (e.key === "Enter") runSearch(); }}
-                       placeholder={t(lang, "qz_search_ph")}
+                       aria-label={t(lang, "qz_search_ph")} placeholder={t(lang, "qz_search_ph")}
                        style={{ flex: 1, minWidth: 180, boxSizing: "border-box", fontFamily: "inherit" }} />
                 <button className="gh-btn gh-btn-primary" onClick={runSearch} disabled={trimmed === "" || hits.length === 0}
                         style={trimmed === "" || hits.length === 0 ? { opacity: 0.5 } : {}}>
@@ -138006,7 +138006,7 @@ function StarDrill({ lang }) {
       <div style={{ fontSize: 14.5, fontWeight: 700, color: C.text, lineHeight: 1.7, marginBottom: 12 }}>{g(p.asked)}</div>
       {!revealed ? (
         <>
-          <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder={en ? "Jot your STAR outline (optional): Situation → Task → Action → Result…" : "STARの骨子をメモ（任意）：状況→課題→行動→結果…"} rows={4}
+          <textarea value={note} onChange={(e) => setNote(e.target.value)} aria-label={en ? "Jot your STAR outline (optional): Situation → Task → Action → Result…" : "STARの骨子をメモ（任意）：状況→課題→行動→結果…"} placeholder={en ? "Jot your STAR outline (optional): Situation → Task → Action → Result…" : "STARの骨子をメモ（任意）：状況→課題→行動→結果…"} rows={4}
             style={{ width: "100%", boxSizing: "border-box", background: C.bg, color: C.text, border: `1px solid ${C.line}`, borderRadius: 8, padding: "10px 12px", fontSize: 12.5, lineHeight: 1.6, resize: "vertical", marginBottom: 10 }} />
           <button onClick={() => setRevealed(true)} style={{ width: "100%", background: C.gold, color: "#1a1410", border: "none", borderRadius: 8, padding: "11px", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>{en ? "Reveal model answer" : "模範解答を見る"}</button>
         </>
@@ -138648,7 +138648,7 @@ function MockInterview() {
         </div>
       )}
       <textarea value={answer} onChange={(e) => setAnswer(e.target.value)} disabled={!!fb}
-                placeholder={t(lang, "mock_answer_ph")} rows={5}
+                aria-label={t(lang, "mock_answer_ph")} placeholder={t(lang, "mock_answer_ph")} rows={5}
                 className="gh-input" style={{ width: "100%", boxSizing: "border-box", fontFamily: "inherit", resize: "vertical", marginBottom: 10 }} />
       {err && <div style={{ fontSize: 11.5, color: C.wine, marginBottom: 8 }}>{err}</div>}
       {!fb && (
@@ -140662,7 +140662,7 @@ function Glossary() {
       <h2 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 4px", color: BLUE.deep }}>略語・用語辞典</h2>
       <p style={{ fontSize: 13, color: "var(--color-text-tertiary)", margin: "0 0 12px" }}>全{ALL_GLOSSARY.length}語（概念用語＋4社の固有サービス名）。用語名・英語・説明文のどれでも検索できます。</p>
       <input
-        type="text" value={q} onChange={(e) => setQ(e.target.value)} placeholder="検索（例: RAG、Bedrock、Spanner、暗号化…）"
+        type="text" value={q} onChange={(e) => setQ(e.target.value)} aria-label="検索（例: RAG、Bedrock、Spanner、暗号化…）" placeholder="検索（例: RAG、Bedrock、Spanner、暗号化…）"
         style={{ width: "100%", boxSizing: "border-box", padding: "10px 14px", borderRadius: "var(--border-radius-md,8px)", border: `1px solid ${BLUE.mid}`, fontSize: 14, marginBottom: 10, outline: "none" }}
       />
       {/* クラウド別フィルタ */}
@@ -143104,7 +143104,7 @@ function CaseDrillView() {
         {!answered && (
           <div style={{ marginBottom: 12 }}>
             <div style={{ fontSize: 10.5, color: C.muted, marginBottom: 5 }}>{en ? "Think first (optional): jot how you'd respond before choosing — then compare with the criteria." : "まず自分で考える（任意）：選ぶ前に自分の対応を書き、採点基準と照らし合わせる。"}</div>
-            <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={3} placeholder={en ? "Your approach…" : "あなたの対応…"}
+            <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={3} aria-label={en ? "Your approach…" : "あなたの対応…"} placeholder={en ? "Your approach…" : "あなたの対応…"}
                       className="gh-input" style={{ width: "100%", boxSizing: "border-box", fontFamily: "inherit", resize: "vertical", fontSize: 12.5 }} />
           </div>
         )}
@@ -145395,7 +145395,7 @@ function GeneratorView() {
       <div style={{ fontSize: 11, color: C.teal, marginBottom: 5 }}>{en ? "Data class" : "データ区分"}</div>
       <Chips arr={GEN_DATA} val={data} set={setData} />
       <div style={{ fontSize: 11, color: C.teal, marginBottom: 5 }}>{en ? "Context (optional)" : "文脈（任意）"}</div>
-      <input value={ctx} onChange={(e) => setCtx(e.target.value)} placeholder={en ? "e.g., a hospital call center" : "例：病院のコールセンター"}
+      <input value={ctx} onChange={(e) => setCtx(e.target.value)} aria-label={en ? "e.g., a hospital call center" : "例：病院のコールセンター"} placeholder={en ? "e.g., a hospital call center" : "例：病院のコールセンター"}
              className="gh-input" style={{ width: "100%", boxSizing: "border-box", fontFamily: "inherit", fontSize: 12.5, marginBottom: 12 }} />
       <button className="gh-btn gh-btn-primary" onClick={generate} disabled={busy} style={{ padding: "10px 22px" }}>
         {busy ? (en ? "Generating…" : "生成中…") : (scen ? (en ? "↻ Another scenario" : "↻ 別のシナリオ") : (en ? "Generate scenario" : "シナリオを生成"))}
@@ -145409,7 +145409,7 @@ function GeneratorView() {
           {scen.situation.map((s, i) => <div key={i} style={{ fontSize: 13, lineHeight: 1.75, color: C.text, marginBottom: 8 }}>{s}</div>)}
           <div style={{ fontSize: 14, fontWeight: 700, color: C.gold, margin: "12px 0 10px" }}>{scen.question}</div>
 
-          <textarea value={resp} onChange={(e) => setResp(e.target.value)} rows={5} placeholder={en ? "Your response…" : "あなたの対応…"}
+          <textarea value={resp} onChange={(e) => setResp(e.target.value)} rows={5} aria-label={en ? "Your response…" : "あなたの対応…"} placeholder={en ? "Your response…" : "あなたの対応…"}
                     className="gh-input" style={{ width: "100%", boxSizing: "border-box", fontFamily: "inherit", resize: "vertical", fontSize: 12.5, marginBottom: 10 }} />
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             <button className="gh-btn gh-btn-primary" onClick={grade} disabled={grading || !resp.trim()} style={{ padding: "8px 18px", ...((grading || !resp.trim()) ? { opacity: 0.6 } : {}) }}>
@@ -145619,7 +145619,7 @@ function TabDojo() {
               </div>
               <textarea className="gh-input" rows={3} style={{ width: "100%", boxSizing: "border-box", resize: "vertical", fontFamily: "inherit", marginBottom: 8 }}
                         value={gradeInput} onChange={(e) => setGradeInput(e.target.value)}
-                        placeholder={t(dlang, "oe_inputph")} />
+                        aria-label={t(dlang, "oe_inputph")} placeholder={t(dlang, "oe_inputph")} />
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
                 <button className="gh-btn gh-btn-primary" onClick={gradeIt} disabled={gradeBusy || !gradeInput.trim()}>{t(dlang, "oe_grade")}</button>
                 {!revealed && <button className="gh-btn" onClick={() => setRevealed(true)}>{t(dlang, "oe_reveal")}</button>}
@@ -146139,7 +146139,7 @@ function TabLexicon() {
         {t(lang, "lx_intro")}
       </div>
       <input className="gh-input" value={query} onChange={(e) => setQuery(e.target.value)}
-             placeholder={t(lang, "lx_search")}
+             aria-label={t(lang, "lx_search")} placeholder={t(lang, "lx_search")}
              style={{ width: "100%", boxSizing: "border-box", marginBottom: 12, fontFamily: "inherit" }} />
       <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap", alignItems: "center" }}>
         {cats.map((c) => (
@@ -146318,7 +146318,7 @@ function TabFactbook() {
           </div>
         ))}
       </div>
-      <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={en ? "search figures…" : "数値・キーワードで検索…"} className="gh-input" style={{ width: "100%", boxSizing: "border-box", marginBottom: 10, fontSize: 13 }} />
+      <input value={q} onChange={(e) => setQ(e.target.value)} aria-label={en ? "search figures…" : "数値・キーワードで検索…"} placeholder={en ? "search figures…" : "数値・キーワードで検索…"} className="gh-input" style={{ width: "100%", boxSizing: "border-box", marginBottom: 10, fontSize: 13 }} />
       {/* 現在地（いま何で絞り込んでいるか） */}
       <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 10, fontSize: 11 }}>
         <span style={{ color: C.muted }}>{en ? "Showing:" : "表示中："}</span>
@@ -146847,7 +146847,7 @@ function TabIssues() {
               ["g", en ? "Grounds (up to two facts)" : "根拠（事実を2つまで）", tCard.g, (v) => setTCard((c) => ({ ...c, g: v }))],
               ["q", en ? "Test question for the meeting" : "検証質問（商談で聞く1つ）", tCard.q, (v) => setTCard((c) => ({ ...c, q: v }))],
               ["dd", en ? "Disproof condition" : "反証条件（何が観測されたら捨てるか）", tCard.d, (v) => setTCard((c) => ({ ...c, d: v }))]].map(([k, ph, val, set]) => (
-              <textarea key={k} value={val} onChange={(e) => set(e.target.value)} rows={k === "issue" ? 1 : 2} placeholder={ph}
+              <textarea key={k} value={val} onChange={(e) => set(e.target.value)} rows={k === "issue" ? 1 : 2} aria-label={ph} placeholder={ph}
                 style={{ background: C.surface2, color: C.text, border: `1px solid ${C.line}`, borderRadius: 8, padding: "8px 11px", fontSize: 12.5, lineHeight: 1.6, resize: "vertical", fontFamily: "inherit" }} />
             ))}
             {tErr ? <div style={{ fontSize: 12, color: "#E27069" }}>{tErr}</div> : null}
@@ -149946,7 +149946,7 @@ function LiveDealDojo() {
           {err ? <div style={{ fontSize: 12, color: "#E27069", marginBottom: 8 }}>{err}</div> : null}
           {!review ? (
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "flex-end" }}>
-              <textarea value={input} onChange={(e) => setInput(e.target.value)} rows={2} placeholder={en ? "Reply as the salesperson (Japanese recommended)…" : "営業として返答を入力（Enterで改行、送信はボタン）…"}
+              <textarea value={input} onChange={(e) => setInput(e.target.value)} rows={2} aria-label={en ? "Reply as the salesperson (Japanese recommended)…" : "営業として返答を入力（Enterで改行、送信はボタン）…"} placeholder={en ? "Reply as the salesperson (Japanese recommended)…" : "営業として返答を入力（Enterで改行、送信はボタン）…"}
                 style={{ flex: "1 1 260px", minWidth: 0, background: C.surface2, color: C.text, border: `1px solid ${C.line}`, borderRadius: 8, padding: "9px 11px", fontSize: 13, lineHeight: 1.6, resize: "vertical", fontFamily: "inherit" }} />
               <button onClick={send} disabled={busy || !input.trim()} style={{ background: C.teal, color: "#08131A", border: "none", borderRadius: 8, padding: "10px 18px", fontSize: 13, fontWeight: 800, cursor: busy ? "wait" : "pointer", opacity: busy || !input.trim() ? 0.5 : 1 }}>{en ? "Send" : "送信"}</button>
               <button onClick={grade} disabled={busy || userTurns < 2} title={userTurns < 2 ? (en ? "At least 2 turns first" : "2往復以上で講評可") : ""} style={{ background: "transparent", color: userTurns < 2 ? C.dim : C.gold, border: `1px solid ${userTurns < 2 ? C.line : C.gold}`, borderRadius: 8, padding: "10px 14px", fontSize: 12.5, fontWeight: 700, cursor: busy || userTurns < 2 ? "default" : "pointer" }}>{en ? "Get debrief" : "講評を受ける"}</button>
@@ -152576,7 +152576,7 @@ function FtArchExplorer({ en }) {
           {en ? `AI / agent only (${FT_AI.size})` : `AI・エージェント関連のみ（${FT_AI.size}）`}
         </button>
       </div>
-      <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={en ? "Search company, product, tag or component (e.g. BigQuery, Fargate, IoT)" : "会社・プロダクト・タグ・構成要素で検索（例: BigQuery、Fargate、IoT）"}
+      <input value={q} onChange={(e) => setQ(e.target.value)} aria-label={en ? "Search company, product, tag or component (e.g. BigQuery, Fargate, IoT)" : "会社・プロダクト・タグ・構成要素で検索（例: BigQuery、Fargate、IoT）"} placeholder={en ? "Search company, product, tag or component (e.g. BigQuery, Fargate, IoT)" : "会社・プロダクト・タグ・構成要素で検索（例: BigQuery、Fargate、IoT）"}
         style={{ width: "100%", boxSizing: "border-box", background: C.surface, border: `1px solid ${C.line}`, borderRadius: 8, color: C.text, fontSize: 12, padding: "7px 11px", marginBottom: 8 }} />
       <div style={{ fontSize: 11, color: C.dim, marginBottom: 6 }}>
         {en ? `${list.length} of ${FT_META.nArch} match` : `${FT_META.nArch}件中 ${list.length}件が該当`}
@@ -154292,11 +154292,11 @@ function CaseWorkCard({ card, idx, onBack }) {
       </div>
       <div style={{ marginBottom: 10 }}>
         <div style={{ fontSize: 11.5, fontWeight: 800, color: C.teal, marginBottom: 4 }}>{en ? "1. YOUR SHORTLIST (3 use cases + rationale + what you will NOT do)" : "1. 絞り込み3件＋根拠＋やらないこと"}</div>
-        <textarea style={ta} value={notes.a} onChange={e => saveNotes({ ...notes, a: e.target.value })} placeholder={en ? "Which 3, why, and why not the others…" : "どの3件か・なぜか・なぜ他を捨てるか…"} />
+        <textarea style={ta} value={notes.a} onChange={e => saveNotes({ ...notes, a: e.target.value })} aria-label={en ? "Which 3, why, and why not the others…" : "どの3件か・なぜか・なぜ他を捨てるか…"} placeholder={en ? "Which 3, why, and why not the others…" : "どの3件か・なぜか・なぜ他を捨てるか…"} />
       </div>
       <div style={{ marginBottom: 12 }}>
         <div style={{ fontSize: 11.5, fontWeight: 800, color: C.teal, marginBottom: 4 }}>{en ? "2. PROPOSAL SKELETON (7 sections, one line each)" : "2. 提案骨子（7項目×各1行：①企業価値の問い②なぜ今か③絞り込み④効果と測定⑤段階投資とゲート⑥統制先回り⑦なぜ当社か）"}</div>
-        <textarea style={{ ...ta, minHeight: 150 }} value={notes.b} onChange={e => saveNotes({ ...notes, b: e.target.value })} placeholder={en ? "① … ② … ③ …" : "① … ② … ③ …"} />
+        <textarea style={{ ...ta, minHeight: 150 }} value={notes.b} onChange={e => saveNotes({ ...notes, b: e.target.value })} aria-label={en ? "① … ② … ③ …" : "① … ② … ③ …"} placeholder={en ? "① … ② … ③ …" : "① … ② … ③ …"} />
       </div>
       <button className="gh-btn" onClick={() => setShowModel(m => !m)} style={{ borderColor: C.gold, color: C.gold, fontWeight: 700, marginBottom: 12 }}>{showModel ? (en ? "▲ Hide model answer" : "▲ 模範解答を閉じる") : (en ? "▼ Compare with the model answer" : "▼ 模範解答と照合する")}</button>
       <button className="gh-btn" disabled={aiBusy || (!notes.a.trim() && !notes.b.trim())} onClick={async () => {
@@ -154971,7 +154971,7 @@ function FsLibrary({ en }) {
   return (
     <div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
-        <input className="gh-input" value={q} onChange={(e) => setQ(e.target.value)} placeholder={en ? "Search name, publisher or content" : "名称・運営・内容で検索"} style={{ flex: 1, minWidth: 180 }} />
+        <input className="gh-input" value={q} onChange={(e) => setQ(e.target.value)} aria-label={en ? "Search name, publisher or content" : "名称・運営・内容で検索"} placeholder={en ? "Search name, publisher or content" : "名称・運営・内容で検索"} style={{ flex: 1, minWidth: 180 }} />
         <select className="gh-select" value={ly} onChange={(e) => { setLy(e.target.value); setSub(""); }}>
           <option value="">{en ? "All layers" : "すべてのレイヤー"}</option>
           {FORESIGHT.layers.map((l) => <option key={l.id} value={l.id}>{FS_PICK(l.tab, en)}</option>)}
@@ -155155,15 +155155,15 @@ function FsCollection({ en }) {
       <Card style={{ marginBottom: 12, borderColor: C.teal }}>
         <div style={{ fontSize: 12.5, lineHeight: 1.7, marginBottom: 10 }}>{en ? "Your own clippings: Instagram saves, YouTube digests and notes you emailed yourself are already filed by layer. Items you add here are saved in this browser; use Export to back them up." : "自分で集めた情報の置き場所。Instagram の保存、YouTube のダイジェスト、自分宛てのメールのメモをレイヤー別に取り込み済み。ここで追加した項目はこの端末のブラウザに保存されます（バックアップは「書き出し」）。"}</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,240px),1fr))", gap: 8 }}>
-          <input className="gh-input" style={inp} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder={en ? "Title (required)" : "タイトル（必須）"} />
-          <input className="gh-input" style={inp} value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} placeholder="URL" />
+          <input className="gh-input" style={inp} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} aria-label={en ? "Title (required)" : "タイトル（必須）"} placeholder={en ? "Title (required)" : "タイトル（必須）"} />
+          <input className="gh-input" style={inp} value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} aria-label="URL" placeholder="URL" />
           <select className="gh-select" style={inp} value={form.layer} onChange={(e) => setForm({ ...form, layer: e.target.value })}>
             <option value="">{en ? "Layer: Other" : "レイヤー：その他"}</option>
             {FORESIGHT.layers.map((l) => <option key={l.id} value={l.id}>{FS_PICK(l.tab, en)}</option>)}
           </select>
-          <input className="gh-input" style={inp} value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} placeholder={en ? "Tags (comma separated)" : "タグ（カンマ区切り）"} />
+          <input className="gh-input" style={inp} value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} aria-label={en ? "Tags (comma separated)" : "タグ（カンマ区切り）"} placeholder={en ? "Tags (comma separated)" : "タグ（カンマ区切り）"} />
         </div>
-        <textarea className="gh-input" style={{ ...inp, marginTop: 8, minHeight: 72, fontFamily: "inherit", lineHeight: 1.6 }} value={form.memo} onChange={(e) => setForm({ ...form, memo: e.target.value })} placeholder={en ? "Notes: why it matters, the So What" : "メモ：なぜ気になったか、So What"} />
+        <textarea className="gh-input" style={{ ...inp, marginTop: 8, minHeight: 72, fontFamily: "inherit", lineHeight: 1.6 }} value={form.memo} onChange={(e) => setForm({ ...form, memo: e.target.value })} aria-label={en ? "Notes: why it matters, the So What" : "メモ：なぜ気になったか、So What"} placeholder={en ? "Notes: why it matters, the So What" : "メモ：なぜ気になったか、So What"} />
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
           <button className="gh-btn gh-btn-primary" onClick={submit} disabled={!form.title.trim()}>{edit ? (en ? "Update" : "更新する") : (en ? "Add" : "追加する")}</button>
           {edit && <button className="gh-btn" onClick={() => { setForm(blank); setEdit(null); }}>{en ? "Cancel" : "取り消す"}</button>}
@@ -155174,7 +155174,7 @@ function FsCollection({ en }) {
         </div>
       </Card>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 8 }}>
-        <input className="gh-input" value={q} onChange={(e) => setQ(e.target.value)} placeholder={en ? "Search your collection" : "コレクションを検索"} style={{ flex: 1, minWidth: 180 }} />
+        <input className="gh-input" value={q} onChange={(e) => setQ(e.target.value)} aria-label={en ? "Search your collection" : "コレクションを検索"} placeholder={en ? "Search your collection" : "コレクションを検索"} style={{ flex: 1, minWidth: 180 }} />
         <select className="gh-select" value={ly} onChange={(e) => setLy(e.target.value)}>
           <option value="">{en ? "All layers" : "すべてのレイヤー"}</option>
           {FORESIGHT.layers.map((l) => <option key={l.id} value={l.id}>{FS_PICK(l.tab, en)}</option>)}
@@ -155940,7 +155940,7 @@ function ItSecGlossary({ en, initLayer = "ALL", initOpen = null }) {
         })}
       </div>
       <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 10 }}>
-        <input className="gh-input" value={q} onChange={(e) => setQ(e.target.value)} placeholder={en ? "search (e.g. EDR, 固定IP, CASB)" : "検索（例：EDR、固定IP、CASB）"} style={{ flex: "1 1 220px" }} />
+        <input className="gh-input" value={q} onChange={(e) => setQ(e.target.value)} aria-label={en ? "search (e.g. EDR, 固定IP, CASB)" : "検索（例：EDR、固定IP、CASB）"} placeholder={en ? "search (e.g. EDR, 固定IP, CASB)" : "検索（例：EDR、固定IP、CASB）"} style={{ flex: "1 1 220px" }} />
         <span style={{ fontSize: 11, color: C.muted }}>{list.length}{en ? " shown" : "件"}</span>
         <button className="gh-btn" onClick={() => setOpen(Object.fromEntries(list.map((c) => [c.id, true])))} style={{ padding: "4px 10px", fontSize: 11 }}>{en ? "Expand all" : "すべて開く"}</button>
         <button className="gh-btn" onClick={() => setOpen({})} style={{ padding: "4px 10px", fontSize: 11 }}>{en ? "Collapse" : "閉じる"}</button>
@@ -158525,7 +158525,7 @@ function NoteArticleView({ en }) {
           <option value="ALL">{en ? "All themes" : "テーマすべて"}</option>
           {themes.map((th) => <option key={th} value={th}>{th}</option>)}
         </select>
-        <input className="gh-btn" value={qstr} onChange={(e) => setQstr(e.target.value)} placeholder={en ? "search" : "本文を検索"} style={{ minWidth: 160 }} />
+        <input className="gh-btn" value={qstr} onChange={(e) => setQstr(e.target.value)} aria-label={en ? "search" : "本文を検索"} placeholder={en ? "search" : "本文を検索"} style={{ minWidth: 160 }} />
         <span style={{ fontSize: 11, color: C.muted }}>{list.length}{en ? " hits" : "件"}</span>
       </div>
       <div style={{ display: "grid", gap: 8 }}>
@@ -167238,7 +167238,7 @@ function GlossaryTab({ lang, tt, t }) {
         <DomainChip dom={{ color: C.ink, mark: "◎", ja: t(L.allDomains), en: t(L.allDomains) }} active={dom === -1} onClick={() => setDom(-1)} lang={lang} />
         {DOMAINS.map((d) => <DomainChip key={d.id} dom={d} active={dom === d.id} onClick={() => setDom(d.id)} lang={lang} />)}
       </div>
-      <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t(L.search)}
+      <input value={q} onChange={(e) => setQ(e.target.value)} aria-label={t(L.search)} placeholder={t(L.search)}
         style={{ width: "100%", boxSizing: "border-box", padding: "11px 15px", borderRadius: 9, border: `1.5px solid ${C.line}`, fontSize: 14, marginBottom: 16, fontFamily: sans }} />
       <div style={{ display: "grid", gap: 10 }}>
         {list.map((g, i) => (
@@ -169075,7 +169075,7 @@ function GlossaryView({ glCat, setGlCat, glSearch, setGlSearch }) {
       <input
         type="text"
         className="gl-input"
-        placeholder="用語を検索…"
+        aria-label="用語を検索…" placeholder="用語を検索…"
         value={glSearch}
         onChange={(e) => setGlSearch(e.target.value)}
       />
@@ -170161,7 +170161,7 @@ function Confuse({ lang, t }) {
   const list = CONFUSE.filter(c => !q || c.join("").toLowerCase().includes(q.toLowerCase()));
   return (
     <div>
-      <input value={q} onChange={e => setQ(e.target.value)} placeholder={t.confuseSearch}
+      <input value={q} onChange={e => setQ(e.target.value)} aria-label={t.confuseSearch} placeholder={t.confuseSearch}
         style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 14, boxSizing: "border-box" }} />
       {list.map((c, i) => (
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 10 }}>
@@ -174776,7 +174776,7 @@ function Confuse({ lang, t }) {
   const list = CONFUSE.filter(c => !q || c.join("").toLowerCase().includes(q.toLowerCase()));
   return (
     <div>
-      <input value={q} onChange={e => setQ(e.target.value)} placeholder={t.confuseSearch}
+      <input value={q} onChange={e => setQ(e.target.value)} aria-label={t.confuseSearch} placeholder={t.confuseSearch}
         style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 14, boxSizing: "border-box" }} />
       {list.map((c, i) => (
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 10 }}>
@@ -177960,7 +177960,7 @@ function Confuse({ lang }) {
   const list = data.filter(c => !q || c.join("").toLowerCase().includes(q.toLowerCase()));
   return (
     <div>
-      <input value={q} onChange={e => setQ(e.target.value)} placeholder={t.searchConfuse}
+      <input value={q} onChange={e => setQ(e.target.value)} aria-label={t.searchConfuse} placeholder={t.searchConfuse}
         style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 14, boxSizing: "border-box" }} />
       {list.map((c, i) => (
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 10 }}>
@@ -177986,7 +177986,7 @@ function Glossary({ lang }) {
   });
   return (
     <div>
-      <input value={q} onChange={e => setQ(e.target.value)} placeholder={t.searchTerm}
+      <input value={q} onChange={e => setQ(e.target.value)} aria-label={t.searchTerm} placeholder={t.searchTerm}
         style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 10, boxSizing: "border-box" }} />
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
         {cats.map(k => (
@@ -181067,7 +181067,7 @@ function Confuse({ t }) {
   const list = CONFUSE.filter(c => !q || c.join("").toLowerCase().includes(q.toLowerCase()));
   return (
     <div>
-      <input value={q} onChange={e => setQ(e.target.value)} placeholder={t.confuseSearch}
+      <input value={q} onChange={e => setQ(e.target.value)} aria-label={t.confuseSearch} placeholder={t.confuseSearch}
         style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 14, boxSizing: "border-box" }} />
       {list.map((c, i) => (
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 10 }}>
@@ -181092,7 +181092,7 @@ function Glossary({ t }) {
   });
   return (
     <div>
-      <input value={q} onChange={e => setQ(e.target.value)} placeholder={t.glossarySearch}
+      <input value={q} onChange={e => setQ(e.target.value)} aria-label={t.glossarySearch} placeholder={t.glossarySearch}
         style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 10, boxSizing: "border-box" }} />
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
         {GLOSSARY_CATS.map(k => (
@@ -183009,7 +183009,7 @@ function Confuse({ lang, t }) {
   const list = CONFUSE.filter(c => !q || c.join("").toLowerCase().includes(q.toLowerCase()));
   return (
     <div>
-      <input value={q} onChange={e => setQ(e.target.value)} placeholder={t.confuseSearch}
+      <input value={q} onChange={e => setQ(e.target.value)} aria-label={t.confuseSearch} placeholder={t.confuseSearch}
         style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 14, boxSizing: "border-box" }} />
       {list.map((c, i) => (
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 10 }}>
@@ -185372,7 +185372,7 @@ function Confuse({ lang, t }) {
   const list = CONFUSE.filter(c => !q || c.join("").toLowerCase().includes(q.toLowerCase()));
   return (
     <div>
-      <input value={q} onChange={e => setQ(e.target.value)} placeholder={t.confuseSearch}
+      <input value={q} onChange={e => setQ(e.target.value)} aria-label={t.confuseSearch} placeholder={t.confuseSearch}
         style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 14, boxSizing: "border-box" }} />
       {list.map((c, i) => (
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 10 }}>
@@ -187166,7 +187166,7 @@ function Confuse({ lang, t }) {
   const list = CONFUSE.filter(c => !q || c.join("").toLowerCase().includes(q.toLowerCase()));
   return (
     <div>
-      <input value={q} onChange={e => setQ(e.target.value)} placeholder={t.confuseSearch}
+      <input value={q} onChange={e => setQ(e.target.value)} aria-label={t.confuseSearch} placeholder={t.confuseSearch}
         style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 14, boxSizing: "border-box" }} />
       {list.map((c, i) => (
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 10 }}>
@@ -188960,7 +188960,7 @@ function Confuse({ lang, t }) {
   const list = CONFUSE.filter(c => !q || c.join("").toLowerCase().includes(q.toLowerCase()));
   return (
     <div>
-      <input value={q} onChange={e => setQ(e.target.value)} placeholder={t.confuseSearch}
+      <input value={q} onChange={e => setQ(e.target.value)} aria-label={t.confuseSearch} placeholder={t.confuseSearch}
         style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 14, boxSizing: "border-box" }} />
       {list.map((c, i) => (
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 10 }}>
@@ -190256,7 +190256,7 @@ function Confuse({ lang, t }) {
   const list = CONFUSE.filter(c => !q || c.join("").toLowerCase().includes(q.toLowerCase()));
   return (
     <div>
-      <input value={q} onChange={e => setQ(e.target.value)} placeholder={t.confuseSearch}
+      <input value={q} onChange={e => setQ(e.target.value)} aria-label={t.confuseSearch} placeholder={t.confuseSearch}
         style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 14, boxSizing: "border-box" }} />
       {list.map((c, i) => (
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 10 }}>
@@ -191551,7 +191551,7 @@ function Confuse({ lang, t }) {
   const list = CONFUSE.filter(c => !q || c.join("").toLowerCase().includes(q.toLowerCase()));
   return (
     <div>
-      <input value={q} onChange={e => setQ(e.target.value)} placeholder={t.confuseSearch}
+      <input value={q} onChange={e => setQ(e.target.value)} aria-label={t.confuseSearch} placeholder={t.confuseSearch}
         style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 14, boxSizing: "border-box" }} />
       {list.map((c, i) => (
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 10 }}>
@@ -192846,7 +192846,7 @@ function Confuse({ lang, t }) {
   const list = CONFUSE.filter(c => !q || c.join("").toLowerCase().includes(q.toLowerCase()));
   return (
     <div>
-      <input value={q} onChange={e => setQ(e.target.value)} placeholder={t.confuseSearch}
+      <input value={q} onChange={e => setQ(e.target.value)} aria-label={t.confuseSearch} placeholder={t.confuseSearch}
         style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 14, boxSizing: "border-box" }} />
       {list.map((c, i) => (
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 10 }}>
@@ -194141,7 +194141,7 @@ function Confuse({ lang, t }) {
   const list = CONFUSE.filter(c => !q || c.join("").toLowerCase().includes(q.toLowerCase()));
   return (
     <div>
-      <input value={q} onChange={e => setQ(e.target.value)} placeholder={t.confuseSearch}
+      <input value={q} onChange={e => setQ(e.target.value)} aria-label={t.confuseSearch} placeholder={t.confuseSearch}
         style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 14, boxSizing: "border-box" }} />
       {list.map((c, i) => (
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 10 }}>
@@ -195575,7 +195575,7 @@ function Confuse({ lang, t }) {
   const list = CONFUSE.filter(c => !q || c.join("").toLowerCase().includes(q.toLowerCase()));
   return (
     <div>
-      <input value={q} onChange={e => setQ(e.target.value)} placeholder={t.confuseSearch}
+      <input value={q} onChange={e => setQ(e.target.value)} aria-label={t.confuseSearch} placeholder={t.confuseSearch}
         style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 14, boxSizing: "border-box" }} />
       {list.map((c, i) => (
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 10 }}>
@@ -196994,7 +196994,7 @@ function Confuse({ lang, t }) {
   const list = CONFUSE.filter(c => !q || c.join("").toLowerCase().includes(q.toLowerCase()));
   return (
     <div>
-      <input value={q} onChange={e => setQ(e.target.value)} placeholder={t.confuseSearch}
+      <input value={q} onChange={e => setQ(e.target.value)} aria-label={t.confuseSearch} placeholder={t.confuseSearch}
         style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 14, boxSizing: "border-box" }} />
       {list.map((c, i) => (
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 10 }}>
@@ -198616,7 +198616,7 @@ function Confuse({ lang, t }) {
   const list = CONFUSE.filter(c => !q || c.join("").toLowerCase().includes(q.toLowerCase()));
   return (
     <div>
-      <input value={q} onChange={e => setQ(e.target.value)} placeholder={t.confuseSearch}
+      <input value={q} onChange={e => setQ(e.target.value)} aria-label={t.confuseSearch} placeholder={t.confuseSearch}
         style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 14, boxSizing: "border-box" }} />
       {list.map((c, i) => (
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 10 }}>
@@ -200226,7 +200226,7 @@ function Confuse({ lang, t }) {
   const list = CONFUSE.filter(c => !q || c.join("").toLowerCase().includes(q.toLowerCase()));
   return (
     <div>
-      <input value={q} onChange={e => setQ(e.target.value)} placeholder={t.confuseSearch}
+      <input value={q} onChange={e => setQ(e.target.value)} aria-label={t.confuseSearch} placeholder={t.confuseSearch}
         style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 14, boxSizing: "border-box" }} />
       {list.map((c, i) => (
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 10 }}>
@@ -201590,7 +201590,7 @@ function Confuse({ lang, t }) {
   const list = CONFUSE.filter(c => !q || c.join("").toLowerCase().includes(q.toLowerCase()));
   return (
     <div>
-      <input value={q} onChange={e => setQ(e.target.value)} placeholder={t.confuseSearch} style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 14, boxSizing: "border-box" }} />
+      <input value={q} onChange={e => setQ(e.target.value)} aria-label={t.confuseSearch} placeholder={t.confuseSearch} style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 14, boxSizing: "border-box" }} />
       {list.map((c, i) => (
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 10 }}>
           <div style={{ fontWeight: 700, color: C.deep, fontSize: 13.5, marginBottom: 5 }}>{lang === "en" && c[3] ? c[3] : c[0]}</div>
@@ -212152,7 +212152,7 @@ function VocabPanel({lang,t,voiceURI,onVoiceChange}){
       {/* コントロール行 */}
       <div style={{display:"flex",gap:8,marginBottom:10,flexWrap:"wrap",alignItems:"center"}}>
         <input type="text" value={search} onChange={e=>setSearch(e.target.value)}
-          placeholder="単語・意味で検索"
+          aria-label="単語・意味で検索" placeholder="単語・意味で検索"
           style={{padding:"8px 10px",borderRadius:9,border:"1px solid #ddd",fontSize:13,background:"#fff",
             width:150,maxWidth:"100%"}}/>
 
@@ -213985,7 +213985,7 @@ const TrainingHubModule = (function () {
           ) : pick === "other" ? (
             <label style={{ display: "block", ...cap }}>やった内容（自由記述）
               <textarea value={other} onChange={(e) => setOther(e.target.value)} rows={3} autoFocus
-                        placeholder="例：ゴルフ18ホール／ストレッチ30分／上半身だけ実施"
+                        aria-label="例：ゴルフ18ホール／ストレッチ30分／上半身だけ実施" placeholder="例：ゴルフ18ホール／ストレッチ30分／上半身だけ実施"
                         style={{ ...field, width: "100%", marginTop: 4, resize: "vertical", lineHeight: 1.6 }} />
             </label>
           ) : (
@@ -214061,7 +214061,7 @@ const TrainingHubModule = (function () {
             {r.s === "other" ? (
               <label style={{ display: "block", ...cap, marginTop: 12 }}>やった内容（自由記述）
                 <textarea value={other} onChange={(e) => setOther(e.target.value)} onBlur={() => onPut({ other: other.trim() || undefined })} rows={3} autoFocus
-                          placeholder="例：ゴルフ18ホール／ストレッチ30分／上半身だけ実施"
+                          aria-label="例：ゴルフ18ホール／ストレッチ30分／上半身だけ実施" placeholder="例：ゴルフ18ホール／ストレッチ30分／上半身だけ実施"
                           style={{ ...field, width: "100%", marginTop: 4, resize: "vertical", lineHeight: 1.6 }} />
               </label>
             ) : null}
@@ -214084,16 +214084,16 @@ const TrainingHubModule = (function () {
           {!isFuture ? (
             <>
               <label style={cap}>体重（kg）<br />
-                <input inputMode="decimal" value={kg} onChange={(e) => setKg(e.target.value)} onBlur={() => onPut({ kg: num1(kg) })} style={{ ...field, width: 90 }} placeholder="87.6" />
+                <input inputMode="decimal" value={kg} onChange={(e) => setKg(e.target.value)} onBlur={() => onPut({ kg: num1(kg) })} style={{ ...field, width: 90 }} aria-label="87.6" placeholder="87.6" />
               </label>
               <label style={cap}>体脂肪率（％）<br />
-                <input inputMode="decimal" value={bf} onChange={(e) => setBf(e.target.value)} onBlur={() => onPut({ bf: num1(bf) })} style={{ ...field, width: 90 }} placeholder="25.8" />
+                <input inputMode="decimal" value={bf} onChange={(e) => setBf(e.target.value)} onBlur={() => onPut({ bf: num1(bf) })} style={{ ...field, width: 90 }} aria-label="25.8" placeholder="25.8" />
               </label>
             </>
           ) : null}
           <label style={{ ...cap, flex: 1, minWidth: 180 }}>メモ（体調・使った重量など）<br />
             <input value={memo} onChange={(e) => setMemo(e.target.value)} onBlur={() => onPut({ memo: memo.trim() || undefined })}
-                   style={{ ...field, width: "100%" }} placeholder="例：脚に疲れが残りランは見送り" />
+                   style={{ ...field, width: "100%" }} aria-label="例：脚に疲れが残りランは見送り" placeholder="例：脚に疲れが残りランは見送り" />
           </label>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 12, gap: 8, flexWrap: "wrap" }}>
@@ -214205,9 +214205,9 @@ const TrainingHubModule = (function () {
           <div style={h2}>今朝の計測 <span style={{ fontWeight: 600, color: TC.sub, fontSize: 13 }}>{label(todayK)}</span></div>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end" }}>
             <label style={cap}>体重（kg）<br />
-              <input inputMode="decimal" value={kg} onChange={(e) => setKg(e.target.value)} style={{ ...field, width: 100, fontSize: 15 }} placeholder="87.6" /></label>
+              <input inputMode="decimal" value={kg} onChange={(e) => setKg(e.target.value)} style={{ ...field, width: 100, fontSize: 15 }} aria-label="87.6" placeholder="87.6" /></label>
             <label style={cap}>体脂肪率（％）<br />
-              <input inputMode="decimal" value={bf} onChange={(e) => setBf(e.target.value)} style={{ ...field, width: 100, fontSize: 15 }} placeholder="25.8" /></label>
+              <input inputMode="decimal" value={bf} onChange={(e) => setBf(e.target.value)} style={{ ...field, width: 100, fontSize: 15 }} aria-label="25.8" placeholder="25.8" /></label>
             <button onClick={() => onPut(todayK, { kg: num1(kg), bf: num1(bf) })} style={{ ...btn(true), marginBottom: 6 }}>記録する</button>
           </div>
           <div style={{ fontSize: 11.5, color: TC.faint, marginTop: 4 }}>毎朝、同じ条件で測ります。過去の日の値は、記録タブのカレンダーから直せます。</div>
@@ -214460,7 +214460,7 @@ const TrainingHubModule = (function () {
         </div>
         <label style={{ display: "block", ...cap }}>食べたもの
           <textarea value={text} onChange={(e) => setText(e.target.value)} rows={2}
-                    placeholder="例：鶏むね肉200g、玄米150g、サラダ、味噌汁"
+                    aria-label="例：鶏むね肉200g、玄米150g、サラダ、味噌汁" placeholder="例：鶏むね肉200g、玄米150g、サラダ、味噌汁"
                     style={{ ...field, width: "100%", marginTop: 4, resize: "vertical", lineHeight: 1.6 }} />
         </label>
         <div style={{ ...cap, marginTop: 8 }}>栄養（分かる分だけで構いません）</div>
@@ -214669,7 +214669,7 @@ const TrainingHubModule = (function () {
                     onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); e.currentTarget.blur(); } }}
                     style={{ ...field, width, resize: "vertical", lineHeight: 1.5, fontSize: 13 }} />
         ) : (
-          <input value={v} inputMode={inputMode} placeholder={placeholder} onChange={(e) => setV(e.target.value)}
+          <input value={v} inputMode={inputMode} aria-label={placeholder} placeholder={placeholder} onChange={(e) => setV(e.target.value)}
                  onBlur={() => onCommit(v)} onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }}
                  style={{ ...field, width }} />
         )}
@@ -219191,7 +219191,7 @@ function ComparisonTable({ cat }) {
           className="lh-input"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={t("分野名・キーワードで絞り込み", "Filter by name or keyword")}
+          aria-label={t("分野名・キーワードで絞り込み", "Filter by name or keyword")} placeholder={t("分野名・キーワードで絞り込み", "Filter by name or keyword")}
           style={{
             flex: 1,
             minWidth: 160,
@@ -219343,7 +219343,7 @@ function GlossaryList({ cat }) {
           className="lh-input"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={t("用語・英語名・説明で検索", "Search term, English name, or definition")}
+          aria-label={t("用語・英語名・説明で検索", "Search term, English name, or definition")} placeholder={t("用語・英語名・説明で検索", "Search term, English name, or definition")}
           style={{
             width: "100%",
             boxSizing: "border-box",
@@ -221787,7 +221787,10 @@ function LinguisticsHub() {
                   className="lh-input"
                   value={globalGlossaryQuery}
                   onChange={(e) => setGlobalGlossaryQuery(e.target.value)}
-                  placeholder={t(
+                  aria-label={t(
+                    "全カテゴリの用語・問題文を検索(例: オントロジー, RDF, 音素)",
+                    "Search terms and questions across all categories (e.g. ontology, RDF, phoneme)"
+                  )} placeholder={t(
                     "全カテゴリの用語・問題文を検索(例: オントロジー, RDF, 音素)",
                     "Search terms and questions across all categories (e.g. ontology, RDF, phoneme)"
                   )}
@@ -224270,7 +224273,7 @@ function PortalLibrary({ lang, onResume }) {
             ))}
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8, marginBottom: 12 }}>
-            <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={en ? "search title…" : "タイトルで検索…"} style={{ flex: "1 1 200px", minWidth: 160, fontSize: 11.5, color: NOVA.ink, border: `1px solid ${NOVA.line}`, borderRadius: 8, padding: "5px 10px" }} />
+            <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} aria-label={en ? "search title…" : "タイトルで検索…"} placeholder={en ? "search title…" : "タイトルで検索…"} style={{ flex: "1 1 200px", minWidth: 160, fontSize: 11.5, color: NOVA.ink, border: `1px solid ${NOVA.line}`, borderRadius: 8, padding: "5px 10px" }} />
             {query ? <button onClick={() => setQuery("")} style={{ background: "transparent", border: `1px solid ${NOVA.line}`, borderRadius: 999, padding: "3px 9px", fontSize: 10, color: NOVA.sub, cursor: "pointer" }}>×</button> : null}
             <label style={{ fontSize: 10, color: NOVA.faint, fontWeight: 700 }}>{en ? "sort" : "並び"}</label>
             <select value={itemSort} onChange={(e) => setItemSort(e.target.value)} style={{ fontSize: 10.5, color: NOVA.sub, border: `1px solid ${NOVA.line}`, borderRadius: 7, padding: "3px 6px" }}>
