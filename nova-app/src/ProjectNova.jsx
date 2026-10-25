@@ -12691,7 +12691,7 @@ SECTIONS.push({
         a: 0,
         exp: { ja: "オークションは競争で価格最大化、相対は特定相手と条件を作り込む。", en: "Auctions drive price via competition; bilateral tailors terms with one party." } },
       { id: "q_pr_05", dom: "process", diff: 1,
-        q: { ja: "『IM(インフォメーション・メモrandum)』の役割は。", en: "What is the role of an Information Memorandum (IM)?" },
+        q: { ja: "『IM(インフォメーション・メモランダム)』の役割は。", en: "What is the role of an Information Memorandum (IM)?" },
         ch: {
           ja: ["対象会社の概要・財務・事業を買い手候補に提示する資料", "買い手が売り手に提出する、買収価格と資金調達計画を記した提案書", "売買の最終条件と補償範囲を定める法的拘束力のある契約書", "DDで見つかった問題点を買い手が整理した調査報告書"],
           en: ["A document presenting the target's overview/financials to bidders", "A proposal the buyer submits to the seller stating price and financing plan", "A binding agreement fixing final terms and the scope of indemnity", "A report in which the buyer summarizes issues found in due diligence"]
