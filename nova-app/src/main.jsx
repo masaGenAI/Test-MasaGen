@@ -279,6 +279,8 @@ function BackupBar() {
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <ProjectNova />
+    {/* 画面下に浮くボタン（進捗バックアップ・トップへ）が本文の最終行を隠さないよう、末尾に余白を置く */}
+    <div aria-hidden="true" style={{ height: 72 }} />
     <BackupBar />
   </React.StrictMode>,
 );

@@ -136,7 +136,7 @@ tr:hover .delrow{ opacity:1; } .delrow:hover{ color:#c0392b; }
 <body>
 <div class="wrap">
   <h1>📘 学習ロードマップ トラッカー</h1>
-  <div class="sub">Excel「Jobopp」全件を取り込み（資格・Tools・講座・書籍）· 全項目を編集・新規追加するとNotionへ即保存 · <span id="meta"></span></div>
+  <div class="sub">Excel「Jobopp」全件を取り込み（資格・Tools・講座・書籍）· 全項目を編集・新規追加でき、この端末に保存（Cowork版ではNotionへも同期） · <span id="meta"></span></div>
   <div id="banner" class="banner"></div>
   <div class="tabs" id="tabs"></div>
 
@@ -165,7 +165,7 @@ tr:hover .delrow{ opacity:1; } .delrow:hover{ color:#c0392b; }
     <div class="tblwrap"><table id="tbl"><thead></thead><tbody></tbody></table></div>
   </div>
 
-  <div class="foot">表示はExcel全件が基準。編集・新規追加はNotionへ同期保存します · ヘッダー再読み込みで最新化</div>
+  <div class="foot">表示はExcel全件が基準。編集・新規追加はこの端末に保存します（Cowork版ではNotionへも同期）</div>
 </div>
 <div id="rowtools"><span class="rt-color" title="この行に色を付ける">🎨</span><span class="rt-hide" title="この行を非表示にする">🙈</span></div>
 <div id="toast"></div>
@@ -176,6 +176,8 @@ tr:hover .delrow{ opacity:1; } .delrow:hover{ color:#c0392b; }
 <script>
 const SERVER="mcp__b62b1ad0-d654-4051-ac41-05d68c8c759d";
 const CALL=(t,a)=>window.cowork.callMcpTool(SERVER+"__"+t,a);
+// ポータルに埋め込んだ版には Notion への接続（window.cowork）が無い。その場合は端末への保存だけで動かす
+const HAS_NOTION=!!(window.cowork&&window.cowork.callMcpTool);
 const ED=window.EXCELDATA;
 
 const ORDER=["cert","tools","course","book","udemy"];
@@ -357,6 +359,7 @@ async function resolveId(it){
 }
 async function persist(it,patch){
   if(!KEY2COL[it.key]){ toast("Udemyはこの画面内に保存しました"); return; }
+  if(!HAS_NOTION){ toast("この端末に保存しました"); return; }
   const id=await resolveId(it);
   if(!id){ toast("Notionの項目が見つからず保存できませんでした",true); return; }
   try{ await CALL("notion-update-page",{page_id:id,command:"update_properties",properties:patch}); toast("Notionに保存しました"); }
@@ -529,7 +532,7 @@ async function addNew(k){
   const it={key:k,no:maxNo+1,ord:9000+DATA.length,name:"新規項目",status:defS,p:{},id:null,__new:true};
   it.p[tp]="新規項目"; it.p["ステータス"]=defS;
   recompDate(it); DATA.push(it); idxByKeyTitle[k+"||"+norm(it.name)]=it;
-  saveCache(); renderTable(k); renderCards(); if(!KEY2COL[k]){ toast("行を追加しました（この画面内）"); return; } toast("Notionに新規行を作成中…");
+  saveCache(); renderTable(k); renderCards(); if(!KEY2COL[k]||!HAS_NOTION){ toast("行を追加しました（この端末に保存）"); return; } toast("Notionに新規行を作成中…");
   try{ const props={}; props[tp]="新規項目"; props["ステータス"]=defS;
     const r=unwrap(await CALL("notion-create-pages",{parent:{type:"data_source_id",data_source_id:KEY2COL[k]},pages:[{properties:props}]}));
     const pg=r&&r.pages&&r.pages[0]; if(pg&&pg.id){ it.id=pg.id; saveCache(); toast("新規行を作成しました。各セルを編集してください"); }
@@ -650,6 +653,7 @@ document.getElementById("undatedBtn").onclick=renderUndated;
 
 /* ---- background Notion id sync (enables editing without per-row lookup) ---- */
 async function syncNotion(){
+  if(!HAS_NOTION){ setMeta("· この端末に保存（Notion連携なし）"); return; }
   try{
     const ids=await discoverIds();
     const pages=await fetchPages(ids,(n,t)=>{ setMeta(`<span class="updating">· Notion照合中 ${n}/${t}</span>`); });

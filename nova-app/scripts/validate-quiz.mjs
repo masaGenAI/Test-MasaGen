@@ -238,6 +238,27 @@ for (const st of STATIONS) {
 {
   const SKEW_SNAPSHOT = {
     // 2026-09-27 時点で帯の外にあるバンク（すべて share が低すぎる側）。直したら行を消す。
+    // 2026-10-25：入れ子の問題も検査するようにして見つかったバンク（Finance・Certification のセキュリティ/ガバナンス・TechHub）。直したら行を消す。
+    'HARD:あるグローバル製造業がA#0': { hit: 0.7500, share: 0.8000 },
+    'HARD:あるフィンテック企業が信#0': { hit: 0.9512, share: 0.9512 },
+    'HARD:ある企業の情報セキュリテ#0': { hit: 0.6125, share: 0.6375 },
+    'HARD:ある金融機関がAIリスク#0': { hit: 0.6625, share: 0.7625 },
+    'HARD:ある銀行のAIガバナンス#0': { hit: 0.6835, share: 0.7089 },
+    'quiz:s11q001#0': { hit: 0.9100, share: 0.9300 },
+    'quiz:s13q001#0': { hit: 0.9400, share: 0.9400 },
+    'runs:m_a01#0': { hit: 0.8000, share: 0.9000 },
+    'runs:m_a01#1': { hit: 0.9667, share: 0.9667 },
+    'runs:m_a01#2': { hit: 0.9667, share: 1.0000 },
+    'runs:q_fo_01#0': { hit: 0.9385, share: 0.9385 },
+    'runs:q_ov_01#0': { hit: 0.9769, share: 0.9769 },
+    'runs:q_st_01#0': { hit: 0.9615, share: 0.9615 },
+    'runs:q01#0': { hit: 0.8231, share: 0.8231 },
+    'runs:q101#0': { hit: 0.1040, share: 0.1160 },
+    'runs:s14q001#0': { hit: 0.9846, share: 0.9846 },
+    'runs:s15q001#0': { hit: 0.9769, share: 0.9769 },
+    'runs:s16q001#0': { hit: 0.9692, share: 0.9692 },
+    'runs:s17q001#0': { hit: 0.9846, share: 0.9846 },
+    'runs:s18q001#0': { hit: 0.9846, share: 0.9846 },
   };
   const TOL = 0.005;
   const OPT_KEYS = ['opts', 'choices', 'o', 'options'];
@@ -246,7 +267,72 @@ for (const st of STATIONS) {
   // 同じ名前の定数が各ハブモジュールに1つずつあるため、最初の宣言だけでなく全宣言を見る
   const decls = [...text.matchAll(/(?:const|var|let)\s+([A-Z][A-Z0-9_]{2,})\s*=\s*\[/g)].map((m) => [m[1], m.index]);
   const seenDecl = {};
-  const banks = [...skewExtra];
+  // 入れ子の問題配列も拾う（例: Finance の各セクションの `quiz: [ { q, choices, ans } ]`）。
+  // トップレベルの宣言だけを見ていた頃は、ここに入る1,300問の偏りを見逃していた（2026-10）。
+  // id は「キー名:先頭の問題の id（なければ設問の先頭）」で、行番号に依存しない。
+  const nested = [], covered = [], seenNest = {};
+  {
+    const re = /([A-Za-z_$][\w$]*)\s*:\s*\[\s*\{/g;
+    let m;
+    while ((m = re.exec(text))) {
+      const start = text.indexOf('[', m.index);
+      const head = text.slice(start, start + 4000);
+      if (!/\b(?:choices|opts|options)\s*"?\s*:\s*\[|"o"\s*:\s*\[/.test(head) || !/\b(?:ans|answer|correct)"?\s*:\s*\d|"a"\s*:\s*\d/.test(head)) continue;
+      let depth = 0, inStr = false, q = null, esc = false, i = start;
+      for (; i < text.length; i++) {
+        const c = text[i];
+        if (inStr) { if (esc) { esc = false; continue; } if (c === '\\') { esc = true; continue; } if (c === q) inStr = false; continue; }
+        if (c === '"' || c === "'" || c === '`') { inStr = true; q = c; continue; }
+        if (c === '[') depth++;
+        else if (c === ']') { depth--; if (depth === 0) break; }
+      }
+      re.lastIndex = i;
+      let v;
+      try { v = (0, eval)('(' + text.slice(start, i + 1) + ')'); } catch (e) { continue; }
+      if (!Array.isArray(v) || v.length < 20 || !v[0] || typeof v[0] !== 'object') continue;
+      const ok = OPT_KEYS.find((k) => Array.isArray(v[0][k]));
+      const ak = ANS_KEYS.find((k) => typeof v[0][k] === 'number');
+      if (!ok || ak === undefined) continue;
+      const first = v[0].id || String(optText(v[0].q) || v[0].q || '').slice(0, 12);
+      const s = skewStat(v.filter((row) => row && Array.isArray(row[ok]) && typeof row[ak] === 'number').map((row) => [row[ok].map(optText), row[ak]]));
+      if (s.n >= 20) { const d = (seenNest[`${m[1]}:${first}`] = (seenNest[`${m[1]}:${first}`] || 0)); seenNest[`${m[1]}:${first}`]++; nested.push({ id: `${m[1]}:${first}#${d}`, ...s }); covered.push([start, i]); }
+    }
+  }
+  // 配列にまとめず1問ずつ push する書き方（Finance の sec14〜 など）も拾う。
+  // `{ id: "s14q006", …, choices: [...], ans: 0 }` を1問ずつ評価し、近くに続けて並ぶ問題（間が3,000字以内）を1つのバンクとみなす。
+  // バンク名は先頭の問題の id（例 runs:s14q001）。
+  {
+    const runs = []; let cur = null;
+    const re = /\{\s*"?id"?\s*:\s*"([A-Za-z][\w-]*?)\d+"/g;
+    let m;
+    while ((m = re.exec(text))) {
+      const start = m.index;
+      if (covered.some(([a, b]) => start > a && start < b)) continue;
+      let depth = 0, inStr = false, q = null, esc = false, i = start;
+      for (; i < text.length && i < start + 20000; i++) {
+        const c = text[i];
+        if (inStr) { if (esc) { esc = false; continue; } if (c === '\\') { esc = true; continue; } if (c === q) inStr = false; continue; }
+        if (c === '"' || c === "'" || c === '`') { inStr = true; q = c; continue; }
+        if (c === '{') depth++;
+        else if (c === '}') { depth--; if (depth === 0) break; }
+      }
+      const body = text.slice(start, i + 1);
+      if (!/\b(?:choices|opts|options|ch)\s*"?\s*:\s*[\[{]/.test(body) || !/\b(?:ans|answer|correct|a)"?\s*:\s*\d/.test(body)) continue;
+      let v;
+      try { v = (0, eval)('(' + body + ')'); } catch (e) { continue; }
+      // 選択肢は配列か、`ch: { ja: [...], en: [...] }`（Finance sec8〜10）
+      const ok = OPT_KEYS.find((k) => Array.isArray(v[k]));
+      const opts = ok ? v[ok] : v.ch && Array.isArray(v.ch.ja) ? v.ch.ja : null;
+      const ak = ANS_KEYS.find((k) => typeof v[k] === 'number');
+      if (!opts || ak === undefined) continue;
+      if (!cur || start - cur.end > 3000) { cur = { id: v.id, rows: [], end: i }; runs.push(cur); }
+      cur.rows.push([opts.map(optText), v[ak]]); cur.end = i;
+      re.lastIndex = i;
+    }
+    const seenRun = {};
+    for (const r of runs) { const s = skewStat(r.rows); if (s.n < 20) continue; const d = (seenRun[r.id] = (seenRun[r.id] || 0)); seenRun[r.id]++; nested.push({ id: `runs:${r.id}#${d}`, ...s }); }
+  }
+  const banks = [...skewExtra, ...nested];
   for (const [name, at] of decls) {
     let v;
     try { v = extract(name, at); } catch (e) { continue; }
