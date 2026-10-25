@@ -239,13 +239,11 @@ for (const st of STATIONS) {
   const SKEW_SNAPSHOT = {
     // 2026-09-27 時点で帯の外にあるバンク（すべて share が低すぎる側）。直したら行を消す。
     // 2026-10-25：入れ子の問題も検査するようにして見つかったバンク（Finance・Certification のセキュリティ/ガバナンス）。直したら行を消す。
-    'quiz:s12q001#0': { hit: 0.0720, share: 0.1230 },
     'HARD:あるグローバル製造業がA#0': { hit: 0.7500, share: 0.8000 },
     'HARD:あるフィンテック企業が信#0': { hit: 0.9512, share: 0.9512 },
     'HARD:ある企業の情報セキュリテ#0': { hit: 0.6125, share: 0.6375 },
     'HARD:ある金融機関がAIリスク#0': { hit: 0.6625, share: 0.7625 },
     'HARD:ある銀行のAIガバナンス#0': { hit: 0.6835, share: 0.7089 },
-    'runs:q101#0': { hit: 0.1040, share: 0.1160 },
   };
   const TOL = 0.005;
   const OPT_KEYS = ['opts', 'choices', 'o', 'options'];
