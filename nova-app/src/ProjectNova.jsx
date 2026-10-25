@@ -221544,6 +221544,29 @@ function LinguisticsHub() {
     return allQuizFlat.filter((item) => item.question.toLowerCase().includes(q)).slice(0, 20);
   }, [globalGlossaryQuery, allQuizFlat]);
 
+  /* 分野の解説（要点・人物・最近の動き）も横断検索できるようにフラット化 */
+  const allOverviewFlat = useMemo(() => {
+    const flat = [];
+    Object.keys(FIELD_OVERVIEW).forEach((key) => {
+      const [catId, fieldId, subId] = key.split(":");
+      const cat = CATEGORIES.find((c) => c.id === catId);
+      const f = cat?.fields.find((ff) => ff.id === fieldId);
+      const sub = subId ? f?.sub?.find((x) => x.id === subId) : null;
+      if (!cat || !f) return;
+      const base = { catId, fieldId, subId, fieldJa: sub ? sub.ja : f.ja, fieldEn: sub ? sub.en : f.en };
+      const o = FIELD_OVERVIEW[key];
+      (o.concepts || []).forEach((c) => flat.push({ ...base, kind: ["要点", "Concept"], title: c.t, titleEn: c.en, body: c.d, bodyEn: c.dEn }));
+      (o.people || []).forEach((pp) => flat.push({ ...base, kind: ["人物", "Person"], title: pp.n, titleEn: pp.en, body: pp.w, bodyEn: pp.wEn }));
+      (FIELD_RECENT[key] || []).forEach((r) => flat.push({ ...base, kind: ["最近の動き", "Recent"], title: r.t, titleEn: r.tEn, body: r.d, bodyEn: r.dEn }));
+    });
+    return flat;
+  }, []);
+  const globalOverviewResults = useMemo(() => {
+    const q = globalGlossaryQuery.trim().toLowerCase();
+    if (!q) return [];
+    return allOverviewFlat.filter((x) => [x.title, x.titleEn, x.body, x.bodyEn].some((v) => (v || "").toLowerCase().includes(q))).slice(0, 20);
+  }, [globalGlossaryQuery, allOverviewFlat]);
+
   const goToSearchResult = (item) => {
     if (item.subId) goSub(item.catId, item.fieldId, item.subId);
     else goField(item.catId, item.fieldId);
@@ -221745,6 +221768,29 @@ function LinguisticsHub() {
                             </span>
                           </div>
                           <div style={{ fontSize: 12.5, color: "var(--lh-muted)", marginTop: 3 }}>{lang === "en" && term.defEn ? term.defEn : term.def}</div>
+                        </button>
+                      ))
+                    )}
+
+                    <p style={{ fontSize: 12, color: "var(--lh-muted2)", margin: "18px 0 4px" }}>
+                      {t("分野の解説（要点・人物・最近の動き）", "Field notes (concepts, people, recent work)")} · {globalOverviewResults.length}
+                      {t("件ヒット(最大20件)", " matches (up to 20)")}
+                    </p>
+                    {globalOverviewResults.length === 0 ? (
+                      <p style={{ fontSize: 13.5, color: "var(--lh-muted)" }}>{t("該当する解説が見つかりません。", "No matching notes found.")}</p>
+                    ) : (
+                      globalOverviewResults.map((item, i) => (
+                        <button
+                          key={i}
+                          onClick={() => goToSearchResult(item)}
+                          style={{ display: "block", width: "100%", textAlign: "left", padding: "12px 4px", background: "none", border: "none", borderBottom: "1px solid var(--lh-border)", cursor: "pointer" }}
+                        >
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <span style={{ fontSize: 10.5, color: "var(--lh-muted)", border: "1px solid var(--lh-border2)", borderRadius: 4, padding: "0 5px", flexShrink: 0 }}>{t(item.kind[0], item.kind[1])}</span>
+                            <span style={{ fontSize: 13.5, fontWeight: 500, color: "var(--lh-text)" }}>{lang === "en" ? item.titleEn : item.title}</span>
+                            <span style={{ fontSize: 10.5, color: "#4C8BF5", background: "#eef3fd", borderRadius: 999, padding: "1px 8px", marginLeft: "auto", flexShrink: 0 }}>{lang === "en" ? item.fieldEn : item.fieldJa}</span>
+                          </div>
+                          <div style={{ fontSize: 12.5, color: "var(--lh-muted)", marginTop: 3 }}>{lang === "en" ? item.bodyEn : item.body}</div>
                         </button>
                       ))
                     )}
