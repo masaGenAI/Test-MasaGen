@@ -158,9 +158,9 @@ var PAL = ['var(--c-baroque)','var(--c-classical)','var(--c-romantic)','var(--c-
 var KIND_LABEL = {person:'人物',inst:'項目',work:'作品',term:'用語',place:'地名',event:'出来事'};
 var KIND_COLOR = {person:'var(--k-person)',inst:'var(--k-inst)',work:'var(--k-work)',term:'var(--k-term)',place:'var(--k-place)',event:'var(--k-event)'};
 var ST = load();
-var S = {domain:'music', region:'海外', tab:'explore', view:'people', isel:null, sel:null, word:null, q:null, qmode:'all', qOnly:null};
+var S = {domain:'music', region:'海外', tab:'explore', view:'people', isel:null, sel:null, word:null, q:null, qmode:'all', qOnly:null, find:''};
 
-function load(){ try{ var v = JSON.parse(localStorage.getItem('lah:v1')||'null'); if(v && v.seen) return v; }catch(e){} return {seen:{}, quiz:{asked:0,right:0}}; }
+function load(){ try{ var v = JSON.parse(localStorage.getItem('lah:v1')||'null'); if(v && v.seen){ v.wrong = v.wrong || []; return v; } }catch(e){} return {seen:{}, quiz:{asked:0,right:0}, wrong:[]}; }
 function save(){ try{ localStorage.setItem('lah:v1', JSON.stringify(ST)); }catch(e){} }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
 function el(id){ return document.getElementById(id); }
@@ -1058,6 +1058,7 @@ function render(){
       return '<button class="dchip'+(x.id===S.domain?' on':'')+(x.ready?'':' soon')+'" data-d="'+x.id+'" title="'+esc((x.ready?'':'予定：')+(x.sub||''))+'">'+esc(x.ja)+(x.ready?'':'<small>準備中</small>')+'</button>';
     }).join('')+'</div></section>';
   }).join('')+'</div>';
+  h += '<div class="panel" style="margin:10px 0 14px"><input id="lafind" type="search" autocomplete="off" aria-label="全領域を検索" placeholder="人物・作品・用語を全'+D.domains.length+'領域から検索" value="'+esc(S.find)+'" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #d0d5dd;border-radius:8px;font-size:14px"><div id="lafindres"></div></div>';
   h += '<div class="seg2" id="regseg" role="tablist" aria-label="地域">'+['海外','日本'].map(function(r){ return '<button data-r="'+r+'" class="'+(S.region===r?'on':'')+'">'+r+'</button>'; }).join('')+'</div>';
   h += '<div class="tabs"><button class="tab'+(S.tab==='explore'?' on':'')+'" data-t="explore">年表と一覧</button><button class="tab'+(S.tab==='quiz'?' on':'')+'" data-t="quiz">クイズ</button></div>';
   h += '<div id="main"></div>';
@@ -1067,7 +1068,39 @@ function render(){
   el('app').querySelectorAll('[data-d]').forEach(function(b){ b.onclick=function(){ loadDomain(b.dataset.d); S.sel=null; S.isel=null; S.word=null; S.q=null; S.qOnly=null; S.view='people'; setRegion(S.region); render(); }; });
   el('app').querySelectorAll('#regseg [data-r]').forEach(function(b){ b.onclick=function(){ if(S.region===b.dataset.r) return; S.sel=null; S.isel=null; S.word=null; S.q=null; S.qOnly=null; S.view='people'; setRegion(b.dataset.r); render(); }; });
   el('app').querySelectorAll('[data-t]').forEach(function(b){ b.onclick=function(){ S.tab=b.dataset.t; S.q=null; render(); }; });
+  var fi = el('lafind'); fi.oninput = function(){ S.find = fi.value; drawFind(); }; drawFind();
   if(S.tab==='explore') renderExplore(); else renderQuiz();
+}
+
+/* ---------- 全領域の横断検索（人物・項目・用語） ---------- */
+function drawFind(){
+  var box = el('lafindres'); if(!box) return;
+  var q = S.find.trim().toLowerCase(); if(!q){ box.innerHTML = ''; return; }
+  var hit = function(arr){ return arr.some(function(v){ return v && String(v).toLowerCase().indexOf(q) !== -1; }); };
+  var res = [];
+  D.domains.forEach(function(dm){
+    var md = (D.data||{})[dm.id]; if(!md) return;
+    (md.people||[]).forEach(function(p){ if(hit([p.name, p.full, p.en, p.tagline].concat((p.works||[]).map(function(w){ return w.t; })))) res.push({d:dm, k:'p', id:p.id, name:p.name, sub:p.tagline||'', reg:p.region||'海外'}); });
+    (md.items||[]).forEach(function(x){ if(hit([x.name, x.full, x.en, x.tagline])) res.push({d:dm, k:'i', id:x.id, name:x.name, sub:x.tagline||'', reg:x.region||'海外'}); });
+    (md.glossary||[]).forEach(function(g){ if(hit([g.t, g.en, g.d])) res.push({d:dm, k:'g', id:g.t, name:g.t, sub:g.d||''}); });
+  });
+  var KL = {p:'人物', i:'項目', g:'用語'};
+  box.innerHTML = '<p class="hint" style="margin:8px 0 4px">'+res.length+' 件'+(res.length>40?'（先頭の40件を表示）':'')+'</p>' + res.slice(0,40).map(function(r, n){
+    return '<button class="opt" data-n="'+n+'" style="display:block;width:100%;text-align:left;margin:4px 0"><b>'+esc(r.name)+'</b> <small style="color:#667085">'+esc(r.d.ja)+' ・ '+KL[r.k]+'</small><br><small style="color:#475467">'+esc(String(r.sub).slice(0,70))+'</small></button>';
+  }).join('');
+  box.querySelectorAll('[data-n]').forEach(function(b){ b.onclick = function(){
+    var r = res[+b.dataset.n];
+    if(r.d.id !== S.domain){ loadDomain(r.d.id); S.sel=null; S.isel=null; S.word=null; S.q=null; S.qOnly=null; }
+    S.find = ''; S.tab = 'explore';
+    if(r.k === 'p'){ setRegion(r.reg); render(); showPerson(r.id, true); }
+    else if(r.k === 'i'){ setRegion(r.reg); render(); showInst(r.id, true); }
+    else {
+      // 用語の解説は人物・項目カードの中に出るので、その用語でつながるカードを開いてから表示する
+      var rel = (inv[r.id]||[]).map(function(id){ return byId[id] || iById[id]; }).filter(Boolean)[0];
+      if(rel){ render(); if(byId[rel.id]) showPerson(rel.id, true); else showInst(rel.id, true); if(el('word')) openWord(r.id, true); }
+      else { render(); var bx = el('lafindres'); if(bx) bx.innerHTML = '<div class="word"><h4>'+esc(r.name)+' <span class="hint">'+esc(r.d.ja)+'</span></h4><p>'+esc(r.sub)+'</p></div>'; }
+    }
+  }; });
 }
 
 /* ---------- 年表と一覧 ---------- */
@@ -1317,6 +1350,11 @@ function pool(){ return (D.sample||[]).filter(function(x){return x.d===DM.ja && 
 function triviaPool(){ return entities().filter(function(z){ return (z.e.trivia||[]).length; }); }
 function nextQ(){
   var tp = triviaPool(), sp = pool(), mode = S.qmode;
+  if(mode === 'wrong'){
+    var ws = ST.wrong.filter(function(w){ return w.d === S.domain; });
+    if(!ws.length){ S.qmode = 'all'; mode = 'all'; }
+    else { var w = pickOne(ws); return {q:w.q, o:w.o, a:w.a, e:w.e, trv:w.trv, pid:w.pid, iid:w.iid, again:1}; }
+  }
   if(S.qOnly){
     var isI = S.qOnly.indexOf('i:')===0, id = S.qOnly.slice(2), e = isI ? iById[id] : byId[id];
     if(!e) return null;
@@ -1353,7 +1391,8 @@ function renderQuiz(){
   var q = S.q, hasT = triviaPool().length;
   var only = S.qOnly ? (S.qOnly.indexOf('i:')===0 ? iById[S.qOnly.slice(2)] : byId[S.qOnly.slice(2)]) : null;
   var h = '<div class="panel qbox"><div class="qmeta"><span>'+esc(DM.ja)+(only?' ・ '+esc(only.name)+' だけ':'')+' ・ これまで '+ST.quiz.right+'/'+ST.quiz.asked+' 問正解</span>';
-  var modes = [['all','ぜんぶ'],['card','カードから'],['trivia','雑学'],['sample','用語・教養']];
+  var nWrong = ST.wrong.filter(function(w){ return w.d === S.domain; }).length;
+  var modes = [['all','ぜんぶ'],['card','カードから'],['trivia','雑学'],['sample','用語・教養']].concat(nWrong ? [['wrong','まちがえた問題（'+nWrong+'）']] : []);
   h += '<span class="seg">'+modes.filter(function(x){ return x[0]==='all' || (x[0]==='trivia'?hasT:x[0]==='sample'?pool().length:true); }).map(function(x){ return '<button data-m="'+x[0]+'" class="'+(S.qmode===x[0]&&!S.qOnly?'on':'')+'">'+x[1]+'</button>'; }).join('')+'</span>';
   h += '</div>'+(q.trv?'<div class="trvtag">雑学問題</div>':'')+'<div class="qq">'+esc(q.q).replace(/\n/g,'<br>')+'</div><div class="opts">'+q.o.map(function(o,i){ return '<button class="opt" data-i="'+i+'">'+esc(o)+'</button>'; }).join('')+'</div><div id="fb"></div></div>';
   m.innerHTML = h;
@@ -1362,7 +1401,12 @@ function renderQuiz(){
 }
 function answer(i){
   var q = S.q, ok = i===q.a;
-  ST.quiz.asked++; if(ok) ST.quiz.right++; save();
+  ST.quiz.asked++; if(ok) ST.quiz.right++;
+  // 間違えた問題は設問ごと残し（最大200問）、「まちがえた問題」で正解したら外す
+  var same = function(w){ return w.d === S.domain && w.q === q.q; };
+  if(!ok && !ST.wrong.some(same)){ ST.wrong.push({d:S.domain, q:q.q, o:q.o, a:q.a, e:q.e, trv:q.trv, pid:q.pid, iid:q.iid}); if(ST.wrong.length > 200) ST.wrong.shift(); }
+  if(ok && q.again) ST.wrong = ST.wrong.filter(function(w){ return !same(w); });
+  save();
   el('main').querySelectorAll('.opt').forEach(function(b,k){ b.disabled=true; if(k===q.a) b.classList.add('ok'); else if(k===i) b.classList.add('ng'); });
   var h = '<div class="exp"><b>'+(ok?'正解':'不正解')+'</b>　'+(q.trv?'へぇ〜：':'')+esc(q.e)+'</div><div class="btnrow"><button class="btn pri" id="nx">次の問題</button>'+(q.pid?'<button class="btn" id="seec">この人物のカードを見る</button>':'')+(q.iid?'<button class="btn" id="seei">このカードを見る</button>':'')+'</div>';
   el('fb').innerHTML = h;
