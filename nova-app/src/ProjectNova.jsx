@@ -3045,6 +3045,8 @@ function QuizTab({ section, lang, progress, saveProgress }) {
   const [domFilter, setDomFilter] = useState("all");
   const [diffFilter, setDiffFilter] = useState("all");
   const [order, setOrder] = useState("fixed");
+  // all / wrong（前回まちがえた問題）/ fresh（未解答）。対象は切り替えた時点の記録で決め、解き直しても一覧が動かないようにする
+  const [status, setStatus] = useState("all");
   const [seed, setSeed] = useState(1);
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState(null);
@@ -3056,23 +3058,44 @@ function QuizTab({ section, lang, progress, saveProgress }) {
   const pool = useMemo(() => {
     let p = QUIZ.filter((q) =>
       (domFilter === "all" || q.dom === domFilter) &&
-      (diffFilter === "all" || q.diff === Number(diffFilter))
+      (diffFilter === "all" || q.diff === Number(diffFilter)) &&
+      (status === "all" || (status === "wrong" ? progress[q.id] && progress[q.id].correct === false : !progress[q.id]))
     );
     if (order === "random") p = seededShuffle(p, "quiz-order-" + seed).map((x) => x[0]);
     return p;
-  }, [QUIZ, domFilter, diffFilter, order, seed]);
+  }, [QUIZ, domFilter, diffFilter, order, seed, status]);
+  const wrongCount = QUIZ.filter((q) => progress[q.id] && progress[q.id].correct === false).length;
 
-  useEffect(() => { setIdx(0); setPicked(null); setRevealed(false); }, [domFilter, diffFilter, order, seed]);
+  useEffect(() => { setIdx(0); setPicked(null); setRevealed(false); }, [domFilter, diffFilter, order, seed, status]);
 
-  if (pool.length === 0) return <Empty lang={lang} />;
-  const item = pool[idx];
-  const { choices, ansIdx } = shuffledChoices(item, section.id);
-
+  const item = pool[Math.min(idx, pool.length - 1)];
   useEffect(() => {
+    if (!item) return;
     const prev = progress[item.id];
-    if (prev && prev.picked != null) { setPicked(prev.picked); setRevealed(true); }
+    // 「まちがえた問題」では前回の解答を出さず、解き直せるようにする
+    if (status !== "wrong" && prev && prev.picked != null) { setPicked(prev.picked); setRevealed(true); }
     else { setPicked(null); setRevealed(false); }
-  }, [idx, item.id]);
+  }, [idx, item && item.id, status]);
+
+  const statusPills = (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 14 }}>
+      <Pill active={status === "all"} accent={section.accentActive} onClick={() => setStatus("all")}>{L("すべて", "All", lang)}</Pill>
+      <Pill active={status === "wrong"} accent={section.accentActive} onClick={() => setStatus("wrong")}>{L(`まちがえた問題（${wrongCount}）`, `Missed (${wrongCount})`, lang)}</Pill>
+      <Pill active={status === "fresh"} accent={section.accentActive} onClick={() => setStatus("fresh")}>{L("未解答", "Unanswered", lang)}</Pill>
+    </div>
+  );
+  if (!item) return (
+    <div>
+      {statusPills}
+      {(domFilter !== "all" || diffFilter !== "all") && (
+        <div style={{ marginBottom: 14 }}>
+          <Pill active={false} accent={section.accentActive} onClick={() => { setDomFilter("all"); setDiffFilter("all"); }}>{L("領域・難度の絞り込みを解除", "Clear domain and difficulty filters", lang)}</Pill>
+        </div>
+      )}
+      <Empty lang={lang} />
+    </div>
+  );
+  const { choices, ansIdx } = shuffledChoices(item, section.id);
 
   const choose = (i) => {
     if (revealed) return;
@@ -3084,6 +3107,7 @@ function QuizTab({ section, lang, progress, saveProgress }) {
 
   return (
     <div>
+      {statusPills}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 14 }}>
         <Pill active={domFilter === "all"} accent={section.accentActive} onClick={() => setDomFilter("all")}><DoneCheck on={domDone.has("all")} onToggle={(e) => domDone.toggle("all", e)} en={lang === "en"} />{L("全分野", "All", lang)}</Pill>
         {section.domains.map((d) => (
