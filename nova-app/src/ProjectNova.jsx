@@ -217234,6 +217234,33 @@ const SideWorkHubModule = (function () {
 .sw-neta-y{font-size:13.5px;font-weight:800;color:var(--blue-d);font-variant-numeric:tabular-nums;flex-shrink:0}
 .sw-neta-q{font-weight:700;font-size:15px;color:var(--ink);border-left:3px solid var(--sky);padding-left:10px;line-height:1.6}
 .sw-neta p{margin:0;font-size:14px;color:var(--ink2);line-height:1.7}
+.sw-st{border-radius:16px;background:linear-gradient(135deg,#0B1A33,#1E3A8A);color:#fff;padding:18px 20px;margin:14px 0 14px;position:relative;overflow:hidden}
+.sw-st::after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(56,189,248,.12)}
+.sw-st-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.sw-st-when{font-size:13px;font-weight:800;letter-spacing:.06em;color:#BAE6FD}
+.sw-st-type{font-size:12px;font-weight:800;padding:2px 9px;border-radius:99px;background:rgba(255,255,255,.14);color:#fff;white-space:nowrap}
+.sw-st-hl{font-size:20px;font-weight:800;line-height:1.55;margin:8px 0 6px;letter-spacing:-.01em;position:relative;z-index:1}
+.sw-st-who{font-size:13.5px;color:#DBEAFE}
+.sw-st-who b{color:#fff}
+.sw-st-flow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px;position:relative;z-index:1}
+.sw-st-flow>div{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:9px 11px}
+.sw-st-flow>div.m{background:rgba(56,189,248,.22);border-color:rgba(125,211,252,.5)}
+.sw-st-flow h5{margin:0 0 3px;font-size:11.5px;letter-spacing:.08em;color:#BAE6FD}
+.sw-st-flow p{margin:0;font-size:13.5px;line-height:1.7;color:#F1F5F9}
+.sw-st-if{margin-top:10px;font-size:14px;color:#E0F2FE;font-weight:700;position:relative;z-index:1}
+.sw-st .sw-fref{background:rgba(255,255,255,.18);color:#fff}
+.sw-st .sw-fref.ok{background:#34D399;color:#053B2C}
+.sw-stars{color:#F59E0B;letter-spacing:1px;font-size:12px;white-space:nowrap}
+.sw-ep-h{display:block;font-size:13px;color:var(--ink2);line-height:1.55;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sw-cal{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px}
+.sw-cal-m{border:1px solid var(--line);border-radius:14px;background:var(--panel);overflow:hidden}
+.sw-cal-m.now{border-color:var(--blue);box-shadow:0 0 0 2px var(--blue-soft)}
+.sw-cal-h{display:flex;justify-content:space-between;align-items:baseline;padding:10px 14px;background:#F3F6FB;font-weight:800;font-size:15px}
+.sw-cal-r{display:grid;grid-template-columns:44px minmax(0,1fr);gap:8px;width:100%;text-align:left;border:0;border-top:1px solid var(--line2);background:none;padding:8px 14px;cursor:pointer;font:inherit;color:inherit}
+.sw-cal-r:hover{background:#F7F9FD}
+.sw-cal-d{font-weight:800;color:var(--blue-d);font-variant-numeric:tabular-nums;font-size:14px}
+.sw-cal-r.today .sw-cal-d{color:#fff;background:var(--blue);border-radius:6px;text-align:center}
+.sw-neta-m{font-size:13.5px;color:var(--ink2);background:#F3F6FB;border-radius:8px;padding:6px 10px}
 @media (max-width:1180px){.sw-g5{grid-template-columns:repeat(3,minmax(0,1fr))}.sw-g4{grid-template-columns:repeat(2,minmax(0,1fr))}.sw-g3{grid-template-columns:repeat(2,minmax(0,1fr))}.sw-g-7-5{grid-template-columns:1fr}.sw-vow{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:900px){
   .sw{grid-template-columns:1fr}
@@ -217279,6 +217306,9 @@ const SideWorkHubModule = (function () {
   .sw-field{flex-wrap:wrap}
   .sw-scores{grid-template-columns:1fr}
   .sw-epd{padding:16px 14px}
+  .sw-st{padding:14px}
+  .sw-st-hl{font-size:17px}
+  .sw-st-flow{grid-template-columns:1fr}
   .sw-epsum-i{flex:1 1 40%}
   .sw-fold-h{padding:11px 12px}
   .sw-fold-b{padding:12px}
@@ -217461,6 +217491,14 @@ const SideWorkHubModule = (function () {
     return (
       <div>
         <Head kick="DASHBOARD" title="嘘のない発信を、仕組みで回す" lede="ワインと歴史を題材に、調べる・企画する・作る・確かめるを、AIと人の役割を分けて回すための作業場です。" right={<span className="sw-stamp">調査時点　2026年10月</span>} />
+        {(() => { const cm = new Date().getMonth() + 1; const rs = EPS.filter((e) => e.st && MD(e.st.date_greg) && MD(e.st.date_greg)[0] === cm).sort((a, b) => MD(a.st.date_greg)[1] - MD(b.st.date_greg)[1]); return rs.length ? (
+          <div className="sw-card sw-sec">
+            <div className="sw-ch"><h2 className="sw-ct">今月の「その時」　{cm}月の記念日</h2><button className="sw-btn" onClick={() => go("plans")}>企画帳へ</button></div>
+            <div className="sw-cal" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(min(100%,320px),1fr))" }}>
+              {rs.slice(0, 6).map((e) => <button key={e.kind + e.id} className="sw-cal-r" style={{ border: "1px solid var(--line2)", borderRadius: 10 }} onClick={() => openEp(e)}><span className="sw-cal-d">{MD(e.st.date_greg)[1]}日</span><span style={{ minWidth: 0 }}><b style={{ fontSize: 14 }}>{splitTitle(e.title)[0]}</b><span className="sw-sm" style={{ display: "block" }}>{e.st.headline}</span></span></button>)}
+            </div>
+          </div>
+        ) : null; })()}
         <div className="sw-g sw-g5">
           {kpis.map(([k, ic, n, u, l, s], i) => (
             <button key={i} className="sw-card sw-kpi" onClick={() => go(k)}>
@@ -218011,6 +218049,10 @@ const SideWorkHubModule = (function () {
   const CASE_BY_NAME = Object.fromEntries((SW_DATA.global_cases || []).map((c) => [c.name, c]));
   const SCORES = SW_DATA.scores || {};
   const SERIES = SW_DATA.series || [];
+  const ST_TYPE = { "決断": "決断の瞬間", "瞬間": "出来事の瞬間", "解説": "解説型" };
+  const Stars = ({ n }) => n ? <span className="sw-stars" title={`その時度 ${n} / 5`} aria-label={`その時度 ${n} / 5`}>{"★".repeat(n)}<span style={{ color: "#CBD5E1" }}>{"★".repeat(5 - n)}</span></span> : null;
+  const stFit = (e) => (e.st && e.st.fit) || 0;
+  const MD = (d) => { const m = /^-?\d+-(\d{2})-(\d{2})$/.exec(String(d || "")); return m ? [Number(m[1]), Number(m[2])] : null; };
   const SER = Object.fromEntries(SERIES.map((x) => [x.id, x]));
   const NETA = SW_DATA.neta || [];
   const NETA_KEY = "sw:neta:v1";
@@ -218140,6 +218182,32 @@ const SideWorkHubModule = (function () {
     );
   }
 
+  // 記念日カレンダー：グレゴリオ暦の日付が分かる「その時」を月ごとに並べる（SNS で記念日に合わせて出すため）
+  function StCalendar({ list, onOpen, months }) {
+    const now = new Date(), cm = now.getMonth() + 1, cd = now.getDate();
+    const rows = list.filter((e) => e.st && MD(e.st.date_greg)).map((e) => [e, ...MD(e.st.date_greg)]);
+    const ms = months || [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    return (
+      <>
+        <p className="sw-sm" style={{ margin: "0 0 10px" }}>グレゴリオ暦の年月日が事実で分かる「その時」{rows.length}本を、月日の順に並べました。旧暦・ユリウス暦の日付しか分からないものは載せていません。記念日に合わせて出すと、その日に検索・話題になりやすくなります。</p>
+        <div className="sw-cal">
+          {ms.map((m) => { const rs = rows.filter(([, mm]) => mm === m).sort((a, b) => a[2] - b[2]); return (
+            <div key={m} className={"sw-cal-m" + (m === cm ? " now" : "")}>
+              <div className="sw-cal-h"><span>{m}月{m === cm ? "（今月）" : ""}</span><span className="sw-sm">{rs.length}本</span></div>
+              {rs.map(([e, , d]) => (
+                <button key={e.kind + e.id} className={"sw-cal-r" + (m === cm && d === cd ? " today" : "")} onClick={() => onOpen(e)}>
+                  <span className="sw-cal-d">{d}日</span>
+                  <span style={{ minWidth: 0 }}><b style={{ fontSize: 14 }}>{splitTitle(e.title)[0]}</b><span className="sw-sm" style={{ display: "block" }}>{String(e.st.date_greg).slice(0, 4).replace(/^0+/, "")}年・{e.st.headline}</span></span>
+                </button>
+              ))}
+              {!rs.length ? <div className="sw-sm" style={{ padding: "8px 14px" }}>この月の「その時」はまだありません。</div> : null}
+            </div>
+          ); })}
+        </div>
+      </>
+    );
+  }
+
   // 企画帳の一覧で、シリーズごとに開閉できる束
   function EpGroup({ g, es, item, hasCur }) {
     const sig = useContext(FoldSig);
@@ -218167,11 +218235,12 @@ const SideWorkHubModule = (function () {
     const [fmt, setFmt] = useState("all");
     const [sort, setSort] = useState("series");
     const [ser, setSer] = useState("all");
+    const [stt, setStt] = useState("all");
     const [sel, setSel] = useState(initial || null);
     const [gsig, setGAll] = useFoldSig();
     const wide = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(min-width: 901px)").matches;
-    const SORTS = { id: null, series: null, quality: (a, b) => sabShare(b) - sabShare(a), appeal: (a, b) => ((SCORES[b.id] || {}).appeal || 0) - ((SCORES[a.id] || {}).appeal || 0), year: (a, b) => (epYear(a) ?? 9999) - (epYear(b) ?? 9999) };
-    const list0 = EPS.filter((e) => (kind === "all" || e.kind === kind) && (area === "all" || epArea(e) === area) && (fmt === "all" || (e.formats || []).includes(fmt)) && (ser === "all" || e.series === ser));
+    const SORTS = { id: null, series: null, fit: (a, b) => (stFit(b) - stFit(a)) || (((SCORES[b.id] || {}).appeal || 0) - ((SCORES[a.id] || {}).appeal || 0)), quality: (a, b) => sabShare(b) - sabShare(a), appeal: (a, b) => ((SCORES[b.id] || {}).appeal || 0) - ((SCORES[a.id] || {}).appeal || 0), year: (a, b) => (epYear(a) ?? 9999) - (epYear(b) ?? 9999) };
+    const list0 = EPS.filter((e) => (kind === "all" || e.kind === kind) && (area === "all" || epArea(e) === area) && (fmt === "all" || (e.formats || []).includes(fmt)) && (ser === "all" || e.series === ser) && (stt === "all" || (e.st && e.st.type === stt)));
     const list = SORTS[sort] ? list0.slice().sort(SORTS[sort]) : list0;
     const grouped = sort === "series";
     const byYear = (a, b) => (epYear(a) ?? 9999) - (epYear(b) ?? 9999);
@@ -218190,7 +218259,8 @@ const SideWorkHubModule = (function () {
           <span className="sw-ep-y" style={{ color: c }}>{yearLabel(epYear(e))}</span>
           <span style={{ minWidth: 0 }}>
             <span className="sw-ep-t">{t}</span>
-            <span className="sw-ep-p">{grouped ? "" : `${epArea(e)}・`}事実 {ok}/{all}・出典 {sabShare(e)}%{q ? `・${QUADS.find((z) => z[0] === q)[1]}` : ""}</span>
+            {e.st && e.st.headline ? <span className="sw-ep-h">{e.st.headline}</span> : null}
+            <span className="sw-ep-p"><Stars n={stFit(e)} />{stFit(e) ? "　" : ""}{grouped ? "" : `${epArea(e)}・`}事実 {ok}/{all}・出典 {sabShare(e)}%{q ? `・${QUADS.find((z) => z[0] === q)[1]}` : ""}</span>
           </span>
         </button>
       );
@@ -218198,19 +218268,23 @@ const SideWorkHubModule = (function () {
     return (
       <div>
         <Head kick="02 企画する" title="企画帳" lede={`ワインと歴史の企画${EPS.length}本。つかみ・事実・台本の骨組み・タイトル案・素材案に加え、海外の発信者の型と、その手本から得た学びを付けています。事実はまだ検索の要約でしか確かめていません。出典の原文と照らし合わせ、合っていたらチェックを付けてください。チェックした事実だけが台本に入ります。`} />
-        <Tabs value={view} onChange={(v) => { setView(v); if (v !== "list") setSel(null); }} options={[["list", "一覧と詳細", list.length], ["matrix", "4象限", null], ["timeline", "年表", null], ["formats", "型で探す", FORMATS.length]]} />
+        <Tabs value={view} onChange={(v) => { setView(v); if (v !== "list") setSel(null); }} options={[["list", "一覧と詳細", list.length], ["cal", "記念日カレンダー", EPS.filter((e) => e.st && MD(e.st.date_greg)).length], ["matrix", "4象限", null], ["timeline", "年表", null], ["formats", "型で探す", FORMATS.length]]} />
         <div className="sw-tbar">
           <Seg value={kind} onChange={(v) => { setKind(v); setSel(null); if (v === "wine") setArea("all"); }} options={[["all", `すべて ${EPS.length}`], ["wine", `ワイン ${EPS.filter((e) => e.kind === "wine").length}`], ["history", `歴史 ${EPS.filter((e) => e.kind === "history").length}`]]} />
+          <select className="sw-select" value={stt} onChange={(e) => { setStt(e.target.value); setSel(null); }} aria-label="その時の型で絞り込む">
+            <option value="all">その時の型：すべて</option>
+            {Object.entries(ST_TYPE).map(([k, l]) => <option key={k} value={k}>{l}（{EPS.filter((e) => e.st && e.st.type === k).length}）</option>)}
+          </select>
           <select className="sw-select" value={ser} onChange={(e) => { setSer(e.target.value); setSel(null); }} aria-label="シリーズで絞り込む">
             <option value="all">すべてのシリーズ</option>
             {SERIES.filter((x) => kind === "all" || x.kind === kind).map((x) => <option key={x.id} value={x.id}>{x.name}（{EPS.filter((e) => e.series === x.id).length}）</option>)}
           </select>
           {kind !== "wine" ? <Seg value={area} onChange={(v) => { setArea(v); setSel(null); }} options={[["all", "全地域"], ...areas.filter((a) => kind === "all" || a !== "ワイン").map((a) => [a, a])]} /> : null}
           <select className="sw-select" value={sort} onChange={(e) => setSort(e.target.value)} aria-label="並べ替え">
-            <option value="series">シリーズ別にまとめる</option><option value="id">番号順</option><option value="quality">出典の質が高い順</option><option value="appeal">話題性が高い順</option><option value="year">年代順</option>
+            <option value="series">シリーズ別にまとめる</option><option value="fit">その時度が高い順</option><option value="id">番号順</option><option value="quality">出典の質が高い順</option><option value="appeal">話題性が高い順</option><option value="year">年代順</option>
           </select>
           <select className="sw-select" value={fmt} onChange={(e) => { setFmt(e.target.value); setSel(null); }} aria-label="発信の型で絞り込む">
-            <option value="all">すべての型</option>
+            <option value="all">発信の型：すべて</option>
             {FORMATS.map((f) => <option key={f.id} value={f.id}>{f.id} {f.name}</option>)}
           </select>
         </div>
@@ -218244,6 +218318,7 @@ const SideWorkHubModule = (function () {
             </div>
           </>
         ) : null}
+        {view === "cal" ? <StCalendar list={list} onOpen={open} /> : null}
         {view === "timeline" ? <div className="sw-card"><div className="sw-ch"><h2 className="sw-ct">企画の年表</h2><span className="sw-sm">{list.length}本</span></div><Timeline list={list} onOpen={open} /></div> : null}
         {view === "formats" ? (
           <>
@@ -218274,13 +218349,15 @@ const SideWorkHubModule = (function () {
       ["概要欄", "出典の一覧と、AIで作成した映像・音声であることの表示"],
     ];
     const [sig, setAll] = useFoldSig();
-    const [ver, setVer] = useState("s60");
+    const st = e.st;
+    const [ver, setVer] = useState(st ? "st60" : "s60");
     const q = quadOf(s);
     const qd = q ? QUADS.find((z) => z[0] === q) : null;
     const sr = SER[e.series];
     const refs = (ns) => (ns || []).map((n) => facts[n] ? <span key={n} className={"sw-fref" + (facts[n].ok ? " ok" : "")} title={facts[n].t}>{n + 1}</span> : null);
     const aud = (l) => l.audited ? <span className="sw-aud" title={l.why || "台本の監査で直した行"}>監査で修正</span> : null;
-    const chars = sc ? (sc.script60 || []).reduce((a, l) => a + String(l.line || "").length, 0) : 0;
+    const chars = (st ? st.script60 : sc ? sc.script60 : []).reduce((a, l) => a + String(l.line || "").length, 0);
+    const sref = (k) => refs((st && st.refs && st.refs[k]) || []);
     let k = 0;
     return (
       <article className="sw-card sw-epd" style={{ "--k": kv, "--k-soft": ks }}>
@@ -218295,7 +218372,20 @@ const SideWorkHubModule = (function () {
           <span className="sw-epsum-i"><small>原文で確認</small><b>{okFacts.length} / {facts.length}</b></span>
           {e.length ? <span className="sw-epsum-i"><small>尺の目安</small><b>{e.length}</b></span> : null}
         </div>
-        <blockquote className="sw-hook">{e.hook}</blockquote>
+        {st ? (
+          <div className="sw-st">
+            <div className="sw-st-top"><span className="sw-st-when">その時　{st.when}{st.where ? `　${st.where}` : ""}{st.date_note ? `（${st.date_note}）` : ""}</span><span className="sw-st-type">{ST_TYPE[st.type] || st.type}　<Stars n={st.fit} /></span></div>
+            <div className="sw-st-hl">{st.headline}{sref("headline")}</div>
+            {st.who ? <div className="sw-st-who">主人公　<b>{st.who}</b>{sref("who")}</div> : null}
+            <div className="sw-st-flow">
+              <div><h5>懸かっていたもの</h5><p>{st.stakes}{sref("stakes")}</p></div>
+              <div><h5>迫られた選択</h5><p>{st.choice}{sref("choice")}</p></div>
+              <div className="m"><h5>その瞬間</h5><p>{st.turn}{sref("turn")}</p></div>
+              <div><h5>動いたもの</h5><p>{st.moved}{sref("moved")}</p></div>
+            </div>
+            {st.ifnot ? <div className="sw-st-if">もしも　{st.ifnot}</div> : null}
+          </div>
+        ) : <blockquote className="sw-hook">{e.hook}</blockquote>}
         <div className="sw-epd-bar"><span className="sw-sm">見出しを押すと開閉できます</span><FoldAll onSet={setAll} /></div>
         <FoldSig.Provider value={sig}>
           <Fold id="ep:core" n={++k} title="企画の芯" meta={kind === "history" ? "その前・転換点・その後" : "切り口"}>
@@ -218307,6 +218397,7 @@ const SideWorkHubModule = (function () {
               </div>
             ) : <p style={{ fontSize: 14.5, margin: "0 0 12px", lineHeight: 1.8 }}>{e.angle}</p>}
             {e.people && e.people.length ? <p className="sw-sm" style={{ margin: "0 0 10px" }}><b style={{ color: "var(--ink2)" }}>人物</b>　{e.people.join("、")}</p> : null}
+            {st && e.hook ? <p className="sw-sm" style={{ margin: "0 0 10px" }}><b style={{ color: "var(--ink2)" }}>解説型のつかみ</b>　{e.hook}</p> : null}
             <div className="sw-chips">
               {(e.media || []).map((m) => <span key={m} className="sw-chip">{m}</span>)}
               {fmts.map((f) => <span key={f.id} className="sw-chip" style={{ background: "var(--blue-soft)", color: "var(--blue-d)", fontWeight: 700 }}>{f.id} {f.short}</span>)}
@@ -218322,16 +218413,23 @@ const SideWorkHubModule = (function () {
             ))}
             {(e.caution || e.debate) ? <div className="sw-note warn" style={{ marginTop: 12 }}><b>{kind === "history" ? "学説が分かれる点・俗説　" : "俗説と事実の違い・注意　"}</b>{e.caution || e.debate}</div> : null}
           </Fold>
-          <Fold id="ep:script" n={++k} title="台本" meta={sc ? `60秒 ${chars}字・3分 ${(sc.beats3 || []).length}拍` : "骨組み"}>
-            {sc ? <div style={{ marginBottom: 10 }}><Seg value={ver} onChange={setVer} options={[["s60", "60秒台本"], ["b3", "3分版の構成"], ["bone", "骨組み"]]} /></div> : null}
+          <Fold id="ep:script" n={++k} title="台本" meta={st ? `その時版 60秒 ${chars}字・3分 ${(st.beats3 || []).length}拍` : sc ? `60秒 ${chars}字・3分 ${(sc.beats3 || []).length}拍` : "骨組み"}>
+            {sc || st ? <div style={{ marginBottom: 10 }}><Seg value={ver} onChange={setVer} options={[...(st ? [["st60", "その時版 60秒"], ["st3", "その時版 3分"]] : []), ...(sc ? [["s60", st ? "解説版 60秒" : "60秒台本"], ["b3", st ? "解説版 3分" : "3分版の構成"]] : []), ["bone", "骨組み"]]} /></div> : null}
+            {st && ver === "st60" ? (
+              <div className="sw-script">
+                {(st.script60 || []).map((l, j) => <div key={j}><span className="sw-script-t">{l.t}</span><span>{l.line}{refs(l.facts)}{aud(l)}</span></div>)}
+              </div>
+            ) : null}
+            {st && ver === "st3" ? <div className="sw-story">{(st.beats3 || []).map((b, j) => <div key={j}><span>{b.t}　{b.beat}</span><span>{b.line}{refs(b.facts)}{aud(b)}</span></div>)}</div> : null}
             {sc && ver === "s60" ? (
               <div className="sw-script">
                 {(sc.script60 || []).map((l, j) => <div key={j}><span className="sw-script-t">{l.t}</span><span>{l.line}{refs(l.facts)}{aud(l)}</span></div>)}
               </div>
             ) : null}
             {sc && ver === "b3" ? <div className="sw-story">{(sc.beats3 || []).map((b, j) => <div key={j}><span>{b.t}　{b.beat}</span><span>{b.line}{refs(b.facts)}{aud(b)}</span></div>)}</div> : null}
-            {!sc || ver === "bone" ? <div className="sw-story">{story.map(([a, b], j) => b ? <div key={j}><span>{a}</span><span>{b}</span></div> : null)}</div> : null}
-            {sc && ver !== "bone" ? <p className="sw-sm" style={{ margin: "8px 0 0" }}>番号は、その行が頼る事実（「事実と出典」の番号）。<span className="sw-fref">1</span> 原文で未確認　<span className="sw-fref ok">1</span> 確認済み。未確認の番号が残る行は、そのまま公開しないでください。</p> : null}
+            {(!sc && !st) || ver === "bone" ? <div className="sw-story">{story.map(([a, b], j) => b ? <div key={j}><span>{a}</span><span>{b}</span></div> : null)}</div> : null}
+            {st && (ver === "st60" || ver === "st3") ? <p className="sw-sm" style={{ margin: "8px 0 0" }}>その時版は、冒頭で「その瞬間」に立ち会い、背景 → 迫られた選択 → 山場 → 動いたもの の順に進みます。事実にない場面・心情は描かず、分からないことは問いにしています。</p> : null}
+            {(sc || st) && ver !== "bone" ? <p className="sw-sm" style={{ margin: "8px 0 0" }}>番号は、その行が頼る事実（「事実と出典」の番号）。<span className="sw-fref">1</span> 原文で未確認　<span className="sw-fref ok">1</span> 確認済み。未確認の番号が残る行は、そのまま公開しないでください。</p> : null}
           </Fold>
           {sc ? (
             <Fold id="ep:check" n={++k} title="公開前チェック" meta={`最優先で照合 ${(sc.check_first || []).length}件`} def={false}>
@@ -218342,8 +218440,10 @@ const SideWorkHubModule = (function () {
               {sc.disclosure ? <><div className="sw-sub-h">概要欄の文案</div><div className="sw-fmtbox"><div style={{ fontSize: 14, whiteSpace: "pre-wrap" }}>{[].concat(sc.disclosure).join("\n")}</div>{kind === "wine" ? <div className="sw-sm" style={{ marginTop: 6, color: "#7A3E06" }}>＋ 酒類の注意表示を必ず添える（例：「20歳未満の飲酒は法律で禁止されています。」）。各SNSで年齢制限の設定も行う。</div> : null}</div></> : null}
             </Fold>
           ) : null}
-          <Fold id="ep:titles" n={++k} title="タイトル案と素材" meta={`タイトル ${(e.titles || []).length}・素材 ${(e.visuals || []).length}`} def={false}>
-            {(e.titles || []).length ? <><div className="sw-sub-h">タイトル案</div>{e.titles.map((x, j) => <div key={j} className="sw-fact" style={{ cursor: "default", gridTemplateColumns: "24px 1fr" }}><span className="sw-todo-n" style={{ width: 22, height: 22, fontSize: 11.5 }}>{j + 1}</span><span style={{ fontWeight: 700 }}>{x}</span></div>)}</> : null}
+          <Fold id="ep:titles" n={++k} title="タイトル案と素材" meta={`タイトル ${(e.titles || []).length + ((st && st.titles) || []).length}・素材 ${(e.visuals || []).length}`} def={false}>
+            {st && (st.titles || []).length ? <><div className="sw-sub-h">その時型のタイトル案</div>{st.titles.map((x, j) => <div key={j} className="sw-fact" style={{ cursor: "default", gridTemplateColumns: "24px 1fr" }}><span className="sw-todo-n" style={{ width: 22, height: 22, fontSize: 11.5 }}>{j + 1}</span><span style={{ fontWeight: 700 }}>{x}</span></div>)}</> : null}
+            {st && (st.staging || []).length ? <><div className="sw-sub-h">演出メモ（台本ではありません）</div>{st.staging.map((x, j) => <div key={j} className="sw-sm" style={{ color: "var(--ink2)" }}>・{x}</div>)}</> : null}
+            {(e.titles || []).length ? <><div className="sw-sub-h">{st ? "解説型のタイトル案" : "タイトル案"}</div>{e.titles.map((x, j) => <div key={j} className="sw-fact" style={{ cursor: "default", gridTemplateColumns: "24px 1fr" }}><span className="sw-todo-n" style={{ width: 22, height: 22, fontSize: 11.5 }}>{j + 1}</span><span style={{ fontWeight: 700 }}>{x}</span></div>)}</> : null}
             {(e.visuals || []).length ? <><div className="sw-sub-h">映像・画像の素材案</div>{e.visuals.map((v, j) => <div key={j} className="sw-tool"><span><b>{v.what}</b></span><span className="sw-sm" style={{ color: "var(--ink2)" }}>{v.source_hint}</span></div>)}</> : null}
           </Fold>
           {fmts.length ? (
@@ -218369,6 +218469,8 @@ const SideWorkHubModule = (function () {
           <Fold id="ep:log" n={++k} title="見直しと監査の記録" meta={`直した点 ${(e.review || []).length}件${sc && sc.audit_n ? `・台本 ${sc.audit_n}行` : ""}`} def={false}>
             {(e.review || []).length ? <div className="sw-note ng"><b>見直しで直した点</b>{e.review.map((r, j) => <div key={j}>・{r}</div>)}</div> : <p className="sw-sm" style={{ margin: 0 }}>見直しで直した点はありません。</p>}
             {sc && sc.audit ? <div className="sw-note info" style={{ marginTop: 10 }}><b>台本の監査　</b>{sc.audit}</div> : null}
+            {st && st.audit ? <div className="sw-note info" style={{ marginTop: 10 }}><b>その時版の監査　</b>{st.audit}</div> : null}
+            {st && (st.needs || []).length ? <div className="sw-note warn" style={{ marginTop: 10 }}><b>「その時」を強めるために調べたいこと</b>{st.needs.map((x, j) => <div key={j}>・{x}</div>)}</div> : null}
           </Fold>
         </FoldSig.Provider>
       </article>
@@ -218379,7 +218481,8 @@ const SideWorkHubModule = (function () {
   function NetaCard({ n, on, flip }) {
     return (
       <div className={"sw-neta" + (on ? " on" : "")}>
-        <div className="sw-neta-h"><span className="sw-neta-y">{yearLabel(n.year)}</span><b>{n.title}</b><button type="button" className={"sw-btn" + (on ? " pri" : "")} onClick={flip} aria-pressed={on}>{on ? "★ 選んだ" : "☆ 選ぶ"}</button></div>
+        <div className="sw-neta-h"><span className="sw-neta-y">{yearLabel(n.year)}</span><b>{n.title}{n.fit ? <span style={{ marginLeft: 6 }}><Stars n={n.fit} /></span> : null}</b><button type="button" className={"sw-btn" + (on ? " pri" : "")} onClick={flip} aria-pressed={on}>{on ? "★ 選んだ" : "☆ 選ぶ"}</button></div>
+        {n.moment || n.who ? <div className="sw-neta-m">{n.who ? <><b>主人公</b>　{n.who}　</> : null}{n.moment ? <><b>その瞬間</b>　{n.moment}</> : null}</div> : null}
         <div className="sw-neta-q">{n.q}</div>
         <p>{n.angle}</p>
         <dl className="sw-kv">
