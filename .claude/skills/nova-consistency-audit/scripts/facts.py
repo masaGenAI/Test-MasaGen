@@ -174,10 +174,12 @@ def main():
         b = BOOK.read_text(encoding="utf-8")
         yt = b.count('{"id":"yt_')
         note = b.count('{"id":"note_')
+        ig = b.count('{"id":"ig_')
         allb = b.count('"oneLiner":')
         f["Book.youtube"] = yt
         f["Book.note"] = note
-        f["Book.flier"] = allb - yt - note
+        f["Book.instagram"] = ig
+        f["Book.flier"] = allb - yt - note - ig
         f["Book.total"] = allb
         src = array_after(b, "const SOURCES = [")
         f["Book.sources"] = [re.match(r"\{\s*id:\s*['\"]([^'\"]+)", e).group(1) for e in src]

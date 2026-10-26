@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback, useContext, createContext } from "react";
 import { Waves, Clock3, Users, Brain, Cpu, BookOpen, Layers, ChevronRight, ArrowLeft, Check, Circle, X, Star, Sun, Moon, Globe, RotateCcw } from "lucide-react";
-// 完成版 Book-Summary ハブ（flier・Kindle・YouTube・note の要約、検索・クイズ・メモ付き。件数はポータルがこの文字列から数える）を素の文字列として取り込み、
+// 完成版 Book-Summary ハブ（flier・Kindle・YouTube・note・Instagram の要約、検索・クイズ・メモ付き。件数はポータルがこの文字列から数える）を素の文字列として取り込み、
 // 実行時に Blob URL 化して iframe に読み込む（単一ファイルでもスクリプトが実行される）。
 import BOOK_SUMMARY_HTML from "../public/booksummaryhub.html?raw";
 // 学習ロードマップ トラッカー（資格/Tools/講座/書籍/Udemy の一元管理・自動保存つき表アプリ）
@@ -216746,7 +216746,7 @@ const BookSummaryModule = (function () {
   const BSH_STORE_KEY = "bsh:store:v1";
 
   function BookSummaryModule() {
-    // 完成版 Book-Summary ハブ（flier・Kindle・YouTube・note の要約、検索・クイズ・メモ・ダークモード・履歴ナビ）を、
+    // 完成版 Book-Summary ハブ（flier・Kindle・YouTube・note・Instagram の要約、検索・クイズ・メモ・ダークモード・履歴ナビ）を、
     // 実行時に Blob URL 化して iframe で読み込む。これにより単一HTMLファイルのままでも
     // 大容量インラインスクリプトが確実に実行され、履歴ナビ(#/route)も正しく動作する。
     //
@@ -225922,8 +225922,8 @@ const NOVA_STATIONS = [
     Icon: IconBook,
     ja: "Book-Summary",
     en: "Book-Summary",
-    get tagJa() { return `flier・Kindle・YouTube・note 要約${nf(novaStats().books)}件`; },
-    get tagEn() { return `flier · Kindle · YouTube · note · ${nf(novaStats().books)} summaries`; },
+    get tagJa() { return `flier・Kindle・YouTube・note・Instagram 要約${nf(novaStats().books)}件`; },
+    get tagEn() { return `flier · Kindle · YouTube · note · Instagram · ${nf(novaStats().books)} summaries`; },
   },
   {
     id: "tracker",
