@@ -47,7 +47,7 @@ console.log('  ' + pick(t, /問題は合計[^。]+。/));
 console.log('  ' + pick(t, /前倒し圧縮版：[^\n]{0,120}/));
 
 // 2. 各ハブを開く（開けること・実行時エラーがないこと）
-const hubs = ['Consulting Hub', 'TechHub', 'Finance Hub', 'Certification Hub', 'Language Hub', 'Linguistics Hub', 'Book-Summary', 'Learning Tracker', 'Anything Memo', 'Training Hub'];
+const hubs = ['Consulting Hub', 'TechHub', 'Finance Hub', 'Certification Hub', 'Language Hub', 'Linguistics Hub', 'Book-Summary', 'Learning Tracker', 'Anything Memo', 'Training Hub', 'Side Work Hub'];
 console.log('■ ハブ');
 for (const h of hubs) {
   await page.goto(DIST); await page.waitForTimeout(2200);
