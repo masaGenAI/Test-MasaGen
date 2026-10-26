@@ -251,12 +251,14 @@ for (const st of STATIONS) {
   // id は「キー名:先頭の問題の id（なければ設問の先頭）」で、行番号に依存しない。
   const nested = [], covered = [], seenNest = {};
   {
-    const re = /([A-Za-z_$][\w$]*)\s*:\s*\[\s*\{/g;
+    // 配列の先頭にコメント行（`// D1 ガバナンス` など）があっても拾う。これが無かった頃は、
+    // セキュリティ・ガバナンス系7資格の BANK・HARD（約3,600問）が検査を素通りしていた（2026-10）。
+    const re = /([A-Za-z_$][\w$]*)\s*:\s*\[\s*(?:\/\/[^\n]*\n\s*)*\{/g;
     let m;
     while ((m = re.exec(text))) {
       const start = text.indexOf('[', m.index);
       const head = text.slice(start, start + 4000);
-      if (!/\b(?:choices|opts|options)\s*"?\s*:\s*\[|"o"\s*:\s*\[/.test(head) || !/\b(?:ans|answer|correct)"?\s*:\s*\d|"a"\s*:\s*\d/.test(head)) continue;
+      if (!/\b(?:choices|opts|options)\s*"?\s*:\s*\[|"o"\s*:\s*\[|[{,]\s*o\s*:\s*\[/.test(head) || !/\b(?:ans|answer|correct)"?\s*:\s*\d|"a"\s*:\s*\d|[{,]\s*a\s*:\s*\d/.test(head)) continue;
       let depth = 0, inStr = false, q = null, esc = false, i = start;
       for (; i < text.length; i++) {
         const c = text[i];
