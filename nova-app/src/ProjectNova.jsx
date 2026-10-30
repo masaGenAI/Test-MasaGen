@@ -164498,6 +164498,7 @@ const GOVKIT = {"cust":{"pre":[{"c":["AIと話していること・AIを使う�
 const GOVX_L = (x, en) => (Array.isArray(x) ? x[en ? 1 : 0] : x || "");
 function GovSrc({ src, en }) {
   if (!src || !src.length) return null;
+  src = src.filter((x, i, a) => a.findIndex((y) => y.url === x.url && y.name === x.name) === i);
   return (
     <div style={{ fontSize: 10.5, color: C.dim, marginTop: 6, lineHeight: 1.6 }}>
       {en ? "Sources: " : "出典："}
@@ -164515,207 +164516,508 @@ function GovPills({ items, val, onPick, col = C.teal }) {
   );
 }
 const GOVREG_RL = { "日本": ["日本", "Japan"], "米国（連邦）": ["米国（連邦）", "US (federal)"], "米国（州）": ["米国（州）", "US (states)"], "EU": ["EU", "EU"], "英国": ["英国", "UK"], "中国": ["中国", "China"], "韓国": ["韓国", "Korea"], "シンガポール": ["シンガポール", "Singapore"], "インド": ["インド", "India"], "国際": ["国際", "International"] };
-function GovRegMap({ en }) {
-  const [rg, setRg] = useState("all");
-  const [view, setView] = useState("list");
-  const [open, setOpen] = useState(null);
-  const L = (x) => GOVX_L(x, en);
-  const regions = Array.from(new Set(GOVREG_ITEMS.map((x) => x.region)));
-  const list = GOVREG_ITEMS.filter((x) => rg === "all" || x.region === rg);
-  const ev = list.flatMap((x) => (x.dates || []).map((d) => ({ ...d, x }))).sort((a, b) => a.d.localeCompare(b.d));
-  const years = Array.from(new Set(ev.map((e) => e.d.slice(0, 4))));
-  const chip = (r) => <span style={{ fontSize: 10, fontWeight: 800, color: C.teal, border: `1px solid ${C.teal}`, borderRadius: 999, padding: "0 7px", whiteSpace: "nowrap" }}>{L(GOVREG_RL[r] || [r, r])}</span>;
+// ---- 図解の共通部品（色は TechHub の暗い背景で検査済み：分類3色、件数の濃淡4段） ----
+const GV_COL = { law: "#3987e5", gov: "#d95926", soft: "#199e70" };
+const GV_RAMP = ["#2b6660", "#2f8f84", "#45b3a5", "#7fe0d3"];
+const GV_BIND_L = { law: ["法令（拘束力あり）", "Binding law"], gov: ["政府内向け（大統領令・行政文書）", "Government-internal (orders, memos)"], soft: ["非拘束（ガイドライン・指針など）", "Non-binding (guidelines etc.)"] };
+const govBind = (k) => (["法律", "規則"].includes(k) ? "law" : ["大統領令", "行政文書"].includes(k) ? "gov" : "soft");
+const GOVREG_ORDER = ["日本", "国際", "米国（連邦）", "米国（州）", "EU", "英国", "中国", "韓国", "シンガポール", "インド"];
+const GOVREG_STAGE = {
+  "jp-ai-act": ["施行中", "In force"], "jp-appi-2026": ["公布済み・施行前", "Promulgated, not yet in force"],
+  "us-co-sb26-189": ["成立・2027年1月施行", "Enacted, in force Jan 2027"], "us-tx-traiga": ["施行中", "In force"],
+  "eu-ai-act": ["段階的に適用中", "Applying in stages"], "eu-ai-omnibus": ["発効済み（段階的に適用）", "In force, staged"],
+  "eu-gpai-obligations": ["適用中", "Applying"], "eu-ai-act-art50": ["適用中", "Applying"], "eu-pld": ["発効済み（適用日は未確認）", "In force (application date unconfirmed)"],
+  "eu-cra": ["段階的に適用中", "Applying in stages"], "uk-data-protection-ai": ["施行中（新法は段階施行）", "In force (new act staged)"],
+  "kr-ai-basic-act": ["施行中（猶予期間中）", "In force (grace period)"], "in-it-rules-synthetic-content-2026": ["施行中", "In force"],
+  "uk-ai-framework": ["政府の方針", "Government policy"], "uk-aisi": ["政府機関", "Government body"],
+};
+const govStage = (x) => GOVREG_STAGE[x.id] || (govBind(x.kind) === "law" ? ["施行中", "In force"] : govBind(x.kind) === "gov" ? ["発出済み", "Issued"] : ["公表済み（非拘束）", "Published (non-binding)"]);
+const govDay = (d) => { const [y, m, dd] = d.split("-").map(Number); return Date.UTC(y, (m || 1) - 1, dd || 1); };
+function GvLegend({ en, items }) {
   return (
-    <div>
-      <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.75, marginBottom: 10 }}>
-        {en ? `AI laws and guidelines by jurisdiction, as of ${GOVREG_ASOF}. Each entry cites the official text or, where that could not be opened, a marked secondary source. Proposals and bills are labelled as such — re-check before quoting.` : `法域ごとのAI規制・ガイドライン（${GOVREG_ASOF}時点）。各項目は公式の本文で確かめ、開けなかったものだけ二次の出典を明記した。提案中・審議中のものはそう書いてある。引用する前に最新の状況を確かめること。`}
-      </div>
-      <GovPills items={[["all", en ? `All ${GOVREG_ITEMS.length}` : `すべて ${GOVREG_ITEMS.length}`], ...regions.map((r) => [r, `${L(GOVREG_RL[r] || [r, r])} ${GOVREG_ITEMS.filter((x) => x.region === r).length}`])]} val={rg} onPick={(k) => { setRg(k); setOpen(null); }} />
-      <GovPills items={[["list", en ? "List" : "一覧"], ["time", en ? "Timeline" : "年表"]]} val={view} onPick={setView} col={C.gold} />
-      {view === "list" ? list.map((x) => {
-        const on = open === x.id;
-        return (
-          <div key={x.id} style={{ background: C.surface, border: `1px solid ${on ? C.teal : C.line}`, borderRadius: 10, marginBottom: 8 }}>
-            <button onClick={() => setOpen(on ? null : x.id)} aria-expanded={on} style={{ display: "block", width: "100%", textAlign: "left", background: "transparent", border: "none", padding: "10px 13px", cursor: "pointer", color: C.text }}>
-              <div style={{ display: "flex", gap: 7, alignItems: "center", flexWrap: "wrap", marginBottom: 3 }}>{chip(x.region)}<span style={{ fontSize: 10.5, color: C.dim }}>{x.kind}</span></div>
-              <div style={{ fontWeight: 700, fontSize: 13.5, lineHeight: 1.5 }}>{on ? "▾ " : "▸ "}{L(x.name)}</div>
-              <div style={{ fontSize: 11.5, color: C.gold, marginTop: 2 }}>{L(x.status)}</div>
-            </button>
-            {on ? (
-              <div style={{ padding: "0 13px 12px", fontSize: 12, color: C.muted, lineHeight: 1.7 }}>
-                {(x.what || []).length ? <><div style={{ fontWeight: 800, color: C.text, marginTop: 4 }}>{en ? "What it sets out" : "何を定めるか"}</div>{x.what.map((w, i) => <div key={i}>・{L(w)}</div>)}</> : null}
-                {x.who ? <><div style={{ fontWeight: 800, color: C.text, marginTop: 6 }}>{en ? "Who it covers" : "対象"}</div><div>{L(x.who)}</div></> : null}
-                {(x.duty || []).length ? <><div style={{ fontWeight: 800, color: C.text, marginTop: 6 }}>{en ? "What companies must do" : "企業に求められること"}</div>{x.duty.map((w, i) => <div key={i}>・{L(w)}</div>)}</> : null}
-                {x.penalty && L(x.penalty) ? <><div style={{ fontWeight: 800, color: C.text, marginTop: 6 }}>{en ? "Penalties" : "罰則・制裁"}</div><div>{L(x.penalty)}</div></> : null}
-                {x.jp && L(x.jp) ? <div style={{ ...DGM_DETAIL, marginTop: 8 }}><b style={{ color: C.text }}>{en ? "For Japanese companies: " : "日本企業が気を付けること："}</b>{L(x.jp)}</div> : null}
-                {(x.dates || []).length ? <div style={{ marginTop: 6 }}>{x.dates.map((d, i) => <div key={i} style={{ fontSize: 11.5 }}><span style={{ fontFamily: "ui-monospace,monospace", color: d.d > GOVREG_ASOF ? C.gold : C.teal }}>{d.d}</span>　{L(d.ev)}{d.d > GOVREG_ASOF ? (en ? " (scheduled)" : "（予定）") : ""}</div>)}</div> : null}
-                {x.note ? <div style={{ fontSize: 11, color: C.dim, marginTop: 6 }}>{L(x.note)}</div> : null}
-                <GovSrc src={x.src} en={en} />
-              </div>
-            ) : null}
-          </div>
-        );
-      }) : (
-        <div>
-          {years.map((y) => (
-            <div key={y} style={{ marginBottom: 10 }}>
-              <div style={{ fontSize: 13, fontWeight: 800, color: C.text, borderBottom: `1px solid ${C.line}`, marginBottom: 4 }}>{y}</div>
-              {ev.filter((e) => e.d.startsWith(y)).map((e, i) => (
-                <div key={i} style={{ display: "grid", gridTemplateColumns: "92px minmax(0,1fr)", gap: 8, fontSize: 12, lineHeight: 1.6, padding: "3px 0" }}>
-                  <span style={{ fontFamily: "ui-monospace,monospace", color: e.d > GOVREG_ASOF ? C.gold : C.teal }}>{e.d}</span>
-                  <span style={{ color: C.muted }}>{chip(e.x.region)} <b style={{ color: C.text }}>{L(e.x.short || e.x.name)}</b>：{L(e.ev)}{e.d > GOVREG_ASOF ? (en ? " (scheduled)" : "（予定）") : ""}</span>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      )}
+    <div style={{ display: "flex", gap: 14, flexWrap: "wrap", fontSize: 11.5, color: C.muted, margin: "4px 0 8px" }}>
+      {items.map(([col, label, hollow], i) => (
+        <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+          <span style={{ width: 10, height: 10, borderRadius: 99, background: hollow ? "transparent" : col, border: `2px solid ${col}`, boxSizing: "border-box" }} />{label}
+        </span>
+      ))}
     </div>
   );
 }
-function GovIndustry({ en, onMode }) {
-  const [k, setK] = useState(GOVIND[0].key);
-  const L = (x) => GOVX_L(x, en);
-  const d = GOVIND.find((x) => x.key === k) || GOVIND[0];
-  const sc = GOVDOJO_SCENARIOS.filter((x) => (d.scen || []).includes(x.industry));
+function GvKpi({ items }) {
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(130px,1fr))", gap: 8, marginBottom: 12 }}>
+      {items.map(([n, label, col], i) => (
+        <div key={i} style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 10, padding: "9px 12px", borderTop: `3px solid ${col || C.line}` }}>
+          <div style={{ fontSize: 22, fontWeight: 800, color: C.text, lineHeight: 1.1 }}>{n}</div>
+          <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>{label}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+const GV_H = ({ children }) => <div style={{ fontSize: 13.5, fontWeight: 800, color: C.text, margin: "16px 0 6px" }}>{children}</div>;
+const GV_SUB = ({ children }) => <div style={{ fontSize: 11.5, color: C.dim, marginBottom: 6, lineHeight: 1.6 }}>{children}</div>;
+
+// ---------- 規制マップ ----------
+function GovRegDetail({ x, en }) {
+  const L = (v) => GOVX_L(v, en);
+  if (!x) return null;
+  const b = govBind(x.kind);
+  return (
+    <div style={{ ...DGM_DETAIL, borderLeftColor: GV_COL[b], fontSize: 12, color: C.muted, lineHeight: 1.7 }}>
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", marginBottom: 4 }}>
+        <span style={{ fontSize: 10.5, fontWeight: 800, color: GV_COL[b], border: `1px solid ${GV_COL[b]}`, borderRadius: 99, padding: "0 7px" }}>{L(GV_BIND_L[b])}</span>
+        <span style={{ fontSize: 10.5, color: C.gold }}>{L(govStage(x))}</span>
+        <span style={{ fontSize: 10.5, color: C.dim }}>{L(GOVREG_RL[x.region] || [x.region, x.region])}・{x.kind}</span>
+      </div>
+      <div style={{ fontWeight: 800, color: C.text, fontSize: 13.5 }}>{L(x.name)}</div>
+      <div style={{ color: C.gold, margin: "2px 0 6px" }}>{L(x.status)}</div>
+      {(x.what || []).length ? <><b style={{ color: C.text }}>{en ? "What it sets out" : "何を定めるか"}</b>{x.what.map((w, i) => <div key={i}>・{L(w)}</div>)}</> : null}
+      {x.who ? <div style={{ marginTop: 4 }}><b style={{ color: C.text }}>{en ? "Who: " : "対象："}</b>{L(x.who)}</div> : null}
+      {(x.duty || []).length ? <div style={{ marginTop: 4 }}><b style={{ color: C.text }}>{en ? "What companies must do" : "企業に求められること"}</b>{x.duty.map((w, i) => <div key={i}>・{L(w)}</div>)}</div> : null}
+      {x.penalty && L(x.penalty) ? <div style={{ marginTop: 4 }}><b style={{ color: C.text }}>{en ? "Penalties: " : "罰則・制裁："}</b>{L(x.penalty)}</div> : null}
+      {x.jp && L(x.jp) ? <div style={{ marginTop: 6, background: C.surface, borderRadius: 8, padding: "6px 9px" }}><b style={{ color: C.text }}>{en ? "For Japanese companies: " : "日本企業が気を付けること："}</b>{L(x.jp)}</div> : null}
+      {x.note ? <div style={{ fontSize: 11, color: C.dim, marginTop: 4 }}>{L(x.note)}</div> : null}
+      <GovSrc src={x.src} en={en} />
+    </div>
+  );
+}
+function GovRegTimeline({ en, list, sel, onPick }) {
+  const [hov, setHov] = useState(null);
+  const L = (v) => GOVX_L(v, en);
+  const regions = GOVREG_ORDER.filter((r) => list.some((x) => x.region === r));
+  const W = 920, LX = 118, RX = 14, TOP = 30, LANE = 30;
+  const t0 = govDay("2021-10"), t1 = govDay("2029-01"), today = govDay(GOVREG_ASOF);
+  const X = (d) => LX + ((govDay(d) - t0) / (t1 - t0)) * (W - LX - RX);
+  const H = TOP + regions.length * LANE + 22;
+  const ev = list.flatMap((x) => (x.dates || []).map((d) => ({ ...d, x, b: govBind(x.kind) })));
+  const yrs = [2022, 2023, 2024, 2025, 2026, 2027, 2028];
+  const info = hov || (sel ? { x: sel, d: "", ev: null } : null);
+  return (
+    <div style={DGM_WRAP}>
+      <GvLegend en={en} items={[[GV_COL.law, L(GV_BIND_L.law)], [GV_COL.gov, L(GV_BIND_L.gov)], [GV_COL.soft, L(GV_BIND_L.soft)], [C.muted, en ? "hollow = scheduled (after today)" : "白抜き＝予定（今日より後）", true]]} />
+      <div style={{ minHeight: 34, fontSize: 12, color: C.muted, lineHeight: 1.5, marginBottom: 4 }}>
+        {info && info.ev ? <><span style={{ fontFamily: "ui-monospace,monospace", color: govDay(info.d) > today ? C.gold : C.teal }}>{info.d}</span>　<b style={{ color: C.text }}>{L(info.x.short || info.x.name)}</b>：{L(info.ev)}{govDay(info.d) > today ? (en ? " (scheduled)" : "（予定）") : ""}</> : (en ? "Hover or tap a point to read it; tap to open the entry below." : "点に合わせると内容が出る。押すと下に詳細を開く。")}
+      </div>
+      <div className="gh-figscroll">
+        <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={en ? "Timeline of AI regulations by jurisdiction" : "法域ごとのAI規制の年表"} style={{ display: "block" }}>
+          {yrs.map((y) => { const x = X(`${y}-01-01`); return <g key={y}><line x1={x} x2={x} y1={TOP - 8} y2={H - 6} stroke={C.line} strokeWidth="1" /><text x={x + 3} y={TOP - 12} fill={C.dim} fontSize="11">{y}</text></g>; })}
+          {regions.map((r, i) => (
+            <g key={r}>
+              <line x1={LX} x2={W - RX} y1={TOP + i * LANE + LANE / 2} y2={TOP + i * LANE + LANE / 2} stroke={C.line} strokeWidth="1" strokeDasharray="2 4" />
+              <text x={LX - 8} y={TOP + i * LANE + LANE / 2 + 4} textAnchor="end" fill={C.muted} fontSize="11.5" fontWeight="700">{L(GOVREG_RL[r] || [r, r])}</text>
+            </g>
+          ))}
+          <line x1={X(GOVREG_ASOF)} x2={X(GOVREG_ASOF)} y1={TOP - 6} y2={H - 4} stroke={C.gold} strokeWidth="2" strokeDasharray="4 3" />
+          <text x={X(GOVREG_ASOF) - 4} y={H - 8} textAnchor="end" fill={C.gold} fontSize="10.5" fontWeight="700">{en ? `today ${GOVREG_ASOF}` : `今日 ${GOVREG_ASOF}`}</text>
+          {ev.map((e, i) => {
+            const cx = X(e.d), cy = TOP + regions.indexOf(e.x.region) * LANE + LANE / 2, fut = govDay(e.d) > today, on = sel && sel.id === e.x.id;
+            return (
+              <g key={i} style={{ cursor: "pointer" }} onMouseEnter={() => setHov({ x: e.x, d: e.d, ev: e.ev })} onMouseLeave={() => setHov(null)} onClick={() => onPick(e.x)}>
+                <circle cx={cx} cy={cy} r={11} fill="transparent" />
+                <circle cx={cx} cy={cy} r={on ? 7 : 5.5} fill={fut ? C.surface2 : GV_COL[e.b]} stroke={fut ? GV_COL[e.b] : C.surface2} strokeWidth="2" />
+                <title>{`${e.d} ${L(e.x.short || e.x.name)}：${L(e.ev)}`}</title>
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+    </div>
+  );
+}
+function GovRegMap({ en }) {
+  const [sel, setSel] = useState(null);
+  const [view, setView] = useState("map");
+  const L = (v) => GOVX_L(v, en);
+  const regions = GOVREG_ORDER.filter((r) => GOVREG_ITEMS.some((x) => x.region === r));
+  const cnt = (b) => GOVREG_ITEMS.filter((x) => govBind(x.kind) === b).length;
+  const fut = GOVREG_ITEMS.flatMap((x) => x.dates || []).filter((d) => govDay(d.d) > govDay(GOVREG_ASOF)).length;
+  const pick = (x) => setSel(sel && sel.id === x.id ? null : x);
+  const chip = (x) => {
+    const b = govBind(x.kind), on = sel && sel.id === x.id;
+    return (
+      <button key={x.id} onClick={() => pick(x)} title={L(x.name)} style={{ display: "block", width: "100%", textAlign: "left", background: on ? C.surface2 : C.surface, border: `1px solid ${on ? C.gold : C.line}`, borderLeft: `4px solid ${GV_COL[b]}`, borderRadius: 7, padding: "4px 7px", marginBottom: 4, cursor: "pointer", color: C.text, fontSize: 11.5, lineHeight: 1.35 }}>
+        {L(x.short || x.name)}<span style={{ display: "block", fontSize: 10, color: C.dim }}>{L(govStage(x))}</span>
+      </button>
+    );
+  };
   return (
     <div>
       <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.75, marginBottom: 10 }}>
-        {en ? "What each industry must check before and while using AI. The rules listed are the ones that apply whether or not they mention AI — the 'AI' column says where they bite. Where a rule does not mention AI directly, the entry says it is an application of the rule." : "業界ごとに、AIを入れる前と使っている間に必ず確かめる規定。AIに直接触れていない規定も、AIに及ぶものは載せた（その場合は「当てはめ」と明記）。"}
+        {en ? `AI laws and guidelines by jurisdiction, as of ${GOVREG_ASOF}. Colour shows how binding each one is; the timeline shows what has started and what is still to come. Every entry links the official text it was checked against.` : `法域ごとのAI規制・ガイドライン（${GOVREG_ASOF}時点）。色は拘束力の強さ、年表は始まったものとこれからのもの。各項目は確かめた公式ページにリンクしている。`}
       </div>
-      <GovPills items={GOVIND.map((x) => [x.key, `${L([x.ind, x.ind_en])} ${x.regs.length}`])} val={k} onPick={setK} />
-      <div style={{ display: "grid", gap: 8 }}>
-        {d.regs.map((r, i) => (
-          <div key={i} style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 10, padding: "10px 13px" }}>
-            <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
-              <b style={{ fontSize: 13, color: C.text }}>{L(r.name)}</b>
-              <span style={{ fontSize: 10.5, color: C.dim }}>{L(r.owner)}・{r.kind}</span>
-            </div>
-            {(r.ai || []).map((a, j) => <div key={j} style={{ fontSize: 12, color: C.muted, lineHeight: 1.65, marginTop: 3 }}>・{L(a)}</div>)}
-            {r.note ? <div style={{ fontSize: 10.5, color: C.gold, marginTop: 3 }}>{L(r.note)}</div> : null}
-            <GovSrc src={r.src} en={en} />
+      <GvKpi items={[[GOVREG_ITEMS.length, en ? "laws & guidelines" : "法令・ガイドライン", C.gold], [cnt("law"), L(GV_BIND_L.law), GV_COL.law], [cnt("gov"), L(GV_BIND_L.gov), GV_COL.gov], [cnt("soft"), L(GV_BIND_L.soft), GV_COL.soft], [fut, en ? "milestones still ahead" : "これからの予定", C.gold]]} />
+      <GovPills items={[["map", en ? "Map: jurisdiction × binding force" : "地図：地域 × 拘束力"], ["time", en ? "Timeline" : "年表"], ["list", en ? "List" : "一覧"]]} val={view} onPick={setView} col={C.gold} />
+      {view === "map" ? (
+        <div className="gh-figscroll">
+          <div style={{ minWidth: 620, display: "grid", gridTemplateColumns: "96px repeat(3,minmax(0,1fr))", gap: 6 }}>
+            <div />
+            {["law", "gov", "soft"].map((b) => <div key={b} style={{ fontSize: 11, fontWeight: 800, color: GV_COL[b], borderBottom: `2px solid ${GV_COL[b]}`, paddingBottom: 3 }}>{L(GV_BIND_L[b])}</div>)}
+            {regions.map((r) => (
+              <React.Fragment key={r}>
+                <div style={{ fontSize: 12, fontWeight: 800, color: C.text, paddingTop: 5 }}>{L(GOVREG_RL[r] || [r, r])}<div style={{ fontSize: 10, color: C.dim, fontWeight: 400 }}>{GOVREG_ITEMS.filter((x) => x.region === r).length}{en ? " items" : "件"}</div></div>
+                {["law", "gov", "soft"].map((b) => <div key={b} style={{ background: "rgba(255,255,255,0.02)", borderRadius: 8, padding: 4, minHeight: 30 }}>{GOVREG_ITEMS.filter((x) => x.region === r && govBind(x.kind) === b).map(chip)}</div>)}
+              </React.Fragment>
+            ))}
           </div>
-        ))}
-      </div>
-      {(d.watch || []).length ? (
-        <div style={{ ...DGM_DETAIL, marginTop: 12 }}>
-          <div style={{ fontWeight: 800, color: C.text, fontSize: 12.5, marginBottom: 4 }}>{en ? "Watch points for AI in this industry" : "この業界でAIに特に気を付けること"}</div>
-          {d.watch.map((w, i) => <div key={i} style={{ fontSize: 12, color: C.muted, lineHeight: 1.65 }}>・{L(w)}</div>)}
         </div>
+      ) : null}
+      {view === "time" ? <GovRegTimeline en={en} list={GOVREG_ITEMS} sel={sel} onPick={pick} /> : null}
+      {view === "list" ? GOVREG_ORDER.filter((r) => regions.includes(r)).map((r) => (
+        <div key={r} style={{ marginBottom: 8 }}>
+          <div style={{ fontSize: 12, fontWeight: 800, color: C.teal, margin: "6px 0 4px" }}>{L(GOVREG_RL[r] || [r, r])}</div>
+          {GOVREG_ITEMS.filter((x) => x.region === r).map(chip)}
+        </div>
+      )) : null}
+      {sel ? <GovRegDetail x={sel} en={en} /> : <div style={DGM_HINT}>{en ? "Pick an entry to see what it requires and its sources." : "項目を押すと、中身と出典が開く。"}</div>}
+    </div>
+  );
+}
+
+// ---------- 業界別チェック ----------
+const GOVIND_TH = [["ai", "AIそのものの規律", "AI-specific rules"], ["pi", "個人情報・データ", "Personal data"], ["out", "委託・クラウド・調達", "Outsourcing, cloud, procurement"], ["sec", "セキュリティ", "Security"], ["model", "モデル検証・業務規制", "Model validation & conduct"], ["prod", "製品・機器の安全と責任", "Product safety & liability"], ["info", "記録・秘密・輸出管理", "Records, secrets, export"]];
+const GOVIND_TAG = {
+  "fin:0": ["out", "sec"], "fin:1": ["ai"], "fin:2": ["model"], "fin:3": ["sec"], "fin:4": ["model"], "fin:5": ["out"], "fin:6": ["pi"], "fin:7": ["model"], "fin:8": ["model"], "fin:9": ["ai"], "fin:10": ["out", "sec"], "fin:11": ["model"], "fin:12": ["model"], "fin:13": ["ai"],
+  "med:0": ["sec", "pi"], "med:1": ["out", "sec"], "med:2": ["prod"], "med:3": ["prod", "model"], "med:4": ["ai", "prod"], "med:5": ["ai"], "med:6": ["pi"], "med:7": ["pi"], "med:8": ["pi", "ai"], "med:9": ["pi"], "med:10": ["pi"], "med:11": ["ai", "prod"], "med:12": ["ai", "prod"], "med:13": ["ai", "prod"],
+  "pub:0": ["ai", "out"], "pub:1": ["sec"], "pub:2": ["out", "sec"], "pub:3": ["pi"], "pub:4": ["sec"], "pub:5": ["ai"], "pub:6": ["info"], "pub:7": ["ai"], "pub:8": ["ai"], "pub:9": ["ai"], "pub:10": ["ai"], "pub:11": ["ai", "out"], "pub:12": ["ai", "out"],
+  "mfg:0": ["info"], "mfg:1": ["info"], "mfg:2": ["info"], "mfg:3": ["info"], "mfg:4": ["sec"], "mfg:5": ["sec", "prod"], "mfg:6": ["prod"], "mfg:7": ["ai"], "mfg:8": ["ai"], "mfg:9": ["ai", "prod"], "mfg:10": ["prod"], "mfg:11": ["sec", "prod"], "mfg:12": ["prod"],
+};
+const GOVIND_OVERSEAS = new Set(["fin:9", "fin:10", "fin:11", "fin:12", "fin:13", "med:11", "med:12", "med:13", "pub:9", "pub:10", "pub:11", "pub:12", "mfg:5", "mfg:9", "mfg:10", "mfg:11", "mfg:12"]);
+const govKindG = (k) => (k === "法律" ? "law" : k === "基準" ? "std" : "guide");
+const GOVIND_KG = { law: ["法令", "Statute"], guide: ["指針・ガイドライン・原則", "Guidance & principles"], std: ["基準・規格", "Standards"] };
+function GovIndustry({ en, onMode }) {
+  const [k, setK] = useState(GOVIND[0].key);
+  const [th, setTh] = useState(null);
+  const [sel, setSel] = useState(null);
+  const L = (x) => GOVX_L(x, en);
+  const d = GOVIND.find((x) => x.key === k) || GOVIND[0];
+  const sc = GOVDOJO_SCENARIOS.filter((x) => (d.scen || []).includes(x.industry));
+  const count = (ind, t) => ind.regs.filter((r, i) => (GOVIND_TAG[`${ind.key}:${i}`] || []).includes(t)).length;
+  const max = Math.max(...GOVIND.flatMap((ind) => GOVIND_TH.map(([t]) => count(ind, t))));
+  const shade = (n) => (n === 0 ? C.surface : GV_RAMP[Math.min(GV_RAMP.length - 1, Math.floor(((n - 1) / Math.max(1, max - 1)) * (GV_RAMP.length - 1)))]);
+  const regs = d.regs.map((r, i) => ({ ...r, i, tags: GOVIND_TAG[`${d.key}:${i}`] || [], os: GOVIND_OVERSEAS.has(`${d.key}:${i}`) }));
+  const cur = sel != null ? regs[sel] : null;
+  return (
+    <div>
+      <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.75, marginBottom: 10 }}>
+        {en ? "What each industry must check before and while using AI. The heat map shows where each industry's rules concentrate; pick a cell to highlight those rules. Rules that don't mention AI are marked as applications." : "業界ごとに、AIを入れる前と使っている間に確かめる規定。下の表は、業界ごとに規定がどのテーマに集まっているか（濃いほど多い）。マスを押すと、その規定が光る。AIに直接触れていない規定は「当てはめ」と明記。"}
+      </div>
+      <GV_H>{en ? "Where the rules concentrate (number of rules)" : "規定が集まるテーマ（規定の数）"}</GV_H>
+      <div className="gh-figscroll">
+        <div style={{ minWidth: 560, display: "grid", gridTemplateColumns: "170px repeat(4,minmax(0,1fr))", gap: 3 }}>
+          <div />
+          {GOVIND.map((ind) => <button key={ind.key} onClick={() => { setK(ind.key); setSel(null); }} style={{ background: "transparent", border: "none", borderBottom: `2px solid ${ind.key === k ? C.gold : C.line}`, color: ind.key === k ? C.gold : C.text, fontSize: 11.5, fontWeight: 800, padding: "3px 2px", cursor: "pointer" }}>{L([ind.ind, ind.ind_en])}</button>)}
+          {GOVIND_TH.map(([t, ja, enl]) => (
+            <React.Fragment key={t}>
+              <div style={{ fontSize: 11.5, color: C.muted, display: "flex", alignItems: "center" }}>{en ? enl : ja}</div>
+              {GOVIND.map((ind) => {
+                const n = count(ind, t), on = th === t && k === ind.key;
+                return <button key={ind.key} onClick={() => { setK(ind.key); setTh(on ? null : t); setSel(null); }} title={`${L([ind.ind, ind.ind_en])} × ${en ? enl : ja}: ${n}`} style={{ background: shade(n), color: n >= 3 ? C.bg : C.text, border: `2px solid ${on ? C.gold : "transparent"}`, borderRadius: 6, height: 30, fontSize: 12.5, fontWeight: 800, cursor: "pointer" }}>{n || "·"}</button>;
+              })}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+      <GV_H>{en ? `${L([d.ind, d.ind_en])}: the map of rules` : `${d.ind}：規定の地図`}{th ? <span style={{ fontSize: 11, color: C.gold, marginLeft: 8 }}>{en ? "highlight: " : "強調："}{L(GOVIND_TH.find((x) => x[0] === th).slice(1))}<button onClick={() => setTh(null)} style={{ marginLeft: 6, background: "transparent", border: `1px solid ${C.line}`, color: C.muted, borderRadius: 6, fontSize: 10.5, cursor: "pointer" }}>{en ? "clear" : "解除"}</button></span> : null}</GV_H>
+      <div className="gh-figscroll">
+        <div style={{ minWidth: 560, display: "grid", gridTemplateColumns: "120px repeat(2,minmax(0,1fr))", gap: 6 }}>
+          <div />
+          {[["dom", en ? "Japan" : "国内"], ["os", en ? "Overseas / international" : "海外・国際"]].map(([c, label]) => <div key={c} style={{ fontSize: 11, fontWeight: 800, color: C.teal, borderBottom: `2px solid ${C.teal}`, paddingBottom: 3 }}>{label}</div>)}
+          {["law", "guide", "std"].map((g) => (
+            <React.Fragment key={g}>
+              <div style={{ fontSize: 12, fontWeight: 800, color: C.text, paddingTop: 5 }}>{L(GOVIND_KG[g])}</div>
+              {[false, true].map((os) => (
+                <div key={String(os)} style={{ background: "rgba(255,255,255,0.02)", borderRadius: 8, padding: 4, minHeight: 30 }}>
+                  {regs.filter((r) => govKindG(r.kind) === g && r.os === os).map((r) => {
+                    const hit = !th || r.tags.includes(th), on = sel === r.i;
+                    return <button key={r.i} onClick={() => setSel(on ? null : r.i)} title={L(r.name)} style={{ display: "block", width: "100%", textAlign: "left", background: on ? C.surface2 : C.surface, border: `1px solid ${on ? C.gold : C.line}`, borderLeft: `4px solid ${hit ? C.teal : C.line}`, borderRadius: 7, padding: "4px 7px", marginBottom: 4, cursor: "pointer", color: C.text, fontSize: 11.5, lineHeight: 1.35, opacity: hit ? 1 : 0.35 }}>{L(r.name).replace(/（[^）]{12,}）/, "")}</button>;
+                  })}
+                </div>
+              ))}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+      {cur ? (
+        <div style={{ ...DGM_DETAIL, borderLeftColor: C.teal }}>
+          <div style={{ fontWeight: 800, color: C.text, fontSize: 13 }}>{L(cur.name)}</div>
+          <div style={{ fontSize: 11, color: C.dim, margin: "2px 0 4px" }}>{L(cur.owner)}・{cur.kind}{cur.tags.length ? " ・ " + cur.tags.map((t) => L(GOVIND_TH.find((x) => x[0] === t).slice(1))).join("／") : ""}</div>
+          {(cur.ai || []).map((a, j) => <div key={j} style={{ fontSize: 12, color: C.muted, lineHeight: 1.65 }}>・{L(a)}</div>)}
+          {cur.note ? <div style={{ fontSize: 11, color: C.gold, marginTop: 4 }}>{L(cur.note)}</div> : null}
+          <GovSrc src={cur.src} en={en} />
+        </div>
+      ) : <div style={DGM_HINT}>{en ? "Pick a rule to see where it bites for AI." : "規定を押すと、AIで見る点と出典が開く。"}</div>}
+      {(d.watch || []).length ? (
+        <>
+          <GV_H>{en ? "Watch points for AI in this industry" : "この業界でAIに特に気を付けること"}</GV_H>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,260px),1fr))", gap: 6 }}>
+            {d.watch.map((w, i) => (
+              <div key={i} style={{ display: "flex", gap: 8, background: C.surface, border: `1px solid ${C.line}`, borderRadius: 9, padding: "8px 10px" }}>
+                <span style={{ flex: "0 0 22px", height: 22, borderRadius: 99, background: C.gold, color: C.bg, fontSize: 11.5, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>{i + 1}</span>
+                <span style={{ fontSize: 12, color: C.muted, lineHeight: 1.6 }}>{L(w)}</span>
+              </div>
+            ))}
+          </div>
+        </>
       ) : null}
       {sc.length ? (
         <div style={{ marginTop: 12 }}>
           <div style={{ fontWeight: 800, color: C.text, fontSize: 12.5, marginBottom: 4 }}>{en ? `Practise it: ${sc.length} scenarios` : `シナリオで練習する（${sc.length}本）`}</div>
-          <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.7 }}>{sc.map((x) => x.title).join(" ／ ")}</div>
+          <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.7 }}>{sc.map((x) => (en && x.titleEn) || x.title).join(" ／ ")}</div>
           <button className="gh-btn" style={{ marginTop: 6 }} onClick={() => onMode && onMode("scenario")}>{en ? "Open scenarios →" : "シナリオを開く →"}</button>
         </div>
       ) : null}
     </div>
   );
 }
+
+// ---------- ローコード統制 ----------
 const GOVLC_LV = { tenant: ["テナント", "Tenant"], environment: ["環境", "Environment"], agent: ["エージェント", "Agent"], maker: ["作成者", "Maker"], monitor: ["監視・監査", "Monitoring & audit"], identity: ["ID・所有者", "Identity & ownership"] };
+const GOVLC_ZONES = [
+  { n: ["ゾーン1 市民開発", "Zone 1 · Citizen"], who: ["誰でも（自分がアクセスできる内容で）", "Anyone, on content they can already access"], reach: ["個人・チーム用（非公開）", "Personal or team, private"], ctl: [["開発者環境・環境ルーティング", "Developer environments, routing"], ["共有は無効", "Sharing disabled"], ["Microsoft 365 と Power Platform のコネクタのみ", "Only M365 and Power Platform connectors"]] },
+  { n: ["ゾーン2 パートナー開発", "Zone 2 · Partnered"], who: ["IT が承認した訓練済みのメーカー（コーチが監督）", "IT-approved, trained makers with a coach"], reach: ["他チーム・部門向け", "Other teams and departments"], ctl: [["高度なコネクタポリシー・環境グループとルール", "Advanced connector policies, environment groups"], ["版管理用の ALM パイプライン", "ALM pipelines for versioning"], ["公開には IT 管理者の承認", "IT-admin approval to publish"]] },
+  { n: ["ゾーン3 プロ開発", "Zone 3 · Professional"], who: ["プロの開発者と IT", "Pro developers and IT"], reach: ["全社・ミッションクリティカル", "Enterprise, mission-critical"], ctl: [["組織標準の ALM と最も強い統制", "Standard ALM, strongest controls"], ["SLA を持ち得る", "Possibly SLAs"], ["共有は Integrated Apps で管理", "Sharing via Integrated Apps"]] },
+];
+const GOVLC_STRICT = [[["個人の開発環境", "Personal development"], 2, 2], [["専用の開発環境", "Dedicated development"], 1, 2], [["専用のテスト・本番環境", "Dedicated test & production"], 1, 1]];
 function GovLowCode({ en }) {
-  const [tab, setTab] = useState("steps");
+  const [step, setStep] = useState(0);
+  const [ctl, setCtl] = useState(null);
   const L = (x) => GOVX_L(x, en);
-  const lv = Array.from(new Set(GOVLC.controls.map((c) => c.level)));
+  const short = (s) => s.split(/（| ― |\(/)[0];
+  const S = GOVLC.steps[step];
+  const strictPill = (v) => <span style={{ fontSize: 11, fontWeight: 800, borderRadius: 99, padding: "1px 9px", background: v === 2 ? GV_COL.gov : "transparent", color: v === 2 ? C.bg : C.muted, border: `1px solid ${v === 2 ? GV_COL.gov : C.line}` }}>{v === 2 ? (en ? "strict" : "厳格") : (en ? "relaxed" : "緩め")}</span>;
+  const lvRows = ["tenant", "environment", "agent", "maker"];
+  const rail = ["identity", "monitor"];
+  const chip = (c) => { const i = GOVLC.controls.indexOf(c), on = ctl === i; return <button key={i} onClick={() => setCtl(on ? null : i)} title={L(c.name)} style={{ background: on ? C.surface2 : C.surface, border: `1px solid ${on ? C.gold : C.line}`, color: C.text, borderRadius: 7, padding: "4px 8px", fontSize: 11.5, cursor: "pointer", textAlign: "left", lineHeight: 1.35 }}>{short(L(c.name))}</button>; };
+  const cur = ctl != null ? GOVLC.controls[ctl] : null;
   return (
     <div>
       <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.75, marginBottom: 10 }}>
         {en ? `Governing agents and apps that business users build with low-code / no-code tools, using Copilot Studio and Power Platform as the worked example (Microsoft documentation, checked ${GOVLC.checked}). Feature names and licensing change often — check the linked page before you design around one.` : `業務部門がローコード・ノーコードで作るエージェントやアプリの統制。Copilot Studio と Power Platform を例に、Microsoft の公式文書（${GOVLC.checked}確認）で裏づけた。機能名やライセンス条件は変わりやすいので、設計の前にリンク先で確かめること。`}
       </div>
-      <GovPills items={[["steps", en ? "Design steps" : "統制の設計手順"], ["controls", en ? `Controls ${GOVLC.controls.length}` : `統制の一覧 ${GOVLC.controls.length}`], ["risks", en ? "Risks" : "なぜ統制が要るか"], ["inv", en ? "Inventory & owners" : "台帳と所有者"]]} val={tab} onPick={setTab} />
-      {tab === "steps" ? GOVLC.steps.map((x, i) => (
-        <div key={i} style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 10, padding: "10px 13px", marginBottom: 8 }}>
-          <div style={{ fontWeight: 800, color: C.teal, fontSize: 13 }}>{L(x.name)}</div>
-          {(x.points || []).map((p, j) => <div key={j} style={{ fontSize: 12, color: C.muted, lineHeight: 1.65 }}>・{L(p)}</div>)}
-          <GovSrc src={x.src ? [].concat(x.src) : null} en={en} />
+      <GV_H>{en ? "1. Six steps to design the controls" : "1. 統制を設計する6つの段階"}</GV_H>
+      <div style={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+        {GOVLC.steps.map((x, i) => (
+          <button key={i} onClick={() => setStep(i)} style={{ flex: "1 1 120px", minWidth: 110, background: i === step ? C.teal : C.surface, color: i === step ? C.bg : C.text, border: "none", padding: "9px 16px 9px 14px", fontSize: 12, fontWeight: 800, cursor: "pointer", clipPath: "polygon(0 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,0 100%,8px 50%)", textAlign: "left" }}>{L(x.name)}</button>
+        ))}
+      </div>
+      <div style={{ ...DGM_DETAIL, borderLeftColor: C.teal }}>
+        {S.points.map((p, j) => <div key={j} style={{ fontSize: 12, color: C.muted, lineHeight: 1.65 }}>・{L(p)}</div>)}
+        <GovSrc src={S.src ? [].concat(S.src) : null} en={en} />
+      </div>
+      <GV_H>{en ? "2. Zones: who builds, for whom, under which controls" : "2. ゾーン：誰が・誰のために・どの統制で作るか"}</GV_H>
+      <div style={{ height: 8, borderRadius: 99, background: `linear-gradient(90deg, ${GV_RAMP[0]}, ${GV_RAMP[3]})`, margin: "2px 0 4px" }} />
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10.5, color: C.dim, marginBottom: 6 }}><span>{en ? "narrow reach · light controls" : "使う範囲が狭い・統制は軽め"}</span><span>{en ? "wide reach · strongest controls →" : "使う範囲が広い・統制は最も強い →"}</span></div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,220px),1fr))", gap: 8 }}>
+        {GOVLC_ZONES.map((z, i) => (
+          <div key={i} style={{ background: C.surface, border: `1px solid ${C.line}`, borderTop: `4px solid ${GV_RAMP[i + 1]}`, borderRadius: 10, padding: "9px 12px" }}>
+            <div style={{ fontWeight: 800, color: C.text, fontSize: 13 }}>{L(z.n)}</div>
+            <div style={{ fontSize: 11.5, color: C.muted, marginTop: 3 }}><b style={{ color: C.text }}>{en ? "Builds: " : "作る人："}</b>{L(z.who)}</div>
+            <div style={{ fontSize: 11.5, color: C.muted }}><b style={{ color: C.text }}>{en ? "For: " : "使う範囲："}</b>{L(z.reach)}</div>
+            <div style={{ marginTop: 5 }}>{z.ctl.map((c, j) => <div key={j} style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.55 }}>✓ {L(c)}</div>)}</div>
+          </div>
+        ))}
+      </div>
+      <GV_SUB>{en ? "Source: Microsoft Copilot Studio guidance, 'Implement a zoned governance strategy'." : "出典：Microsoft の Copilot Studio ガイダンス「ゾーン分けしたガバナンス戦略」。"}</GV_SUB>
+      <GV_H>{en ? "3. How strict, by environment type" : "3. 環境の種類ごとの厳しさ"}</GV_H>
+      <div className="gh-figscroll">
+        <div style={{ minWidth: 420, display: "grid", gridTemplateColumns: "1.4fr 1fr 1fr", gap: 4, fontSize: 12 }}>
+          <div /><div style={{ fontSize: 11, fontWeight: 800, color: C.text }}>{en ? "Data policies" : "データポリシー"}</div><div style={{ fontSize: 11, fontWeight: 800, color: C.text }}>{en ? "Managed Environment rules" : "Managed Environment のルール"}</div>
+          {GOVLC_STRICT.map(([n, a, b], i) => <React.Fragment key={i}><div style={{ color: C.muted }}>{L(n)}</div><div>{strictPill(a)}</div><div>{strictPill(b)}</div></React.Fragment>)}
         </div>
-      )) : null}
-      {tab === "controls" ? lv.map((l) => (
-        <div key={l} style={{ marginBottom: 12 }}>
-          <div style={{ fontSize: 12.5, fontWeight: 800, color: C.gold, marginBottom: 4 }}>{L(GOVLC_LV[l] || [l, l])}</div>
-          {GOVLC.controls.filter((c) => c.level === l).map((c, i) => (
-            <div key={i} style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 9, padding: "8px 12px", marginBottom: 6 }}>
-              <b style={{ fontSize: 12.5, color: C.text }}>{L(c.name)}</b>
-              <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.6 }}>{L(c.what)}</div>
-              {c.where ? <div style={{ fontSize: 11, color: C.dim }}>{en ? "Where: " : "設定する場所："}{L(c.where)}</div> : null}
-              <GovSrc src={c.src ? [].concat(c.src) : null} en={en} />
+      </div>
+      <GV_SUB>{en ? "Source: Microsoft Copilot Studio guidance, 'Secure your Copilot Studio projects'." : "出典：Microsoft の Copilot Studio ガイダンス「Copilot Studio プロジェクトの保護」。"}</GV_SUB>
+      <GV_H>{en ? `4. Controls by level (${GOVLC.controls.length})` : `4. レベル別の統制（${GOVLC.controls.length}件）`}</GV_H>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,300px),1fr))", gap: 8 }}>
+        <div>
+          {lvRows.map((lv, i) => (
+            <div key={lv} style={{ background: C.surface, border: `1px solid ${C.line}`, borderLeft: `4px solid ${GV_RAMP[3 - i]}`, borderRadius: 9, padding: "7px 9px", marginBottom: 5 }}>
+              <div style={{ fontSize: 11.5, fontWeight: 800, color: C.text, marginBottom: 4 }}>{L(GOVLC_LV[lv])}<span style={{ color: C.dim, fontWeight: 400 }}>{i === 0 ? (en ? "  — widest" : "　— いちばん広い") : i === 3 ? (en ? "  — the person building" : "　— 作る人") : ""}</span></div>
+              <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>{GOVLC.controls.filter((c) => c.level === lv).map(chip)}</div>
             </div>
           ))}
         </div>
-      )) : null}
-      {tab === "risks" || tab === "inv" ? (tab === "risks" ? GOVLC.risks : GOVLC.inventory).map((x, i) => (
-        <div key={i} style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 9, padding: "8px 12px", marginBottom: 6 }}>
-          <div style={{ fontSize: 12.5, color: C.text, lineHeight: 1.6 }}>{L(x.t)}</div>
-          <GovSrc src={x.src ? [].concat(x.src) : null} en={en} />
+        <div>
+          {rail.map((lv) => (
+            <div key={lv} style={{ background: C.surface, border: `1px dashed ${C.gold}`, borderRadius: 9, padding: "7px 9px", marginBottom: 5 }}>
+              <div style={{ fontSize: 11.5, fontWeight: 800, color: C.gold, marginBottom: 4 }}>{L(GOVLC_LV[lv])}<span style={{ color: C.dim, fontWeight: 400 }}>{en ? "  — across all levels" : "　— 全レベルに横串"}</span></div>
+              <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>{GOVLC.controls.filter((c) => c.level === lv).map(chip)}</div>
+            </div>
+          ))}
         </div>
-      )) : null}
+      </div>
+      {cur ? (
+        <div style={{ ...DGM_DETAIL, borderLeftColor: C.gold }}>
+          <div style={{ fontWeight: 800, color: C.text, fontSize: 13 }}>{L(cur.name)}</div>
+          <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.65, marginTop: 3 }}>{L(cur.what)}</div>
+          {cur.where ? <div style={{ fontSize: 11, color: C.dim, marginTop: 3 }}>{en ? "Where: " : "設定する場所："}{L(cur.where)}</div> : null}
+          <GovSrc src={cur.src ? [].concat(cur.src) : null} en={en} />
+        </div>
+      ) : <div style={DGM_HINT}>{en ? "Pick a control to see what it does and where to set it." : "統制を押すと、できることと設定する場所が開く。"}</div>}
+      <GV_H>{en ? "5. Why controls are needed" : "5. なぜ統制が要るか"}</GV_H>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,260px),1fr))", gap: 6 }}>
+        {GOVLC.risks.map((x, i) => {
+          const t = L(x.t), m = t.match(/^([^：:]+)[：:](.*)$/);
+          return (
+            <div key={i} style={{ background: C.surface, border: `1px solid ${C.line}`, borderTop: `3px solid ${C.wine}`, borderRadius: 9, padding: "8px 10px" }}>
+              <div style={{ fontSize: 12.5, fontWeight: 800, color: C.text }}>{m ? m[1] : t}</div>
+              {m ? <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.6, marginTop: 2 }}>{m[2]}</div> : null}
+              <GovSrc src={x.src ? [].concat(x.src) : null} en={en} />
+            </div>
+          );
+        })}
+      </div>
+      <GV_H>{en ? "6. Inventory and owners" : "6. 台帳と所有者"}</GV_H>
+      {GOVLC.inventory.map((x, i) => (
+        <div key={i} style={{ display: "flex", gap: 8, background: C.surface, border: `1px solid ${C.line}`, borderRadius: 9, padding: "8px 10px", marginBottom: 5 }}>
+          <span style={{ flex: "0 0 22px", height: 22, borderRadius: 99, background: C.teal, color: C.bg, fontSize: 11.5, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>{i + 1}</span>
+          <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.6 }}>{L(x.t)}<GovSrc src={x.src ? [].concat(x.src) : null} en={en} /></div>
+        </div>
+      ))}
     </div>
   );
 }
+
+// ---------- 実務キット ----------
+function GovInvLoop({ en, flow, sel, onPick }) {
+  const L = (x) => GOVX_L(x, en);
+  const n = flow.length, cx = 280, cy = 165, R = 112;
+  const pt = (i) => [cx + R * Math.sin((2 * Math.PI * i) / n), cy - R * Math.cos((2 * Math.PI * i) / n)];
+  return (
+    <svg viewBox="0 0 560 330" width="100%" style={{ maxWidth: 620, display: "block", margin: "0 auto" }} role="img" aria-label={en ? "Lifecycle of a use case in the register" : "台帳に載るユースケースの一生"}>
+      <defs><marker id="gvArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill={C.dim} /></marker></defs>
+      <circle cx={cx} cy={cy} r={R} fill="none" stroke={C.line} strokeWidth="2" />
+      {flow.map((x, i) => { const [a1, b1] = pt(i + 0.32), [a2, b2] = pt(i + 0.68); return i < n - 1 ? <path key={"a" + i} d={`M${a1} ${b1} A${R} ${R} 0 0 1 ${a2} ${b2}`} fill="none" stroke={C.dim} strokeWidth="2" markerEnd="url(#gvArr)" /> : null; })}
+      <text x={cx} y={cy - 6} textAnchor="middle" fill={C.text} fontSize="13" fontWeight="800">{en ? "Use-case register" : "ユースケース台帳"}</text>
+      <text x={cx} y={cy + 12} textAnchor="middle" fill={C.dim} fontSize="10.5">{en ? "one row per use case" : "1件＝1行"}</text>
+      {flow.map((x, i) => {
+        const [x0, y0] = pt(i), on = sel === i, label = L(x.s).replace(/^\d+\s*/, "");
+        const dx = (x0 - cx) / R, dy = (y0 - cy) / R, lx = cx + (R + 30) * dx, ly = cy + (R + 30) * dy + 4;
+        const anchor = Math.abs(dx) < 0.3 ? "middle" : dx > 0 ? "start" : "end";
+        return (
+          <g key={i} style={{ cursor: "pointer" }} onClick={() => onPick(on ? null : i)}>
+            <circle cx={x0} cy={y0} r={on ? 20 : 17} fill={on ? C.teal : C.surface} stroke={C.teal} strokeWidth="2" />
+            <text x={x0} y={y0 + 4} textAnchor="middle" fill={on ? C.bg : C.text} fontSize="12" fontWeight="800">{i + 1}</text>
+            <text x={lx} y={Math.abs(dx) < 0.3 ? (dy < 0 ? ly - 4 : ly + 4) : ly} textAnchor={anchor} fill={C.muted} fontSize="12">{label}</text>
+            <title>{label}</title>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+const GOVEV_T = [["pre", ["導入前", "Before launch"], /導入前|公開前/], ["chg", ["変更時", "On change"], /変更|更新|利用拡大/], ["prod", ["本番中", "In production"], /本番|運用中|定期|常時|稼働後/]];
 function GovKit({ en }) {
   const [tab, setTab] = useState("cust");
+  const [done, setDone] = useState({});
+  const [inv, setInv] = useState(null);
+  const [ev, setEv] = useState(0);
   const L = (x) => GOVX_L(x, en);
-  const box = (k, a, b, src) => (
-    <div key={k} style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 9, padding: "8px 12px", marginBottom: 6 }}>
-      <b style={{ fontSize: 12.5, color: C.text }}>{L(a)}</b>
-      {b ? <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.6 }}>{L(b)}</div> : null}
-      <GovSrc src={src} en={en} />
-    </div>
-  );
-  const head = (t) => <div style={{ fontSize: 13, fontWeight: 800, color: C.gold, margin: "12px 0 6px" }}>{t}</div>;
   const K = GOVKIT;
+  const phases = [["pre", ["公開前", "Before launch"]], ["run", ["運用中", "In operation"]], ["inc", ["事故時", "When it goes wrong"]]];
+  const all = phases.reduce((a, [p]) => a + K.cust[p].length, 0);
+  const nd = Object.values(done).filter(Boolean).length;
+  const E = K.eval.kinds[ev];
   return (
     <div>
       <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.75, marginBottom: 10 }}>
         {en ? "Working templates for four jobs the taxonomy only names. Items with a source restate what that framework or law says; items without one are practice, not a legal requirement." : "論点体系では名前だけだった4つの仕事を、手を動かせる型にした。出典つきの項目はその規格・法令が言っていること、出典のない項目は実務上の型で、法的な義務ではない。"}
       </div>
-      <GovPills items={[["cust", en ? "Customer-facing AI" : "顧客向けAI"], ["inv", en ? "Use-case inventory" : "ユースケース台帳"], ["eval", en ? "Evaluation methods" : "検証の手法"], ["riskai", en ? "AI in risk management" : "リスク管理×AI"]]} val={tab} onPick={setTab} />
+      <GovPills items={[["cust", en ? "Customer-facing AI" : "顧客向けAI"], ["inv", en ? "Use-case register" : "ユースケース台帳"], ["eval", en ? "Evaluation methods" : "検証の手法"], ["riskai", en ? "AI in risk management" : "リスク管理×AI"]]} val={tab} onPick={setTab} />
       {tab === "cust" ? <>
-        {head(en ? "Before launch" : "公開前")}{K.cust.pre.map((x, i) => box("p" + i, x.c, x.why, x.src))}
-        {head(en ? "In operation" : "運用中")}{K.cust.run.map((x, i) => box("r" + i, x.c, x.why, x.src))}
-        {head(en ? "When something goes wrong" : "事故が起きたとき")}{K.cust.inc.map((x, i) => box("i" + i, x.c, x.why, x.src))}
+        <div style={{ display: "flex", gap: 2, marginBottom: 6 }}>
+          {phases.map(([p, label], i) => {
+            const n = K.cust[p].length, d = K.cust[p].filter((x, j) => done[p + j]).length;
+            return <div key={p} style={{ flex: n, background: i === 2 ? C.wineDeep : C.surface2, color: C.text, padding: "8px 14px", fontSize: 12, fontWeight: 800, clipPath: "polygon(0 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,0 100%,8px 50%)" }}>{L(label)}<span style={{ fontWeight: 400, color: C.muted, marginLeft: 6 }}>{d}/{n}</span></div>;
+          })}
+        </div>
+        <div style={{ height: 6, background: C.surface, borderRadius: 99, overflow: "hidden", marginBottom: 4 }}><div style={{ width: `${(nd / all) * 100}%`, height: "100%", background: C.teal }} /></div>
+        <GV_SUB>{en ? `Checked ${nd} of ${all} (kept only on this screen)` : `${all}項目中 ${nd}項目にチェック（この画面の中だけで保持）`}</GV_SUB>
+        {phases.map(([p, label]) => (
+          <div key={p}>
+            <GV_H>{L(label)}</GV_H>
+            {K.cust[p].map((x, j) => (
+              <label key={j} style={{ display: "grid", gridTemplateColumns: "22px minmax(0,1fr)", gap: 8, background: C.surface, border: `1px solid ${done[p + j] ? C.teal : C.line}`, borderRadius: 9, padding: "7px 10px", marginBottom: 5, cursor: "pointer" }}>
+                <input type="checkbox" checked={!!done[p + j]} onChange={() => setDone({ ...done, [p + j]: !done[p + j] })} style={{ marginTop: 3 }} />
+                <span><b style={{ fontSize: 12.5, color: C.text }}>{L(x.c)}</b><span style={{ display: "block", fontSize: 11.5, color: C.muted, lineHeight: 1.55 }}>{L(x.why)}</span><GovSrc src={x.src} en={en} /></span>
+              </label>
+            ))}
+          </div>
+        ))}
       </> : null}
       {tab === "inv" ? <>
-        {head(en ? "Fields of the register" : "台帳の項目")}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,260px),1fr))", gap: 6 }}>
+        <GV_H>{en ? "From registration to retirement" : "登録から廃止まで（8段階）"}</GV_H>
+        <div style={DGM_WRAP}>
+          <GovInvLoop en={en} flow={K.inv.flow} sel={inv} onPick={setInv} />
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 4, justifyContent: "center", marginTop: 6 }}>
+            {K.inv.flow.map((x, i) => <button key={i} onClick={() => setInv(inv === i ? null : i)} style={{ background: inv === i ? C.teal : C.surface, color: inv === i ? C.bg : C.text, border: `1px solid ${inv === i ? C.teal : C.line}`, borderRadius: 99, padding: "3px 10px", fontSize: 11.5, cursor: "pointer" }}>{L(x.s)}</button>)}
+          </div>
+        </div>
+        {inv != null ? <div style={{ ...DGM_DETAIL, borderLeftColor: C.teal }}><b style={{ color: C.text }}>{L(K.inv.flow[inv].s)}</b><div style={{ fontSize: 12, color: C.muted, lineHeight: 1.65 }}>{L(K.inv.flow[inv].d)}</div></div> : <div style={DGM_HINT}>{en ? "Tap a step to read it." : "段階を押すと内容が出る。"}</div>}
+        <GV_H>{en ? `One row of the register (${K.inv.fields.length} fields)` : `台帳の1行（${K.inv.fields.length}項目）`}</GV_H>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,190px),1fr))", gap: 1, background: C.line, border: `1px solid ${C.line}`, borderRadius: 9, overflow: "hidden" }}>
           {K.inv.fields.map((x, i) => (
-            <div key={i} style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 9, padding: "8px 12px" }}>
-              <b style={{ fontSize: 12.5, color: C.text }}>{L(x.f)}</b>
-              <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.55 }}>{L(x.why)}</div>
-              {x.ex ? <div style={{ fontSize: 11, color: C.dim }}>{en ? "e.g. " : "例："}{L(x.ex)}</div> : null}
+            <div key={i} title={L(x.why)} style={{ background: C.surface, padding: "7px 9px" }}>
+              <div style={{ fontSize: 10.5, fontWeight: 800, color: C.teal }}>{L(x.f)}</div>
+              <div style={{ fontSize: 11.5, color: C.text, lineHeight: 1.45, marginTop: 2 }}>{x.ex ? L(x.ex) : "—"}</div>
+              <div style={{ fontSize: 10.5, color: C.dim, lineHeight: 1.45, marginTop: 2 }}>{L(x.why)}</div>
             </div>
           ))}
         </div>
-        {head(en ? "From registration to retirement" : "登録から廃止まで")}{K.inv.flow.map((x, i) => box("f" + i, [`${i + 1}. ${x.s[0]}`, `${i + 1}. ${x.s[1]}`], x.d))}
-        {head(en ? "Finding shadow AI" : "シャドーAIの見つけ方")}{K.inv.shadow.map((x, i) => box("s" + i, x.c, x.d))}
+        <GV_H>{en ? "Finding shadow AI" : "シャドーAIの見つけ方"}</GV_H>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,220px),1fr))", gap: 6 }}>
+          {K.inv.shadow.map((x, i) => <div key={i} style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 9, padding: "8px 10px" }}><b style={{ fontSize: 12.5, color: C.text }}>🔍 {L(x.c)}</b><div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.55 }}>{L(x.d)}</div><GovSrc src={x.src} en={en} /></div>)}
+        </div>
         <GovSrc src={K.inv.src} en={en} />
       </> : null}
       {tab === "eval" ? <>
-        {K.eval.kinds.map((x, i) => (
-          <div key={i} style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 9, padding: "9px 12px", marginBottom: 6 }}>
-            <b style={{ fontSize: 12.5, color: C.teal }}>{L(x.k)}</b>
-            <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.6 }}>{L(x.what)}</div>
-            <div style={{ fontSize: 11.5, color: C.dim, lineHeight: 1.6 }}>{en ? "When: " : "いつ："}{L(x.when)}　{en ? "Who: " : "誰が："}{L(x.who)}</div>
-            <div style={{ fontSize: 11.5, color: C.dim, lineHeight: 1.6 }}>{en ? "How: " : "方法・指標："}{L(x.how)}</div>
-            {x.trap ? <div style={{ fontSize: 11.5, color: C.wine, lineHeight: 1.6 }}>{en ? "Trap: " : "落とし穴："}{L(x.trap)}</div> : null}
-            <GovSrc src={x.src} en={en} />
+        <GV_H>{en ? "Which method, when" : "どの検証を、いつ行うか"}</GV_H>
+        <div>
+          <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) repeat(3,56px)", gap: 2 }}>
+            <div />{GOVEV_T.map(([k, label]) => <div key={k} style={{ fontSize: 10.5, fontWeight: 800, color: C.text, textAlign: "center", lineHeight: 1.3 }}>{L(label)}</div>)}
+            {K.eval.kinds.map((x, i) => {
+              const on = ev === i, w = L(x.when) + (en ? "" : "");
+              const wja = x.when[0];
+              return (
+                <React.Fragment key={i}>
+                  <button onClick={() => setEv(i)} style={{ textAlign: "left", background: on ? C.surface2 : "transparent", border: `1px solid ${on ? C.gold : "transparent"}`, borderRadius: 6, color: C.text, fontSize: 11.5, padding: "4px 6px", cursor: "pointer" }}>{L(x.k)}</button>
+                  {GOVEV_T.map(([k, , re]) => <div key={k} title={w} style={{ display: "flex", alignItems: "center", justifyContent: "center", background: on ? C.surface2 : "transparent", borderRadius: 6 }}>{re.test(wja) ? <span style={{ width: 12, height: 12, borderRadius: 99, background: C.teal }} /> : <span style={{ width: 6, height: 2, background: C.line }} />}</div>)}
+                </React.Fragment>
+              );
+            })}
           </div>
-        ))}
-        {head(en ? "Setting the pass mark" : "合格基準の決め方")}{K.eval.accept.map((x, i) => box("a" + i, x.c, x.d, x.src))}
+        </div>
+        <GV_SUB>{en ? "Dots follow each method's 'when' text below." : "点は、下の各手法の「いつ」の記述から付けた。"}</GV_SUB>
+        <div style={{ ...DGM_DETAIL, borderLeftColor: C.teal }}>
+          <b style={{ fontSize: 13, color: C.teal }}>{L(E.k)}</b>
+          <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.6 }}>{L(E.what)}</div>
+          <div style={{ fontSize: 11.5, color: C.dim, lineHeight: 1.6 }}>{en ? "When: " : "いつ："}{L(E.when)}　{en ? "Who: " : "誰が："}{L(E.who)}</div>
+          <div style={{ fontSize: 11.5, color: C.dim, lineHeight: 1.6 }}>{en ? "How: " : "方法・指標："}{L(E.how)}</div>
+          {E.trap ? <div style={{ fontSize: 11.5, color: C.wine, lineHeight: 1.6 }}>{en ? "Trap: " : "落とし穴："}{L(E.trap)}</div> : null}
+          <GovSrc src={E.src} en={en} />
+        </div>
+        <GV_H>{en ? "Setting the pass mark" : "合格基準の決め方"}</GV_H>
+        {K.eval.accept.map((x, i) => <div key={i} style={{ display: "flex", gap: 8, background: C.surface, border: `1px solid ${C.line}`, borderRadius: 9, padding: "7px 10px", marginBottom: 5 }}><span style={{ flex: "0 0 22px", height: 22, borderRadius: 99, background: C.gold, color: C.bg, fontSize: 11.5, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>{i + 1}</span><div><b style={{ fontSize: 12.5, color: C.text }}>{L(x.c)}</b><div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.55 }}>{L(x.d)}</div><GovSrc src={x.src} en={en} /></div></div>)}
       </> : null}
       {tab === "riskai" ? <>
+        <GV_H>{en ? "What AI does, what people keep" : "AIがすること・人に残すこと"}</GV_H>
+        <GvLegend en={en} items={[[GV_COL.law, en ? "AI does" : "AIがすること"], [GV_COL.gov, en ? "People keep (final call)" : "人に残すこと（最終判断）"]]} />
         {K.riskai.uses.map((x, i) => (
-          <div key={i} style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 9, padding: "9px 12px", marginBottom: 6 }}>
-            <b style={{ fontSize: 12.5, color: C.teal }}>{L(x.a)}</b>
-            <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.6 }}>{en ? "AI does: " : "AIがすること："}{L(x.ai)}</div>
-            <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.6 }}>{en ? "People keep: " : "人に残すこと："}{L(x.human)}</div>
-            <div style={{ fontSize: 11.5, color: C.wine, lineHeight: 1.6 }}>{en ? "Risk: " : "主なリスク："}{L(x.risk)}</div>
-            <div style={{ fontSize: 11.5, color: C.dim, lineHeight: 1.6 }}>{en ? "Controls: " : "必要な統制："}{L(x.ctl)}</div>
+          <div key={i} style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 10, padding: "8px 10px", marginBottom: 6 }}>
+            <div style={{ fontSize: 12.5, fontWeight: 800, color: C.text, marginBottom: 5 }}>{L(x.a)}</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,200px),1fr))", gap: 4 }}>
+              <div style={{ background: "rgba(57,135,229,0.12)", borderLeft: `4px solid ${GV_COL.law}`, borderRadius: 7, padding: "5px 8px", fontSize: 11.5, color: C.text, lineHeight: 1.55 }}>🤖 {L(x.ai)}</div>
+              <div style={{ background: "rgba(217,89,38,0.12)", borderLeft: `4px solid ${GV_COL.gov}`, borderRadius: 7, padding: "5px 8px", fontSize: 11.5, color: C.text, lineHeight: 1.55 }}>🧑‍⚖️ {L(x.human)}</div>
+            </div>
+            <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.55, marginTop: 4 }}><b style={{ color: C.wine }}>{en ? "Risk: " : "リスク："}</b>{L(x.risk)}　<b style={{ color: C.teal }}>{en ? "Controls: " : "統制："}</b>{L(x.ctl)}</div>
             <GovSrc src={x.src} en={en} />
           </div>
         ))}
-        {head(en ? "Monitoring KRIs / KPIs with AI" : "KRI・KPI のモニタリングの型")}{K.riskai.kri.map((x, i) => box("k" + i, x.c, x.d, x.src))}
+        <GV_H>{en ? "Monitoring KRIs / KPIs with AI" : "KRI・KPI のモニタリングの型"}</GV_H>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,240px),1fr))", gap: 6 }}>
+          {K.riskai.kri.map((x, i) => <div key={i} style={{ background: C.surface, border: `1px solid ${C.line}`, borderTop: `3px solid ${C.gold}`, borderRadius: 9, padding: "8px 10px" }}><b style={{ fontSize: 12.5, color: C.text }}>{L(x.c)}</b><div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.55 }}>{L(x.d)}</div><GovSrc src={x.src} en={en} /></div>)}
+        </div>
       </> : null}
     </div>
   );
