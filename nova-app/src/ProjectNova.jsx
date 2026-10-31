@@ -164916,6 +164916,7 @@ function GovRegDetail({ x, en }) {
       </div>
       <div style={{ fontWeight: 800, color: C.text, fontSize: 13.5 }}>{L(x.name)}</div>
       <div style={{ color: C.gold, margin: "2px 0 6px" }}>{L(x.status)}</div>
+      <div style={{ marginBottom: 6 }}><GovShare en={en} url={govLink("regmap", { id: x.id })} /></div>
       {(x.what || []).length ? <><b style={{ color: C.text }}>{en ? "What it sets out" : "何を定めるか"}</b>{x.what.map((w, i) => <div key={i}>・{L(w)}</div>)}</> : null}
       {x.who ? <div style={{ marginTop: 4 }}><b style={{ color: C.text }}>{en ? "Who: " : "対象："}</b>{L(x.who)}</div> : null}
       {(x.duty || []).length ? <div style={{ marginTop: 4 }}><b style={{ color: C.text }}>{en ? "What companies must do" : "企業に求められること"}</b>{x.duty.map((w, i) => <div key={i}>・{L(w)}</div>)}</div> : null}
@@ -165038,8 +165039,8 @@ function GovRegNext({ en, onPick }) {
     </div>
   );
 }
-function GovRegMap({ en }) {
-  const [sel, setSel] = useState(null);
+function GovRegMap({ en, deep }) {
+  const [sel, setSel] = useState(() => (deep && deep.id ? GOVREG_ITEMS.find((x) => x.id === deep.id) || null : null));
   const [view, setView] = useState("map");
   const L = (v) => GOVX_L(v, en);
   const regions = GOVREG_ORDER.filter((r) => GOVREG_ITEMS.some((x) => x.region === r));
@@ -165096,8 +165097,8 @@ const GOVIND_BASE = ["jp-ai-act", "jp-ai-biz-guideline", "jp-ppc-genai-alert", "
 const govKindG = (k) => (k === "法律" || k === "判例" ? "law" : k === "基準" ? "std" : "guide");
 const GOVIND_KG = { law: ["法令・判例", "Statutes & case law"], guide: ["指針・ガイドライン・原則", "Guidance & principles"], std: ["基準・規格", "Standards"] };
 const GOVIND_KIND = { 法律: "Statute", 判例: "Case law", 基準: "Standard", ガイドライン: "Guideline", 原則: "Principles", 指針: "Guidance" };
-function GovIndustry({ en, onMode }) {
-  const [k, setK] = useState(GOVIND[0].key);
+function GovIndustry({ en, onMode, onTab, deep }) {
+  const [k, setK] = useState(deep && GOVIND.some((x) => x.key === deep.k) ? deep.k : GOVIND[0].key);
   const [th, setTh] = useState(null);
   const [sel, setSel] = useState(null);
   const [base, setBase] = useState(null);
@@ -165144,6 +165145,7 @@ function GovIndustry({ en, onMode }) {
         </div>
       </div>
       <GV_H>{en ? `${L([d.ind, d.ind_en])}: the map of rules` : `${d.ind}：規定の地図`}{th ? <span style={{ fontSize: 11, color: C.gold, marginLeft: 8 }}>{en ? "highlight: " : "強調："}{L(GOVIND_TH.find((x) => x[0] === th).slice(1))}<button onClick={() => setTh(null)} style={{ marginLeft: 6, background: "transparent", border: `1px solid ${C.line}`, color: C.muted, borderRadius: 6, fontSize: 10.5, cursor: "pointer" }}>{en ? "clear" : "解除"}</button></span> : null}</GV_H>
+      <div style={{ marginBottom: 6 }}><GovShare en={en} url={govLink("industry", { k })} /></div>
       <div className="gh-figscroll">
         <div style={{ minWidth: 560, display: "grid", gridTemplateColumns: "120px repeat(2,minmax(0,1fr))", gap: 6 }}>
           <div />
@@ -165192,6 +165194,7 @@ function GovIndustry({ en, onMode }) {
           <button className="gh-btn" style={{ marginTop: 6 }} onClick={() => onMode && onMode("scenario")}>{en ? "Open scenarios →" : "シナリオを開く →"}</button>
         </div>
       ) : null}
+      <GovToSales en={en} onTab={onTab} />
     </div>
   );
 }
@@ -165447,6 +165450,45 @@ function GovKit({ en }) {
   );
 }
 
+// ---------- 共有リンク（#megatech/govdojo/<画面>?キー=値）と提案系タブへの導線 ----------
+const GOV_MODES = ["home", "diagrams", "incidents", "quiz", "scenario", "risk", "regmap", "industry", "profile", "usecase", "templates", "workshop", "lowcode", "kit", "fresh", "taxonomy", "exam"];
+function govDeep() {
+  try {
+    const h = (window.location.hash || "").replace(/^#\/?/, "");
+    const m = h.match(/^megatech\/govdojo(?:\/(\w+))?(?:\?(.*))?$/);
+    if (!m) return null;
+    const q = {};
+    (m[2] || "").split("&").filter(Boolean).forEach((kv) => { const i = kv.indexOf("="); q[decodeURIComponent(i < 0 ? kv : kv.slice(0, i))] = i < 0 ? "" : decodeURIComponent(kv.slice(i + 1)); });
+    return { mode: GOV_MODES.includes(m[1]) ? m[1] : null, q };
+  } catch (e) { return null; }
+}
+function govLink(mode, q) {
+  const qs = Object.entries(q || {}).filter(([, v]) => v != null && v !== "").map(([k, v]) => encodeURIComponent(k) + "=" + encodeURIComponent(v)).join("&");
+  return window.location.href.split("#")[0] + "#megatech/govdojo/" + mode + (qs ? "?" + qs : "");
+}
+function GovShare({ en, url, note }) {
+  const [st, setSt] = useState(null);
+  const copy = async () => { try { await navigator.clipboard.writeText(url); setSt("ok"); } catch (e) { setSt("show"); } };
+  return (
+    <span style={{ display: "inline-flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
+      <button onClick={copy} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 99, border: `1px solid ${C.line}`, background: "transparent", color: C.text, cursor: "pointer" }}>{en ? "Copy link" : "リンクをコピー"}</button>
+      {st === "ok" ? <span style={{ fontSize: 10.5, color: C.teal }}>{en ? "Copied" : "コピーしました"}</span> : null}
+      {st === "show" ? <input readOnly value={url} autoFocus onFocus={(e) => e.target.select()} style={{ fontSize: 10.5, minWidth: 200, flex: "1 1 220px", background: C.bg, color: C.text, border: `1px solid ${C.line}`, borderRadius: 6, padding: "2px 6px" }} /> : null}
+      {note ? <span style={{ fontSize: 10.5, color: C.dim }}>{note}</span> : null}
+    </span>
+  );
+}
+const GOV_SALES_TABS = [["proposal", ["提案の型", "Proposal Kit"]], ["industry", ["業界別（AX実務）", "Industries (AX practice)"]], ["salesdojo", ["商談ドリル", "Sales Dojo"]], ["casework", ["ケース演習", "Case Work"]], ["livedojo", ["模擬商談LIVE", "Live Deal Dojo"]]];
+function GovToSales({ en, onTab }) {
+  if (!onTab) return null;
+  return (
+    <div style={{ ...DGM_DETAIL, borderLeftColor: C.teal, marginTop: 14 }}>
+      <div style={{ fontSize: 12.5, fontWeight: 800, color: C.text, marginBottom: 4 }}>{en ? "Take it into a proposal or a client conversation" : "提案・商談につなげる"}</div>
+      <div style={{ fontSize: 11.5, color: C.muted, marginBottom: 6, lineHeight: 1.6 }}>{en ? "Other TechHub tabs for building the proposal, rehearsing objections and practising the conversation." : "TechHub の他のタブで、提案の骨子づくり、想定問答、商談の練習に進める。"}</div>
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>{GOV_SALES_TABS.map(([k, l]) => <button key={k} onClick={() => { onTab(k); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} }} style={{ fontSize: 11.5, padding: "4px 11px", borderRadius: 99, border: `1px solid ${C.teal}`, background: "transparent", color: C.teal, cursor: "pointer", fontWeight: 700 }}>{GOVX_L(l, en)} →</button>)}</div>
+    </div>
+  );
+}
 // ---------- 鮮度・要再確認 ----------
 const govToday = () => new Date().toISOString().slice(0, 10);
 const govEnd = (d) => (d.length === 7 ? d + "-31" : d.length === 4 ? d + "-12-31" : d);
@@ -165523,7 +165565,7 @@ const govHasUnc = (o) => GOV_UNCONF.test(JSON.stringify({ ...o, src: undefined }
 const govIsApp = (r) => /当てはめ/.test(JSON.stringify(r.note || "")) || /当てはめ/.test(JSON.stringify(r.ai || ""));
 const GOVGAP_ST = [["", "未評価", "Not assessed", C.line], ["done", "対応済", "Done", C.teal], ["part", "一部", "Partly", C.gold], ["todo", "未対応", "Not done", C.wine], ["na", "対象外", "Not applicable", C.dim]];
 const GOVGAP_KEY = "govdojo_gap_v1", GOVPROF_KEY = "govdojo_profile_v1";
-function GovProfile({ en, init }) {
+function GovProfile({ en, init, onTab }) {
   const L = (v) => GOVX_L(v, en);
   const today = govToday();
   const regions = GOVREG_ORDER.filter((r) => GOVREG_ITEMS.some((x) => x.region === r));
@@ -165714,6 +165756,7 @@ ${dec.length ? "<table><tr><th>" + esc(en ? "Decision" : "事項") + "</th><th>"
         <GovPills items={[["list", en ? "Rules and assessment" : "規定と対応状況"], ["exec", en ? "One page for executives" : "経営層向け1枚"]]} val={view} onPick={setView} />
         <button onClick={download} disabled={!mk.length} style={{ background: mk.length ? C.teal : C.surface, color: mk.length ? C.bg : C.dim, border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 12, fontWeight: 800, cursor: mk.length ? "pointer" : "default", marginBottom: 12 }}>{en ? "Save as CSV" : "CSV で保存"}</button>
         <button onClick={resetGap} style={{ background: "transparent", color: C.dim, border: `1px solid ${C.line}`, borderRadius: 8, padding: "5px 10px", fontSize: 11, cursor: "pointer", marginBottom: 12 }}>{en ? "Clear assessments" : "対応状況を消す"}</button>
+        <span style={{ marginBottom: 12 }}><GovShare en={en} url={govLink("profile", { i: inds.join(","), m: mk.join(","), t: th === "ALL" ? "" : th, v: view === "exec" ? "exec" : "" })} note={en ? "The link carries the selections, not the assessments (those stay on this device)." : "リンクに入るのは選んだ条件だけ。対応状況はこの端末の中だけにある。"} /></span>
       </div>
       {!mk.length ? <div style={DGM_HINT}>{en ? "Pick at least one market." : "地域を1つ以上選ぶ。"}</div> : null}
       {view === "list" ? (
@@ -165775,13 +165818,16 @@ ${dec.length ? "<table><tr><th>" + esc(en ? "Decision" : "事項") + "</th><th>"
           </div>
         </div>
       )}
+      <GovToSales en={en} onTab={onTab} />
     </div>
   );
 }
-function GovDojo() {
+function GovDojo({ onTab } = {}) {
   const lang = useLang();
   const en = lang === "en";
-  const [mode, setMode] = useState("home");
+  const [deep] = useState(() => govDeep());
+  const [mode, setMode] = useState(deep && deep.mode ? deep.mode : "home");
+  useEffect(() => { if (deep) { try { window.history.replaceState(null, "", "#megatech"); } catch (e) {} } }, []);
   const __opBack = useLocalHistory([[mode, setMode]]);
   useRegisterBack(__opBack.back, __opBack.canBack);
   const [focusInc, setFocusInc] = useState(null);
@@ -165805,9 +165851,9 @@ function GovDojo() {
       {mode === "quiz" && <GovQuiz en={en} />}
       {mode === "scenario" && <GovScenarios en={en} />}
       {mode === "risk" && <GovRiskPractice en={en} />}
-      {mode === "regmap" && <GovRegMap en={en} />}
-      {mode === "industry" && <GovIndustry en={en} onMode={setMode} />}
-      {mode === "profile" && <GovProfile en={en} />}
+      {mode === "regmap" && <GovRegMap en={en} deep={deep && deep.mode === "regmap" ? deep.q : null} />}
+      {mode === "industry" && <GovIndustry en={en} onMode={setMode} onTab={onTab} deep={deep && deep.mode === "industry" ? deep.q : null} />}
+      {mode === "profile" && <GovProfile en={en} onTab={onTab} init={deep && deep.mode === "profile" ? { inds: deep.q.i ? deep.q.i.split(",").filter((k) => GOVIND.some((d) => d.key === k)) : [], mk: deep.q.m ? deep.q.m.split(",").filter((r) => GOVREG_ORDER.includes(r)) : ["日本"], th: deep.q.t || "ALL", view: deep.q.v === "exec" ? "exec" : "list" } : null} />}
       {mode === "lowcode" && <GovLowCode en={en} />}
       {mode === "kit" && <GovKit en={en} />}
       {mode === "fresh" && <GovFresh en={en} />}
@@ -165820,7 +165866,7 @@ function GovDojo() {
 const STORE_KEY = "gafa_hub_v1";
 
 function GafaHub() {
-  const [tab, _setTab] = useState("strategy");
+  const [tab, _setTab] = useState(() => (govDeep() ? "govdojo" : "strategy"));
   const [resetKey, setResetKey] = useState(0); // 「↑トップへ」で現在タブを再マウント→初期化（道場以外）
   // 1つ前の画面に戻る（閲覧履歴。setTab 経由のタブ遷移を自動記録）
   const [tabHist, setTabHist] = useState([]);
@@ -165954,7 +166000,7 @@ function GafaHub() {
         {tab === "architect" && <ArchAcademy key={resetKey} />}
         {tab === "archcase" && <TabArchCases key={resetKey} />}
         {tab === "frontier" && <TabFrontier key={resetKey} />}
-        {tab === "govdojo" && <GovDojo key={resetKey} />}
+        {tab === "govdojo" && <GovDojo key={resetKey} onTab={setTab} />}
         {tab === "itsec" && <TabItSec key={resetKey} />}
         {tab === "postmortem" && <TabPostmortem key={resetKey} />}
         {tab === "companies" && <TabCompanies key={resetKey} />}
@@ -231681,21 +231727,26 @@ class HubErrorBoundary extends React.Component {
     return this.props.children;
   }
 }
+// ハッシュの先頭（ハブ名）。#megatech/govdojo/... のように深い位置が続いてもハブとして読む
+const NOVA_HUBS = ["finance", "megatech", "consulting", "certification", "languagehub", "booksummary", "tracker", "anythingmemo", "linguisticshub", "liberalarts", "sidework"];
+function novaHashHub() {
+  try { const h = (window.location.hash || "").replace(/^#\/?/, "").split(/[/?]/)[0]; return NOVA_HUBS.includes(h) ? h : null; } catch (e) { return null; }
+}
 function ProjectNova() {
   const [lang, setLang] = useState("ja");
-  const [active, setActive] = useState(null);
+  // 最初の描画からハッシュのハブを使う（null で始めると、下の書き戻しが深い位置を消してしまう）
+  const [active, setActive] = useState(() => novaHashHub());
 
   // ディープリンク：URLハッシュ ↔ アクティブなハブ（リロード/ブックマークで同じ位置へ）
   useEffect(() => {
-    const HUBS = ["finance", "megatech", "consulting", "certification", "languagehub", "booksummary", "tracker", "anythingmemo", "linguisticshub", "liberalarts", "sidework"];
-    const apply = () => { const h = (window.location.hash || "").replace(/^#\/?/, ""); setActive(HUBS.includes(h) ? h : null); };
+    const apply = () => setActive(novaHashHub());
     apply();
     window.addEventListener("hashchange", apply);
     return () => window.removeEventListener("hashchange", apply);
   }, []);
   useEffect(() => {
     const want = active || "";
-    const cur = (window.location.hash || "").replace(/^#\/?/, "");
+    const cur = (window.location.hash || "").replace(/^#\/?/, "").split(/[/?]/)[0];
     if (cur !== want) { try { window.history.replaceState(null, "", want ? ("#" + want) : (window.location.pathname + window.location.search)); } catch (e) {} }
   }, [active]);
 
