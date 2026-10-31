@@ -165521,13 +165521,41 @@ function GovFresh({ en }) {
 const govCsv = (rows) => "﻿" + rows.map((r) => r.map((c) => `"${String(c == null ? "" : c).replace(/"/g, '""')}"`).join(",")).join("\r\n");
 const govHasUnc = (o) => GOV_UNCONF.test(JSON.stringify({ ...o, src: undefined }));
 const govIsApp = (r) => /当てはめ/.test(JSON.stringify(r.note || "")) || /当てはめ/.test(JSON.stringify(r.ai || ""));
-function GovProfile({ en }) {
+const GOVGAP_ST = [["", "未評価", "Not assessed", C.line], ["done", "対応済", "Done", C.teal], ["part", "一部", "Partly", C.gold], ["todo", "未対応", "Not done", C.wine], ["na", "対象外", "Not applicable", C.dim]];
+const GOVGAP_KEY = "govdojo_gap_v1", GOVPROF_KEY = "govdojo_profile_v1";
+function GovProfile({ en, init }) {
   const L = (v) => GOVX_L(v, en);
   const today = govToday();
   const regions = GOVREG_ORDER.filter((r) => GOVREG_ITEMS.some((x) => x.region === r));
-  const [inds, setInds] = useState([]);
-  const [mk, setMk] = useState(["日本"]);
-  const [th, setTh] = useState("ALL");
+  const [inds, setInds] = useState(init && init.inds ? init.inds : []);
+  const [mk, setMk] = useState(init && init.mk ? init.mk : ["日本"]);
+  const [th, setTh] = useState(init && init.th ? init.th : "ALL");
+  const [view, setView] = useState(init && init.view ? init.view : "list");
+  const [gap, setGap] = useState({});
+  const [dec, setDec] = useState([]);
+  const [open, setOpen] = useState(null);
+  const [only, setOnly] = useState("all");
+  const [loaded, setLoaded] = useState(false);
+  // 端末に保存した評価と選択を読み込む（共有リンクで開いたときは、リンクの選択を優先する）
+  useEffect(() => {
+    let live = true;
+    (async () => {
+      try { const r = await window.storage.get(GOVGAP_KEY); if (live && r && r.value) setGap(JSON.parse(r.value)); } catch (e) {}
+      try {
+        const r = await window.storage.get(GOVPROF_KEY);
+        if (live && r && r.value) {
+          const p = JSON.parse(r.value);
+          if (!init) { if (p.inds) setInds(p.inds); if (p.mk) setMk(p.mk); if (p.th) setTh(p.th); }
+          if (p.dec) setDec(p.dec);
+        }
+      } catch (e) {}
+      if (live) setLoaded(true);
+    })();
+    return () => { live = false; };
+  }, []);
+  useEffect(() => { if (loaded) { try { window.storage.set(GOVPROF_KEY, JSON.stringify({ inds, mk, th, dec })); } catch (e) {} } }, [inds, mk, th, dec, loaded]);
+  const saveGap = (next) => { setGap(next); try { window.storage.set(GOVGAP_KEY, JSON.stringify(next)); } catch (e) {} };
+  const setG = (k, f, v) => saveGap({ ...gap, [k]: { ...(gap[k] || {}), [f]: v } });
   const tog = (arr, set, v) => set(arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);
   const abroad = mk.some((r) => r !== "日本");
   const base = GOVIND_BASE.map((id) => GOVREG_ITEMS.find((y) => y.id === id)).filter((x) => x && mk.includes(x.region));
@@ -165540,19 +165568,45 @@ function GovProfile({ en }) {
   const regL = (r) => L(GOVREG_RL[r] || [r, r]);
   const indL = (d) => L([d.ind, d.ind_en]);
   const cut = (t, n = 140) => (t.length > n ? t.slice(0, n) + "…" : t);
-  const nUnc = [...base, ...regs].filter(govHasUnc).length + ir.filter(({ r }) => govHasUnc(r)).length;
+  const stL = (st) => { const x = GOVGAP_ST.find((y) => y[0] === (st || "")); return en ? x[2] : x[1]; };
+  // 評価の対象（規定）。キーは名前で持つ（並びが変わっても評価がずれないように）
+  const items = [
+    ...base.map((x) => ({ k: "r:" + x.id, sec: "base", x, bind: govBind(x.kind) === "law" })),
+    ...regs.map((x) => ({ k: "r:" + x.id, sec: "reg", x, bind: govBind(x.kind) === "law" })),
+    ...ir.map(({ d, r }) => ({ k: "i:" + d.key + ":" + r.name[0], sec: "ind", d, r, bind: r.kind === "法律" || r.kind === "判例" })),
+  ];
+  const G = (k) => gap[k] || {};
+  const noEv = (k) => G(k).st === "done" && !(G(k).ev || "").trim();
+  const shown = (k) => only === "all" || (only === "unrated" && !G(k).st) || (only === "gap" && (G(k).st === "todo" || G(k).st === "part")) || (only === "noev" && noEv(k));
+  const cnt = (st) => items.filter((it) => (G(it.k).st || "") === st).length;
+  const scored = items.filter((it) => G(it.k).st !== "na");
+  const pct = (list) => { const n = list.filter((it) => G(it.k).st !== "na").length; return n ? Math.round((list.filter((it) => G(it.k).st === "done").length + 0.5 * list.filter((it) => G(it.k).st === "part").length) / n * 100) : null; };
+  // テーマごとの充足度（業界の規定はテーマで、地域の規制・指針は1行にまとめる）
+  const bars = [
+    ...(base.length + regs.length ? [[en ? "Laws & guidelines in your markets" : "選んだ地域の規制・指針", items.filter((it) => it.sec !== "ind")]] : []),
+    ...GOVIND_TH.map(([t, ja, enl]) => [en ? enl : ja, items.filter((it) => it.sec === "ind" && (it.r.themes || []).includes(t))]).filter(([, l]) => l.length),
+  ];
+  const upcoming12 = dl.filter((u) => govDay(govEnd(u.d)) <= govDay(today) + 365 * 86400000);
+  const binding = items.filter((it) => it.sec !== "ind" && it.bind);
+  const soonIds = new Set(upcoming12.map((u) => u.id));
+  const gaps = items.filter((it) => G(it.k).st === "todo" || G(it.k).st === "part")
+    .sort((a, b) => (b.bind - a.bind) || ((b.x && soonIds.has(b.x.id)) - (a.x && soonIds.has(a.x.id))) || ((G(a.k).st === "todo" ? 0 : 1) - (G(b.k).st === "todo" ? 0 : 1)));
+  const nameOf = (it) => (it.x ? L(it.x.name) : L(it.r.name));
+  const shortOf = (it) => (it.x ? L(it.x.short || it.x.name) : L(it.r.name).replace(/（[^）]{12,}）/, ""));
   const rows = () => {
-    const H = en ? ["Section", "Region / industry", "Name", "Kind", "Status / what to check for AI", "Unconfirmed points", "Application (rule does not mention AI)", "Source URL", "Check date"] : ["区分", "地域・業界", "名称", "種類", "状況・AIで見る点", "未確認の点", "当てはめ（AIに直接触れていない規定）", "出典URL", "確認日"];
+    const H = en ? ["Section", "Region / industry", "Name", "Kind", "Status / what to check for AI", "Unconfirmed points", "Application (rule does not mention AI)", "Assessment", "Owner", "Due", "Evidence", "Notes", "Source URL", "Check date"] : ["区分", "地域・業界", "名称", "種類", "状況・AIで見る点", "未確認の点", "当てはめ（AIに直接触れていない規定）", "対応状況", "担当", "期限", "根拠資料", "メモ", "出典URL", "確認日"];
     const yes = en ? "yes" : "あり";
-    const out = [[en ? "Gov Dojo — my checklist" : "ガバナンス道場 自社チェック表", (en ? "Check date " : "確認日 ") + GOVREG_ASOF, (en ? "Made " : "作成日 ") + today],
-      [en ? "A learning summary, not legal advice. Confirm every point at source before relying on it." : "学習用の整理で、法的助言ではない。使う前に、すべて原典で確かめること。"],
+    const out = [[en ? "Gov Dojo — my checklist (self-assessment, not audited)" : "ガバナンス道場 自社チェック表（自己評価・未監査）", (en ? "Check date " : "確認日 ") + GOVREG_ASOF, (en ? "Made " : "作成日 ") + today],
+      [en ? "A learning summary, not legal advice. The assessment is the user's own and has not been audited. Confirm every point at source before relying on it." : "学習用の整理で、法的助言ではない。対応状況は利用者の自己評価で、監査を経ていない。使う前に、すべて原典で確かめること。"],
       [(en ? "Industries: " : "業界：") + (sel.map(indL).join(" / ") || "-"), (en ? "Markets: " : "進出先・提供先：") + mk.map(regL).join(" / "), (en ? "Theme: " : "テーマ：") + (th === "ALL" ? (en ? "all" : "すべて") : L(GOVIND_TH.find((x) => x[0] === th).slice(1, 3)))],
       [], H];
-    base.forEach((x) => out.push([en ? "Cross-industry rule" : "横断ルール", regL(x.region), L(x.name), kindL(x.kind), L(govStage(x)) + " — " + L(x.status), govHasUnc(x) ? yes : "", "", (x.src[0] || {}).url, GOVREG_ASOF]));
-    regs.forEach((x) => out.push([en ? "Regional law / guideline" : "地域の規制・指針", regL(x.region), L(x.name), kindL(x.kind), L(govStage(x)) + " — " + L(x.status), govHasUnc(x) ? yes : "", "", (x.src[0] || {}).url, GOVREG_ASOF]));
-    ir.forEach(({ d, r }) => out.push([en ? "Industry rule" : "業界の規定", indL(d) + (r.os ? (en ? " (overseas)" : "（海外）") : (en ? " (Japan)" : "（国内）")), L(r.name), kindL(r.kind), L((r.ai || [])[0] || ""), govHasUnc(r) ? yes : "", govIsApp(r) ? yes : "", (r.src[0] || {}).url, GOVREG_ASOF]));
-    dl.forEach((u) => out.push([en ? "Upcoming deadline" : "これからの期限", regL(u.x.region), L(u.x.short || u.x.name), "", u.d + " " + L(u.ev), "", "", (u.x.src[0] || {}).url, GOVREG_ASOF]));
-    watch.forEach(({ d, w }) => out.push([en ? "Watch point" : "気を付けること", indL(d), "", "", L(w), GOV_UNCONF.test(L(w)) ? yes : "", "", "", GOVREG_ASOF]));
+    const g = (k) => [stL(G(k).st) + (noEv(k) ? (en ? " (no evidence)" : "（根拠未記入）") : ""), G(k).ow || "", G(k).due || "", G(k).ev || "", G(k).memo || ""];
+    items.forEach((it) => {
+      if (it.sec === "ind") out.push([en ? "Industry rule" : "業界の規定", indL(it.d) + (it.r.os ? (en ? " (overseas)" : "（海外）") : (en ? " (Japan)" : "（国内）")), L(it.r.name), kindL(it.r.kind), L((it.r.ai || [])[0] || ""), govHasUnc(it.r) ? yes : "", govIsApp(it.r) ? yes : "", ...g(it.k), (it.r.src[0] || {}).url, GOVREG_ASOF]);
+      else out.push([it.sec === "base" ? (en ? "Cross-industry rule" : "横断ルール") : (en ? "Regional law / guideline" : "地域の規制・指針"), regL(it.x.region), L(it.x.name), kindL(it.x.kind), L(govStage(it.x)) + " — " + L(it.x.status), govHasUnc(it.x) ? yes : "", "", ...g(it.k), (it.x.src[0] || {}).url, GOVREG_ASOF]);
+    });
+    dl.forEach((u) => out.push([en ? "Upcoming deadline" : "これからの期限", regL(u.x.region), L(u.x.short || u.x.name), "", u.d + " " + L(u.ev), "", "", "", "", "", "", "", (u.x.src[0] || {}).url, GOVREG_ASOF]));
+    watch.forEach(({ d, w }) => out.push([en ? "Watch point" : "気を付けること", indL(d), "", "", L(w), GOV_UNCONF.test(L(w)) ? yes : "", "", "", "", "", "", "", "", GOVREG_ASOF]));
     return out;
   };
   const download = () => {
@@ -165564,23 +165618,86 @@ function GovProfile({ en }) {
       setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
     } catch (e) {}
   };
+  const resetGap = () => { if (window.confirm(en ? "Clear all assessments saved on this device?" : "この端末に保存した対応状況をすべて消しますか？")) saveGap({}); };
   const Chip = ({ on, onClick, children }) => <button onClick={onClick} style={{ background: on ? C.surface2 : "transparent", border: `1px solid ${on ? C.gold : C.line}`, color: on ? C.gold : C.text, borderRadius: 99, fontSize: 11.5, padding: "4px 10px", cursor: "pointer" }}>{children}</button>;
   const Tag = ({ c, children }) => <span style={{ fontSize: 10, color: c, border: `1px solid ${c}`, borderRadius: 99, padding: "0 6px", marginLeft: 6, whiteSpace: "nowrap" }}>{children}</span>;
-  const Row = ({ title, meta, body, unc, app }) => (
-    <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 8, padding: "6px 9px", marginBottom: 4 }}>
+  const inp = { background: C.bg, border: `1px solid ${C.line}`, borderRadius: 6, color: C.text, fontSize: 11.5, padding: "4px 6px", width: "100%", boxSizing: "border-box" };
+  const Assess = ({ k }) => {
+    const g = G(k), op = open === k;
+    return (
+      <div style={{ marginTop: 5 }}>
+        <div style={{ display: "flex", gap: 4, flexWrap: "wrap", alignItems: "center" }}>
+          {GOVGAP_ST.map(([st, ja, enl, col]) => <button key={st || "none"} onClick={() => setG(k, "st", st)} style={{ fontSize: 10.5, padding: "2px 8px", borderRadius: 99, cursor: "pointer", border: `1px solid ${(g.st || "") === st ? col : C.line}`, background: (g.st || "") === st ? col : "transparent", color: (g.st || "") === st ? C.bg : C.muted, fontWeight: (g.st || "") === st ? 800 : 500 }}>{en ? enl : ja}</button>)}
+          <button onClick={() => setOpen(op ? null : k)} style={{ fontSize: 10.5, padding: "2px 8px", borderRadius: 99, cursor: "pointer", border: `1px solid ${C.line}`, background: "transparent", color: C.text }}>{op ? (en ? "Close" : "閉じる") : (en ? "Owner, due, evidence" : "担当・期限・根拠")}{g.ow || g.due || g.ev || g.memo ? " ●" : ""}</button>
+          {noEv(k) ? <span style={{ fontSize: 10.5, color: C.wine }}>{en ? "Add evidence for 'Done'" : "「対応済」には根拠資料を書く"}</span> : null}
+        </div>
+        {op ? (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,180px),1fr))", gap: 6, marginTop: 6 }}>
+            <label style={{ fontSize: 10.5, color: C.dim }}>{en ? "Owner" : "担当"}<input style={inp} defaultValue={g.ow || ""} onBlur={(e) => setG(k, "ow", e.target.value)} /></label>
+            <label style={{ fontSize: 10.5, color: C.dim }}>{en ? "Due" : "期限"}<input type="date" style={inp} defaultValue={g.due || ""} onChange={(e) => setG(k, "due", e.target.value)} /></label>
+            <label style={{ fontSize: 10.5, color: C.dim }}>{en ? "Evidence (document, record)" : "根拠資料（文書・記録）"}<input style={inp} defaultValue={g.ev || ""} onBlur={(e) => setG(k, "ev", e.target.value)} /></label>
+            <label style={{ fontSize: 10.5, color: C.dim }}>{en ? "Notes" : "メモ"}<input style={inp} defaultValue={g.memo || ""} onBlur={(e) => setG(k, "memo", e.target.value)} /></label>
+          </div>
+        ) : null}
+      </div>
+    );
+  };
+  const Row = ({ k, title, meta, body, unc, app }) => (
+    <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderLeft: `4px solid ${k ? (GOVGAP_ST.find((y) => y[0] === (G(k).st || ""))[3]) : C.line}`, borderRadius: 8, padding: "6px 9px", marginBottom: 4 }}>
       <div style={{ fontSize: 12, fontWeight: 800, color: C.text, lineHeight: 1.45 }}>{title}{unc ? <Tag c={C.gold}>{en ? "unconfirmed points" : "未確認あり"}</Tag> : null}{app ? <Tag c={C.teal}>{en ? "application" : "当てはめ"}</Tag> : null}</div>
       {meta ? <div style={{ fontSize: 10.5, color: C.dim }}>{meta}</div> : null}
       {body ? <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.6, marginTop: 2 }}>{body}</div> : null}
+      {k ? <Assess k={k} /> : null}
     </div>
   );
+  const Bar = ({ list }) => {
+    const n = list.length || 1;
+    return (
+      <div style={{ display: "flex", height: 12, borderRadius: 6, overflow: "hidden", background: C.surface2 }}>
+        {[["done", C.teal], ["part", C.gold], ["todo", C.wine], ["", C.line], ["na", C.surface2]].map(([st, col]) => { const c = list.filter((it) => (G(it.k).st || "") === st).length; return c ? <div key={st || "none"} title={`${stL(st)}: ${c}`} style={{ width: `${(c / n) * 100}%`, background: col }} /> : null; })}
+      </div>
+    );
+  };
+  const disclaimer = en ? `A learning summary as of ${GOVREG_ASOF}, not legal advice and not a complete list of what applies to you. Assessments are your own (self-assessment, not audited) and are saved only on this device. Confirm every point at source.` : `${GOVREG_ASOF}時点の学習用の整理で、法的助言でも、自社に当てはまるものの完全な一覧でもない。対応状況は利用者の自己評価（未監査）で、この端末の中だけに保存される。使う前に、すべて原典で確かめること。`;
+  const total = pct(items);
+  // 経営層向け1枚を、白地の印刷用ページとして組み立てて印刷する（ブラウザの印刷から PDF にも保存できる）
+  const printExec = () => {
+    const esc = (t) => String(t == null ? "" : t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+    const li = (arr) => (arr.length ? "<ul>" + arr.map((t) => "<li>" + t + "</li>").join("") + "</ul>" : `<p class="dim">${en ? "None." : "なし。"}</p>`);
+    const h = `<!doctype html><html><head><meta charset="utf-8"><title>${esc(en ? "AI governance — for executives" : "AIガバナンス 現状の要点")}</title><style>
+body{font-family:"Hiragino Sans","Noto Sans JP","Yu Gothic",sans-serif;color:#111;margin:18mm 14mm;font-size:10.5pt;line-height:1.55}
+h1{font-size:16pt;margin:0 0 4px}h2{font-size:12pt;margin:14px 0 4px;border-bottom:1px solid #999}
+.meta{color:#444;font-size:9pt}.warn{color:#8a1c2b;font-size:9pt;margin:4px 0 10px}.dim{color:#666}ul{margin:2px 0 0 18px;padding:0}
+table{border-collapse:collapse;width:100%}td,th{border:1px solid #bbb;padding:3px 6px;text-align:left;font-size:9.5pt}</style></head><body>
+<h1>${esc(en ? "AI governance: where we stand (for executives)" : "AIガバナンス 現状の要点（経営層向け）")}</h1>
+<div class="meta">${esc((en ? "Industries: " : "業界：") + (sel.map(indL).join("・") || "-") + "　" + (en ? "Markets: " : "地域：") + mk.map(regL).join("・") + "　" + (en ? "Check date " : "確認日 ") + GOVREG_ASOF + "　" + (en ? "Made " : "作成日 ") + today)}</div>
+<div class="warn">${esc(en ? "Self-assessment, not audited. A learning summary, not legal advice — confirm at source." : "自己評価・未監査。学習用の整理で法的助言ではない。原典で確かめること。")}</div>
+<h2>${esc(en ? `1. Deadlines in the next 12 months (${upcoming12.length})` : `1. これから12か月の期限（${upcoming12.length}件）`)}</h2>
+${li(upcoming12.map((u) => `<b>${esc(u.d)}</b>　${esc(L(u.x.short || u.x.name))}：${esc(L(u.ev))}`))}
+<h2>${esc(en ? `2. Binding laws in your markets (${binding.length})` : `2. 選んだ地域の拘束力のある法令（${binding.length}件）`)}</h2>
+${li(binding.map((it) => `<b>${esc(L(it.x.short || it.x.name))}</b>（${esc(regL(it.x.region))}・${esc(stL(G(it.k).st))}）${it.x.penalty ? "　" + esc((en ? "Penalties: " : "罰則：") + cut(L(it.x.penalty), 120)) : ""}`))}
+<h2>${esc(en ? "3. Where we stand" : "3. 対応の状況")}</h2>
+<p>${esc(en ? `Rules: ${items.length}; assessed ${items.length - cnt("")}; done ${cnt("done")}; partly ${cnt("part")}; not done ${cnt("todo")}; not applicable ${cnt("na")}. Coverage ${total == null ? "-" : total + "%"}. 'Done' without evidence: ${items.filter((it) => noEv(it.k)).length}.` : `規定 ${items.length}件／評価済み ${items.length - cnt("")}件：対応済 ${cnt("done")}・一部 ${cnt("part")}・未対応 ${cnt("todo")}・対象外 ${cnt("na")}。充足度 ${total == null ? "-" : total + "%"}。根拠未記入の「対応済」${items.filter((it) => noEv(it.k)).length}件。`)}</p>
+<p><b>${esc(en ? "Main gaps (binding first)" : "主な未対応・一部（拘束力のあるものから）")}</b></p>
+${li(gaps.slice(0, 8).map((it) => esc(shortOf(it) + "（" + stL(G(it.k).st) + (G(it.k).ow ? (en ? ", owner " : "・担当 ") + G(it.k).ow : "") + (G(it.k).due ? (en ? ", due " : "・期限 ") + G(it.k).due : "") + "）")))}
+<h2>${esc(en ? "4. Decisions to make" : "4. 決めるべき事項")}</h2>
+${dec.length ? "<table><tr><th>" + esc(en ? "Decision" : "事項") + "</th><th>" + esc(en ? "Who" : "責任者") + "</th><th>" + esc(en ? "By when" : "期限") + "</th></tr>" + dec.map((d) => `<tr><td>${esc(d.t)}</td><td>${esc(d.who)}</td><td>${esc(d.due)}</td></tr>`).join("") + "</table>" : `<p class="dim">${esc(en ? "None entered." : "未記入。")}</p>`}
+</body></html>`;
+    try {
+      const f = document.createElement("iframe");
+      f.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0";
+      f.setAttribute("data-gov-print", "1");
+      document.body.appendChild(f);
+      const d = f.contentWindow.document; d.open(); d.write(h); d.close();
+      setTimeout(() => { try { f.contentWindow.focus(); f.contentWindow.print(); } catch (e) {} setTimeout(() => f.remove(), 60000); }, 300);
+    } catch (e) {}
+  };
   return (
     <div>
       <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.75, marginBottom: 8 }}>
-        {en ? "Pick your industries and the markets where you provide or use AI. The list gathers the matching rules, deadlines and watch points from this dojo, and can be saved as CSV." : "自社の業界と、AIを提供・利用する地域を選ぶと、この道場の中から当てはまる規定・期限・気を付けることを集める。CSV で保存できる。"}
+        {en ? "Pick your industries and the markets where you provide or use AI. The list gathers the matching rules, deadlines and watch points; record where you stand on each rule, then view a one-page summary for executives or save everything as CSV." : "自社の業界と、AIを提供・利用する地域を選ぶと、当てはまる規定・期限・気を付けることを集める。規定ごとに対応状況を記録し、経営層向けの1枚にまとめたり、CSVで保存したりできる。"}
       </div>
-      <div style={{ ...DGM_DETAIL, borderLeftColor: C.wine, marginBottom: 10 }}>
-        <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.7 }}>{en ? `A learning summary as of ${GOVREG_ASOF}, not legal advice and not a complete list of what applies to you. Overseas industry rules are shown when any market outside Japan is picked; check each one's jurisdiction. Confirm every point at source.` : `${GOVREG_ASOF}時点の学習用の整理で、法的助言でも、自社に当てはまるものの完全な一覧でもない。業界の海外の規定は、日本以外の地域を1つでも選ぶと表示する（どの国・地域の規定かは各項目で確かめる）。使う前に、すべて原典で確かめること。`}</div>
-      </div>
+      <div style={{ ...DGM_DETAIL, borderLeftColor: C.wine, marginBottom: 10 }}><div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.7 }}>{disclaimer}</div></div>
       <GV_H>{en ? "1. Industries" : "1. 業界（複数選べる）"}</GV_H>
       <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>{GOVIND.map((d) => <Chip key={d.key} on={inds.includes(d.key)} onClick={() => tog(inds, setInds, d.key)}>{indL(d)}</Chip>)}</div>
       <GV_H>{en ? "2. Markets where you provide or use AI" : "2. AIを提供・利用する地域（複数選べる）"}</GV_H>
@@ -165591,15 +165708,73 @@ function GovProfile({ en }) {
         {GOVIND_TH.map(([t, ja, enl]) => <Chip key={t} on={th === t} onClick={() => setTh(t)}>{en ? enl : ja}</Chip>)}
       </div>
       <div style={{ marginTop: 12 }}>
-        <GvKpi items={[[base.length + regs.length, en ? "laws & guidelines in these markets" : "選んだ地域の規制・指針", C.gold], [ir.length, en ? "industry rules" : "業界の規定", C.teal], [dl.length, en ? "deadlines still ahead" : "これからの期限", C.wine], [nUnc, en ? "with unconfirmed points" : "未確認の点を含む項目", C.gold]]} />
+        <GvKpi items={[[items.length, en ? "rules to assess" : "評価する規定", C.gold], [`${items.length - cnt("")}/${items.length}`, en ? "assessed" : "評価済み", C.text], [total == null ? "-" : `${total}%`, en ? "coverage (done + half of partly)" : "充足度（対応済＋一部の半分）", C.teal], [cnt("todo") + cnt("part"), en ? "not done or partly" : "未対応・一部", C.wine], [items.filter((it) => noEv(it.k)).length, en ? "'Done' without evidence" : "根拠未記入の「対応済」", C.gold]]} />
       </div>
-      <button onClick={download} disabled={!mk.length} style={{ background: mk.length ? C.teal : C.surface, color: mk.length ? C.bg : C.dim, border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 12.5, fontWeight: 800, cursor: mk.length ? "pointer" : "default", marginBottom: 6 }}>{en ? "Save as CSV" : "CSV で保存"}</button>
+      <div className="gov-noprint" style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", marginBottom: 6 }}>
+        <GovPills items={[["list", en ? "Rules and assessment" : "規定と対応状況"], ["exec", en ? "One page for executives" : "経営層向け1枚"]]} val={view} onPick={setView} />
+        <button onClick={download} disabled={!mk.length} style={{ background: mk.length ? C.teal : C.surface, color: mk.length ? C.bg : C.dim, border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 12, fontWeight: 800, cursor: mk.length ? "pointer" : "default", marginBottom: 12 }}>{en ? "Save as CSV" : "CSV で保存"}</button>
+        <button onClick={resetGap} style={{ background: "transparent", color: C.dim, border: `1px solid ${C.line}`, borderRadius: 8, padding: "5px 10px", fontSize: 11, cursor: "pointer", marginBottom: 12 }}>{en ? "Clear assessments" : "対応状況を消す"}</button>
+      </div>
       {!mk.length ? <div style={DGM_HINT}>{en ? "Pick at least one market." : "地域を1つ以上選ぶ。"}</div> : null}
-      {base.length ? <><GV_H>{en ? "Cross-industry rules to check first" : "まず確かめる横断ルール"}</GV_H>{base.map((x) => <Row key={x.id} title={L(x.name)} meta={`${regL(x.region)}・${kindL(x.kind)}・${L(govStage(x))}`} body={cut(L(x.status))} unc={govHasUnc(x)} />)}</> : null}
-      {regs.length ? <><GV_H>{en ? `Laws and guidelines in the markets you picked (${regs.length})` : `選んだ地域の規制・指針（${regs.length}件）`}</GV_H>{regs.map((x) => <Row key={x.id} title={L(x.name)} meta={`${regL(x.region)}・${kindL(x.kind)}・${L(govStage(x))}`} body={cut(L(x.status))} unc={govHasUnc(x)} />)}</> : null}
-      {sel.length ? <><GV_H>{en ? `Industry rules (${ir.length})` : `業界の規定（${ir.length}件）`}</GV_H>{ir.map(({ d, r }, i) => <Row key={i} title={L(r.name)} meta={`${indL(d)}・${r.os ? (en ? "overseas" : "海外") : (en ? "Japan" : "国内")}・${kindL(r.kind)}`} body={cut(L((r.ai || [])[0] || ""), 180)} unc={govHasUnc(r)} app={govIsApp(r)} />)}</> : <div style={DGM_HINT}>{en ? "Pick an industry to add its rules and watch points." : "業界を選ぶと、業界の規定と気を付けることが加わる。"}</div>}
-      {dl.length ? <><GV_H>{en ? `Deadlines still ahead (${dl.length})` : `これからの期限（${dl.length}件）`}</GV_H>{dl.map((u, i) => <Row key={i} title={`${u.d}　${L(u.x.short || u.x.name)}`} meta={regL(u.x.region)} body={L(u.ev)} />)}</> : null}
-      {watch.length ? <><GV_H>{en ? "Watch points" : "気を付けること"}</GV_H>{watch.map(({ d, w }, i) => <Row key={i} title={indL(d)} body={L(w)} unc={GOV_UNCONF.test(L(w))} />)}</> : null}
+      {view === "list" ? (
+        <>
+          {bars.length ? (
+            <>
+              <GV_H>{en ? "Coverage by area" : "領域ごとの充足度"}</GV_H>
+              <GV_SUB>{en ? "Teal done, gold partly, red not done, grey not assessed. Industry rules count under each of their themes." : "緑＝対応済、金＝一部、赤＝未対応、灰＝未評価。業界の規定は、付いているテーマごとに数える。"}</GV_SUB>
+              <div style={{ display: "grid", gridTemplateColumns: "minmax(110px,190px) minmax(0,1fr) 44px", gap: "4px 8px", alignItems: "center", marginBottom: 6 }}>
+                {bars.map(([label, list]) => <React.Fragment key={label}><div style={{ fontSize: 11.5, color: C.muted }}>{label}<span style={{ color: C.dim }}>（{list.length}）</span></div><Bar list={list} /><div style={{ fontSize: 11.5, color: C.text, textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{pct(list) == null ? "-" : pct(list) + "%"}</div></React.Fragment>)}
+              </div>
+            </>
+          ) : null}
+          <div style={{ display: "flex", gap: 5, flexWrap: "wrap", margin: "8px 0" }}>
+            {[["all", en ? "All" : "すべて"], ["unrated", en ? "Not assessed" : "未評価"], ["gap", en ? "Not done / partly" : "未対応・一部"], ["noev", en ? "'Done' without evidence" : "根拠未記入"]].map(([k, lb]) => <Chip key={k} on={only === k} onClick={() => setOnly(k)}>{lb}</Chip>)}
+          </div>
+          {base.length ? <><GV_H>{en ? "Cross-industry rules to check first" : "まず確かめる横断ルール"}</GV_H>{base.filter((x) => shown("r:" + x.id)).map((x) => <Row key={x.id} k={"r:" + x.id} title={L(x.name)} meta={`${regL(x.region)}・${kindL(x.kind)}・${L(govStage(x))}`} body={cut(L(x.status))} unc={govHasUnc(x)} />)}</> : null}
+          {regs.length ? <><GV_H>{en ? `Laws and guidelines in the markets you picked (${regs.length})` : `選んだ地域の規制・指針（${regs.length}件）`}</GV_H>{regs.filter((x) => shown("r:" + x.id)).map((x) => <Row key={x.id} k={"r:" + x.id} title={L(x.name)} meta={`${regL(x.region)}・${kindL(x.kind)}・${L(govStage(x))}`} body={cut(L(x.status))} unc={govHasUnc(x)} />)}</> : null}
+          {sel.length ? <><GV_H>{en ? `Industry rules (${ir.length})` : `業界の規定（${ir.length}件）`}</GV_H>{ir.filter(({ d, r }) => shown("i:" + d.key + ":" + r.name[0])).map(({ d, r }) => <Row key={d.key + r.name[0]} k={"i:" + d.key + ":" + r.name[0]} title={L(r.name)} meta={`${indL(d)}・${r.os ? (en ? "overseas" : "海外") : (en ? "Japan" : "国内")}・${kindL(r.kind)}`} body={cut(L((r.ai || [])[0] || ""), 180)} unc={govHasUnc(r)} app={govIsApp(r)} />)}</> : <div style={DGM_HINT}>{en ? "Pick an industry to add its rules and watch points." : "業界を選ぶと、業界の規定と気を付けることが加わる。"}</div>}
+          {dl.length ? <><GV_H>{en ? `Deadlines still ahead (${dl.length})` : `これからの期限（${dl.length}件）`}</GV_H>{dl.map((u, i) => <Row key={i} title={`${u.d}　${L(u.x.short || u.x.name)}`} meta={regL(u.x.region)} body={L(u.ev)} />)}</> : null}
+          {watch.length ? <><GV_H>{en ? "Watch points" : "気を付けること"}</GV_H>{watch.map(({ d, w }, i) => <Row key={i} title={indL(d)} body={L(w)} unc={GOV_UNCONF.test(L(w))} />)}</> : null}
+        </>
+      ) : (
+        <div className="gov-print" style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 10, padding: "14px 16px" }}>
+          <div className="gov-noprint" style={{ display: "flex", justifyContent: "flex-end", marginBottom: 6 }}><button onClick={printExec} style={{ background: C.teal, color: C.bg, border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 12, fontWeight: 800, cursor: "pointer" }}>{en ? "Print / save as PDF" : "印刷・PDFで保存"}</button></div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: C.text }}>{en ? "AI governance: where we stand (for executives)" : "AIガバナンス 現状の要点（経営層向け）"}</div>
+          <div style={{ fontSize: 11, color: C.dim, margin: "2px 0 8px" }}>{(en ? "Industries: " : "業界：") + (sel.map(indL).join("・") || "-")}　{(en ? "Markets: " : "地域：") + mk.map(regL).join("・")}　{(en ? "Check date " : "確認日 ") + GOVREG_ASOF}　{(en ? "Made " : "作成日 ") + today}</div>
+          <div style={{ fontSize: 11, color: C.wine, marginBottom: 10 }}>{en ? "Self-assessment, not audited. A learning summary, not legal advice — confirm at source." : "自己評価・未監査。学習用の整理で法的助言ではない。原典で確かめること。"}</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,300px),1fr))", gap: 12 }}>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: C.text, marginBottom: 4 }}>{en ? `1. Deadlines in the next 12 months (${upcoming12.length})` : `1. これから12か月の期限（${upcoming12.length}件）`}</div>
+              {upcoming12.length ? upcoming12.map((u, i) => <div key={i} style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.6 }}><b style={{ color: C.text }}>{u.d}</b>　{L(u.x.short || u.x.name)}：{L(u.ev)}</div>) : <div style={{ fontSize: 11.5, color: C.dim }}>{en ? "None in the markets picked." : "選んだ地域にはない。"}</div>}
+            </div>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: C.text, marginBottom: 4 }}>{en ? `2. Binding laws in your markets (${binding.length})` : `2. 選んだ地域の拘束力のある法令（${binding.length}件）`}</div>
+              {binding.map((it) => <div key={it.k} style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.6 }}><b style={{ color: C.text }}>{L(it.x.short || it.x.name)}</b>（{regL(it.x.region)}・{stL(G(it.k).st)}）{it.x.penalty ? <span>　{en ? "Penalties: " : "罰則："}{cut(L(it.x.penalty), 90)}</span> : null}</div>)}
+            </div>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: C.text, marginBottom: 4 }}>{en ? "3. Where we stand" : "3. 対応の状況"}</div>
+              <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.7 }}>{en ? `Rules: ${items.length}; assessed ${items.length - cnt("")}; done ${cnt("done")}; partly ${cnt("part")}; not done ${cnt("todo")}; not applicable ${cnt("na")}. Coverage ${total == null ? "-" : total + "%"}. 'Done' without evidence: ${items.filter((it) => noEv(it.k)).length}.` : `規定 ${items.length}件／評価済み ${items.length - cnt("")}件：対応済 ${cnt("done")}・一部 ${cnt("part")}・未対応 ${cnt("todo")}・対象外 ${cnt("na")}。充足度 ${total == null ? "-" : total + "%"}。根拠未記入の「対応済」${items.filter((it) => noEv(it.k)).length}件。`}</div>
+              <div style={{ fontSize: 12, fontWeight: 800, color: C.text, margin: "6px 0 2px" }}>{en ? "Main gaps (binding first)" : "主な未対応・一部（拘束力のあるものから）"}</div>
+              {gaps.length ? gaps.slice(0, 8).map((it) => <div key={it.k} style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.6 }}>・{shortOf(it)}（{stL(G(it.k).st)}{G(it.k).ow ? (en ? ", owner " : "・担当 ") + G(it.k).ow : ""}{G(it.k).due ? (en ? ", due " : "・期限 ") + G(it.k).due : ""}）</div>) : <div style={{ fontSize: 11.5, color: C.dim }}>{en ? "No rule is marked not done or partly yet." : "未対応・一部の規定はまだない（または未評価）。"}</div>}
+            </div>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: C.text, marginBottom: 4 }}>{en ? "4. Decisions to make (what, who, by when)" : "4. 決めるべき事項（何を・誰が・いつまでに）"}</div>
+              {dec.map((d, i) => (
+                <div key={i} style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 90px 120px 22px", gap: 4, marginBottom: 4 }}>
+                  <input style={inp} defaultValue={d.t} placeholder={en ? "Decision" : "事項"} onBlur={(e) => setDec(dec.map((x, j) => (j === i ? { ...x, t: e.target.value } : x)))} />
+                  <input style={inp} defaultValue={d.who} placeholder={en ? "Who" : "責任者"} onBlur={(e) => setDec(dec.map((x, j) => (j === i ? { ...x, who: e.target.value } : x)))} />
+                  <input type="date" style={inp} defaultValue={d.due} onChange={(e) => setDec(dec.map((x, j) => (j === i ? { ...x, due: e.target.value } : x)))} />
+                  <button className="gov-noprint" onClick={() => setDec(dec.filter((_, j) => j !== i))} style={{ background: "transparent", border: "none", color: C.dim, cursor: "pointer" }}>×</button>
+                </div>
+              ))}
+              <div className="gov-noprint" style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                <button onClick={() => setDec([...dec, { t: "", who: "", due: "" }])} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 99, border: `1px solid ${C.line}`, background: "transparent", color: C.text, cursor: "pointer" }}>{en ? "+ Add" : "＋ 追加"}</button>
+                <button onClick={() => setDec([...dec, ...(gaps.some((it) => it.bind) ? gaps.filter((it) => it.bind) : gaps).slice(0, 3).map((it) => ({ t: en ? `Decide the approach and owner for ${shortOf(it)}` : `「${shortOf(it)}」への対応方針と責任者を決める`, who: G(it.k).ow || "", due: G(it.k).due || "" }))])} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 99, border: `1px solid ${C.line}`, background: "transparent", color: C.text, cursor: "pointer" }}>{en ? "Suggest from the main gaps" : "主な未対応から候補を入れる"}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
