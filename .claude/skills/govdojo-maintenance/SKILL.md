@@ -19,10 +19,11 @@ description: TechHub「セキュリティ・ガバナンス道場」の規制マ
 | `data/govdojo/compare.json` | 8法域の比較表と「これからの期限」 |
 | `data/govdojo/meta.json` | 確認日（asof）。出典を確かめ直したときだけ更新する |
 | `data/govdojo/facts.json` | 主要な事実の台帳（古い日付・取り違えを止める規則） |
+| `data/govdojo/templates.json` | ひな形（AI利用規程の骨子・ユースケース審査票・ベンダー質問票・インシデント初動）。各行は根拠のポインタ（検証済みの1行）か「判断」 |
 | `data/govdojo/usecases.json` | ユースケースの入口（採用・与信・チャットボットなど）。規制の1行・業界の規定・シナリオ・事例・問題の語への**対応づけ（判断）**。中身の文は持たず、規制マップ・業界の検証済みの文を指すだけ |
-| `nova-app/src/ProjectNova.jsx` | 画面。`GOVREG_ASOF`・`GOVREG_ITEMS`・`GOVIND`・`GOVLC`・`GOVKIT`・`GOVREG_CMP`・`GOVUC` は **data から生成する**（手で直さない）。`GOVDOJO_BANK`（判定演習）と `GOVDOJO_SCENARIOS` は jsx が正本 |
+| `nova-app/src/ProjectNova.jsx` | 画面。`GOVREG_ASOF`・`GOVREG_ITEMS`・`GOVIND`・`GOVLC`・`GOVKIT`・`GOVREG_CMP`・`GOVUC`・`GOVTPL` は **data から生成する**（手で直さない）。`GOVDOJO_BANK`（判定演習）と `GOVDOJO_SCENARIOS` は jsx が正本 |
 | `nova-app/scripts/validate-govdojo.mjs` | facts.json の照合。`npm run build` の前に自動で走る（prebuild） |
-| `scripts/` | build.py（生成）・urlcheck.py（出典の取り直し）・fetch.sh / h2t.py（取得）・qcheck.py（下書きの引用確認）・qlen.py（問題の長さ） |
+| `scripts/` | build.py（生成）・urlcheck.py（出典の取り直し）・fetch.sh / h2t.py（取得）・qcheck.py（下書きの引用確認）・qlen.py（問題の長さ）・cite_index.py（根拠に指せる行の索引とポインタの解決）・tpl_check.py（ひな形と根拠の照合表） |
 | `references/` | 調査・検算・作問の指示書（下の対応表を見る） |
 
 公開する画面には引用（quote）を出さない。出典は名前・種類・URL だけを出す。
@@ -63,6 +64,13 @@ description: TechHub「セキュリティ・ガバナンス道場」の規制マ
 - 業界の規定は `[業界 key, 規定名の先頭]` で指す。build.py が番号に直し、先頭が一致する規定がちょうど1つでなければ止まる。
 - シナリオ・事例は jsx の id。`q` は判定演習の設問（q）に当てる正規表現。足したら拾われた問題を抜き取りで読み、関係の薄い問題が混じる語（「採用」＝導入の意味など）を外す。
 - 規制・業界のデータを直したら build.py を流し、参照エラーが出ないことを確かめる。
+
+### B3. ひな形を足す・直す（templates.json）
+1. 索引を作る：`python3 .claude/skills/govdojo-maintenance/scripts/cite_index.py > 作業/cite_index.tsv`
+2. 下書き（`references/TPL_BRIEF.md`）→ 照合表：`python3 -B .../tpl_check.py 下書き.json 作業/照合表.md`（問題 0 にする）
+3. 別の目の検算（`references/AUDIT_TPL_BRIEF.md`）。数字・期限・法域・義務か任意かを根拠の行と一字ずつ合わせる。
+4. `data/govdojo/templates.json` に入れ、build.py。根拠の行（規制・業界・キット）を直したら、ひな形の行が今も根拠どおりかを照合表で見直す（ポインタは解決できても、根拠の文が変われば行の言い方が古くなる）。
+5. 期限つきの行（例：EUの機械可読マークの猶予 2026年12月2日、令和8年改正個人情報保護法の施行、コロラド州の司法長官規則）は、期限が来たら見直す。
 
 ### C. 判定演習・シナリオを足す
 - `quiz-authoring` スキルの規約に従う（1バッチ100問以上、最長選択の悪用なし、位置の偏りなし）。

@@ -1,0 +1,1212 @@
+{
+ "note": [
+  "各行の「根拠」は、規制マップ・業界別チェック・実務キット・ローコード統制と同じ、出典で確かめた要約の1行。「判断」は根拠から直接は言えない実務上の勧め（道場の作成者の判断）。法的助言ではない。自社で使う前に、根拠の原文と専門家の確認を経ること。",
+  "Each “source” is a line from the same source-checked summaries used in the regulation map, industry checks, practice kit and low-code governance. “Judgement” marks practice advice the sources do not state directly (the dojo authors’ judgement). Not legal advice: check the original texts and with specialists before adopting."
+ ],
+ "list": [
+  {
+   "id": "policy",
+   "name": [
+    "AI利用規程の骨子",
+    "AI use policy outline"
+   ],
+   "purpose": [
+    "自社のAI利用規程を作るときの章立てと、各章に書く条項の要点。自社に合わせて書き換えて使う。",
+    "A chapter outline for an in-house AI use policy and the key points for each chapter's clauses. Adapt it to your company."
+   ],
+   "sections": [
+    {
+     "h": [
+      "目的と適用範囲",
+      "Purpose and scope"
+     ],
+     "lines": [
+      {
+       "t": [
+        "自社がAI開発者・提供者・利用者のどれに当たるか（兼ねる場合も）を、適用範囲に書く",
+        "State in the scope whether the company is an AI developer, provider or user, or more than one of these"
+       ],
+       "cite": [
+        "reg:jp-ai-biz-guideline:who:0"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "自社の立場に応じ、AI事業者ガイドラインの10の共通指針を自主的に実践し、個人情報保護法などの既存法令を守ると定める",
+        "Commit to practising the 10 common principles of Japan's AI Guidelines for Business on a voluntary basis, and to complying with existing laws such as the personal information protection law"
+       ],
+       "cite": [
+        "reg:jp-ai-biz-guideline:duty:0",
+        "reg:jp-ai-biz-guideline:duty:1"
+       ],
+       "judge": false
+      }
+     ]
+    },
+    {
+     "h": [
+      "体制と責任",
+      "Governance and responsibility"
+     ],
+     "lines": [
+      {
+       "t": [
+        "経営層のリーダーシップの下で、AIガバナンス（方針・設計・運用・評価）を回す体制を定める",
+        "Set up a governance structure, under management leadership, covering AI policy, design, operation and evaluation"
+       ],
+       "cite": [
+        "reg:jp-ai-biz-guideline:duty:2"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "AIごとの所管部門と責任者を氏名まで決め、事故時に判断・停止できる人を定める",
+        "For each AI, name the responsible department and owner (down to the person), and who can decide and stop it in an incident"
+       ],
+       "cite": [
+        "kit:inv.fields:3",
+        "kit:inv.fields:17"
+       ],
+       "judge": false
+      }
+     ]
+    },
+    {
+     "h": [
+      "利用の区分と承認",
+      "Use categories and approval"
+     ],
+     "lines": [
+      {
+       "t": [
+        "リスクの高さに応じて、審査と統制の深さを変える区分を定める",
+        "Define risk tiers so that the depth of review and controls matches the level of risk"
+       ],
+       "cite": [
+        "reg:jp-ai-biz-guideline:what:1",
+        "kit:inv.fields:8",
+        "kit:inv.flow:1"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "新規利用・外部AIの申請・SaaSへのAI機能の追加は台帳に登録し、一次判定から審査へ進める",
+        "Register new uses, external AI requests and AI features added to SaaS in the inventory, then move from first triage to review"
+       ],
+       "cite": [
+        "kit:inv.flow:0",
+        "kit:inv.flow:1",
+        "kit:inv.flow:2"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "EU向けの高リスクAI（採用・与信など）は上市前の要件を確認する（適用はAnnex IIIが2027年12月2日、Annex Iが2028年8月2日から）",
+        "For high-risk AI offered in the EU (e.g. hiring, credit), check the pre-market requirements (they apply from 2 Dec 2027 for Annex III and from 2 Aug 2028 for Annex I)"
+       ],
+       "cite": [
+        "reg:eu-ai-act:duty:2",
+        "reg:eu-ai-omnibus:what:0",
+        "reg:eu-ai-act:jp:0"
+       ],
+       "judge": false
+      }
+     ]
+    },
+    {
+     "h": [
+      "入力してよい情報",
+      "What may be entered"
+     ],
+     "lines": [
+      {
+       "t": [
+        "個人情報を含むプロンプトは、利用目的の範囲内かを確認してから入力する（個人情報保護委員会の注意喚起）",
+        "Before entering personal information in a prompt, confirm it is within the specified purpose of use (alert from Japan's Personal Information Protection Commission)"
+       ],
+       "cite": [
+        "reg:jp-ppc-genai-alert:duty:0"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "本人の同意なく個人データを入力するなら、提供事業者が機械学習に使わないことを確認する",
+        "If personal data is entered without the person's consent, confirm that the provider will not use it for machine learning"
+       ],
+       "cite": [
+        "reg:jp-ppc-genai-alert:duty:1"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "入力データを個人情報・要配慮・機密などに区分し、外部送信の可否を決める",
+        "Classify input data (personal, sensitive, confidential, etc.) and decide what may be sent outside"
+       ],
+       "cite": [
+        "kit:inv.fields:6"
+       ],
+       "judge": false
+      }
+     ]
+    },
+    {
+     "h": [
+      "出力と外部サービス",
+      "Outputs and external services"
+     ],
+     "lines": [
+      {
+       "t": [
+        "生成物を外部に公表・販売する前に、既存著作物との類似性・依拠性を確認する（日本の著作権の考え方）",
+        "Before publishing or selling AI output, check it for similarity to and reliance on existing works (Japan's copyright guidance)"
+       ],
+       "cite": [
+        "reg:jp-copyright-ai:duty:1",
+        "reg:jp-copyright-ai:jp:0"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "EU向けに生成画像・動画・音声を使うなら、EU AI法第50条の表示が必要か確認する",
+        "If generated images, video or audio are used for the EU, check whether Article 50 of the EU AI Act requires labelling"
+       ],
+       "cite": [
+        "reg:eu-ai-act-art50:jp:0"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "外部の生成AIは導入前に、入力の学習利用・個人データの第三者提供該当性・セキュリティ・規約改定の扱いを契約書・利用規約で確認する",
+        "Before adopting an external generative AI, check in the contract and terms of use how they handle training use of inputs, whether personal data is provided to a third party, security and changes to terms"
+       ],
+       "cite": [
+        "reg:jp-meti-contract-checklist:jp:0"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "重要な用途では、AIの出力を人が確認してから使うと定める",
+        "For important uses, require a person to check AI output before it is used"
+       ],
+       "cite": [],
+       "judge": true
+      }
+     ]
+    },
+    {
+     "h": [
+      "台帳と棚卸し",
+      "Inventory and stocktaking"
+     ],
+     "lines": [
+      {
+       "t": [
+        "AI台帳に載せる項目（名称・版、責任者、リスク階層と判定日など）を決める",
+        "Decide the fields of the AI inventory (name and version, owner, risk tier and date of assessment, etc.)"
+       ],
+       "cite": [
+        "kit:inv.fields:1",
+        "kit:inv.fields:3",
+        "kit:inv.fields:8"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "台帳にない利用（シャドーAI）を、通信ログ・経費明細・拡張機能の棚卸で洗い出す",
+        "Find uses missing from the inventory (shadow AI) through network logs, expense records and an inventory of extensions"
+       ],
+       "cite": [
+        "kit:inv.shadow:0",
+        "kit:inv.shadow:1",
+        "kit:inv.shadow:2"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "見直し頻度はリスクに合わせ、モデルやプロンプトの変更時は再評価する",
+        "Set the review frequency by risk, and re-evaluate when the model or prompt changes"
+       ],
+       "cite": [
+        "kit:inv.fields:14",
+        "kit:inv.flow:6"
+       ],
+       "judge": false
+      }
+     ]
+    },
+    {
+     "h": [
+      "教育",
+      "Training"
+     ],
+     "lines": [
+      {
+       "t": [
+        "EU向けにAIを提供・利用する場合は、AIリテラシーの確保に取り組む（特定の水準までは求められない）",
+        "If providing or using AI in the EU, work on AI literacy (no specific level is required)"
+       ],
+       "cite": [
+        "reg:eu-ai-act:duty:1",
+        "reg:eu-ai-omnibus:duty:1"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "全従業員向けの教育（対象・内容・受講の頻度）を定める",
+        "Define training for all staff: who, what content and how often"
+       ],
+       "cite": [],
+       "judge": true
+      }
+     ]
+    },
+    {
+     "h": [
+      "事故時と見直し",
+      "Incidents and review"
+     ],
+     "lines": [
+      {
+       "t": [
+        "停止・遮断の手順と、原因調査・復旧・連絡体制を事前に決め、停止の手順を訓練する",
+        "Decide in advance the stop and isolation steps, cause investigation, recovery and contact structure, and rehearse the stop steps"
+       ],
+       "cite": [
+        "kit:cust.pre:11",
+        "kit:cust.inc:3"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "自社のAIガバナンスと規程を、最新のAI基本計画と指針に照らして定期的に点検する",
+        "Regularly check the company's AI governance and this policy against the latest AI Basic Plan and guidelines"
+       ],
+       "cite": [
+        "reg:jp-ai-basic-plan:jp:0"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "規程の見直しは年1回を目安にし、改定履歴を残す",
+        "Review the policy about once a year and keep a revision history"
+       ],
+       "cite": [],
+       "judge": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "review",
+   "name": [
+    "ユースケース審査票",
+    "Use-case review form"
+   ],
+   "purpose": [
+    "1件のAI利用を審査するときの確認項目を、問いの形でまとめた審査票。自社の審査に合わせて書き換えて使う。",
+    "A review form that puts the checks for one AI use case in question form. Adapt it to your own review process."
+   ],
+   "sections": [
+    {
+     "h": [
+      "基本情報",
+      "Basic information"
+     ],
+     "lines": [
+      {
+       "t": [
+        "このAI利用の業務と目的は何か",
+        "What business task and purpose does this AI use serve?"
+       ],
+       "cite": [
+        "kit:inv.fields:2"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "所管部門と責任者は氏名まで決まっているか。事故時に判断・停止できる人か",
+        "Are the responsible department and owner named down to the person, and can that person decide and stop the AI in an incident?"
+       ],
+       "cite": [
+        "kit:inv.fields:3"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "使うモデル・サービス、提供者、版、契約を追えるか",
+        "Can we trace the model or service, its provider, version and contract?"
+       ],
+       "cite": [
+        "kit:inv.fields:5",
+        "kit:inv.fields:1"
+       ],
+       "judge": false
+      }
+     ]
+    },
+    {
+     "h": [
+      "影響を受ける人",
+      "People affected"
+     ],
+     "lines": [
+      {
+       "t": [
+        "操作する人と結果を受ける人（顧客・従業員・第三者）を分けて書いたか",
+        "Have we separated the people who operate the AI from those who receive its results (customers, employees, third parties)?"
+       ],
+       "cite": [
+        "kit:inv.fields:4"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "年齢や脆弱性のある利用者への提供方針は決まっているか",
+        "Is there a policy for providing the service to minors or vulnerable users?"
+       ],
+       "cite": [
+        "kit:cust.pre:8"
+       ],
+       "judge": false
+      }
+     ]
+    },
+    {
+     "h": [
+      "判断への影響",
+      "Effect on decisions"
+     ],
+     "lines": [
+      {
+       "t": [
+        "AIの出力は人の判断の補助か、自動で結果が決まるか（自動化の度合いで統制の重さが変わる）",
+        "Does the AI output only assist a person's judgement, or does it decide automatically? (The degree of automation sets how heavy the controls are)"
+       ],
+       "cite": [
+        "kit:inv.fields:7"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "コロラド州の消費者への重大な決定（2027年1月1日以降）に使うなら、事前告知、不利な結果への30日以内の説明、求めに応じた訂正・再審査を用意したか",
+        "If used for significant decisions about Colorado consumers (from 1 Jan 2027), are prior notice, an explanation within 30 days of an adverse outcome, and, on request, data correction and human review (where commercially reasonable) ready?"
+       ],
+       "cite": [
+        "reg:us-co-sb26-189:duty:1",
+        "reg:us-co-sb26-189:duty:2",
+        "reg:us-co-sb26-189:jp:0"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "韓国向けのAIサービスが採用・融資審査・医療などに関わるなら、高影響AIに当たるかを事前に検討したか（韓国AI基本法第33条）",
+        "If our AI service for South Korea is involved in hiring, credit screening or healthcare, did we assess in advance whether it is high-impact AI? (Korea AI Basic Act, Art. 33)"
+       ],
+       "cite": [
+        "reg:kr-ai-basic-act:duty:0",
+        "reg:kr-ai-basic-act:what:2",
+        "reg:kr-ai-basic-act:jp:0"
+       ],
+       "judge": false
+      }
+     ]
+    },
+    {
+     "h": [
+      "扱うデータ",
+      "Data handled"
+     ],
+     "lines": [
+      {
+       "t": [
+        "個人データを入力するなら、利用目的の範囲内か。同意がなければ、事業者が機械学習に使わないと確認したか",
+        "If personal data is entered, is it within the purpose of use? Without consent, have we confirmed the provider does not use it for machine learning?"
+       ],
+       "cite": [
+        "reg:jp-ppc-genai-alert:duty:0",
+        "reg:jp-ppc-genai-alert:duty:1"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "要配慮個人情報（病歴・信条など）を取得するなら、原則として事前に本人の同意があるか（日本の個人情報保護法）",
+        "If sensitive personal information (medical history, beliefs, etc.) is collected, is there prior consent in principle? (Japan's personal information protection law)"
+       ],
+       "cite": [
+        "ind:hr:個人情報の保護に関する法律（個人情報保護:1"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "学習・RAG用データの出所（海賊版か、有償DBか、クローラ制限の有無）を点検したか",
+        "Have we checked where training and RAG data come from (pirated copies, paid databases, crawler restrictions)?"
+       ],
+       "cite": [
+        "reg:jp-copyright-ai:jp:0",
+        "reg:jp-copyright-ai:duty:0"
+       ],
+       "judge": false
+      }
+     ]
+    },
+    {
+     "h": [
+      "顧客向けか",
+      "Customer-facing use"
+     ],
+     "lines": [
+      {
+       "t": [
+        "顧客に、AIと話していることを最初に示すか（EU向けはEU AI法第50条の義務になりうる。対話型AIは相手がAIと分かる設計にする）",
+        "Do we tell customers up front that they are talking to AI? (For the EU this can be an obligation under Article 50 of the EU AI Act: interactive AI is designed so people know it is AI)"
+       ],
+       "cite": [
+        "kit:cust.pre:0",
+        "reg:eu-ai-act-art50:duty:0"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "誤りの指摘と苦情を受け付ける窓口と、人への切り替えを用意するか",
+        "Is there a channel for reporting errors and complaints, and a way to hand over to a person?"
+       ],
+       "cite": [
+        "kit:cust.pre:5"
+       ],
+       "judge": false
+      }
+     ]
+    },
+    {
+     "h": [
+      "自律実行と権限",
+      "Autonomy and authority"
+     ],
+     "lines": [
+      {
+       "t": [
+        "エージェント型なら、自律度・ツール・データアクセスの上限を決めたか（シンガポールIMDAの枠組み）",
+        "For agent-type AI, have we set limits on autonomy, tools and data access? (Singapore IMDA framework)"
+       ],
+       "cite": [
+        "reg:sg-imda-agentic-ai-framework:what:0"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "重要な局面で人の承認を挟み、その承認が有効かを定期的に監査するか",
+        "Is human approval required at key points, and is its effectiveness audited regularly?"
+       ],
+       "cite": [
+        "reg:sg-imda-agentic-ai-framework:duty:1"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "誰がいつ介入・停止できるかが決まり、停止の手順を訓練しているか",
+        "Is it settled who can intervene or stop the AI and when, and are the stop steps rehearsed?"
+       ],
+       "cite": [
+        "kit:inv.fields:17",
+        "kit:cust.pre:11"
+       ],
+       "judge": false
+      }
+     ]
+    },
+    {
+     "h": [
+      "評価の計画",
+      "Evaluation plan"
+     ],
+     "lines": [
+      {
+       "t": [
+        "公開前の評価、合格基準、承認者を決めて記録したか",
+        "Have we decided and recorded the pre-release evaluation, acceptance criteria and approver?"
+       ],
+       "cite": [
+        "kit:cust.pre:13",
+        "kit:inv.fields:10"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "オフライン評価・人手評価・レッドチーミングなどから、この用途に合う評価を選んだか",
+        "Have we chosen evaluations that fit this use from options such as offline tests, human review and red teaming?"
+       ],
+       "cite": [
+        "kit:eval.kinds:0",
+        "kit:eval.kinds:3",
+        "kit:eval.kinds:4"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "モデルやプロンプトの変更、事故、規制変更のときに再評価する条件を先に決めたか",
+        "Have we set in advance the triggers for re-evaluation, such as model or prompt changes, incidents and regulatory changes?"
+       ],
+       "cite": [
+        "kit:eval.accept:3"
+       ],
+       "judge": false
+      }
+     ]
+    },
+    {
+     "h": [
+      "市場・法域と判定",
+      "Markets, jurisdictions and decision"
+     ],
+     "lines": [
+      {
+       "t": [
+        "提供先と利用者の所在地の法令を、適用規制・法域として書いたか（EU AI法は、EU域外の事業者もEU市場にAIを出す・EUで使うなら対象）",
+        "Have we recorded the laws of where the service is offered and where users are as applicable rules and jurisdictions? (The EU AI Act also covers non-EU businesses that place AI on the EU market or use it in the EU)"
+       ],
+       "cite": [
+        "kit:inv.fields:9",
+        "reg:eu-ai-act:what:2"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "承認は責任者が残るリスクを受け入れて署名したか。条件や期限、次回見直し日は書いたか",
+        "Did the owner sign to accept the remaining risk, and are conditions, deadline and next review date written down?"
+       ],
+       "cite": [
+        "kit:inv.flow:3",
+        "kit:inv.fields:14"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "不承認なら、再申請に必要な条件を申請者に伝えるか",
+        "If rejected, do we tell the applicant what is needed to apply again?"
+       ],
+       "cite": [],
+       "judge": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "vendor",
+   "name": [
+    "ベンダー・モデル審査の質問票",
+    "Vendor and model due-diligence questionnaire"
+   ],
+   "purpose": [
+    "外部のAIサービスやモデルの提供者に聞く質問をまとめた質問票。自社の調達・審査に合わせて書き換えて使う。",
+    "A questionnaire to put to providers of external AI services and models. Adapt it to your procurement and review process."
+   ],
+   "sections": [
+    {
+     "h": [
+      "入力の学習利用",
+      "Use of inputs for training"
+     ],
+     "lines": [
+      {
+       "t": [
+        "入力データを学習に使いますか。使う場合の範囲と、使わない設定や契約上の定めを教えてください",
+        "Do you use input data for training? If so, to what extent, and what settings or contract terms stop that use?"
+       ],
+       "cite": [
+        "reg:jp-ppc-genai-alert:what:2",
+        "reg:jp-meti-contract-checklist:what:1"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "出力（生成物）の利用条件は、契約・規約でどう定められていますか",
+        "How do the contract and terms set the conditions for using outputs (generated content)?"
+       ],
+       "cite": [
+        "reg:jp-meti-contract-checklist:duty:0",
+        "reg:jp-meti-contract-checklist:what:1"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "個人データを渡す場合、貴社は委託先と第三者のどちらに当たると整理していますか",
+        "If we pass personal data, do you treat yourself as a contractor or as a third party?"
+       ],
+       "cite": [
+        "reg:jp-meti-contract-checklist:duty:2"
+       ],
+       "judge": false
+      }
+     ]
+    },
+    {
+     "h": [
+      "保存・再委託・所在",
+      "Storage, subcontracting and location"
+     ],
+     "lines": [
+      {
+       "t": [
+        "入力・出力・ログの保存場所、保持期間、削除の方法はどうなっていますか",
+        "Where are inputs, outputs and logs stored, for how long, and how are they deleted?"
+       ],
+       "cite": [],
+       "judge": true
+      },
+      {
+       "t": [
+        "再委託の手続は、契約でどう定められていますか（主要行等向け監督指針の外部委託の確認点を当てはめたもの。AI固有の規定ではない）",
+        "How does the contract set the procedure for subcontracting? (Applied from the outsourcing checks in the Comprehensive Guidelines for Supervision of Major Banks; not an AI-specific provision)"
+       ],
+       "cite": [
+        "ind:fin:主要行等向けの総合的な監督指針（Ⅲ-3-:0"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "医療情報を外部保存・委託する場合、保存先の機器等は国内法の適用・執行が及ぶ範囲にありますか（医療情報システムの安全管理に関するガイドライン）",
+        "If medical information is stored or processed externally, are the storage devices within reach of Japanese law and its enforcement? (Guidelines for the Safety Management of Medical Information Systems)"
+       ],
+       "cite": [
+        "ind:med:医療情報システムの安全管理に関するガイド:2"
+       ],
+       "judge": false
+      }
+     ]
+    },
+    {
+     "h": [
+      "セキュリティと監査",
+      "Security and audit"
+     ],
+     "lines": [
+      {
+       "t": [
+        "監査を受ける条項と、ログを保存する条項は、契約にありますか",
+        "Does the contract include an audit clause and a log-retention clause?"
+       ],
+       "cite": [
+        "reg:jp-meti-contract-checklist:what:2"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "新しい攻撃手法や脆弱性の動向を確認し、対策を更新していますか",
+        "Do you track new attack methods and vulnerabilities and update your countermeasures?"
+       ],
+       "cite": [
+        "kit:cust.run:5"
+       ],
+       "judge": false
+      }
+     ]
+    },
+    {
+     "h": [
+      "評価・レッドチーム・文書",
+      "Evaluation, red teaming and documentation"
+     ],
+     "lines": [
+      {
+       "t": [
+        "講じた対策の有効性を、レッドチーミングで攻撃者の視点から確かめていますか。結果は共有できますか",
+        "Do you verify your countermeasures through red teaming from an attacker's viewpoint, and can you share the results?"
+       ],
+       "cite": [
+        "reg:jp-aisi-guides:duty:2"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "EU市場に出すGPAIモデルの提供者は、技術情報を文書化して下流へ開示する。同等の文書を出せますか",
+        "Providers of GPAI models placed on the EU market document technical information and disclose it downstream. Can you provide equivalent documents?"
+       ],
+       "cite": [
+        "reg:eu-gpai-obligations:duty:0"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "EUのGPAI行動規範に署名していますか（署名は任意）",
+        "Have you signed the EU GPAI Code of Practice? (Signing is voluntary)"
+       ],
+       "cite": [
+        "reg:eu-gpai-code:who:0"
+       ],
+       "judge": false
+      }
+     ]
+    },
+    {
+     "h": [
+      "学習データと著作権",
+      "Training data and copyright"
+     ],
+     "lines": [
+      {
+       "t": [
+        "生成AI知財プリンシプル・コード（任意）に沿い、使用モデルや学習データ等を自社サイトで開示していますか",
+        "Following Japan's voluntary GenAI IP Principle Code, do you disclose the model used, training data, etc. on your own site?"
+       ],
+       "cite": [
+        "reg:jp-ip-principle-code:what:0",
+        "reg:jp-ip-principle-code:duty:0"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "EU市場に出すGPAIモデルについて、EU著作権法に従う方針を整え、学習内容の要約を公表していますか",
+        "For GPAI models placed on the EU market, do you have a policy to comply with EU copyright law and publish a summary of training content?"
+       ],
+       "cite": [
+        "reg:eu-gpai-obligations:duty:1",
+        "reg:eu-gpai-obligations:who:0"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "既存著作物に似た生成物を出しにくくする措置を講じていますか",
+        "Do you take measures that make outputs resembling existing works less likely?"
+       ],
+       "cite": [
+        "reg:jp-copyright-ai:duty:3"
+       ],
+       "judge": false
+      }
+     ]
+    },
+    {
+     "h": [
+      "生成物の表示",
+      "Marking of generated content"
+     ],
+     "lines": [
+      {
+       "t": [
+        "生成物に機械可読のマークを付け、検知可能にしていますか（EU向けの生成AI提供者に求められる。2026年8月2日より前に出したものは同年12月2日まで猶予）",
+        "Do you add machine-readable marks to outputs so they can be detected? (Required of generative AI providers for the EU; systems placed on the market before 2 Aug 2026 have until 2 Dec 2026)"
+       ],
+       "cite": [
+        "reg:eu-ai-act-art50:duty:1",
+        "kit:cust.pre:1",
+        "reg:eu-ai-act-art50:jp:0"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "対話型のサービスで、相手がAIだと分かる設計になっていますか（EU向け）",
+        "In interactive services, is it designed so people can tell they are dealing with AI? (EU)"
+       ],
+       "cite": [
+        "reg:eu-ai-act-art50:duty:0"
+       ],
+       "judge": false
+      }
+     ]
+    },
+    {
+     "h": [
+      "規約改定・更新・障害",
+      "Terms changes, updates and outages"
+     ],
+     "lines": [
+      {
+       "t": [
+        "利用規約を改定するとき、どのように知らせてもらえますか",
+        "When you amend the terms of use, how will we be told?"
+       ],
+       "cite": [
+        "reg:jp-meti-contract-checklist:what:2"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "モデルの更新内容・理由と、不具合の原因・対応を、どのように知らせてもらえますか",
+        "How will we be told about the content and reasons for model updates, and the cause and response to defects?"
+       ],
+       "cite": [
+        "kit:cust.run:3"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "モデルの仕様変更や提供停止のときの連絡と、代替の備えはどうなっていますか",
+        "How are we notified of specification changes or discontinuation of a model, and what alternatives exist?"
+       ],
+       "cite": [
+        "kit:cust.run:4"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "障害・事故の第一報は、何時間以内に、どの窓口から届きますか",
+        "Within how many hours, and through which contact point, will the first report of an outage or incident reach us?"
+       ],
+       "cite": [],
+       "judge": true
+      }
+     ]
+    },
+    {
+     "h": [
+      "エージェントの権限",
+      "Agent authority"
+     ],
+     "lines": [
+      {
+       "t": [
+        "エージェント機能で、自律度・使えるツール・データアクセスに上限を設けられますか",
+        "For agent features, can limits be set on autonomy, usable tools and data access?"
+       ],
+       "cite": [
+        "reg:sg-imda-agentic-ai-framework:what:0"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "重要な操作に人の承認を挟めますか。外部連携や自律実行の挙動を観測・制御できますか",
+        "Can human approval be required for important operations, and can external connections and autonomous behaviour be observed and controlled?"
+       ],
+       "cite": [
+        "reg:sg-imda-agentic-ai-framework:duty:1",
+        "reg:jp-aisi-guides:jp:0"
+       ],
+       "judge": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "incident",
+   "name": [
+    "インシデント初動の手順",
+    "Incident first-response procedure"
+   ],
+   "purpose": [
+    "AIが関わる事故が起きたときの、最初の動きを順に並べた手順。自社の体制に合わせて書き換えて使う。",
+    "A step-by-step procedure for the first moves when an incident involves AI. Adapt it to your own organisation."
+   ],
+   "sections": [
+    {
+     "h": [
+      "受付",
+      "Intake"
+     ],
+     "lines": [
+      {
+       "t": [
+        "事故の疑いを誰でも報告できる窓口と、受付番号の付け方を決める",
+        "Set up a channel where anyone can report a suspected incident, and a way to number each case"
+       ],
+       "cite": [],
+       "judge": true
+      },
+      {
+       "t": [
+        "台帳で、対象AIの名称・版と責任者を確認する",
+        "Check the inventory for the affected AI's name, version and owner"
+       ],
+       "cite": [
+        "kit:inv.fields:1",
+        "kit:inv.fields:3"
+       ],
+       "judge": false
+      }
+     ]
+    },
+    {
+     "h": [
+      "停止・遮断",
+      "Stop and isolate"
+     ],
+     "lines": [
+      {
+       "t": [
+        "停止・ロールバック・遮断を、すぐ判断して実行する",
+        "Decide at once on stopping, rolling back or isolating, and carry it out"
+       ],
+       "cite": [
+        "kit:cust.inc:0"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "台帳で停止権限を持つ人を確認し、その人が停止を判断する",
+        "Confirm in the inventory who has authority to stop the AI, and have that person decide"
+       ],
+       "cite": [
+        "kit:inv.fields:17",
+        "kit:inv.fields:3"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "外部モデルが使えないときは、用意しておいた代替に切り替える",
+        "If the external model is unavailable, switch to the prepared alternative"
+       ],
+       "cite": [
+        "kit:cust.run:4"
+       ],
+       "judge": false
+      }
+     ]
+    },
+    {
+     "h": [
+      "影響範囲",
+      "Scope of impact"
+     ],
+     "lines": [
+      {
+       "t": [
+        "被害の内容と影響範囲を確認し、関係者へ報告する",
+        "Confirm the nature and scope of the harm and report to the people concerned"
+       ],
+       "cite": [
+        "kit:cust.inc:1"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "影響を受けた人を、顧客・従業員・第三者に分けて把握する",
+        "Identify the people affected, separated into customers, employees and third parties"
+       ],
+       "cite": [
+        "kit:inv.fields:4"
+       ],
+       "judge": false
+      }
+     ]
+    },
+    {
+     "h": [
+      "報告義務の要否",
+      "Whether reporting is required"
+     ],
+     "lines": [
+      {
+       "t": [
+        "個人データの漏えい等が疑われるなら、報告義務の要否をすぐ判断する",
+        "If a leak of personal data is suspected, decide at once whether a report is mandatory"
+       ],
+       "cite": [
+        "kit:cust.inc:2"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "要配慮個人情報を含む個人データの漏えい等は、個人情報保護委員会へ報告し本人へ通知する（個人情報保護法。委託時は原則、委託元と委託先の双方に報告義務）",
+        "Report a leak of personal data containing special care-required information to Japan's Personal Information Protection Commission and notify the individual (APPI; when processing is entrusted, both the entrusting party and the processor generally have a reporting duty)"
+       ],
+       "cite": [
+        "ind:med:個人情報保護法（要配慮個人情報）と医療・:1"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "EU向けデジタル要素付き製品の製造者は、悪用中の脆弱性・重大インシデントを24時間で早期警告、72時間で通知（2026年9月11日から）",
+        "A manufacturer of products with digital elements for the EU gives an early warning within 24 hours and a notification within 72 hours of exploited vulnerabilities or severe incidents (from 11 Sep 2026)"
+       ],
+       "cite": [
+        "reg:eu-cra:duty:1"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "EU市場に出すシステミックリスクのあるGPAIモデルの提供者は、重大インシデントの報告も求められる",
+        "A provider of a systemic-risk GPAI model placed on the EU market is also required to report serious incidents"
+       ],
+       "cite": [
+        "reg:eu-gpai-obligations:what:1"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "報告の要否と、その判断の理由を、法務・個人情報の担当と一緒に決めて記録する",
+        "Decide whether to report, and the reasons, together with legal and privacy staff, and record it"
+       ],
+       "cite": [],
+       "judge": true
+      }
+     ]
+    },
+    {
+     "h": [
+      "証拠",
+      "Evidence"
+     ],
+     "lines": [
+      {
+       "t": [
+        "あらかじめ決めたログ（項目・保存期間・閲覧権限）を、原因究明のために確保する",
+        "Secure the logs defined in advance (fields, retention, access rights) for finding the cause"
+       ],
+       "cite": [
+        "kit:cust.pre:10"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "事故時点のモデル・プロンプト・参照データの版を、変更履歴から特定する",
+        "Identify from the change history the versions of the model, prompt and reference data at the time of the incident"
+       ],
+       "cite": [
+        "kit:inv.fields:1",
+        "kit:inv.fields:15"
+       ],
+       "judge": false
+      }
+     ]
+    },
+    {
+     "h": [
+      "説明",
+      "Explanation"
+     ],
+     "lines": [
+      {
+       "t": [
+        "あらかじめ用意した説明・補償の方針と連絡文面に沿って、関係者へ説明する",
+        "Explain to those concerned following the pre-prepared policy on explanation and compensation and the draft messages"
+       ],
+       "cite": [
+        "kit:cust.inc:4"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "不具合の原因と対応を、利用者に知らせる",
+        "Tell users the cause of the defect and what is being done"
+       ],
+       "cite": [
+        "kit:cust.run:3"
+       ],
+       "judge": false
+      }
+     ]
+    },
+    {
+     "h": [
+      "再開の条件",
+      "Conditions to resume"
+     ],
+     "lines": [
+      {
+       "t": [
+        "改善後は再評価・再テストを通してから再開する。必要に応じてレッドチーミングをやり直す",
+        "After the fix, resume only once re-evaluation and retesting are passed, repeating red teaming where needed"
+       ],
+       "cite": [
+        "kit:cust.inc:5"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "モデルやプロンプトを直したなら、影響に応じて再評価し、承認し直してから再開する",
+        "If the model or prompt was changed, re-evaluate according to the impact and re-approve before resuming"
+       ],
+       "cite": [
+        "kit:inv.flow:6"
+       ],
+       "judge": false
+      }
+     ]
+    },
+    {
+     "h": [
+      "再発防止と台帳",
+      "Prevention and inventory update"
+     ],
+     "lines": [
+      {
+       "t": [
+        "原因調査・復旧・再発防止の結果をまとめ、最終報告を必要に応じて経営層へ上げる",
+        "Summarise the cause investigation, recovery and prevention measures, and escalate the final report to management where needed"
+       ],
+       "cite": [
+        "kit:cust.inc:3",
+        "kit:cust.inc:5"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "台帳のインシデント・苦情の履歴を更新する（再評価や統制強化の根拠になる）",
+        "Update the incident and complaint history in the inventory (it supports re-evaluation and stronger controls)"
+       ],
+       "cite": [
+        "kit:inv.fields:16"
+       ],
+       "judge": false
+      },
+      {
+       "t": [
+        "事故を再評価の契機にし、結果を変更履歴・再評価の記録に残す",
+        "Treat the incident as a trigger for re-evaluation and keep the result in the change and re-evaluation records"
+       ],
+       "cite": [
+        "kit:eval.accept:3",
+        "kit:inv.fields:15"
+       ],
+       "judge": false
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

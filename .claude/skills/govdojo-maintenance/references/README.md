@@ -22,3 +22,4 @@
 | QUIZ_BRIEF.md・QUIZ2/3/4_BRIEF.md | 判定演習の作問 |
 | SCEN_BRIEF.md | シナリオの作成 |
 | QAUDIT_BRIEF.md | 問題・シナリオの検算 |
+| TPL_BRIEF.md・AUDIT_TPL_BRIEF.md | ひな形の下書きと、根拠の行との突き合わせ |
