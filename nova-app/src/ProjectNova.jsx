@@ -163614,6 +163614,7 @@ function GovOverview({ en, onMode }) {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))", gap: 10, marginBottom: 16 }}>
         {[["usecase", en ? `By use case: ${(GOVUC && GOVUC.list.length) || 0} common uses of AI` : `ユースケースから引く：よくある使い方${(GOVUC && GOVUC.list.length) || 0}つ`, en ? "Hiring, credit, chatbots, internal RAG, agents, products, cameras, content — the rules, incidents and drills for each" : "採用・与信・チャットボット・社内RAG・エージェント・製品・カメラ・生成コンテンツごとに、規定・事例・演習をまとめて"],
           ["profile", en ? "My checklist" : "自社チェック表", en ? "Pick your industries and markets; record status, owners and evidence; one-page summary for executives" : "業界と市場を選び、対応状況・担当・根拠を記録。経営層向けの1枚も"],
+          ["workshop", en ? "Workshop mode for instructors" : "講師用ワークショップ", en ? "Project a scenario, run a timed discussion, count hands, reveal the answer and principle, save the tally" : "シナリオを投影し、時間を決めて討議、挙手を数えて答えと原則を開く。集計も保存"],
           ...(GOVTPL && GOVTPL.list.length ? [["templates", en ? "Templates" : "ひな形", en ? "Policy outline, use-case review sheet, vendor questionnaire, incident first response — each line with its source or marked as judgement" : "AI利用規程の骨子・ユースケース審査票・ベンダー質問票・インシデント初動。各行に根拠、無い行は「判断」と明記"]] : []),
           ["diagrams", en ? "Diagrams: how attacks work and where to stop them" : "図解：攻撃の仕組みと、止める場所", en ? "Lethal trifecta, agent boundaries, response steps and reporting clocks, three control layers" : "致死的三要素・エージェントの境界・対応の流れと報告期限・統制の三層"],
           ["incidents", en ? `Incidents: ${GOVDOJO_INCIDENTS.length} real cases, 2024–2026` : `インシデント事例：2024〜2026年の実例${GOVDOJO_INCIDENTS.length}件`, en ? "Each broken into how it worked, causes in three layers and the countermeasure for each cause" : "仕組み・3層の要因・要因ごとの対策に分解"],
@@ -165458,7 +165459,7 @@ function GovKit({ en, tab0 }) {
 }
 
 // ---------- 共有リンク（#megatech/govdojo/<画面>?キー=値）と提案系タブへの導線 ----------
-const GOV_MODES = ["home", "usecase", "templates", "diagrams", "incidents", "quiz", "scenario", "risk", "regmap", "industry", "profile", "usecase", "templates", "workshop", "lowcode", "kit", "fresh", "taxonomy", "exam"];
+const GOV_MODES = ["home", "usecase", "templates", "workshop", "diagrams", "incidents", "quiz", "scenario", "risk", "regmap", "industry", "profile", "usecase", "templates", "workshop", "lowcode", "kit", "fresh", "taxonomy", "exam"];
 function govDeep() {
   try {
     const h = (window.location.hash || "").replace(/^#\/?/, "");
@@ -165718,6 +165719,177 @@ function GovTemplates({ en, deep, onTab }) {
         </div>
       ))}
       <GovToSales en={en} onTab={onTab} />
+    </div>
+  );
+}
+
+// ---------- 講師用ワークショップ（シナリオを投影し、討議・挙手・答えの開示を進める） ----------
+// 進行のための問いは、道場の作成者が用意した判断（事実の主張ではない）
+const GOVWS_PROMPTS = {
+  setup: [["この場面で、最初に判断するのは誰か", "Who should make the first call here?"], ["影響を受けるのは誰か（社内・顧客・第三者）", "Who is affected (staff, customers, third parties)?"], ["関わりそうな規定・社内ルールは何か", "Which rules or internal policies are likely to apply?"], ["足りない情報は何か。誰に確かめるか", "What is missing, and whom would you ask?"]],
+  reveal: [["選ばなかった選択肢は、どんな前提なら正しくなるか", "Under what assumptions would the other options be right?"], ["自社で同じことが起きたら、どこで止められるか", "If this happened here, where would we catch it?"], ["この原則を、自社の規程や審査票のどこに書くか", "Where in our policy or review sheet would this principle go?"]],
+};
+const GOVWS_ABC = ["A", "B", "C", "D", "E"];
+function GovWorkshop({ en, go }) {
+  const L = (x) => GOVX_L(x, en);
+  const G = (o, k) => (en && o[k + "En"]) || o[k];
+  const ucs = (GOVUC && GOVUC.list) || [];
+  const [uc, setUc] = useState("all");
+  const [scId, setScId] = useState(null);
+  const [si, setSi] = useState(-1); // -1 は状況説明
+  const [rev, setRev] = useState(false);
+  const [votes, setVotes] = useState({});
+  const [done, setDone] = useState(false);
+  const [scale, setScale] = useState(1.15);
+  const [secs, setSecs] = useState(120);
+  const [left, setLeft] = useState(120);
+  const [run, setRun] = useState(false);
+  const [showP, setShowP] = useState(true);
+  const box = useRef(null);
+  const sc = GOVDOJO_SCENARIOS.find((x) => x.id === scId);
+  const pool = uc === "all" ? GOVDOJO_SCENARIOS : GOVDOJO_SCENARIOS.filter((x) => (ucs.find((u) => u.key === uc) || { scen: [] }).scen.includes(x.id));
+  useEffect(() => {
+    if (!run) return undefined;
+    const t = setInterval(() => setLeft((v) => { if (v <= 1) { setRun(false); return 0; } return v - 1; }), 1000);
+    return () => clearInterval(t);
+  }, [run]);
+  const resetTimer = (n) => { setRun(false); setSecs(n); setLeft(n); };
+  const start = (id) => { setScId(id); setSi(-1); setRev(false); setVotes({}); setDone(false); resetTimer(secs); };
+  const step = sc && si >= 0 ? sc.steps[si] : null;
+  const vk = (i) => (votes[si] || [])[i] || 0;
+  const vote = (i, d) => setVotes((v) => { const a = (v[si] || []).slice(); while (a.length <= i) a.push(0); a[i] = Math.max(0, (a[i] || 0) + d); return { ...v, [si]: a }; });
+  const next = () => {
+    if (!sc) return;
+    if (si === -1) { setSi(0); setRev(false); resetTimer(secs); return; }
+    if (!rev) { setRev(true); setRun(false); return; }
+    if (si < sc.steps.length - 1) { setSi(si + 1); setRev(false); resetTimer(secs); return; }
+    setDone(true); setRun(false);
+  };
+  const back = () => { if (done) { setDone(false); return; } if (rev) { setRev(false); return; } if (si >= 0) { setSi(si - 1); setRev(si - 1 >= 0); } };
+  // 講師の操作：→ 次へ（答えを出す）、← 戻る、スペース タイマー、1〜4 挙手を1つ足す
+  useEffect(() => {
+    if (!sc) return undefined;
+    const f = (e) => {
+      const tag = (e.target && e.target.tagName) || "";
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      if (e.key === "ArrowRight") { e.preventDefault(); next(); }
+      else if (e.key === "ArrowLeft") { e.preventDefault(); back(); }
+      else if (e.key === " ") { e.preventDefault(); setRun((r) => !r); }
+      else if (step && !rev && /^[1-5]$/.test(e.key) && Number(e.key) <= step.choices.length) vote(Number(e.key) - 1, 1);
+    };
+    window.addEventListener("keydown", f);
+    return () => window.removeEventListener("keydown", f);
+  });
+  const full = () => { try { if (document.fullscreenElement) document.exitFullscreen(); else if (box.current && box.current.requestFullscreen) box.current.requestFullscreen(); } catch (e) {} };
+  const mmss = (n) => `${Math.floor(n / 60)}:${String(n % 60).padStart(2, "0")}`;
+  const fs = (n) => `${Math.round(n * scale * 10) / 10}px`;
+  const rows = () => {
+    const out = [[en ? "Scenario" : "シナリオ", en ? "Question" : "問い", en ? "Option" : "選択肢", en ? "Correct" : "正解", en ? "Votes" : "挙手", en ? "Share" : "割合"]];
+    sc.steps.forEach((st, k) => { const tot = (votes[k] || []).reduce((a, b) => a + b, 0); st.choices.forEach((c, i) => { const n = (votes[k] || [])[i] || 0; out.push([G(sc, "title"), G(st, "q"), `${GOVWS_ABC[i]}. ${G(c, "t")}`, c.ok ? "○" : "", n, tot ? Math.round((n / tot) * 100) + "%" : ""]); }); });
+    return out;
+  };
+
+  if (!sc) {
+    return (
+      <div>
+        <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.75, marginBottom: 8 }}>{en ? "For instructors: project a scenario, let the room discuss against a timer, count hands for each option, then reveal the answer with the feedback and principle. Keys: → next / reveal, ← back, space starts or pauses the timer, 1–4 adds a vote." : "講師用。シナリオを投影し、タイマーで討議し、選択肢ごとに挙手を数えてから、答えと解説・原則を開く。操作キー：→ 次へ（答えを出す）、← 戻る、スペース タイマーの開始・停止、1〜4 挙手を1つ足す。"}</div>
+        <div style={{ fontSize: 11, color: C.dim, marginBottom: 6 }}>{en ? "Pick scenarios by use case" : "ユースケースで絞る"}</div>
+        <GovPills items={[["all", en ? `All (${GOVDOJO_SCENARIOS.length})` : `すべて（${GOVDOJO_SCENARIOS.length}）`], ...ucs.map((u) => [u.key, `${L(u.name)}（${u.scen.length}）`])]} val={uc} onPick={setUc} />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,250px),1fr))", gap: 8 }}>
+          {pool.map((x) => (
+            <button key={x.id} onClick={() => start(x.id)} style={{ textAlign: "left", background: C.surface, border: `1px solid ${C.line}`, borderLeft: `4px solid ${GOVDOJO_TIER[x.tier] || C.line}`, borderRadius: 10, padding: "10px 12px", cursor: "pointer", color: C.text }}>
+              <div style={{ fontSize: 10.5, color: C.dim }}>{G(x, "industry")}・{L(GOVDOJO_TIER_LABEL[x.tier] || [x.tier, x.tier])}・{en ? `${x.steps.length} questions` : `問い${x.steps.length}つ`}</div>
+              <div style={{ fontSize: 13, fontWeight: 800, lineHeight: 1.45, marginTop: 2 }}>{G(x, "title")}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  const tot = (votes[si] || []).reduce((a, b) => a + b, 0);
+  const panel = { background: C.surface, border: `1px solid ${C.line}`, borderRadius: 12, padding: "14px 18px" };
+  return (
+    <div ref={box} style={{ background: C.bg, color: C.text, padding: 12, borderRadius: 12, overflowY: "auto", maxHeight: "100vh" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+        <div style={{ fontSize: fs(13), fontWeight: 800, color: C.gold }}>{G(sc, "title")}<span style={{ fontSize: fs(11), color: C.dim, marginLeft: 8, fontWeight: 600 }}>{done ? (en ? "Wrap-up" : "まとめ") : si < 0 ? (en ? "Situation" : "状況") : en ? `Question ${si + 1} of ${sc.steps.length}` : `問い ${si + 1}／${sc.steps.length}`}</span></div>
+        <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
+          <span style={{ fontSize: fs(22), fontWeight: 800, fontVariantNumeric: "tabular-nums", color: left === 0 ? C.wine : run ? C.teal : C.text, minWidth: 64, textAlign: "right" }}>{mmss(left)}</span>
+          <button className="gh-btn" onClick={() => setRun(!run)}>{run ? (en ? "Pause" : "止める") : (en ? "Start" : "開始")}</button>
+          {[60, 120, 180, 300].map((n) => <button key={n} className="gh-btn" onClick={() => resetTimer(n)} style={secs === n ? { borderColor: C.gold, color: C.gold } : {}}>{n / 60}{en ? "m" : "分"}</button>)}
+          <button className="gh-btn" onClick={() => setScale(Math.max(0.9, scale - 0.15))}>A−</button>
+          <button className="gh-btn" onClick={() => setScale(Math.min(2, scale + 0.15))}>A＋</button>
+          <button className="gh-btn" onClick={full}>{en ? "Full screen" : "全画面"}</button>
+          <button className="gh-btn" onClick={() => { try { if (document.fullscreenElement) document.exitFullscreen(); } catch (e) {} setScId(null); }}>{en ? "End" : "終える"}</button>
+        </div>
+      </div>
+
+      {si < 0 && !done ? (
+        <div style={panel}>
+          <div style={{ fontSize: fs(17), lineHeight: 1.8 }}>{G(sc, "setup")}</div>
+        </div>
+      ) : null}
+
+      {step && !done ? (
+        <div style={panel}>
+          <div style={{ fontSize: fs(20), fontWeight: 800, lineHeight: 1.6, marginBottom: 10 }}>{G(step, "q")}</div>
+          {step.choices.map((c, i) => {
+            const n = vk(i), pct = tot ? Math.round((n / tot) * 100) : 0;
+            const good = rev && c.ok, bad = rev && !c.ok;
+            return (
+              <div key={i} style={{ border: `2px solid ${good ? C.teal : C.line}`, background: good ? "rgba(77,182,172,0.10)" : C.bg, borderRadius: 10, padding: "8px 12px", marginBottom: 8, opacity: bad ? 0.75 : 1 }}>
+                <div style={{ display: "flex", gap: 10, alignItems: "flex-start", flexWrap: "wrap" }}>
+                  <span style={{ flex: "0 0 auto", fontSize: fs(18), fontWeight: 800, color: good ? C.teal : C.gold }}>{GOVWS_ABC[i]}{good ? " ✓" : ""}</span>
+                  <span style={{ flex: "1 1 220px", minWidth: 0, fontSize: fs(16), lineHeight: 1.6 }}>{G(c, "t")}</span>
+                  <span style={{ flex: "0 0 auto", display: "flex", alignItems: "center", gap: 4, marginLeft: "auto" }}>
+                    {!rev ? <button className="gh-btn" onClick={() => vote(i, -1)} aria-label="−">−</button> : null}
+                    <span style={{ fontSize: fs(18), fontWeight: 800, minWidth: 28, textAlign: "center", fontVariantNumeric: "tabular-nums" }}>{n}</span>
+                    {!rev ? <button className="gh-btn" onClick={() => vote(i, 1)} aria-label="+">＋</button> : null}
+                  </span>
+                </div>
+                <div style={{ height: 6, background: C.surface2, borderRadius: 99, marginTop: 6, overflow: "hidden" }}><div style={{ width: pct + "%", height: "100%", background: good ? C.teal : C.gold }} /></div>
+                {rev ? <div style={{ fontSize: fs(13.5), color: C.muted, lineHeight: 1.65, marginTop: 6 }}>{G(c, "fb")}</div> : null}
+              </div>
+            );
+          })}
+          <div style={{ fontSize: fs(12), color: C.dim }}>{en ? `${tot} votes` : `挙手 ${tot}人`}{rev && tot ? (en ? ` · ${Math.round(((vk(step.choices.findIndex((c) => c.ok))) / tot) * 100)}% chose the answer` : `・正解を選んだ割合 ${Math.round((vk(step.choices.findIndex((c) => c.ok)) / tot) * 100)}%`) : ""}</div>
+          {rev ? <div style={{ ...DGM_DETAIL, borderLeftColor: C.gold, marginTop: 10, fontSize: fs(14.5), lineHeight: 1.7 }}><b style={{ color: C.gold }}>{en ? "Principle: " : "原則："}</b>{G(step, "principle")}</div> : null}
+        </div>
+      ) : null}
+
+      {done ? (
+        <div style={panel}>
+          <div style={{ fontSize: fs(17), fontWeight: 800, marginBottom: 8 }}>{en ? "How the room answered" : "会場の答え"}</div>
+          {sc.steps.map((st, k) => {
+            const vs = votes[k] || [], t = vs.reduce((a, b) => a + b, 0), ok = st.choices.findIndex((c) => c.ok);
+            return (
+              <div key={k} style={{ borderBottom: `1px solid ${C.line}`, padding: "6px 0" }}>
+                <div style={{ fontSize: fs(14), fontWeight: 700 }}>{k + 1}. {G(st, "q")}</div>
+                <div style={{ fontSize: fs(12.5), color: C.muted }}>{en ? "Answer: " : "答え："}{GOVWS_ABC[ok]}{t ? (en ? ` · ${Math.round(((vs[ok] || 0) / t) * 100)}% of ${t} votes` : `・${t}人中 ${Math.round(((vs[ok] || 0) / t) * 100)}%`) : (en ? " · no votes counted" : "・挙手は数えていない")}</div>
+                <div style={{ fontSize: fs(12.5), color: C.gold, marginTop: 2 }}>{G(st, "principle")}</div>
+              </div>
+            );
+          })}
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 10 }}>
+            <button className="gh-btn" onClick={() => govSave(`govdojo_workshop_${sc.id}.csv`, govCsv(rows()), "text/csv;charset=utf-8")}>{en ? "Save the tally (CSV)" : "集計を保存（CSV）"}</button>
+            {go && GOVTPL && GOVTPL.list.some((t) => t.id === "review") ? <button className="gh-btn" onClick={() => go("templates", { t: "review" })}>{en ? "Open the use-case review sheet →" : "ユースケース審査票を開く →"}</button> : null}
+          </div>
+        </div>
+      ) : null}
+
+      {showP && !done && (si < 0 || rev) ? (
+        <div style={{ ...panel, marginTop: 10, background: C.surface2 }}>
+          <div style={{ fontSize: fs(12), color: C.gold, marginBottom: 4 }}>{en ? "Discussion prompts (judgement: prepared by the dojo authors)" : "討議の問い（判断：道場の作成者が用意）"}</div>
+          {(si < 0 ? GOVWS_PROMPTS.setup : GOVWS_PROMPTS.reveal).map((p, i) => <div key={i} style={{ fontSize: fs(14.5), lineHeight: 1.7 }}>・{L(p)}</div>)}
+        </div>
+      ) : null}
+
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 6 }}>
+          <button className="gh-btn" onClick={back} disabled={si < 0 && !done}>{en ? "← Back" : "← 戻る"}</button>
+          <button className="gh-btn" onClick={() => setShowP(!showP)}>{showP ? (en ? "Hide prompts" : "問いを隠す") : (en ? "Show prompts" : "問いを出す")}</button>
+        </div>
+        {!done ? <button className="gh-btn" onClick={next} style={{ borderColor: C.teal, color: C.teal, fontWeight: 800 }}>{si < 0 ? (en ? "First question →" : "最初の問いへ →") : !rev ? (en ? "Reveal the answer →" : "答えを出す →") : si < sc.steps.length - 1 ? (en ? "Next question →" : "次の問いへ →") : (en ? "Wrap-up →" : "まとめへ →")}</button> : null}
+      </div>
     </div>
   );
 }
@@ -166069,7 +166241,7 @@ function GovDojo({ onTab } = {}) {
   const [nav, setNav] = useState(null);
   const go = (m, o) => { setNav({ m, ...(o || {}), n: Date.now() }); setMode(m); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} };
   const navOf = (m) => (nav && nav.m === m ? nav : null);
-  const modes = [["home", ["概要", "Overview"]], ["usecase", ["ユースケースから引く", "By use case"]], ["diagrams", ["図解", "Diagrams"]], ["incidents", ["インシデント事例", "Incidents"]], ["quiz", ["判定演習", "Drills"]], ["scenario", ["シナリオ", "Scenarios"]], ["risk", ["リスク評価実務", "Risk practice"]], ["regmap", ["規制マップ", "Regulation map"]], ["industry", ["業界別チェック", "Industry checks"]], ["profile", ["自社チェック表", "My checklist"]], ["templates", ["ひな形", "Templates"]], ["lowcode", ["ローコード統制", "Low-code governance"]], ["kit", ["実務キット", "Practice kits"]], ["fresh", ["鮮度・要再確認", "Freshness & re-check"]], ["taxonomy", ["論点体系", "Issue taxonomy"]], ["exam", ["模試", "Mock exam"]]];
+  const modes = [["home", ["概要", "Overview"]], ["usecase", ["ユースケースから引く", "By use case"]], ["diagrams", ["図解", "Diagrams"]], ["incidents", ["インシデント事例", "Incidents"]], ["quiz", ["判定演習", "Drills"]], ["scenario", ["シナリオ", "Scenarios"]], ["workshop", ["講師用ワークショップ", "Workshop (instructor)"]], ["risk", ["リスク評価実務", "Risk practice"]], ["regmap", ["規制マップ", "Regulation map"]], ["industry", ["業界別チェック", "Industry checks"]], ["profile", ["自社チェック表", "My checklist"]], ["templates", ["ひな形", "Templates"]], ["lowcode", ["ローコード統制", "Low-code governance"]], ["kit", ["実務キット", "Practice kits"]], ["fresh", ["鮮度・要再確認", "Freshness & re-check"]], ["taxonomy", ["論点体系", "Issue taxonomy"]], ["exam", ["模試", "Mock exam"]]];
   return (
     <div>
       <SectionTitle jp="AIセキュリティ・ガバナンス道場 — 読むだけでなく、判断を訓練する" en="AI Security & Governance Dojo — train judgment, not just reading" />
@@ -166088,11 +166260,12 @@ function GovDojo({ onTab } = {}) {
       {mode === "usecase" && <GovUseCase en={en} go={go} onIncident={openIncident} onTab={onTab} deep={deep && deep.mode === "usecase" ? deep.q : null} />}
       {mode === "quiz" && <GovQuiz en={en} preset={navOf("quiz") ? navOf("quiz").preset : null} />}
       {mode === "scenario" && <GovScenarios en={en} />}
+      {mode === "workshop" && <GovWorkshop en={en} go={go} />}
       {mode === "risk" && <GovRiskPractice en={en} />}
       {mode === "regmap" && <GovRegMap en={en} deep={deep && deep.mode === "regmap" ? deep.q : null} />}
       {mode === "industry" && <GovIndustry en={en} onMode={setMode} onTab={onTab} deep={navOf("industry") ? { k: navOf("industry").k } : deep && deep.mode === "industry" ? deep.q : null} />}
       {mode === "profile" && <GovProfile en={en} onTab={onTab} init={deep && deep.mode === "profile" ? { inds: deep.q.i ? deep.q.i.split(",").filter((k) => GOVIND.some((d) => d.key === k)) : [], mk: deep.q.m ? deep.q.m.split(",").filter((r) => GOVREG_ORDER.includes(r)) : ["日本"], th: deep.q.t || "ALL", view: deep.q.v === "exec" ? "exec" : "list" } : null} />}
-      {mode === "templates" && <GovTemplates en={en} onTab={onTab} deep={deep && deep.mode === "templates" ? deep.q : null} />}
+      {mode === "templates" && <GovTemplates en={en} onTab={onTab} deep={navOf("templates") ? { t: navOf("templates").t } : deep && deep.mode === "templates" ? deep.q : null} />}
       {mode === "lowcode" && <GovLowCode en={en} />}
       {mode === "kit" && <GovKit en={en} tab0={navOf("kit") ? navOf("kit").tab : null} />}
       {mode === "fresh" && <GovFresh en={en} />}
