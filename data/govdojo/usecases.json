@@ -1,0 +1,675 @@
+{
+ "note": [
+  "ユースケースと規定・シナリオ・事例・問題の対応づけは、道場の作成者の判断（当てはめ）。各規定の中身は、規制マップ・業界別チェックと同じ、出典で確かめた要約をそのまま表示する。",
+  "The mapping of use cases to rules, scenarios, incidents and questions is the dojo authors' judgement. Each rule's content is the same source-checked summary used in the regulation map and industry checks."
+ ],
+ "list": [
+  {
+   "key": "hire",
+   "name": [
+    "採用・人事評価のAI",
+    "AI in hiring and HR decisions"
+   ],
+   "ex": [
+    "書類選考のランキング、面接評価の補助、人事評価コメントの作成、従業員のモニタリング",
+    "CV ranking, interview scoring support, drafting appraisal comments, employee monitoring"
+   ],
+   "regs": [
+    [
+     "us-co-sb26-189",
+     "what",
+     0
+    ],
+    [
+     "eu-ai-act",
+     "jp",
+     0
+    ],
+    [
+     "kr-ai-basic-act",
+     "what",
+     2
+    ],
+    [
+     "jp-ppc-genai-alert",
+     "jp",
+     0
+    ]
+   ],
+   "rules": [
+    [
+     "hr",
+     "職業安定法（昭和22年"
+    ],
+    [
+     "hr",
+     "男女雇用機会均等法"
+    ],
+    [
+     "hr",
+     "厚生労働省「公正な採用選考の基本」"
+    ],
+    [
+     "hr",
+     "個人情報保護委員会「雇用管理分野"
+    ],
+    [
+     "hr",
+     "EU AI規則"
+    ],
+    [
+     "hr",
+     "ニューヨーク市条例"
+    ],
+    [
+     "hr",
+     "米国EEOC"
+    ],
+    [
+     "hr",
+     "コロラド州"
+    ],
+    [
+     "rea",
+     "EU AI規則"
+    ]
+   ],
+   "scen": [
+    "sc-recruit-screening",
+    "sc-hr-applicant-data",
+    "sc-training-data-poisoning",
+    "sc-kanjo-monitoring",
+    "sc-worker-monitoring",
+    "sc-genai-eval"
+   ],
+   "inc": [
+    "mchire"
+   ],
+   "kit": [
+    "inv",
+    "eval"
+   ],
+   "lc": false,
+   "q": "採用選考|採用の一次|採用書類|採用AI|採用面接|採用に使|応募者|求職|人事評価|人事分析|面接|書類選考|従業員の(?:感情|監視|モニタ|評価|生産性)"
+  },
+  {
+   "key": "credit",
+   "name": [
+    "与信・保険引受などの審査AI",
+    "AI in credit and underwriting decisions"
+   ],
+   "ex": [
+    "与信スコア、融資審査、保険の引受・料率、不正検知のスコア",
+    "Credit scoring, loan decisions, insurance underwriting and pricing, fraud scores"
+   ],
+   "regs": [
+    [
+     "us-co-sb26-189",
+     "what",
+     3
+    ],
+    [
+     "eu-ai-act",
+     "jp",
+     0
+    ],
+    [
+     "kr-ai-basic-act",
+     "what",
+     2
+    ],
+    [
+     "sg-mas-ai-risk-management-guidelines",
+     "what",
+     0
+    ]
+   ],
+   "rules": [
+    [
+     "fin",
+     "金融庁「AIディスカッションペーパー"
+    ],
+    [
+     "fin",
+     "モデル・リスク管理に関する原則"
+    ],
+    [
+     "fin",
+     "EU AI規則"
+    ],
+    [
+     "fin",
+     "米国 モデル・リスク管理"
+    ],
+    [
+     "fin",
+     "米国 ECOA"
+    ],
+    [
+     "ins",
+     "保険業法（第100条の2"
+    ],
+    [
+     "ins",
+     "保険会社向けの総合的な監督指針（Ⅱ-2-5"
+    ],
+    [
+     "ins",
+     "EU AI規則"
+    ],
+    [
+     "ins",
+     "米国NAIC"
+    ],
+    [
+     "ins",
+     "コロラド州法 SB21-169"
+    ],
+    [
+     "ins",
+     "コロラド州保険規則"
+    ]
+   ],
+   "scen": [
+    "sc-credit-llm",
+    "sc-credit-explain",
+    "sc-fin-credit-reasons",
+    "sc-insurance-pricing",
+    "sc-jisshitsu-henkou",
+    "sc-model-validation",
+    "sc-fin-loan-memo-genai"
+   ],
+   "inc": [],
+   "kit": [
+    "riskai",
+    "eval",
+    "inv"
+   ],
+   "lc": false,
+   "q": "与信|融資|引受|料率|信用力|信用スコア|審査AI"
+  },
+  {
+   "key": "chat",
+   "name": [
+    "顧客向けチャットボット・窓口AI",
+    "Customer-facing chatbots and AI front desks"
+   ],
+   "ex": [
+    "問い合わせ対応、商品の提案、住民窓口、予約・手続きの案内",
+    "Customer support, product suggestions, public service desks, booking and procedure guidance"
+   ],
+   "regs": [
+    [
+     "eu-ai-act-art50",
+     "duty",
+     0
+    ],
+    [
+     "kr-ai-basic-act",
+     "what",
+     0
+    ],
+    [
+     "us-tx-traiga",
+     "duty",
+     0
+    ],
+    [
+     "cn-genai-interim-measures",
+     "jp",
+     0
+    ]
+   ],
+   "rules": [
+    [
+     "ret",
+     "不当景品類及び不当表示防止法"
+    ],
+    [
+     "ret",
+     "消費者契約法"
+    ],
+    [
+     "ret",
+     "EU AI規則"
+    ],
+    [
+     "fin",
+     "金融商品取引法の適合性の原則"
+    ],
+    [
+     "ins",
+     "保険業法（第294条の2"
+    ],
+    [
+     "tel",
+     "英国 オンライン安全法2023"
+    ]
+   ],
+   "scen": [
+    "sc-chatbot-tier",
+    "sc-jailbreak-guardrail",
+    "sc-over-agency",
+    "sc-public-misinfo",
+    "sc-genai-solicit",
+    "sc-ins-agent-chatbot",
+    "sc-pub-municipal-genai-procure",
+    "sc-token-dos",
+    "sc-insecure-output-xss"
+   ],
+   "inc": [
+    "mchire",
+    "grok-antisemitic"
+   ],
+   "kit": [
+    "cust",
+    "eval"
+   ],
+   "lc": false,
+   "q": "チャットボット|窓口|問い合わせ|顧客向け|対話型"
+  },
+  {
+   "key": "rag",
+   "name": [
+    "社内文書の検索・要約（RAG・社内向け生成AI）",
+    "Internal search and summarisation (RAG, in-house generative AI)"
+   ],
+   "ex": [
+    "社内規程・議事録の検索、メールや資料の要約、契約書レビューの補助",
+    "Searching policies and minutes, summarising mail and documents, contract review support"
+   ],
+   "regs": [
+    [
+     "jp-ppc-genai-alert",
+     "duty",
+     0
+    ],
+    [
+     "jp-meti-contract-checklist",
+     "what",
+     1
+    ],
+    [
+     "jp-copyright-ai",
+     "jp",
+     0
+    ]
+   ],
+   "rules": [
+    [
+     "mfg",
+     "不正競争防止法（営業秘密の保護）"
+    ],
+    [
+     "mfg",
+     "秘密情報の保護ハンドブック"
+    ],
+    [
+     "hr",
+     "個人情報保護委員会「生成AIサービス"
+    ],
+    [
+     "tel",
+     "電気通信事業法 第3条"
+    ],
+    [
+     "fin",
+     "金融分野における個人情報保護"
+    ],
+    [
+     "pro",
+     "弁護士法第23条"
+    ],
+    [
+     "pro",
+     "公認会計士法"
+    ],
+    [
+     "pub",
+     "行政の進化と革新のための生成AI"
+    ]
+   ],
+   "scen": [
+    "sc-indirect-injection",
+    "sc-shadow-drawing",
+    "sc-ma-confidential",
+    "sc-tel-mail-ai",
+    "sc-pro-office-genai",
+    "sc-mfg-drawing-overseas-ai",
+    "sc-pub-resident-data-genai",
+    "sc-vendor-review"
+   ],
+   "inc": [
+    "echoleak",
+    "searchleak",
+    "camoleak",
+    "rizap-genai-upload",
+    "shared-chat-index"
+   ],
+   "kit": [
+    "inv",
+    "eval"
+   ],
+   "lc": false,
+   "q": "RAG|検索型|社内文書|社内データ|社内規程|議事録|要約AI|要約Bot|営業秘密|顧客図面|間接プロンプト"
+  },
+  {
+   "key": "agent",
+   "name": [
+    "AIエージェント・ローコードの自動化",
+    "AI agents and low-code automation"
+   ],
+   "ex": [
+    "返金・発注などを実行するエージェント、ローコードで作る業務エージェント、開発支援のエージェント",
+    "Agents that issue refunds or orders, low-code business agents, coding agents"
+   ],
+   "regs": [
+    [
+     "sg-imda-agentic-ai-framework",
+     "what",
+     0
+    ],
+    [
+     "jp-aisi-guides",
+     "what",
+     2
+    ],
+    [
+     "jp-ai-biz-guideline",
+     "what",
+     2
+    ],
+    [
+     "jp-ai-basic-plan",
+     "what",
+     3
+    ]
+   ],
+   "rules": [],
+   "scen": [
+    "sc-over-agency",
+    "sc-indirect-injection",
+    "sc-vendor-review"
+   ],
+   "inc": [
+    "replit-saastr-db-deletion",
+    "pocketos-cursor-railway",
+    "amazon-q-wiper-prompt",
+    "openclaw-rce-clawhub",
+    "github-mcp-toxic-flow",
+    "postmark-mcp-bcc",
+    "forcedleak",
+    "comet-injection"
+   ],
+   "kit": [
+    "inv",
+    "eval"
+   ],
+   "lc": true,
+   "q": "エージェント|ローコード|Copilot Studio|Power Platform|MCP"
+  },
+  {
+   "key": "product",
+   "name": [
+    "製品・機器に組み込むAI",
+    "AI built into products and devices"
+   ],
+   "ex": [
+    "機械・ロボットの制御、医療機器のソフトウェア、自動運転、IoT製品",
+    "Machine and robot control, medical device software, automated driving, IoT products"
+   ],
+   "regs": [
+    [
+     "eu-pld",
+     "what",
+     0
+    ],
+    [
+     "eu-cra",
+     "what",
+     0
+    ],
+    [
+     "eu-ai-omnibus",
+     "what",
+     4
+    ]
+   ],
+   "rules": [
+    [
+     "mfg",
+     "IEC 62443"
+    ],
+    [
+     "mfg",
+     "製造物責任法（PL法）"
+    ],
+    [
+     "mfg",
+     "EU AI規則"
+    ],
+    [
+     "mfg",
+     "EU機械規則"
+    ],
+    [
+     "med",
+     "医薬品医療機器等法（薬機法）とプログラム医療機器"
+    ],
+    [
+     "med",
+     "変更計画確認手続制度"
+    ],
+    [
+     "med",
+     "米国FDAガイダンス"
+    ],
+    [
+     "auto",
+     "サイバーセキュリティ及びソフトウェアアップデート"
+    ],
+    [
+     "auto",
+     "製造物責任法（PL法）"
+    ],
+    [
+     "auto",
+     "EU AI規則"
+    ]
+   ],
+   "scen": [
+    "sc-jyudai-incident",
+    "sc-supply-chain-model",
+    "sc-mfg-factory-ai-liability",
+    "sc-med-samd-retrain",
+    "sc-samd-offlabel",
+    "sc-medical-drift",
+    "sc-auto-l4-bus",
+    "sc-pha-visual-inspect",
+    "sc-ene-grid-ai"
+   ],
+   "inc": [],
+   "kit": [
+    "eval",
+    "inv"
+   ],
+   "lc": false,
+   "q": "製造物|医療機器|SaMD|機械規則|サイバーレジリエンス|自動運転|型式"
+  },
+  {
+   "key": "bio",
+   "name": [
+    "カメラ・顔認識・感情推定",
+    "Cameras, face recognition and emotion inference"
+   ],
+   "ex": [
+    "店舗・施設の顔識別カメラ、オンラインの本人確認、従業員や来訪者の感情推定",
+    "Face-matching cameras in shops and buildings, online identity checks, emotion inference on staff or visitors"
+   ],
+   "regs": [
+    [
+     "jp-appi-2026",
+     "what",
+     3
+    ],
+    [
+     "eu-ai-act-art50",
+     "duty",
+     3
+    ],
+    [
+     "us-tx-traiga",
+     "what",
+     1
+    ],
+    [
+     "cn-deep-synthesis-provisions",
+     "what",
+     3
+    ]
+   ],
+   "rules": [
+    [
+     "rea",
+     "個人情報保護委員会「犯罪予防"
+    ],
+    [
+     "rea",
+     "EDPB"
+    ],
+    [
+     "rea",
+     "英国ICO"
+    ],
+    [
+     "rea",
+     "EU AI規則"
+    ],
+    [
+     "hr",
+     "EU AI規則"
+    ],
+    [
+     "auto",
+     "個人情報保護法（車載機ID"
+    ]
+   ],
+   "scen": [
+    "sc-public-face-recognition",
+    "sc-deepfake-kyc",
+    "sc-kanjo-monitoring",
+    "sc-trn-ai-camera-report"
+   ],
+   "inc": [],
+   "kit": [
+    "inv",
+    "eval"
+   ],
+   "lc": false,
+   "q": "顔認|顔識別|顔画像|生体|感情|カメラ|本人確認"
+  },
+  {
+   "key": "content",
+   "name": [
+    "画像・文章・音声の生成と公開",
+    "Generating and publishing images, text and audio"
+   ],
+   "ex": [
+    "広告・商品ページの生成、合成音声やナレーション、ゲーム・出版の制作、広報文",
+    "Ads and product pages, synthetic voice and narration, game and publishing production, press copy"
+   ],
+   "regs": [
+    [
+     "eu-ai-act-art50",
+     "what",
+     1
+    ],
+    [
+     "eu-ai-act-art50",
+     "what",
+     2
+    ],
+    [
+     "jp-copyright-ai",
+     "what",
+     2
+    ],
+    [
+     "jp-copyright-ai",
+     "duty",
+     1
+    ],
+    [
+     "cn-ai-content-labeling-measures",
+     "what",
+     0
+    ],
+    [
+     "in-it-rules-synthetic-content-2026",
+     "duty",
+     1
+    ]
+   ],
+   "rules": [
+    [
+     "cnt",
+     "文化審議会著作権分科会法制度小委員会「AIと著作権に関する考え方について」（令和6年3月15日）― 生成"
+    ],
+    [
+     "cnt",
+     "文化庁「AIと著作権に関するチェックリスト"
+    ],
+    [
+     "cnt",
+     "経済産業省「コンテンツ制作のための"
+    ],
+    [
+     "cnt",
+     "パブリシティ権"
+    ],
+    [
+     "cnt",
+     "テネシー州 ELVIS法"
+    ],
+    [
+     "cnt",
+     "EU AI規則（規則(EU) 2024/1689、AI Act）第50条(4)"
+    ],
+    [
+     "ret",
+     "不当景品類及び不当表示防止法"
+    ],
+    [
+     "ret",
+     "「一般消費者が事業者の表示"
+    ],
+    [
+     "ret",
+     "米国FTC"
+    ],
+    [
+     "pha",
+     "医薬品医療機器等法（薬機法）の広告規制"
+    ],
+    [
+     "tel",
+     "デジタル空間における情報流通の諸課題"
+    ]
+   ],
+   "scen": [
+    "sc-gosei-transparency",
+    "sc-ret-genai-ec-content",
+    "sc-cnt-genai-prod-eu",
+    "sc-rea-brokerage-genai"
+   ],
+   "inc": [
+    "grok-images"
+   ],
+   "kit": [
+    "inv"
+   ],
+   "lc": false,
+   "q": "生成物|著作権|ディープフェイク|合成コンテンツ|合成音声|透かし|機械可読"
+  }
+ ]
+}

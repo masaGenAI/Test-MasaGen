@@ -19,7 +19,8 @@ description: TechHub「セキュリティ・ガバナンス道場」の規制マ
 | `data/govdojo/compare.json` | 8法域の比較表と「これからの期限」 |
 | `data/govdojo/meta.json` | 確認日（asof）。出典を確かめ直したときだけ更新する |
 | `data/govdojo/facts.json` | 主要な事実の台帳（古い日付・取り違えを止める規則） |
-| `nova-app/src/ProjectNova.jsx` | 画面。`GOVREG_ASOF`・`GOVREG_ITEMS`・`GOVIND`・`GOVLC`・`GOVKIT`・`GOVREG_CMP` は **data から生成する**（手で直さない）。`GOVDOJO_BANK`（判定演習）と `GOVDOJO_SCENARIOS` は jsx が正本 |
+| `data/govdojo/usecases.json` | ユースケースの入口（採用・与信・チャットボットなど）。規制の1行・業界の規定・シナリオ・事例・問題の語への**対応づけ（判断）**。中身の文は持たず、規制マップ・業界の検証済みの文を指すだけ |
+| `nova-app/src/ProjectNova.jsx` | 画面。`GOVREG_ASOF`・`GOVREG_ITEMS`・`GOVIND`・`GOVLC`・`GOVKIT`・`GOVREG_CMP`・`GOVUC` は **data から生成する**（手で直さない）。`GOVDOJO_BANK`（判定演習）と `GOVDOJO_SCENARIOS` は jsx が正本 |
 | `nova-app/scripts/validate-govdojo.mjs` | facts.json の照合。`npm run build` の前に自動で走る（prebuild） |
 | `scripts/` | build.py（生成）・urlcheck.py（出典の取り直し）・fetch.sh / h2t.py（取得）・qcheck.py（下書きの引用確認）・qlen.py（問題の長さ） |
 | `references/` | 調査・検算・作問の指示書（下の対応表を見る） |
@@ -56,6 +57,12 @@ description: TechHub「セキュリティ・ガバナンス道場」の規制マ
    cd .. && python3 .claude/skills/nova-consistency-audit/scripts/stale_scan.py   # MISMATCH 0
    node .claude/skills/nova-consistency-audit/scripts/smoke.mjs     # 実行時エラー 0
    ```
+
+### B2. ユースケースの入口を足す・直す（usecases.json）
+- 対応づけは判断なので、画面では「判断」と明示している。新しい事実の文は書かない。見せる文は規制の項目の欄（`[id, 欄, 番号]`：what・who・duty・jp・penalty）を指して選ぶ。
+- 業界の規定は `[業界 key, 規定名の先頭]` で指す。build.py が番号に直し、先頭が一致する規定がちょうど1つでなければ止まる。
+- シナリオ・事例は jsx の id。`q` は判定演習の設問（q）に当てる正規表現。足したら拾われた問題を抜き取りで読み、関係の薄い問題が混じる語（「採用」＝導入の意味など）を外す。
+- 規制・業界のデータを直したら build.py を流し、参照エラーが出ないことを確かめる。
 
 ### C. 判定演習・シナリオを足す
 - `quiz-authoring` スキルの規約に従う（1バッチ100問以上、最長選択の悪用なし、位置の偏りなし）。
