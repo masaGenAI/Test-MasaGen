@@ -34,6 +34,11 @@
 `.claude/skills/nova-consistency-audit/` の手順に従う（ポータルのタグ・Mastery Track・説明文・コメントに残る古い件数や名称を洗い出す）。
 `python3 .claude/skills/nova-consistency-audit/scripts/stale_scan.py` で MISMATCH が 0 になるまで直す。
 
+## ガバナンス道場の規制・業界・問題を更新するとき
+`.claude/skills/govdojo-maintenance/` の手順に従う（出典の本文で確かめた事実だけ、未確認は未確認と書く）。
+規制マップ・業界別チェック・ローコード・実務キットは `data/govdojo/` を直して `build.py` で生成する（jsx の定数を手で直さない）。
+`npm run build` の前に事実の台帳（`data/govdojo/facts.json`）の照合が走るので、食い違いを 0 にしてから入れる。
+
 ## やってはいけないこと
 - `_tasks` など内部状態に外部から直接触れない。必ず `TaskStore` のメソッド経由
 - 新しい依存ライブラリの追加は事前に相談する

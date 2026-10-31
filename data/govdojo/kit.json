@@ -1,0 +1,2469 @@
+{
+ "cust": {
+  "pre": [
+   {
+    "c": [
+     "AIと話していること・AIを使う範囲を最初に示す",
+     "Say up front that the user is talking to AI and where AI is used"
+    ],
+    "why": [
+     "誤認を防ぐ。EU向けは第50条の義務になりうる（2026年8月2日適用、制裁金は最大1,500万ユーロか売上3%）",
+     "Prevents people from mistaking AI for a human. For EU users Art. 50 can apply from 2 August 2026 (fines up to EUR 15M or up to 3% of total worldwide annual turnover for companies)"
+    ],
+    "src": [
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "AI を利用しているという事実、活用している範囲、適切/不適切な使用方法等"
+     },
+     {
+      "name": "EU AI Act Article 50（artificialintelligenceact.eu の条文表示。EU機関ではない第三者サイトのため二次扱い）",
+      "kind": "二次",
+      "url": "https://artificialintelligenceact.eu/article/50/",
+      "quote": "Providers shall ensure that AI systems intended to interact directly with natural persons are designed and developed in such a way that the natural persons concerned are informed that they are interacting with an AI system"
+     },
+     {
+      "name": "European Commission, Quick Facts: Transparency rules for AI systems",
+      "kind": "一次",
+      "url": "https://digital-strategy.ec.europa.eu/en/factpages/quick-facts-transparency-rules-ai-systems",
+      "quote": "These transparency rules apply from 2 August 2026."
+     },
+     {
+      "name": "European Commission, Quick Facts: Transparency rules for AI systems",
+      "kind": "一次",
+      "url": "https://digital-strategy.ec.europa.eu/en/factpages/quick-facts-transparency-rules-ai-systems",
+      "quote": "Fines up to €15M, or up to 3% of total worldwide annual turnover for companies"
+     }
+    ]
+   },
+   {
+    "c": [
+     "AI生成物を識別できるようにする（透かし・表示・機械可読の印）",
+     "Make AI-generated output identifiable (watermark, label, machine-readable mark)"
+    ],
+    "why": [
+     "偽情報・誤認を防ぐ。EUは提供者に機械可読の表示を求める（2026年8月前に出した生成AIは2026年12月2日まで猶予）",
+     "Prevents deception. The EU requires providers to mark outputs machine-readably (grace period to 2 December 2026 for generative AI placed on the market before 2 August 2026)"
+    ],
+    "src": [
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "人間の判断を介在させるための工夫としては、生成物であることを示す透かしを入れること"
+     },
+     {
+      "name": "European Commission, Quick Facts: Transparency rules for AI systems",
+      "kind": "一次",
+      "url": "https://digital-strategy.ec.europa.eu/en/factpages/quick-facts-transparency-rules-ai-systems",
+      "quote": "Providers must apply a machine-readable mark to synthetic content generated or manipulated by AI and enable its detection"
+     },
+     {
+      "name": "European Commission, Quick Facts: Transparency rules for AI systems",
+      "kind": "一次",
+      "url": "https://digital-strategy.ec.europa.eu/en/factpages/quick-facts-transparency-rules-ai-systems",
+      "quote": "Grace period for marking obligation until December 2026 for generative AI systems placed on the market before 2 August 2026 (Article 50(2) AI Act, amended by AI Omnibus)."
+     },
+     {
+      "name": "欧州議会 Legislative Train「Digital Omnibus on AI」",
+      "kind": "一次",
+      "url": "https://www.europarl.europa.eu/legislative-train/package-digital-package/file-digital-omnibus-on-ai",
+      "quote": "The obligation to mark AI-generated content was also postponed until 2 December 2026 for systems placed on the market before 2 August 2026."
+     }
+    ]
+   },
+   {
+    "c": [
+     "利用規約・プライバシーポリシーを公開前に整える",
+     "Finalize the terms of service and privacy policy before launch"
+    ],
+    "why": [
+     "規約の作成とプライバシーポリシーの明示は、AI提供者の重要事項に挙げられている",
+     "Drafting terms of service and publishing a privacy policy are listed among AI provider items"
+    ],
+    "src": [
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "AI 利用者又は業務外利用者に向けたサービス規約を作成する（「7）アカウンタビリティ」） プライバシーポリシーを明示する（「7）アカウンタビリティ」）"
+     }
+    ]
+   },
+   {
+    "c": [
+     "免責条項の限界を確認する（消費者向けは無効になる条項がある）",
+     "Check the limits of disclaimers (some clauses are void in consumer contracts)"
+    ],
+    "why": [
+     "事業者の債務不履行による損害賠償責任を全部免除する条項は、消費者契約法で無効（消費者向けのみ。法人間契約は別途確認）",
+     "Under the Consumer Contract Act a clause fully exempting the business from damages for non-performance is void (consumers only; check B2B contracts separately)"
+    ],
+    "src": [
+     {
+      "name": "消費者契約法（e-Gov法令検索 API の法令本文）",
+      "kind": "一次",
+      "url": "https://laws.e-gov.go.jp/api/1/lawdata/412AC0000000061",
+      "quote": "次に掲げる消費者契約の条項は、無効とする。 一 事業者の債務不履行により消費者に生じた損害を賠償する責任の全部を免除し、又は当該事業者にその責任の有無を決定する権限を付与する条項"
+     }
+    ]
+   },
+   {
+    "c": [
+     "誤回答の責任者を決め、事業者間の責任分担を契約で明確にする",
+     "Name who answers for wrong outputs and allocate responsibility between parties by contract"
+    ],
+    "why": [
+     "ガイドラインは、責任者の設定と、契約等による責任の所在の明確化を挙げる",
+     "The guideline lists naming an accountable person and clarifying responsibility by contract"
+    ],
+    "src": [
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "各主体においてアカウンタビリティを果たす責任者を設定する"
+     },
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "関係者間の責任について、業務外利用者も含めた主体間の契約、社会的な約束（ボランタリーコミットメント）等により、責任の所在を明確化する"
+     }
+    ]
+   },
+   {
+    "c": [
+     "人への切り替えと、苦情・誤り指摘の窓口を用意する",
+     "Provide a route to a human and a channel for complaints and error reports"
+    ],
+    "why": [
+     "誤りの指摘を受ける機会と苦情の救済の仕組みが挙げられる。人への切替は実務上の工夫",
+     "The guideline lists accepting error reports and a redress mechanism for complaints; the handoff to a person is a practical measure (judgment)"
+    ],
+    "src": [
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "必要に応じ、AI の出力の誤り等について、ステークホルダーからの指摘を受け付ける機会を設けるとともに、定期的かつ客観的なモニタリングを実施する"
+     },
+     {
+      "name": "AI事業者ガイドライン（第1.2版）別添（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_3.pdf",
+      "quote": "ステークホルダーが苦情を提起できるプロセス等の救済メカニズムの確立及び伝達"
+     }
+    ]
+   },
+   {
+    "c": [
+     "入力してはいけない情報（個人・機密）を入力画面で案内する",
+     "Warn on the input screen against entering personal or confidential data"
+    ],
+    "why": [
+     "個人情報の不適切入力への注意喚起は、AI提供者の重要事項に挙げられている",
+     "Warning against improper entry of personal data is listed among AI provider items"
+    ],
+    "src": [
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "提供する AI システム・サービスへの個人情報の不適切入力について注意喚起する"
+     }
+    ]
+   },
+   {
+    "c": [
+     "外部AIに個人情報を渡す範囲と条件（利用目的内か・学習に使われないか）を確認する",
+     "Check the scope and terms for passing personal data to an external AI (within the purpose of use; not used for training)"
+    ],
+    "why": [
+     "PPC注意喚起は、利用目的の範囲内かと、提供者が学習に使わないかの確認を挙げる。自社の外部AI連携に当てはめ",
+     "The PPC alert to businesses using generative AI asks them to confirm use stays within the purpose and that the provider does not use the data for training; applied by analogy to your own external-AI integrations"
+    ],
+    "src": [
+     {
+      "name": "個人情報保護委員会「生成AIサービスの利用に関する注意喚起等について」（令和5年6月2日）",
+      "kind": "一次",
+      "url": "https://www.ppc.go.jp/files/pdf/230602_kouhou_houdou.pdf",
+      "quote": "あらかじめ本人の同意を得ることなく生成AI サービスに個人データを含むプロンプトを入力 し、当該個人データが当該プロンプトに対する応答結果の出力以外の目的で取り扱われる場合、当該個人情報取扱事業者は個人情報保護法の規定に 違反することとなる可能性がある"
+     },
+     {
+      "name": "個人情報保護委員会「生成AIサービスの利用に関する注意喚起等について」（令和5年6月2日）",
+      "kind": "一次",
+      "url": "https://www.ppc.go.jp/files/pdf/230602_kouhou_houdou.pdf",
+      "quote": "当該生成 AI サービスを提供する事業者が、当該個人データを機械学習に利用しないこと等を十分に確認すること"
+     },
+     {
+      "name": "個人情報保護委員会「生成AIサービスの利用に関する注意喚起等について」（令和5年6月2日）",
+      "kind": "一次",
+      "url": "https://www.ppc.go.jp/files/pdf/230602_kouhou_houdou.pdf",
+      "quote": "個人情報取扱事業者が生成 AI サービスに個人情報を含むプロンプトを入力する場合には、特定された当該個人情報の利用目的を達成するために必要な範囲内であることを十分に確認すること。"
+     }
+    ]
+   },
+   {
+    "c": [
+     "年齢・脆弱な利用者への提供方針を決める",
+     "Decide the policy for minors and vulnerable users"
+    ],
+    "why": [
+     "社会的弱者が使いやすくする配慮が挙げられる。年齢条件の具体策は自社の判断",
+     "The guideline asks for care so vulnerable people can use AI; concrete age rules are your own judgment"
+    ],
+    "src": [
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "いわゆる「情報弱者」及び「技術弱者」を生じさせず、より多くの人々が AI の恩恵を享受できるよう社会的弱者による AI の活用を容易にするよう注意を払う"
+     }
+    ]
+   },
+   {
+    "c": [
+     "アクセシビリティを確かめる（読み上げ・文字サイズ・言語）",
+     "Check accessibility (screen readers, text size, language)"
+    ],
+    "why": [
+     "ガイドラインがアクセシビリティ確保を挙げ、EU第50条も開示が要件に沿うことを求める",
+     "The guideline lists accessibility, and EU Art. 50 requires the disclosure to meet accessibility requirements"
+    ],
+    "src": [
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "ユニバーサルデザイン、アクセシビリティの確保"
+     },
+     {
+      "name": "EU AI Act Article 50（artificialintelligenceact.eu の条文表示。EU機関ではない第三者サイトのため二次扱い）",
+      "kind": "二次",
+      "url": "https://artificialintelligenceact.eu/article/50/",
+      "quote": "The information referred to in paragraphs 1 to 4 shall be provided to the natural persons concerned in a clear and distinguishable manner at the latest at the time of the first interaction or exposure. The information shall conform to the applicable accessibility requirements."
+     }
+    ]
+   },
+   {
+    "c": [
+     "ログの項目・保存期間・閲覧権限を決める（個人情報は最小化）",
+     "Define what is logged, retention, and access rights (minimize personal data)"
+    ],
+    "why": [
+     "原因究明・再発防止・責任の立証を踏まえ、記録方法・頻度・保存期間を検討するとされる",
+     "The guideline says to set method, frequency, and retention with cause analysis, recurrence prevention, and proof of liability in mind"
+    ],
+    "src": [
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "ログの記録・保存にあたっては、利用する技術の特性及び用途に照らして、事故等の原因究明、再発防止策の検討、損害賠償責任要件の立証上の重要性等を踏まえて、記録方法、頻度、保存期間等について検討する"
+     }
+    ]
+   },
+   {
+    "c": [
+     "停止・ロールバック・遮断の手順を決めて訓練する",
+     "Define and rehearse stop, rollback, and cut-off procedures"
+    ],
+    "why": [
+     "安全性を損なう事態に速やかに動ける準備が挙げられ、別添はキルスイッチや遮断を例示する",
+     "Readiness to act quickly is listed, and the appendix gives kill switch and network isolation as examples"
+    ],
+    "src": [
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "AI システム・サービスの安全性を損なう事態が生じた場合の対処方法を検討し、当該事態が生じた場合に速やかに実施できるよう整える"
+     },
+     {
+      "name": "AI事業者ガイドライン（第1.2版）別添（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_3.pdf",
+      "quote": "インシデント対策の整理及び発生時の措置の検討 インシデント対策の整理⚫ 危害発生時の連絡体制の事前整備⚫ 原因調査方法及び復旧作業方法の整理⚫ 再発防止策の検討・対応方針の整理⚫ インシデントに関する情報共有方法の設定 初動措置⚫ AI システムのロールバック、代替システムの利用等による復旧⚫ AI システムの停止（キルスイッチ）⚫ AI システムのネットワークからの遮断"
+     }
+    ]
+   },
+   {
+    "c": [
+     "AIの精度・効果を広告や画面で謳う前に、根拠資料を揃える",
+     "Assemble supporting evidence before advertising the AI's accuracy or effect"
+    ],
+    "why": [
+     "景表法は誤認される不当表示を禁じ、効果・性能の表示には根拠資料の提出を求められうる。AIの広告にも当てはめる（当てはめ）",
+     "The Act against Unjustifiable Premiums and Misleading Representations bans misleading claims and may require proof of performance claims; apply it to AI advertising (by analogy)"
+    ],
+    "src": [
+     {
+      "name": "消費者庁「表示規制の概要」",
+      "kind": "一次",
+      "url": "https://www.caa.go.jp/policies/policy/representation/fair_labeling/representation_regulation",
+      "quote": "景品表示法では、消費者に誤認される不当な表示を禁止しています。"
+     },
+     {
+      "name": "消費者庁「表示規制の概要」",
+      "kind": "一次",
+      "url": "https://www.caa.go.jp/policies/policy/representation/fair_labeling/representation_regulation",
+      "quote": "消費者庁長官は、商品・サービスの内容(効果、性能)に関する表示についての優良誤認表示に該当するか否かを判断する必要がある場合に、期間を定めて、事業者に表示の裏付けとなる合理的な根拠を示す資料の提出を求めることができる"
+     },
+     {
+      "name": "消費者庁「表示に関するQ&A」",
+      "kind": "一次",
+      "url": "https://www.caa.go.jp/policies/policy/representation/fair_labeling/faq/representation",
+      "quote": "不当な表示についてその内容の決定に関与した事業者が、景品表示法上、規制の対象となる事業者となります"
+     },
+     {
+      "name": "消費者庁「表示に関するQ&A」",
+      "kind": "一次",
+      "url": "https://www.caa.go.jp/policies/policy/representation/fair_labeling/faq/representation",
+      "quote": "当該表示の決定に関与した者に故意又は過失があることは要しません"
+     }
+    ]
+   },
+   {
+    "c": [
+     "公開前の評価と合格基準・承認者を決めて記録する",
+     "Fix pre-launch evaluation, pass criteria, and the approver, and record them"
+    ],
+    "why": [
+     "評価は一度で終えず繰り返す。リスク許容水準が経営判断で設定済みかも確認観点に挙がる",
+     "Evaluation is repeated, not one-off; whether risk tolerance is set by management is also a check point"
+    ],
+    "src": [
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関する評価観点ガイド（第1.20版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/ai_safety_eval_v1.20_ja.pdf",
+      "quote": "AI セーフティ評価は一度のみでなく、繰り返し実施するものとする。"
+     },
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関する評価観点ガイド（第1.20版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/ai_safety_eval_v1.20_ja.pdf",
+      "quote": "活用方針やリスク許容水準が経営判断として設定されているか"
+     },
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関するレッドチーミング手法ガイド（第1.10版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/J1_ai_safety_RT_v1.10_ja.pdf",
+      "quote": "レッドチーミングを初回実施する際は、対象とする AI システムのリリース/運用開始前までに実施することを基本とする。"
+     }
+    ]
+   }
+  ],
+  "run": [
+   {
+    "c": [
+     "品質・安全性・目的外利用を、定期サンプルで検証する",
+     "Periodically sample outputs to verify quality, safety, and proper use"
+    ],
+    "why": [
+     "提供後に、適切な目的で使われているかを定期的に検証することが挙げられている",
+     "Verifying periodically that the service is used for appropriate purposes is listed for the post-launch phase"
+    ],
+    "src": [
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "適切な目的で AI システム・サービスが利用されているかを定期的に検証する"
+     }
+    ]
+   },
+   {
+    "c": [
+     "苦情・誤りの指摘を集計し、原因別に改善する",
+     "Aggregate complaints and error reports and fix by root cause"
+    ],
+    "why": [
+     "指摘を受け付ける機会を設け、定期的かつ客観的にモニタリングすることが挙げられる",
+     "The guideline lists accepting error reports together with regular, objective monitoring"
+    ],
+    "src": [
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "必要に応じ、AI の出力の誤り等について、ステークホルダーからの指摘を受け付ける機会を設けるとともに、定期的かつ客観的なモニタリングを実施する"
+     }
+    ]
+   },
+   {
+    "c": [
+     "モデル・プロンプト・参照データを変えたら再評価する",
+     "Re-evaluate whenever the model, prompt, or reference data changes"
+    ],
+    "why": [
+     "AISIのレッドチーミングガイドは、再学習やシステムプロンプト変更後も随時実施が望ましいとする",
+     "The AISI red-teaming guide says to test as needed after retraining or system-prompt changes"
+    ],
+    "src": [
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関するレッドチーミング手法ガイド（第1.10版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/J1_ai_safety_RT_v1.10_ja.pdf",
+      "quote": "オフラインによる追加学習によってモデルのパラメータを更新した場合、システムプロンプト等を変更した場合も含め、開発・提供・利用の各フェーズにおいて定期的に実施する他、必要に応じて随時実施することが望ましい。"
+     }
+    ]
+   },
+   {
+    "c": [
+     "更新内容・理由と不具合の状況を利用者に知らせる",
+     "Tell users what changed and why, and the status of defects"
+    ],
+    "why": [
+     "動作状況、不具合の原因と対応、更新の内容と理由の情報提供が挙げられている",
+     "Information on operating status, defect causes and responses, and the content and reason for updates is listed"
+    ],
+    "src": [
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "AI システム・サービスの動作状況に関する情報、不具合の原因及び対応状況、インシデント事例等（「2）安全性」）⚫ AI システムの更新を行った場合の更新内容及びその理由の情報"
+     }
+    ]
+   },
+   {
+    "c": [
+     "外部モデルの更新・仕様変更・停止を監視し、代替を用意する",
+     "Monitor upstream model updates, spec changes, and discontinuation; keep a fallback"
+    ],
+    "why": [
+     "基盤モデルは外部提供で頻繁に更新される。金融庁の原則（大手金融機関向け）は使えない時の備えを例示",
+     "Foundation models are externally provided and updated often; the FSA principles (which apply to systemically important institutions) cite contingency plans for unavailable vendor models"
+    ],
+    "src": [
+     {
+      "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+      "quote": "生成 AI は、活用の汎用性が極めて高い、学習データに含まれない情報を生成し得る、同じ入力に対して異なる結果が出力されうる、基盤モデルは外部事業者により提供され頻繁にアップデートされるといった"
+     },
+     {
+      "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+      "quote": "当該ベンダー・モデル等が使用できない状況に備えたコンティンジェンシープラン を策定すること等が考えられる。"
+     }
+    ]
+   },
+   {
+    "c": [
+     "攻撃手法・脆弱性の動向を確認し、対策を更新する",
+     "Track attack techniques and vulnerabilities and update defenses"
+    ],
+    "why": [
+     "攻撃手法は日々生まれるため、動向の確認と脆弱性への対応の検討が挙げられている",
+     "New attack methods keep appearing, so the guideline lists tracking trends and addressing vulnerabilities"
+    ],
+    "src": [
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "AI システム・サービスに対する攻撃手法も数多く生まれているため、最新のリスク及びそれに対応するために提供の各工程で気を付けるべき点の動向を確認する。また、脆弱性に対応することを検討する"
+     }
+    ]
+   },
+   {
+    "c": [
+     "法令・規制・社会の変化があれば、リスク分析をやり直す",
+     "Redo the risk analysis when laws, regulation, or the environment change"
+    ],
+    "why": [
+     "運用開始後も外部環境の変化を踏まえて環境・リスク分析を再実施するとされる",
+     "After launch, the guideline says to repeat the environment and risk analysis as the external environment changes"
+    ],
+    "src": [
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "AI システム・サービスの運用開始後も、規制等の社会的制度の変更等の「外部環境の変化」を踏まえ、再び「環境・リスク分析」を実施し、必要に応じてゴールを見直す"
+     }
+    ]
+   }
+  ],
+  "inc": [
+   {
+    "c": [
+     "停止・ロールバック・遮断を即時に判断し実行する",
+     "Decide and execute stop, rollback, or isolation immediately"
+    ],
+    "why": [
+     "事態に速やかに実施できるよう整えておくことと、初動の例（復旧・停止・遮断）が示される",
+     "The guideline asks to be ready to act quickly and gives initial responses (recovery, stop, isolation)"
+    ],
+    "src": [
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "AI システム・サービスの安全性を損なう事態が生じた場合の対処方法を検討し、当該事態が生じた場合に速やかに実施できるよう整える"
+     },
+     {
+      "name": "AI事業者ガイドライン（第1.2版）別添（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_3.pdf",
+      "quote": "インシデント対策の整理及び発生時の措置の検討 インシデント対策の整理⚫ 危害発生時の連絡体制の事前整備⚫ 原因調査方法及び復旧作業方法の整理⚫ 再発防止策の検討・対応方針の整理⚫ インシデントに関する情報共有方法の設定 初動措置⚫ AI システムのロールバック、代替システムの利用等による復旧⚫ AI システムの停止（キルスイッチ）⚫ AI システムのネットワークからの遮断"
+     }
+    ]
+   },
+   {
+    "c": [
+     "被害の内容と影響範囲を確認し、関係者へ報告する",
+     "Confirm the harm and its scope, and report to stakeholders"
+    ],
+    "why": [
+     "初動に、危害の内容の確認と関連するステークホルダーへの報告が含まれる",
+     "Initial response includes confirming the harm and reporting to the stakeholders concerned"
+    ],
+    "src": [
+     {
+      "name": "AI事業者ガイドライン（第1.2版）別添（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_3.pdf",
+      "quote": "危害の内容の確認⚫ 関連するステークホルダーへの報告"
+     }
+    ]
+   },
+   {
+    "c": [
+     "個人データの漏えい等は、報告義務の要否をすぐ判断する",
+     "For personal-data leaks, decide at once whether a report is mandatory"
+    ],
+    "why": [
+     "要件に該当する漏えい等は報告が義務付けられ、発覚後はまず速やかな報告が求められる",
+     "Leaks meeting the criteria must be reported, and a prompt report is expected once discovered"
+    ],
+    "src": [
+     {
+      "name": "個人情報保護委員会「漏えい等報告について」",
+      "kind": "一次",
+      "url": "https://www.ppc.go.jp/personalinfo/legal/leakAction/",
+      "quote": "下記の要件に該当する場合、漏えい等報告が義務付けられています。"
+     },
+     {
+      "name": "個人情報保護委員会「漏えい等報告について」",
+      "kind": "一次",
+      "url": "https://www.ppc.go.jp/personalinfo/legal/leakAction/",
+      "quote": "発覚したら、まずは速やかに報告してください。"
+     }
+    ]
+   },
+   {
+    "c": [
+     "原因調査・復旧・再発防止の手順と連絡体制を事前に決める",
+     "Pre-define root-cause analysis, recovery, recurrence prevention, and contact lines"
+    ],
+    "why": [
+     "危害発生時の連絡体制、原因調査と復旧の方法、再発防止策の整理が例示されている",
+     "The appendix gives contact lines, cause-investigation and recovery methods, and recurrence-prevention plans as examples"
+    ],
+    "src": [
+     {
+      "name": "AI事業者ガイドライン（第1.2版）別添（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_3.pdf",
+      "quote": "インシデント対策の整理及び発生時の措置の検討 インシデント対策の整理⚫ 危害発生時の連絡体制の事前整備⚫ 原因調査方法及び復旧作業方法の整理⚫ 再発防止策の検討・対応方針の整理⚫ インシデントに関する情報共有方法の設定 初動措置⚫ AI システムのロールバック、代替システムの利用等による復旧⚫ AI システムの停止（キルスイッチ）⚫ AI システムのネットワークからの遮断"
+     },
+     {
+      "name": "AI事業者ガイドライン（第1.2版）別添（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_3.pdf",
+      "quote": "予防措置及び事後対応（情報共有、停止・復旧、原因解明、再発防止措置等）に取り組むことが期待される"
+     }
+    ]
+   },
+   {
+    "c": [
+     "説明・補償の方針と連絡文面を事前に用意する",
+     "Prepare the explanation and compensation policy and notice templates in advance"
+    ],
+    "why": [
+     "利益を損なう事態への対応方針の策定・実施・定期報告と、補償を円滑にする保険の利用が挙げられる",
+     "The guideline lists a response policy with regular progress reports, and insurance to ease compensation"
+    ],
+    "src": [
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "どのように対応するか方針を策定してこれを着実に実施し、進捗状況については必要に応じて定期的にステークホルダーに報告する"
+     },
+     {
+      "name": "AI事業者ガイドライン（第1.2版）別添（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_3.pdf",
+      "quote": "補償・賠償等を円滑に行うための保険の利用"
+     }
+    ]
+   },
+   {
+    "c": [
+     "改善後は再評価・再テストを通してから再開する",
+     "Resume only after re-evaluation and re-testing following the fix"
+    ],
+    "why": [
+     "改善後のフォローアップで必要に応じ再度レッドチーミングを行う。最終報告は必要に応じ経営層へ上げる",
+     "The guide has follow-up after fixes, re-running red teaming as needed; final reports go to management as needed"
+    ],
+    "src": [
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関するレッドチーミング手法ガイド（第1.10版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/J1_ai_safety_RT_v1.10_ja.pdf",
+      "quote": "改善後のフォローアップとして改善状況の進捗を確認し、必要に応じて再度レッドチーミングを実施する"
+     },
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関するレッドチーミング手法ガイド（第1.10版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/J1_ai_safety_RT_v1.10_ja.pdf",
+      "quote": "これらの内容について、必要に応じて経営層へ報告する。"
+     }
+    ]
+   }
+  ]
+ },
+ "inv": {
+  "fields": [
+   {
+    "f": [
+     "ID（台帳番号）",
+     "ID (register number)"
+    ],
+    "why": [
+     "契約・ログ・評価など他の記録と結びつける一意の鍵",
+     "A unique key that links contracts, logs, and evaluations"
+    ],
+    "ex": [
+     "AI-2026-0042",
+     "AI-2026-0042"
+    ]
+   },
+   {
+    "f": [
+     "名称・バージョン",
+     "Name and version"
+    ],
+    "why": [
+     "同じAIでも版で挙動が変わる。事故時にどの版かを特定できるようにする",
+     "Behavior changes by version; lets you tie an incident to a version"
+    ],
+    "ex": [
+     "問い合わせ要約Bot v1.3",
+     "Inquiry-summary bot v1.3"
+    ]
+   },
+   {
+    "f": [
+     "業務と目的",
+     "Business process and purpose"
+    ],
+    "why": [
+     "目的外利用の判定と、評価で何を測るかの出発点になる",
+     "The basis for judging out-of-scope use and deciding what to measure"
+    ],
+    "ex": [
+     "コールセンターの通話後要約（記録時間の短縮）",
+     "Post-call summaries at the call center (shorter record-keeping time)"
+    ]
+   },
+   {
+    "f": [
+     "所管部門・責任者（Owner）",
+     "Owning unit and accountable owner"
+    ],
+    "why": [
+     "事故時に判断・停止できる人を決める。部門名だけでなく氏名まで書く",
+     "Names who can decide and stop the system in an incident; record a person, not just a unit"
+    ],
+    "ex": [
+     "CS部 部長（責任者）／運用担当 1名",
+     "Head of CS (owner) / one operations lead"
+    ],
+    "src": [
+     {
+      "name": "OMB Memorandum M-25-21 (April 3, 2025) Accelerating Federal Use of AI through Innovation, Governance, and Public Trust",
+      "kind": "一次",
+      "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-21-Accelerating-Federal-Use-of-AI-through-Innovation-Governance-and-Public-Trust.pdf",
+      "quote": "Agencies must enable trained and accountable agency officials at the lowest appropriate level21 to identify, assess, mitigate, and accept risk for AI use cases."
+     },
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "各主体においてアカウンタビリティを果たす責任者を設定する"
+     }
+    ]
+   },
+   {
+    "f": [
+     "利用者・影響を受ける人",
+     "Users and affected people"
+    ],
+    "why": [
+     "操作する人と結果を受ける人は別。顧客・従業員・第三者を分けて書く",
+     "Operators and those affected differ; list customers, staff, and third parties separately"
+    ],
+    "ex": [
+     "利用者＝オペレーター／影響を受ける人＝顧客",
+     "Users = operators / affected = customers"
+    ]
+   },
+   {
+    "f": [
+     "使うモデル・サービスと提供者",
+     "Model or service used and its provider"
+    ],
+    "why": [
+     "外部モデルは頻繁に更新される。提供者・版・契約を追えるようにする",
+     "External models update often; keep provider, version, and contract traceable"
+    ],
+    "ex": [
+     "外部LLM API（提供者名・モデル名・版・リージョン）",
+     "External LLM API (provider, model, version, region)"
+    ],
+    "src": [
+     {
+      "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+      "quote": "生成 AI は、活用の汎用性が極めて高い、学習データに含まれない情報を生成し得る、同じ入力に対して異なる結果が出力されうる、基盤モデルは外部事業者により提供され頻繁にアップデートされるといった"
+     }
+    ]
+   },
+   {
+    "f": [
+     "入力データの区分",
+     "Classification of input data"
+    ],
+    "why": [
+     "個人情報・要配慮・機密の入力は、法令対応・契約・外部送信の可否を左右する",
+     "Personal, sensitive, and confidential input drives legal handling, contracts, and whether data may leave"
+    ],
+    "ex": [
+     "個人データ（氏名・電話）あり／要配慮なし／外部送信あり",
+     "Personal data (name, phone) yes / sensitive no / sent externally yes"
+    ],
+    "src": [
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "AI システム・サービスに機密情報等を不適切に入力することがないよう注意を払う"
+     },
+     {
+      "name": "個人情報保護委員会「生成AIサービスの利用に関する注意喚起等について」（令和5年6月2日）",
+      "kind": "一次",
+      "url": "https://www.ppc.go.jp/files/pdf/230602_kouhou_houdou.pdf",
+      "quote": "あらかじめ本人の同意を得ることなく生成AI サービスに個人データを含むプロンプトを入力 し、当該個人データが当該プロンプトに対する応答結果の出力以外の目的で取り扱われる場合、当該個人情報取扱事業者は個人情報保護法の規定に 違反することとなる可能性がある"
+     }
+    ]
+   },
+   {
+    "f": [
+     "出力の使われ方（人の判断の補助か自動か）",
+     "How the output is used (decision support or automated)"
+    ],
+    "why": [
+     "自動化の度合いが影響と統制の重さを左右する。人が見ていても高影響と判定されうる（米OMB、連邦機関向け）",
+     "Degree of automation drives impact and the weight of controls; human review does not rule out a high-impact finding (US OMB, for federal agencies)"
+    ],
+    "ex": [
+     "担当者が確認して保存（最終判断は人）",
+     "Staff review before saving (final decision by a person)"
+    ],
+    "src": [
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "AI に単独で判断させるだけでなく、適切なタイミングで人間の判断を介在させる利用を検討する"
+     },
+     {
+      "name": "OMB Memorandum M-25-21 (April 3, 2025) Accelerating Federal Use of AI through Innovation, Governance, and Public Trust",
+      "kind": "一次",
+      "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-21-Accelerating-Federal-Use-of-AI-through-Innovation-Governance-and-Public-Trust.pdf",
+      "quote": "A high-impact determination is possible whether there is or is not human oversight for the decision or action."
+     }
+    ]
+   },
+   {
+    "f": [
+     "リスク階層と判定日",
+     "Risk tier and date of determination"
+    ],
+    "why": [
+     "リスク格付が統制の深さと検証頻度を決める。判定日を残して陳腐化を防ぐ",
+     "The rating sets depth of control and revalidation frequency; the date prevents staleness"
+    ],
+    "ex": [
+     "中（社内業務・顧客影響なし）／2026-09-30",
+     "Medium (internal work, no customer impact) / 2026-09-30"
+    ],
+    "src": [
+     {
+      "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+      "quote": "リスク格付は、モデル ・ リスク管理におけるリスクベース ・ アプローチの基礎として、各モデルに対する統制のレベル（検証の深度や頻度等）を決定する重要な要素となる。"
+     },
+     {
+      "name": "OMB Memorandum M-25-21 (April 3, 2025) Accelerating Federal Use of AI through Innovation, Governance, and Public Trust",
+      "kind": "一次",
+      "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-21-Accelerating-Federal-Use-of-AI-through-Innovation-Governance-and-Public-Trust.pdf",
+      "quote": "centrally tracking high-impact use cases and use case determinations;"
+     }
+    ]
+   },
+   {
+    "f": [
+     "適用規制・法域",
+     "Applicable rules and jurisdictions"
+    ],
+    "why": [
+     "提供先や利用者の所在地の法令に従う。EU向けなら第50条など",
+     "Rules where the service is provided or used apply; e.g., EU Art. 50 for EU users"
+    ],
+    "ex": [
+     "個人情報保護法／EU向けあり→AI法第50条",
+     "APPI / EU users yes -> AI Act Art. 50"
+    ],
+    "src": [
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "AI システム・サービスの提供先、AI 利用者が所在する国・地域等において適用される関連法令等"
+     }
+    ]
+   },
+   {
+    "f": [
+     "評価結果と合格基準",
+     "Evaluation results and pass criteria"
+    ],
+    "why": [
+     "基準を事前に決めた記録がないと、承認の根拠を説明できない",
+     "Without pre-set criteria on record, the approval cannot be justified"
+    ],
+    "ex": [
+     "正答率92%（基準90%）／有害出力0件／評価日2026-09-20",
+     "Accuracy 92% (bar 90%) / 0 harmful outputs / evaluated 2026-09-20"
+    ],
+    "src": [
+     {
+      "name": "OMB Memorandum M-25-21 (April 3, 2025) Accelerating Federal Use of AI through Innovation, Governance, and Public Trust",
+      "kind": "一次",
+      "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-21-Accelerating-Federal-Use-of-AI-through-Innovation-Governance-and-Public-Trust.pdf",
+      "quote": "Agencies must develop pre-deployment testing and prepare risk mitigation plans that reflect expected real-world outcomes"
+     },
+     {
+      "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+      "quote": "検証結果は適切に文書化され、モデル承認 の判断基準として考慮されるべきである。"
+     }
+    ]
+   },
+   {
+    "f": [
+     "監視指標とアラート条件",
+     "Monitoring metrics and alert conditions"
+    ],
+    "why": [
+     "稼働後に性能は落ちうる。何を見て、誰がいつ動くかを決める",
+     "Performance can decay after launch; decide what to watch and who acts when"
+    ],
+    "ex": [
+     "苦情率・人の修正率・月次抜き取り検査／修正率20%超で調査",
+     "Complaint rate, human-edit rate, monthly spot checks / investigate if edits exceed 20%"
+    ],
+    "src": [
+     {
+      "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+      "quote": "使用開始時には意図したとおりの性能が確認されたモデルであっても、 計測対象とする金融商品、金融機関のビジネス活動、市場の状況その他の環境の変化等により性能が低下することも想定される。継続モニタリングは、そのようなモデルの陳腐化を捕捉し、モデルの変更又は使用停止が必要となっていないかを確認する役割も担っている。"
+     }
+    ]
+   },
+   {
+    "f": [
+     "契約・統制適用表（SoA）の参照",
+     "Reference to contracts and control applicability statement (SoA)"
+    ],
+    "why": [
+     "約束した責任分担と統制の根拠を辿れるようにする",
+     "Lets you trace the agreed responsibilities and the controls promised"
+    ],
+    "ex": [
+     "契約C-123／データ処理条件／統制適用表 2026-09版",
+     "Contract C-123 / data-processing terms / SoA 2026-09 edition"
+    ],
+    "src": [
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "関係者間の責任について、業務外利用者も含めた主体間の契約、社会的な約束（ボランタリーコミットメント）等により、責任の所在を明確化する"
+     }
+    ]
+   },
+   {
+    "f": [
+     "稼働状態",
+     "Operating status"
+    ],
+    "why": [
+     "開発中・稼働中・停止・廃止まで載せる。金融庁の原則も停止したモデルの記録を挙げる（大手金融機関向け）",
+     "Cover in-development, live, suspended, and retired; the FSA principles also list recently retired models (they apply to systemically important financial institutions)"
+    ],
+    "ex": [
+     "本番（2026-10-01〜）",
+     "Production (from 2026-10-01)"
+    ],
+    "src": [
+     {
+      "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+      "quote": "金融機関は、使用中のモデル、開発中のモデル 及び最近使用を停止したモデルに関する一連の情報を、モデル・インベントリーに記録すべきである。"
+     }
+    ]
+   },
+   {
+    "f": [
+     "次回見直し日",
+     "Next review date"
+    ],
+    "why": [
+     "見直し頻度はリスクに合わせる。環境変化や性能低下の兆候で前倒しする",
+     "Match review frequency to risk; bring it forward on environment change or signs of degradation"
+    ],
+    "ex": [
+     "2027-03-31（半年ごと）",
+     "2027-03-31 (every six months)"
+    ],
+    "src": [
+     {
+      "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+      "quote": "モデル検証の実施頻度や深度・範囲等は、当該モデルのリスクの高低と整合的でなければならない。"
+     }
+    ]
+   },
+   {
+    "f": [
+     "変更履歴・再評価の記録",
+     "Change history and re-evaluation records"
+    ],
+    "why": [
+     "モデルやプロンプトの変更は挙動を変える。変更ごとに再評価したかを残す",
+     "Model or prompt changes alter behavior; record whether each change was re-evaluated"
+    ],
+    "ex": [
+     "2026-08 モデル版更新→再評価済み",
+     "2026-08 model version update -> re-evaluated"
+    ],
+    "src": [
+     {
+      "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+      "quote": "モデルに重要な変更が加えられる場合には、第２線が検証の必要性を検討すべきである。"
+     }
+    ]
+   },
+   {
+    "f": [
+     "インシデント・苦情の履歴",
+     "Incident and complaint history"
+    ],
+    "why": [
+     "再評価や統制強化の根拠になり、当局・取引先への説明材料にもなる",
+     "Grounds for re-evaluation and tighter controls; material for explaining to regulators and partners"
+    ],
+    "ex": [
+     "2026-07 誤要約1件（個人情報の混入なし）",
+     "2026-07 one wrong summary (no personal data involved)"
+    ]
+   },
+   {
+    "f": [
+     "人の関与の設計と停止権限",
+     "Human involvement design and authority to stop"
+    ],
+    "why": [
+     "誰がいつ介入・停止できるかが未定だと、事故時に止められない",
+     "If nobody is defined who can intervene or stop it, it cannot be stopped in an incident"
+    ],
+    "ex": [
+     "出力は担当者が承認／異常時はOwnerが停止",
+     "Output approved by staff / owner stops it on anomaly"
+    ],
+    "src": [
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "人間がコントロールできる制御可能性を確保する"
+     },
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関する評価観点ガイド（第1.20版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/ai_safety_eval_v1.20_ja.pdf",
+      "quote": "リスクの高いタスクの実行時に異常を検知した場合における人間による介入・停止。"
+     }
+    ]
+   },
+   {
+    "f": [
+     "廃止日と廃止時の処理",
+     "Retirement date and decommissioning actions"
+    ],
+    "why": [
+     "ログ・データ・契約・権限の扱いを決めずに止めると、情報や費用が残る",
+     "Stopping without deciding on logs, data, contracts, and access leaves data and cost behind"
+    ],
+    "ex": [
+     "2027-06-30 廃止／ログは規程どおり削除／契約解約",
+     "Retire 2027-06-30 / delete logs per policy / terminate contract"
+    ],
+    "src": [
+     {
+      "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+      "quote": "「モデル・ライフサイクル」（モデルの特定、リスク格付の付与、開発、使用、変更、使用停止等の、モデルが経る一連の流れをいう。 ）"
+     }
+    ]
+   }
+  ],
+  "flow": [
+   {
+    "s": [
+     "1 登録の契機",
+     "1 Triggers for registration"
+    ],
+    "d": [
+     "新規企画・外部AI申請・SaaSのAI追加・シャドーAI発見で登録。金融庁原則は特定を第1線、該当判定を第2線とする",
+     "Register on any of: new project, external-AI request, AI feature added to a SaaS, or shadow AI found; the FSA principles have the first line identify models and the second line make the final call"
+    ],
+    "src": [
+     {
+      "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+      "quote": "通常、第１線がモデルの特定に責任を負い、第２線がモデルの該当・非該当の最終判定に責任を負う。"
+     }
+    ]
+   },
+   {
+    "s": [
+     "2 一次判定",
+     "2 Initial triage"
+    ],
+    "d": [
+     "リスク階層・個人データの有無・自動化の度合い・法域で仕分け、審査の深さを決める",
+     "Sort by risk tier, personal data, degree of automation, and jurisdiction to set review depth"
+    ],
+    "src": [
+     {
+      "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+      "quote": "リスク格付は、モデル ・ リスク管理におけるリスクベース ・ アプローチの基礎として、各モデルに対する統制のレベル（検証の深度や頻度等）を決定する重要な要素となる。"
+     },
+     {
+      "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+      "quote": "社内の業務効率化などのリスクの低い AI 利用については、チェックリストに基づく現場判断に委ねつつ、顧客向けにAI を活用するようなリスクの高い AI 利用については、専門部署で事前審査を行っている事例があった。"
+     }
+    ]
+   },
+   {
+    "s": [
+     "3 審査",
+     "3 Review"
+    ],
+    "d": [
+     "法務・個人情報・セキュリティ・リスク部門が観点別に確認し、結果と条件を記録する",
+     "Legal, privacy, security, and risk review their areas; record findings and conditions"
+    ],
+    "src": [
+     {
+      "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+      "quote": "リスク管理部門など複数部署が協働で案件推進部署と打ち合わせを行いリスク対策状況の把握に努めている"
+     }
+    ]
+   },
+   {
+    "s": [
+     "4 承認",
+     "4 Approval"
+    ],
+    "d": [
+     "責任者が残るリスクを受け入れて署名する。条件付き・期限付きの承認もある",
+     "The owner accepts residual risk and signs; approval may be conditional or time-limited"
+    ],
+    "src": [
+     {
+      "name": "OMB Memorandum M-25-21 (April 3, 2025) Accelerating Federal Use of AI through Innovation, Governance, and Public Trust",
+      "kind": "一次",
+      "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-21-Accelerating-Federal-Use-of-AI-through-Innovation-Governance-and-Public-Trust.pdf",
+      "quote": "risk acceptance, supported by a signature from the individual accepting the risk."
+     },
+     {
+      "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+      "quote": "金融機関は、モデル・ライフサイクルのステージ（モデルの使用開始時、 重要な変更の発生時、 再検証時等）に応じたモデルの内部承認プロセスを有するべきである。"
+     }
+    ]
+   },
+   {
+    "s": [
+     "5 本番",
+     "5 Go-live"
+    ],
+    "d": [
+     "表示・窓口・ログ・監視・停止手順を有効にして稼働し、台帳の状態を更新する",
+     "Enable disclosure, contact desk, logging, monitoring, and stop procedure; update the register status"
+    ]
+   },
+   {
+    "s": [
+     "6 定期見直し",
+     "6 Periodic review"
+    ],
+    "d": [
+     "リスクに応じた頻度で性能・苦情・規制変更を点検する。兆候があれば前倒しする",
+     "Check performance, complaints, and rule changes at a risk-based frequency; bring forward on warning signs"
+    ],
+    "src": [
+     {
+      "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+      "quote": "モデル検証の実施頻度や深度・範囲等は、当該モデルのリスクの高低と整合的でなければならない。"
+     },
+     {
+      "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+      "quote": "AI 導入後の環境変化を踏まえ、リスク評価や低減策を継続的に点検・見直しし、ライフサイクル全体で適切にリスク管理することの重要性が指摘された。"
+     }
+    ]
+   },
+   {
+    "s": [
+     "7 変更時の再評価",
+     "7 Re-evaluation on change"
+    ],
+    "d": [
+     "モデル・プロンプト・参照データ・提供先を変えたら、影響に応じて再評価し承認し直す",
+     "On changes to model, prompt, reference data, or recipients, re-evaluate and re-approve in proportion to impact"
+    ],
+    "src": [
+     {
+      "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+      "quote": "モデルに重要な変更が加えられる場合には、第２線が検証の必要性を検討すべきである。"
+     },
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関するレッドチーミング手法ガイド（第1.10版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/J1_ai_safety_RT_v1.10_ja.pdf",
+      "quote": "オフラインによる追加学習によってモデルのパラメータを更新した場合、システムプロンプト等を変更した場合も含め、開発・提供・利用の各フェーズにおいて定期的に実施する他、必要に応じて随時実施することが望ましい。"
+     }
+    ]
+   },
+   {
+    "s": [
+     "8 廃止",
+     "8 Retirement"
+    ],
+    "d": [
+     "利用停止、ログ・データ・契約・権限の処理、利用者への通知を行い、台帳に廃止日を残す",
+     "Stop use; handle logs, data, contracts, and access; notify users; record the retirement date"
+    ],
+    "src": [
+     {
+      "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+      "quote": "金融機関は、使用中のモデル、開発中のモデル 及び最近使用を停止したモデルに関する一連の情報を、モデル・インベントリーに記録すべきである。"
+     },
+     {
+      "name": "OMB Memorandum M-25-21 (April 3, 2025) Accelerating Federal Use of AI through Innovation, Governance, and Public Trust",
+      "kind": "一次",
+      "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-21-Accelerating-Federal-Use-of-AI-through-Innovation-Governance-and-Public-Trust.pdf",
+      "quote": "If a particular high-impact use case is not compliant with the minimum practices then the agency must safely discontinue use of the AI functionality."
+     }
+    ]
+   }
+  ],
+  "shadow": [
+   {
+    "c": [
+     "通信・IDのログ（プロキシ・DNS・CASB・SSO）",
+     "Network and identity logs (proxy, DNS, CASB, SSO)"
+    ],
+    "d": [
+     "生成AIサービスのドメインや認証の利用状況から、台帳にない利用を洗い出す",
+     "Find use missing from the register from AI-service domains and sign-in activity"
+    ],
+    "src": [
+     {
+      "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+      "quote": "従業員個人や業務部門が組織の許可を得ずに外部の AI サービスを使用する「シャドーIT」の利用が増加する可能性もあり、情報漏洩や不正アクセスなどのセキュリティリスクを増幅させる恐れがある。"
+     }
+    ]
+   },
+   {
+    "c": [
+     "経費・購買・カード明細",
+     "Expense, procurement, and card statements"
+    ],
+    "d": [
+     "個人や部門で契約したAIの定額・従量課金を、費用科目から拾う",
+     "Pick up AI subscriptions and usage fees bought by individuals or units from expense lines"
+    ]
+   },
+   {
+    "c": [
+     "ブラウザ拡張・IDEプラグイン・端末アプリの棚卸",
+     "Inventory of browser extensions, IDE plugins, and desktop apps"
+    ],
+    "d": [
+     "端末管理（MDM/EDR）で導入済みの拡張・アプリを一覧化し、AI機能を持つものを抽出する",
+     "List installed extensions and apps via device management (MDM/EDR) and pick those with AI features"
+    ]
+   },
+   {
+    "c": [
+     "既存SaaSへのAI機能追加の把握",
+     "Spotting AI features added to existing SaaS"
+    ],
+    "d": [
+     "ベンダーの通知・更新履歴、管理画面の設定、契約更新時の確認で、新たに有効になったAI機能を見つける",
+     "Use vendor notices, release notes, admin settings, and renewal checks to find newly enabled AI features"
+    ]
+   },
+   {
+    "c": [
+     "部門アンケート・ヒアリング",
+     "Department surveys and interviews"
+    ],
+    "d": [
+     "棚卸の期間は申告しても責めないと明示し、業務で使っているAIを自己申告してもらう",
+     "State that self-reporting during the sweep carries no blame, and ask units to declare AI they use"
+    ]
+   },
+   {
+    "c": [
+     "APIキー・OAuth連携の棚卸",
+     "Inventory of API keys and OAuth grants"
+    ],
+    "d": [
+     "クラウド上のAI API利用と、外部アプリへの連携許可を定期的に監査する",
+     "Regularly audit AI API usage in the cloud and third-party app authorizations"
+    ]
+   }
+  ],
+  "src": [
+   {
+    "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+    "kind": "一次",
+    "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+    "quote": "金融機関は、使用中のモデル、開発中のモデル 及び最近使用を停止したモデルに関する一連の情報を、モデル・インベントリーに記録すべきである。"
+   },
+   {
+    "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+    "kind": "一次",
+    "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+    "quote": "利用する重要な AI モデルを一覧で管理するなど、一定のリスク管理態勢を準備することが考えられる。"
+   },
+   {
+    "name": "OMB Memorandum M-25-21 (April 3, 2025) Accelerating Federal Use of AI through Innovation, Governance, and Public Trust",
+    "kind": "一次",
+    "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-21-Accelerating-Federal-Use-of-AI-through-Innovation-Governance-and-Public-Trust.pdf",
+    "quote": "Each agency (except for the Department of Defense and the Intelligence Community) must inventory its AI use cases at least annually, submit the inventory to 0MB, and post a public version on the agency's website."
+   },
+   {
+    "name": "OMB Memorandum M-25-21 (April 3, 2025) Accelerating Federal Use of AI through Innovation, Governance, and Public Trust",
+    "kind": "一次",
+    "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-21-Accelerating-Federal-Use-of-AI-through-Innovation-Governance-and-Public-Trust.pdf",
+    "quote": "centrally tracking high-impact use cases and use case determinations;"
+   },
+   {
+    "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+    "kind": "一次",
+    "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+    "quote": "本文書は、金融システム上重要な金融機関、具体的には以下に掲げる金融機関を適用対象とする。"
+   },
+   {
+    "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+    "kind": "一次",
+    "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+    "quote": "本文書は、モニタリング上の目線や金融機関等に求める具体的対応を示すものではなく"
+   },
+   {
+    "name": "OMB Memorandum M-25-21 (April 3, 2025) Accelerating Federal Use of AI through Innovation, Governance, and Public Trust",
+    "kind": "一次",
+    "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-21-Accelerating-Federal-Use-of-AI-through-Innovation-Governance-and-Public-Trust.pdf",
+    "quote": "This memorandum is directed to the heads of all Executive Branch departments and agencies, including independent regulatory agencies."
+   },
+   {
+    "name": "OMB Memorandum M-25-21 (April 3, 2025) Accelerating Federal Use of AI through Innovation, Governance, and Public Trust",
+    "kind": "一次",
+    "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-21-Accelerating-Federal-Use-of-AI-through-Innovation-Governance-and-Public-Trust.pdf",
+    "quote": "This memorandum rescinds and replaces Office of Management and Budget (0MB) Memorandum M-24-10"
+   }
+  ]
+ },
+ "eval": {
+  "kinds": [
+   {
+    "k": [
+     "オフライン評価（評価用データセット）",
+     "Offline evaluation (benchmark dataset)"
+    ],
+    "what": [
+     "想定業務の入出力で、品質が基準に届くか確かめる",
+     "Check on realistic inputs and expected outputs that quality meets the bar"
+    ],
+    "when": [
+     "導入前・モデルやプロンプトの変更時",
+     "Before launch and whenever the model or prompt changes"
+    ],
+    "who": [
+     "開発者が実施。問いと正解は業務担当が作る",
+     "Developers run it; business owners write the questions and answers"
+    ],
+    "how": [
+     "通常例・難例・境界例・失敗例の固定セットを版管理し、新旧を同条件で比べる",
+     "Version a fixed set of typical, hard, edge, and failure cases; compare old and new under identical conditions"
+    ],
+    "trap": [
+     "評価セットが調整に漏れる／実際の入力分布と違う",
+     "The set leaks into tuning, or differs from the real input mix"
+    ],
+    "src": [
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関する評価観点ガイド（第1.20版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/ai_safety_eval_v1.20_ja.pdf",
+      "quote": "AI システム（LLM システム、AI エージェントシステム）の活用に際しては、開発・提供・利用の 3 種類のフェーズが存在する。AI セーフティ評価の実施時期は、各フェーズにおいて、合理的な範囲、適切なタイミングとする。"
+     }
+    ]
+   },
+   {
+    "k": [
+     "タスク別の指標（分類・要約・RAG）",
+     "Task-specific metrics (classification, summarization, RAG)"
+    ],
+    "what": [
+     "タスクの性質に合う指標で、品質を数値にする",
+     "Quantify quality with metrics that fit the task"
+    ],
+    "when": [
+     "導入前・変更時・本番の定点観測",
+     "Before launch, on change, and in production at fixed intervals"
+    ],
+    "who": [
+     "開発者＋業務担当（指標の妥当性は業務側が確認）",
+     "Developers plus business owners (who confirm the metrics make sense)"
+    ],
+    "how": [
+     "分類は適合率・再現率。RAGは根拠への忠実さ・回答の関連性・検索結果との一貫性。要約は重要点の網羅と誤り",
+     "Classification: precision and recall. RAG: faithfulness to sources, answer relevance, consistency with retrieved results. Summaries: coverage of key points and errors"
+    ],
+    "trap": [
+     "平均点だけ見て重大な失敗が埋もれる／指標が業務価値と無関係",
+     "Averages hide serious failures; metrics unrelated to business value"
+    ],
+    "src": [
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関する評価観点ガイド（第1.20版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/ai_safety_eval_v1.20_ja.pdf",
+      "quote": "LLM システムに対するプロンプトと出力データの関連性 LLM システムに対するプロンプトと RAG（Retrieval-Augmented Generation）による検索結果※1 の関連性※2  LLM システムの出力データと RAG による検索結果※1 の一貫性※2"
+     }
+    ]
+   },
+   {
+    "k": [
+     "AIによる自動採点（LLM-as-a-judge）と校正",
+     "Automated grading by AI (LLM-as-a-judge) and calibration"
+    ],
+    "what": [
+     "大量の出力を別のAIで採点し、人手採点とのずれを測る",
+     "Grade many outputs with another AI and measure its gap from human grading"
+    ],
+    "when": [
+     "導入前・変更時・本番の抜き取り",
+     "Before launch, on change, and on production samples"
+    ],
+    "who": [
+     "評価担当（採点基準は業務側が承認）",
+     "Evaluation team (business owners approve the rubric)"
+    ],
+    "how": [
+     "採点基準を文書化し、人手採点との一致率を測り、不一致例で基準を直す。判定AIは被評価モデルと分ける",
+     "Document the rubric, measure agreement with human grades, fix the rubric from disagreements; keep the judge separate from the model under test"
+    ],
+    "trap": [
+     "判定AIの癖（長文を好む等）／同系列モデルで甘くなる／校正せず運用する",
+     "Judge quirks (favoring long answers), leniency toward same-family models, running without calibration"
+    ],
+    "src": [
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関する評価観点ガイド（第1.20版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/ai_safety_eval_v1.20_ja.pdf",
+      "quote": "また、LLM を用いて評価を行うモデルベースの評価も存在する。一方で、AI セーフティ評価の観点の全てをツールによって自動実施することは難しい。その他の手法と組み合わせることで、効果的な AI セーフティ評価の実施を目指すことが重要である。"
+     }
+    ]
+   },
+   {
+    "k": [
+     "人手評価",
+     "Human evaluation"
+    ],
+    "what": [
+     "専門家や業務担当が出力を採点し、指標では測れない妥当性を判断する",
+     "Experts and business staff grade outputs and judge validity that metrics cannot capture"
+    ],
+    "when": [
+     "導入前・大きな変更時・本番の定期サンプル",
+     "Before launch, on major changes, and on periodic production samples"
+    ],
+    "who": [
+     "開発に直接関わらない専門家を含める",
+     "Include experts not directly involved in development"
+    ],
+    "how": [
+     "2人以上の独立採点、採点基準表、不一致の調整、利用者視点の項目",
+     "Two or more independent graders, a rubric, reconciliation of disagreements, user-perspective items"
+    ],
+    "trap": [
+     "採点者の基準ずれ・疲労／少数サンプル／開発者が自分で採点",
+     "Rater drift and fatigue; tiny samples; developers grading their own work"
+    ],
+    "src": [
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関する評価観点ガイド（第1.20版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/ai_safety_eval_v1.20_ja.pdf",
+      "quote": "しかし、客観的な評価を行うため、また、システム開発・提供の意思決定に関わる提言内容に独立性を持たせるために、対象システムの開発・提供に直接的には携わらない自組織または他組織の専門家による評価を行うことも有効である。"
+     }
+    ]
+   },
+   {
+    "k": [
+     "レッドチーミング",
+     "Red teaming"
+    ],
+    "what": [
+     "悪意ある利用者を想定し、実際のシステムを攻撃して耐性を確かめる",
+     "Attack the real system as a malicious user would and test its resilience"
+    ],
+    "when": [
+     "公開前が基本。運用中は変更や新たな脅威のたびに",
+     "Before release as a rule; in operation, at each change or new threat"
+    ],
+    "who": [
+     "開発・提供から独立したレッドチーム＋ドメイン専門家（外部委託も可）",
+     "A red team independent of development and operations plus domain experts (may be outsourced)"
+    ],
+    "how": [
+     "計画→リスク・攻撃シナリオ作成→実施→報告→改善→フォローアップ（AISIの工程）",
+     "Plan -> risk and attack scenarios -> execution -> report -> remediation -> follow-up (the AISI process)"
+    ],
+    "trap": [
+     "一度きりで終わる／プロンプト単体だけ見てシステム全体を見ない／結果が経営に届かない",
+     "Done once only; testing prompts but not the whole system; results never reach management"
+    ],
+    "src": [
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関するレッドチーミング手法ガイド（第1.10版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/J1_ai_safety_RT_v1.10_ja.pdf",
+      "quote": "レッドチーミングを初回実施する際は、対象とする AI システムのリリース/運用開始前までに実施することを基本とする。"
+     },
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関するレッドチーミング手法ガイド（第1.10版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/J1_ai_safety_RT_v1.10_ja.pdf",
+      "quote": "オフラインによる追加学習によってモデルのパラメータを更新した場合、システムプロンプト等を変更した場合も含め、開発・提供・利用の各フェーズにおいて定期的に実施する他、必要に応じて随時実施することが望ましい。"
+     },
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関するレッドチーミング手法ガイド（第1.10版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/J1_ai_safety_RT_v1.10_ja.pdf",
+      "quote": "加えて、対象 AI システムの開発・提供管理者からの独立性、関係者とのコミュニケーション能力、倫理性も求められる。"
+     },
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関するレッドチーミング手法ガイド（第1.10版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/J1_ai_safety_RT_v1.10_ja.pdf",
+      "quote": "組織内だけで攻撃計画・実施者を十分確保できないと見込まれる場合には、サードパーティの活用"
+     }
+    ]
+   },
+   {
+    "k": [
+     "安全性評価（有害出力・情報漏えい・プロンプトインジェクション）",
+     "Safety evaluation (harmful output, data leakage, prompt injection)"
+    ],
+    "what": [
+     "有害情報の拒否、機密の漏えい、注入攻撃への防御を確かめる",
+     "Check refusal of harmful content, confidentiality, and defenses against injection"
+    ],
+    "when": [
+     "導入前・変更時・新たな攻撃手法の出現時",
+     "Before launch, on change, and when new attack methods appear"
+    ],
+    "who": [
+     "セキュリティ担当＋開発者。重要な用途はレッドチームも",
+     "Security staff and developers; add a red team for important uses"
+    ],
+    "how": [
+     "有害プロンプト集、RAG検索先の権限確認、入力側の禁止リスト、エージェントの権限最小化を組み合わせる",
+     "Combine harmful-prompt sets, RAG access-permission checks, input deny-lists, and least-privilege for agents"
+    ],
+    "trap": [
+     "全部は防げない前提で多層防御を作らない／テスト通過を安全の保証と誤解する",
+     "Failing to build layered defense despite imperfect protection; treating a passed test as proof of safety"
+    ],
+    "src": [
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関する評価観点ガイド（第1.20版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/ai_safety_eval_v1.20_ja.pdf",
+      "quote": "プロンプトインジェクションに対する防護策があるか。また、LLM システムのバックエンドシステムに意図していない操作が行われない防護策ができているか。"
+     },
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関する評価観点ガイド（第1.20版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/ai_safety_eval_v1.20_ja.pdf",
+      "quote": "バックエンドシステムに RAG が含まれる場合、LLM システムにおいて、機密情報が出力されないよう、RAG による検索先のアクセス権限の設定等に不備がないか。"
+     },
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関するレッドチーミング手法ガイド（第1.10版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/J1_ai_safety_RT_v1.10_ja.pdf",
+      "quote": "ただし、確実に脅威を防げるという保証はないため、多層防御として複数の対策を組み合わせることや、継続的なチューニングが必要となる。"
+     }
+    ]
+   },
+   {
+    "k": [
+     "公平性・偏りの検査",
+     "Fairness and bias testing"
+    ],
+    "what": [
+     "人の属性によって出力が不当に変わらないか確かめる",
+     "Check that output does not change unfairly with a person's attributes"
+    ],
+    "when": [
+     "導入前・データや参照元の変更時・定期",
+     "Before launch, when data or sources change, and periodically"
+    ],
+    "who": [
+     "開発者＋業務担当＋第2線（重要用途）",
+     "Developers, business owners, and second line (important uses)"
+    ],
+    "how": [
+     "属性だけを変えた対のテスト文、群別の誤り率の差、プロンプトや参照データ由来の偏りの確認",
+     "Paired prompts differing only in attribute, error-rate gaps by group, bias from prompts and reference data"
+    ],
+    "trap": [
+     "属性を除いても代理の情報で偏る／平均では群別の差が見えない",
+     "Bias persists through proxies even when attributes are removed; averages hide group gaps"
+    ],
+    "src": [
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関する評価観点ガイド（第1.20版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/ai_safety_eval_v1.20_ja.pdf",
+      "quote": "出力が人の属性に影響されないと想定されるテストデータを入力した際、出力結果が属性による影響を受けないか。"
+     },
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "潜在的なバイアスの例として、人種や性別等の明らかなセンシティブ属性を取り除いたデータであっても、関連する情報からセンシティブ属性が類推されてしまう場合や、複数の属性の組み合わせによってバイアスが生じてしまう場合（交差バイアス）などがある"
+     }
+    ]
+   },
+   {
+    "k": [
+     "頑健性（ロバスト性）",
+     "Robustness"
+    ],
+    "what": [
+     "誤入力や言い換えなど予期せぬ入力でも、出力が安定するか確かめる",
+     "Check that output stays stable under unexpected input such as typos and rephrasing"
+    ],
+    "when": [
+     "導入前・変更時",
+     "Before launch and on change"
+    ],
+    "who": [
+     "開発者・評価担当",
+     "Developers and evaluation staff"
+    ],
+    "how": [
+     "同じ入力の反復、意味が近い言い換え、誤字・文字化け・表記ゆれ・敵対的な入力",
+     "Repeat identical input, paraphrases, typos, garbled text, spelling variants, adversarial input"
+    ],
+    "trap": [
+     "毎回結果が変わり評価がぶれる／極端な入力だけで通常入力を測らない",
+     "Run-to-run variation blurs results; testing only extreme input and not normal input"
+    ],
+    "src": [
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関する評価観点ガイド（第1.20版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/ai_safety_eval_v1.20_ja.pdf",
+      "quote": "LLM システムに同一のデータを複数回入力した際、出力に一貫性があるか。"
+     },
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関する評価観点ガイド（第1.20版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/ai_safety_eval_v1.20_ja.pdf",
+      "quote": "摂動したデータ（誤入力、敵対的プロンプト、文字化けデータ、表記ゆれを含むデータなど）を入力した場合でも LLM システムが安定動作するか。"
+     }
+    ]
+   },
+   {
+    "k": [
+     "負荷・コスト評価",
+     "Load and cost testing"
+    ],
+    "what": [
+     "重い入力や同時利用で性能が落ちないか、費用が予算内かを確かめる",
+     "Check that heavy input and concurrency do not degrade service and that cost stays in budget"
+    ],
+    "when": [
+     "導入前・利用拡大の前・モデル変更時",
+     "Before launch, before scaling, and on model change"
+    ],
+    "who": [
+     "開発者・基盤担当・費用の責任者",
+     "Developers, platform staff, and the cost owner"
+    ],
+    "how": [
+     "処理が重い入力の反復、同時接続試験、トークン使用量の上限と警報、利用制限の設定",
+     "Repeated heavy inputs, concurrency tests, token budgets with alerts, rate limits"
+    ],
+    "trap": [
+     "本番の入力長や利用量を甘く見積もる／外部APIの制限・値上げを織り込まない",
+     "Underestimating real input size and volume; ignoring external API limits and price changes"
+    ],
+    "src": [
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関する評価観点ガイド（第1.20版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/ai_safety_eval_v1.20_ja.pdf",
+      "quote": "LLM システムが処理困難でコストのかかる複数のテストデータを繰り返し入力した場合でも、LLM システムのパフォーマンス低下やシステムの停止が発生しない対策が取られているか。"
+     },
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関する評価観点ガイド（第1.20版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/ai_safety_eval_v1.20_ja.pdf",
+      "quote": "AI エージェントシステムの計算リソースの使用量の記録・確認"
+     }
+    ]
+   },
+   {
+    "k": [
+     "A/Bテスト・カナリア",
+     "A/B testing and canary release"
+    ],
+    "what": [
+     "本番の一部だけで新旧を比べ、問題があれば戻す",
+     "Compare old and new on a slice of production and roll back if there is a problem"
+    ],
+    "when": [
+     "モデルやプロンプトの更新時",
+     "On model or prompt updates"
+    ],
+    "who": [
+     "サービス責任者＋監視担当",
+     "Service owner and monitoring staff"
+    ],
+    "how": [
+     "少数の利用者へ段階展開し、主要指標の差を見る。戻す条件を先に決める",
+     "Roll out gradually to few users, watch key-metric differences, and fix rollback conditions beforehand"
+    ],
+    "trap": [
+     "低リスクの領域だけで試して重大な失敗を見逃す／利用者への告知を怠る",
+     "Testing only low-risk areas and missing serious failures; failing to inform users"
+    ]
+   },
+   {
+    "k": [
+     "本番の継続評価とドリフト監視",
+     "Continuous production evaluation and drift monitoring"
+    ],
+    "what": [
+     "稼働後に品質や入力の傾向が変わっていないか見張る",
+     "Watch for changes in quality or input patterns after launch"
+    ],
+    "when": [
+     "本番中、常時または定期",
+     "In production, continuously or on schedule"
+    ],
+    "who": [
+     "運用担当（第1線）。結果は第2線も確認",
+     "Operations (first line); second line also reviews results"
+    ],
+    "how": [
+     "抜き取りレビュー、入力分布の変化、人の修正率・苦情率、固定の評価セットの定期再実行",
+     "Spot reviews, input-distribution shifts, human-edit and complaint rates, periodic reruns of a fixed evaluation set"
+    ],
+    "trap": [
+     "閾値が未設定／悪化しても動く責任者がいない",
+     "No thresholds set; nobody responsible to act when metrics worsen"
+    ],
+    "src": [
+     {
+      "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+      "quote": "使用開始時には意図したとおりの性能が確認されたモデルであっても、 計測対象とする金融商品、金融機関のビジネス活動、市場の状況その他の環境の変化等により性能が低下することも想定される。継続モニタリングは、そのようなモデルの陳腐化を捕捉し、モデルの変更又は使用停止が必要となっていないかを確認する役割も担っている。"
+     },
+     {
+      "name": "OMB Memorandum M-25-21 (April 3, 2025) Accelerating Federal Use of AI through Innovation, Governance, and Public Trust",
+      "kind": "一次",
+      "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-21-Accelerating-Federal-Use-of-AI-through-Innovation-Governance-and-Public-Trust.pdf",
+      "quote": "Ongoing monitoring must be designed to detect unforeseen circumstances, changes to an AI system after deployment, or changes to the context of use or associated data."
+     },
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関するレッドチーミング手法ガイド（第1.10版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/J1_ai_safety_RT_v1.10_ja.pdf",
+      "quote": "外部環境の変化等によってコンセプトドリフトやデータドリフト等が発生している場合や、システム改修に伴ってセキュリティ対策を追加・修正する場合"
+     }
+    ]
+   },
+   {
+    "k": [
+     "第2線の独立検証（モデルリスク管理）",
+     "Independent second-line validation (model risk management)"
+    ],
+    "what": [
+     "開発・運用から独立した検証者が、導入前・変更時・導入後に点検する",
+     "A validator independent of development and operations checks before launch, on change, and after launch"
+    ],
+    "when": [
+     "導入前・重要な変更時・稼働後の再検証",
+     "Before launch, on material change, and revalidation after launch"
+    ],
+    "who": [
+     "第2線（リスク管理部門）。内部監査は第3線で全体を評価",
+     "Second line (risk management); internal audit as third line assesses the whole"
+    ],
+    "how": [
+     "モデル記述書、前提・限界、データの確認。頻度・深さはリスク格付に連動。欠陥時は使用制限を求める",
+     "Review model description, assumptions, limits, and data; set frequency and depth by risk rating; request restrictions if defects are found"
+    ],
+    "trap": [
+     "第1線の自己検証／使用制限の権限なし／現在の直接の適用対象は金融システム上重要な金融機関",
+     "First line validating itself; validator without authority to restrict use; the FSA principles currently apply directly to systemically important financial institutions (other firms are not covered and may use them as a reference)"
+    ],
+    "src": [
+     {
+      "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+      "quote": "金融機関は、モデル検証者が第１線から十分に独立してけん制機能を発揮できる態勢を構築すべきである。"
+     },
+     {
+      "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+      "quote": "欠陥等が発見されたモデルについては、第２線が使用を制限又は拒否する権限を持つ。"
+     },
+     {
+      "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+      "quote": "モデル開発者と独立した検証者によって本番適用前の検証や継続的なモデルのパフォーマンス監視を行っている先"
+     },
+     {
+      "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+      "quote": "本文書は、金融システム上重要な金融機関、具体的には以下に掲げる金融機関を適用対象とする。"
+     }
+    ]
+   }
+  ],
+  "accept": [
+   {
+    "c": [
+     "リスク階層に比例させる",
+     "Scale to the risk tier"
+    ],
+    "d": [
+     "影響が大きい用途ほど、評価の深さ・頻度・独立性を上げる。低リスクは軽い手順で足りる",
+     "Raise depth, frequency, and independence of evaluation for higher-impact uses; light checks suffice for low risk"
+    ],
+    "src": [
+     {
+      "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+      "quote": "モデル検証の実施頻度や深度・範囲等は、当該モデルのリスクの高低と整合的でなければならない。"
+     },
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "具体的な検討にあたっては開発・提供・利用予定のAI のもたらすリスクの程度及び蓋然性、並びに各主体の資源制約に配慮することが重要である"
+     }
+    ]
+   },
+   {
+    "c": [
+     "ベースラインと比べる",
+     "Compare against a baseline"
+    ],
+    "d": [
+     "現行の人手や既存システムと比べ、『現状より悪化せず重大失敗なし』を軸にする（米OMBも連邦機関向けに既存業務と比較）",
+     "Compare with the current manual process or system and judge by 'no worse than now, no serious failures' (US OMB, for federal agencies, also compares with existing processes)"
+    ],
+    "src": [
+     {
+      "name": "OMB Memorandum M-25-21 (April 3, 2025) Accelerating Federal Use of AI through Innovation, Governance, and Public Trust",
+      "kind": "一次",
+      "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-21-Accelerating-Federal-Use-of-AI-through-Innovation-Governance-and-Public-Trust.pdf",
+      "quote": "the intended purpose for the AI and its expected benefit, supported by specific metrics or qualitative analysis, assessing impact inclusive of but not limited to costs, customer experience, or expected positive outcomes of AI use, as compared to existing agency processes;"
+     },
+     {
+      "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+      "quote": "他方、人間が誤った判断を行うこともあり、厳密なルールに基づいて動作する従来の AI システムと同様に「AI は絶対に誤ってはならない」といった極めて高精度の要求水準を AI に課すことは適切ではないとも考えられる"
+     }
+    ]
+   },
+   {
+    "c": [
+     "失敗の重さで閾値を分ける",
+     "Set thresholds by severity of failure"
+    ],
+    "d": [
+     "権利・安全に重大な影響が出る失敗は許容ゼロか即停止、軽微なものは閾値内で許容（米OMBの高影響の定義を参照）",
+     "Failures with serious impact on rights or safety get zero tolerance or an immediate stop; minor ones are accepted within a threshold (see the US OMB definition of high-impact AI, written for federal agencies)"
+    ],
+    "src": [
+     {
+      "name": "OMB Memorandum M-25-21 (April 3, 2025) Accelerating Federal Use of AI through Innovation, Governance, and Public Trust",
+      "kind": "一次",
+      "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-21-Accelerating-Federal-Use-of-AI-through-Innovation-Governance-and-Public-Trust.pdf",
+      "quote": "AI is considered high-impact when its output serves as a principal basis for decisions or actions that have a legal, material, binding, or significant effect on rights or safety."
+     }
+    ]
+   },
+   {
+    "c": [
+     "再評価の条件を先に決める",
+     "Define re-evaluation triggers in advance"
+    ],
+    "d": [
+     "モデル更新・プロンプト変更・データ変化・インシデント・規制変更を契機に、再評価を必須にする",
+     "Make re-evaluation mandatory on model updates, prompt changes, data shifts, incidents, and rule changes"
+    ],
+    "src": [
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関するレッドチーミング手法ガイド（第1.10版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/J1_ai_safety_RT_v1.10_ja.pdf",
+      "quote": "オフラインによる追加学習によってモデルのパラメータを更新した場合、システムプロンプト等を変更した場合も含め、開発・提供・利用の各フェーズにおいて定期的に実施する他、必要に応じて随時実施することが望ましい。"
+     },
+     {
+      "name": "OMB Memorandum M-25-21 (April 3, 2025) Accelerating Federal Use of AI through Innovation, Governance, and Public Trust",
+      "kind": "一次",
+      "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-21-Accelerating-Federal-Use-of-AI-through-Innovation-Governance-and-Public-Trust.pdf",
+      "quote": "reassessment scheduling and procedures, supported by schedules for periodic reassessments as well as reassessment requirements following significant modifications to an underlying AI system"
+     }
+    ]
+   },
+   {
+    "c": [
+     "基準・例外・承認を記録する",
+     "Record criteria, exceptions, and approvals"
+    ],
+    "d": [
+     "合格基準と例外は文書に残し、残るリスクを受け入れる責任者が署名する（米OMBの影響評価は署名つきのリスク受容を含む）",
+     "Document pass criteria and exceptions, and have the accountable person sign off on residual risk (the US OMB impact assessment includes signed risk acceptance)"
+    ],
+    "src": [
+     {
+      "name": "OMB Memorandum M-25-21 (April 3, 2025) Accelerating Federal Use of AI through Innovation, Governance, and Public Trust",
+      "kind": "一次",
+      "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-21-Accelerating-Federal-Use-of-AI-through-Innovation-Governance-and-Public-Trust.pdf",
+      "quote": "risk acceptance, supported by a signature from the individual accepting the risk."
+     },
+     {
+      "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+      "quote": "検証結果は適切に文書化され、モデル承認 の判断基準として考慮されるべきである。"
+     }
+    ]
+   },
+   {
+    "c": [
+     "数値にしにくい領域は、観点別チェックと人手サンプルで補う",
+     "Where numbers are hard, add per-aspect checklists and human sampling"
+    ],
+    "d": [
+     "生成AIは評価軸が確立していない。自動採点だけに頼らず、人手サンプルと本番監視を組み合わせる",
+     "Generative AI lacks settled evaluation axes; combine human samples and production monitoring instead of relying on automation alone"
+    ],
+    "src": [
+     {
+      "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+      "quote": "生成 AI は従来型 AI とは異なり性能の評価方法や評価軸が確立しておらず、また汎用性も高いため、客観性を持って性能検証をすることが難しい。"
+     },
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関する評価観点ガイド（第1.20版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/ai_safety_eval_v1.20_ja.pdf",
+      "quote": "また、LLM を用いて評価を行うモデルベースの評価も存在する。一方で、AI セーフティ評価の観点の全てをツールによって自動実施することは難しい。その他の手法と組み合わせることで、効果的な AI セーフティ評価の実施を目指すことが重要である。"
+     }
+    ]
+   }
+  ]
+ },
+ "riskai": {
+  "uses": [
+   {
+    "a": [
+     "与信・引受の審査補助",
+     "Credit and underwriting decision support"
+    ],
+    "ai": [
+     "申込・取引履歴から、スコアや判定案と根拠を示す",
+     "Produces a score or draft decision with reasons from application and transaction data"
+    ],
+    "human": [
+     "可否・条件・例外の最終判断と、顧客への説明",
+     "Final approve/decline/exception decision and the explanation to the customer"
+    ],
+    "risk": [
+     "説明できない判断／属性による偏り／モデルの陳腐化",
+     "Unexplainable decisions; bias by attribute; model going stale"
+    ],
+    "ctl": [
+     "寄与度の可視化、群別の誤り率の検査、独立検証、定期の再検証",
+     "Contribution visualization, error-rate checks by group, independent validation, periodic revalidation"
+    ],
+    "src": [
+     {
+      "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+      "quote": "「与信審査・信用リスク管理・引受審査」においては、例えば、顧客のローン返済履歴等を学習させた与信判定モデルや過去の審査判定データを学習させた保証審査モデルを開発・運用している先"
+     },
+     {
+      "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+      "quote": "与信判断など、その影響（リスク）に照らして重要な判断にAI を用いる場合、当該 AI の性質に応じて、どのようなデータで学習したか、RAG等を利用する場合どのようなデータを参照したか、どのようなプロンプトが与えられたか、出力結果の記録とモニタリングが機能しているかといった観点から、金融機関自身が判断の合理性を検証・説明できるようにする必要がある。"
+     }
+    ]
+   },
+   {
+    "a": [
+     "AMLの取引モニタリングと誤検知の削減",
+     "AML transaction monitoring and false-positive reduction"
+    ],
+    "ai": [
+     "取引をスコア化してアラートの優先順位を付け、誤検知の削減案を出す",
+     "Scores transactions, prioritizes alerts, and proposes ways to cut false positives"
+    ],
+    "human": [
+     "疑わしい取引の該当性判断と届出の最終判断",
+     "Final judgment on whether a transaction is suspicious and on filing"
+    ],
+    "risk": [
+     "学習データ不足で精度が出ない／見逃し／シナリオ・閾値の陳腐化",
+     "Insufficient training data limits accuracy; misses; stale scenarios and thresholds"
+    ],
+    "ctl": [
+     "既存ルールと併用、シナリオ・閾値の有効性分析、独立した検証",
+     "Run alongside existing rules, analyze scenario/threshold effectiveness, independent validation"
+    ],
+    "src": [
+     {
+      "name": "金融庁「マネー・ローンダリング及びテロ資金供与対策に関するガイドライン」",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/amlcft/20260331/02.pdf",
+      "quote": "疑わしい取引の届出につながる取引等について、 リスクに応じて検知するため、 以下を含む、 取引モニタリングに関する適切な体制を構築し、整備すること"
+     },
+     {
+      "name": "金融庁「マネー・ローンダリング及びテロ資金供与対策に関するガイドライン」",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/amlcft/20260331/02.pdf",
+      "quote": "AI（人工知能） 、ブロックチェーン、RPA（注）等の新技術が導入され、実効性向上に活用されている"
+     },
+     {
+      "name": "金融庁「マネー・ローンダリング及びテロ資金供与対策に関するガイドライン」",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/amlcft/20260331/02.pdf",
+      "quote": "疑わしい取引の届出は、 犯収法に定める法律上の義務であり"
+     },
+     {
+      "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+      "quote": "個社での自社開発では学習データに限りがあり十分な精度が得られず本番利用を見送ったと回答した先もあった"
+     }
+    ]
+   },
+   {
+    "a": [
+     "制裁リスト照合・ネームスクリーニング",
+     "Sanctions-list matching and name screening"
+    ],
+    "ai": [
+     "表記ゆれや別名を考慮して、照合候補を絞り込む",
+     "Narrows match candidates, allowing for spelling variants and aliases"
+    ],
+    "human": [
+     "ヒットの真偽判定と、取引の可否の判断",
+     "Judges whether a hit is real and decides whether the transaction proceeds"
+    ],
+    "risk": [
+     "最新リストの反映漏れ／見逃し／判定の根拠が残らない",
+     "Missed list updates; false negatives; no record of why a hit was cleared"
+    ],
+    "ctl": [
+     "リスト更新の確認、既知の制裁対象でのテスト、判定ログの保存",
+     "Verify list updates, test with known sanctioned names, keep decision logs"
+    ],
+    "src": [
+     {
+      "name": "金融庁「マネー・ローンダリング及びテロ資金供与対策に関するガイドライン」",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/amlcft/20260331/02.pdf",
+      "quote": "照合対象となる制裁リストが最新のものとなっているか、 及び制裁対象の検知基準がリスクに応じた適切な設定となっているかを検証するなど、的確な運用を図ること"
+     },
+     {
+      "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+      "quote": "取引モニタリング及びネームスクリーニング業務の高度化に資するサービスの提供を開始又は提供の準備を進めている先"
+     }
+    ]
+   },
+   {
+    "a": [
+     "不正検知（カード・保険金・社内不正）",
+     "Fraud detection (cards, insurance claims, internal fraud)"
+    ],
+    "ai": [
+     "異常パターンをスコア化し、調査対象を提示する",
+     "Scores anomalous patterns and surfaces cases to investigate"
+    ],
+    "human": [
+     "調査、不正の認定、顧客対応の最終判断",
+     "Final judgment on investigation, fraud findings, and customer handling"
+    ],
+    "risk": [
+     "正当な顧客の不利益（誤検知）／AIで巧妙化した偽造／ラベル不足",
+     "Harm to legitimate customers (false positives); AI-enhanced forgeries; scarce labels"
+    ],
+    "ctl": [
+     "誤検知率と見逃し率の両方を追跡、異議申立ての手順、再学習の承認",
+     "Track both false-positive and miss rates, an appeal procedure, approval of retraining"
+    ],
+    "src": [
+     {
+      "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+      "quote": "保険金不正請求の検知や監査業務における活用"
+     },
+     {
+      "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+      "quote": "従来の KYC 手続や認証システムでは実在の人物との見分けが困難になり、本人確認をすり抜ける可能性が指摘されている。"
+     }
+    ]
+   },
+   {
+    "a": [
+     "契約・委託先審査の一次チェック",
+     "First-pass checks of contracts and third parties"
+    ],
+    "ai": [
+     "契約条項や質問票の回答から、抜け・矛盾・要確認点を抽出する",
+     "Extracts gaps, inconsistencies, and points to confirm from clauses and questionnaires"
+    ],
+    "human": [
+     "リスク評価と承認、重要条項の最終確認（法務・調達）",
+     "Risk assessment, approval, and final review of key clauses (legal, procurement)"
+    ],
+    "risk": [
+     "見落とし・ハルシネーション／機密の外部入力／過信",
+     "Misses and hallucinations; confidential data sent out; overreliance"
+    ],
+    "ctl": [
+     "抽出箇所の原文引用を必須に、人が全件承認、入力できる情報の区分を制限",
+     "Require source quotations, human approval of every case, limits on what data may be input"
+    ],
+    "src": [
+     {
+      "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+      "quote": "典型的には、人間の関与を前提とした業務プロセスの構築で、ハルシネーションがゼロにはならないとの前提の下、生成 AI の導入に当たっては人間によるレビューのプロセスを設定している先が多い。"
+     },
+     {
+      "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+      "quote": "根拠となる文書を回答に含めることで根拠の裏付けを確認できるようにしている"
+     }
+    ]
+   },
+   {
+    "a": [
+     "規程・法令改正の影響分析",
+     "Impact analysis of rule and law changes"
+    ],
+    "ai": [
+     "改正点と社内規程の対応表の案、影響しそうな業務の候補を出す",
+     "Drafts a mapping of amendments to internal rules and candidate affected processes"
+    ],
+    "human": [
+     "影響の有無と対応要否の判断、規程改定の承認",
+     "Decides whether there is an impact and what to do; approves rule changes"
+    ],
+    "risk": [
+     "条文の誤読・古い版の参照／網羅漏れ",
+     "Misreading provisions; citing outdated versions; incomplete coverage"
+    ],
+    "ctl": [
+     "参照先を公式原文に固定、根拠箇所の提示、法務・コンプライアンスの二重確認",
+     "Pin sources to official texts, show supporting passages, double-check by legal/compliance"
+    ],
+    "src": [
+     {
+      "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+      "quote": "学習データに古い情報が多く混在していると、古い情報の出現回数の方が多いため、ハルシネーションが起きやすい。"
+     },
+     {
+      "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+      "quote": "根拠となる文書を回答に含めることで根拠の裏付けを確認できるようにしている"
+     }
+    ]
+   },
+   {
+    "a": [
+     "KRI/KPIの常時モニタリングと早期警戒",
+     "Continuous KRI/KPI monitoring and early warning"
+    ],
+    "ai": [
+     "指標の異常やトレンドの変化を検知し、兆候と関連情報を要約する",
+     "Detects anomalies and trend shifts and summarizes signs and related information"
+    ],
+    "human": [
+     "警戒レベルの判断、対応方針の決定、経営への報告",
+     "Judges alert level, decides the response, and reports to management"
+    ],
+    "risk": [
+     "誤警報で現場が疲弊／検知漏れ／原因を説明できない／データの遅延",
+     "Alert fatigue; missed detections; unexplained causes; data delays"
+    ],
+    "ctl": [
+     "閾値とエスカレーション基準を事前承認、データ鮮度の監視、AIの警告は端緒として扱う",
+     "Pre-approved thresholds and escalation rules, data-freshness monitoring, treat AI warnings as leads"
+    ],
+    "src": [
+     {
+      "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+      "quote": "ニュースや SNS を活用した予兆管理を行っている先"
+     }
+    ]
+   },
+   {
+    "a": [
+     "内部監査（全件テスト・継続的監査）",
+     "Internal audit (full-population testing, continuous auditing)"
+    ],
+    "ai": [
+     "全件データから異常を抽出し、サンプル選定や調書の下書きを作る",
+     "Extracts anomalies from full data and drafts sample selections and working papers"
+    ],
+    "human": [
+     "監査判断・所見・報告（結論は人が出す）",
+     "Audit judgment, findings, and reporting (conclusions by people)"
+    ],
+    "risk": [
+     "自己監査（AIを作った部門を自分で監査する）／抽出ロジックの偏り／説明不能",
+     "Self-review (auditing the unit that built the AI); biased extraction logic; unexplainable results"
+    ],
+    "ctl": [
+     "AIの運用部門から独立した監査体制、抽出ロジックの検証、第3線によるAI管理態勢の評価",
+     "Audit independent of the AI's operators, validation of extraction logic, third-line assessment of AI governance"
+    ],
+    "src": [
+     {
+      "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+      "quote": "社内メールを AI でスコアリングして不正検知の一助とする"
+     },
+     {
+      "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+      "quote": "内部監査部門は、第３線として、モデル・リスク管理態勢の全体的な有効性を評価すべきである。"
+     },
+     {
+      "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+      "quote": "金融機関は、モデル検証者が第１線から十分に独立してけん制機能を発揮できる態勢を構築すべきである。"
+     }
+    ]
+   },
+   {
+    "a": [
+     "統制テストの自動化（証跡の突合・例外抽出）",
+     "Automated control testing (evidence matching, exception extraction)"
+    ],
+    "ai": [
+     "証跡を集めて突合し、例外を抽出する",
+     "Collects and matches evidence and extracts exceptions"
+    ],
+    "human": [
+     "不備の評価と是正の指示",
+     "Assesses deficiencies and directs remediation"
+    ],
+    "risk": [
+     "証跡の欠落を見逃す／テストの形骸化／抽出基準の変更で統制が弱まる",
+     "Missed evidence gaps; hollow tests; weakened controls when extraction criteria change"
+    ],
+    "ctl": [
+     "抽出基準の変更管理、一定割合の人手再テスト、第2線によるAI出力のサンプル検証",
+     "Change control on extraction criteria, a share of tests redone by hand, second-line sampling of AI output"
+    ]
+   },
+   {
+    "a": [
+     "インシデント・苦情の分類",
+     "Incident and complaint triage"
+    ],
+    "ai": [
+     "受付文を分類し、緊急度の推定と類似案件の紐づけを行う",
+     "Classifies intake text, estimates urgency, and links similar cases"
+    ],
+    "human": [
+     "重大度の最終判定、顧客対応、再発防止",
+     "Final severity call, customer response, and recurrence prevention"
+    ],
+    "risk": [
+     "重大案件の過小分類／文脈の見落とし／言語や属性による偏り",
+     "Under-classifying serious cases; missed context; bias by language or attribute"
+    ],
+    "ctl": [
+     "重大キーワードは人へ自動エスカレーション、分類精度の定期サンプル検査、未分類の滞留監視",
+     "Auto-escalate critical terms to people, periodic accuracy sampling, monitor unclassified backlog"
+    ]
+   },
+   {
+    "a": [
+     "営業現場のコンプライアンス違反の兆候検知",
+     "Detecting signs of misconduct in sales conduct"
+    ],
+    "ai": [
+     "応接記録などから、違反が疑われるものを抽出する",
+     "Extracts items suspected of violations from interaction records"
+    ],
+    "human": [
+     "事実確認、評価、指導や処分の判断",
+     "Fact-finding, evaluation, and the decision on guidance or discipline"
+    ],
+    "risk": [
+     "従業員の監視とプライバシー／誤検知による不当な評価／過信",
+     "Employee monitoring and privacy; unfair evaluation from false positives; overreliance"
+    ],
+    "ctl": [
+     "抽出は調査の端緒に限定、評価に使うなら対象者へ通知し人が判断、検知精度の検査",
+     "Limit extraction to investigative leads; if used for evaluation, notify the person and decide by human judgment; test detection accuracy"
+    ],
+    "src": [
+     {
+      "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+      "quote": "営業現場におけるコンプライアンス違反の検知（例︓金融商品販売時等における応接記録からコンプライアンス違反が疑われるものを抽出）"
+     },
+     {
+      "name": "AI事業者ガイドライン（第1.2版）本編（経済産業省・総務省）",
+      "kind": "一次",
+      "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20260331_1.pdf",
+      "quote": "当該 AI の出力結果を特定の個人又は集団に対する評価の参考にする場合は、AI を利用している旨を評価対象となっている当該特定の個人又は集団に対して通知し"
+     }
+    ]
+   }
+  ],
+  "kri": [
+   {
+    "c": [
+     "指標の定義と閾値",
+     "Metric definition and thresholds"
+    ],
+    "d": [
+     "計算式・データ源・頻度・責任者を定義する。閾値は自社のリスク評価に結び、有効性を分析し見直す（AML指針を当てはめ）",
+     "Define formula, data source, frequency, and owner; tie thresholds to your own risk assessment and review them by analyzing effectiveness (applying the AML/CFT guideline by analogy)"
+    ],
+    "src": [
+     {
+      "name": "金融庁「マネー・ローンダリング及びテロ資金供与対策に関するガイドライン」",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/amlcft/20260331/02.pdf",
+      "quote": "自らのリスク評価を反映したシナリオ ・ 敷居値等の抽出基準を設定すること"
+     },
+     {
+      "name": "金融庁「マネー・ローンダリング及びテロ資金供与対策に関するガイドライン」",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/amlcft/20260331/02.pdf",
+      "quote": "現行の抽出基準（シナリオ・敷居値等）の有効性を分析し、シナリオ・敷居値等の抽出基準について改善を図ること"
+     }
+    ]
+   },
+   {
+    "c": [
+     "データの鮮度・網羅性・正確性",
+     "Data freshness, completeness, and accuracy"
+    ],
+    "d": [
+     "入力の遅延・欠損・誤りはAIの警告も誤らせる。取得時刻と欠損率を指標にし定期検証（AML指針を当てはめ）",
+     "Delayed, missing, or wrong input makes AI warnings wrong too; track timestamps and missing rates and verify regularly (applying the AML/CFT guideline by analogy)"
+    ],
+    "src": [
+     {
+      "name": "金融庁「マネー・ローンダリング及びテロ資金供与対策に関するガイドライン」",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/amlcft/20260331/02.pdf",
+      "quote": "網羅性・正確性の観点で適切なデータが活用されているかを定期的に検証すること"
+     }
+    ]
+   },
+   {
+    "c": [
+     "アラートの責任者とエスカレーション",
+     "Alert owner and escalation"
+    ],
+    "d": [
+     "誰が何時間以内に確認し、どの水準で上位へ上げるかを決める。未対応の滞留も指標にする",
+     "Decide who checks within what time and at what level it escalates; track the backlog of unhandled alerts"
+    ],
+    "src": [
+     {
+      "name": "AIセーフティ・インスティテュート「AIセーフティに関する評価観点ガイド（第1.20版）」",
+      "kind": "一次",
+      "url": "https://aisi.go.jp/assets/pdf/ai_safety_eval_v1.20_ja.pdf",
+      "quote": "問題発生時のエスカレーション体制や責任の所在"
+     }
+    ]
+   },
+   {
+    "c": [
+     "AIが出す早期警戒の扱い",
+     "Handling AI-generated early warnings"
+    ],
+    "d": [
+     "警告は確定でなく端緒として扱う。的中率と誤警報率を記録し、ルールベースの指標と併用する",
+     "Treat warnings as leads, not conclusions; record hit and false-alarm rates; run alongside rule-based indicators"
+    ],
+    "src": [
+     {
+      "name": "金融庁「AIディスカッションペーパー（第1.1版）」（2026年3月）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/sonota/20260303/aidp_version1.1.pdf",
+      "quote": "ルールベースの不正検知システムとの併用を検討する先"
+     }
+    ]
+   },
+   {
+    "c": [
+     "AI自体のKRI（性能・ドリフト・人の修正率）",
+     "KRIs for the AI itself (performance, drift, human-edit rate)"
+    ],
+    "d": [
+     "性能低下、入力分布の変化、人が直した割合、停止回数を指標にし、変更・停止の判断に使う",
+     "Use performance decline, input-distribution shift, share corrected by people, and stoppages to decide on change or retirement"
+    ],
+    "src": [
+     {
+      "name": "金融庁「モデル・リスク管理に関する原則」（令和3年11月12日）",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r3/ginkou/20211112/pdf_02.pdf",
+      "quote": "使用開始時には意図したとおりの性能が確認されたモデルであっても、 計測対象とする金融商品、金融機関のビジネス活動、市場の状況その他の環境の変化等により性能が低下することも想定される。継続モニタリングは、そのようなモデルの陳腐化を捕捉し、モデルの変更又は使用停止が必要となっていないかを確認する役割も担っている。"
+     }
+    ]
+   },
+   {
+    "c": [
+     "閾値・シナリオの変更管理と独立検証",
+     "Change control and independent validation of thresholds and scenarios"
+    ],
+    "d": [
+     "変更は承認と記録を経て行い、運用部門とは別の立場が有効性を検証する（AML指針を当てはめ）",
+     "Make changes through approval and records, and have a party apart from operations verify effectiveness (applying the AML/CFT guideline by analogy)"
+    ],
+    "src": [
+     {
+      "name": "金融庁「マネー・ローンダリング及びテロ資金供与対策に関するガイドライン」",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/amlcft/20260331/02.pdf",
+      "quote": "IT システムの設計・運用等が、マネロン・テロ資金供与リスクの動向に的確に対応し、自らが行うリスク管理に見合ったものとなっているか検証するとともに、導入後も定期的に検証し、検証結果を踏まえて必要に応じ改善を図ること"
+     },
+     {
+      "name": "金融庁「マネー・ローンダリング及びテロ資金供与対策に関するガイドライン」",
+      "kind": "一次",
+      "url": "https://www.fsa.go.jp/news/r7/amlcft/20260331/02.pdf",
+      "quote": "内部 ・ 外部監査等の独立した検証プロセスを通じ"
+     }
+    ]
+   }
+  ]
+ },
+ "src_note": "【出典と範囲】cust：AI事業者ガイドライン第1.2版（本編・別添）、EU AI法第50条（条文表示は二次、適用日・制裁金・猶予は欧州委員会Quick Factsの一次）、個人情報保護委員会（生成AI注意喚起は事業者向けの別添1を使用、OpenAI宛ての別添2は使わない・漏えい等報告）、消費者庁（景品表示法）、消費者契約法（e-Gov）。消費者庁の資料はAIに直接触れておらず、景表法の項目は当てはめ。inv：金融庁「モデル・リスク管理に関する原則」（直接の適用対象は金融システム上重要な金融機関。他社は対象外で、参考にするかは各社の判断）、金融庁AIディスカッションペーパー1.1版（監督上の要求事項を示すものではない）、米OMB M-25-21（連邦政府機関向けで、民間企業の義務ではない。後継文書の有無は未確認）。eval：AISI「評価観点ガイド」第1.20版・「レッドチーミング手法ガイド」第1.10版、金融庁の原則。riskai：金融庁AIディスカッションペーパー、マネロン・テロ資金供与対策ガイドライン（『対応が求められる事項』。KRIの項目では当てはめ）、金融庁の原則。出典（src）のない項目は判断・ベストプラクティス（A/Bテスト、統制テスト自動化、苦情分類など）。【未使用・未確認】NIST AI RMF・AI 600-1は本文の取得先（nvlpubs・airc・tsapps）が接続拒否（403）で本文を確認できず、引用していない。ISO/IEC 42001・IIA基準も取得できず引用していない。EU AI法のAI OmnibusによるArt.50への影響は、欧州委員会Quick Facts（「2026年12月まで」）と欧州議会のLegislative Train（「2026年12月2日まで」）にあるマーキング猶予のみ確認。\n\nSOURCES AND SCOPE: cust relies on Japan's AI Guidelines for Business v1.2, EU AI Act Art. 50 (article text is a secondary reproduction; application date, fines, and grace period come from the European Commission's Quick Facts), PPC alerts, the Consumer Affairs Agency pages (CAA pages do not mention AI, so the representation-law items are by analogy), and the Consumer Contract Act (e-Gov). inv relies on the FSA Model Risk Management principles (direct scope is systemically important financial institutions; other firms are not covered and decide for themselves whether to use it as a reference), the FSA AI Discussion Paper v1.1 (not a supervisory requirement), and US OMB M-25-21 (federal agencies only; not a private-sector duty; whether a successor exists is unconfirmed). eval relies on the Japan AISI evaluation guide v1.20 and red-teaming guide v1.10 and the FSA principles; riskai relies on the FSA AI Discussion Paper, the AML/CFT Guidelines (applied by analogy in the KRI items), and the FSA principles. Items without src are judgment or best practice. NOT USED: the NIST AI RMF and AI 600-1 texts could not be retrieved (nvlpubs, airc, tsapps returned 403), and ISO/IEC 42001 and IIA standards were unavailable, so none is cited."
+}

@@ -1,0 +1,851 @@
+{
+ "cols": [
+  "日本",
+  "米国（連邦）",
+  "米国（州）",
+  "EU",
+  "英国",
+  "中国",
+  "韓国",
+  "シンガポール"
+ ],
+ "rows": [
+  {
+   "key": "approach",
+   "label": [
+    "基本の進め方",
+    "Basic approach"
+   ],
+   "cells": {
+    "日本": {
+     "t": [
+      "推進のための基本法（AI法）を置き、具体的な取組はAI指針・AI事業者ガイドライン等のソフトローと既存法に委ねる。",
+      "A promotion-oriented basic act (the AI Act); practical measures are left to soft law such as the AI Guideline and the AI Guidelines for Business, and to existing laws."
+     ],
+     "refs": [
+      "jp-ai-act",
+      "jp-ai-guideline",
+      "jp-ai-biz-guideline"
+     ]
+    },
+    "米国（連邦）": {
+     "t": [
+      "大統領令・行政文書でAI推進へ転じ、民間向けは任意のNIST枠組み。州AI法には連邦が対抗措置を取る（EO 14365）。",
+      "Executive orders and policy documents shifted federal policy toward promoting AI; for the private sector there is the voluntary NIST framework; the federal government counters state AI laws (EO 14365)."
+     ],
+     "refs": [
+      "us-eo-14179",
+      "us-ai-action-plan",
+      "us-nist-ai-rmf",
+      "us-eo-14365"
+     ]
+    },
+    "米国（州）": {
+     "t": [
+      "材料はコロラド・テキサス両州のみ。コロラドは重大な決定でのADMT、テキサスは意図に基づく禁止等を州法で定める。",
+      "The material covers only Colorado and Texas: Colorado regulates ADMT in consequential decisions; Texas sets intent-based prohibitions and other rules by statute."
+     ],
+     "refs": [
+      "us-co-sb26-189",
+      "us-tx-traiga"
+     ]
+    },
+    "EU": {
+     "t": [
+      "AI法（規則）でAIをリスクの高さにより区分して規律する包括的な法律。製造物責任指令・CRAも関連する。",
+      "A comprehensive regulation (the AI Act) that sorts AI by risk level; the Product Liability Directive and the CRA are related laws."
+     ],
+     "refs": [
+      "eu-ai-act",
+      "eu-pld",
+      "eu-cra"
+     ]
+    },
+    "英国": {
+     "t": [
+      "AI専用の包括法は置かず、5つの分野横断の原則を既存の規制当局が非法定で適用する（2024年政府回答）。",
+      "No dedicated horizontal AI statute; existing regulators apply five cross-sectoral principles on a non-statutory basis (2024 Government response)."
+     ],
+     "refs": [
+      "uk-ai-framework"
+     ]
+    },
+    "中国": {
+     "t": [
+      "生成AI・深層合成・推奨アルゴリズム・標識等の個別の行政規則で規律。包括的なAI法の有無は材料では未確認。",
+      "Regulated through separate administrative rules on generative AI, deep synthesis, recommendation algorithms, labelling etc.; whether a comprehensive AI law exists is unconfirmed in the material."
+     ],
+     "refs": [
+      "cn-genai-interim-measures",
+      "cn-deep-synthesis-provisions",
+      "cn-algorithmic-recommendation-provisions",
+      "cn-ai-content-labeling-measures",
+      "cn-anthropomorphic-ai-interaction-measures",
+      "cn-cybersecurity-law-amendment-2025"
+     ]
+    },
+    "韓国": {
+     "t": [
+      "AI基本法という一つの法律で、AI産業の振興と、高影響AI・生成AI等への義務の両方を定める包括的な方式。",
+      "A single framework act (the AI Basic Act) that both promotes the AI industry and sets duties for high-impact and generative AI."
+     ],
+     "refs": [
+      "kr-ai-basic-act"
+     ]
+    },
+    "シンガポール": {
+     "t": [
+      "材料の4件はいずれもガイダンス（IMDAの枠組み、PDPC助言GL、MASのGL）。個人データにはPDPA自体が適用される。",
+      "All four items in the material are guidance (IMDA frameworks, PDPC advisory guidelines, MAS guidelines); the PDPA itself applies to personal data."
+     ],
+     "refs": [
+      "sg-imda-model-ai-governance-framework",
+      "sg-imda-agentic-ai-framework",
+      "sg-pdpc-ai-advisory-guidelines",
+      "sg-mas-ai-risk-management-guidelines"
+     ]
+    }
+   }
+  },
+  {
+   "key": "core",
+   "label": [
+    "中心となるルール",
+    "Core rules"
+   ],
+   "cells": {
+    "日本": {
+     "t": [
+      "AI法（2025年）、同法13条のAI指針、AI事業者ガイドライン（第1.2版）、AI基本計画（第Ⅱ期）。",
+      "The AI Act (2025), the AI Guideline under its Art. 13, the AI Guidelines for Business (v1.2) and the AI Basic Plan (Phase II)."
+     ],
+     "refs": [
+      "jp-ai-act",
+      "jp-ai-guideline",
+      "jp-ai-biz-guideline",
+      "jp-ai-basic-plan"
+     ]
+    },
+    "米国（連邦）": {
+     "t": [
+      "EO 14179、AI行動計画（2025年7月）、OMB覚書M-25-21/22・M-26-04、NIST AI RMF。",
+      "EO 14179, the AI Action Plan (July 2025), OMB memoranda M-25-21/22 and M-26-04, and the NIST AI RMF."
+     ],
+     "refs": [
+      "us-eo-14179",
+      "us-ai-action-plan",
+      "us-omb-m25-21-22",
+      "us-omb-m26-04",
+      "us-nist-ai-rmf"
+     ]
+    },
+    "米国（州）": {
+     "t": [
+      "コロラド州SB 26-189（ADMT法。旧SB 24-205を廃止・再制定）とテキサス州HB 149（責任あるAI統治法）。",
+      "Colorado SB 26-189 (ADMT law, repealing and reenacting SB 24-205) and Texas HB 149 (Responsible AI Governance Act)."
+     ],
+     "refs": [
+      "us-co-sb26-189",
+      "us-tx-traiga"
+     ]
+    },
+    "EU": {
+     "t": [
+      "EU AI規則（規則(EU) 2024/1689）。AI Omnibusで改正済みで、GPAI行動規範・第50条の指針等が補う。",
+      "The EU AI Act (Regulation (EU) 2024/1689), amended by the AI Omnibus and complemented by the GPAI Code of Practice and Article 50 guidance."
+     ],
+     "refs": [
+      "eu-ai-act",
+      "eu-ai-omnibus",
+      "eu-gpai-code",
+      "eu-ai-act-art50"
+     ]
+    },
+    "英国": {
+     "t": [
+      "AI規制白書（2023年）と政府回答（2024年）の5原則。個人データにはUK GDPR・DPA 2018・DUAA 2025。",
+      "The five principles of the AI White Paper (2023) and Government response (2024); for personal data, UK GDPR, DPA 2018 and the DUAA 2025."
+     ],
+     "refs": [
+      "uk-ai-framework",
+      "uk-data-protection-ai"
+     ]
+    },
+    "中国": {
+     "t": [
+      "生成AIサービス管理暫定弁法、深層合成管理規定、アルゴリズム推奨管理規定、AI生成合成コンテンツ標識弁法。",
+      "Interim Measures on Generative AI Services, Deep Synthesis Provisions, Algorithmic Recommendation Provisions and Measures for Labeling AI-Generated Synthetic Content."
+     ],
+     "refs": [
+      "cn-genai-interim-measures",
+      "cn-deep-synthesis-provisions",
+      "cn-algorithmic-recommendation-provisions",
+      "cn-ai-content-labeling-measures"
+     ]
+    },
+    "韓国": {
+     "t": [
+      "AI基本法（人工知能の発展と信頼基盤の造成等に関する基本法、法律第20676号）と施行令。",
+      "The AI Basic Act (Framework Act on the Development of AI and the Creation of a Foundation for Trust, Act No. 20676) and its Enforcement Decree."
+     ],
+     "refs": [
+      "kr-ai-basic-act"
+     ]
+    },
+    "シンガポール": {
+     "t": [
+      "IMDAモデルAIガバナンス枠組み（生成AI版・エージェンティックAI版あり）、PDPC助言GL、MAS AIリスク管理GL。",
+      "IMDA Model AI Governance Framework (with generative AI and agentic AI versions), PDPC Advisory Guidelines and MAS AI Risk Management Guidelines."
+     ],
+     "refs": [
+      "sg-imda-model-ai-governance-framework",
+      "sg-imda-agentic-ai-framework",
+      "sg-pdpc-ai-advisory-guidelines",
+      "sg-mas-ai-risk-management-guidelines"
+     ]
+    }
+   }
+  },
+  {
+   "key": "binding",
+   "label": [
+    "拘束力",
+    "Binding force"
+   ],
+   "cells": {
+    "日本": {
+     "t": [
+      "AI法の事業者の義務は国の施策への協力（第7条）が中心で、罰則規定は見当たらない。指針・ガイドラインは非拘束。",
+      "The AI Act's business duty centres on cooperating with government measures (Art. 7), and no penalty provision appears; the guideline and guidelines are non-binding."
+     ],
+     "refs": [
+      "jp-ai-act",
+      "jp-ai-guideline",
+      "jp-ai-biz-guideline"
+     ]
+    },
+    "米国（連邦）": {
+     "t": [
+      "大統領令・OMB覚書の名宛人は連邦機関で、民間への直接の義務は本文にない（調達契約で間接に及ぶ）。NISTは任意。",
+      "Executive orders and OMB memoranda are addressed to federal agencies, with no direct duty on companies in their text (vendors are reached indirectly via contracts); NIST is voluntary."
+     ],
+     "refs": [
+      "us-eo-14179",
+      "us-eo-14365",
+      "us-eo-14409",
+      "us-eo-14434",
+      "us-omb-m25-21-22",
+      "us-omb-m26-04",
+      "us-nist-ai-rmf"
+     ]
+    },
+    "米国（州）": {
+     "t": [
+      "両州とも罰則付きの州法で、執行は州司法長官のみ。違反通知後60日の是正期間がある（コロラドは故意・反復を除く）。",
+      "Both are state statutes with penalties, enforced only by the Attorney General; a 60-day cure period follows notice (in Colorado, not for knowing or repeated violations)."
+     ],
+     "refs": [
+      "us-co-sb26-189",
+      "us-tx-traiga"
+     ]
+    },
+    "EU": {
+     "t": [
+      "法的拘束力のある規則で制裁金がある（具体的な罰則は加盟国が定める）。GPAI行動規範への署名は任意。",
+      "A binding regulation with fines (specific penalties are laid down by Member States); signing the GPAI Code of Practice is voluntary."
+     ],
+     "refs": [
+      "eu-ai-act",
+      "eu-gpai-obligations",
+      "eu-gpai-code"
+     ]
+    },
+    "英国": {
+     "t": [
+      "5原則は非法定で、拘束力のある義務ではない。データ保護法など既存法は適用され、既存の規制当局が執行する。",
+      "The five principles are non-statutory, not binding duties; existing laws such as data protection law apply and are enforced by existing regulators."
+     ],
+     "refs": [
+      "uk-ai-framework",
+      "uk-data-protection-ai"
+     ]
+    },
+    "中国": {
+     "t": [
+      "罰則付きの行政規則。違反には警告・是正命令・サービス停止等があり、算法備案・安全評価が必要な場合もある。",
+      "Administrative rules with sanctions: violations bring warnings, correction orders, service suspension etc., and algorithm filing or a security assessment may be required."
+     ],
+     "refs": [
+      "cn-genai-interim-measures",
+      "cn-deep-synthesis-provisions",
+      "cn-algorithmic-recommendation-provisions"
+     ]
+    },
+    "韓国": {
+     "t": [
+      "法的義務と過料の定めがある。ただし最低1年の猶予期間中は事実調査と過料の賦課を延期する運用。",
+      "Legal duties backed by administrative fines, but fact-finding investigations and fines are deferred during a grace period of at least one year."
+     ],
+     "refs": [
+      "kr-ai-basic-act"
+     ]
+    },
+    "シンガポール": {
+     "t": [
+      "IMDAの枠組みは任意、PDPC助言GLは非拘束。MAS GLは金融機関への監督上の期待として示される。",
+      "The IMDA frameworks are voluntary and the PDPC guidelines non-binding; the MAS guidelines are framed as supervisory expectations for financial institutions."
+     ],
+     "refs": [
+      "sg-imda-model-ai-governance-framework",
+      "sg-imda-agentic-ai-framework",
+      "sg-pdpc-ai-advisory-guidelines",
+      "sg-mas-ai-risk-management-guidelines"
+     ]
+    }
+   }
+  },
+  {
+   "key": "risk",
+   "label": [
+    "リスクに応じた区分",
+    "Risk-based categories"
+   ],
+   "cells": {
+    "日本": {
+     "t": [
+      "AI指針・事業者ガイドラインはリスクベースの考え方を掲げる。高リスク等の法定の区分は材料では確認できない。",
+      "The AI Guideline and the Guidelines for Business adopt a risk-based approach; no statutory high-risk category is established in the material."
+     ],
+     "refs": [
+      "jp-ai-guideline",
+      "jp-ai-biz-guideline"
+     ]
+    },
+    "米国（連邦）": {
+     "t": [
+      "連邦機関の「高影響AI」に事前テスト・影響評価を求める（M-25-21）。民間向けの区分は材料では確認できない。",
+      "M-25-21 requires pre-deployment testing and impact assessment for agencies' 'high-impact AI'; no category for the private sector is established in the material."
+     ],
+     "refs": [
+      "us-omb-m25-21-22"
+     ]
+    },
+    "米国（州）": {
+     "t": [
+      "コロラドは教育・雇用・金融等の「重大な決定」に対象を絞る。テキサスは意図に基づく禁止が中心で、段階区分は材料にない。",
+      "Colorado targets 'consequential decisions' in education, employment, finance etc.; Texas centres on intent-based bans, and no tiered categories appear in the material."
+     ],
+     "refs": [
+      "us-co-sb26-189",
+      "us-tx-traiga"
+     ]
+    },
+    "EU": {
+     "t": [
+      "禁止・高リスク・透明性の義務という区分がある。GPAIモデルには別の義務、システミックリスクのモデルには追加義務。",
+      "Tiered into prohibited practices, high-risk duties and transparency duties; separate duties for GPAI models and extra duties for those with systemic risk."
+     ],
+     "refs": [
+      "eu-ai-act",
+      "eu-gpai-obligations"
+     ]
+    },
+    "英国": {
+     "t": [
+      "高リスク等の区分は材料では確認できない。DUAA 2025は自動化のみによる重要な決定に保護措置を求める。",
+      "No high-risk categories are established in the material; the DUAA 2025 requires safeguards for solely automated significant decisions."
+     ],
+     "refs": [
+      "uk-data-protection-ai"
+     ]
+    },
+    "中国": {
+     "t": [
+      "「分類分級」の監督を掲げ、世論形成力・社会動員力のあるサービスに安全評価・算法備案を課す。",
+      "Applies 'classified and tiered' supervision; services with public-opinion or social-mobilisation capacity need a security assessment and algorithm filing."
+     ],
+     "refs": [
+      "cn-genai-interim-measures",
+      "cn-deep-synthesis-provisions",
+      "cn-algorithmic-recommendation-provisions"
+     ]
+    },
+    "韓国": {
+     "t": [
+      "採用・融資審査・医療等の「高影響AI」にリスク管理・説明・人の監督等を求める。一定計算量以上のAIにも義務。",
+      "'High-impact AI' (hiring, loan screening, healthcare etc.) needs risk management, explanation and human oversight; AI above a compute threshold also has duties."
+     ],
+     "refs": [
+      "kr-ai-basic-act"
+     ]
+    },
+    "シンガポール": {
+     "t": [
+      "法律上の区分は材料では確認できない。MAS GLは金融機関にリスク重要度の評価と比例的な統制を求める。",
+      "No statutory categories are established in the material; the MAS guidelines ask financial institutions to assess risk materiality and apply proportionate controls."
+     ],
+     "refs": [
+      "sg-mas-ai-risk-management-guidelines"
+     ]
+    }
+   }
+  },
+  {
+   "key": "genai",
+   "label": [
+    "生成AI・AI生成物の表示と透明性",
+    "Generative AI: labelling and transparency"
+   ],
+   "cells": {
+    "日本": {
+     "t": [
+      "AI生成物の表示義務は材料では確認できない。AI指針は学習データの出所と生成物の説明可能性の確保を自主的取組として示す。",
+      "No labelling duty for AI-generated content is established in the material; the AI Guideline lists explainability of training-data provenance and outputs as a voluntary effort."
+     ],
+     "refs": [
+      "jp-ai-guideline"
+     ]
+    },
+    "米国（連邦）": {
+     "t": [
+      "AI生成物の表示義務は材料では確認できない。連邦機関のLLM調達ではモデルカード等の提出を求める（M-26-04）。",
+      "No labelling duty for AI-generated content is established in the material; federal LLM procurement asks vendors for model cards and similar documents (M-26-04)."
+     ],
+     "refs": [
+      "us-omb-m26-04"
+     ]
+    },
+    "米国（州）": {
+     "t": [
+      "AI生成物の表示義務は材料では確認できない。テキサスは政府機関・医療提供者にAI利用の開示を求める。",
+      "No labelling duty for AI-generated content is established in the material; Texas requires government agencies and health care providers to disclose AI use."
+     ],
+     "refs": [
+      "us-tx-traiga"
+     ]
+    },
+    "EU": {
+     "t": [
+      "第50条で生成AIの出力に機械可読のマーク、ディープフェイクには見て分かる表示を義務づける（2026年8月2日から）。",
+      "Article 50 requires machine-readable marking of generative AI output and visible disclosure of deepfakes (from 2 Aug 2026)."
+     ],
+     "refs": [
+      "eu-ai-act-art50"
+     ]
+    },
+    "英国": {
+     "t": [
+      "材料では確認できない",
+      "Not established in the material"
+     ],
+     "refs": []
+    },
+    "中国": {
+     "t": [
+      "AI生成物に明示標識とメタデータ等の暗黙標識を義務づける（2025年9月施行）。標識の削除・改ざんは禁止。",
+      "AI-generated content must carry explicit labels and implicit labels such as metadata (since Sept 2025); removing or altering labels is prohibited."
+     ],
+     "refs": [
+      "cn-ai-content-labeling-measures",
+      "cn-deep-synthesis-provisions",
+      "cn-genai-interim-measures"
+     ]
+    },
+    "韓国": {
+     "t": [
+      "生成AI利用の事前告知と出力へのAI生成の表示。本物と見分けにくい合成物は認識しやすく表示する（第31条）。",
+      "Prior notice of generative AI use and marking of outputs as AI-generated; deepfake-like outputs must be readily recognisable (Art. 31)."
+     ],
+     "refs": [
+      "kr-ai-basic-act"
+     ]
+    },
+    "シンガポール": {
+     "t": [
+      "表示義務は材料では確認できない。IMDA生成AI版（2024年）はコンテンツの来歴を含む9観点を示す（任意）。",
+      "No labelling duty is established in the material; the IMDA generative AI framework (2024) sets out nine dimensions including content provenance (voluntary)."
+     ],
+     "refs": [
+      "sg-imda-model-ai-governance-framework"
+     ]
+    }
+   }
+  },
+  {
+   "key": "penalty",
+   "label": [
+    "罰則・制裁の水準",
+    "Penalties and sanctions"
+   ],
+   "cells": {
+    "日本": {
+     "t": [
+      "AI法・AI指針・事業者ガイドラインに罰則の記載は見当たらない。改正個情法（施行前）が重大違反に課徴金を新設。",
+      "No penalties appear in the AI Act, the AI Guideline or the Guidelines for Business; the amended APPI (not yet in force) introduces surcharges for serious violations."
+     ],
+     "refs": [
+      "jp-ai-act",
+      "jp-ai-guideline",
+      "jp-ai-biz-guideline",
+      "jp-appi-2026"
+     ]
+    },
+    "米国（連邦）": {
+     "t": [
+      "大統領令・覚書の本文に民間への罰則はない。LLM調達要件の不履行は契約解除・撤去費用負担など契約上の効果。",
+      "The executive orders and memoranda contain no penalties on companies; failing LLM procurement terms has contractual effects such as termination and decommissioning costs."
+     ],
+     "refs": [
+      "us-eo-14179",
+      "us-eo-14365",
+      "us-eo-14409",
+      "us-eo-14434",
+      "us-omb-m25-21-22",
+      "us-omb-m26-04"
+     ]
+    },
+    "米国（州）": {
+     "t": [
+      "コロラドは1違反最大2万ドル（財政覚書）。テキサスは是正不能な違反で8万〜20万ドル、継続違反は1日最大4万ドル。",
+      "Colorado: up to $20,000 per violation (fiscal note). Texas: $80,000-$200,000 for uncurable violations and up to $40,000 per day for continuing ones."
+     ],
+     "refs": [
+      "us-co-sb26-189",
+      "us-tx-traiga"
+     ]
+    },
+    "EU": {
+     "t": [
+      "禁止慣行違反で最大3,500万ユーロか世界売上高7%、その他の義務違反で最大1,500万ユーロか3%（中小企業は低い方）。",
+      "Up to EUR 35m or 7% of worldwide turnover for prohibited practices, and up to EUR 15m or 3% for other obligations (the lower amount for SMEs)."
+     ],
+     "refs": [
+      "eu-ai-act",
+      "eu-gpai-obligations",
+      "eu-ai-act-art50"
+     ]
+    },
+    "英国": {
+     "t": [
+      "5原則は非法定で、原則自体に罰則はない。AI固有の罰則とデータ保護法の制裁金額は材料では確認できない。",
+      "The principles are non-statutory and carry no penalties of their own; AI-specific penalties and data protection fine amounts are not established in the material."
+     ],
+     "refs": [
+      "uk-ai-framework",
+      "uk-data-protection-ai"
+     ]
+    },
+    "中国": {
+     "t": [
+      "生成AI弁法に罰金額の定めなし。推奨規定は1万〜10万元、擬人化弁法は最大20万元、網絡安全法は最大1,000万元。",
+      "The generative AI Measures set no fine amounts; the recommendation rules allow RMB 10,000-100,000, the anthropomorphic AI Measures up to RMB 200,000, the Cybersecurity Law up to RMB 10 million."
+     ],
+     "refs": [
+      "cn-genai-interim-measures",
+      "cn-algorithmic-recommendation-provisions",
+      "cn-anthropomorphic-ai-interaction-measures",
+      "cn-cybersecurity-law-amendment-2025"
+     ]
+    },
+    "韓国": {
+     "t": [
+      "3,000万ウォン以下の過料（事前告知違反、国内代理人の未指定、命令不履行）。猶予期間中は賦課を延期。",
+      "Administrative fines up to KRW 30 million (no prior notice, no domestic representative, ignoring orders); deferred during the grace period."
+     ],
+     "refs": [
+      "kr-ai-basic-act"
+     ]
+    },
+    "シンガポール": {
+     "t": [
+      "ガイダンス自体に罰則の定めは見当たらない。PDPC助言GLは、PDPCによるPDPAの執行を制限しない。",
+      "No penalty provisions appear in the guidance itself; the PDPC guidelines do not limit the Commission's enforcement of the PDPA."
+     ],
+     "refs": [
+      "sg-imda-model-ai-governance-framework",
+      "sg-imda-agentic-ai-framework",
+      "sg-pdpc-ai-advisory-guidelines",
+      "sg-mas-ai-risk-management-guidelines"
+     ]
+    }
+   }
+  },
+  {
+   "key": "extra",
+   "label": [
+    "域外適用・外国企業への影響",
+    "Extraterritorial reach / impact on foreign firms"
+   ],
+   "cells": {
+    "日本": {
+     "t": [
+      "AI法に域外適用を明記する規定は見当たらない。AI指針は活用事業者に海外事業者も含むとする（非拘束）。",
+      "The AI Act has no express extraterritorial provision; the (non-binding) AI Guideline says 'utilizing businesses' include foreign businesses."
+     ],
+     "refs": [
+      "jp-ai-act",
+      "jp-ai-guideline"
+     ]
+    },
+    "米国（連邦）": {
+     "t": [
+      "大統領令は本文上、民間・外国企業を直接拘束しない。連邦機関にAIを納める企業には調達契約の条件が及ぶ。",
+      "Per their text, the executive orders do not directly bind private or foreign companies; companies supplying AI to federal agencies face procurement contract terms."
+     ],
+     "refs": [
+      "us-eo-14179",
+      "us-eo-14365",
+      "us-eo-14409",
+      "us-eo-14434",
+      "us-omb-m25-21-22",
+      "us-omb-m26-04"
+     ]
+    },
+    "米国（州）": {
+     "t": [
+      "両州とも州内で事業を行う者が対象で、日本企業にも及びうる。テキサスは州民が使う製品の提供者も含む。",
+      "Both cover those doing business in the state, which can include Japanese companies; Texas also covers producers of products used by Texas residents."
+     ],
+     "refs": [
+      "us-co-sb26-189",
+      "us-tx-traiga"
+     ]
+    },
+    "EU": {
+     "t": [
+      "EU域外の事業者も、EU市場にAIを出す・EU内で使うなら対象。GPAIモデル提供者も第三国の者を含む。",
+      "Non-EU actors are covered if they place AI on the EU market or use it in the EU; GPAI model providers include those in third countries."
+     ],
+     "refs": [
+      "eu-ai-act",
+      "eu-gpai-obligations"
+     ]
+    },
+    "英国": {
+     "t": [
+      "材料では確認できない",
+      "Not established in the material"
+     ],
+     "refs": []
+    },
+    "中国": {
+     "t": [
+      "国外から中国国内へ提供する生成AIサービスも処置の対象になり得る。網絡安全法は国外の組織への制裁も定める。",
+      "Generative AI services supplied from abroad into the PRC can be acted upon; the Cybersecurity Law also provides for sanctions on foreign organisations."
+     ],
+     "refs": [
+      "cn-genai-interim-measures",
+      "cn-cybersecurity-law-amendment-2025"
+     ]
+    },
+    "韓国": {
+     "t": [
+      "国外の行為でも国内の市場・利用者に影響すれば適用（第4条）。基準を満たす国外事業者は国内代理人を指定する。",
+      "Applies to conduct abroad affecting the Korean market or users (Art. 4); qualifying operators without a Korean presence must designate a domestic representative."
+     ],
+     "refs": [
+      "kr-ai-basic-act"
+     ]
+    },
+    "シンガポール": {
+     "t": [
+      "MAS GLはシンガポールの全金融機関に設立地を問わず適用。条件付きでグループのAI枠組みを活用できる。",
+      "The MAS guidelines apply to all financial institutions in Singapore wherever incorporated; a group AI framework can be used if it meets MAS expectations."
+     ],
+     "refs": [
+      "sg-mas-ai-risk-management-guidelines"
+     ]
+    }
+   }
+  },
+  {
+   "key": "status",
+   "label": [
+    "2026年10月時点の状況",
+    "Status as of October 2026"
+   ],
+   "cells": {
+    "日本": {
+     "t": [
+      "AI法は2025年9月1日に全面施行済み。AI指針・基本計画（第Ⅱ期）は決定済みで、改正個情法は施行前。",
+      "The AI Act has been fully in force since 1 Sept 2025; the AI Guideline and the Basic Plan (Phase II) are adopted; the amended APPI is not yet in force."
+     ],
+     "refs": [
+      "jp-ai-act",
+      "jp-ai-guideline",
+      "jp-ai-basic-plan",
+      "jp-appi-2026"
+     ]
+    },
+    "米国（連邦）": {
+     "t": [
+      "主要な大統領令・OMB覚書は発出済み。NISTはAI RMF 1.0を行動計画の一環として改定中（2026年10月時点）。",
+      "Key executive orders and OMB memoranda have been issued; NIST is revising AI RMF 1.0 as part of the Action Plan (as of Oct 2026)."
+     ],
+     "refs": [
+      "us-eo-14179",
+      "us-eo-14365",
+      "us-eo-14409",
+      "us-eo-14434",
+      "us-omb-m25-21-22",
+      "us-omb-m26-04",
+      "us-nist-ai-rmf"
+     ]
+    },
+    "米国（州）": {
+     "t": [
+      "テキサス州法は2026年1月1日に施行済み。コロラド州法は2027年1月1日施行予定（関連訴訟の現況は未確認）。",
+      "The Texas law has been in force since 1 Jan 2026; the Colorado law is due to take effect on 1 Jan 2027 (current status of related litigation unconfirmed)."
+     ],
+     "refs": [
+      "us-co-sb26-189",
+      "us-tx-traiga"
+     ]
+    },
+    "EU": {
+     "t": [
+      "2026年8月2日に原則適用（段階的）。高リスクはAI Omnibusで2027年12月2日／2028年8月2日に延期。",
+      "Generally applicable since 2 Aug 2026 (phased); high-risk rules postponed by the AI Omnibus to 2 Dec 2027 / 2 Aug 2028."
+     ],
+     "refs": [
+      "eu-ai-act",
+      "eu-ai-omnibus"
+     ]
+    },
+    "英国": {
+     "t": [
+      "包括的なAI法の制定・提出は材料では確認できない。DUAA 2025は2025年6月に国王裁可、段階施行の計画。",
+      "No comprehensive AI bill or statute is established in the material; the DUAA 2025 received Royal Assent in June 2025, with staged commencement planned."
+     ],
+     "refs": [
+      "uk-ai-framework",
+      "uk-data-protection-ai"
+     ]
+    },
+    "中国": {
+     "t": [
+      "生成AI弁法・標識弁法・擬人化弁法（2026年7月）と改正網絡安全法（2026年1月）はいずれも施行済み。",
+      "The generative AI Measures, the labelling Measures, the anthropomorphic AI Measures (July 2026) and the amended Cybersecurity Law (Jan 2026) are all in force."
+     ],
+     "refs": [
+      "cn-genai-interim-measures",
+      "cn-ai-content-labeling-measures",
+      "cn-anthropomorphic-ai-interaction-measures",
+      "cn-cybersecurity-law-amendment-2025"
+     ]
+    },
+    "韓国": {
+     "t": [
+      "2026年1月22日に施行済み。最低1年の猶予期間中で、MSITが制度改善を検討中（終了時期は未確認）。",
+      "In force since 22 Jan 2026; in a grace period of at least one year while MSIT studies improvements (end date unconfirmed)."
+     ],
+     "refs": [
+      "kr-ai-basic-act"
+     ]
+    },
+    "シンガポール": {
+     "t": [
+      "IMDA・PDPCの指針は公表済み。MAS GLは2026年10月7日に最終化、2027年10月7日に効力発生（一部は2028年まで）。",
+      "IMDA and PDPC guidance is published; the MAS guidelines were finalised on 7 Oct 2026 and take effect on 7 Oct 2027 (some sections by 2028)."
+     ],
+     "refs": [
+      "sg-imda-model-ai-governance-framework",
+      "sg-imda-agentic-ai-framework",
+      "sg-pdpc-ai-advisory-guidelines",
+      "sg-mas-ai-risk-management-guidelines"
+     ]
+    }
+   }
+  }
+ ],
+ "upcoming": [
+  {
+   "d": "2026-12-02",
+   "id": "eu-ai-act-art50",
+   "ev": [
+    "2026年8月2日より前に上市した生成AIのマーキング義務の猶予期限（2026年12月2日まで）",
+    "End of the grace period (until 2 December 2026) for marking in generative AI placed on the market before 2 August 2026"
+   ]
+  },
+  {
+   "d": "2026-12-02",
+   "id": "eu-ai-omnibus",
+   "ev": [
+    "同意のない性的画像・児童性的虐待素材を生成するAIの禁止が適用（予定）",
+    "Prohibition on AI generating non-consensual intimate content and CSAM applies (scheduled)"
+   ]
+  },
+  {
+   "d": "2027-01-01",
+   "id": "us-co-sb26-189",
+   "ev": [
+    "主要規定の施行（予定）。司法長官の規則採択の期限",
+    "Main provisions take effect (scheduled); deadline for Attorney General rules"
+   ]
+  },
+  {
+   "d": "2027-08-02",
+   "id": "eu-gpai-obligations",
+   "ev": [
+    "2025年8月2日より前に上市したGPAIモデルの遵守期限",
+    "Deadline for GPAI models placed on the market before 2 Aug 2025"
+   ]
+  },
+  {
+   "d": "2027-10-07",
+   "id": "sg-mas-ai-risk-management-guidelines",
+   "ev": [
+    "効力発生（予定）。第3〜4節（AIの監督、リスク管理の仕組み）はこの日から",
+    "Takes effect (scheduled); Sections 3 to 4 (oversight and risk management systems) apply from this date"
+   ]
+  },
+  {
+   "d": "2027-12-02",
+   "id": "eu-ai-act",
+   "ev": [
+    "Annex IIIの高リスクAIの規則が適用（予定）",
+    "Annex III high-risk rules apply (scheduled)"
+   ]
+  },
+  {
+   "d": "2027-12-02",
+   "id": "eu-ai-omnibus",
+   "ev": [
+    "Annex IIIの高リスクAIの規則が適用（予定）",
+    "Annex III high-risk rules apply (scheduled)"
+   ]
+  },
+  {
+   "d": "2027-12-11",
+   "id": "eu-cra",
+   "ev": [
+    "主要な義務が全面適用（予定）",
+    "Main obligations apply in full (scheduled)"
+   ]
+  },
+  {
+   "d": "2028-08-02",
+   "id": "eu-ai-act",
+   "ev": [
+    "製品に組み込まれる高リスクAIの規則が適用（予定）",
+    "Rules for high-risk AI embedded in regulated products apply (scheduled)"
+   ]
+  },
+  {
+   "d": "2028-08-02",
+   "id": "eu-ai-omnibus",
+   "ev": [
+    "製品に組み込まれた高リスクAI（Annex I）の規則が適用（予定）。機械は高リスク規則の直接適用から外れた（欧州議会の説明）",
+    "High-risk rules for AI embedded in products (Annex I) apply (scheduled); machinery was removed from direct applicability (Parliament's summary)"
+   ]
+  },
+  {
+   "d": "2028-10-07",
+   "id": "sg-mas-ai-risk-management-guidelines",
+   "ev": [
+    "第5〜6節（ライフサイクル管理、体制・能力）の対応期限",
+    "Deadline for Sections 5 to 6 (life cycle controls, capability and capacity)"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,883 @@
+{
+ "risks": [
+  {
+   "t": [
+    "コネクタ経由のデータ持ち出し：Copilot Studio のエージェントは、外部の非Microsoftサービスや SNS を含む多数のデータソース・サービスにつながり得る。公式は、メーカーによる悪意ある／意図しない流出から組織データを守るため、データポリシーでコネクタを分類・制御するよう示している。",
+    "Data exfiltration via connectors: agents can connect to many data sources and services, including external non-Microsoft services and even social networks. Microsoft points to classifying and controlling connectors in data policies to protect organizational data from malicious or unintentional exfiltration by makers."
+   ],
+   "src": {
+    "title": "Configure data policies for agents",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/admin-data-loss-prevention",
+    "quote": "Use these connectors in data policies to protect your organization's data from any malicious or unintentional data exfiltration by your agent makers."
+   }
+  },
+  {
+   "t": [
+    "認証なしの公開：メーカーは『認証なし』を選べ、リンクを知る誰でも対話できるようになる（自動セキュリティスキャンのページ）。保護ステータスの説明では、公開状態の自律型エージェントは機微データを攻撃者や権限のない人に露出させるおそれがあり、その場合は脅威ベクタの可能性として状態に表れる。",
+    "Unauthenticated agents: makers can choose 'No authentication', letting anyone with the link interact (security-scan page). The protection-status page warns that a public autonomous agent might expose sensitive data to attackers or unauthorized people, and the status then reflects a possible threat vector."
+   ],
+   "src": {
+    "title": "Agent runtime protection status",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/security-agent-runtime-view",
+    "quote": "If an autonomous agent is public, it might expose sensitive data to potential attackers or unauthorized individuals."
+   }
+  },
+  {
+   "t": [
+    "自律実行のトリガー：イベントトリガーは他システムのイベントに自動で反応する（生成オーケストレーションを有効にしたエージェントのみ）。認証は作成者の資格情報に限られるため、公開すると利用者が本来権限のないデータ・システムにエージェント経由で届くおそれがあり、公開前に警告が出る。トリガーの有効化は課金の計算にも影響し得る。データポリシーで『Microsoft Copilot Studio』コネクタをブロックすればトリガーの追加を止められる（データポリシーのページ）。",
+    "Autonomous triggers: event triggers react automatically to events in other systems (only for agents with generative orchestration). They authenticate only with the author's credentials, so users of a published agent might reach data and systems they shouldn't; a warning is shown before publishing. Enabling triggers can affect billing. Blocking the 'Microsoft Copilot Studio' connector in a data policy stops makers from adding triggers (data-policy page)."
+   ],
+   "src": {
+    "title": "Add an event trigger",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/authoring-trigger-event",
+    "quote": "Event triggers can only use the agent author's credentials for authentication (that is, the credentials you used to authorize the connections). This might allow users of an agent without their own authorization the ability to access data and systems they shouldn't."
+   }
+  },
+  {
+   "t": [
+    "共有範囲の広がり：エージェントは既定では誰にも共有されないが、メーカーは組織の全員に共有できる。自動セキュリティスキャンはこの変更を公開前にメーカーへ警告する（ページの記述は警告で、公開を止めるとはしていない）。共有範囲を制限するのは管理側の共有ルール（管理対象環境が前提）。",
+    "Sharing scope creep: agents are shared with no one by default, but makers can share them with everyone in the organization. The automatic security scan warns makers before publishing (the page describes a warning, not a block); limiting the scope is done with admin sharing rules (managed environments required)."
+   ],
+   "src": {
+    "title": "Automatic security scan in Copilot Studio",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/security-scan",
+    "quote": "The default agent is shared with no one and makers can then share it with everyone in the organization."
+   }
+  },
+  {
+   "t": [
+    "所有者不在（孤立）エージェント：作成者が退職・異動すると、設定やコンプライアンス要件を管理する責任者がいなくなり、業務の中断やセキュリティリスクにつながり得る。",
+    "Orphaned agents: when the original owner leaves or changes roles, there may be no one responsible for the agent's settings and compliance requirements, which can disrupt business processes and create security risks."
+   ],
+   "src": {
+    "title": "Reassign ownership of orphaned agents with the Power Platform API",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/admin-api-reassign-ownership-orphaned-agent",
+    "quote": "This situation can disrupt business processes and create security risks, as there might not be a responsible party to manage the agent's settings and compliance requirements."
+   }
+  },
+  {
+   "t": [
+    "知識源の過剰共有：公式FAQは、応答は話しかけている人とその権限に応じて調整され、機密ラベルで過剰共有を防げる（SharePoint 知識源には DLP のエンドポイントフィルタリングも使える）とする。応答が元データの権限・ラベルに依存する以上、元データ側の権限設計とラベル付けが統制の前提になる（判断）。",
+    "Knowledge-source oversharing: the FAQ says responses are tailored to who is asking and their permissions, and that sensitivity labels help prevent oversharing (DLP endpoint filtering also works for SharePoint knowledge sources). Because answers depend on the source permissions and labels, sound permissions and labeling of the underlying data are a precondition (judgment)."
+   ],
+   "src": {
+    "title": "Security FAQs for Copilot Studio",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/security-faq",
+    "quote": "Copilot Studio is secure by default. The system tailors its responses based on who is speaking to it, and the permissions they have. Copilot Studio supports sensitivity labels to prevent oversharing."
+   }
+  },
+  {
+   "t": [
+    "費用の膨張：GitHub Copilot ハーネスのエージェントは、公開前の作成・プレビュー・評価の段階から Copilot クレジットを消費し、本番公開しない探索用の環境でも消費が生じ得る。このため公式ガイドは、公開済みエージェントだけでなく環境を単位に初日から統制するよう勧める（環境の容量統制は Copilot Studio の全ワークロードに及ぶ）。",
+    "Cost growth: agents powered by the GitHub Copilot harness consume Copilot Credits while makers build, preview and evaluate them, and an exploration environment can incur consumption even if nothing is published. The guidance therefore says to govern at the environment level from day one, not just the published agent (environment capacity controls apply to all Copilot Studio workloads)."
+   ],
+   "src": {
+    "title": "Govern Copilot Credit consumption for agents powered by the GitHub Copilot harness",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/guidance/govern-credit-consumption",
+    "quote": "Consumption starts at design time, before an agent is published."
+   }
+  },
+  {
+   "t": [
+    "作成自体は止められない：FAQ は、Copilot Studio のエージェント作成は無効化できず、データポリシーで誰もそのエージェントと対話できないようにするのが推奨だとする。『作らせない』ではなく『作っても公開・利用させない』前提で設計する（判断）。",
+    "Creation cannot be disabled: the FAQ says agent creation can't be disabled and recommends using data policies so no one can chat with such agents. Design on the assumption that agents will be built and control whether they can be published or used (judgment)."
+   ],
+   "src": {
+    "title": "Security FAQs for Copilot Studio",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/security-faq",
+    "quote": "You can't disable agent creation. Our guidance is to use data policies to disable anyone from chatting with that agent."
+   }
+  },
+  {
+   "t": [
+    "テナント分離は非対応：FAQ は、Copilot Studio はテナント分離をサポートしないとする。Power Platform の既定（テナント分離オフ）では、適切な Entra の資格情報があればテナント間の接続が成立する。テナント境界を越える接続は、データポリシーなど他の統制で補う前提で設計する（判断）。",
+    "No tenant isolation: the FAQ says Copilot Studio doesn't support tenant isolation. With Power Platform's default (isolation off), cross-tenant connections are established when the user presents appropriate Entra credentials. Plan to cover cross-tenant connections with other controls such as data policies (judgment)."
+   ],
+   "src": {
+    "title": "Security FAQs for Copilot Studio",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/security-faq",
+    "quote": "No, Copilot Studio doesn't support tenant isolation."
+   }
+  }
+ ],
+ "steps": [
+  {
+   "name": [
+    "1. 要件の把握",
+    "Capture governance requirements"
+   ],
+   "points": [
+    [
+     "IT・セキュリティ・コンプライアンス・法務を最初から巻き込み、データ所在地・保持・プライバシーの方針を文書化する。",
+     "Involve IT, security, compliance and legal from the outset; document data residency, retention and privacy policies."
+    ],
+    [
+     "適用される規制（例：GDPR、HIPAA）と、データ・会話トランスクリプトの保持要件を文書化する。",
+     "Document applicable regulations (e.g., GDPR, HIPAA) and data and transcript retention requirements."
+    ],
+    [
+     "エージェントが扱う業務シナリオと、必要なシステム・データ連携を特定する。",
+     "Identify the business scenarios the agent handles and the systems and data integration it needs."
+    ],
+    [
+     "使う知識源・データソース（SharePoint、Teams、Dataverse 等）を文書化し、機微度を分類して漏えいリスクを評価する。ブロックするコネクタ・データソースとマスキング要件を決め、エージェント自身の一般知識の利用を許すかも明記する。",
+     "Document knowledge and data sources (SharePoint, Teams, Dataverse, etc.), classify sensitivity and assess leakage risk; decide which connectors and sources to block, masking requirements, and whether agents may use their own general knowledge."
+    ],
+    [
+     "命名規則（エージェント・ソリューション）、会話開始時の免責・注意文のテンプレート、全エージェント共通の必須コンポーネントを決める。",
+     "Set naming conventions for agents and solutions, a disclaimer template for the conversation start, and mandatory shared components."
+    ],
+    [
+     "ライセンスと予算：保有ライセンスを棚卸しし、プレミアム機能（Managed Environments 等）・プレミアムコネクタ・生成AIの費用、従量課金か容量ライセンスか、環境単位のメッセージ容量の割当を決める。",
+     "Licensing and budget: review current entitlements; plan costs of premium features (e.g., Managed Environments), premium connectors and generative AI; choose pay-as-you-go or capacity licensing; allocate message capacity per environment."
+    ]
+   ],
+   "src": {
+    "title": "Capture governance requirements",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/guidance/sec-gov-phase1",
+    "quote": "Effective discovery and planning are the foundation of a successful governance and security strategy for agents. This section focuses on recommendations to align stakeholders, define compliance requirements, and establish key objectives to ensure secure and efficient operations."
+   }
+  },
+  {
+   "name": [
+    "2. ゾーン分けした環境戦略",
+    "Implement a zoned governance strategy"
+   ],
+   "points": [
+    [
+     "Copilot Studio のエージェントは必ず Power Platform の環境内で作成・管理される。環境が、データの置き場所、作成・編集できる人、許可するコネクタ、開発・テスト・本番の分離を決める。",
+     "Copilot Studio agents are always created and managed in Power Platform environments, which determine where data lives, who can build or edit, which connectors are allowed and how dev, test and prod are isolated."
+    ],
+    [
+     "ゾーン1（市民開発）：誰でも、自分がアクセスできる内容をもとに個人・チーム用のエージェントを作る（読み取り専用・非公開。作成ツールは Microsoft Copilot の Agent Builder と SharePoint エージェント）。保護＝Microsoft 365 と Power Platform のコネクタのみ、利用者の文脈でのみ実行。統制＝開発者環境、環境ルーティングで作成者に隔離、共有は無効。監視＝PPAC の Copilot 領域で利用状況を確認。",
+     "Zone 1 (citizen development): anyone builds personal or team agents on content they can already access (read-only, private; Agent Builder in Microsoft Copilot and SharePoint agents). Secure: only Microsoft 365 and Power Platform connectors, user context only. Govern: Developer environments, environment routing, sharing disabled. Monitor: Copilot area in PPAC."
+    ],
+    [
+     "ゾーン2（パートナー開発）：IT が承認した訓練済みのメーカーが、コーチの支援と監督のもとで他チーム・部門向けに作る（Copilot Studio）。保護＝ゾーン別の高度なコネクタポリシー、承認済みデータソースの共有、環境グループとルールで拡大。統制＝管理者承認による環境の払い出し、ロールと共有ポリシーの限定、版管理用の ALM パイプライン、公開には IT 管理者の承認。",
+     "Zone 2 (partnered development): IT-approved, trained makers build for other teams with a coach's oversight (Copilot Studio). Secure: zone-specific advanced connector policies, approved data sources, environment groups and rules. Govern: admin-approved provisioning, scoped roles and sharing, ALM pipelines for versioning, IT-admin approval to publish."
+    ],
+    [
+     "ゾーン3（プロ開発）：プロの開発者と IT が全社向けのミッションクリティカルなエージェントを作る（Microsoft Foundry Agent Service、Copilot Studio）。組織標準の ALM と最も強いセキュリティ統制、SLA を持ち得る。保護＝ゾーン別の高度なコネクタポリシー（PPAC と Microsoft Purview）。統制＝共有は Microsoft 管理センターの Integrated Apps で管理。",
+     "Zone 3 (professional development): pro developers and IT build mission-critical enterprise agents (Microsoft Foundry Agent Service, Copilot Studio) with standard ALM, the strongest controls and possibly SLAs. Secure: zone-specific advanced connector policies in PPAC and Purview. Govern: sharing via Integrated Apps in the Microsoft admin center."
+    ],
+    [
+     "ゾーン2・3の監視：Microsoft 管理センター、Microsoft Purview、PPAC で利用状況とセキュリティ態勢を追う。",
+     "Monitoring for Zones 2 and 3: track usage and security posture in the Microsoft admin center, Microsoft Purview and PPAC."
+    ],
+    [
+     "機能の許可・ブロックはテナント・環境・エージェントの各レベルで行う（例：テナント＝全環境へのデータポリシー適用と生成AIエージェントの公開可否、環境＝ポリシーの対象範囲・公開データソース（Bing 等）・ネットワーク分離、エージェント＝生成オーケストレーション等の有効化・認証方式・Webチャネルのセキュリティ）。",
+     "Allow or block features at tenant, environment and agent level (tenant: data policies across environments, publishing of generative-AI agents; environment: policy scope, public data source such as Bing, network isolation; agent: generative orchestration and related features, authentication, web channel security)."
+    ]
+   ],
+   "src": {
+    "title": "Implement a zoned governance strategy",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/guidance/sec-gov-phase2",
+    "quote": "Zoned governance refers to segmenting environments and applying different governance policies based on the purpose of an agent and its risk level."
+   }
+  },
+  {
+   "name": [
+    "3. セキュリティ",
+    "Secure your Copilot Studio projects"
+   ],
+   "points": [
+    [
+     "ライセンス付与、環境へのアクセス、Dataverse のセキュリティロールは、個人ではなく Entra ID グループで割り当てる。環境とデータストアに入れるのはボット作成者とジャストインタイムの管理者だけにする。",
+     "Assign licenses, environment access and Dataverse security roles through Entra ID groups; only bot authors and just-in-time admins should access environments and data stores."
+    ],
+    [
+     "データポリシーで、プロジェクトに不要なコネクタと、不要なチャネル・設定（認証なし利用、Azure Bot Service skills 等）をブロックする。データポリシーは単一環境・環境グループ・テナント全体に適用できる。",
+     "Use data policies to block connectors, channels and settings the project doesn't need (unauthenticated use, Azure Bot Service skills, etc.); a policy can apply to one environment, an environment group or the whole tenant."
+    ],
+    [
+     "環境の種類で強度を変える：個人開発＝厳格なデータポリシー＋厳格な Managed Environment ルール（例：認証なし不可、ほとんどのチャネル・コネクタをブロック）／専用開発＝緩めのポリシー＋厳格なルール／専用テスト・本番＝緩めのポリシーとルール（レビュー後に広く使えるようにする）。",
+     "Vary strength by environment type: personal dev = strict policies and strict managed-environment rules; dedicated dev = relaxed policies, strict rules; dedicated test and prod = relaxed policies and rules after review."
+    ],
+    [
+     "Managed Environment の機能を使うには、エージェントを管理対象環境で作成または展開する必要がある（Copilot Studio のエージェントライセンスにはプレミアムコネクタの権利が含まれる）。",
+     "Managed-environment features require agents to be built or deployed in a managed environment; Copilot Studio agent licensing includes premium connector entitlements."
+    ],
+    [
+     "共有ルールで、所有者・編集者が Editor／Viewer 権限を付与できるかを決め（禁止すると付与できるのは管理者だけ）、閲覧者数の上限と『個人のみ（セキュリティグループ不可）』で広い共有を避ける。",
+     "Use sharing rules to decide whether owners and editors may grant Editor or Viewer rights (if blocked, only admins can), and cap viewers and restrict sharing to individuals to avoid broad sharing."
+    ],
+    [
+     "必要な設定だけを有効にする：テナント管理者は生成AIエージェントの公開を無効化でき、環境管理者はリージョン外へのデータ移動を伴う生成AI機能を無効化できる。内部向けエージェントは特定グループに限定し、接続は強い認証、シークレットは Azure Key Vault 等に保管し、データにはエンドユーザーの文脈（委任・代理・フィルタ）でアクセスする。",
+     "Enable only relevant settings: tenant admins can disable publishing of generative-AI agents and environment admins can disable features that move data out of region; limit internal agents to groups, require strong authentication, store secrets in e.g. Azure Key Vault, and access data in the end user's context."
+    ],
+    [
+     "重要なユースケースでは VNet、IP ファイアウォール、継続的アクセス評価、会話トークン取得用のシークレットを検討する。開発→テスト→本番の展開は、レビューを伴うゲート付きのプロセスにする。",
+     "For critical use cases consider VNet, IP firewall, continuous access evaluation and a secret for conversation tokens; gate deployments from dev to test to prod with reviews."
+    ]
+   ],
+   "src": {
+    "title": "Secure your Copilot Studio projects",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/guidance/sec-gov-phase3",
+    "quote": "Apply data policies to your environments to block all connectors that the project doesn't require, and any channel or setting that isn't useful for the project (for example, unauthenticated use, use of Azure Bot Service skills, and so on)."
+   }
+  },
+  {
+   "name": [
+    "4. テスト",
+    "Design a testing strategy"
+   ],
+   "points": [
+    [
+     "テストの種類：開発時（単体）、コアシナリオ、ナレッジ、回帰、敵対的（境界例・意図不明・誤情報）、性能・負荷、セキュリティとコンプライアンス（RBAC・条件付きアクセス・機密ラベルの適用と機密データが漏れないこと）、アクセシビリティと UX。",
+     "Test types: development-time, core scenario, knowledge, regression, adversarial (edge cases, unknown intent, false information), performance and load, security and compliance (RBAC, conditional access, sensitivity labels, no leakage), accessibility and UX."
+    ],
+    [
+     "原則：シフトレフト、機能・知識の追加に合わせてテストケースを更新、本番前に必ずステージングで検証、CI/CD に自動テストを組み込む。",
+     "Principles: shift left, update test cases as features and knowledge are added, always validate in staging before go-live, automate tests in CI/CD."
+    ],
+    [
+     "Copilot Studio の評価（テストセット）：テキスト一致、類似度、品質（関連性・根拠性・網羅性・棄権、または期待応答との意図の類似）の3方式。テスト質問は手作業、指示・知識からの生成、過去のテスト会話から作れる。",
+     "Copilot Studio evaluations (test sets): text match, similarity and quality (relevance, groundedness, completeness, abstention, or intent similarity); questions can be written, generated or taken from past test chats."
+    ],
+    [
+     "Copilot Agent Kit で大規模な一括テストを行う（応答一致・トピック一致・マルチターン）。",
+     "Run bulk tests with the Copilot Agent Kit (response match, topic match, multi-turn)."
+    ],
+    [
+     "本番前のセキュリティ確認：本番環境のデータポリシー・ロール・接続の検証、Azure 側（アプリ登録・VNet・キー・エンドポイント）の確認と承認、本番の知識源・文書が本番用エージェントで正しく参照されていること。",
+     "Pre-production checks: validate data policies, roles and connections in production; review and approve app registrations, VNets, keys and endpoints in Azure; confirm production knowledge sources are referenced."
+    ]
+   ],
+   "src": {
+    "title": "Design a testing strategy for your agents",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/guidance/sec-gov-phase4",
+    "quote": "Always run tests before deployment to the production environment and consider including automated testing as part of your deployment pipeline."
+   }
+  },
+  {
+   "name": [
+    "5. ALM（アプリケーションライフサイクル管理）",
+    "Application lifecycle management (ALM)"
+   ],
+   "points": [
+    [
+     "環境は最低3つ（開発・テスト・本番）。本番は production タイプ、それ以外は sandbox タイプにし、各環境は Entra セキュリティグループでアクセスを絞る。",
+     "At least three environments (dev, test, prod): prod as a production-type environment, the others as sandbox; restrict each with an Entra security group."
+    ],
+    [
+     "ALM の黄金律：開発環境以外ではカスタマイズしない／常にソリューション内で作業／カスタムのパブリッシャーとプレフィックス／独立して展開する必要があるときだけソリューションを分ける／環境ごとに変わる設定・シークレットは環境変数／開発環境以外へはマネージドとして展開／ALM の自動化を検討。",
+     "ALM golden rules: don't customize outside dev; always work in solutions; custom publisher and prefix; separate solutions only for independent deployment; environment variables for settings and secrets; deploy as managed outside dev; consider automating ALM."
+    ],
+    [
+     "ソリューションで運べない項目（Application Insights 設定、手動認証設定、Direct Line／Web チャネルのセキュリティ設定、展開済みチャネル、共有）は、展開後に下流環境で手作業の設定が要る。",
+     "Items that aren't solution-aware (Application Insights, manual authentication, Direct Line/web channel security, deployed channels, sharing) need post-deployment steps downstream."
+    ],
+    [
+     "展開ツール：Azure DevOps（全社的な ALM 管理）、GitHub Actions for Power Platform（ソリューションチェッカーによる静的解析を含む）、Power Platform パイプライン（市民開発者向けで設定が簡単）。ソース管理はネイティブの Git 統合。",
+     "Deployment tools: Azure DevOps (full enterprise ALM), GitHub Actions for Power Platform (incl. Solution Checker static analysis), Power Platform Pipelines (simple, for citizen developers); native Git integration for source control."
+    ],
+    [
+     "コンポーネントコレクション（トピック・ナレッジ・アクション・エンティティ）で再利用し、版管理とモジュール設計でチームごとに独立したリリースを可能にする。",
+     "Reuse components through component collections with version control and modular design for independent release cadences."
+    ]
+   ],
+   "src": {
+    "title": "Establish an application lifecycle management strategy",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/guidance/alm",
+    "quote": "A healthy ALM strategy includes at least three environments: development, test, and production."
+   }
+  },
+  {
+   "name": [
+    "6. 運用監視",
+    "Monitor operations, compliance, and capacity"
+   ],
+   "points": [
+    [
+     "運用監視：組み込みの分析ダッシュボードで利用状況と KPI を見る。Application Insights にメッセージ・トピック・カスタムイベントを送れる。",
+     "Operational monitoring: built-in analytics dashboard for usage and KPIs; send messages, topics and custom events to Application Insights."
+    ],
+    [
+     "アラートとインシデント対応：Microsoft Sentinel でエージェントの活動を監視しアラートを受ける。Sentinel に Purview の監査ログを取り込み、Copilot Studio イベントのカスタム検出ルールを作る（ユーザーへの Microsoft 365 ライセンス割当が前提）。PPAC の Copilot 領域でも推奨事項とアラートを確認できる。",
+     "Alerts and incident response: Microsoft Sentinel ingesting Purview audit logs with custom detection rules for Copilot Studio events (users need assigned Microsoft 365 licenses); the Copilot area in PPAC also shows recommendations and alerts."
+    ],
+    [
+     "監査：Copilot Studio の活動・データ変更・ユーザー操作を Microsoft Purview で追跡・監査する。",
+     "Auditing: track and audit Copilot Studio activities, data modifications and user actions in Microsoft Purview."
+    ],
+    [
+     "会話トランスクリプトは Dataverse に保持期間30日で保存される。保持期間は延長でき、さらに長く残すなら Azure Synapse Link for Dataverse で Azure Data Lake Storage Gen2 などに書き出す。",
+     "Transcripts are kept in Dataverse with a 30-day retention period, which can be extended; for longer retention export them to e.g. Azure Data Lake Storage Gen2 via Azure Synapse Link for Dataverse."
+    ],
+    [
+     "コンテンツモデレーションでブロックされた件数は PPAC の Copilot 領域で確認。PPAC のセキュリティページでテナント・環境・エージェントのセキュリティをまとめて見る。",
+     "View blocked-query counts in the Copilot area of PPAC; use the PPAC security page for tenant, environment and agent security."
+    ],
+    [
+     "容量とクォータ：PPAC でメッセージ使用量・容量・関連依存（Power Automate、prompt builder 等）を監視し、超過やスロットリングを防ぐ。",
+     "Capacity and quota: monitor message usage, capacity and dependencies (Power Automate, prompt builder) in PPAC to prevent overages and throttling."
+    ]
+   ],
+   "src": {
+    "title": "Monitor operations, compliance, and capacity",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/guidance/sec-gov-phase5",
+    "quote": "This article focuses on monitoring and optimization to ensure optimal performance, compliance, and continuous improvement. It suggests tools and strategies for operational monitoring, compliance auditing, and capacity management."
+   }
+  }
+ ],
+ "controls": [
+  {
+   "level": "tenant",
+   "name": [
+    "データポリシー（DLP）― Copilot Studio 向け",
+    "Data policies for Copilot Studio agents"
+   ],
+   "what": [
+    "コネクタを Business／Non-business／Blocked に分類して制御する。設定すればブロックできるもの：認証なしの公開（『Chat without Microsoft Entra ID authentication in Copilot Studio』）、Power Platform コネクタのツール利用（接続先 MCP サーバのツールも止まる）、HTTP リクエスト（エンドポイントフィルタリングで個別の許可・拒否も可）、Azure Bot Service skills、公開チャネル（Teams+M365／Direct Line／Facebook／Omnichannel／SharePoint／WhatsApp）、イベントトリガー（『Microsoft Copilot Studio』コネクタ。認証済みアカウントでの自動評価も止まる）、Application Insights。SharePoint・公開サイトの知識源にもエンドポイントを指定できる。適用はリアルタイムで、違反があると Publish ボタンが使えなくなる。2025年初頭から全テナントで適用が有効で、エージェント単位の適用除外はできない。同じポリシー内では、異なるデータグループのコネクタ間でデータを共有できない。",
+    "Classify connectors as Business, Non-business or Blocked. When configured, a policy can block: unauthenticated chat, Power Platform connectors as tools (also MCP server tools), HTTP requests (endpoint filtering available), Azure Bot Service skills, publishing channels, event triggers (also automated evaluations with authenticated accounts) and Application Insights; endpoints can also be set for SharePoint and public-website knowledge sources. Enforced in real time; violations disable Publish. Enforcement has applied to all tenants since early 2025 and agent exemptions are no longer supported. Data can't be shared between connectors in different groups."
+   ],
+   "where": [
+    "Power Platform 管理センター > セキュリティ > データとプライバシー > データポリシー（スコープ：全環境／複数環境／除外指定）。必要ロール：テナント管理者または環境管理者。",
+    "Power Platform admin center > Security > Data and privacy > Data policy (scope: all, multiple or excluded environments); tenant admin or Environment Admin."
+   ],
+   "src": {
+    "title": "Configure data policies for agents",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/admin-data-loss-prevention",
+    "quote": "Data policies let you govern how agents connect and interact with data and services, both within and outside your organization."
+   }
+  },
+  {
+   "level": "tenant",
+   "name": [
+    "生成AIを使うエージェントの公開可否",
+    "Allow or block publishing of generative-AI agents"
+   ],
+   "what": [
+    "テナント全体で、生成AI機能を使うエージェントの公開をオフにできる。米国外での生成AI機能に伴う地理的なデータ移動も無効化でき（FAQ では環境レベルの設定）、Microsoft Copilot に表示される会話型・AI アクションとエージェントは Microsoft 365 管理センターで統制する。注意：同ページによれば、Copilot Studio のコンテンツモデレーションは定義済みの有害カテゴリが対象で、Microsoft 365 Copilot のガバナンス・安全制御には、管理者が任意に決めた話題や倫理カテゴリで会話をブロックするテナント設定はない。",
+    "Admins can turn off publishing of agents that use generative AI for the tenant, disable cross-geography data movement for generative AI features outside the United States (an environment-level setting per the FAQ), and govern actions and agents shown in Microsoft Copilot from the Microsoft 365 admin center. Note: content moderation covers predefined harmful categories, and Microsoft 365 Copilot controls offer no tenant policy to block conversations on arbitrary admin-defined subjects."
+   ],
+   "where": [
+    "Power Platform 管理センター（生成AIエージェントの公開をオフにする設定）／Microsoft 365 管理センター",
+    "Power Platform admin center (turn off publishing of generative-AI agents) / Microsoft 365 admin center"
+   ],
+   "src": {
+    "title": "Key concepts - Copilot Studio security and governance",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/security-and-governance",
+    "quote": "Your admin can use the Power Platform admin center to turn off the ability to publish agents that use generative AI features for your tenant."
+   }
+  },
+  {
+   "level": "tenant",
+   "name": [
+    "環境ルーティング（個人用の開発者環境へ誘導）",
+    "Environment routing"
+   ],
+   "what": [
+    "メーカーが Copilot Studio／Power Apps／Power Automate（デスクトップを含む）を開いたとき、既定環境ではなく本人の開発者環境へ自動で誘導する（新規／既存メーカーを選択）。作られる環境は管理対象で、割り当てた環境グループのルールを継承する。ルールはセキュリティグループごとに複数作れ、優先順で最初に一致したものを適用（一致なし・作成失敗時は既定環境へ）。プリセット：共有は『セキュリティグループ除外・個人5人まで』、ソリューションチェッカーは Warn、利用状況インサイトは有効、ウェルカムメッセージは未設定。メーカーはその環境の管理者ロールになる。専用のデータポリシーは付かず、テナントレベルのポリシーを継承する。メーカーは他の環境へいつでも切り替えられるため、誘導であって隔離の強制ではない（判断）。プレミアムなガバナンス機能で既定はオフ、有効化できるのは Power Platform 管理者のみ。管理対象の開発者環境でアプリ・フローを実行するにはプレミアムライセンスが必要（作成・プレビューは不要）。テナントの Dataverse 容量には影響しない。",
+    "Routes makers to their own developer environment instead of the default one when they open Copilot Studio, Power Apps or Power Automate. Created environments are managed and inherit the assigned environment group's rules; multiple rules by security group, first match wins (no match or creation failure goes to the default environment). Presets: sharing limited to 5 individuals without security groups, Solution Checker = Warn, usage insights on, no welcome message. Makers get the admin role there; no dedicated data policy (tenant-level policies apply). Makers can always switch environments, so this routes rather than enforces isolation (judgment). Premium feature, off by default, Power Platform admins only; running apps or flows in a managed developer environment needs a premium license (creating and previewing doesn't). No impact on tenant Dataverse capacity."
+   ],
+   "where": [
+    "PPAC > 管理 > テナント設定 > Environment routing（環境グループの画面の『Environment Routing』ボタンからも割当先グループを設定可）",
+    "PPAC > Manage > Tenant settings > Environment routing (the target group can also be set via the Environment Routing button on the Environment groups page)"
+   ],
+   "src": {
+    "title": "Environment routing",
+    "url": "https://learn.microsoft.com/power-platform/admin/default-environment-routing",
+    "quote": "Environment routing offers makers a personal, safe space to build with Microsoft Dataverse without the fear of others accessing their apps or data."
+   }
+  },
+  {
+   "level": "tenant",
+   "name": [
+    "環境グループとルール",
+    "Environment groups and rules"
+   ],
+   "what": [
+    "管理対象環境を『フォルダ』のようにまとめ、ルールを発行して全メンバー環境に一括適用する（プレミアムなガバナンス機能）。発行されたルールは各環境で読み取り専用になり、ローカル管理者は上書きできない。強制されるのは発行済みのルールだけ。管理対象環境のみ・1環境1グループ・重複や入れ子は不可・環境ごとの例外は未サポート。グループから外すと最後の設定を保持したままロックが外れる。ルールの例：共有の制限、ウェルカムコンテンツ、ソリューションチェッカー、利用状況インサイト、バックアップ保持、生成AI設定（これらは発行済みなら、環境を追加したとき環境側の設定を上書きする）、高度なコネクタポリシー、知識源の制御。個人用の開発者環境は専用グループ（例：Personal Productivity）に入れ、環境ルーティングの割当先にするのがベストプラクティス。",
+    "Group managed environments like a folder and publish rules that apply to every member environment (premium governance feature); published rules become read-only locally and only published rules are enforced. Managed environments only, one group per environment, no overlap or nesting, no per-environment exceptions; removing an environment keeps the last settings but unlocks them. Rules include sharing limits, welcome content, solution checker, usage insights, backup retention and generative AI settings (these override local settings when an environment is added), plus advanced connector policies and knowledge-source controls. Best practice: put routed personal developer environments in a dedicated group."
+   ],
+   "where": [
+    "PPAC > 管理 > 環境グループ > グループを選択 > Rules タブ > ルールを保存 > Publish rules（Power Platform テナント管理者）",
+    "PPAC > Manage > Environment groups > select group > Rules > save rule > Publish rules (Power Platform tenant admin)"
+   ],
+   "src": {
+    "title": "Environment groups",
+    "url": "https://learn.microsoft.com/power-platform/admin/environment-groups",
+    "quote": "When a rule is published at the environment group level, it's enforced across every environment within that group. This means the corresponding setting or policy becomes locked (read-only) within individual environments"
+   }
+  },
+  {
+   "level": "tenant",
+   "name": [
+    "Microsoft Purview の DLP（SharePoint 知識源の機密ラベル）",
+    "Microsoft Purview DLP for SharePoint-grounded agents"
+   ],
+   "what": [
+    "知識源が SharePoint のとき、Microsoft 365 Copilot ロケーションを対象にした DLP ポリシーで、指定した機密ラベルの付いたコンテンツをエージェントが処理しないよう制限できる。対象は Teams・SharePoint・Microsoft 365 Copilot 向けに Copilot Studio で作ったエージェント（他のチャネルへの適用は出典ページで確認）。DSPM for AI、保持、eDiscovery など他の Purview 機能の対応範囲と前提条件（課金など）も出典ページで確認する。",
+    "When the knowledge source is SharePoint, a DLP policy scoped to the Microsoft 365 Copilot location can stop Copilot Studio agents built for Teams, SharePoint and Microsoft 365 Copilot from processing content with a specified sensitivity label (check the source page for other channels). Check the page for coverage and prerequisites of other Purview features such as DSPM for AI, retention and eDiscovery."
+   ],
+   "where": [
+    "Microsoft Purview ポータル（DLP ポリシー）",
+    "Microsoft Purview portal (DLP policies)"
+   ],
+   "src": {
+    "title": "Use Microsoft Purview to manage data security & compliance for Microsoft Copilot Studio",
+    "url": "https://learn.microsoft.com/purview/ai-copilot-studio",
+    "quote": "When the knowledge source is SharePoint, a DLP policy scoped to the Microsoft 365 Copilot location can restrict agents built in Copilot Studio for Microsoft Teams, SharePoint, and Microsoft 365 Copilot from processing sensitive content based on a specified sensitivity label."
+   }
+  },
+  {
+   "level": "tenant",
+   "name": [
+    "Microsoft Agent 365（エージェントのコントロールプレーン）",
+    "Microsoft Agent 365 (agent control plane)"
+   ],
+   "what": [
+    "Copilot Studio エージェントを観察・統制・保護する中央のコントロールプレーン（Key concepts）。導入した組織では、エージェントを Entra の ID として表し、条件付きアクセス、ロール／属性ベースのアクセス制御、アクセスガバナンスのワークフローで統制でき、Entra のネットワーク制御（送信・受信）も Agent 365 経由で適用できる（GA）。既存の Power Platform／Microsoft 365 のガバナンスに加えて使う位置づけ。ライセンス：2026年5月1日から商用向けにユーザー単位で一般提供。Microsoft 365 E7 に含まれる（エージェント管理のページ）。注意：Agent 365 を通るガバナンス・監査イベントは Customer Lockbox の対象外。",
+    "Central control plane to observe, govern and secure Copilot Studio agents (Key concepts). For organizations that onboard it, agents can be represented as Entra identities governed by Conditional Access, role- and attribute-based access control and access governance, and Entra network egress/ingress controls can be applied (GA); it complements existing Power Platform and Microsoft 365 governance. Licensing: generally available for the Commercial segment per user since May 1, 2026; included in Microsoft 365 E7. Note: Agent 365 governance and audit events are not covered by Customer Lockbox."
+   ],
+   "where": [
+    "Microsoft 365 管理センター > Agents（Overview／Registry）、Microsoft Entra、Microsoft Purview、Microsoft Defender",
+    "Microsoft 365 admin center > Agents (Overview / Registry), Microsoft Entra, Microsoft Purview, Microsoft Defender"
+   ],
+   "src": {
+    "title": "Overview of Microsoft Agent 365",
+    "url": "https://learn.microsoft.com/microsoft-agent-365/overview",
+    "quote": "As of May 1, 2026, Microsoft Agent 365 is generally available for the Commercial segment on a per user basis."
+   }
+  },
+  {
+   "level": "tenant",
+   "name": [
+    "Copilot クレジットの統制（環境の容量・エージェント上限・運用手順）",
+    "Copilot Credit governance (environment capacity, agent limits, process)"
+   ],
+   "what": [
+    "4層で統制する：テナント（購入済み容量と、割当できる人）、環境（前払いの割当・テナントの未割当容量からの引き出し・従量課金）、エージェント（月次上限・通知閾値・使用量によるハードストップ・明示的な停止）、運用（費用責任者・アラート対応・例外承認・所有者への通知）。エージェント上限は前払い／従量課金のどちらでも設定できるが環境全体の消費は抑えないため、前払い分を封じ込めるには割当量を決めてテナント容量からの引き出しをオフにする。PPAC にはテナント全体の既定のエージェント上限がないので、標準の上限は定期・自動の処理で個々に適用する。Azure の予算とアラートは通知だけで消費を止めない。割当の権限を環境管理者に与えるとテナントの全環境に及ぶため、テナント管理者に限るのが推奨。運用の型：発見→分類（探索・試作／テスト・検証／本番）→統制の確認→上限の適用→繰り返しと自動化（インベントリ API で新しい環境・エージェントを検出）。出典は GitHub Copilot ハーネスのエージェント向けガイドだが、容量統制は Copilot Studio の全ワークロードに及ぶ。",
+    "Four layers: tenant (purchased capacity, who can allocate), environment (prepaid allocation, draw from tenant capacity, pay-as-you-go), agent (monthly limit, notification threshold, usage-based hard stop, explicit stop) and process (cost owner, alert triage, exceptions, owner notification). Agent limits work with prepaid or pay-as-you-go but don't cap environment totals, so contain prepaid use by allocating a fixed amount and turning off tenant draw. PPAC has no tenant-wide default agent limit, so apply standard limits by a recurring or automated process. Azure budgets alert but don't stop consumption. Allowing environment admins to allocate grants tenant-wide allocation, so keep it with tenant admins. Process: discover, classify, review controls, apply limits, repeat and automate with the inventory API. The guide targets GitHub Copilot harness agents, but capacity controls apply to all Copilot Studio workloads."
+   ],
+   "where": [
+    "PPAC（ライセンスの容量割当、Manage Agents、消費レポートのダウンロード）、Power Platform インベントリ API、Power Platform API（allocationsV2）",
+    "PPAC (capacity allocation, Manage Agents, consumption report download), Power Platform inventory API, Power Platform API (allocationsV2)"
+   ],
+   "src": {
+    "title": "Govern Copilot Credit consumption for agents powered by the GitHub Copilot harness",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/guidance/govern-credit-consumption",
+    "quote": "Power Platform admin center doesn't provide a tenant-wide default agent limit. If your organization defines a standard limit for new agents, use a recurring or automated process to apply it to individual agents."
+   }
+  },
+  {
+   "level": "environment",
+   "name": [
+    "Managed Environments（管理対象環境）― 機能群とライセンス",
+    "Managed Environments: feature suite and licensing"
+   ],
+   "what": [
+    "大規模運用のためのプレミアムな管理機能群で、どの種類の環境でも有効化できる。含まれる機能の例：環境グループ、共有の制限、週次の利用状況インサイト、データポリシー、パイプライン、メーカー向けウェルカムコンテンツ、ソリューションチェッカー、IP ファイアウォール、IP Cookie バインディング、CMK、Lockbox、拡張バックアップ、既定の環境ルーティング、VNet サポート、マスキングルール。ライセンス：スタンドアロンの Power Apps／Power Automate／Copilot Studio／Power Pages／Dynamics 365 ライセンスに権利として含まれる（Developer Plan ではアセット実行時の権利に含まれない）。管理対象でない開発者環境は非推奨で、残すには 2026年12月15日までに Managed Environments を有効にする必要がある。",
+    "Premium capabilities to manage Power Platform at scale, usable with any environment type. Features include environment groups, limit sharing, weekly usage insights, data policies, pipelines, maker welcome content, solution checker, IP firewall, IP cookie binding, CMK, Lockbox, extended backup, default environment routing, VNet support and masking rules. Licensing: an entitlement with standalone Power Apps, Power Automate, Copilot Studio, Power Pages and Dynamics 365 licenses (not for running assets under the Developer Plan). Unmanaged developer environments are deprecated; enable Managed Environments before December 15, 2026 to keep one."
+   ],
+   "where": [
+    "PPAC の環境設定で有効化（手順は『Enable managed environments』）。有効化後は 管理 > 環境 > 環境を選択 > Edit Managed Environments で各機能を設定",
+    "Enable in PPAC environment settings (see 'Enable managed environments'); then Manage > Environments > select environment > Edit Managed Environments"
+   ],
+   "src": {
+    "title": "Managed environments overview",
+    "url": "https://learn.microsoft.com/power-platform/admin/managed-environment-overview",
+    "quote": "Managed environments are included as an entitlement with standalone Power Apps, Power Automate, Microsoft Copilot Studio, Power Pages, and Dynamics 365 licenses."
+   }
+  },
+  {
+   "level": "environment",
+   "name": [
+    "高度なコネクタポリシー（ACP）",
+    "Advanced connector policies (ACP)"
+   ],
+   "what": [
+    "認定コネクタと MCP コネクタを許可リスト方式で制御する（既定ですべて拒否、新しいコネクタも自動でブロック）。トリガー・内部アクション・非推奨アクションまで見える。MCP はサーバ単位でブロックできる（個々のツール単位は不可）。カスタム／HTTP コネクタは未対応で従来のデータポリシーで統制し、Copilot Studio の仮想コネクタも専用ルールができるまで従来のデータポリシーで管理する。モードは Mixed（既定。従来のデータポリシーと併用し、より厳しい設定を適用）と ACP-only。メーカーの設計時の強制は Power Automate→Copilot Studio→Power Apps の順に展開中で、各ポータルでの提供がそのワークロードの GA にあたり、それまでは実行時のみの強制。保存（単一環境）／発行（環境グループ）した時点で未許可のコネクタはすべてブロックされるため、許可リストを先に精査し、まず Mixed モードで検証する。単一環境なら管理対象でない環境でも使えるが、その場合ブロック不可のコネクタはブロックできない。ルールを外しても、各環境には最後の設定が残る。",
+    "Default-deny allowlist for certified and MCP connectors (new connectors blocked automatically), with visibility of triggers, internal and deprecated actions; MCP servers can be blocked as a whole (not individual tools). Custom and HTTP connectors aren't supported yet (use classic data policies), and Copilot Studio virtual connectors stay under classic policies until dedicated rules exist. Modes: Mixed (default; most restrictive of both) and ACP-only. Design-time enforcement is rolling out to Power Automate, then Copilot Studio, then Power Apps, and marks GA per workload; until then enforcement is runtime only. Everything not allowed is blocked on save or publish, so curate the allowlist and start in Mixed mode. Single-environment ACP also works on unmanaged environments, but nonblockable connectors stay nonblockable there. Removing a rule leaves the last configuration in each environment."
+   ],
+   "where": [
+    "PPAC > 管理 > 環境グループ > Rules > Advanced connector policies、または セキュリティ > データとプライバシー > Advanced connector policies（単一環境）",
+    "PPAC > Manage > Environment groups > Rules > Advanced connector policies, or Security > Data and privacy > Advanced connector policies (single environment)"
+   ],
+   "src": {
+    "title": "Advanced connector policies",
+    "url": "https://learn.microsoft.com/power-platform/admin/advanced-connector-policies",
+    "quote": "All connectors and actions are blocked unless explicitly allowed. New connectors added to the platform are automatically blocked."
+   }
+  },
+  {
+   "level": "environment",
+   "name": [
+    "共有の制限（Limit sharing）",
+    "Limit sharing (agents, apps, flows)"
+   ],
+   "what": [
+    "管理対象環境で、エージェント・キャンバスアプリ・ソリューション対応クラウドフローの共有範囲を制限する。エージェントの共有ルール：Editor 権限の付与可否／Viewer 権限の付与可否（不可にするとセキュリティグループへの共有もできない）／個人のみ（セキュリティグループ不可）／1エージェントあたりの閲覧者数の上限。共有済みのユーザーには影響せず、ルールに反する状態のものは準拠するまで共有解除しかできない。反映まで最大1時間。環境グループのルールとして一括適用でき、環境ルーティングで作られる開発者環境の既定は『セキュリティグループ除外・個人5人まで』。",
+    "In managed environments, limit how broadly agents, canvas apps and solution-aware cloud flows can be shared. Agent rules: allow granting Editor, allow granting Viewer (if off, no sharing with security groups either), individuals only, and a maximum number of viewers per agent. Existing access is unaffected; non-compliant items can only be unshared until compliant; up to an hour to take effect. Deployable as an environment group rule; routed developer environments default to five individuals without security groups."
+   ],
+   "where": [
+    "PPAC > 管理 > 環境 > 管理対象環境を選択 > Edit Managed Environments > Manage sharing（PowerShell でも設定可）",
+    "PPAC > Manage > Environments > managed environment > Edit Managed Environments > Manage sharing (PowerShell also supported)"
+   ],
+   "src": {
+    "title": "Limit sharing",
+    "url": "https://learn.microsoft.com/power-platform/admin/managed-environment-sharing-limits",
+    "quote": "In managed environments, admins can limit how broadly users can share canvas apps, flows, and agents."
+   }
+  },
+  {
+   "level": "environment",
+   "name": [
+    "エージェントの知識源の制御（preview）",
+    "Knowledge sources for agents (preview)"
+   ],
+   "what": [
+    "エージェントが参照できる知識源の種類を管理者が選ぶ：SharePoint＋OneDrive と公開 Web サイト（None／All／Custom＝URL ごとに許可・拒否を優先順で指定）、文書のアップロード（Yes／No）。環境または環境グループ単位で設定し、グループで設定すると環境側では変えられない。プレビュー（プレリリースの文書で変更の可能性あり）。Copilot Studio の FAQ によれば、データポリシーでも SharePoint・公開サイト・文書の知識源を制御でき、SharePoint 知識源には DLP のエンドポイントフィルタリングが使える。",
+    "Admins choose which knowledge-source types agents may use: SharePoint + OneDrive and public websites (None / All / Custom allow or deny per URL in priority order) and uploaded documents (Yes / No), per environment or environment group (group settings can't be changed locally). Preview (prerelease documentation, subject to change). Per the FAQ, data policies can also control these sources, with DLP endpoint filtering for SharePoint."
+   ],
+   "where": [
+    "PPAC > セキュリティ > データとプライバシー > Knowledge sources for agents（または環境グループのルール）",
+    "PPAC > Security > Data and privacy > Knowledge sources for agents (or an environment group rule)"
+   ],
+   "src": {
+    "title": "Configure knowledge sources for agents in the Power Platform admin center (preview)",
+    "url": "https://learn.microsoft.com/power-platform/admin/knowledge-sources-for-agents-rule",
+    "quote": "You can choose which types of knowledge sources your agents can reference."
+   }
+  },
+  {
+   "level": "environment",
+   "name": [
+    "ソリューションチェッカーの強制",
+    "Solution checker enforcement"
+   ],
+   "what": [
+    "管理対象環境へのソリューションのインポート時に、ベストプラクティス規則による静的解析を強制する。None（検証なし）／Warn（重大な問題があれば警告するがインポートは続行し、要約メールを送る）／Block（重大な問題があればインポートを中止し、環境は変更されない）。規則ごとに除外でき、インポートを止めるのは重大度 critical の規則だけ。メールは Power Platform 管理者、Dynamics 365 サービス管理者と週次ダイジェストの受信者に届く。管理者モードの環境では使えない。環境ルーティングで作られる開発者環境の既定は Warn。環境グループのルールとしても適用できる。",
+    "Static analysis enforced on solution import into a managed environment: None, Warn (import continues, summary email) or Block (import cancelled for highly critical issues, no changes). Rules can be excluded; only critical-severity rules block. Emails go to Power Platform and Dynamics 365 service admins and weekly-digest recipients. Not available in administration mode; routed developer environments default to Warn; available as an environment group rule."
+   ],
+   "where": [
+    "PPAC > 管理 > 環境 > 管理対象環境 > Edit Managed Environments > Solution checker enforcement（PowerShell・環境グループのルールでも可）",
+    "PPAC > Manage > Environments > managed environment > Edit Managed Environments > Solution checker enforcement (PowerShell or environment group rule also possible)"
+   ],
+   "src": {
+    "title": "Solution checker enforcement in managed environments",
+    "url": "https://learn.microsoft.com/power-platform/admin/managed-environment-solution-checker",
+    "quote": "Administrators can use solution checker to enforce checks to identify problematic patterns on solutions when the solution is imported in the managed environment."
+   }
+  },
+  {
+   "level": "environment",
+   "name": [
+    "IP ファイアウォール（Dataverse へのアクセス元 IP の制限）",
+    "IP firewall"
+   ],
+   "what": [
+    "Dataverse へのアクセスを許可した IP 範囲に限り、要求ごとにリアルタイムで評価する。内部不正によるデータ持ち出しやトークン再利用攻撃の緩和を想定。許可リストは CIDR 形式で最大200範囲。既定では無効。監査専用モード（有効化時の既定）を少なくとも1週間使い、ログを確認してから強制へ切り替えることを推奨。環境または環境グループ単位で設定。強制されるのは管理対象環境だけで、さらに強制する環境のユーザーに Microsoft 365／Office 365 A5/E5/G5 などの対象サブスクリプションが必要。",
+    "Restricts Dataverse access to allowed IP ranges, evaluated in real time, to mitigate insider exfiltration and token replay; up to 200 CIDR ranges. Off by default; use audit-only mode (the default when set up) for at least a week and review logs before enforcing. Per environment or environment group. Enforced only on managed environments, and users in enforced environments need a qualifying subscription such as Microsoft 365 or Office 365 A5/E5/G5."
+   ],
+   "where": [
+    "PPAC > セキュリティ > ID とアクセス > IP firewall（環境グループ単位も可）",
+    "PPAC > Security > Identity and access > IP firewall (environment or environment group)"
+   ],
+   "src": {
+    "title": "IP firewall in Power Platform environments",
+    "url": "https://learn.microsoft.com/power-platform/admin/ip-firewall",
+    "quote": "The IP firewall protects your organizational data by ensuring users can only access Microsoft Dataverse from allowed IP locations."
+   }
+  },
+  {
+   "level": "environment",
+   "name": [
+    "仮想ネットワーク（VNet）サポート",
+    "Azure VNet support for Power Platform"
+   ],
+   "what": [
+    "Azure のサブネット委任により、Power Platform からの送信呼び出し（Dataverse プラグイン、SQL Server・Azure Key Vault・Blob Storage・カスタムコネクタなど対応コネクタ、Copilot Studio の AI search 知識源を含む）を自社の仮想ネットワーク経由にし、内部リソースをインターネットに公開せずに使う。対応環境は Production／Default／Sandbox／Developer（Trial と Dataverse for Teams は不可）。Azure サブスクリプションの関連付けが必要。有効にすると公開リソースへの呼び出しが失敗し始めるため、事前にプラグインとコネクタの URL・接続を見直す。Managed Environments の機能として挙げられている。",
+    "Azure subnet delegation routes outbound calls (Dataverse plugins and supported connectors such as SQL Server, Azure Key Vault, Blob Storage, custom connectors and the AI search knowledge source) through your virtual network, so internal resources aren't exposed to the internet. Supported in Production, Default, Sandbox and Developer environments (not Trial or Dataverse for Teams); requires an Azure subscription linked to the tenant. Calls to public resources start to break, so review plugin and connector URLs first. Listed as a managed-environment feature."
+   ],
+   "where": [
+    "Azure（仮想ネットワーク・委任サブネット・Power Platform のエンタープライズポリシー）と対象環境の関連付け",
+    "Azure virtual network, delegated subnet and Power Platform enterprise policy linked to the environment"
+   ],
+   "src": {
+    "title": "Microsoft Azure VNet support overview",
+    "url": "https://learn.microsoft.com/power-platform/admin/vnet-support-overview",
+    "quote": "VNet support allows Power Platform services to connect to your private and protected resources without exposing them to the internet."
+   }
+  },
+  {
+   "level": "environment",
+   "name": [
+    "顧客管理キー（CMK）による暗号化",
+    "Customer-managed encryption key (CMK)"
+   ],
+   "what": [
+    "Dataverse 環境に紐づくデータベース暗号化キーを自社で管理できる。Copilot Studio の FAQ によれば、Copilot Studio 環境で有効にすると Copilot Studio のデータがすべて顧客のキーで暗号化され、キーの更新や CMK の無効化もできる。Managed Environments の機能一覧に含まれる。キーを取り消した・失ったときの影響、ユーザー側のライセンス条件、適用中の環境の扱いなどの前提は、適用前に出典ページで確認する。",
+    "Self-manage the database encryption key associated with a Dataverse environment. Per the Copilot Studio FAQ, turning CMK on for a Copilot Studio environment encrypts all Copilot Studio data with the customer's key, and keys can be cycled or CMK turned off. Listed among managed-environment features. Check the source page before applying for the impact of revoking or losing a key, user licensing conditions and environment behavior during encryption."
+   ],
+   "where": [
+    "Power Platform 管理センター（キーの準備を含む手順は出典ページで確認）",
+    "Power Platform admin center (see the source page for the full procedure, including key preparation)"
+   ],
+   "src": {
+    "title": "Manage your customer-managed encryption key",
+    "url": "https://learn.microsoft.com/power-platform/admin/customer-managed-key",
+    "quote": "Power Platform provides this customer-managed encryption key (CMK) for your added data protection control where you can self-manage the database encryption key that is associated with your Microsoft Dataverse environment."
+   }
+  },
+  {
+   "level": "maker",
+   "name": [
+    "自動セキュリティスキャン（公開前のメーカーへの警告）",
+    "Automatic security scan (warnings to makers before publishing)"
+   ],
+   "what": [
+    "公開前に自動でスキャンし、既定の安全な設定が変更されたときにメーカーへ警告する：(1) 認証を『認証なし』にした（リンクを知る誰でも対話可）、(2) コネクタ・フローの資格情報を既定の『エンドユーザー資格情報』から『メーカー提供の資格情報』に変えた、(3) 組織の全員に共有した。ページの記述は警告で、公開を止めるとはしていない。Key concepts によれば、知識・ツール・アクションを設定している間に、データ流出などの可能性を示すリスク所見が随時更新され、公開前に直せる。",
+    "Scans automatically and warns makers before publishing when secure defaults change: No authentication (anyone with the link can interact), maker-provided instead of end-user credentials for connectors and flows, or sharing with everyone in the organization. The page describes warnings, not blocking. Per Key concepts, makers also see continuously updated risk findings while configuring knowledge, tools and actions."
+   ],
+   "where": [
+    "Copilot Studio（メーカーの画面で自動実行）",
+    "Copilot Studio maker experience (runs automatically)"
+   ],
+   "src": {
+    "title": "Automatic security scan in Copilot Studio",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/security-scan",
+    "quote": "Copilot Studio automatically runs a security scan and warns makers before publishing."
+   }
+  },
+  {
+   "level": "maker",
+   "name": [
+    "メーカー向けウェルカムコンテンツ",
+    "Maker welcome content"
+   ],
+   "what": [
+    "管理対象環境の機能。メーカーにプライバシーやコンプライアンス上の重要な要件を伝えるメッセージを表示できる（Key concepts）。リンク先の内容を読んで確認（acknowledge）しないと先へ進めない仕組みがある。環境グループのルールでも配布でき、環境ルーティングで作る開発者環境では既定で未設定。同意の記録方法などの詳細は出典ページで確認。",
+    "A managed-environment feature: show makers a message about important privacy and compliance requirements (Key concepts); makers must read and acknowledge the linked content before they can continue. Deployable as an environment group rule; not set by default in routed developer environments. See the source page for details such as how acknowledgement is recorded."
+   ],
+   "where": [
+    "PPAC の管理対象環境の設定、または環境グループのルール（手順は出典ページ）",
+    "PPAC managed-environment settings or an environment group rule (see the source page)"
+   ],
+   "src": {
+    "title": "Enable maker welcome content",
+    "url": "https://learn.microsoft.com/power-platform/admin/welcome-content",
+    "quote": "Makers must read and acknowledge the linked content before they can continue."
+   }
+  },
+  {
+   "level": "maker",
+   "name": [
+    "作成者（メーカー）のアクセス制御",
+    "Maker access controls (licenses, environment access, security roles)"
+   ],
+   "what": [
+    "Copilot Studio のユーザーライセンス、環境へのアクセス、Dataverse のセキュリティロールを Entra ID グループで管理する。作成者には環境の Environment Maker ロールを付与する（エージェント・サブコンポーネント・会話トランスクリプトの各テーブルへの権限はロールで異なり、System Administrator は全エージェントとトランスクリプトを読み書きできる）。トランスクリプトを読めるのは Conversation Transcript テーブルの読み取り権限を持つ人だけ。テナントレベル：ライセンスまたは従量課金の Copilot Author 設定による作成機能へのアクセス、セルフサービス試用の許可・ブロック、Copilot Studio の Teams アプリの許可・ブロック。環境レベル：セキュリティグループによるアクセス、セキュリティロールによるエージェントの作成・参照・更新・削除の制御。",
+    "Manage Copilot Studio licenses, environment access and Dataverse security roles through Entra ID groups; give authors the Environment Maker role (role permissions on agent, subcomponent and transcript tables differ; System Administrators can read and update all agents and transcripts). Only users with read access on the Conversation Transcript table can see transcripts. Tenant level: access to authoring via licenses or pay-as-you-go Copilot Author settings, self-service trials, Teams app. Environment level: security-group access and role-based create/read/update/delete on agents."
+   ],
+   "where": [
+    "Microsoft Entra（グループ）／PPAC の環境のセキュリティロール／Copilot Author 設定（従量課金）／Teams のアプリ管理",
+    "Microsoft Entra groups / PPAC environment security roles / Copilot Author settings (pay-as-you-go) / Teams app management"
+   ],
+   "src": {
+    "title": "Secure your Copilot Studio projects",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/guidance/sec-gov-phase3",
+    "quote": "Only bot authors and just-in-time admins should have access to your environments and data stores."
+   }
+  },
+  {
+   "level": "agent",
+   "name": [
+    "エージェントの保護ステータス（Protection status）",
+    "Agent runtime protection status"
+   ],
+   "what": [
+    "Copilot Studio の Agents ページで、公開済みエージェントの保護状態を Protected／Needs review／Unknown で表示する。内訳は認証・ポリシー・コンテンツモデレーションで、認証が不十分かポリシー違反があると Needs review になる（モデレーションは状態に直接影響しない）。公開済みエージェントは脅威検出が自動で有効（Active）で、プロンプト攻撃は既定でブロックされる。Security analytics で、ブロックされたメッセージ数と理由・傾向（直近7／14／30日）を確認できる。",
+    "The Agents page shows each published agent as Protected, Needs review or Unknown, broken down into authentication, policies and content moderation; inadequate authentication or policy violations give Needs review (moderation doesn't affect the status). Threat detection is automatically active on published agents and prompt attacks are blocked by default. Security analytics shows blocked messages, reasons and trends for 7, 14 or 30 days."
+   ],
+   "where": [
+    "Copilot Studio > Agents ページ > Protection status 列 > See details（Security analytics）",
+    "Copilot Studio > Agents page > Protection status column > See details (Security analytics)"
+   ],
+   "src": {
+    "title": "Agent runtime protection status",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/security-agent-runtime-view",
+    "quote": "This component shows statistics on blocked prompt attacks, which are actively blocked by default."
+   }
+  },
+  {
+   "level": "agent",
+   "name": [
+    "非準拠エージェントの隔離（クォランティン）",
+    "Quarantine noncompliant agents"
+   ],
+   "what": [
+    "セキュリティ・コンプライアンス上の問題がある（非準拠の）エージェントを、調査・是正の間、Power Platform API の隔離 API で隔離できる。必要な管理者ロールと API 権限、隔離中にできること、対象外のエージェント種別は出典ページで確認する。",
+    "Isolate noncompliant agents with the Power Platform quarantine APIs while investigating and remediating security and compliance issues. Check the source page for required admin roles and API permissions, what remains possible during quarantine and unsupported agent types."
+   ],
+   "where": [
+    "Power Platform API",
+    "Power Platform API"
+   ],
+   "src": {
+    "title": "Quarantine noncompliant agents with the Power Platform API",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/admin-api-quarantine",
+    "quote": "Admins can then use the quarantine APIs to isolate the noncompliant agents while investigating and remediating security and compliance issues."
+   }
+  },
+  {
+   "level": "identity",
+   "name": [
+    "Microsoft Entra Agent ID（Copilot Studio 統合）",
+    "Microsoft Entra Agent ID for Copilot Studio agents"
+   ],
+   "what": [
+    "Copilot Studio は、新しく作る各エージェントに Microsoft Entra Agent ID を自動で作成する。開始時期、既存エージェントの扱い、オプトアウトの可否は出典ページで確認する（Security FAQ には新規エージェントにアプリ登録を作るという記述も残るため、自テナントの実態を確かめる）。Key concepts によれば、Agent 365 を導入した組織では、エージェントの ID を条件付きアクセス、ロール／属性ベースのアクセス制御、アクセスガバナンスの対象にできる。",
+    "Copilot Studio automatically creates a Microsoft Entra Agent ID for each new agent. Check the source page for timing, existing agents and opt-out (the Security FAQ still describes app registrations for new agents, so verify your tenant). Per Key concepts, organizations that onboard Agent 365 can govern these identities with Conditional Access, role- and attribute-based access control and access governance."
+   ],
+   "where": [
+    "Microsoft Entra 管理センター（エージェント ID）／Copilot Studio のエージェント設定（確認箇所は出典ページ）",
+    "Microsoft Entra admin center (agent identities) / Copilot Studio agent settings (see the source page)"
+   ],
+   "src": {
+    "title": "Microsoft Entra Agent IDs for Copilot Studio agents",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/admin-use-entra-agent-identities",
+    "quote": "Copilot Studio automatically creates a Microsoft Entra Agent ID for each new agent you create."
+   }
+  },
+  {
+   "level": "monitor",
+   "name": [
+    "Microsoft Purview の監査ログ（Copilot Studio の活動）",
+    "Microsoft Purview audit logs for Copilot Studio"
+   ],
+   "what": [
+    "エージェントの内容や設定の変更はセキュリティと挙動に影響するため、その操作を監査しておくと障害の緩和、コンプライアンス、脅威への対応に役立つ。Microsoft Purview ポータルで Copilot Studio の監査イベントを絞り込める（Security FAQ は、誰が作ったか、共同所有者、誰が設定・変更したかの確認を例に挙げる）。Microsoft Sentinel に取り込んで検出ルールとアラートを作るには、ユーザーへの Microsoft 365 ライセンス割当が前提（運用監視ガイド）。対象イベントの一覧や前提条件は出典ページで確認。",
+    "Changes to agent content and settings affect security and behavior, so auditing them helps mitigate failures, meet compliance and address threats. Filter Copilot Studio audit events in the Microsoft Purview portal (the Security FAQ gives examples: who built an agent, co-owners, who changed it). Ingesting into Microsoft Sentinel for detection rules and alerts requires Microsoft 365 licenses assigned to users (monitoring guide). See the source page for event lists and prerequisites."
+   ],
+   "where": [
+    "Microsoft Purview ポータル（監査イベントを絞り込み）／Microsoft Sentinel",
+    "Microsoft Purview portal (filter audit events) / Microsoft Sentinel"
+   ],
+   "src": {
+    "title": "Audit Copilot Studio activities in Microsoft Purview",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/admin-logging-copilot-studio",
+    "quote": "Changes to the content and settings of an agent can affect security and agent behavior. Auditing these actions helps mitigate failures, contain systems of security constraints, adhere to compliance requirements, and address security threats."
+   }
+  },
+  {
+   "level": "monitor",
+   "name": [
+    "利用状況インサイト（週次の管理者ダイジェスト）",
+    "Usage insights (weekly admin digest)"
+   ],
+   "what": [
+    "管理対象環境の週次メール：過去1か月に使われたアプリ数とアクティブユーザー、しばらく起動されていないアプリ・フロー（最終起動日。未起動は『None』）、人気のアプリ・フローと上位メーカー。使われていないものは所有者と相談して更新または削除するよう勧めている。受信者は Power Platform 管理者と Dynamics 365 サービス管理者（追加可）。テナントレベル分析の有効化が前提で、GCC／GCC High／DoD／中国などのソブリンクラウドでは未提供。ページの記述はアプリとフローが対象で、エージェントは明記されていない。",
+    "Weekly email for managed environments: apps used and active users, apps and flows not launched for a while (last launch date, 'None' if never), top apps and flows and top makers; recommends working with owners to update or remove unused items. Sent to Power Platform and Dynamics 365 service admins (more recipients possible). Requires tenant-level analytics; not available in sovereign clouds. The page covers apps and flows and doesn't mention agents."
+   ],
+   "where": [
+    "PPAC > 管理 > 環境 > 管理対象環境 > Edit Managed Environments > Usage insights",
+    "PPAC > Manage > Environments > managed environment > Edit Managed Environments > Usage insights"
+   ],
+   "src": {
+    "title": "Usage insights",
+    "url": "https://learn.microsoft.com/power-platform/admin/managed-environment-usage-insights",
+    "quote": "Analytics about your top apps, your most impactful makers, and inactive resources you can safely clean up are distilled and delivered to your mailbox once a week."
+   }
+  },
+  {
+   "level": "monitor",
+   "name": [
+    "Microsoft Defender のリアルタイム保護",
+    "Microsoft Defender real-time protection for AI agents"
+   ],
+   "what": [
+    "エージェンティックループ全体でエージェントの活動を検査し、危険なアクションを実行前にブロックする機能とされる。どのルールで監査のみ／ブロックになるか、Copilot Studio エージェントへの対応範囲と提供状況（プレビューか）、必要な接続設定は出典ページで確認する。2026年7月1日からのライセンス変更（次項）にも注意。",
+    "Described as inspecting agent activity throughout the agentic loop and blocking risky actions before they execute. Check the source page for which rules audit or block, coverage and availability for Copilot Studio agents (including preview status) and required connection setup. Note the licensing change from July 1, 2026 (next item)."
+   ],
+   "where": [
+    "Microsoft Defender ポータル（設定箇所は出典ページ）",
+    "Microsoft Defender portal (see the source page)"
+   ],
+   "src": {
+    "title": "Protect AI agents in real time using Microsoft Defender",
+    "url": "https://learn.microsoft.com/defender-xdr/security-for-ai/ai-agent-real-time-protection",
+    "quote": "Real-time protection inspects AI agent activity throughout the agentic loop and blocks risky actions before they execute."
+   }
+  },
+  {
+   "level": "monitor",
+   "name": [
+    "Defender のエージェント保護機能のライセンス変更（2026-07-01）",
+    "Agent 365 license required for agent security capabilities (from 2026-07-01)"
+   ],
+   "what": [
+    "2026年7月1日から、Microsoft Copilot Studio と Microsoft Foundry のエージェント向け『AI エージェントセキュリティ機能』には Microsoft Agent 365 ライセンスが必要（Defender のページ）。どの機能が対象か、既存の設定・ルールへの影響はテナントごとに出典ページで確認する。",
+    "From July 1, 2026, AI agent security capabilities for Microsoft Copilot Studio and Microsoft Foundry agents require a Microsoft Agent 365 license (Defender page). Check the source page for which capabilities are affected and the impact on existing settings and rules in your tenant."
+   ],
+   "where": [
+    "Microsoft Defender ポータル／Microsoft 365 管理センター（ライセンス）",
+    "Microsoft Defender portal / Microsoft 365 admin center (licenses)"
+   ],
+   "src": {
+    "title": "Transition Microsoft Copilot Studio and Microsoft Foundry agent security capabilities to Microsoft Agent 365",
+    "url": "https://learn.microsoft.com/defender-xdr/security-for-ai/transition-agent-security-to-agent-365",
+    "quote": "Effective July 1, 2026, AI agent security capabilities for Microsoft Copilot Studio and Microsoft Foundry agents require a Microsoft Agent 365 license."
+   }
+  }
+ ],
+ "inventory": [
+  {
+   "t": [
+    "Power Platform インベントリ（PPAC）で Copilot Studio のエージェントと所属環境・所有者を洗い出せ、規模が大きければインベントリ API で繰り返し照会できる（クレジット統制ガイド）。公式は使い方の一つに『退職予定者が所有するリソースを事前に見つけ、所有権を移して業務を継続させる』を挙げる。用途の分類や承認記録などの業務上の文脈はインベントリからは出ないため、環境の命名・環境グループ・自社の台帳で補う。",
+    "Power Platform inventory in PPAC finds Copilot Studio agents with their environments and owners, and the inventory API makes this repeatable at scale (credit-governance guide). One listed use is finding resources owned by departing users in advance so ownership can be transferred. Business context such as purpose and approvals doesn't come from inventory, so add it via environment naming, environment groups and your own register."
+   ],
+   "src": {
+    "title": "Power Platform inventory",
+    "url": "https://learn.microsoft.com/power-platform/admin/power-platform-inventory",
+    "quote": "Proactively find resources owned by departing users to allow seamless ownership transfers and ensure business continuity."
+   }
+  },
+  {
+   "t": [
+    "CoE スターターキットは、機能を製品側（PPAC）で提供する方針に伴い、新機能の追加や更新が行われなくなった。データポリシーのページは CoE の Power BI ダッシュボードでエージェントと環境を一覧できるとするが、Teams の旧 Copilot Studio アプリで作った従来型チャットボットは CoE では検出されない（環境内の全件は Dataverse の『List rows from selected environment』アクションを使うクラウドフローで取得できる）。新しく台帳を作るなら PPAC のインベントリを軸にするのが妥当（判断）。",
+    "The CoE Starter Kit no longer receives feature investments or updates as the capabilities move into the product (PPAC). The data-policy page says its Power BI dashboard lists agents and environments, but classic chatbots built with the legacy Teams app aren't discoverable there (a cloud flow with the Dataverse 'List rows from selected environment' action lists everything). For a new register, building on PPAC inventory is the sensible base (judgment)."
+   ],
+   "src": {
+    "title": "Microsoft Power Platform Center of Excellence (CoE) Starter Kit transition to Power Platform admin center",
+    "url": "https://learn.microsoft.com/power-platform/guidance/coe/starter-kit",
+    "quote": "As Microsoft continues to invest in delivering these capabilities natively in product, the CoE Starter Kit is no longer receiving ongoing feature investments or updates."
+   }
+  },
+  {
+   "t": [
+    "Microsoft 365 管理センターのエージェントレジストリは、Microsoft 製・パートナー製・自社製を含む組織のエージェントの一覧（エージェント管理のページ）。作成者をテナントから削除すると、その人が共有したエージェントは所有者不在になり得る。概要画面の『Agents without owners』から絞り込み、所有者を割り当てる。下書きのエージェントが見えるのは現在 Copilot Studio のものだけで、他社製エージェントのデータ収集には Agent 365 ライセンスが必要。",
+    "The agent registry in the Microsoft 365 admin center lists the organization's agents, including Microsoft-built, partner-built and custom ones (agent-management page). Shared agents can become ownerless when the creator is deleted from the organization; filter them via 'Agents without owners' on the overview and assign an owner. Draft agents are currently visible only from Copilot Studio, and data collection for third-party agents requires Agent 365 licenses."
+   ],
+   "src": {
+    "title": "Manage agent registry in Microsoft 365 admin center",
+    "url": "https://learn.microsoft.com/microsoft-agent-365/admin/agent-registry-overview",
+    "quote": "Shared agents can become ownerless when you delete the user who created them from the organization."
+   }
+  },
+  {
+   "t": [
+    "所有者の退職・異動で孤立したエージェントは、Power Platform API の reassign 操作で新しい所有者へ付け替える。新所有者は環境のメーカー権限を得て、旧所有者はアクセスを失う（新所有者が Read transcript 権限を持てば既存のトランスクリプトも読める）。必要ロール：Global tenant administrator／AI administrator／Power Platform administrator／Environment administrator（Agent Builder で作ったエージェントは Environment administrator を除く3つ）。トークン取得に使うアプリ登録に CopilotStudio.AdminActions.Invoke スコープが必要で、新所有者はテナント内のユーザーであること。従来型チャットボットは非対応（405）。",
+    "Reassign orphaned agents with the Power Platform API reassign operation: the new owner gets environment maker permissions and the old owner loses access (existing transcripts are readable if the new owner has Read transcript). Requires Global tenant, AI, Power Platform or Environment administrator (not Environment administrator for Agent Builder agents), an app registration with the CopilotStudio.AdminActions.Invoke scope, and a new owner in the tenant; classic chatbots return 405."
+   ],
+   "src": {
+    "title": "Reassign ownership of orphaned agents with the Power Platform API",
+    "url": "https://learn.microsoft.com/microsoft-copilot-studio/admin-api-reassign-ownership-orphaned-agent",
+    "quote": "The new owner gets environment maker permissions on the agent's environment. The old owner loses access to the agent after reassignment."
+   }
+  },
+  {
+   "t": [
+    "Microsoft 365 管理センターのエージェント管理：ルールベースのライフサイクルポリシー（所有者不在のフラグ付け、リスクのあるエージェントのブロックなど）を自動で適用できるとされる。概要の『Top actions』に承認待ちの要求、所有者不在、リスクのある（Entra・Defender・Purview の高重大度リスクを集約）、例外のあるエージェントが並び、絞り込んだ一覧から対処する。承認や所有者の割り当ては AI Administrator か Global Administrator だけが実行でき、他のロールは監視のみ。使える機能は契約しているサービス（Microsoft 365／Copilot／Agent 365）による。",
+    "Agent management in the Microsoft 365 admin center: rules-based lifecycle policies (e.g., flagging ownerless agents, blocking risky agents) are described as automatically enforceable. Top actions surface pending requests, agents without owners, agents at risk (aggregated high-severity risks from Entra, Defender and Purview) and agents with exceptions, each opening a filtered view. Only AI Administrators or Global Administrators can approve requests or assign owners; other roles can monitor. Available features depend on licensed services (Microsoft 365, Copilot, Agent 365)."
+   ],
+   "src": {
+    "title": "Agent management in Microsoft 365 admin center",
+    "url": "https://learn.microsoft.com/microsoft-agent-365/admin/agent-365-overview",
+    "quote": "Leverage rules-based agent management to automatically enforce lifecycle policies, such as flagging ownerless agents, or blocking risky agents."
+   }
+  }
+ ],
+ "checked": "2026-10-30"
+}

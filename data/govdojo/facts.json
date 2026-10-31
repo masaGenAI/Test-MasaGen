@@ -1,0 +1,94 @@
+{
+ "about": "ガバナンス道場の主要な事実の台帳。各規則は「同じ文の中で when がすべて当たり、unless が当たらないのに forbid が当たる」ときに誤りとする。正しい値の根拠は source（data/govdojo の項目）。事実が変わったら、ここと regs.json / industries.json を同時に直す。",
+ "rules": [
+  {
+   "id": "eu-annex3-date",
+   "desc": "EU AI法 附属書IIIの高リスク規則は 2027年12月2日から（AI Omnibus、規則(EU) 2026/1744）",
+   "source": "regs:eu-ai-omnibus",
+   "forbid": [
+    "(附属書III|Annex III)[^。]{0,40}(2026年8月2日|2 August 2026|2026-08-02)"
+   ],
+   "unless": [
+    "延期前|当初|もともと|改正前|originally|before the (AI )?Omnibus|prior to the (AI )?Omnibus|旧日程|old date"
+   ]
+  },
+  {
+   "id": "eu-marking-grace",
+   "desc": "第50条のマーキング義務の猶予は 2026年12月2日まで",
+   "source": "regs:eu-ai-act-art50",
+   "forbid": [
+    "2026年12月まで",
+    "(until|by|to) December 2026(?! \\()",
+    "grace period (until|to) December 2026"
+   ],
+   "unless": [
+    "2026年12月31日|31 December 2026",
+    "Quick Facts（「2026年12月まで」）"
+   ]
+  },
+  {
+   "id": "eu-machinery",
+   "desc": "AIを組み込んだ機械は AI法の高リスク規則の直接適用から外れた（欧州議会の説明）。附属書Iの例に機械を挙げない",
+   "source": "regs:eu-ai-omnibus",
+   "forbid": [
+    "機械・玩具・エレベーター",
+    "機械、玩具、リフト",
+    "機械など製品に組み込まれる",
+    "machinery, toys, lifts",
+    "products such as machinery",
+    "附属書IIIに列挙された領域（機械の安全部品）"
+   ],
+   "unless": [
+    "欧州委員会の発効ニュース|Commission's (entry-into-force )?news|食い違|conflict"
+   ]
+  },
+  {
+   "id": "eu-omnibus-status",
+   "desc": "AI Omnibus は成立・発効済み（2026年7月27日）",
+   "source": "regs:eu-ai-omnibus",
+   "forbid": [
+    "(AI ?Omnibus|AIオムニバス)[^。]{0,20}(は提案中|は提案段階|is (still )?a proposal|remains a proposal)"
+   ],
+   "unless": []
+  },
+  {
+   "id": "elvis-signed",
+   "desc": "テネシー州 ELVIS法の署名は 2024年3月21日（3月26日は公布番号の日付）",
+   "source": "industries:cnt",
+   "forbid": [
+    "(署名|signed)[^。]{0,20}(2024年3月26日|26 March 2024|March 26, 2024)",
+    "(2024年3月26日|26 March 2024)[^。]{0,8}(に署名|署名|signed)"
+   ],
+   "unless": []
+  },
+  {
+   "id": "ja-copyright-title-en",
+   "desc": "文化庁「AIと著作権に関する考え方について」の英題は General Understanding on AI and Copyright in Japan",
+   "source": "regs:jp-copyright-ai",
+   "forbid": [
+    "Approach to AI and Copyright"
+   ],
+   "unless": []
+  },
+  {
+   "id": "kokinkei-en",
+   "desc": "拘禁刑（2025年6月施行）の英訳は imprisonment。without work は廃止された禁錮の訳",
+   "source": "industries:pro",
+   "forbid": [
+    "imprisonment without (work|labou?r)"
+   ],
+   "unless": [
+    "禁錮|old penalty|former"
+   ]
+  },
+  {
+   "id": "copyright-char-count",
+   "desc": "「考え方」本文の字数を書かない（約14万字は誤り。保存した本文は約5万4千字）",
+   "source": "regs:jp-copyright-ai",
+   "forbid": [
+    "約14万字"
+   ],
+   "unless": []
+  }
+ ]
+}
