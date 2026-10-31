@@ -165351,7 +165351,7 @@ function GovKit({ en }) {
 const govToday = () => new Date().toISOString().slice(0, 10);
 const govEnd = (d) => (d.length === 7 ? d + "-31" : d.length === 4 ? d + "-12-31" : d);
 const govDays = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 86400000);
-const GOV_UNCONF = /未確認|unconfirmed|not confirmed|could not be confirmed|has not been confirmed|not verified/i;
+const GOV_UNCONF = /未確認|確認できず|確認できなかった|unconfirmed|not confirmed|could not be confirmed|has not been confirmed|not verified|could not be checked/i;
 const GOV_JA = /[ぁ-んァ-ン一-龥]/;
 function govUnconfirmed(en) {
   const L = (x) => GOVX_L(x, en);
@@ -165417,6 +165417,92 @@ function GovFresh({ en }) {
     </div>
   );
 }
+// ---------- 自社チェック表（業界 × 進出先・提供先から、当てはまる規定と期限を引く） ----------
+const govCsv = (rows) => "﻿" + rows.map((r) => r.map((c) => `"${String(c == null ? "" : c).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+const govHasUnc = (o) => GOV_UNCONF.test(JSON.stringify({ ...o, src: undefined }));
+const govIsApp = (r) => /当てはめ/.test(JSON.stringify(r.note || "")) || /当てはめ/.test(JSON.stringify(r.ai || ""));
+function GovProfile({ en }) {
+  const L = (v) => GOVX_L(v, en);
+  const today = govToday();
+  const regions = GOVREG_ORDER.filter((r) => GOVREG_ITEMS.some((x) => x.region === r));
+  const [inds, setInds] = useState([]);
+  const [mk, setMk] = useState(["日本"]);
+  const [th, setTh] = useState("ALL");
+  const tog = (arr, set, v) => set(arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);
+  const abroad = mk.some((r) => r !== "日本");
+  const base = GOVIND_BASE.map((id) => GOVREG_ITEMS.find((y) => y.id === id)).filter((x) => x && mk.includes(x.region));
+  const regs = GOVREG_ITEMS.filter((x) => mk.includes(x.region) && !GOVIND_BASE.includes(x.id));
+  const sel = GOVIND.filter((d) => inds.includes(d.key));
+  const ir = sel.flatMap((d) => d.regs.filter((r) => (r.os ? abroad : mk.includes("日本")) && (th === "ALL" || (r.themes || []).includes(th))).map((r) => ({ d, r })));
+  const dl = (GOVREG_CMP.upcoming || []).map((u) => ({ ...u, x: GOVREG_ITEMS.find((y) => y.id === u.id) })).filter((u) => u.x && mk.includes(u.x.region) && govEnd(u.d) >= today);
+  const watch = sel.flatMap((d) => (d.watch || []).map((w) => ({ d, w })));
+  const kindL = (k) => (en ? GOVIND_KIND[k] || L(GV_BIND_L[govBind(k)]) : k);
+  const regL = (r) => L(GOVREG_RL[r] || [r, r]);
+  const indL = (d) => L([d.ind, d.ind_en]);
+  const cut = (t, n = 140) => (t.length > n ? t.slice(0, n) + "…" : t);
+  const nUnc = [...base, ...regs].filter(govHasUnc).length + ir.filter(({ r }) => govHasUnc(r)).length;
+  const rows = () => {
+    const H = en ? ["Section", "Region / industry", "Name", "Kind", "Status / what to check for AI", "Unconfirmed points", "Application (rule does not mention AI)", "Source URL", "Check date"] : ["区分", "地域・業界", "名称", "種類", "状況・AIで見る点", "未確認の点", "当てはめ（AIに直接触れていない規定）", "出典URL", "確認日"];
+    const yes = en ? "yes" : "あり";
+    const out = [[en ? "Gov Dojo — my checklist" : "ガバナンス道場 自社チェック表", (en ? "Check date " : "確認日 ") + GOVREG_ASOF, (en ? "Made " : "作成日 ") + today],
+      [en ? "A learning summary, not legal advice. Confirm every point at source before relying on it." : "学習用の整理で、法的助言ではない。使う前に、すべて原典で確かめること。"],
+      [(en ? "Industries: " : "業界：") + (sel.map(indL).join(" / ") || "-"), (en ? "Markets: " : "進出先・提供先：") + mk.map(regL).join(" / "), (en ? "Theme: " : "テーマ：") + (th === "ALL" ? (en ? "all" : "すべて") : L(GOVIND_TH.find((x) => x[0] === th).slice(1, 3)))],
+      [], H];
+    base.forEach((x) => out.push([en ? "Cross-industry rule" : "横断ルール", regL(x.region), L(x.name), kindL(x.kind), L(govStage(x)) + " — " + L(x.status), govHasUnc(x) ? yes : "", "", (x.src[0] || {}).url, GOVREG_ASOF]));
+    regs.forEach((x) => out.push([en ? "Regional law / guideline" : "地域の規制・指針", regL(x.region), L(x.name), kindL(x.kind), L(govStage(x)) + " — " + L(x.status), govHasUnc(x) ? yes : "", "", (x.src[0] || {}).url, GOVREG_ASOF]));
+    ir.forEach(({ d, r }) => out.push([en ? "Industry rule" : "業界の規定", indL(d) + (r.os ? (en ? " (overseas)" : "（海外）") : (en ? " (Japan)" : "（国内）")), L(r.name), kindL(r.kind), L((r.ai || [])[0] || ""), govHasUnc(r) ? yes : "", govIsApp(r) ? yes : "", (r.src[0] || {}).url, GOVREG_ASOF]));
+    dl.forEach((u) => out.push([en ? "Upcoming deadline" : "これからの期限", regL(u.x.region), L(u.x.short || u.x.name), "", u.d + " " + L(u.ev), "", "", (u.x.src[0] || {}).url, GOVREG_ASOF]));
+    watch.forEach(({ d, w }) => out.push([en ? "Watch point" : "気を付けること", indL(d), "", "", L(w), GOV_UNCONF.test(L(w)) ? yes : "", "", "", GOVREG_ASOF]));
+    return out;
+  };
+  const download = () => {
+    try {
+      const blob = new Blob([govCsv(rows())], { type: "text/csv;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob); a.download = `govdojo_checklist_${today}.csv`;
+      document.body.appendChild(a); a.click();
+      setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    } catch (e) {}
+  };
+  const Chip = ({ on, onClick, children }) => <button onClick={onClick} style={{ background: on ? C.surface2 : "transparent", border: `1px solid ${on ? C.gold : C.line}`, color: on ? C.gold : C.text, borderRadius: 99, fontSize: 11.5, padding: "4px 10px", cursor: "pointer" }}>{children}</button>;
+  const Tag = ({ c, children }) => <span style={{ fontSize: 10, color: c, border: `1px solid ${c}`, borderRadius: 99, padding: "0 6px", marginLeft: 6, whiteSpace: "nowrap" }}>{children}</span>;
+  const Row = ({ title, meta, body, unc, app }) => (
+    <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 8, padding: "6px 9px", marginBottom: 4 }}>
+      <div style={{ fontSize: 12, fontWeight: 800, color: C.text, lineHeight: 1.45 }}>{title}{unc ? <Tag c={C.gold}>{en ? "unconfirmed points" : "未確認あり"}</Tag> : null}{app ? <Tag c={C.teal}>{en ? "application" : "当てはめ"}</Tag> : null}</div>
+      {meta ? <div style={{ fontSize: 10.5, color: C.dim }}>{meta}</div> : null}
+      {body ? <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.6, marginTop: 2 }}>{body}</div> : null}
+    </div>
+  );
+  return (
+    <div>
+      <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.75, marginBottom: 8 }}>
+        {en ? "Pick your industries and the markets where you provide or use AI. The list gathers the matching rules, deadlines and watch points from this dojo, and can be saved as CSV." : "自社の業界と、AIを提供・利用する地域を選ぶと、この道場の中から当てはまる規定・期限・気を付けることを集める。CSV で保存できる。"}
+      </div>
+      <div style={{ ...DGM_DETAIL, borderLeftColor: C.wine, marginBottom: 10 }}>
+        <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.7 }}>{en ? `A learning summary as of ${GOVREG_ASOF}, not legal advice and not a complete list of what applies to you. Overseas industry rules are shown when any market outside Japan is picked; check each one's jurisdiction. Confirm every point at source.` : `${GOVREG_ASOF}時点の学習用の整理で、法的助言でも、自社に当てはまるものの完全な一覧でもない。業界の海外の規定は、日本以外の地域を1つでも選ぶと表示する（どの国・地域の規定かは各項目で確かめる）。使う前に、すべて原典で確かめること。`}</div>
+      </div>
+      <GV_H>{en ? "1. Industries" : "1. 業界（複数選べる）"}</GV_H>
+      <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>{GOVIND.map((d) => <Chip key={d.key} on={inds.includes(d.key)} onClick={() => tog(inds, setInds, d.key)}>{indL(d)}</Chip>)}</div>
+      <GV_H>{en ? "2. Markets where you provide or use AI" : "2. AIを提供・利用する地域（複数選べる）"}</GV_H>
+      <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>{regions.map((r) => <Chip key={r} on={mk.includes(r)} onClick={() => tog(mk, setMk, r)}>{regL(r)}</Chip>)}</div>
+      <GV_H>{en ? "3. Theme (optional, narrows industry rules)" : "3. テーマ（任意。業界の規定を絞る）"}</GV_H>
+      <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
+        <Chip on={th === "ALL"} onClick={() => setTh("ALL")}>{en ? "All" : "すべて"}</Chip>
+        {GOVIND_TH.map(([t, ja, enl]) => <Chip key={t} on={th === t} onClick={() => setTh(t)}>{en ? enl : ja}</Chip>)}
+      </div>
+      <div style={{ marginTop: 12 }}>
+        <GvKpi items={[[base.length + regs.length, en ? "laws & guidelines in these markets" : "選んだ地域の規制・指針", C.gold], [ir.length, en ? "industry rules" : "業界の規定", C.teal], [dl.length, en ? "deadlines still ahead" : "これからの期限", C.wine], [nUnc, en ? "with unconfirmed points" : "未確認の点を含む項目", C.gold]]} />
+      </div>
+      <button onClick={download} disabled={!mk.length} style={{ background: mk.length ? C.teal : C.surface, color: mk.length ? C.bg : C.dim, border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 12.5, fontWeight: 800, cursor: mk.length ? "pointer" : "default", marginBottom: 6 }}>{en ? "Save as CSV" : "CSV で保存"}</button>
+      {!mk.length ? <div style={DGM_HINT}>{en ? "Pick at least one market." : "地域を1つ以上選ぶ。"}</div> : null}
+      {base.length ? <><GV_H>{en ? "Cross-industry rules to check first" : "まず確かめる横断ルール"}</GV_H>{base.map((x) => <Row key={x.id} title={L(x.name)} meta={`${regL(x.region)}・${kindL(x.kind)}・${L(govStage(x))}`} body={cut(L(x.status))} unc={govHasUnc(x)} />)}</> : null}
+      {regs.length ? <><GV_H>{en ? `Laws and guidelines in the markets you picked (${regs.length})` : `選んだ地域の規制・指針（${regs.length}件）`}</GV_H>{regs.map((x) => <Row key={x.id} title={L(x.name)} meta={`${regL(x.region)}・${kindL(x.kind)}・${L(govStage(x))}`} body={cut(L(x.status))} unc={govHasUnc(x)} />)}</> : null}
+      {sel.length ? <><GV_H>{en ? `Industry rules (${ir.length})` : `業界の規定（${ir.length}件）`}</GV_H>{ir.map(({ d, r }, i) => <Row key={i} title={L(r.name)} meta={`${indL(d)}・${r.os ? (en ? "overseas" : "海外") : (en ? "Japan" : "国内")}・${kindL(r.kind)}`} body={cut(L((r.ai || [])[0] || ""), 180)} unc={govHasUnc(r)} app={govIsApp(r)} />)}</> : <div style={DGM_HINT}>{en ? "Pick an industry to add its rules and watch points." : "業界を選ぶと、業界の規定と気を付けることが加わる。"}</div>}
+      {dl.length ? <><GV_H>{en ? `Deadlines still ahead (${dl.length})` : `これからの期限（${dl.length}件）`}</GV_H>{dl.map((u, i) => <Row key={i} title={`${u.d}　${L(u.x.short || u.x.name)}`} meta={regL(u.x.region)} body={L(u.ev)} />)}</> : null}
+      {watch.length ? <><GV_H>{en ? "Watch points" : "気を付けること"}</GV_H>{watch.map(({ d, w }, i) => <Row key={i} title={indL(d)} body={L(w)} unc={GOV_UNCONF.test(L(w))} />)}</> : null}
+    </div>
+  );
+}
 function GovDojo() {
   const lang = useLang();
   const en = lang === "en";
@@ -165425,7 +165511,7 @@ function GovDojo() {
   useRegisterBack(__opBack.back, __opBack.canBack);
   const [focusInc, setFocusInc] = useState(null);
   const openIncident = (id) => { setFocusInc({ id, n: Date.now() }); setMode("incidents"); };
-  const modes = [["home", ["概要", "Overview"]], ["diagrams", ["図解", "Diagrams"]], ["incidents", ["インシデント事例", "Incidents"]], ["quiz", ["判定演習", "Drills"]], ["scenario", ["シナリオ", "Scenarios"]], ["risk", ["リスク評価実務", "Risk practice"]], ["regmap", ["規制マップ", "Regulation map"]], ["industry", ["業界別チェック", "Industry checks"]], ["lowcode", ["ローコード統制", "Low-code governance"]], ["kit", ["実務キット", "Practice kits"]], ["fresh", ["鮮度・要再確認", "Freshness & re-check"]], ["taxonomy", ["論点体系", "Issue taxonomy"]], ["exam", ["模試", "Mock exam"]]];
+  const modes = [["home", ["概要", "Overview"]], ["diagrams", ["図解", "Diagrams"]], ["incidents", ["インシデント事例", "Incidents"]], ["quiz", ["判定演習", "Drills"]], ["scenario", ["シナリオ", "Scenarios"]], ["risk", ["リスク評価実務", "Risk practice"]], ["regmap", ["規制マップ", "Regulation map"]], ["industry", ["業界別チェック", "Industry checks"]], ["profile", ["自社チェック表", "My checklist"]], ["lowcode", ["ローコード統制", "Low-code governance"]], ["kit", ["実務キット", "Practice kits"]], ["fresh", ["鮮度・要再確認", "Freshness & re-check"]], ["taxonomy", ["論点体系", "Issue taxonomy"]], ["exam", ["模試", "Mock exam"]]];
   return (
     <div>
       <SectionTitle jp="AIセキュリティ・ガバナンス道場 — 読むだけでなく、判断を訓練する" en="AI Security & Governance Dojo — train judgment, not just reading" />
@@ -165446,6 +165532,7 @@ function GovDojo() {
       {mode === "risk" && <GovRiskPractice en={en} />}
       {mode === "regmap" && <GovRegMap en={en} />}
       {mode === "industry" && <GovIndustry en={en} onMode={setMode} />}
+      {mode === "profile" && <GovProfile en={en} />}
       {mode === "lowcode" && <GovLowCode en={en} />}
       {mode === "kit" && <GovKit en={en} />}
       {mode === "fresh" && <GovFresh en={en} />}
