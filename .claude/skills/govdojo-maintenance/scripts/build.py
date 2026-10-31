@@ -5,6 +5,7 @@
   python3 .claude/skills/govdojo-maintenance/scripts/build.py --check  # 書き換えずに差分の有無だけ見る（差分があれば終了コード 1）
 
 usecases.json（ユースケースの入口）は参照を解決して GOVUC にする。参照先が無い・あいまいなら止まる。
+templates.json（ひな形）は根拠のポインタ（cite_index.py の形）を根拠の行と出典に解決して GOVTPL にする。
 
 公開する画面には、出典の quote（引用）を載せない。出典は name・kind・url（ローコードは title を name に読み替え）だけにする。
 """
@@ -86,6 +87,84 @@ def usecases(jsx):
     return {"note": U["note"], "list": out}
 
 
+REG_F = {"what": ["概要", "What it is"], "who": ["対象", "Who"], "duty": ["求めること", "What it asks"], "jp": ["日本企業にとって", "For Japanese firms"], "penalty": ["罰則", "Penalties"]}
+KIT_L = {"cust.pre": ["実務キット：顧客向けAI（公開前）", "Practice kit: customer-facing AI (before launch)"],
+         "cust.run": ["実務キット：顧客向けAI（運用中）", "Practice kit: customer-facing AI (in operation)"],
+         "cust.inc": ["実務キット：顧客向けAI（事故時）", "Practice kit: customer-facing AI (when it goes wrong)"],
+         "inv.fields": ["実務キット：ユースケース台帳（項目）", "Practice kit: use-case register (fields)"],
+         "inv.flow": ["実務キット：ユースケース台帳（流れ）", "Practice kit: use-case register (flow)"],
+         "inv.shadow": ["実務キット：ユースケース台帳（シャドーAI）", "Practice kit: use-case register (shadow AI)"],
+         "eval.kinds": ["実務キット：検証の手法", "Practice kit: evaluation methods"],
+         "eval.accept": ["実務キット：検証の受入基準", "Practice kit: acceptance criteria"],
+         "riskai.uses": ["実務キット：リスク管理×AI", "Practice kit: AI in risk management"],
+         "riskai.kri": ["実務キット：リスク指標", "Practice kit: risk indicators"]}
+
+
+def cite(ptr):
+    """ひな形の根拠のポインタを、画面に出す {s: 出典の見出し, l: 根拠の行, u: 出典（最大2件）} にする。解決できなければ None"""
+    import cite_index
+    r = cite_index.resolve(ptr)
+    if not r:
+        return None
+    line = r[0]
+    parts = ptr.split(":")
+    src = []
+    if parts[0] == "reg":
+        x = next(y for y in J("regs.json") if y["id"] == parts[1])
+        label = [x["short"][0] + "・" + REG_F[parts[2]][0], x["short"][1] + " · " + REG_F[parts[2]][1]]
+        src = x.get("src", [])
+    elif parts[0] == "kit":
+        k = J("kit.json"); a, b = parts[1].split(".")
+        it = k[a][b][int(parts[2])]
+        label = KIT_L[parts[1]]
+        src = it.get("src") or k[a].get("src") or []
+    elif parts[0] == "lc":
+        l = J("lowcode.json")
+        it = l[parts[1]][int(parts[2])]
+        label = ["ローコード統制", "Low-code governance"]
+        src = it.get("src", []) if isinstance(it, dict) else []
+    else:
+        d = next(y for y in J("industries.json") if y["key"] == parts[1])
+        rule = next(rr for rr in d["regs"] if rr["name"][0].startswith(parts[2]))
+        cut = lambda n: __import__("re").sub(r"（[^）]{12,}）", "", n)
+        label = [d["ind"] + "：" + cut(rule["name"][0]), d["ind_en"] + ": " + cut(rule["name"][1])]
+        src = rule.get("src", [])
+    seen, u = set(), []
+    for o in src:
+        if isinstance(o, dict) and o.get("url") and o["url"] not in seen:
+            seen.add(o["url"]); u.append({"name": o.get("name") or o.get("title"), "url": o["url"]})
+    return {"s": label, "l": line, "u": u[:2]}
+
+
+def templates():
+    """templates.json（ひな形）の根拠を解決して GOVTPL にする。解決できない・判断の扱いが崩れていれば止める"""
+    if not os.path.exists(os.path.join(DATA, "templates.json")):
+        return None
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    T = J("templates.json"); errs = []
+    out = {"note": T["note"], "list": []}
+    for tp in T["list"]:
+        o = {k: tp[k] for k in ("id", "name", "purpose")}
+        o["sections"] = []
+        for si, sec in enumerate(tp["sections"]):
+            ls = []
+            for li, ln in enumerate(sec["lines"]):
+                w = f"{tp['id']} {si + 1}-{li + 1}"
+                cs = [cite(p) for p in ln.get("cite", [])]
+                if any(c is None for c in cs):
+                    errs.append(f"{w}: 根拠のポインタが解決できない")
+                if ln.get("judge") and cs:
+                    errs.append(f"{w}: 判断の行に根拠がある")
+                if not ln.get("judge") and not cs:
+                    errs.append(f"{w}: 判断でない行に根拠が無い")
+                ls.append({"t": ln["t"], "j": bool(ln.get("judge")), "c": [c for c in cs if c]})
+            o["sections"].append({"h": sec["h"], "lines": ls})
+        out["list"].append(o)
+    if errs:
+        raise SystemExit("templates.json の参照エラー:\n  " + "\n  ".join(errs))
+    return out
+
+
 def constants(jsx=""):
     return {
         "GOVREG_ASOF": json.dumps(J("meta.json")["asof"]),
@@ -95,6 +174,7 @@ def constants(jsx=""):
         "GOVKIT": dump(strip(J("kit.json"))),
         "GOVREG_CMP": dump(J("compare.json")),
         "GOVUC": dump(usecases(jsx)),
+        "GOVTPL": dump(templates()),
     }
 
 

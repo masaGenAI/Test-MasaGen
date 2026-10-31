@@ -16,6 +16,7 @@ function extract(name) {
   const m = new RegExp('const\\s+' + name + '\\s*=\\s*').exec(text);
   if (!m) throw new Error('not found: ' + name);
   let i = m.index + m[0].length;
+  if (text.startsWith('null', i)) return null; // まだデータの無い定数（ひな形など）
   const open = text[i], close = open === '{' ? '}' : ']';
   let depth = 0, inStr = false, q = null, esc = false;
   for (; i < text.length; i++) {
@@ -34,7 +35,7 @@ const walk = (o, where) => {
   else if (Array.isArray(o)) o.forEach((v, i) => walk(v, where + '[' + i + ']'));
   else if (o && typeof o === 'object') for (const [k, v] of Object.entries(o)) if (k !== 'url') walk(v, where + '.' + k);
 };
-for (const n of ['GOVREG_ITEMS', 'GOVIND', 'GOVLC', 'GOVKIT', 'GOVREG_CMP']) walk(extract(n), n);
+for (const n of ['GOVREG_ITEMS', 'GOVIND', 'GOVLC', 'GOVKIT', 'GOVREG_CMP', 'GOVUC', 'GOVTPL']) { const v = extract(n); if (v) walk(v, n); }
 // 判定演習とシナリオの錯乱肢はわざと誤りなので見ない。正解・設問・解説・フィードバック・原則だけを見る
 extract('GOVDOJO_BANK').forEach((q, i) => {
   const w = 'GOVDOJO_BANK[' + i + ']';
