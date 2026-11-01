@@ -13,6 +13,7 @@
     --navy-deep:#0B1F3F;
     --navy-mid:#1E3A6E;
     --sky:#4C8FD6;
+    --sky-ink:#2D6FB8;   /* 白地に置く文字用（--sky のままだと 3.4:1 で読みにくい） */
     --sky-light:#9BC8EE;
     --ink:#16181D;
     --muted:#6B7280;
@@ -25,6 +26,7 @@
     --navy-deep:#EDF1F8;   /* 見出し（ダークでは明色） */
     --navy-mid:#C6D6EC;
     --sky:#6BA7EA;
+    --sky-ink:#6BA7EA;
     --sky-light:#3A5F86;
     --ink:#E7EAF1;
     --muted:#98A2B3;
@@ -56,7 +58,7 @@
     font-size:11px;
     letter-spacing:.16em;
     text-transform:uppercase;
-    color:var(--sky);
+    color:var(--sky-ink);
     font-weight:600;
     margin:0 0 14px;
   }
@@ -165,7 +167,7 @@
     justify-self:end;
     transition:transform .18s ease;
   }
-  .index-row:hover .chevron{transform:translateX(3px);color:var(--sky);}
+  .index-row:hover .chevron{transform:translateX(3px);color:var(--sky-ink);}
 
   /* ---- 既読チェック ---- */
   .row-check{
@@ -322,7 +324,7 @@
     font-size:12px;
     letter-spacing:.1em;
     text-transform:uppercase;
-    color:var(--sky);
+    color:var(--sky-ink);
     font-weight:600;
     margin:36px 0 14px;
   }
@@ -446,7 +448,7 @@
   }
   .point-head .num{
     font-size:11px;
-    color:var(--sky);
+    color:var(--sky-ink);
     font-weight:600;
     letter-spacing:.05em;
   }
@@ -461,7 +463,7 @@
   .dg-flow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
   .dg-chip{display:inline-flex;flex-direction:column;padding:8px 10px;border-radius:8px;border:1px solid var(--sky-light);font-size:13px;line-height:1.5;color:var(--ink);max-width:100%;}
   .dg-detail{font-size:11.5px;color:var(--muted);}
-  .dg-arrow{color:var(--sky);font-size:14px;}
+  .dg-arrow{color:var(--sky-ink);font-size:14px;}
   .dg-list{margin:0;padding-left:1.2em;font-size:13.5px;line-height:1.8;color:var(--ink);}
   .dg-table-wrap{overflow-x:auto;}
   .dg-table{border-collapse:collapse;font-size:12.5px;min-width:100%;}
@@ -519,7 +521,7 @@
     font-size:11px;
     letter-spacing:.16em;
     text-transform:uppercase;
-    color:var(--sky);
+    color:var(--sky-ink);
     font-weight:600;
     margin:0 0 18px;
   }
@@ -547,7 +549,7 @@
     font-size:14.5px;font-weight:600;color:var(--navy-mid);margin:0 0 5px;
   }
   .theme-synth .synth-point-head .num{
-    font-family:'Fraunces',serif;font-size:13px;color:var(--sky);
+    font-family:'Fraunces',serif;font-size:13px;color:var(--sky-ink);
     min-width:22px;font-weight:600;
   }
   .theme-synth .synth-point-body{
@@ -593,7 +595,7 @@
     font-size:12px;color:var(--navy-mid);font-weight:600;margin:0 0 10px;line-height:1.5;
   }
   .quiz-source-label{
-    font-size:10px;letter-spacing:.08em;color:var(--sky);font-weight:700;
+    font-size:10px;letter-spacing:.08em;color:var(--sky-ink);font-weight:700;
     border:1px solid var(--sky-light);border-radius:100px;padding:2px 8px;
     background:rgba(76,143,214,0.07);white-space:nowrap;
   }
@@ -602,7 +604,7 @@
     font-size:14.5px;font-weight:600;color:var(--ink);margin:0 0 14px;line-height:1.65;
   }
   .quiz-q-text .quiz-num{
-    font-family:'Fraunces',serif;font-size:13px;color:var(--sky);font-weight:600;
+    font-family:'Fraunces',serif;font-size:13px;color:var(--sky-ink);font-weight:600;
     white-space:nowrap;
   }
   .quiz-choices{display:flex;flex-direction:column;gap:8px;}
@@ -688,7 +690,7 @@
   .search-count{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:8px 4px 4px;}
   .search-empty{font-size:13.5px;color:var(--muted);padding:14px 6px;margin:0;}
   .search-row{max-width:none;}
-  .search-memo{color:var(--sky) !important;font-style:italic;}
+  .search-memo{color:var(--sky-ink) !important;font-style:italic;}
 
   /* ---- マイ進捗ダッシュボード ---- */
   .dash-panel{margin:22px 0 4px;}
@@ -759,7 +761,7 @@
   .memo-area:focus{border-color:var(--sky);box-shadow:0 0 0 3px rgba(76,143,214,0.12);}
   .memo-status{font-size:11.5px;color:var(--muted);margin:6px 2px 0;min-height:15px;transition:color .15s ease;}
   .memo-status.saved{color:#3f9d6c;}
-  .row-memo{display:none;margin-left:7px;color:var(--sky);font-size:12px;vertical-align:middle;}
+  .row-memo{display:none;margin-left:7px;color:var(--sky-ink);font-size:12px;vertical-align:middle;}
   .row-memo.on{display:inline;}
 
   /* ---- 自分の記録（評価・タグ） ---- */
@@ -789,7 +791,7 @@
   }
   .memo-card:hover{border-color:var(--sky);transform:translateY(-1px);}
   .memo-card-title{font-family:'Fraunces',serif;font-size:16px;font-weight:600;color:var(--ink);margin:0 0 7px;}
-  .memo-card-title .mc-mark{color:var(--sky);margin-right:7px;}
+  .memo-card-title .mc-mark{color:var(--sky-ink);margin-right:7px;}
   .memo-card-body{font-size:13.5px;line-height:1.65;color:var(--ink);margin:0 0 7px;white-space:pre-wrap;overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;}
   .memo-card-crumb{font-size:11.5px;color:var(--muted);margin:0;}
 

@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
 import ProjectNova from "./ProjectNova.jsx";
+import { installKeyboardAccess } from "./kbdAccess.js";
+
+installKeyboardAccess();
 
 /*
  * window.storage ポリフィル + 進捗バックアップ

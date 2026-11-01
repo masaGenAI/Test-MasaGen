@@ -1556,7 +1556,7 @@ function CertCompletion({ state, storeKey, figsKey, figsTotal, bankLen, lang, C 
   const compPct = Math.round(parts.reduce((a, b) => a + b, 0) / parts.length);
   const bar = (label, pct, extra) => (
     <div style={{ marginBottom: 7 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, marginBottom: 2 }}><span style={{ fontWeight: 700, color: ink }}>{label}</span><span style={{ color: "#7a8592" }}>{extra ? extra + "・" : ""}{pct}%</span></div>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, marginBottom: 2 }}><span style={{ fontWeight: 700, color: ink }}>{label}</span><span style={{ color: "#5f6974" }}>{extra ? extra + "・" : ""}{pct}%</span></div>
       <div style={{ height: 7, background: "#eef2f5", borderRadius: 999, overflow: "hidden" }}><div style={{ width: pct + "%", height: "100%", background: pct >= 100 ? "#158F6B" : col }} /></div>
     </div>
   );
@@ -1565,7 +1565,7 @@ function CertCompletion({ state, storeKey, figsKey, figsTotal, bankLen, lang, C 
       <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
         <span style={{ fontSize: 12.5, fontWeight: 800, color: ink }}>{en ? "Completion" : "学習完了度"}</span>
         <span style={{ fontSize: 22, fontWeight: 800, color: compPct >= 100 ? "#158F6B" : col }}>{compPct}<span style={{ fontSize: 12 }}>%</span></span>
-        <span style={{ fontSize: 10.5, color: "#7a8592" }}>{en ? "quiz · mock exams · diagrams" : "クイズ・模試・図解の完了を計測"}</span>
+        <span style={{ fontSize: 10.5, color: "#5f6974" }}>{en ? "quiz · mock exams · diagrams" : "クイズ・模試・図解の完了を計測"}</span>
       </div>
       {bar(en ? "Quiz coverage" : "クイズ消化", quizPct, `${Math.min(ta, bankLen)}/${bankLen}${en ? "" : "問"}`)}
       {bar(en ? "Mock exam sets" : "模試セット完了", mockPct, `${act.mock}/5`)}
@@ -2501,19 +2501,19 @@ function GlossaryView({ GLOSSARY, GLOSSARY_CATS, DOM_HUE, C, lang, t }) {
         ))}
         <span style={{ flex: 1 }} />
         <button onClick={() => setSortAz((v) => !v)} title="sort" style={{ padding: "5px 11px", borderRadius: 8, fontSize: 11.5, cursor: "pointer", border: `1px solid ${sortAz ? C.primary : C.mid}`, background: sortAz ? C.primary : "#fff", color: sortAz ? C.deep : C.ink, fontWeight: 700 }}>{sortAz ? (en ? "↕ A–Z" : "↕ 名前順") : (en ? "↕ default" : "↕ 既定順")}</button>
-        <span style={{ fontSize: 11, color: "#9b8d82" }}>{list.length}{en ? " terms" : " 件"}</span>
+        <span style={{ fontSize: 11, color: "#7b6d62" }}>{list.length}{en ? " terms" : " 件"}</span>
       </div>
       {list.map((g, i) => (
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 9 }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
             <span style={{ background: DOM_HUE[g[0]], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{g[0]}</span>
             <span style={{ fontWeight: 700, fontSize: 14, color: C.deep }}>{g[1]}</span>
-            {g[2] !== "-" && <span style={{ fontSize: 11.5, color: "#9b8d82" }}>{g[2]}</span>}
+            {g[2] !== "-" && <span style={{ fontSize: 11.5, color: "#7b6d62" }}>{g[2]}</span>}
           </div>
           <div style={{ fontSize: 13, lineHeight: 1.5 }}>{en && g[4] ? g[4] : g[3]}</div>
         </div>
       ))}
-      {list.length === 0 && <div style={{ textAlign: "center", color: "#9b8d82", padding: 20 }}>{t.noMatch}</div>}
+      {list.length === 0 && <div style={{ textAlign: "center", color: "#7b6d62", padding: 20 }}>{t.noMatch}</div>}
     </div>
   );
 }
@@ -2606,6 +2606,24 @@ const HubBackCtx = createContext(null);
 // parts は今の状態を表す文字列の配列、apply(arr) は配列から状態を戻す関数（不正な値は既定に戻すこと）。
 // それより深い位置（資格の中のタブなど）は、各ハブのアプリ内「戻る」に任せる。
 // ============================================================
+// 文字色を背景に対して読める濃さ（既定 4.5:1）まで寄せる。暗い背景なら明るく、明るい背景なら暗くする。
+// アクセント色をそのまま文字に使っている所（資格一覧のコード・「開く →」など）で使う。
+function nvInk(fg, bg, min = 4.5) {
+  try {
+    const rgb = (h) => { const x = String(h).replace("#", ""); const f = x.length === 3 ? x.split("").map((c) => c + c).join("") : x; return [0, 2, 4].map((i) => parseInt(f.slice(i, i + 2), 16)); };
+    const lum = (c) => { const v = c.map((x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }); return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]; };
+    const ratio = (a, b) => { const la = lum(a), lb = lum(b); return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05); };
+    const B = rgb(bg); let c = rgb(fg);
+    if (B.some((x) => Number.isNaN(x)) || c.some((x) => Number.isNaN(x))) return fg;
+    if (ratio(c, B) >= min) return fg;
+    const to = lum(B) < 0.18 ? 255 : 0;
+    for (let t = 0.05; t <= 1.0001; t += 0.05) {
+      const d = c.map((x) => Math.round(x + (to - x) * t));
+      if (ratio(d, B) >= min) return "#" + d.map((x) => x.toString(16).padStart(2, "0")).join("");
+    }
+    return to ? "#ffffff" : "#000000";
+  } catch (e) { return fg; }
+}
 function novaHubPath(hub) {
   try {
     const h = (window.location.hash || "").replace(/^#\/?/, "").split("?")[0];
@@ -167034,7 +167052,7 @@ const ConsultingHubModule = (function () {
 const C = {
   ink: "#0F1B2D", inkSoft: "#1C2B42", paper: "#F6F7F9", card: "#FFFFFF",
   line: "#E3E7EE", txt: "#182233", sub: "#5A6B85",
-  blue: "#2E5BFF", crimson: "#D64550", teal: "#0FA3B1", violet: "#7C5CFF",
+  blue: "#2E5BFF", crimson: "#C42F3B", teal: "#0FA3B1", violet: "#7C5CFF",
   gold: "#C9A227", green: "#12B76A", red: "#F04438", amber: "#F79009",
   dx: "#0E9F6E",
 };
@@ -173171,7 +173189,7 @@ function MSExamShell({ sets, setKeys, domainSets, domains, lang, C, PASS, dName,
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{T.modeHint}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", T.practice], ["real", T.real]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#86a6b0", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
@@ -173185,7 +173203,7 @@ function MSExamShell({ sets, setKeys, domainSets, domains, lang, C, PASS, dName,
         {kind === "domain" && domainSets && DOMS.map(d => (
           <button key={d.id} onClick={() => start(d.id)} style={{ width: "100%", textAlign: "left", padding: "15px 16px", marginBottom: 10, borderRadius: 11, border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 10 }}><DoneCheck on={mockDone.has(d.id)} onToggle={(e) => mockDone.toggle(d.id, e)} />
-              <span style={{ background: d.hue || C.primary, color: "#fff", borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
+              <span style={{ background: d.hue || C.primary, color: nvInk("#ffffff", d.hue || C.primary), borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
               <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep }}>{en ? (d.nameEn || d.name) : d.name}</span>
             </span>
             <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary }}>{T.start}</span>
@@ -174087,7 +174105,7 @@ var ILLUSTS = [
       '<rect x="470" y="100" width="200" height="100" rx="10" fill="#faeeda" stroke="#ba7517"/>'+
       '<text x="484" y="135" font-size="14" font-weight="700" fill="#633806">エッジロケーション</text>'+
       '<text x="484" y="160" font-size="12" fill="#633806">CloudFront 配信点</text>'+
-      '<text x="484" y="180" font-size="11" fill="#999">※AZに紐づかない別系統</text>'+
+      '<text x="484" y="180" font-size="11" fill="#6f6f6f">※AZに紐づかない別系統</text>'+
       '</svg>'
   },
   {
@@ -174099,7 +174117,7 @@ var ILLUSTS = [
       '<rect x="256" y="58" width="190" height="40" rx="6" fill="#fff"/><text x="270" y="83" font-size="12" fill="#0f6e56">OS・アプリ設定</text>'+
       '<rect x="456" y="58" width="190" height="40" rx="6" fill="#fff"/><text x="470" y="83" font-size="12" fill="#0f6e56">IAM・アクセス権</text>'+
       '<rect x="56" y="106" width="590" height="36" rx="6" fill="#fff"/><text x="70" y="129" font-size="12" fill="#0f6e56">セキュリティグループ / S3公開設定など構成の管理</text>'+
-      '<text x="350" y="178" font-size="13" font-weight="700" fill="#999" text-anchor="middle">━━━ 責任の境界 ━━━</text>'+
+      '<text x="350" y="178" font-size="13" font-weight="700" fill="#6f6f6f" text-anchor="middle">━━━ 責任の境界 ━━━</text>'+
       '<rect x="40" y="190" width="620" height="110" rx="10" fill="#232f3e"/>'+
       '<text x="56" y="216" font-size="15" font-weight="700" fill="#ff9900">AWSの責任（クラウド「本体」のセキュリティ）</text>'+
       '<rect x="56" y="228" width="190" height="56" rx="6" fill="#3a4a5e"/><text x="70" y="252" font-size="12" fill="#fff">物理・ハードウェア</text><text x="70" y="270" font-size="11" fill="#bcc">データセンター</text>'+
@@ -174111,7 +174129,7 @@ var ILLUSTS = [
     id:"iam", t:"IAMの構造（権限の流れ）", desc:"ルートを頂点に、ユーザー／グループ／ロールがポリシーで権限を得る関係。",
     svg:'<svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">'+
       '<rect x="270" y="20" width="160" height="50" rx="8" fill="#d4537e"/><text x="350" y="50" font-size="14" font-weight="700" fill="#fff" text-anchor="middle">ルートユーザー</text>'+
-      '<text x="350" y="86" font-size="11" fill="#999" text-anchor="middle">全権限・非常用（日常は使わない）</text>'+
+      '<text x="350" y="86" font-size="11" fill="#6f6f6f" text-anchor="middle">全権限・非常用（日常は使わない）</text>'+
       '<line x1="350" y1="96" x2="350" y2="120" stroke="#bbb" stroke-width="2"/>'+
       '<rect x="60" y="120" width="180" height="56" rx="8" fill="#eeedfe" stroke="#7f77dd"/><text x="150" y="144" font-size="13" font-weight="600" fill="#3c3489" text-anchor="middle">IAMユーザー</text><text x="150" y="163" font-size="11" fill="#3c3489" text-anchor="middle">個別の恒久認証情報</text>'+
       '<rect x="260" y="120" width="180" height="56" rx="8" fill="#eeedfe" stroke="#7f77dd"/><text x="350" y="144" font-size="13" font-weight="600" fill="#3c3489" text-anchor="middle">IAMグループ</text><text x="350" y="163" font-size="11" fill="#3c3489" text-anchor="middle">権限の一括付与</text>'+
@@ -174154,7 +174172,7 @@ var ILLUSTS = [
       '<rect x="340" y="55" width="120" height="50" rx="8" fill="#faece7" stroke="#d85a30"/><text x="400" y="80" font-size="13" font-weight="600" fill="#993c1d" text-anchor="middle">Lambda</text><text x="400" y="97" font-size="10" fill="#993c1d" text-anchor="middle">処理（関数）</text>'+
       '<line x1="460" y1="80" x2="505" y2="80" stroke="#888" stroke-width="2" marker-end="url(#ar2)"/>'+
       '<rect x="505" y="55" width="120" height="50" rx="8" fill="#e6f1fb" stroke="#378add"/><text x="565" y="80" font-size="13" font-weight="600" fill="#0c447c" text-anchor="middle">DynamoDB</text><text x="565" y="97" font-size="10" fill="#0c447c" text-anchor="middle">データ保存</text>'+
-      '<text x="350" y="135" font-size="11" fill="#999" text-anchor="middle">いずれもサーバー管理不要・使った分だけ課金・自動スケール</text>'+
+      '<text x="350" y="135" font-size="11" fill="#6f6f6f" text-anchor="middle">いずれもサーバー管理不要・使った分だけ課金・自動スケール</text>'+
       '</svg>'
   },
   {
@@ -174165,7 +174183,7 @@ var ILLUSTS = [
       '<line x1="175" y1="180" x2="175" y2="150" stroke="#378add" stroke-width="2" marker-end="url(#au)"/>'+
       '<defs><marker id="au" markerWidth="9" markerHeight="9" refX="3.5" refY="2" orient="auto"><path d="M0,7 L3.5,0 L7,7 Z" fill="#378add"/></marker></defs>'+
       '<rect x="130" y="70" width="90" height="75" rx="6" fill="#378add"/><text x="175" y="113" font-size="12" fill="#fff" text-anchor="middle">大（増強）</text>'+
-      '<text x="175" y="245" font-size="11" fill="#999" text-anchor="middle">1台のCPU・メモリを増強（上限あり）</text>'+
+      '<text x="175" y="245" font-size="11" fill="#6f6f6f" text-anchor="middle">1台のCPU・メモリを増強（上限あり）</text>'+
       '<line x1="350" y1="40" x2="350" y2="230" stroke="#ddd" stroke-width="1"/>'+
       '<text x="525" y="30" font-size="14" font-weight="700" fill="#1a1a1a" text-anchor="middle">水平スケール（スケールアウト）</text>'+
       '<rect x="420" y="90" width="50" height="55" rx="6" fill="#1d9e75"/>'+
@@ -174173,7 +174191,7 @@ var ILLUSTS = [
       '<rect x="540" y="90" width="50" height="55" rx="6" fill="#1d9e75"/>'+
       '<rect x="600" y="90" width="50" height="55" rx="6" fill="#9ad9c2" stroke="#1d9e75" stroke-dasharray="4"/>'+
       '<text x="625" y="122" font-size="18" fill="#0f6e56" text-anchor="middle">+</text>'+
-      '<text x="525" y="180" font-size="11" fill="#999" text-anchor="middle">台数を増やして並列処理（ほぼ無制限）</text>'+
+      '<text x="525" y="180" font-size="11" fill="#6f6f6f" text-anchor="middle">台数を増やして並列処理（ほぼ無制限）</text>'+
       '</svg>'
   },
   {
@@ -174292,7 +174310,7 @@ function ProgressView({ state, setState }) {
           <div className="bar-row" key={d.id}>
             <div className="bar-head">
               <span style={{ fontSize: 14, fontWeight: 600 }}>
-                {d.id} {d.name} <span style={{ color: "#999", fontWeight: 400, fontSize: 12 }}>（{d.weight}%）</span>
+                {d.id} {d.name} <span style={{ color: "#6f6f6f", fontWeight: 400, fontSize: 12 }}>（{d.weight}%）</span>
               </span>
               <span style={{ fontSize: 12, color: "#666" }}>{st.done}/{st.total}問・正答{cr}%</span>
             </div>
@@ -174382,7 +174400,7 @@ function QuizView({ quizSet, setQuizSet, quizFilter, setQuizFilter, quizIdx, set
         <button className="btn" style={{ padding: "6px 14px", fontSize: 12.5 }} onClick={() => slot.save({ quizSet, quizFilter, orderMode, shufKey, quizIdx }, "セット" + quizSet)}>{slot.meta ? "💾 保存済" : "💾 セーブ"}</button>
         {slot.meta && (<>
           <button className="btn" style={{ padding: "6px 14px", fontSize: 12.5 }} onClick={async () => { const d = await slot.read(); if (!d) return; setQuizSet(d.quizSet || 1); setQuizFilter(d.quizFilter || "all"); setOrderMode(d.orderMode || "fixed"); setShufKey(d.shufKey || 0); setQuizIdx(d.quizIdx || 0); }}>▶ 続きから</button>
-          <span style={{ fontSize: 11, color: "#999" }}>{saveStamp(slot.meta.t)}</span>
+          <span style={{ fontSize: 11, color: "#6f6f6f" }}>{saveStamp(slot.meta.t)}</span>
           <button className="btn" style={{ padding: "6px 10px", fontSize: 11 }} onClick={() => slot.remove()}>削除</button>
         </>)}
       </div>
@@ -174403,7 +174421,7 @@ function QuizView({ quizSet, setQuizSet, quizFilter, setQuizFilter, quizIdx, set
       </div>
       {setAnswered > 0 && (
         <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 10, marginBottom: 12 }}>
-          <span style={{ fontSize: 12, color: "#999" }}>セット{quizSet}：{setAnswered}問 解答済み</span>
+          <span style={{ fontSize: 12, color: "#6f6f6f" }}>セット{quizSet}：{setAnswered}問 解答済み</span>
           <button className="btn" style={{ padding: "6px 14px", fontSize: 13 }} onClick={() => resetSet(quizSet)}>このセットの解答をリセット</button>
         </div>
       )}
@@ -174473,7 +174491,7 @@ function ExamView({ examMode, setExamMode, exam, setExam, gradeAndSubmit }) {
             className={"setcard" + (ok ? "" : " off")}
             onClick={() => { if (ok) setExam({ set: n, mode: examMode, cur: 0, ans: {}, submitted: false, review: false, sh: buildExamShuffle(n) }); }}
           >
-            <div style={{ display: "flex", alignItems: "center" }}><DoneCheck on={mockDone.has("m" + n)} onToggle={(e) => mockDone.toggle("m" + n, e)} /><span style={{ fontSize: 15, fontWeight: 600 }}>模試 {n}</span> <span style={{ fontSize: 13, color: "#999", marginLeft: 8 }}>{ok ? cnt + "問" : "準備中"}</span></div>
+            <div style={{ display: "flex", alignItems: "center" }}><DoneCheck on={mockDone.has("m" + n)} onToggle={(e) => mockDone.toggle("m" + n, e)} /><span style={{ fontSize: 15, fontWeight: 600 }}>模試 {n}</span> <span style={{ fontSize: 13, color: "#6f6f6f", marginLeft: 8 }}>{ok ? cnt + "問" : "準備中"}</span></div>
             {ok && <div style={{ fontSize: 14, color: "#a8632a", fontWeight: 500, whiteSpace: "nowrap" }}>{modeLabel} 開始 →</div>}
           </div>
         );
@@ -174529,7 +174547,7 @@ function ExamRunningView({ exam, setExam, gradeAndSubmit }) {
         )}
       </div>
       <div style={{ textAlign: "center", marginTop: 12 }}>
-        <button className="btn" style={{ fontSize: 12, padding: "6px 14px", color: "#999" }} onClick={() => setExam(null)}>中断して戻る</button>
+        <button className="btn" style={{ fontSize: 12, padding: "6px 14px", color: "#6f6f6f" }} onClick={() => setExam(null)}>中断して戻る</button>
       </div>
     </div>
   );
@@ -174625,7 +174643,7 @@ function ReviewView({ state, setState, reviewShow, setReviewShow, removeWrong })
               <p style={{ fontSize: 14, fontWeight: 600, margin: 0, lineHeight: 1.5 }}>{w.q}</p>
               <span className="badge" style={{ background: d.color, flexShrink: 0 }}>{w.d}</span>
             </div>
-            <p style={{ fontSize: 11, color: "#999", margin: "6px 0 0" }}>出題：{w.src}</p>
+            <p style={{ fontSize: 11, color: "#6f6f6f", margin: "6px 0 0" }}>出題：{w.src}</p>
             {open && (
               <div style={{ marginTop: 10 }}>
                 {w.o.map((opt, oi) => {
@@ -174780,7 +174798,7 @@ function GlossaryView({ glCat, setGlCat, glSearch, setGlSearch }) {
           </button>
         ))}
       </div>
-      {items.length === 0 && <p style={{ fontSize: 13, color: "#999" }}>該当する用語なし</p>}
+      {items.length === 0 && <p style={{ fontSize: 13, color: "#6f6f6f" }}>該当する用語なし</p>}
       {items.map((it, i) => (
         <div className="gl-row" key={i}>
           <span className="gl-term">{it[0]}</span>
@@ -175616,7 +175634,7 @@ function App() {
           {["ja", "en"].map(l => (
             <button key={l} onClick={() => setLang(l)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "5px 12px", fontSize: 12, fontWeight: 700,
-                background: lang === l ? C.primary : "transparent", color: lang === l ? C.deep : "#fff" }}>
+                background: lang === l ? "#fff" : "transparent", color: lang === l ? C.deep : "#fff" }}>
               {l === "ja" ? "日本語" : "English"}
             </button>
           ))}
@@ -175689,7 +175707,7 @@ function Home({ state, lang, t }) {
             <div key={d.id} style={{ marginBottom: 12 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
                 <span style={{ fontWeight: 600 }}>
-                  <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+                  <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
                   {domName(d.id, lang)}
                 </span>
                 <span style={{ color: "#6b5d52" }}>{d.pct}% · {p.attempts ? `${rate}%` : t.notStarted}</span>
@@ -175703,7 +175721,7 @@ function Home({ state, lang, t }) {
         <Card title={t.weakDomains}>
           {weak.slice(0, 3).map(d => (
             <div key={d.id} style={{ fontSize: 13, padding: "6px 0", borderBottom: `1px solid ${C.light}` }}>
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
               {domName(d.id, lang)} — <strong style={{ color: d.rate < PASS ? C.ng : C.ok }}>{d.rate}%</strong>
             </div>
           ))}
@@ -175718,7 +175736,7 @@ function Stat({ label, value, sub, color }) {
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#6b5d52" }}>{label}</div>
       <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
-      <div style={{ fontSize: 11, color: "#9b8d82" }}>{sub}</div>
+      <div style={{ fontSize: 11, color: "#7b6d62" }}>{sub}</div>
     </div>
   );
 }
@@ -175764,17 +175782,17 @@ function Quiz({ onAnswer, lang, t }) {
         <button onClick={() => slot.save({ filter, shuf, seed, pos }, filter === "ALL" ? (en ? "All" : "全分野") : filter)} style={{ padding: "6px 14px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{slot.meta ? (en ? "💾 Saved" : "💾 保存済") : (en ? "💾 Save" : "💾 セーブ")}</button>
         {slot.meta && (<>
           <button onClick={async () => { const d = await slot.read(); if (!d) return; resumeRef.current = { pos: d.pos || 0 }; setFilter(d.filter || "ALL"); setShuf(!!d.shuf); setSeed(d.seed || 0); setPos(d.pos || 0); setSel(null); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
-          <span style={{ fontSize: 11, color: "#8499ad" }}>{saveStamp(slot.meta.t)}</span>
+          <span style={{ fontSize: 11, color: "#5a7288" }}>{saveStamp(slot.meta.t)}</span>
           <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
         </>)}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-        <div style={{ fontSize: 13, color: "#9b8d82", fontWeight: 600 }}>{en ? `${pool.length} questions` : `全${pool.length}問`}</div>
+        <div style={{ fontSize: 13, color: "#7b6d62", fontWeight: 600 }}>{en ? `${pool.length} questions` : `全${pool.length}問`}</div>
         <div style={{ display: "inline-flex", background: C.light, borderRadius: 20, padding: 3 }}>
           {[[false, en ? "Fixed order" : "固定順"], [true, en ? "Random" : "ランダム"]].map(([val, label]) => (
             <button key={String(val)} onClick={() => { setShuf(val); setSeed(x => x + 1); }}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "6px 16px", fontSize: 12.5, fontWeight: 700,
-                background: shuf === val ? "#fff" : "transparent", color: shuf === val ? C.deep : "#9b8d82",
+                background: shuf === val ? "#fff" : "transparent", color: shuf === val ? C.deep : "#7b6d62",
                 boxShadow: shuf === val ? "0 1px 3px rgba(0,0,0,.12)" : "none" }}>
               {label}
             </button>
@@ -175789,7 +175807,7 @@ function Quiz({ onAnswer, lang, t }) {
         ))}
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 18 }}>
-        <div style={{ fontSize: 11.5, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 5, padding: "3px 10px", marginBottom: 14 }}>{Q.d} · {domName(Q.d, lang)}</div>
+        <div style={{ fontSize: 11.5, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 5, padding: "3px 10px", marginBottom: 14 }}>{Q.d} · {domName(Q.d, lang)}</div>
         <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 16, lineHeight: 1.5, display: "flex", alignItems: "flex-start", gap: 6 }}><span style={{ flex: 1 }}>{qText(Q, lang)}</span><StarButton id={"q#" + novaQHash(Q.q || Q.j || Q.qEn || "")} text={qText(Q, lang)} scope={lang === "en" ? "Quiz" : "クイズ"} /></div>
         {qOpts(Q, lang).map((opt, i) => {
           let bg = "#fff", bd = C.mid, col = C.ink;
@@ -175824,7 +175842,7 @@ function Quiz({ onAnswer, lang, t }) {
           style={{ padding: "10px 30px", borderRadius: 9, border: `1.5px solid ${C.mid}`, background: "#fff", color: pos === 0 ? "#bcae9f" : C.ink, fontWeight: 700, fontSize: 13.5, cursor: pos === 0 ? "default" : "pointer" }}>
           ← {en ? "Prev" : "前の問題"}
         </button>
-        <span style={{ fontSize: 13.5, color: "#9b8d82", fontWeight: 600 }}>{pos + 1} / {pool.length}</span>
+        <span style={{ fontSize: 13.5, color: "#7b6d62", fontWeight: 600 }}>{pos + 1} / {pool.length}</span>
         <button onClick={() => go(1)} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 700, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
     </div>
@@ -175840,7 +175858,7 @@ function Compare({ lang, t }) {
   }));
   return (
     <div>
-      {t.compareIntro ? <div style={{ fontSize: 12, color: "#9b8d82", marginBottom: 10 }}>{t.compareIntro}</div> : null}
+      {t.compareIntro ? <div style={{ fontSize: 12, color: "#7b6d62", marginBottom: 10 }}>{t.compareIntro}</div> : null}
       <CmpTable compare={norm} C={C} lang={lang} t={t} />
     </div>
   );
@@ -175860,7 +175878,7 @@ function Confuse({ lang, t }) {
           <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{t.judgeAxis}：{lang === "en" && c[5] ? c[5] : c[2]}</div>
         </div>
       ))}
-      {list.length === 0 && <div style={{ textAlign: "center", color: "#9b8d82", padding: 20 }}>{t.noMatch}</div>}
+      {list.length === 0 && <div style={{ textAlign: "center", color: "#7b6d62", padding: 20 }}>{t.noMatch}</div>}
     </div>
   );
 }
@@ -175899,7 +175917,7 @@ function Review({ state, onAnswer, onResolve, onClear, lang, t }) {
         {list.map((q, i) => (
           <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 12, marginBottom: 9 }}>
             <div style={{ fontSize: 13, fontWeight: 600, lineHeight: 1.5 }}>
-              <span style={{ background: DOM_HUE[q.d], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5, marginRight: 6 }}>{q.d}</span>{q.q}
+              <span style={{ background: DOM_HUE[q.d], color: nvInk("#ffffff", DOM_HUE[q.d]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5, marginRight: 6 }}>{q.d}</span>{q.q}
             </div>
           </div>
         ))}
@@ -175949,7 +175967,7 @@ function Review({ state, onAnswer, onResolve, onClear, lang, t }) {
         <span style={{ fontSize: 13, fontWeight: 700 }}>{en ? "Remaining" : "残り"}: {remaining}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>{Q.d} · {domName(Q.d, lang)}</div>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>{Q.d} · {domName(Q.d, lang)}</div>
         {multi && <div style={{ display: "inline-block", marginLeft: 8, fontSize: 11, color: C.accent, fontWeight: 700, border: `1px solid ${C.accent}`, borderRadius: 4, padding: "2px 8px" }}>{t.multiSelect(numNeeded)}</div>}
         <div style={{ fontSize: 15, fontWeight: 600, margin: "12px 0 14px", lineHeight: 1.6 }}>{qText(Q, lang)}</div>
         {qOpts(Q, lang).map((opt, i) => {
@@ -176014,13 +176032,13 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <button onClick={onBack} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
         </div>
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 4 }}>{lang === "ja" ? "本試験形式ケース" : "Exam-style cases"}</div>
-        <div style={{ fontSize: 12, color: "#8595ad", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
+        <div style={{ fontSize: 12, color: "#5d6c83", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
         {clist.map((c, i) => (
           <button key={i} onClick={() => openCase(i)}
             style={{ width: "100%", textAlign: "left", padding: "14px 15px", marginBottom: 10, borderRadius: 11,
               border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep, lineHeight: 1.45, paddingRight: 10 }}><DoneCheck on={caseDone.has(i)} onToggle={(e) => caseDone.toggle(i, e)} />{g(c.title)}</span>
-            <span style={{ fontSize: 11.5, color: "#8595ad", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
+            <span style={{ fontSize: 11.5, color: "#5d6c83", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
           </button>
         ))}
       </div>
@@ -176054,7 +176072,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
         <button onClick={backToList} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
-        {!finished && <span style={{ fontSize: 12, color: "#8595ad" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
+        {!finished && <span style={{ fontSize: 12, color: "#5d6c83" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 12 }}>
@@ -176079,7 +176097,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <div style={{ textAlign: "center", marginBottom: 12 }}>
             <div style={{ fontSize: 13, color: "#5a6a85", fontWeight: 600, marginBottom: 6 }}>{lang === "ja" ? "ケース完了" : "Case complete"}</div>
             <div style={{ fontSize: 32, fontWeight: 800, color: rate >= PASS ? C.ok : C.ng }}>{rate}%</div>
-            <div style={{ fontSize: 12.5, color: "#8595ad", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
+            <div style={{ fontSize: 12.5, color: "#5d6c83", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
@@ -176104,7 +176122,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
             <div style={{ marginTop: 12 }}>
               {Q.options.map((opt, i) => (
                 <div key={i} style={{ background: opt.ok ? "#E6F4EC" : (i === sel ? "#FBEAE8" : C.light), borderRadius: 8, padding: "9px 11px", marginBottom: 6, fontSize: 12.5, lineHeight: 1.55 }}>
-                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#8595ad") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
+                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#5d6c83") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
                 </div>
               ))}
             </div>
@@ -176203,14 +176221,14 @@ function Exam({ onAnswer, onWrong, lang, t }) {
             {examModeBtns.map(([k, label]) => (
               <button key={k} onClick={() => setExamMode(k)}
                 style={{ border: "none", cursor: "pointer", borderRadius: 18, padding: "9px 22px", fontSize: 13, fontWeight: 700,
-                  background: examMode === k ? "#fff" : "transparent", color: examMode === k ? C.deep : "#9b8d82",
+                  background: examMode === k ? "#fff" : "transparent", color: examMode === k ? C.deep : "#7b6d62",
                   boxShadow: examMode === k ? "0 1px 4px rgba(0,0,0,.12)" : "none" }}>
                 {label}
               </button>
             ))}
           </div>
         </div>
-        <div style={{ textAlign: "center", fontSize: 12, color: "#9b8d82", marginBottom: 16, lineHeight: 1.5, padding: "0 10px" }}>
+        <div style={{ textAlign: "center", fontSize: 12, color: "#7b6d62", marginBottom: 16, lineHeight: 1.5, padding: "0 10px" }}>
           {isPractice ? t.examModePracticeDesc : t.examModeRealDesc}
         </div>
 
@@ -176231,7 +176249,7 @@ function Exam({ onAnswer, onWrong, lang, t }) {
                 border: `1.5px solid ${C.deep}`, background: "#FBF7EF", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span>
                 <span style={{ fontWeight: 700, fontSize: 15, color: C.deep }}>{en ? "Exam-style case" : "本試験形式ケース"}</span>
-                <span style={{ fontSize: 12, color: "#9b8d82", marginLeft: 8 }}>{en ? "Design scenario with data tables & rationale" : "設計シナリオ・資料表つき・僅差4択・根拠解説"}</span>
+                <span style={{ fontSize: 12, color: "#7b6d62", marginLeft: 8 }}>{en ? "Design scenario with data tables & rationale" : "設計シナリオ・資料表つき・僅差4択・根拠解説"}</span>
               </span>
               <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary }}>{en ? "Start →" : "挑戦 →"}</span>
             </button>
@@ -176250,7 +176268,7 @@ function Exam({ onAnswer, onWrong, lang, t }) {
             style={{ width: "100%", textAlign: "left", padding: "15px 16px", marginBottom: 10, borderRadius: 11,
               border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span>
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "2px 7px", fontSize: 11, marginRight: 8, fontWeight: 700 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "2px 7px", fontSize: 11, marginRight: 8, fontWeight: 700 }}>{d.id}</span>
               <span style={{ fontWeight: 700, fontSize: 14, color: C.deep }}>{domName(d.id, lang)}</span>
             </span>
             <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary }}>{t.start}</span>
@@ -176284,7 +176302,7 @@ function Exam({ onAnswer, onWrong, lang, t }) {
           ) : wrong.map((w, idx) => (
             <div key={idx} style={{ padding: "8px 0", borderBottom: `1px solid ${C.light}`, fontSize: 13 }}>
               <div style={{ fontWeight: 600, marginBottom: 4 }}>
-                <span style={{ background: DOM_HUE[w.Q.d], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5, marginRight: 6 }}>{w.Q.d}</span>{qText(w.Q, lang)}
+                <span style={{ background: DOM_HUE[w.Q.d], color: nvInk("#ffffff", DOM_HUE[w.Q.d]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5, marginRight: 6 }}>{w.Q.d}</span>{qText(w.Q, lang)}
               </div>
               <div style={{ color: C.ng, fontSize: 12.5 }}>{t.yourAnswer}：{w.pick.length ? w.pick.map(x => "ABCD"[x]).join(", ") : "—"}</div>
               <div style={{ color: C.ok, fontSize: 12.5 }}>{t.answer}：{w.correctAns.map(x => "ABCD"[x]).join(", ")} {w.correctAns.map(x => qOpts(w.Q, lang)[x]).join(" / ")}</div>
@@ -176321,15 +176339,15 @@ function Exam({ onAnswer, onWrong, lang, t }) {
           ? <span style={{ fontSize: 13, fontWeight: 700, opacity: 0.85 }}>{en ? "Answered" : "回答済"} {answeredCount}/{qs.length}</span>
           : <span style={{ fontSize: 17, fontWeight: 800 }}>{fmtTime(timeLeft)}</span>}
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#9b8d82", marginBottom: 6 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#7b6d62", marginBottom: 6 }}>
         <span>{en ? "Answered" : "回答済"} {answeredCount}/{qs.length}</span>
         <button onClick={() => setFlags(f => ({ ...f, [pos]: !f[pos] }))}
-          style={{ border: "none", background: "none", cursor: "pointer", fontSize: 12, fontWeight: 700, color: flags[pos] ? C.primary : "#9b8d82" }}>
+          style={{ border: "none", background: "none", cursor: "pointer", fontSize: 12, fontWeight: 700, color: flags[pos] ? C.primary : "#7b6d62" }}>
           {flags[pos] ? (en ? "★ Flagged" : "★ フラグ") : (en ? "☆ Flag" : "☆ フラグ")}
         </button>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>{Q.d} · {domName(Q.d, lang)}</div>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>{Q.d} · {domName(Q.d, lang)}</div>
         {multi && <div style={{ display: "inline-block", marginLeft: 8, fontSize: 11, color: C.accent, fontWeight: 700, border: `1px solid ${C.accent}`, borderRadius: 4, padding: "2px 8px" }}>{t.multiSelect(numNeeded)}</div>}
         <div style={{ fontSize: 15, fontWeight: 600, margin: "12px 0 14px", lineHeight: 1.6 }}>{qText(Q, lang)}</div>
         {qOpts(Q, lang).map((opt, i) => {
@@ -176443,7 +176461,7 @@ function Diagrams({ lang, t }) {
   );
   return (
     <div>
-      <div style={{ fontSize: 12, color: "#9b8d82", marginBottom: 10 }}>{t.diagIntro}</div>
+      <div style={{ fontSize: 12, color: "#7b6d62", marginBottom: 10 }}>{t.diagIntro}</div>
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
         {CATS.map(([k, label]) => (
           <button key={k} onClick={() => setCat(k)}
@@ -176518,7 +176536,7 @@ function DecisionWidget({ lang, steps, leaves, startKey = "start" }) {
   const leaf = leaves[cur];
   return (
     <div>
-      <div style={{ marginBottom: 10, fontSize: 12, color: "#9b8d82" }}>
+      <div style={{ marginBottom: 10, fontSize: 12, color: "#7b6d62" }}>
         {path.length > 0 && <button onClick={() => setPath(p => p.slice(0, -1))} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, padding: 0 }}>{en ? "← Back" : "← 戻る"}</button>}
       </div>
       {!leaf && steps[cur] && (
@@ -176590,7 +176608,7 @@ function DomainBars({ lang }) {
       {DOMAINS.map(d => (
         <div key={d.id} onClick={() => setSel(sel === d.id ? null : d.id)} style={{ marginBottom: 10, cursor: "pointer" }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 3 }}>
-            <span><span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>{domName(d.id, lang)}</span>
+            <span><span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>{domName(d.id, lang)}</span>
             <strong>{d.pct}%</strong>
           </div>
           <div style={{ background: C.light, borderRadius: 6, height: 16, overflow: "hidden", border: sel === d.id ? `2px solid ${C.deep}` : "none" }}>
@@ -176694,7 +176712,7 @@ function DefenseLayers({ lang }) {
           {sel === i && <div style={{ fontSize: 12, marginTop: 6, opacity: 0.95, lineHeight: 1.5 }}>{desc}</div>}
         </div>
       ))}
-      <div style={{ textAlign: "center", fontSize: 11, color: "#9b8d82", marginTop: 4 }}>↓ {en ? "deeper = closer to data" : "下ほどデータに近い"}</div>
+      <div style={{ textAlign: "center", fontSize: 11, color: "#7b6d62", marginTop: 4 }}>↓ {en ? "deeper = closer to data" : "下ほどデータに近い"}</div>
     </div>
   );
 }
@@ -176710,7 +176728,7 @@ function DrLadder({ lang }) {
   ];
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#9b8d82", marginBottom: 8 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#7b6d62", marginBottom: 8 }}>
         <span>← {en ? "lower cost" : "低コスト"}</span><span>{en ? "shorter RTO" : "短い RTO"} →</span>
       </div>
       {steps.map(([label, sub, hue], i) => (
@@ -176792,7 +176810,7 @@ function RequestFlow({ lang }) {
   return (
     <div>
       <FlowChain nodes={[
-        [en ? "User" : "ユーザー", "#9b8d82", en ? "Browser request" : "ブラウザからの要求"],
+        [en ? "User" : "ユーザー", "#7b6d62", en ? "Browser request" : "ブラウザからの要求"],
         ["Route 53", "#232F3E", en ? "DNS resolves to CloudFront/ALB" : "DNS で CloudFront/ALB へ解決"],
         ["CloudFront (+WAF)", "#146EB4", en ? "Edge cache, blocks L7 attacks" : "エッジキャッシュ・L7 攻撃を遮断"],
         ["ALB", "#CC7000", en ? "L7 routing to healthy targets" : "正常ターゲットへ L7 振り分け"],
@@ -176853,7 +176871,7 @@ function VpcConcept({ lang }) {
   const en = lang === "en";
   const Box = ({ label, sub, hue, children, dashed }) => (
     <div style={{ border: `${dashed ? "2px dashed" : "1.5px solid"} ${hue}`, borderRadius: 10, padding: 10, marginBottom: 8 }}>
-      <div style={{ fontWeight: 700, fontSize: 12.5, color: hue }}>{label}{sub && <span style={{ fontSize: 11, color: "#9b8d82", fontWeight: 500 }}> — {sub}</span>}</div>
+      <div style={{ fontWeight: 700, fontSize: 12.5, color: hue }}>{label}{sub && <span style={{ fontSize: 11, color: "#7b6d62", fontWeight: 500 }}> — {sub}</span>}</div>
       {children && <div style={{ marginTop: 8 }}>{children}</div>}
     </div>
   );
@@ -176883,7 +176901,7 @@ function VpcConcept({ lang }) {
 function EdgeConcept({ lang }) {
   const en = lang === "en";
   const items = [
-    [en ? "Internet (users + attackers)" : "インターネット（利用者＋攻撃者）", "#9b8d82"],
+    [en ? "Internet (users + attackers)" : "インターネット（利用者＋攻撃者）", "#7b6d62"],
     ["Route 53", "#232F3E", en ? "DNS + health-based failover" : "DNS＋ヘルスチェックで切替"],
     ["AWS Shield", "#146EB4", en ? "L3/L4 DDoS mitigation" : "L3/L4 の DDoS 緩和"],
     ["AWS WAF", "#CC7000", en ? "L7: blocks SQLi / XSS / rate" : "L7：SQLi/XSS/レート遮断"],
@@ -176969,7 +176987,7 @@ function S3ClassHierarchy({ lang }) {
   ];
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#9b8d82", marginBottom: 8 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#7b6d62", marginBottom: 8 }}>
         <span>{en ? "hotter / pricier ↑" : "高頻度・割高 ↑"}</span><span>{en ? "↓ colder / cheaper" : "↓ 低頻度・安価"}</span>
       </div>
       {tiers.map(([label, hue, sub], i) => (
@@ -177220,7 +177238,7 @@ function ArchBuilder({ lang }) {
           built.map((id, i) => {
             const tr = tiers.find(t => t.id === id);
             return <div key={id}>
-              <div style={{ background: tr.hue, color: "#fff", borderRadius: 9, padding: "9px 13px", fontWeight: 700, fontSize: 13, textAlign: "center" }}>{tr.label}</div>
+              <div style={{ background: tr.hue, color: nvInk("#ffffff", tr.hue), borderRadius: 9, padding: "9px 13px", fontWeight: 700, fontSize: 13, textAlign: "center" }}>{tr.label}</div>
               {i < built.length - 1 && <div style={{ textAlign: "center", color: C.mid, fontSize: 15 }}>↓</div>}
             </div>;
           })}
@@ -177264,7 +177282,7 @@ function CostSimulator({ lang }) {
         return (
           <div key={i} style={{ marginBottom: 9 }}>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
-              <span style={{ fontWeight: 700, color: hue }}>{name} <span style={{ color: "#9b8d82", fontWeight: 500, fontSize: 11 }}>{note}</span></span>
+              <span style={{ fontWeight: 700, color: hue }}>{name} <span style={{ color: "#7b6d62", fontWeight: 500, fontSize: 11 }}>{note}</span></span>
               <strong style={{ color: C.deep }}>${cost}</strong>
             </div>
             <div style={{ background: C.light, borderRadius: 6, height: 14, overflow: "hidden" }}>
@@ -177273,7 +177291,7 @@ function CostSimulator({ lang }) {
           </div>
         );
       })}
-      <div style={{ fontSize: 11.5, color: "#9b8d82", marginTop: 8, lineHeight: 1.5 }}>{en ? "Illustrative rates. Steady/long usage favors commitment; spiky/short favors On-Demand; interruptible favors Spot." : "※概算。常時稼働ほどコミットが有利、短期はオンデマンド、中断耐性があればスポットが有利。"}</div>
+      <div style={{ fontSize: 11.5, color: "#7b6d62", marginTop: 8, lineHeight: 1.5 }}>{en ? "Illustrative rates. Steady/long usage favors commitment; spiky/short favors On-Demand; interruptible favors Spot." : "※概算。常時稼働ほどコミットが有利、短期はオンデマンド、中断耐性があればスポットが有利。"}</div>
     </div>
   );
 }
@@ -177293,10 +177311,10 @@ function DrSimulator({ lang }) {
     <div>
       <div style={{ fontSize: 12, color: "#6b5d52", marginBottom: 6 }}>{en ? "Drag toward shorter RTO →" : "RTO を短くする方向へ →"}</div>
       <input type="range" min="0" max="3" step="1" value={rto} onChange={e => setRto(Number(e.target.value))} style={{ width: "100%", marginBottom: 4, accentColor: C.primary }} />
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10.5, color: "#9b8d82", marginBottom: 12 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10.5, color: "#7b6d62", marginBottom: 12 }}>
         <span>{en ? "cheap/slow" : "安い/遅い"}</span><span>{en ? "fast/costly" : "速い/高い"}</span>
       </div>
-      <div style={{ background: cur.hue, color: "#fff", borderRadius: 11, padding: 16 }}>
+      <div style={{ background: cur.hue, color: nvInk("#ffffff", cur.hue), borderRadius: 11, padding: 16 }}>
         <div style={{ fontSize: 17, fontWeight: 800 }}>{cur.name}</div>
         <div style={{ display: "flex", gap: 14, margin: "8px 0", fontSize: 12.5 }}>
           <span>RTO: <strong>{cur.rto}</strong></span>
@@ -177325,7 +177343,7 @@ function S3Chooser({ lang }) {
     <div style={{ marginBottom: 12 }}>
       <div style={{ fontSize: 12.5, color: C.deep, fontWeight: 600, marginBottom: 4 }}>{label}</div>
       <input type="range" min="0" max="3" step="1" value={val} onChange={e => set(Number(e.target.value))} style={{ width: "100%", accentColor: C.primary }} />
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10.5, color: "#9b8d82" }}><span>{lo}</span><span>{hi}</span></div>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10.5, color: "#7b6d62" }}><span>{lo}</span><span>{hi}</span></div>
     </div>
   );
   return (
@@ -177364,7 +177382,7 @@ function ScaleSimulator({ lang }) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
         <div style={{ background: C.light, borderRadius: 9, padding: 11, textAlign: "center" }}>
           <div style={{ fontSize: 11, color: "#6b5d52" }}>{en ? "Running instances" : "稼働台数"}</div>
-          <div style={{ fontSize: 24, fontWeight: 800, color: C.deep }}>{instances}<span style={{ fontSize: 12, color: "#9b8d82" }}> / {max}</span></div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: C.deep }}>{instances}<span style={{ fontSize: 12, color: "#7b6d62" }}> / {max}</span></div>
         </div>
         <div style={{ background: C.light, borderRadius: 9, padding: 11, textAlign: "center" }}>
           <div style={{ fontSize: 11, color: "#6b5d52" }}>{en ? "Avg CPU/instance" : "1台あたりCPU"}</div>
@@ -177402,7 +177420,7 @@ function IamEvaluator({ lang }) {
         <div style={{ fontSize: 22, fontWeight: 800, margin: "3px 0" }}>{result}</div>
         <div style={{ fontSize: 12.5, opacity: 0.95, lineHeight: 1.5 }}>{reason}</div>
       </div>
-      <div style={{ fontSize: 11.5, color: "#9b8d82", marginTop: 8 }}>{en ? "Precedence: explicit Deny > explicit Allow > implicit Deny." : "優先順位：明示的拒否 ＞ 明示的許可 ＞ 暗黙的拒否。"}</div>
+      <div style={{ fontSize: 11.5, color: "#7b6d62", marginTop: 8 }}>{en ? "Precedence: explicit Deny > explicit Allow > implicit Deny." : "優先順位：明示的拒否 ＞ 明示的許可 ＞ 暗黙的拒否。"}</div>
     </div>
   );
 }
@@ -179643,7 +179661,7 @@ function Home({ state, lang, t }) {
             <div key={d.id} style={{ marginBottom: 12 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
                 <span style={{ fontWeight: 600 }}>
-                  <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+                  <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
                   {domName(d.id, lang)}
                 </span>
                 <span style={{ color: "#6b5d52" }}>{d.pct}% · {p.attempts ? `${rate}%` : t.notStarted}</span>
@@ -179657,7 +179675,7 @@ function Home({ state, lang, t }) {
         <Card title={t.weakDomains}>
           {weak.slice(0, 3).map(d => (
             <div key={d.id} style={{ fontSize: 13, padding: "6px 0", borderBottom: `1px solid ${C.light}` }}>
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
               {domName(d.id, lang)} — <strong style={{ color: d.rate < PASS ? C.ng : C.ok }}>{d.rate}%</strong>
             </div>
           ))}
@@ -179672,7 +179690,7 @@ function Stat({ label, value, sub, color }) {
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#6b5d52" }}>{label}</div>
       <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
-      <div style={{ fontSize: 11, color: "#9b8d82" }}>{sub}</div>
+      <div style={{ fontSize: 11, color: "#7b6d62" }}>{sub}</div>
     </div>
   );
 }
@@ -179778,24 +179796,24 @@ function Quiz({ onAnswer, lang, t }) {
         <button onClick={() => slot.save({ filter, order, session, pos, sel, answers, stats, done }, filter === "ALL" ? (lang === "en" ? "All" : "全分野") : filter)} style={{ padding: "6px 14px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{slot.meta ? (lang === "en" ? "💾 Saved" : "💾 保存済") : (lang === "en" ? "💾 Save" : "💾 セーブ")}</button>
         {slot.meta && (<>
           <button onClick={async () => { const d = await slot.read(); if (!d) return; resumeRef.current = { session: d.session, pos: d.pos, sel: d.sel, answers: d.answers, stats: d.stats, done: d.done }; setFilter(d.filter || "ALL"); setOrder(d.order || "fixed"); setSession(d.session || []); setPos(d.pos || 0); setSel(d.sel == null ? null : d.sel); setAnswers(d.answers || []); setStats(d.stats || { c: 0, a: 0 }); setDone(!!d.done); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
-          <span style={{ fontSize: 11, color: "#8499ad" }}>{saveStamp(slot.meta.t)}</span>
+          <span style={{ fontSize: 11, color: "#5a7288" }}>{saveStamp(slot.meta.t)}</span>
           <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
         </>)}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-        <span style={{ fontSize: 12, color: "#9b8d82" }}>{t.quizBankSize(QUIZ_BANK.length)}</span>
+        <span style={{ fontSize: 12, color: "#7b6d62" }}>{t.quizBankSize(QUIZ_BANK.length)}</span>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ display: "inline-flex", background: C.light, borderRadius: 16, padding: 2 }}>
             {[["fixed", t.orderFixed], ["random", t.orderRandom]].map(([k, label]) => (
               <button key={k} onClick={() => setOrder(k)}
                 style={{ border: "none", cursor: "pointer", borderRadius: 14, padding: "4px 12px", fontSize: 12, fontWeight: 700,
-                  background: order === k ? "#fff" : "transparent", color: order === k ? C.deep : "#9b8d82",
+                  background: order === k ? "#fff" : "transparent", color: order === k ? C.deep : "#7b6d62",
                   boxShadow: order === k ? "0 1px 2px rgba(0,0,0,.12)" : "none" }}>
                 {label}
               </button>
             ))}
           </div>
-          <span style={{ fontSize: 12, color: "#9b8d82" }}>{t.quizProgress(pos + 1, total)}</span>
+          <span style={{ fontSize: 12, color: "#7b6d62" }}>{t.quizProgress(pos + 1, total)}</span>
         </div>
       </div>
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
@@ -179817,7 +179835,7 @@ function Quiz({ onAnswer, lang, t }) {
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
         <div style={{ display: "flex", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
-          <span style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px" }}>
+          <span style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px" }}>
             {Q.d} · {domName(Q.d, lang)}
           </span>
           {isAdvancedQ(Q0) && (
@@ -179908,14 +179926,14 @@ function Exam({ onAnswer, lang, t, backRef }) {
               {[["practice", t.modePractice], ["real", t.modeReal]].map(([k, label]) => (
                 <button key={k} onClick={() => setMode(k)}
                   style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "7px 16px", fontSize: 13, fontWeight: 700,
-                    background: mode === k ? "#fff" : "transparent", color: mode === k ? C.deep : "#9b8d82",
+                    background: mode === k ? "#fff" : "transparent", color: mode === k ? C.deep : "#7b6d62",
                     boxShadow: mode === k ? "0 1px 3px rgba(0,0,0,.12)" : "none" }}>
                   {label}
                 </button>
               ))}
             </div>
           </div>
-          <div style={{ fontSize: 12, color: "#9b8d82", textAlign: "center", marginTop: 8 }}>
+          <div style={{ fontSize: 12, color: "#7b6d62", textAlign: "center", marginTop: 8 }}>
             {mode === "practice" ? t.modePracticeDesc : t.modeRealDesc}
           </div>
         </Card>
@@ -179941,15 +179959,15 @@ function Exam({ onAnswer, lang, t, backRef }) {
                   background: SET_READY[n] ? "#fff" : C.light, cursor: SET_READY[n] ? "pointer" : "not-allowed",
                   display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span><DoneCheck on={mockDone.has("s"+n)} onToggle={(e) => mockDone.toggle("s"+n, e)} />
-                  <span style={{ fontWeight: 700, fontSize: 15, color: SET_READY[n] ? C.deep : "#9b8d82" }}>{t.setLabel} {n}</span>
-                  <span style={{ fontSize: 12, color: "#9b8d82", marginLeft: 10 }}>100{t.questionsUnit}</span>
+                  <span style={{ fontWeight: 700, fontSize: 15, color: SET_READY[n] ? C.deep : "#7b6d62" }}>{t.setLabel} {n}</span>
+                  <span style={{ fontSize: 12, color: "#7b6d62", marginLeft: 10 }}>100{t.questionsUnit}</span>
                 </span>
                 <span style={{ fontSize: 12.5, fontWeight: 700, color: SET_READY[n] ? C.primary : "#bcae9f" }}>
                   {SET_READY[n] ? t.start : t.preparing}
                 </span>
               </button>
             ))}
-            <div style={{ fontSize: 11.5, color: "#9b8d82", textAlign: "center", marginTop: 6 }}>{t.setsNote}</div>
+            <div style={{ fontSize: 11.5, color: "#7b6d62", textAlign: "center", marginTop: 6 }}>{t.setsNote}</div>
           </>
         ) : (
           <>
@@ -179964,10 +179982,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
                     border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer",
                     display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <span style={{ display: "flex", alignItems: "center", gap: 10 }}><DoneCheck on={mockDone.has(d.id)} onToggle={(e) => mockDone.toggle(d.id, e)} />
-                    <span style={{ background: d.hue, color: "#fff", borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
+                    <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
                     <span>
                       <span style={{ fontWeight: 700, fontSize: 14, color: C.deep }}>{domName(d.id, lang)}</span>
-                      <span style={{ fontSize: 12, color: "#9b8d82", marginLeft: 8 }}>{t.domainSetCount(cnt)}</span>
+                      <span style={{ fontSize: 12, color: "#7b6d62", marginLeft: 8 }}>{t.domainSetCount(cnt)}</span>
                     </span>
                   </span>
                   <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, flexShrink: 0 }}>{t.start}</span>
@@ -180003,7 +180021,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           {byDom.map(d => (
             <div key={d.id} style={{ marginBottom: 9 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
-                <span><span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>{domName(d.id, lang)}</span>
+                <span><span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>{domName(d.id, lang)}</span>
                 <strong style={{ color: d.correct / d.total >= PASS / 100 ? C.ok : C.ng }}>{d.correct}/{d.total}</strong>
               </div>
               <Bar pct={Math.round(d.correct / d.total * 100)} color={d.correct / d.total >= PASS / 100 ? C.ok : C.ng} />
@@ -180018,7 +180036,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
             return (
               <div key={idx} style={{ padding: "8px 0", borderBottom: `1px solid ${C.light}`, fontSize: 13 }}>
                 <div style={{ fontWeight: 600, marginBottom: 4 }}>
-                  <span style={{ background: DOM_HUE[a.q.d], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5, marginRight: 6 }}>{a.q.d}</span>
+                  <span style={{ background: DOM_HUE[a.q.d], color: nvInk("#ffffff", DOM_HUE[a.q.d]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5, marginRight: 6 }}>{a.q.d}</span>
                   {lq.q}
                 </div>
                 <div style={{ color: C.ng, fontSize: 12.5 }}>{t.yourAnswer}：{"ABCD"[a.sel]} {lq.o[a.sel]}</div>
@@ -180064,7 +180082,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         </button>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginTop: 12 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)}
         </div>
         <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{Q.q}</div>
@@ -180154,13 +180172,13 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <button onClick={onBack} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
         </div>
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 4 }}>{lang === "ja" ? "本試験形式ケース" : "Exam-style cases"}</div>
-        <div style={{ fontSize: 12, color: "#8595ad", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
+        <div style={{ fontSize: 12, color: "#5d6c83", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
         {clist.map((c, i) => (
           <button key={i} onClick={() => openCase(i)}
             style={{ width: "100%", textAlign: "left", padding: "14px 15px", marginBottom: 10, borderRadius: 11,
               border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep, lineHeight: 1.45, paddingRight: 10 }}><DoneCheck on={caseDone.has(i)} onToggle={(e) => caseDone.toggle(i, e)} />{g(c.title)}</span>
-            <span style={{ fontSize: 11.5, color: "#8595ad", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
+            <span style={{ fontSize: 11.5, color: "#5d6c83", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
           </button>
         ))}
       </div>
@@ -180194,7 +180212,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
         <button onClick={backToList} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
-        {!finished && <span style={{ fontSize: 12, color: "#8595ad" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
+        {!finished && <span style={{ fontSize: 12, color: "#5d6c83" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 12 }}>
@@ -180219,7 +180237,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <div style={{ textAlign: "center", marginBottom: 12 }}>
             <div style={{ fontSize: 13, color: "#5a6a85", fontWeight: 600, marginBottom: 6 }}>{lang === "ja" ? "ケース完了" : "Case complete"}</div>
             <div style={{ fontSize: 32, fontWeight: 800, color: rate >= PASS ? C.ok : C.ng }}>{rate}%</div>
-            <div style={{ fontSize: 12.5, color: "#8595ad", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
+            <div style={{ fontSize: 12.5, color: "#5d6c83", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
@@ -180244,7 +180262,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
             <div style={{ marginTop: 12 }}>
               {Q.options.map((opt, i) => (
                 <div key={i} style={{ background: opt.ok ? "#E6F4EC" : (i === sel ? "#FBEAE8" : C.light), borderRadius: 8, padding: "9px 11px", marginBottom: 6, fontSize: 12.5, lineHeight: 1.55 }}>
-                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#8595ad") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
+                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#5d6c83") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
                 </div>
               ))}
             </div>
@@ -180285,7 +180303,7 @@ function Scenario({ onAnswer, lang, t }) {
             display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span>
             <span style={{ fontWeight: 700, fontSize: 15, color: C.deep }}>{lang === "en" ? "Exam-style case" : "本試験形式ケース"}</span>
-            <span style={{ fontSize: 12, color: "#9b8d82", marginLeft: 8 }}>{lang === "en" ? "Data tables, 4 close options, rationale for each" : "資料表つき・僅差4択・全選択肢に根拠解説"}</span>
+            <span style={{ fontSize: 12, color: "#7b6d62", marginLeft: 8 }}>{lang === "en" ? "Data tables, 4 close options, rationale for each" : "資料表つき・僅差4択・全選択肢に根拠解説"}</span>
           </span>
           <span style={{ fontSize: 12.5, fontWeight: 700, color: C.deep }}>{lang === "en" ? "Start →" : "挑戦 →"}</span>
         </button>
@@ -180294,7 +180312,7 @@ function Scenario({ onAnswer, lang, t }) {
             <button key={n} onClick={() => { setSetNo(n); reset(); }}
               style={{ padding: 16, borderRadius: 12, border: `1.5px solid ${C.mid}`, background: "#fff", cursor: "pointer", textAlign: "left" }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: C.deep }}>{t.scenSet} {n}</div>
-              <div style={{ fontSize: 12, color: "#9b8d82", marginTop: 4 }}>{SCEN_SETS[n].length} {t.questionsUnit}</div>
+              <div style={{ fontSize: 12, color: "#7b6d62", marginTop: 4 }}>{SCEN_SETS[n].length} {t.questionsUnit}</div>
             </button>
           ))}
         </div>
@@ -180357,7 +180375,7 @@ function Scenario({ onAnswer, lang, t }) {
             {t.prevQ}
           </button>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}><span style={{ fontSize: 12, color: "#9b8d82" }}>{t.scenQNo(pos + 1, total)}</span><button onClick={next} style={{ padding: "5px 11px", borderRadius: 8, fontSize: 12, fontWeight: 700, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{pos + 1 >= total ? t.seeResult : t.nextQ}</button></div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}><span style={{ fontSize: 12, color: "#7b6d62" }}>{t.scenQNo(pos + 1, total)}</span><button onClick={next} style={{ padding: "5px 11px", borderRadius: 8, fontSize: 12, fontWeight: 700, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{pos + 1 >= total ? t.seeResult : t.nextQ}</button></div>
       </div>
       <div style={{ marginBottom: 10 }}><Bar pct={Math.round((pos / total) * 100)} color={C.primary} /></div>
       <div style={{ background: C.light, border: `1px solid ${C.mid}`, borderRadius: 10, padding: 12, marginBottom: 12 }}>
@@ -180365,7 +180383,7 @@ function Scenario({ onAnswer, lang, t }) {
         <div style={{ fontSize: 12.5, color: C.ink, lineHeight: 1.6 }}>{scenText}</div>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>{Q.d} · {domName(Q.d, lang)}</div>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>{Q.d} · {domName(Q.d, lang)}</div>
         <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.6 }}>{Q.q}</div>
         {Q.o.map((opt, i) => {
           let bg = "#fff", bd = C.mid, col = C.ink;
@@ -180434,11 +180452,11 @@ function Review({ wrong, onRemove, onClear, lang, t }) {
           <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 10 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
               <div style={{ fontWeight: 600, fontSize: 13.5, lineHeight: 1.5, flex: 1 }}>
-                <span style={{ background: DOM_HUE[w0.d], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5, marginRight: 6 }}>{w0.d}</span>
+                <span style={{ background: DOM_HUE[w0.d], color: nvInk("#ffffff", DOM_HUE[w0.d]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5, marginRight: 6 }}>{w0.d}</span>
                 {w.q}
               </div>
               <button onClick={() => onRemove(key)}
-                style={{ fontSize: 11, color: "#9b8d82", background: "transparent", border: "none", cursor: "pointer", flexShrink: 0, padding: 2 }}>
+                style={{ fontSize: 11, color: "#7b6d62", background: "transparent", border: "none", cursor: "pointer", flexShrink: 0, padding: 2 }}>
                 {t.reviewRemove}
               </button>
             </div>
@@ -180456,7 +180474,7 @@ function Review({ wrong, onRemove, onClear, lang, t }) {
           </div>
         );
       })}
-      {list.length === 0 && <div style={{ textAlign: "center", color: "#9b8d82", padding: 20 }}>{t.noMatch}</div>}
+      {list.length === 0 && <div style={{ textAlign: "center", color: "#7b6d62", padding: 20 }}>{t.noMatch}</div>}
     </div>
   );
 }
@@ -180475,7 +180493,7 @@ function Confuse({ lang, t }) {
           <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{t.judgeAxis}：{lang === "en" && c[5] ? c[5] : c[2]}</div>
         </div>
       ))}
-      {list.length === 0 && <div style={{ textAlign: "center", color: "#9b8d82", padding: 20 }}>{t.noMatch}</div>}
+      {list.length === 0 && <div style={{ textAlign: "center", color: "#7b6d62", padding: 20 }}>{t.noMatch}</div>}
     </div>
   );
 }
@@ -180610,7 +180628,7 @@ function RelMap({ lang }) {
       </svg>
       <div style={{ background: C.light, borderRadius: 9, padding: 12 }}>
         <div style={{ fontWeight: 700, color: C.deep, fontSize: 13.5, marginBottom: 4 }}>
-          <span style={{ background: DOM_HUE[sel], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{sel}</span>
+          <span style={{ background: DOM_HUE[sel], color: nvInk("#ffffff", DOM_HUE[sel]), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{sel}</span>
           {domName(sel, lang)}
         </div>
         <div style={{ fontSize: 13, lineHeight: 1.55 }}>{rel[sel]}</div>
@@ -180687,7 +180705,7 @@ function Versus({ lang }) {
       </div>
       {rows.map((r, i) => (
         <div key={i} style={{ marginBottom: 6 }}>
-          <div style={{ fontSize: 11, color: "#9b8d82", textAlign: "center", fontWeight: 700, marginBottom: 2 }}>{r[0]}</div>
+          <div style={{ fontSize: 11, color: "#7b6d62", textAlign: "center", fontWeight: 700, marginBottom: 2 }}>{r[0]}</div>
           <div style={{ display: "flex", gap: 8, alignItems: "stretch" }}>
             <div style={{ flex: 1, background: "#fff", border: `1.5px solid ${C.deep}`, borderRadius: 8, padding: "8px 10px", fontSize: 12.5, color: C.ink, lineHeight: 1.4 }}>{r[1]}</div>
             <div style={{ width: 28, flexShrink: 0 }} />
@@ -180874,7 +180892,7 @@ function DomainBars({ lang }) {
       {DOMAINS.map(d => (
         <div key={d.id} onClick={() => setSel(sel === d.id ? null : d.id)} style={{ marginBottom: 10, cursor: "pointer" }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 3 }}>
-            <span><span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>{domName(d.id, lang)}</span>
+            <span><span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>{domName(d.id, lang)}</span>
             <strong>{d.pct}%</strong>
           </div>
           <div style={{ background: C.light, borderRadius: 6, height: 16, overflow: "hidden", border: sel === d.id ? `2px solid ${C.ink}` : "none" }}>
@@ -180902,7 +180920,7 @@ function Diagrams({ lang, t }) {
   );
   return (
     <div>
-      <div style={{ fontSize: 12, color: "#9b8d82", marginBottom: 10 }}>{t.diagIntro}</div>
+      <div style={{ fontSize: 12, color: "#7b6d62", marginBottom: 10 }}>{t.diagIntro}</div>
       <Section id="domains" title={en?"① Exam weight by domain":"① 5ドメインの出題比率"}><DomainBars lang={lang} /><DomainDrillPanel domains={DOMAINS} lang={typeof lang === "undefined" ? "" : lang} sets={typeof DOMAIN_SETS !== "undefined" ? DOMAIN_SETS : (typeof SAA_DOMAIN_SETS !== "undefined" ? SAA_DOMAIN_SETS : null)} /></Section>
       <Section id="loop" title={en?"② Agent loop (cycle · tap)":"② エージェント ループ（循環・タップ）"}><AgentLoop lang={lang} /></Section>
       <Section id="spectrum" title={en?"③ Autonomy spectrum (tap)":"③ 自律性スペクトル（タップで解説）"}><Spectrum lang={lang} /></Section>
@@ -182832,7 +182850,7 @@ function Stat({ label, value, sub, color }) {
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5a6a85" }}>{label}</div>
       <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
-      <div style={{ fontSize: 11, color: "#8595ad" }}>{sub}</div>
+      <div style={{ fontSize: 11, color: "#5d6c83" }}>{sub}</div>
     </div>
   );
 }
@@ -182881,7 +182899,7 @@ function Home({ state, lang }) {
             <div key={d.id} style={{ marginBottom: 12 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
                 <span style={{ fontWeight: 600 }}>
-                  <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+                  <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
                   {t.domainNames[d.id]}
                 </span>
                 <span style={{ color: "#5a6a85" }}>{d.pct}% · {p.attempts ? `${rate}%` : t.notStarted}</span>
@@ -182895,7 +182913,7 @@ function Home({ state, lang }) {
         <Card title={t.weakTitle}>
           {weak.slice(0, 3).map(d => (
             <div key={d.id} style={{ fontSize: 13, padding: "6px 0", borderBottom: `1px solid ${C.light}` }}>
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
               {t.domainNames[d.id]} — <strong style={{ color: d.rate < PASS ? C.ng : C.ok }}>{d.rate}%</strong>
             </div>
           ))}
@@ -182909,7 +182927,7 @@ function QuestionCard({ Q, sel, choose, next, lastBtn, lang }) {
   const t = UI[lang];
   return (
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-      <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+      <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
         {Q.d} · {t.domainNames[Q.d]}
       </div>
       <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{Q.q}</div>
@@ -182963,7 +182981,7 @@ function Quiz({ onAnswer, lang }) {
   }, [filter, mode]);
 
   useEffect(() => { if (resumeRef.current) { const r = resumeRef.current; resumeRef.current = null; setOrder(r.order && r.order.length ? r.order : pool); setPos(r.pos || 0); setHistory(r.history || {}); setStats(r.stats || { c: 0, a: 0 }); return; } setOrder(pool); setPos(0); setHistory({}); setStats({ c: 0, a: 0 }); }, [pool]);
-  if (order.length === 0) return <div style={{ textAlign: "center", color: "#8595ad", padding: 20 }}>{t.noQuestions}</div>;
+  if (order.length === 0) return <div style={{ textAlign: "center", color: "#5d6c83", padding: 20 }}>{t.noQuestions}</div>;
 
   const qi = order[pos % order.length];
   const Q = L(QUIZ_BANK[qi], lang);
@@ -182996,7 +183014,7 @@ function Quiz({ onAnswer, lang }) {
         <div style={{ textAlign: "center", marginBottom: 14 }}>
           <div style={{ fontSize: 13, color: "#5a6a85", fontWeight: 600, marginBottom: 6 }}>{lang === "ja" ? "クイズ完了" : "Quiz complete"}</div>
           <div style={{ fontSize: 34, fontWeight: 800, color: frate >= PASS ? C.ok : C.ng }}>{frate}%</div>
-          <div style={{ fontSize: 12.5, color: "#8595ad", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${total} 問` : `${correct} / ${total} correct`}</div>
+          <div style={{ fontSize: 12.5, color: "#5d6c83", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${total} 問` : `${correct} / ${total} correct`}</div>
         </div>
         <div style={{ marginBottom: 14 }}><Bar pct={frate} color={frate >= PASS ? C.ok : C.ng} /></div>
         <button onClick={() => { setPos(0); setHistory({}); setStats({ c: 0, a: 0 }); }}
@@ -183025,7 +183043,7 @@ function Quiz({ onAnswer, lang }) {
         <button onClick={() => slot.save({ filter, mode, order, pos, history, stats }, filter === "ALL" ? (lang === "en" ? "All" : "全分野") : filter)} style={{ padding: "6px 14px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{slot.meta ? (lang === "en" ? "💾 Saved" : "💾 保存済") : (lang === "en" ? "💾 Save" : "💾 セーブ")}</button>
         {slot.meta && (<>
           <button onClick={async () => { const d = await slot.read(); if (!d) return; resumeRef.current = { order: d.order, pos: d.pos, history: d.history, stats: d.stats }; setFilter(d.filter || "ALL"); setMode(d.mode || "fixed"); setOrder(d.order || []); setPos(d.pos || 0); setHistory(d.history || {}); setStats(d.stats || { c: 0, a: 0 }); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
-          <span style={{ fontSize: 11, color: "#8499ad" }}>{saveStamp(slot.meta.t)}</span>
+          <span style={{ fontSize: 11, color: "#5a7288" }}>{saveStamp(slot.meta.t)}</span>
           <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
         </>)}
       </div>
@@ -183063,7 +183081,7 @@ function Quiz({ onAnswer, lang }) {
             border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#b9c4d6" : C.primary }}>
           {t.prevQuestion}
         </button>
-        <span style={{ fontSize: 12.5, color: "#8595ad", fontWeight: 600 }}>{pos + 1} / {order.length}</span>
+        <span style={{ fontSize: 12.5, color: "#5d6c83", fontWeight: 600 }}>{pos + 1} / {order.length}</span>
         <button onClick={() => setPos(p => Math.min(order.length - 1, p + 1))} style={{ padding: "10px 30px", borderRadius: 8, fontSize: 13.5, fontWeight: 700, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQuestion}</button>
       </div>
     </div>
@@ -183134,7 +183152,7 @@ function Exam({ onAnswer, lang }) {
               ))}
             </div>
           </div>
-          <div style={{ fontSize: 12.5, color: "#8595ad", textAlign: "center", lineHeight: 1.6 }}>{examMode === "practice" ? t.practiceDesc : t.realDesc}</div>
+          <div style={{ fontSize: 12.5, color: "#5d6c83", textAlign: "center", lineHeight: 1.6 }}>{examMode === "practice" ? t.practiceDesc : t.realDesc}</div>
         </Card>
         <Card title={t.examTitle}>
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#475569" }}>{t.examDesc}</div>
@@ -183147,12 +183165,12 @@ function Exam({ onAnswer, lang }) {
             <span>
               <span style={{ fontWeight: 700, fontSize: 15, color: C.deep }}>{t.set} {n}</span>
               <span style={{ fontSize: 12, color: "#5a6a85", marginLeft: 8 }}>{exLabels[n]}</span>
-              <span style={{ fontSize: 12, color: "#8595ad", marginLeft: 8 }}>{EXAM_SETS[n].length}{t.questions}</span>
+              <span style={{ fontSize: 12, color: "#5d6c83", marginLeft: 8 }}>{EXAM_SETS[n].length}{t.questions}</span>
             </span>
             <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary }}>{t.start}</span>
           </button>
         ))}
-        <div style={{ fontSize: 11.5, color: "#8595ad", textAlign: "center", marginTop: 6 }}>{t.totalSets}</div>
+        <div style={{ fontSize: 11.5, color: "#5d6c83", textAlign: "center", marginTop: 6 }}>{t.totalSets}</div>
       </div>
     );
   }
@@ -183180,7 +183198,7 @@ function Exam({ onAnswer, lang }) {
           {byDom.map(d => (
             <div key={d.id} style={{ marginBottom: 9 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
-                <span><span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>{t.domainNames[d.id]}</span>
+                <span><span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>{t.domainNames[d.id]}</span>
                 <strong style={{ color: d.correct / d.total >= PASS / 100 ? C.ok : C.ng }}>{d.correct}/{d.total}</strong>
               </div>
               <Bar pct={Math.round(d.correct / d.total * 100)} color={d.correct / d.total >= PASS / 100 ? C.ok : C.ng} />
@@ -183192,7 +183210,7 @@ function Exam({ onAnswer, lang }) {
             wrong.map((a, idx) => (
               <div key={idx} style={{ padding: "8px 0", borderBottom: `1px solid ${C.light}`, fontSize: 13 }}>
                 <div style={{ fontWeight: 600, marginBottom: 4 }}>
-                  <span style={{ background: DOM_HUE[a.q.d], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5, marginRight: 6 }}>{a.q.d}</span>{a.q.q}
+                  <span style={{ background: DOM_HUE[a.q.d], color: nvInk("#ffffff", DOM_HUE[a.q.d]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5, marginRight: 6 }}>{a.q.d}</span>{a.q.q}
                 </div>
                 <div style={{ color: C.ng, fontSize: 12.5 }}>{t.yourAnswer}{a.sel !== undefined ? `${"ABCD"[a.sel]} ${a.q.o[a.sel]}` : t.unanswered}</div>
                 <div style={{ color: C.ok, fontSize: 12.5 }}>{t.answer}{"ABCD"[a.q.a]} {a.q.o[a.q.a]}</div>
@@ -183223,7 +183241,7 @@ function Exam({ onAnswer, lang }) {
         </div>
         <Bar pct={Math.round((pos / qs.length) * 100)} color={C.primary} />
         <div style={{ marginTop: 12, background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-          <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>{Q.d} · {t.domainNames[Q.d]}</div>
+          <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>{Q.d} · {t.domainNames[Q.d]}</div>
           <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{Q.q}</div>
           {Q.o.map((opt, i) => {
             const active = chosen === i;
@@ -183301,13 +183319,13 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <button onClick={onBack} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
         </div>
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 4 }}>{lang === "ja" ? "本試験形式ケース" : "Exam-style cases"}</div>
-        <div style={{ fontSize: 12, color: "#8595ad", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
+        <div style={{ fontSize: 12, color: "#5d6c83", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
         {clist.map((c, i) => (
           <button key={i} onClick={() => openCase(i)}
             style={{ width: "100%", textAlign: "left", padding: "14px 15px", marginBottom: 10, borderRadius: 11,
               border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep, lineHeight: 1.45, paddingRight: 10 }}><DoneCheck on={caseDone.has(i)} onToggle={(e) => caseDone.toggle(i, e)} />{g(c.title)}</span>
-            <span style={{ fontSize: 11.5, color: "#8595ad", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
+            <span style={{ fontSize: 11.5, color: "#5d6c83", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
           </button>
         ))}
       </div>
@@ -183341,7 +183359,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
         <button onClick={backToList} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
-        {!finished && <span style={{ fontSize: 12, color: "#8595ad" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
+        {!finished && <span style={{ fontSize: 12, color: "#5d6c83" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 12 }}>
@@ -183366,7 +183384,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <div style={{ textAlign: "center", marginBottom: 12 }}>
             <div style={{ fontSize: 13, color: "#5a6a85", fontWeight: 600, marginBottom: 6 }}>{lang === "ja" ? "ケース完了" : "Case complete"}</div>
             <div style={{ fontSize: 32, fontWeight: 800, color: rate >= PASS ? C.ok : C.ng }}>{rate}%</div>
-            <div style={{ fontSize: 12.5, color: "#8595ad", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
+            <div style={{ fontSize: 12.5, color: "#5d6c83", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
@@ -183391,7 +183409,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
             <div style={{ marginTop: 12 }}>
               {Q.options.map((opt, i) => (
                 <div key={i} style={{ background: opt.ok ? "#E6F4EC" : (i === sel ? "#FBEAE8" : C.light), borderRadius: 8, padding: "9px 11px", marginBottom: 6, fontSize: 12.5, lineHeight: 1.55 }}>
-                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#8595ad") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
+                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#5d6c83") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
                 </div>
               ))}
             </div>
@@ -183465,7 +183483,7 @@ function CaseStudy({ onAnswer, lang }) {
               <span>
                 <span style={{ fontWeight: 700, fontSize: 15, color: C.deep }}>{t.set} {n}</span>
                 <span style={{ fontSize: 12, color: "#5a6a85", marginLeft: 8 }}>{labels[n]}</span>
-                <span style={{ fontSize: 12, color: "#8595ad", marginLeft: 8 }}>{CASE_SETS[n].length > 0 ? `${CASE_SETS[n].length}${t.questions}` : t.preparing}</span>
+                <span style={{ fontSize: 12, color: "#5d6c83", marginLeft: 8 }}>{CASE_SETS[n].length > 0 ? `${CASE_SETS[n].length}${t.questions}` : t.preparing}</span>
               </span>
               {ready && <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary }}>{t.start}</span>}
             </button>
@@ -183475,7 +183493,7 @@ function CaseStudy({ onAnswer, lang }) {
     );
   }
 
-  if (list.length === 0) return <div style={{ textAlign: "center", color: "#8595ad", padding: 20 }}>{t.preparing}</div>;
+  if (list.length === 0) return <div style={{ textAlign: "center", color: "#5d6c83", padding: 20 }}>{t.preparing}</div>;
   const raw = list[idx % list.length];
   const seq = idx % list.length;
   const c = { d: raw.d, ...pickCase(raw.ja, raw.en, lang, seq) };
@@ -183488,10 +183506,10 @@ function CaseStudy({ onAnswer, lang }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
         <button onClick={() => setSetNo(null)} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{t.toSetSelectShort}</button>
-        <span style={{ fontSize: 12, color: "#8595ad" }}>{t.set}{setNo} · {t.caseCount((idx % list.length) + 1, list.length)}</span>
+        <span style={{ fontSize: 12, color: "#5d6c83" }}>{t.set}{setNo} · {t.caseCount((idx % list.length) + 1, list.length)}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[c.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>{c.d} · {t.domainNames[c.d]}</div>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[c.d]), background: DOM_HUE[c.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>{c.d} · {t.domainNames[c.d]}</div>
         <div style={{ background: C.light, borderRadius: 9, padding: 12, marginBottom: 12 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, marginBottom: 4 }}>{t.situation}</div>
           <div style={{ fontSize: 13.5, lineHeight: 1.6 }}>{c.scene}</div>
@@ -183552,7 +183570,7 @@ function Review({ state, onAnswer, clearReview, removeReview, lang }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: C.deep }}>{t.wrongCount(review.length)}</div>
-        <button onClick={clearReview} style={{ padding: "5px 12px", borderRadius: 8, fontSize: 12, fontWeight: 700, border: `1.5px solid ${C.mid}`, background: "#fff", color: "#8595ad", cursor: "pointer" }}>{t.clearAll}</button>
+        <button onClick={clearReview} style={{ padding: "5px 12px", borderRadius: 8, fontSize: 12, fontWeight: 700, border: `1.5px solid ${C.mid}`, background: "#fff", color: "#5d6c83", cursor: "pointer" }}>{t.clearAll}</button>
       </div>
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 16 }}>
         {[["ALL", t.allDomains], ...DOMAINS.map(d => [d.id, d.id])].map(([k, lbl]) => (
@@ -183577,7 +183595,7 @@ function Review({ state, onAnswer, clearReview, removeReview, lang }) {
           </div>
         );
       })}
-      {filtered.length === 0 && <div style={{ textAlign: "center", color: "#8595ad", padding: 20 }}>{t.noWrongInDomain}</div>}
+      {filtered.length === 0 && <div style={{ textAlign: "center", color: "#5d6c83", padding: 20 }}>{t.noWrongInDomain}</div>}
     </div>
   );
 }
@@ -183593,7 +183611,7 @@ function ReviewCard({ rec, onAnswer, removeReview, lang }) {
   return (
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 15, marginBottom: 12 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-        <span style={{ fontSize: 11, color: "#fff", background: DOM_HUE[rec.d], borderRadius: 4, padding: "2px 8px" }}>{rec.d} · {t.domainNames[rec.d]}</span>
+        <span style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[rec.d]), background: DOM_HUE[rec.d], borderRadius: 4, padding: "2px 8px" }}>{rec.d} · {t.domainNames[rec.d]}</span>
         <button onClick={() => removeReview(rec.key)} style={{ border: "none", background: "none", color: "#b9c4d6", cursor: "pointer", fontSize: 18, lineHeight: 1, padding: 0 }}>×</button>
       </div>
       {it.scene && (
@@ -183659,7 +183677,7 @@ function Confuse({ lang }) {
           <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{t.judgeAxis}{c[2]}</div>
         </div>
       ))}
-      {list.length === 0 && <div style={{ textAlign: "center", color: "#8595ad", padding: 20 }}>{t.noMatch}</div>}
+      {list.length === 0 && <div style={{ textAlign: "center", color: "#5d6c83", padding: 20 }}>{t.noMatch}</div>}
     </div>
   );
 }
@@ -183696,13 +183714,13 @@ function Glossary({ lang }) {
             <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
               <span style={{ background: DOM_HUE[g[0]], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{g[0]}</span>
               <span style={{ fontWeight: 700, fontSize: 14, color: C.deep }}>{primary}</span>
-              {secondary && <span style={{ fontSize: 11.5, color: "#8595ad" }}>{secondary}</span>}
+              {secondary && <span style={{ fontSize: 11.5, color: "#5d6c83" }}>{secondary}</span>}
             </div>
             <div style={{ fontSize: 13, lineHeight: 1.5 }}>{def}</div>
           </div>
         );
       })}
-      {list.length === 0 && <div style={{ textAlign: "center", color: "#8595ad", padding: 20 }}>{t.noMatch}</div>}
+      {list.length === 0 && <div style={{ textAlign: "center", color: "#5d6c83", padding: 20 }}>{t.noMatch}</div>}
     </div>
   );
 }
@@ -183806,7 +183824,7 @@ function AicxGateBoard({ lang }) {
           </div>
         ))}
       </div>
-      <div style={{ fontSize: 10.5, color: "#8595ad", marginTop: 10, lineHeight: 1.6 }}>
+      <div style={{ fontSize: 10.5, color: "#5d6c83", marginTop: 10, lineHeight: 1.6 }}>
         {en ? "Structure follows the official worksheet (3rd edition, September 2026, AICX Association). The wording and the commentary here are this app's own — check the worksheet itself for the authoritative text." : "構成は公式ワークシート（一般社団法人AICX協会・第三版／2026年9月発行）の章立てに沿っています。文面と補足はこのアプリ独自のもので、正式な記述は必ずワークシート本体で確認してください。"}
       </div>
     </div>
@@ -183915,7 +183933,7 @@ function Diagrams({ lang }) {
           </div>
         );
       })}
-      <div style={{ fontSize: 11.5, color: "#8595ad", textAlign: "center", marginTop: 14 }}>{t.diagHint}</div>
+      <div style={{ fontSize: 11.5, color: "#5d6c83", textAlign: "center", marginTop: 14 }}>{t.diagHint}</div>
     </div>
   );
 }
@@ -184959,13 +184977,13 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <button onClick={onBack} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
         </div>
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 4 }}>{lang === "ja" ? "本試験形式ケース" : "Exam-style cases"}</div>
-        <div style={{ fontSize: 12, color: "#8595ad", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
+        <div style={{ fontSize: 12, color: "#5d6c83", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
         {clist.map((c, i) => (
           <button key={i} onClick={() => openCase(i)}
             style={{ width: "100%", textAlign: "left", padding: "14px 15px", marginBottom: 10, borderRadius: 11,
               border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep, lineHeight: 1.45, paddingRight: 10 }}><DoneCheck on={caseDone.has(i)} onToggle={(e) => caseDone.toggle(i, e)} />{g(c.title)}</span>
-            <span style={{ fontSize: 11.5, color: "#8595ad", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
+            <span style={{ fontSize: 11.5, color: "#5d6c83", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
           </button>
         ))}
       </div>
@@ -184999,7 +185017,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
         <button onClick={backToList} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
-        {!finished && <span style={{ fontSize: 12, color: "#8595ad" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
+        {!finished && <span style={{ fontSize: 12, color: "#5d6c83" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 12 }}>
@@ -185053,7 +185071,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <div style={{ textAlign: "center", marginBottom: 12 }}>
             <div style={{ fontSize: 13, color: "#5a6a85", fontWeight: 600, marginBottom: 6 }}>{lang === "ja" ? "ケース完了" : "Case complete"}</div>
             <div style={{ fontSize: 32, fontWeight: 800, color: rate >= PASS ? C.ok : C.ng }}>{rate}%</div>
-            <div style={{ fontSize: 12.5, color: "#8595ad", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
+            <div style={{ fontSize: 12.5, color: "#5d6c83", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
@@ -185064,7 +185082,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
       ) : (
         <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
           {Array.isArray(Q.relevant) && Array.isArray(data.sections) && (
-            <div style={{ fontSize: 11.5, color: "#8595ad", marginBottom: 8 }}>{lang === "ja" ? "関連セクション：" : "Relevant: "}{Q.relevant.map(rid => { const sc = data.sections.find(x => x.id === rid); return sc ? g(sc.title) : rid; }).join(" / ")}</div>
+            <div style={{ fontSize: 11.5, color: "#5d6c83", marginBottom: 8 }}>{lang === "ja" ? "関連セクション：" : "Relevant: "}{Q.relevant.map(rid => { const sc = data.sections.find(x => x.id === rid); return sc ? g(sc.title) : rid; }).join(" / ")}</div>
           )}
           <div style={{ fontSize: 14.5, fontWeight: 700, marginBottom: 12, color: C.deep }}>{lang === "ja" ? `問${Q.n}. ` : `Q${Q.n}. `}{g(Q.q)}</div>
           {Q.options.map((opt, i) => {
@@ -185081,7 +185099,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
             <div style={{ marginTop: 12 }}>
               {Q.options.map((opt, i) => (
                 <div key={i} style={{ background: opt.ok ? "#E6F4EC" : (i === sel ? "#FBEAE8" : C.light), borderRadius: 8, padding: "9px 11px", marginBottom: 6, fontSize: 12.5, lineHeight: 1.55 }}>
-                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#8595ad") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
+                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#5d6c83") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
                 </div>
               ))}
             </div>
@@ -185233,7 +185251,7 @@ function Home({ state, t }) {
             <div key={d.id} style={{ marginBottom: 12 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
                 <span style={{ fontWeight: 600 }}>
-                  <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+                  <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
                   {domName(d.id)}
                 </span>
                 <span style={{ color: "#5a7780" }}>{d.pct}% · {p.attempts ? `${rate}%` : t.notStarted}</span>
@@ -185248,7 +185266,7 @@ function Home({ state, t }) {
         <Card title={t.weakDomains}>
           {weak.slice(0, 3).map(d => (
             <div key={d.id} style={{ fontSize: 13, padding: "6px 0", borderBottom: `1px solid ${C.light}` }}>
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
               {domName(d.id)} — <strong style={{ color: d.rate < PASS ? C.ng : C.ok }}>{d.rate}%</strong>
             </div>
           ))}
@@ -185263,7 +185281,7 @@ function Stat({ label, value, sub, color }) {
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5a7780" }}>{label}</div>
       <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
-      <div style={{ fontSize: 11, color: "#86a6b0" }}>{sub}</div>
+      <div style={{ fontSize: 11, color: "#53757f" }}>{sub}</div>
     </div>
   );
 }
@@ -185328,7 +185346,7 @@ function Quiz({ onAnswer, t, questions }) {
         <button onClick={() => slot.save({ filter, orderMode, shufKey, pos, history, stats }, filter === "ALL" ? "全分野" : filter)} style={{ padding: "6px 14px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{slot.meta ? "💾 保存済" : "💾 セーブ"}</button>
         {slot.meta && (<>
           <button onClick={async () => { const d = await slot.read(); if (!d) return; resumeRef.current = { pos: d.pos, history: d.history, stats: d.stats }; setFilter(d.filter || "ALL"); setOrderMode(d.orderMode || "fixed"); setShufKey(d.shufKey || 0); setPos(d.pos || 0); setHistory(d.history || {}); setStats(d.stats || { c: 0, a: 0 }); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>▶ 続きから</button>
-          <span style={{ fontSize: 11, color: "#8499ad" }}>{saveStamp(slot.meta.t)}</span>
+          <span style={{ fontSize: 11, color: "#5a7288" }}>{saveStamp(slot.meta.t)}</span>
           <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>削除</button>
         </>)}
       </div>
@@ -185364,7 +185382,7 @@ function Quiz({ onAnswer, t, questions }) {
       )}
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d)}
         </div>
         <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{Q.q}</div>
@@ -185434,9 +185452,9 @@ function ReviewTab({ state, onClearOne, onClearAll, t }) {
         <div key={idx} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 11, padding: 14, marginBottom: 11 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
             <div style={{ fontSize: 14, fontWeight: 600, lineHeight: 1.55, marginBottom: 8 }}>
-              <span style={{ background: DOM_HUE[q.d], color: "#fff", borderRadius: 4, padding: "1px 7px", fontSize: 10.5, marginRight: 6 }}>{q.d}</span>{q.q}
+              <span style={{ background: DOM_HUE[q.d], color: nvInk("#ffffff", DOM_HUE[q.d]), borderRadius: 4, padding: "1px 7px", fontSize: 10.5, marginRight: 6 }}>{q.d}</span>{q.q}
             </div>
-            <button onClick={() => onClearOne(idx)} style={{ flexShrink: 0, padding: "4px 9px", borderRadius: 7, border: `1px solid ${C.mid}`, background: "#fff", color: "#86a6b0", fontSize: 11.5, cursor: "pointer" }}>{t.reviewClear}</button>
+            <button onClick={() => onClearOne(idx)} style={{ flexShrink: 0, padding: "4px 9px", borderRadius: 7, border: `1px solid ${C.mid}`, background: "#fff", color: "#53757f", fontSize: 11.5, cursor: "pointer" }}>{t.reviewClear}</button>
           </div>
           {q.o.map((o, i) => (
             <div key={i} style={{ padding: "7px 11px", marginBottom: 6, borderRadius: 8, border: `1.5px solid ${i === q.a ? C.ok : C.mid}`, background: i === q.a ? "#E6F4EF" : "#fff", color: i === q.a ? C.ok : C.ink, fontSize: 13, lineHeight: 1.5, fontWeight: i === q.a ? 700 : 500 }}>
@@ -185619,7 +185637,7 @@ function Exam({ onAnswer, t, onWrong }) {
           {remaining.length ? remaining.map(c => (
             <button key={c.id} onClick={() => !submitted && addBuild(c.id)} disabled={submitted}
               style={{ padding: "7px 11px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: C.ink, fontSize: 12.5, cursor: submitted ? "default" : "pointer" }}>＋ {c.text}</button>
-          )) : <span style={{ fontSize: 12, color: "#8595ad" }}>（候補なし）</span>}
+          )) : <span style={{ fontSize: 12, color: "#5d6c83" }}>（候補なし）</span>}
         </div>
         <div style={{ fontSize: 11.5, fontWeight: 700, color: C.deep, marginBottom: 6 }}>解答欄（上から順に並べる）</div>
         {chosen.length ? chosen.map((id, idx) => {
@@ -185636,7 +185654,7 @@ function Exam({ onAnswer, t, onWrong }) {
               </>)}
             </div>
           );
-        }) : <div style={{ fontSize: 12, color: "#8595ad", padding: "8px 0" }}>候補をタップして追加してください（{Q.answer.length}項目）。</div>}
+        }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>候補をタップして追加してください（{Q.answer.length}項目）。</div>}
       </div>
     );
   };
@@ -185674,7 +185692,7 @@ function Exam({ onAnswer, t, onWrong }) {
             )}
             {c.type === "checkbox" && (
               <button onClick={() => !submitted && setCtrl(c.id, !cur)} disabled={submitted}
-                style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 16, border: `1.5px solid ${cur ? C.primary : C.mid}`, background: cur ? C.light : "#fff", color: cur ? C.deep : "#8595ad", fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{cur ? "オン ✓" : "オフ"}</button>
+                style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 16, border: `1.5px solid ${cur ? C.primary : C.mid}`, background: cur ? C.light : "#fff", color: cur ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{cur ? "オン ✓" : "オフ"}</button>
             )}
             {c.type === "spin" && (
               <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
@@ -185747,7 +185765,7 @@ function Exam({ onAnswer, t, onWrong }) {
                   flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px",
                   fontSize: 13.5, fontWeight: 700,
                   background: mode === m ? "#fff" : "transparent",
-                  color: mode === m ? C.deep : "#86a6b0",
+                  color: mode === m ? C.deep : "#53757f",
                   boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none",
                   transition: "all .2s",
                 }}>
@@ -185773,10 +185791,10 @@ function Exam({ onAnswer, t, onWrong }) {
               border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer",
               display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
               <span>
                 <span style={{ fontWeight: 700, fontSize: 14, color: C.deep }}>{d.name}</span>
-                <span style={{ fontSize: 12, color: "#86a6b0", marginLeft: 8 }}>{t.domainSetCount(DOMAIN_SETS[d.id].length)}</span>
+                <span style={{ fontSize: 12, color: "#53757f", marginLeft: 8 }}>{t.domainSetCount(DOMAIN_SETS[d.id].length)}</span>
               </span>
             </span>
             <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, flexShrink: 0 }}>{t.start}</span>
@@ -185791,8 +185809,8 @@ function Exam({ onAnswer, t, onWrong }) {
               display: "flex", justifyContent: "space-between", alignItems: "center",
             }}>
             <span>
-              <span style={{ fontWeight: 700, fontSize: 15, color: SET_READY[n] ? C.deep : "#86a6b0" }}>{t.setLabel} {n}</span>
-              <span style={{ fontSize: 12, color: "#86a6b0", marginLeft: 10 }}>50{t.questionsUnit}</span>
+              <span style={{ fontWeight: 700, fontSize: 15, color: SET_READY[n] ? C.deep : "#53757f" }}>{t.setLabel} {n}</span>
+              <span style={{ fontSize: 12, color: "#53757f", marginLeft: 10 }}>50{t.questionsUnit}</span>
             </span>
             <span style={{ fontSize: 12.5, fontWeight: 700, color: SET_READY[n] ? C.primary : "#a8c2cc" }}>
               {SET_READY[n] ? `${mode === "practice" ? t.modePractice : t.modeReal}で${t.start}` : t.preparing}
@@ -185831,7 +185849,7 @@ function Exam({ onAnswer, t, onWrong }) {
           {byDom.map(d => (
             <div key={d.id} style={{ marginBottom: 9 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
-                <span><span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>{domName(d.id)}</span>
+                <span><span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>{domName(d.id)}</span>
                 <strong style={{ color: d.correct / d.total >= PASS / 100 ? C.ok : C.ng }}>{d.correct}/{d.total}</strong>
               </div>
               <Bar pct={Math.round(d.correct / d.total * 100)} color={d.correct / d.total >= PASS / 100 ? C.ok : C.ng} />
@@ -185845,7 +185863,7 @@ function Exam({ onAnswer, t, onWrong }) {
           ) : wrong.map((a, idx) => (
             <div key={idx} style={{ padding: "8px 0", borderBottom: `1px solid ${C.light}`, fontSize: 13 }}>
               <div style={{ fontWeight: 600, marginBottom: 4 }}>
-                <span style={{ background: DOM_HUE[a.q.d], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5, marginRight: 6 }}>{a.q.d}</span>
+                <span style={{ background: DOM_HUE[a.q.d], color: nvInk("#ffffff", DOM_HUE[a.q.d]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5, marginRight: 6 }}>{a.q.d}</span>
                 {a.q.q}
               </div>
               {Array.isArray(a.q.o) && (Array.isArray(a.q.a) || a.q.multi) ? (
@@ -185881,7 +185899,7 @@ function Exam({ onAnswer, t, onWrong }) {
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
           {exhibits.map((e, i) => (
             <button key={e.id} onClick={() => setExTab(i)}
-              style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#8595ad", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{e.tab}</button>
+              style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{e.tab}</button>
           ))}
         </div>
         <div style={{ padding: 12 }}>
@@ -186132,7 +186150,7 @@ function Exam({ onAnswer, t, onWrong }) {
       <Bar pct={Math.round(((pos + 1) / qs.length) * 100)} color={C.primary} />
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginTop: 12 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d)}
         </div>
         {Q.exhibits && renderExhibits(Q.exhibits)}
@@ -186306,7 +186324,7 @@ function Diagrams({ t }) {
   );
   return (
     <div>
-      <div style={{ fontSize: 12, color: "#86a6b0", marginBottom: 10 }}>{t.diagIntro}</div>
+      <div style={{ fontSize: 12, color: "#53757f", marginBottom: 10 }}>{t.diagIntro}</div>
       <Section id="domains" title="① 5領域の出題比率"><DomainBars /><DomainDrillPanel domains={DOMAINS} lang={typeof lang === "undefined" ? "" : lang} sets={typeof DOMAIN_SETS !== "undefined" ? DOMAIN_SETS : (typeof SAA_DOMAIN_SETS !== "undefined" ? SAA_DOMAIN_SETS : null)} /></Section>
       <Section id="overview" title="② Power Platform 全体構成（タップで解説）"><Overview /></Section>
       <Section id="appchoice" title="③ アプリ形式の決定木（クイズ形式）"><AppDecision /></Section>
@@ -186370,7 +186388,7 @@ function AppDecision() {
   const leaf = leaves[cur];
   return (
     <div>
-      <div style={{ marginBottom: 10, fontSize: 12, color: "#86a6b0" }}>
+      <div style={{ marginBottom: 10, fontSize: 12, color: "#53757f" }}>
         {path.length > 0 && <button onClick={() => setPath(p => p.slice(0, -1))} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, padding: 0 }}>← 戻る</button>}
       </div>
       {!leaf && steps[cur] && (
@@ -186438,7 +186456,7 @@ function SecurityLadder() {
     <div>
       {items.map((it, i) => (
         <div key={i} onClick={() => setSel(sel === i ? null : i)} style={{ display: "flex", alignItems: "center", marginBottom: 8, cursor: "pointer" }}>
-          <div style={{ width: 26, fontSize: 11, color: "#86a6b0" }}>{i + 1}</div>
+          <div style={{ width: 26, fontSize: 11, color: "#53757f" }}>{i + 1}</div>
           <div style={{ flex: 1, background: colors[i], color: "#fff", borderRadius: 8, padding: "9px 12px", border: sel === i ? `2px solid ${C.ink}` : "2px solid transparent" }}>
             <span style={{ fontWeight: 700, fontSize: 13 }}>{it[0]}</span>
             <span style={{ fontSize: 11.5, marginLeft: 8, opacity: 0.9 }}>{it[1]}</span>
@@ -186495,7 +186513,7 @@ function DomainBars() {
       {DOMAINS.map(d => (
         <div key={d.id} onClick={() => setSel(sel === d.id ? null : d.id)} style={{ marginBottom: 10, cursor: "pointer" }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 3 }}>
-            <span><span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>{domName(d.id)}</span>
+            <span><span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>{domName(d.id)}</span>
             <strong>{d.pct}%</strong>
           </div>
           <div style={{ background: C.light, borderRadius: 6, height: 16, overflow: "hidden", border: sel === d.id ? `2px solid ${C.ink}` : "none" }}>
@@ -186618,7 +186636,7 @@ function Scenario({ t }) {
     <div style={{ display: "flex", gap: 6, alignItems: "center", marginBottom: 8, flexWrap: "wrap" }}>
       <span style={{ background: C.deep, color: "#fff", borderRadius: 4, padding: "1px 7px", fontSize: 11, fontWeight: 700 }}>{s.id}</span>
       <span style={{ background: s.type === "calc" ? "#3BB8D4" : DOM_HUE[s.d], color: "#fff", borderRadius: 4, padding: "1px 7px", fontSize: 10.5 }}>{typeLabel(s.type)}</span>
-      <span style={{ fontSize: 11, color: "#86a6b0" }}>{s.d} · {domName(s.d)}</span>
+      <span style={{ fontSize: 11, color: "#53757f" }}>{s.d} · {domName(s.d)}</span>
     </div>
   );
 
@@ -186626,7 +186644,7 @@ function Scenario({ t }) {
     <div>
       <Card title={t.scenarioTitle}>
         <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770" }}>{t.scenarioDesc}</div>
-        <div style={{ fontSize: 12, color: "#86a6b0", marginTop: 6 }}>{t.scenarioCount(SCENARIOS.length)}</div>
+        <div style={{ fontSize: 12, color: "#53757f", marginTop: 6 }}>{t.scenarioCount(SCENARIOS.length)}</div>
       </Card>
 
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
@@ -186648,7 +186666,7 @@ function Scenario({ t }) {
       {(() => {
         const idx = Math.min(cur, Math.max(0, list.length - 1));
         const s = list[idx];
-        if (!s) return <div style={{ fontSize: 13, color: "#86a6b0" }}>{t.noMatch || "該当なし"}</div>;
+        if (!s) return <div style={{ fontSize: 13, color: "#53757f" }}>{t.noMatch || "該当なし"}</div>;
         const card = (() => {
           if (s.type === "calc") {
             const isOpen = open[s.id];
@@ -186720,7 +186738,7 @@ function Compare({ t }) {
   const table = COMPARE[idx];
   return (
     <div>
-      <div style={{ fontSize: 12, color: "#86a6b0", marginBottom: 10 }}>{t.compareIntro}</div>
+      <div style={{ fontSize: 12, color: "#53757f", marginBottom: 10 }}>{t.compareIntro}</div>
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
         {COMPARE.map((c, i) => (
           <button key={i} onClick={() => setIdx(i)}
@@ -186741,7 +186759,7 @@ function Compare({ t }) {
           style={{ padding: "9px 16px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
           ← 前へ
         </button>
-        <span style={{ fontSize: 12, color: "#86a6b0", alignSelf: "center" }}>{idx + 1} / {COMPARE.length}</span>
+        <span style={{ fontSize: 12, color: "#53757f", alignSelf: "center" }}>{idx + 1} / {COMPARE.length}</span>
         <button onClick={() => setIdx(i => (i + 1) % COMPARE.length)}
           style={{ padding: "9px 16px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
           次へ →
@@ -186766,7 +186784,7 @@ function Confuse({ t }) {
           <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{t.judgeAxis}：{c[2]}</div>
         </div>
       ))}
-      {list.length === 0 && <div style={{ textAlign: "center", color: "#86a6b0", padding: 20 }}>{t.noMatch}</div>}
+      {list.length === 0 && <div style={{ textAlign: "center", color: "#53757f", padding: 20 }}>{t.noMatch}</div>}
     </div>
   );
 }
@@ -186797,12 +186815,12 @@ function Glossary({ t }) {
           <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
             <span style={{ background: DOM_HUE[g[0]], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{g[0]}</span>
             <span style={{ fontWeight: 700, fontSize: 14, color: C.deep }}>{g[1]}</span>
-            {g[2] !== "-" && <span style={{ fontSize: 11.5, color: "#86a6b0" }}>{g[2]}</span>}
+            {g[2] !== "-" && <span style={{ fontSize: 11.5, color: "#53757f" }}>{g[2]}</span>}
           </div>
           <div style={{ fontSize: 13, lineHeight: 1.5 }}>{g[3]}</div>
         </div>
       ))}
-      {list.length === 0 && <div style={{ textAlign: "center", color: "#86a6b0", padding: 20 }}>{t.noMatch}</div>}
+      {list.length === 0 && <div style={{ textAlign: "center", color: "#53757f", padding: 20 }}>{t.noMatch}</div>}
     </div>
   );
 }
@@ -187279,13 +187297,13 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <button onClick={onBack} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
         </div>
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 4 }}>{lang === "ja" ? "本試験形式ケース" : "Exam-style cases"}</div>
-        <div style={{ fontSize: 12, color: "#8595ad", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
+        <div style={{ fontSize: 12, color: "#5d6c83", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
         {clist.map((c, i) => (
           <button key={i} onClick={() => openCase(i)}
             style={{ width: "100%", textAlign: "left", padding: "14px 15px", marginBottom: 10, borderRadius: 11,
               border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep, lineHeight: 1.45, paddingRight: 10 }}><DoneCheck on={caseDone.has(i)} onToggle={(e) => caseDone.toggle(i, e)} />{g(c.title)}</span>
-            <span style={{ fontSize: 11.5, color: "#8595ad", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
+            <span style={{ fontSize: 11.5, color: "#5d6c83", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
           </button>
         ))}
       </div>
@@ -187319,7 +187337,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
         <button onClick={backToList} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
-        {!finished && <span style={{ fontSize: 12, color: "#8595ad" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
+        {!finished && <span style={{ fontSize: 12, color: "#5d6c83" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 12 }}>
@@ -187344,7 +187362,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <div style={{ textAlign: "center", marginBottom: 12 }}>
             <div style={{ fontSize: 13, color: "#5a6a85", fontWeight: 600, marginBottom: 6 }}>{lang === "ja" ? "ケース完了" : "Case complete"}</div>
             <div style={{ fontSize: 32, fontWeight: 800, color: rate >= PASS ? C.ok : C.ng }}>{rate}%</div>
-            <div style={{ fontSize: 12.5, color: "#8595ad", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
+            <div style={{ fontSize: 12.5, color: "#5d6c83", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
@@ -187369,7 +187387,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
             <div style={{ marginTop: 12 }}>
               {Q.options.map((opt, i) => (
                 <div key={i} style={{ background: opt.ok ? "#E6F4EC" : (i === sel ? "#FBEAE8" : C.light), borderRadius: 8, padding: "9px 11px", marginBottom: 6, fontSize: 12.5, lineHeight: 1.55 }}>
-                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#8595ad") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
+                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#5d6c83") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
                 </div>
               ))}
             </div>
@@ -187507,9 +187525,9 @@ function Home({ state, lang, t }) {
             <div key={d.id} style={{ marginBottom: 12 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
                 <span style={{ fontWeight: 600 }}>
-                  <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+                  <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
                   {domName(d.id, lang)}
-                  <span style={{ color: "#8499ad", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
+                  <span style={{ color: "#5a7288", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
                 </span>
                 <span style={{ color: "#5b6b7d" }}>{d.range} · {p.attempts ? `${rate}%` : t.notStarted}</span>
               </div>
@@ -187522,7 +187540,7 @@ function Home({ state, lang, t }) {
         <Card title={t.weakDomains}>
           {weak.slice(0, 3).map(d => (
             <div key={d.id} style={{ fontSize: 13, padding: "6px 0", borderBottom: `1px solid ${C.light}` }}>
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
               {domName(d.id, lang)} — <strong style={{ color: d.rate < PASS ? C.ng : C.ok }}>{d.rate}%</strong>
             </div>
           ))}
@@ -187537,7 +187555,7 @@ function Stat({ label, value, sub, color }) {
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
       <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
-      <div style={{ fontSize: 11, color: "#8499ad" }}>{sub}</div>
+      <div style={{ fontSize: 11, color: "#5a7288" }}>{sub}</div>
     </div>
   );
 }
@@ -187631,13 +187649,13 @@ function Quiz({ onAnswer, lang, t }) {
         {slot.meta && (
           <>
             <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
-            <span style={{ fontSize: 11, color: "#8499ad" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
+            <span style={{ fontSize: 11, color: "#5a7288" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
             <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
           </>
         )}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-        <span style={{ fontSize: 12.5, color: "#8499ad" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
+        <span style={{ fontSize: 12.5, color: "#5a7288" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
         <div style={{ display: "inline-flex", background: C.light, borderRadius: 20, padding: 4 }}>
           {[["seq", t.orderSeq], ["random", t.orderRandom]].map(([k, label]) => (
             <button key={k} onClick={() => setOrderMode(k)}
@@ -187661,7 +187679,7 @@ function Quiz({ onAnswer, lang, t }) {
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)}
         </div>
         <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, lineHeight: 1.5, display: "flex", alignItems: "flex-start", gap: 6 }}><span style={{ flex: 1 }}>{L(Q, "q", lang)}</span><StarButton id={"q#" + novaQHash(Q.q || Q.qEn || "")} text={Q.q || Q.qEn} scope={lang === "en" ? "Quiz" : "クイズ"} /></div>
@@ -187697,7 +187715,7 @@ function Quiz({ onAnswer, lang, t }) {
             color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {lang === "en" ? "← Previous" : "← 前の問題"}
         </button>
-        <span style={{ fontSize: 13, color: "#8499ad" }}>{pos + 1} / {poolCount}</span>
+        <span style={{ fontSize: 13, color: "#5a7288" }}>{pos + 1} / {poolCount}</span>
         <button onClick={goNext} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
       </div>
@@ -187871,7 +187889,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{en ? "Practice = instant explanations. Real = timed, official exam UI, scored at the end." : "演習モード＝即時解説。本番モード＝時間制・公式試験UI・終了後に採点。"}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", en ? "Practice" : "演習モード"], ["real", en ? "Real (exam UI)" : "本番モード"]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#86a6b0", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
@@ -187883,7 +187901,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         {kind === "domain" && DOMAINS.map(d => (
           <button key={d.id} onClick={() => start(d.id)} style={{ width: "100%", textAlign: "left", padding: "15px 16px", marginBottom: 10, borderRadius: 11, border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 10 }}><DoneCheck on={mockDone.has(d.id)} onToggle={(e) => mockDone.toggle(d.id, e)} />
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
               <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep }}>{en ? d.nameEn : d.name}</span>
             </span>
             <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary }}>{en ? "Start" : "開始"}</span>
@@ -187957,7 +187975,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
             <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
           </>)}
-        </div>); }) : <div style={{ fontSize: 12, color: "#8595ad", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
+        </div>); }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
     </div>);
   };
 
@@ -187970,7 +187988,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
-          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#8595ad", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
+          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
@@ -188194,9 +188212,9 @@ function Review({ lang, t, onAnswer }) {
         {list.map((it, i) => (
           <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 12, marginBottom: 9 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
-              <span style={{ background: DOM_HUE[it.q.d], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
+              <span style={{ background: DOM_HUE[it.q.d], color: nvInk("#ffffff", DOM_HUE[it.q.d]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
               <span style={{ fontSize: 10.5, color: C.ng, fontWeight: 700 }}>{t.reviewMiss(it.miss)}</span>
-              <span style={{ fontSize: 10.5, color: "#8499ad" }}>{t.reviewSource}</span>
+              <span style={{ fontSize: 10.5, color: "#5a7288" }}>{t.reviewSource}</span>
             </div>
             <div style={{ fontSize: 13, lineHeight: 1.5 }}>{L(it.q, "q", lang)}</div>
           </div>
@@ -188242,7 +188260,7 @@ function Review({ lang, t, onAnswer }) {
         <span style={{ fontSize: 12, color: "#5b6b7d" }}>{lang === "en" ? "Left" : "残り"} {remaining}{t.questionsUnit}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)} · {t.reviewMiss(entry.miss)}
         </div>
         <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{L(Q, "q", lang)}</div>
@@ -188296,7 +188314,7 @@ function Diagrams({ lang, t }) {
   return (
     <div>
       {CERT_FLOWS["AB-620"] ? <FlowSection flows={CERT_FLOWS["AB-620"]} lang={lang} doneKey={STORE_KEY} terms={typeof GLOSSARY !== "undefined" ? GLOSSARY : null} /> : null}
-      <div style={{ fontSize: 12, color: "#8499ad", marginBottom: 10 }}>{t.diagIntro}</div>
+      <div style={{ fontSize: 12, color: "#5a7288", marginBottom: 10 }}>{t.diagIntro}</div>
       <Section id="weights" cat={t.diagCat.concept} title={en ? "Exam weight by domain" : "ドメインの出題比率"}><DomainBars lang={lang} /><DomainDrillPanel domains={DOMAINS} lang={typeof lang === "undefined" ? "" : lang} sets={typeof DOMAIN_SETS !== "undefined" ? DOMAIN_SETS : (typeof SAA_DOMAIN_SETS !== "undefined" ? SAA_DOMAIN_SETS : null)} /></Section>
       <Section id="cstree" cat={t.diagCat.hier} title={en?"Copilot Studio structure (expandable tree)":"Copilot Studioの構成（展開ツリー）"}><InteractiveTree data={en?CS_TREE_EN:CS_TREE} /></Section>
       <Section id="multiagent" cat={t.diagCat.hier} title={en?"Multi-agent orchestration (tap)":"マルチエージェント連携（オーケストレーターと子）"}><MultiAgent lang={lang} /></Section>
@@ -188323,7 +188341,7 @@ function DomainBars({ lang }) {
       {DOMAINS.map(d => (
         <div key={d.id} onClick={() => setSel(sel === d.id ? null : d.id)} style={{ marginBottom: 10, cursor: "pointer" }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 3, color: C.ink }}>
-            <span><span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6, fontWeight: 700 }}>{d.id}</span>{domName(d.id, lang)}</span>
+            <span><span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6, fontWeight: 700 }}>{d.id}</span>{domName(d.id, lang)}</span>
             <strong>{d.range}</strong>
           </div>
           <div style={{ background: C.light, borderRadius: 6, height: 18, overflow: "hidden", border: sel === d.id ? `2px solid ${C.ink}` : "none" }}>
@@ -188351,7 +188369,7 @@ function ConnMeans({ lang }) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
         {items.map(it => (
           <div key={it.k} onClick={() => setSel(sel === it.k ? null : it.k)}
-            style={{ background: it.hue, color: "#fff", borderRadius: 9, padding: "12px 10px", cursor: "pointer",
+            style={{ background: it.hue, color: nvInk("#ffffff", it.hue), borderRadius: 9, padding: "12px 10px", cursor: "pointer",
               border: sel === it.k ? `3px solid ${C.ink}` : "3px solid transparent", textAlign: "center", fontWeight: 700, fontSize: 13 }}>
             {it.t}
           </div>
@@ -188504,7 +188522,7 @@ function IntegrationTree({ lang }) {
   const leaf = leaves[cur];
   return (
     <div>
-      <div style={{ marginBottom: 10, fontSize: 12, color: "#8499ad" }}>
+      <div style={{ marginBottom: 10, fontSize: 12, color: "#5a7288" }}>
         {path.length > 0 && <button onClick={() => setPath(p => p.slice(0, -1))} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, padding: 0 }}>{en?"← Back":"← 戻る"}</button>}
       </div>
       {!leaf && steps[cur] && (
@@ -188708,7 +188726,7 @@ function Confuse({ lang, t }) {
           <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{t.judgeAxis}：{lang === "en" && c[5] ? c[5] : c[2]}</div>
         </div>
       ))}
-      {list.length === 0 && <div style={{ textAlign: "center", color: "#8499ad", padding: 20 }}>{t.noMatch}</div>}
+      {list.length === 0 && <div style={{ textAlign: "center", color: "#5a7288", padding: 20 }}>{t.noMatch}</div>}
     </div>
   );
 }
@@ -189577,13 +189595,13 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <button onClick={onBack} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
         </div>
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 4 }}>{lang === "ja" ? "本試験形式ケース" : "Exam-style cases"}</div>
-        <div style={{ fontSize: 12, color: "#8595ad", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
+        <div style={{ fontSize: 12, color: "#5d6c83", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
         {clist.map((c, i) => (
           <button key={i} onClick={() => openCase(i)}
             style={{ width: "100%", textAlign: "left", padding: "14px 15px", marginBottom: 10, borderRadius: 11,
               border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep, lineHeight: 1.45, paddingRight: 10 }}><DoneCheck on={caseDone.has(i)} onToggle={(e) => caseDone.toggle(i, e)} />{g(c.title)}</span>
-            <span style={{ fontSize: 11.5, color: "#8595ad", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
+            <span style={{ fontSize: 11.5, color: "#5d6c83", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
           </button>
         ))}
       </div>
@@ -189617,7 +189635,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
         <button onClick={backToList} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
-        {!finished && <span style={{ fontSize: 12, color: "#8595ad" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
+        {!finished && <span style={{ fontSize: 12, color: "#5d6c83" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 12 }}>
@@ -189642,7 +189660,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <div style={{ textAlign: "center", marginBottom: 12 }}>
             <div style={{ fontSize: 13, color: "#5a6a85", fontWeight: 600, marginBottom: 6 }}>{lang === "ja" ? "ケース完了" : "Case complete"}</div>
             <div style={{ fontSize: 32, fontWeight: 800, color: rate >= PASS ? C.ok : C.ng }}>{rate}%</div>
-            <div style={{ fontSize: 12.5, color: "#8595ad", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
+            <div style={{ fontSize: 12.5, color: "#5d6c83", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
@@ -189667,7 +189685,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
             <div style={{ marginTop: 12 }}>
               {Q.options.map((opt, i) => (
                 <div key={i} style={{ background: opt.ok ? "#E6F4EC" : (i === sel ? "#FBEAE8" : C.light), borderRadius: 8, padding: "9px 11px", marginBottom: 6, fontSize: 12.5, lineHeight: 1.55 }}>
-                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#8595ad") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
+                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#5d6c83") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
                 </div>
               ))}
             </div>
@@ -189805,9 +189823,9 @@ function Home({ state, lang, t }) {
             <div key={d.id} style={{ marginBottom: 12 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
                 <span style={{ fontWeight: 600 }}>
-                  <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+                  <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
                   {domName(d.id, lang)}
-                  <span style={{ color: "#8499ad", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
+                  <span style={{ color: "#5a7288", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
                 </span>
                 <span style={{ color: "#5b6b7d" }}>{d.range} · {p.attempts ? `${rate}%` : t.notStarted}</span>
               </div>
@@ -189820,7 +189838,7 @@ function Home({ state, lang, t }) {
         <Card title={t.weakDomains}>
           {weak.slice(0, 3).map(d => (
             <div key={d.id} style={{ fontSize: 13, padding: "6px 0", borderBottom: `1px solid ${C.light}` }}>
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
               {domName(d.id, lang)} — <strong style={{ color: d.rate < PASS ? C.ng : C.ok }}>{d.rate}%</strong>
             </div>
           ))}
@@ -189835,7 +189853,7 @@ function Stat({ label, value, sub, color }) {
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
       <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
-      <div style={{ fontSize: 11, color: "#8499ad" }}>{sub}</div>
+      <div style={{ fontSize: 11, color: "#5a7288" }}>{sub}</div>
     </div>
   );
 }
@@ -189929,13 +189947,13 @@ function Quiz({ onAnswer, lang, t }) {
         {slot.meta && (
           <>
             <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
-            <span style={{ fontSize: 11, color: "#8499ad" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
+            <span style={{ fontSize: 11, color: "#5a7288" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
             <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
           </>
         )}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-        <span style={{ fontSize: 12.5, color: "#8499ad" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
+        <span style={{ fontSize: 12.5, color: "#5a7288" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
         <div style={{ display: "inline-flex", background: C.light, borderRadius: 20, padding: 4 }}>
           {[["seq", t.orderSeq], ["random", t.orderRandom]].map(([k, label]) => (
             <button key={k} onClick={() => setOrderMode(k)}
@@ -189959,7 +189977,7 @@ function Quiz({ onAnswer, lang, t }) {
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)}
         </div>
         <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, lineHeight: 1.5, display: "flex", alignItems: "flex-start", gap: 6 }}><span style={{ flex: 1 }}>{L(Q, "q", lang)}</span><StarButton id={"q#" + novaQHash(Q.q || Q.qEn || "")} text={Q.q || Q.qEn} scope={lang === "en" ? "Quiz" : "クイズ"} /></div>
@@ -189995,7 +190013,7 @@ function Quiz({ onAnswer, lang, t }) {
             color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {lang === "en" ? "← Previous" : "← 前の問題"}
         </button>
-        <span style={{ fontSize: 13, color: "#8499ad" }}>{pos + 1} / {poolCount}</span>
+        <span style={{ fontSize: 13, color: "#5a7288" }}>{pos + 1} / {poolCount}</span>
         <button onClick={goNext} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
       </div>
@@ -190169,7 +190187,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{en ? "Practice = instant explanations. Real = timed, official exam UI, scored at the end." : "演習モード＝即時解説。本番モード＝時間制・公式試験UI・終了後に採点。"}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", en ? "Practice" : "演習モード"], ["real", en ? "Real (exam UI)" : "本番モード"]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#86a6b0", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
@@ -190181,7 +190199,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         {kind === "domain" && DOMAINS.map(d => (
           <button key={d.id} onClick={() => start(d.id)} style={{ width: "100%", textAlign: "left", padding: "15px 16px", marginBottom: 10, borderRadius: 11, border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 10 }}><DoneCheck on={mockDone.has(d.id)} onToggle={(e) => mockDone.toggle(d.id, e)} />
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
               <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep }}>{en ? d.nameEn : d.name}</span>
             </span>
             <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary }}>{en ? "Start" : "開始"}</span>
@@ -190255,7 +190273,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
             <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
           </>)}
-        </div>); }) : <div style={{ fontSize: 12, color: "#8595ad", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
+        </div>); }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
     </div>);
   };
 
@@ -190268,7 +190286,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
-          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#8595ad", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
+          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
@@ -190492,9 +190510,9 @@ function Review({ lang, t, onAnswer }) {
         {list.map((it, i) => (
           <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 12, marginBottom: 9 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
-              <span style={{ background: DOM_HUE[it.q.d], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
+              <span style={{ background: DOM_HUE[it.q.d], color: nvInk("#ffffff", DOM_HUE[it.q.d]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
               <span style={{ fontSize: 10.5, color: C.ng, fontWeight: 700 }}>{t.reviewMiss(it.miss)}</span>
-              <span style={{ fontSize: 10.5, color: "#8499ad" }}>{t.reviewSource}</span>
+              <span style={{ fontSize: 10.5, color: "#5a7288" }}>{t.reviewSource}</span>
             </div>
             <div style={{ fontSize: 13, lineHeight: 1.5 }}>{L(it.q, "q", lang)}</div>
           </div>
@@ -190540,7 +190558,7 @@ function Review({ lang, t, onAnswer }) {
         <span style={{ fontSize: 12, color: "#5b6b7d" }}>{lang === "en" ? "Left" : "残り"} {remaining}{t.questionsUnit}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)} · {t.reviewMiss(entry.miss)}
         </div>
         <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{L(Q, "q", lang)}</div>
@@ -190704,12 +190722,12 @@ function Diagrams({ lang, t }) {
   return (
     <div>
       {CERT_FLOWS["DP-900"] ? <FlowSection flows={CERT_FLOWS["DP-900"]} lang={lang} doneKey={STORE_KEY} terms={typeof GLOSSARY !== "undefined" ? GLOSSARY : null} /> : null}
-      <div style={{ fontSize: 12, color: "#8499ad", marginBottom: 10 }}>{t.diagIntro}</div>
+      <div style={{ fontSize: 12, color: "#5a7288", marginBottom: 10 }}>{t.diagIntro}</div>
       <Section id="weights" cat={t.diagCat.concept} title={en ? "Exam weight by domain" : "\u30c9\u30e1\u30a4\u30f3\u306e\u51fa\u984c\u6bd4\u7387"}>
         {DOMAINS.map(d => (
           <div key={d.id} style={{ marginBottom: 10 }}>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 3, color: C.ink }}>
-              <span><span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6, fontWeight: 700 }}>{d.id}</span>{domName(d.id, lang)}</span>
+              <span><span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6, fontWeight: 700 }}>{d.id}</span>{domName(d.id, lang)}</span>
               <strong>{d.range}</strong>
             </div>
             <div style={{ background: C.light, borderRadius: 6, height: 18, overflow: "hidden" }}>
@@ -190742,7 +190760,7 @@ function DomainBars({ lang }) {
       {DOMAINS.map(d => (
         <div key={d.id} onClick={() => setSel(sel === d.id ? null : d.id)} style={{ marginBottom: 10, cursor: "pointer" }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 3, color: C.ink }}>
-            <span><span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6, fontWeight: 700 }}>{d.id}</span>{domName(d.id, lang)}</span>
+            <span><span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6, fontWeight: 700 }}>{d.id}</span>{domName(d.id, lang)}</span>
             <strong>{d.range}</strong>
           </div>
           <div style={{ background: C.light, borderRadius: 6, height: 18, overflow: "hidden", border: sel === d.id ? `2px solid ${C.ink}` : "none" }}>
@@ -190770,7 +190788,7 @@ function ConnMeans({ lang }) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
         {items.map(it => (
           <div key={it.k} onClick={() => setSel(sel === it.k ? null : it.k)}
-            style={{ background: it.hue, color: "#fff", borderRadius: 9, padding: "12px 10px", cursor: "pointer",
+            style={{ background: it.hue, color: nvInk("#ffffff", it.hue), borderRadius: 9, padding: "12px 10px", cursor: "pointer",
               border: sel === it.k ? `3px solid ${C.ink}` : "3px solid transparent", textAlign: "center", fontWeight: 700, fontSize: 13 }}>
             {it.t}
           </div>
@@ -190923,7 +190941,7 @@ function IntegrationTree({ lang }) {
   const leaf = leaves[cur];
   return (
     <div>
-      <div style={{ marginBottom: 10, fontSize: 12, color: "#8499ad" }}>
+      <div style={{ marginBottom: 10, fontSize: 12, color: "#5a7288" }}>
         {path.length > 0 && <button onClick={() => setPath(p => p.slice(0, -1))} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, padding: 0 }}>{en?"← Back":"← 戻る"}</button>}
       </div>
       {!leaf && steps[cur] && (
@@ -191071,7 +191089,7 @@ function Confuse({ lang, t }) {
           <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{t.judgeAxis}：{lang === "en" && c[5] ? c[5] : c[2]}</div>
         </div>
       ))}
-      {list.length === 0 && <div style={{ textAlign: "center", color: "#8499ad", padding: 20 }}>{t.noMatch}</div>}
+      {list.length === 0 && <div style={{ textAlign: "center", color: "#5a7288", padding: 20 }}>{t.noMatch}</div>}
     </div>
   );
 }
@@ -191398,13 +191416,13 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <button onClick={onBack} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
         </div>
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 4 }}>{lang === "ja" ? "本試験形式ケース" : "Exam-style cases"}</div>
-        <div style={{ fontSize: 12, color: "#8595ad", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
+        <div style={{ fontSize: 12, color: "#5d6c83", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
         {clist.map((c, i) => (
           <button key={i} onClick={() => openCase(i)}
             style={{ width: "100%", textAlign: "left", padding: "14px 15px", marginBottom: 10, borderRadius: 11,
               border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep, lineHeight: 1.45, paddingRight: 10 }}><DoneCheck on={caseDone.has(i)} onToggle={(e) => caseDone.toggle(i, e)} />{g(c.title)}</span>
-            <span style={{ fontSize: 11.5, color: "#8595ad", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
+            <span style={{ fontSize: 11.5, color: "#5d6c83", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
           </button>
         ))}
       </div>
@@ -191438,7 +191456,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
         <button onClick={backToList} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
-        {!finished && <span style={{ fontSize: 12, color: "#8595ad" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
+        {!finished && <span style={{ fontSize: 12, color: "#5d6c83" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 12 }}>
@@ -191463,7 +191481,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <div style={{ textAlign: "center", marginBottom: 12 }}>
             <div style={{ fontSize: 13, color: "#5a6a85", fontWeight: 600, marginBottom: 6 }}>{lang === "ja" ? "ケース完了" : "Case complete"}</div>
             <div style={{ fontSize: 32, fontWeight: 800, color: rate >= PASS ? C.ok : C.ng }}>{rate}%</div>
-            <div style={{ fontSize: 12.5, color: "#8595ad", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
+            <div style={{ fontSize: 12.5, color: "#5d6c83", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
@@ -191488,7 +191506,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
             <div style={{ marginTop: 12 }}>
               {Q.options.map((opt, i) => (
                 <div key={i} style={{ background: opt.ok ? "#E6F4EC" : (i === sel ? "#FBEAE8" : C.light), borderRadius: 8, padding: "9px 11px", marginBottom: 6, fontSize: 12.5, lineHeight: 1.55 }}>
-                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#8595ad") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
+                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#5d6c83") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
                 </div>
               ))}
             </div>
@@ -191626,9 +191644,9 @@ function Home({ state, lang, t }) {
             <div key={d.id} style={{ marginBottom: 12 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
                 <span style={{ fontWeight: 600 }}>
-                  <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+                  <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
                   {domName(d.id, lang)}
-                  <span style={{ color: "#8499ad", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
+                  <span style={{ color: "#5a7288", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
                 </span>
                 <span style={{ color: "#5b6b7d" }}>{d.range} · {p.attempts ? `${rate}%` : t.notStarted}</span>
               </div>
@@ -191641,7 +191659,7 @@ function Home({ state, lang, t }) {
         <Card title={t.weakDomains}>
           {weak.slice(0, 3).map(d => (
             <div key={d.id} style={{ fontSize: 13, padding: "6px 0", borderBottom: `1px solid ${C.light}` }}>
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
               {domName(d.id, lang)} — <strong style={{ color: d.rate < PASS ? C.ng : C.ok }}>{d.rate}%</strong>
             </div>
           ))}
@@ -191656,7 +191674,7 @@ function Stat({ label, value, sub, color }) {
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
       <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
-      <div style={{ fontSize: 11, color: "#8499ad" }}>{sub}</div>
+      <div style={{ fontSize: 11, color: "#5a7288" }}>{sub}</div>
     </div>
   );
 }
@@ -191750,13 +191768,13 @@ function Quiz({ onAnswer, lang, t }) {
         {slot.meta && (
           <>
             <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
-            <span style={{ fontSize: 11, color: "#8499ad" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
+            <span style={{ fontSize: 11, color: "#5a7288" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
             <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
           </>
         )}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-        <span style={{ fontSize: 12.5, color: "#8499ad" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
+        <span style={{ fontSize: 12.5, color: "#5a7288" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
         <div style={{ display: "inline-flex", background: C.light, borderRadius: 20, padding: 4 }}>
           {[["seq", t.orderSeq], ["random", t.orderRandom]].map(([k, label]) => (
             <button key={k} onClick={() => setOrderMode(k)}
@@ -191780,7 +191798,7 @@ function Quiz({ onAnswer, lang, t }) {
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)}
         </div>
         <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, lineHeight: 1.5, display: "flex", alignItems: "flex-start", gap: 6 }}><span style={{ flex: 1 }}>{L(Q, "q", lang)}</span><StarButton id={"q#" + novaQHash(Q.q || Q.qEn || "")} text={Q.q || Q.qEn} scope={lang === "en" ? "Quiz" : "クイズ"} /></div>
@@ -191816,7 +191834,7 @@ function Quiz({ onAnswer, lang, t }) {
             color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {lang === "en" ? "← Previous" : "← 前の問題"}
         </button>
-        <span style={{ fontSize: 13, color: "#8499ad" }}>{pos + 1} / {poolCount}</span>
+        <span style={{ fontSize: 13, color: "#5a7288" }}>{pos + 1} / {poolCount}</span>
         <button onClick={goNext} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
       </div>
@@ -191990,7 +192008,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{en ? "Practice = instant explanations. Real = timed, official exam UI, scored at the end." : "演習モード＝即時解説。本番モード＝時間制・公式試験UI・終了後に採点。"}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", en ? "Practice" : "演習モード"], ["real", en ? "Real (exam UI)" : "本番モード"]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#86a6b0", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
@@ -192002,7 +192020,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         {kind === "domain" && DOMAINS.map(d => (
           <button key={d.id} onClick={() => start(d.id)} style={{ width: "100%", textAlign: "left", padding: "15px 16px", marginBottom: 10, borderRadius: 11, border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 10 }}><DoneCheck on={mockDone.has(d.id)} onToggle={(e) => mockDone.toggle(d.id, e)} />
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
               <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep }}>{en ? d.nameEn : d.name}</span>
             </span>
             <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary }}>{en ? "Start" : "開始"}</span>
@@ -192076,7 +192094,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
             <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
           </>)}
-        </div>); }) : <div style={{ fontSize: 12, color: "#8595ad", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
+        </div>); }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
     </div>);
   };
 
@@ -192089,7 +192107,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
-          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#8595ad", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
+          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
@@ -192313,9 +192331,9 @@ function Review({ lang, t, onAnswer }) {
         {list.map((it, i) => (
           <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 12, marginBottom: 9 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
-              <span style={{ background: DOM_HUE[it.q.d], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
+              <span style={{ background: DOM_HUE[it.q.d], color: nvInk("#ffffff", DOM_HUE[it.q.d]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
               <span style={{ fontSize: 10.5, color: C.ng, fontWeight: 700 }}>{t.reviewMiss(it.miss)}</span>
-              <span style={{ fontSize: 10.5, color: "#8499ad" }}>{t.reviewSource}</span>
+              <span style={{ fontSize: 10.5, color: "#5a7288" }}>{t.reviewSource}</span>
             </div>
             <div style={{ fontSize: 13, lineHeight: 1.5 }}>{L(it.q, "q", lang)}</div>
           </div>
@@ -192361,7 +192379,7 @@ function Review({ lang, t, onAnswer }) {
         <span style={{ fontSize: 12, color: "#5b6b7d" }}>{lang === "en" ? "Left" : "残り"} {remaining}{t.questionsUnit}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)} · {t.reviewMiss(entry.miss)}
         </div>
         <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{L(Q, "q", lang)}</div>
@@ -192499,12 +192517,12 @@ function Diagrams({ lang, t }) {
   return (
     <div>
       {CERT_FLOWS["SC-500"] ? <FlowSection flows={CERT_FLOWS["SC-500"]} lang={lang} doneKey={STORE_KEY} terms={typeof GLOSSARY !== "undefined" ? GLOSSARY : null} /> : null}
-      <div style={{ fontSize: 12, color: "#8499ad", marginBottom: 10 }}>{t.diagIntro}</div>
+      <div style={{ fontSize: 12, color: "#5a7288", marginBottom: 10 }}>{t.diagIntro}</div>
       <Section id="weights" cat={t.diagCat.concept} title={en ? "Exam weight by domain" : "\u30c9\u30e1\u30a4\u30f3\u306e\u51fa\u984c\u6bd4\u7387"}>
         {DOMAINS.map(d => (
           <div key={d.id} style={{ marginBottom: 10 }}>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 3, color: C.ink }}>
-              <span><span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6, fontWeight: 700 }}>{d.id}</span>{domName(d.id, lang)}</span>
+              <span><span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6, fontWeight: 700 }}>{d.id}</span>{domName(d.id, lang)}</span>
               <strong>{d.range}</strong>
             </div>
             <div style={{ background: C.light, borderRadius: 6, height: 18, overflow: "hidden" }}>
@@ -192536,7 +192554,7 @@ function DomainBars({ lang }) {
       {DOMAINS.map(d => (
         <div key={d.id} onClick={() => setSel(sel === d.id ? null : d.id)} style={{ marginBottom: 10, cursor: "pointer" }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 3, color: C.ink }}>
-            <span><span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6, fontWeight: 700 }}>{d.id}</span>{domName(d.id, lang)}</span>
+            <span><span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6, fontWeight: 700 }}>{d.id}</span>{domName(d.id, lang)}</span>
             <strong>{d.range}</strong>
           </div>
           <div style={{ background: C.light, borderRadius: 6, height: 18, overflow: "hidden", border: sel === d.id ? `2px solid ${C.ink}` : "none" }}>
@@ -192564,7 +192582,7 @@ function ConnMeans({ lang }) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
         {items.map(it => (
           <div key={it.k} onClick={() => setSel(sel === it.k ? null : it.k)}
-            style={{ background: it.hue, color: "#fff", borderRadius: 9, padding: "12px 10px", cursor: "pointer",
+            style={{ background: it.hue, color: nvInk("#ffffff", it.hue), borderRadius: 9, padding: "12px 10px", cursor: "pointer",
               border: sel === it.k ? `3px solid ${C.ink}` : "3px solid transparent", textAlign: "center", fontWeight: 700, fontSize: 13 }}>
             {it.t}
           </div>
@@ -192717,7 +192735,7 @@ function IntegrationTree({ lang }) {
   const leaf = leaves[cur];
   return (
     <div>
-      <div style={{ marginBottom: 10, fontSize: 12, color: "#8499ad" }}>
+      <div style={{ marginBottom: 10, fontSize: 12, color: "#5a7288" }}>
         {path.length > 0 && <button onClick={() => setPath(p => p.slice(0, -1))} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, padding: 0 }}>{en?"← Back":"← 戻る"}</button>}
       </div>
       {!leaf && steps[cur] && (
@@ -192865,7 +192883,7 @@ function Confuse({ lang, t }) {
           <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{t.judgeAxis}：{lang === "en" && c[5] ? c[5] : c[2]}</div>
         </div>
       ))}
-      {list.length === 0 && <div style={{ textAlign: "center", color: "#8499ad", padding: 20 }}>{t.noMatch}</div>}
+      {list.length === 0 && <div style={{ textAlign: "center", color: "#5a7288", padding: 20 }}>{t.noMatch}</div>}
     </div>
   );
 }
@@ -193192,13 +193210,13 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <button onClick={onBack} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
         </div>
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 4 }}>{lang === "ja" ? "本試験形式ケース" : "Exam-style cases"}</div>
-        <div style={{ fontSize: 12, color: "#8595ad", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
+        <div style={{ fontSize: 12, color: "#5d6c83", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
         {clist.map((c, i) => (
           <button key={i} onClick={() => openCase(i)}
             style={{ width: "100%", textAlign: "left", padding: "14px 15px", marginBottom: 10, borderRadius: 11,
               border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep, lineHeight: 1.45, paddingRight: 10 }}><DoneCheck on={caseDone.has(i)} onToggle={(e) => caseDone.toggle(i, e)} />{g(c.title)}</span>
-            <span style={{ fontSize: 11.5, color: "#8595ad", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
+            <span style={{ fontSize: 11.5, color: "#5d6c83", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
           </button>
         ))}
       </div>
@@ -193232,7 +193250,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
         <button onClick={backToList} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
-        {!finished && <span style={{ fontSize: 12, color: "#8595ad" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
+        {!finished && <span style={{ fontSize: 12, color: "#5d6c83" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 12 }}>
@@ -193257,7 +193275,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <div style={{ textAlign: "center", marginBottom: 12 }}>
             <div style={{ fontSize: 13, color: "#5a6a85", fontWeight: 600, marginBottom: 6 }}>{lang === "ja" ? "ケース完了" : "Case complete"}</div>
             <div style={{ fontSize: 32, fontWeight: 800, color: rate >= PASS ? C.ok : C.ng }}>{rate}%</div>
-            <div style={{ fontSize: 12.5, color: "#8595ad", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
+            <div style={{ fontSize: 12.5, color: "#5d6c83", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
@@ -193282,7 +193300,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
             <div style={{ marginTop: 12 }}>
               {Q.options.map((opt, i) => (
                 <div key={i} style={{ background: opt.ok ? "#E6F4EC" : (i === sel ? "#FBEAE8" : C.light), borderRadius: 8, padding: "9px 11px", marginBottom: 6, fontSize: 12.5, lineHeight: 1.55 }}>
-                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#8595ad") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
+                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#5d6c83") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
                 </div>
               ))}
             </div>
@@ -193420,9 +193438,9 @@ function Home({ state, lang, t }) {
             <div key={d.id} style={{ marginBottom: 12 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
                 <span style={{ fontWeight: 600 }}>
-                  <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+                  <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
                   {domName(d.id, lang)}
-                  <span style={{ color: "#8499ad", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
+                  <span style={{ color: "#5a7288", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
                 </span>
                 <span style={{ color: "#5b6b7d" }}>{d.range} · {p.attempts ? `${rate}%` : t.notStarted}</span>
               </div>
@@ -193435,7 +193453,7 @@ function Home({ state, lang, t }) {
         <Card title={t.weakDomains}>
           {weak.slice(0, 3).map(d => (
             <div key={d.id} style={{ fontSize: 13, padding: "6px 0", borderBottom: `1px solid ${C.light}` }}>
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
               {domName(d.id, lang)} — <strong style={{ color: d.rate < PASS ? C.ng : C.ok }}>{d.rate}%</strong>
             </div>
           ))}
@@ -193450,7 +193468,7 @@ function Stat({ label, value, sub, color }) {
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
       <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
-      <div style={{ fontSize: 11, color: "#8499ad" }}>{sub}</div>
+      <div style={{ fontSize: 11, color: "#5a7288" }}>{sub}</div>
     </div>
   );
 }
@@ -193544,13 +193562,13 @@ function Quiz({ onAnswer, lang, t }) {
         {slot.meta && (
           <>
             <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
-            <span style={{ fontSize: 11, color: "#8499ad" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
+            <span style={{ fontSize: 11, color: "#5a7288" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
             <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
           </>
         )}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-        <span style={{ fontSize: 12.5, color: "#8499ad" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
+        <span style={{ fontSize: 12.5, color: "#5a7288" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
         <div style={{ display: "inline-flex", background: C.light, borderRadius: 20, padding: 4 }}>
           {[["seq", t.orderSeq], ["random", t.orderRandom]].map(([k, label]) => (
             <button key={k} onClick={() => setOrderMode(k)}
@@ -193574,7 +193592,7 @@ function Quiz({ onAnswer, lang, t }) {
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)}
         </div>
         <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, lineHeight: 1.5, display: "flex", alignItems: "flex-start", gap: 6 }}><span style={{ flex: 1 }}>{L(Q, "q", lang)}</span><StarButton id={"q#" + novaQHash(Q.q || Q.qEn || "")} text={Q.q || Q.qEn} scope={lang === "en" ? "Quiz" : "クイズ"} /></div>
@@ -193610,7 +193628,7 @@ function Quiz({ onAnswer, lang, t }) {
             color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {lang === "en" ? "← Previous" : "← 前の問題"}
         </button>
-        <span style={{ fontSize: 13, color: "#8499ad" }}>{pos + 1} / {poolCount}</span>
+        <span style={{ fontSize: 13, color: "#5a7288" }}>{pos + 1} / {poolCount}</span>
         <button onClick={goNext} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
       </div>
@@ -193784,7 +193802,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{en ? "Practice = instant explanations. Real = timed, official exam UI, scored at the end." : "演習モード＝即時解説。本番モード＝時間制・公式試験UI・終了後に採点。"}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", en ? "Practice" : "演習モード"], ["real", en ? "Real (exam UI)" : "本番モード"]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#86a6b0", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
@@ -193796,7 +193814,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         {kind === "domain" && DOMAINS.map(d => (
           <button key={d.id} onClick={() => start(d.id)} style={{ width: "100%", textAlign: "left", padding: "15px 16px", marginBottom: 10, borderRadius: 11, border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 10 }}><DoneCheck on={mockDone.has(d.id)} onToggle={(e) => mockDone.toggle(d.id, e)} />
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
               <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep }}>{en ? d.nameEn : d.name}</span>
             </span>
             <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary }}>{en ? "Start" : "開始"}</span>
@@ -193870,7 +193888,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
             <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
           </>)}
-        </div>); }) : <div style={{ fontSize: 12, color: "#8595ad", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
+        </div>); }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
     </div>);
   };
 
@@ -193883,7 +193901,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
-          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#8595ad", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
+          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
@@ -194107,9 +194125,9 @@ function Review({ lang, t, onAnswer }) {
         {list.map((it, i) => (
           <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 12, marginBottom: 9 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
-              <span style={{ background: DOM_HUE[it.q.d], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
+              <span style={{ background: DOM_HUE[it.q.d], color: nvInk("#ffffff", DOM_HUE[it.q.d]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
               <span style={{ fontSize: 10.5, color: C.ng, fontWeight: 700 }}>{t.reviewMiss(it.miss)}</span>
-              <span style={{ fontSize: 10.5, color: "#8499ad" }}>{t.reviewSource}</span>
+              <span style={{ fontSize: 10.5, color: "#5a7288" }}>{t.reviewSource}</span>
             </div>
             <div style={{ fontSize: 13, lineHeight: 1.5 }}>{L(it.q, "q", lang)}</div>
           </div>
@@ -194155,7 +194173,7 @@ function Review({ lang, t, onAnswer }) {
         <span style={{ fontSize: 12, color: "#5b6b7d" }}>{lang === "en" ? "Left" : "残り"} {remaining}{t.questionsUnit}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)} · {t.reviewMiss(entry.miss)}
         </div>
         <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{L(Q, "q", lang)}</div>
@@ -194293,12 +194311,12 @@ function Diagrams({ lang, t }) {
   return (
     <div>
       {CERT_FLOWS["SC-900"] ? <FlowSection flows={CERT_FLOWS["SC-900"]} lang={lang} doneKey={STORE_KEY} terms={typeof GLOSSARY !== "undefined" ? GLOSSARY : null} /> : null}
-      <div style={{ fontSize: 12, color: "#8499ad", marginBottom: 10 }}>{t.diagIntro}</div>
+      <div style={{ fontSize: 12, color: "#5a7288", marginBottom: 10 }}>{t.diagIntro}</div>
       <Section id="weights" cat={t.diagCat.concept} title={en ? "Exam weight by domain" : "\u30c9\u30e1\u30a4\u30f3\u306e\u51fa\u984c\u6bd4\u7387"}>
         {DOMAINS.map(d => (
           <div key={d.id} style={{ marginBottom: 10 }}>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 3, color: C.ink }}>
-              <span><span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6, fontWeight: 700 }}>{d.id}</span>{domName(d.id, lang)}</span>
+              <span><span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6, fontWeight: 700 }}>{d.id}</span>{domName(d.id, lang)}</span>
               <strong>{d.range}</strong>
             </div>
             <div style={{ background: C.light, borderRadius: 6, height: 18, overflow: "hidden" }}>
@@ -194330,7 +194348,7 @@ function DomainBars({ lang }) {
       {DOMAINS.map(d => (
         <div key={d.id} onClick={() => setSel(sel === d.id ? null : d.id)} style={{ marginBottom: 10, cursor: "pointer" }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 3, color: C.ink }}>
-            <span><span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6, fontWeight: 700 }}>{d.id}</span>{domName(d.id, lang)}</span>
+            <span><span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6, fontWeight: 700 }}>{d.id}</span>{domName(d.id, lang)}</span>
             <strong>{d.range}</strong>
           </div>
           <div style={{ background: C.light, borderRadius: 6, height: 18, overflow: "hidden", border: sel === d.id ? `2px solid ${C.ink}` : "none" }}>
@@ -194358,7 +194376,7 @@ function ConnMeans({ lang }) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
         {items.map(it => (
           <div key={it.k} onClick={() => setSel(sel === it.k ? null : it.k)}
-            style={{ background: it.hue, color: "#fff", borderRadius: 9, padding: "12px 10px", cursor: "pointer",
+            style={{ background: it.hue, color: nvInk("#ffffff", it.hue), borderRadius: 9, padding: "12px 10px", cursor: "pointer",
               border: sel === it.k ? `3px solid ${C.ink}` : "3px solid transparent", textAlign: "center", fontWeight: 700, fontSize: 13 }}>
             {it.t}
           </div>
@@ -194511,7 +194529,7 @@ function IntegrationTree({ lang }) {
   const leaf = leaves[cur];
   return (
     <div>
-      <div style={{ marginBottom: 10, fontSize: 12, color: "#8499ad" }}>
+      <div style={{ marginBottom: 10, fontSize: 12, color: "#5a7288" }}>
         {path.length > 0 && <button onClick={() => setPath(p => p.slice(0, -1))} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, padding: 0 }}>{en?"← Back":"← 戻る"}</button>}
       </div>
       {!leaf && steps[cur] && (
@@ -194659,7 +194677,7 @@ function Confuse({ lang, t }) {
           <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{t.judgeAxis}：{lang === "en" && c[5] ? c[5] : c[2]}</div>
         </div>
       ))}
-      {list.length === 0 && <div style={{ textAlign: "center", color: "#8499ad", padding: 20 }}>{t.noMatch}</div>}
+      {list.length === 0 && <div style={{ textAlign: "center", color: "#5a7288", padding: 20 }}>{t.noMatch}</div>}
     </div>
   );
 }
@@ -194907,13 +194925,13 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <button onClick={onBack} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
         </div>
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 4 }}>{lang === "ja" ? "本試験形式ケース" : "Exam-style cases"}</div>
-        <div style={{ fontSize: 12, color: "#8595ad", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
+        <div style={{ fontSize: 12, color: "#5d6c83", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
         {clist.map((c, i) => (
           <button key={i} onClick={() => openCase(i)}
             style={{ width: "100%", textAlign: "left", padding: "14px 15px", marginBottom: 10, borderRadius: 11,
               border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep, lineHeight: 1.45, paddingRight: 10 }}><DoneCheck on={caseDone.has(i)} onToggle={(e) => caseDone.toggle(i, e)} />{g(c.title)}</span>
-            <span style={{ fontSize: 11.5, color: "#8595ad", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
+            <span style={{ fontSize: 11.5, color: "#5d6c83", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
           </button>
         ))}
       </div>
@@ -194947,7 +194965,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
         <button onClick={backToList} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
-        {!finished && <span style={{ fontSize: 12, color: "#8595ad" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
+        {!finished && <span style={{ fontSize: 12, color: "#5d6c83" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 12 }}>
@@ -194972,7 +194990,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <div style={{ textAlign: "center", marginBottom: 12 }}>
             <div style={{ fontSize: 13, color: "#5a6a85", fontWeight: 600, marginBottom: 6 }}>{lang === "ja" ? "ケース完了" : "Case complete"}</div>
             <div style={{ fontSize: 32, fontWeight: 800, color: rate >= PASS ? C.ok : C.ng }}>{rate}%</div>
-            <div style={{ fontSize: 12.5, color: "#8595ad", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
+            <div style={{ fontSize: 12.5, color: "#5d6c83", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
@@ -194997,7 +195015,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
             <div style={{ marginTop: 12 }}>
               {Q.options.map((opt, i) => (
                 <div key={i} style={{ background: opt.ok ? "#E6F4EC" : (i === sel ? "#FBEAE8" : C.light), borderRadius: 8, padding: "9px 11px", marginBottom: 6, fontSize: 12.5, lineHeight: 1.55 }}>
-                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#8595ad") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
+                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#5d6c83") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
                 </div>
               ))}
             </div>
@@ -195135,9 +195153,9 @@ function Home({ state, lang, t }) {
             <div key={d.id} style={{ marginBottom: 12 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
                 <span style={{ fontWeight: 600 }}>
-                  <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+                  <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
                   {domName(d.id, lang)}
-                  <span style={{ color: "#8499ad", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
+                  <span style={{ color: "#5a7288", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
                 </span>
                 <span style={{ color: "#5b6b7d" }}>{d.range} · {p.attempts ? `${rate}%` : t.notStarted}</span>
               </div>
@@ -195150,7 +195168,7 @@ function Home({ state, lang, t }) {
         <Card title={t.weakDomains}>
           {weak.slice(0, 3).map(d => (
             <div key={d.id} style={{ fontSize: 13, padding: "6px 0", borderBottom: `1px solid ${C.light}` }}>
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
               {domName(d.id, lang)} — <strong style={{ color: d.rate < PASS ? C.ng : C.ok }}>{d.rate}%</strong>
             </div>
           ))}
@@ -195165,7 +195183,7 @@ function Stat({ label, value, sub, color }) {
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
       <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
-      <div style={{ fontSize: 11, color: "#8499ad" }}>{sub}</div>
+      <div style={{ fontSize: 11, color: "#5a7288" }}>{sub}</div>
     </div>
   );
 }
@@ -195259,13 +195277,13 @@ function Quiz({ onAnswer, lang, t }) {
         {slot.meta && (
           <>
             <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
-            <span style={{ fontSize: 11, color: "#8499ad" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
+            <span style={{ fontSize: 11, color: "#5a7288" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
             <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
           </>
         )}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-        <span style={{ fontSize: 12.5, color: "#8499ad" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
+        <span style={{ fontSize: 12.5, color: "#5a7288" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
         <div style={{ display: "inline-flex", background: C.light, borderRadius: 20, padding: 4 }}>
           {[["seq", t.orderSeq], ["random", t.orderRandom]].map(([k, label]) => (
             <button key={k} onClick={() => setOrderMode(k)}
@@ -195289,7 +195307,7 @@ function Quiz({ onAnswer, lang, t }) {
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)}
         </div>
         <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, lineHeight: 1.5, display: "flex", alignItems: "flex-start", gap: 6 }}><span style={{ flex: 1 }}>{L(Q, "q", lang)}</span><StarButton id={"q#" + novaQHash(Q.q || Q.qEn || "")} text={Q.q || Q.qEn} scope={lang === "en" ? "Quiz" : "クイズ"} /></div>
@@ -195325,7 +195343,7 @@ function Quiz({ onAnswer, lang, t }) {
             color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {lang === "en" ? "← Previous" : "← 前の問題"}
         </button>
-        <span style={{ fontSize: 13, color: "#8499ad" }}>{pos + 1} / {poolCount}</span>
+        <span style={{ fontSize: 13, color: "#5a7288" }}>{pos + 1} / {poolCount}</span>
         <button onClick={goNext} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
       </div>
@@ -195499,7 +195517,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{en ? "Practice = instant explanations. Real = timed, official exam UI, scored at the end." : "演習モード＝即時解説。本番モード＝時間制・公式試験UI・終了後に採点。"}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", en ? "Practice" : "演習モード"], ["real", en ? "Real (exam UI)" : "本番モード"]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#86a6b0", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
@@ -195511,7 +195529,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         {kind === "domain" && DOMAINS.map(d => (
           <button key={d.id} onClick={() => start(d.id)} style={{ width: "100%", textAlign: "left", padding: "15px 16px", marginBottom: 10, borderRadius: 11, border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 10 }}><DoneCheck on={mockDone.has(d.id)} onToggle={(e) => mockDone.toggle(d.id, e)} />
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
               <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep }}>{en ? d.nameEn : d.name}</span>
             </span>
             <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary }}>{en ? "Start" : "開始"}</span>
@@ -195585,7 +195603,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
             <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
           </>)}
-        </div>); }) : <div style={{ fontSize: 12, color: "#8595ad", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
+        </div>); }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
     </div>);
   };
 
@@ -195598,7 +195616,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
-          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#8595ad", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
+          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
@@ -195822,9 +195840,9 @@ function Review({ lang, t, onAnswer }) {
         {list.map((it, i) => (
           <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 12, marginBottom: 9 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
-              <span style={{ background: DOM_HUE[it.q.d], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
+              <span style={{ background: DOM_HUE[it.q.d], color: nvInk("#ffffff", DOM_HUE[it.q.d]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
               <span style={{ fontSize: 10.5, color: C.ng, fontWeight: 700 }}>{t.reviewMiss(it.miss)}</span>
-              <span style={{ fontSize: 10.5, color: "#8499ad" }}>{t.reviewSource}</span>
+              <span style={{ fontSize: 10.5, color: "#5a7288" }}>{t.reviewSource}</span>
             </div>
             <div style={{ fontSize: 13, lineHeight: 1.5 }}>{L(it.q, "q", lang)}</div>
           </div>
@@ -195870,7 +195888,7 @@ function Review({ lang, t, onAnswer }) {
         <span style={{ fontSize: 12, color: "#5b6b7d" }}>{lang === "en" ? "Left" : "残り"} {remaining}{t.questionsUnit}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)} · {t.reviewMiss(entry.miss)}
         </div>
         <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{L(Q, "q", lang)}</div>
@@ -195916,14 +195934,14 @@ function Diagrams({ lang, t }) {
   ,{ h: en ? "Copilot Extensions: Agents & Skillsets" : "Copilot Extensions：エージェントとスキルセット", b: en ? "Copilot Extensions integrate external services and custom tools in two forms: an \"Agent\" that controls the whole conversation and can call its own LLM, and a lightweight \"Skillset\" that just exposes API functions for Copilot's own model to interpret. Choose an Agent for complex multi-turn interaction, a Skillset for simple API integration." : "Copilot Extensionsは会話全体を制御し独自のLLM呼び出しまで担う「エージェント」と、API関数群を公開しCopilot自身のモデルが解釈する軽量な「スキルセット」の2形態で外部サービスや独自ツールと統合する。用途に応じて複雑な多段階対話にはエージェント、単純なAPI連携にはスキルセットを選ぶ。" },{ h: en ? "The Three MCP Primitives" : "MCPの3つのプリミティブ", b: en ? "The Model Context Protocol exposes external capability and knowledge to agents through three primitive types: Tools (callable functions with side effects), Resources (read-only context data), and Prompts (reusable templates a human selects and invokes)." : "Model Context Protocolはツール(Tools・副作用のある実行可能な関数)、リソース(Resources・読み取り専用のコンテキストデータ)、プロンプト(Prompts・人が選択して起動する定型テンプレート)という3種のプリミティブでエージェントに外部の能力と知識を提供する。" },{ h: en ? "Prompt Engineering for Coding Agents" : "コーディングエージェントのためのプロンプト設計", b: en ? "Defining role and constraints persistently via a system prompt, controlling output granularity and format with zero-shot/few-shot examples and chain-of-thought, and fitting the necessary information within the context window and token budget together form the foundation of accurate agent behavior." : "システムプロンプトで役割・制約を持続的に定義し、ゼロショット/少数ショットや思考の連鎖で出力の粒度・形式を制御し、コンテキストウィンドウとトークン予算内に必要な情報を収めることが、精度の高いエージェント動作の土台となる。" },{ h: en ? "Agent Anti-patterns" : "エージェントのアンチパターン", b: en ? "Vague instructions, over-granting tools via wildcards, infinite loops with no exit condition, tool sprawl from overlapping capabilities, and automation bias (trusting agent output without verification) are all classic anti-patterns that make operation unstable or unsafe." : "曖昧な指示、ワイルドカードでの過剰なツール付与、終了条件のない無限ループ、機能が重複したツール拡散、そしてエージェント出力を無検証で信じてしまう過信(オートメーションバイアス)は、いずれも運用を不安定・危険にする代表的なアンチパターンである。" },{ h: en ? "Evaluating Agentic AI Systems" : "エージェント型AIシステムの評価", b: en ? "A continuous evaluation loop underpins trustworthy agent operation: measuring quality against a golden dataset, preventing recurrence of past failures with a regression test suite, and analyzing hallucinations and root causes to feed back into tuning." : "ゴールデンデータセットで絶対的な品質基準を測り、回帰テストスイートで過去の失敗の再発を防ぎ、ハルシネーションや根本原因を分析してチューニングへつなげる、継続的な評価ループが信頼できるエージェント運用を支える。" },{ h: en ? "Security of AI-generated Code" : "AI生成コードのセキュリティ", b: en ? "AI-generated code must be verified with the same rigor as human-written code: continuous SAST/DAST scanning, provenance tracking via SBOMs, vigilance against dependency confusion and typosquatting, and adherence to secure coding standards." : "AIが生成したコードもSAST/DASTでの継続的スキャン、SBOMやプロブナンスによる出所管理、依存関係の混乱やタイポスクワッティングへの警戒、そしてセキュアコーディング標準への準拠を通じて人間が書いたコードと同じ厳格さで検証する必要がある。" }];
   return (
     <div>
-      <div style={{ fontSize: 12, color: "#8499ad", marginBottom: 10 }}>{t.diagIntro}</div>
+      <div style={{ fontSize: 12, color: "#5a7288", marginBottom: 10 }}>{t.diagIntro}</div>
       {CERT_FLOWS["GH-600"] ? <FlowSection flows={CERT_FLOWS["GH-600"]} lang={lang} doneKey={STORE_KEY} terms={typeof GLOSSARY !== "undefined" ? GLOSSARY : null} /> : null}
       <div style={{ fontSize: 14, fontWeight: 800, color: C.deep, marginBottom: 10 }}>{en ? "Domain weights" : "ドメイン比率"}</div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 16 }}>
         {DOMAINS.map(d => (
           <div key={d.id} style={{ marginBottom: 10 }}>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 4 }}>
-              <span style={{ fontWeight: 700, color: C.ink }}><span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 7px", marginRight: 8, fontSize: 11, fontWeight: 800 }}>{d.id}</span>{en ? d.nameEn : d.name}</span>
+              <span style={{ fontWeight: 700, color: C.ink }}><span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 7px", marginRight: 8, fontSize: 11, fontWeight: 800 }}>{d.id}</span>{en ? d.nameEn : d.name}</span>
               <span style={{ color: "#8a6a55", fontWeight: 700 }}>{d.range}</span>
             </div>
             <div style={{ height: 9, background: C.light, borderRadius: 5, overflow: "hidden" }}><div style={{ width: d.pct + "%", height: "100%", background: d.hue }} /></div>
@@ -195955,7 +195973,7 @@ function Confuse({ lang, t }) {
           <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{t.judgeAxis}：{lang === "en" && c[5] ? c[5] : c[2]}</div>
         </div>
       ))}
-      {list.length === 0 && <div style={{ textAlign: "center", color: "#8499ad", padding: 20 }}>{t.noMatch}</div>}
+      {list.length === 0 && <div style={{ textAlign: "center", color: "#5a7288", padding: 20 }}>{t.noMatch}</div>}
     </div>
   );
 }
@@ -196204,13 +196222,13 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <button onClick={onBack} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
         </div>
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 4 }}>{lang === "ja" ? "本試験形式ケース" : "Exam-style cases"}</div>
-        <div style={{ fontSize: 12, color: "#8595ad", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
+        <div style={{ fontSize: 12, color: "#5d6c83", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
         {clist.map((c, i) => (
           <button key={i} onClick={() => openCase(i)}
             style={{ width: "100%", textAlign: "left", padding: "14px 15px", marginBottom: 10, borderRadius: 11,
               border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep, lineHeight: 1.45, paddingRight: 10 }}><DoneCheck on={caseDone.has(i)} onToggle={(e) => caseDone.toggle(i, e)} />{g(c.title)}</span>
-            <span style={{ fontSize: 11.5, color: "#8595ad", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
+            <span style={{ fontSize: 11.5, color: "#5d6c83", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
           </button>
         ))}
       </div>
@@ -196244,7 +196262,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
         <button onClick={backToList} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
-        {!finished && <span style={{ fontSize: 12, color: "#8595ad" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
+        {!finished && <span style={{ fontSize: 12, color: "#5d6c83" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 12 }}>
@@ -196269,7 +196287,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <div style={{ textAlign: "center", marginBottom: 12 }}>
             <div style={{ fontSize: 13, color: "#5a6a85", fontWeight: 600, marginBottom: 6 }}>{lang === "ja" ? "ケース完了" : "Case complete"}</div>
             <div style={{ fontSize: 32, fontWeight: 800, color: rate >= PASS ? C.ok : C.ng }}>{rate}%</div>
-            <div style={{ fontSize: 12.5, color: "#8595ad", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
+            <div style={{ fontSize: 12.5, color: "#5d6c83", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
@@ -196294,7 +196312,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
             <div style={{ marginTop: 12 }}>
               {Q.options.map((opt, i) => (
                 <div key={i} style={{ background: opt.ok ? "#E6F4EC" : (i === sel ? "#FBEAE8" : C.light), borderRadius: 8, padding: "9px 11px", marginBottom: 6, fontSize: 12.5, lineHeight: 1.55 }}>
-                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#8595ad") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
+                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#5d6c83") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
                 </div>
               ))}
             </div>
@@ -196432,9 +196450,9 @@ function Home({ state, lang, t }) {
             <div key={d.id} style={{ marginBottom: 12 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
                 <span style={{ fontWeight: 600 }}>
-                  <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+                  <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
                   {domName(d.id, lang)}
-                  <span style={{ color: "#8499ad", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
+                  <span style={{ color: "#5a7288", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
                 </span>
                 <span style={{ color: "#5b6b7d" }}>{d.range} · {p.attempts ? `${rate}%` : t.notStarted}</span>
               </div>
@@ -196447,7 +196465,7 @@ function Home({ state, lang, t }) {
         <Card title={t.weakDomains}>
           {weak.slice(0, 3).map(d => (
             <div key={d.id} style={{ fontSize: 13, padding: "6px 0", borderBottom: `1px solid ${C.light}` }}>
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
               {domName(d.id, lang)} — <strong style={{ color: d.rate < PASS ? C.ng : C.ok }}>{d.rate}%</strong>
             </div>
           ))}
@@ -196462,7 +196480,7 @@ function Stat({ label, value, sub, color }) {
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
       <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
-      <div style={{ fontSize: 11, color: "#8499ad" }}>{sub}</div>
+      <div style={{ fontSize: 11, color: "#5a7288" }}>{sub}</div>
     </div>
   );
 }
@@ -196556,13 +196574,13 @@ function Quiz({ onAnswer, lang, t }) {
         {slot.meta && (
           <>
             <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
-            <span style={{ fontSize: 11, color: "#8499ad" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
+            <span style={{ fontSize: 11, color: "#5a7288" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
             <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
           </>
         )}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-        <span style={{ fontSize: 12.5, color: "#8499ad" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
+        <span style={{ fontSize: 12.5, color: "#5a7288" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
         <div style={{ display: "inline-flex", background: C.light, borderRadius: 20, padding: 4 }}>
           {[["seq", t.orderSeq], ["random", t.orderRandom]].map(([k, label]) => (
             <button key={k} onClick={() => setOrderMode(k)}
@@ -196586,7 +196604,7 @@ function Quiz({ onAnswer, lang, t }) {
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)}
         </div>
         <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, lineHeight: 1.5, display: "flex", alignItems: "flex-start", gap: 6 }}><span style={{ flex: 1 }}>{L(Q, "q", lang)}</span><StarButton id={"q#" + novaQHash(Q.q || Q.qEn || "")} text={Q.q || Q.qEn} scope={lang === "en" ? "Quiz" : "クイズ"} /></div>
@@ -196622,7 +196640,7 @@ function Quiz({ onAnswer, lang, t }) {
             color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {lang === "en" ? "← Previous" : "← 前の問題"}
         </button>
-        <span style={{ fontSize: 13, color: "#8499ad" }}>{pos + 1} / {poolCount}</span>
+        <span style={{ fontSize: 13, color: "#5a7288" }}>{pos + 1} / {poolCount}</span>
         <button onClick={goNext} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
       </div>
@@ -196796,7 +196814,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{en ? "Practice = instant explanations. Real = timed, official exam UI, scored at the end." : "演習モード＝即時解説。本番モード＝時間制・公式試験UI・終了後に採点。"}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", en ? "Practice" : "演習モード"], ["real", en ? "Real (exam UI)" : "本番モード"]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#86a6b0", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
@@ -196808,7 +196826,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         {kind === "domain" && DOMAINS.map(d => (
           <button key={d.id} onClick={() => start(d.id)} style={{ width: "100%", textAlign: "left", padding: "15px 16px", marginBottom: 10, borderRadius: 11, border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 10 }}><DoneCheck on={mockDone.has(d.id)} onToggle={(e) => mockDone.toggle(d.id, e)} />
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
               <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep }}>{en ? d.nameEn : d.name}</span>
             </span>
             <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary }}>{en ? "Start" : "開始"}</span>
@@ -196882,7 +196900,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
             <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
           </>)}
-        </div>); }) : <div style={{ fontSize: 12, color: "#8595ad", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
+        </div>); }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
     </div>);
   };
 
@@ -196895,7 +196913,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
-          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#8595ad", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
+          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
@@ -197119,9 +197137,9 @@ function Review({ lang, t, onAnswer }) {
         {list.map((it, i) => (
           <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 12, marginBottom: 9 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
-              <span style={{ background: DOM_HUE[it.q.d], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
+              <span style={{ background: DOM_HUE[it.q.d], color: nvInk("#ffffff", DOM_HUE[it.q.d]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
               <span style={{ fontSize: 10.5, color: C.ng, fontWeight: 700 }}>{t.reviewMiss(it.miss)}</span>
-              <span style={{ fontSize: 10.5, color: "#8499ad" }}>{t.reviewSource}</span>
+              <span style={{ fontSize: 10.5, color: "#5a7288" }}>{t.reviewSource}</span>
             </div>
             <div style={{ fontSize: 13, lineHeight: 1.5 }}>{L(it.q, "q", lang)}</div>
           </div>
@@ -197167,7 +197185,7 @@ function Review({ lang, t, onAnswer }) {
         <span style={{ fontSize: 12, color: "#5b6b7d" }}>{lang === "en" ? "Left" : "残り"} {remaining}{t.questionsUnit}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)} · {t.reviewMiss(entry.miss)}
         </div>
         <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{L(Q, "q", lang)}</div>
@@ -197211,14 +197229,14 @@ function Diagrams({ lang, t }) {
   ,{ h: en ? "Designing multi-agent orchestration" : "マルチエージェントオーケストレーションの設計", b: en ? "Choose among four cooperation patterns — sequential, concurrent, group chat, and handoff — based on task dependencies and risk tolerance. When a single agent grows too complex, redesign it as a set of specialist agents with divided responsibilities." : "シーケンシャル(順次)・コンカレント(並列)・グループチャット(協調)・ハンドオフ(委譲)の4パターンから、タスクの依存関係とリスク許容度に応じて最適な協調方式を選ぶ。単一エージェントで複雑すぎる場合は、責務を分割した専門エージェント群へ再設計する。" },{ h: en ? "Grounding and the RAG pipeline" : "グラウンディングとRAGパイプライン", b: en ? "Index knowledge sources (Dataverse, SharePoint, the web, etc.), retrieve semantically relevant passages for the user's input, then feed them to the model. Choose real-time lookups when freshness matters, or batch indexing when scale and speed matter more." : "ナレッジソース(Dataverse・SharePoint・Web等)をインデックス化し、ユーザー入力に対して意味的に近い情報を検索してからモデルに渡す。鮮度が重要ならリアルタイム参照、規模と速度が重要ならバッチインデックスを選ぶ。" },{ h: en ? "Responsible AI as layered guardrails" : "責任あるAIのガードレール多層防御", b: en ? "Combine Prompt Shields (defense against input attacks), Content Safety (harmful content broadly), hallucination detection, and red teaming so the agent is protected by layered defenses rather than a single control." : "Prompt Shields(入力への攻撃対策)、Content Safety(有害コンテンツ全般)、ハルシネーション検出、レッドチーミングを組み合わせ、単一の対策に依存しない多層防御でエージェントを守る。" },{ h: en ? "Choosing the human-involvement model (HITL/HOTL)" : "人間関与モデルの選択(HITL/HOTL)", b: en ? "Choose approval-before-execution (human-in-the-loop) or post-hoc monitoring (human-on-the-loop) based on how irreversible, high-impact, or regulated the action is — thicken the approval gate as risk rises." : "アクションの不可逆性・影響範囲・規制要件に応じて、実行前承認(Human-in-the-loop)か事後監視(Human-on-the-loop)かを選ぶ。高リスクなアクションほど承認ゲートを厚くする。" },{ h: en ? "Agent ALM and deployment strategy" : "エージェントのALMとデプロイ戦略", b: en ? "Package agents, connectors, and data with solution-aware ALM, and promote them across environments with Power Platform pipelines. Reduce production risk with canary releases and a clear rollback strategy." : "ソリューション対応ALMでエージェント・コネクタ・データをパッケージ化し、Power Platformパイプラインで環境間を昇格。カナリアリリースやロールバック戦略で本番展開のリスクを抑える。" },{ h: en ? "Cost and ROI framework" : "コスト・ROIフレームワーク", b: en ? "Weigh PTU vs PAYG, estimate message capacity, and justify the investment on both TCO and ROI. Track actuals continuously with a consumption monitoring dashboard and reconcile them against the plan." : "PTU/PAYGの選択、メッセージキャパシティの見積もり、TCOとROIの両面から投資判断を行う。消費量監視ダッシュボードで実績を継続的に追跡し、計画と実績を照合する。" }];
   return (
     <div>
-      <div style={{ fontSize: 12, color: "#8499ad", marginBottom: 10 }}>{t.diagIntro}</div>
+      <div style={{ fontSize: 12, color: "#5a7288", marginBottom: 10 }}>{t.diagIntro}</div>
       {CERT_FLOWS["AB-100"] ? <FlowSection flows={CERT_FLOWS["AB-100"]} lang={lang} doneKey={STORE_KEY} terms={typeof GLOSSARY !== "undefined" ? GLOSSARY : null} /> : null}
       <div style={{ fontSize: 14, fontWeight: 800, color: C.deep, marginBottom: 10 }}>{en ? "Domain weights" : "ドメイン比率"}</div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 16 }}>
         {DOMAINS.map(d => (
           <div key={d.id} style={{ marginBottom: 10 }}>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 4 }}>
-              <span style={{ fontWeight: 700, color: C.ink }}><span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 7px", marginRight: 8, fontSize: 11, fontWeight: 800 }}>{d.id}</span>{en ? d.nameEn : d.name}</span>
+              <span style={{ fontWeight: 700, color: C.ink }}><span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 7px", marginRight: 8, fontSize: 11, fontWeight: 800 }}>{d.id}</span>{en ? d.nameEn : d.name}</span>
               <span style={{ color: "#8a6a55", fontWeight: 700 }}>{d.range}</span>
             </div>
             <div style={{ height: 9, background: C.light, borderRadius: 5, overflow: "hidden" }}><div style={{ width: d.pct + "%", height: "100%", background: d.hue }} /></div>
@@ -197250,7 +197268,7 @@ function Confuse({ lang, t }) {
           <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{t.judgeAxis}：{lang === "en" && c[5] ? c[5] : c[2]}</div>
         </div>
       ))}
-      {list.length === 0 && <div style={{ textAlign: "center", color: "#8499ad", padding: 20 }}>{t.noMatch}</div>}
+      {list.length === 0 && <div style={{ textAlign: "center", color: "#5a7288", padding: 20 }}>{t.noMatch}</div>}
     </div>
   );
 }
@@ -197499,13 +197517,13 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <button onClick={onBack} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
         </div>
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 4 }}>{lang === "ja" ? "本試験形式ケース" : "Exam-style cases"}</div>
-        <div style={{ fontSize: 12, color: "#8595ad", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
+        <div style={{ fontSize: 12, color: "#5d6c83", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
         {clist.map((c, i) => (
           <button key={i} onClick={() => openCase(i)}
             style={{ width: "100%", textAlign: "left", padding: "14px 15px", marginBottom: 10, borderRadius: 11,
               border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep, lineHeight: 1.45, paddingRight: 10 }}><DoneCheck on={caseDone.has(i)} onToggle={(e) => caseDone.toggle(i, e)} />{g(c.title)}</span>
-            <span style={{ fontSize: 11.5, color: "#8595ad", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
+            <span style={{ fontSize: 11.5, color: "#5d6c83", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
           </button>
         ))}
       </div>
@@ -197539,7 +197557,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
         <button onClick={backToList} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
-        {!finished && <span style={{ fontSize: 12, color: "#8595ad" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
+        {!finished && <span style={{ fontSize: 12, color: "#5d6c83" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 12 }}>
@@ -197564,7 +197582,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <div style={{ textAlign: "center", marginBottom: 12 }}>
             <div style={{ fontSize: 13, color: "#5a6a85", fontWeight: 600, marginBottom: 6 }}>{lang === "ja" ? "ケース完了" : "Case complete"}</div>
             <div style={{ fontSize: 32, fontWeight: 800, color: rate >= PASS ? C.ok : C.ng }}>{rate}%</div>
-            <div style={{ fontSize: 12.5, color: "#8595ad", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
+            <div style={{ fontSize: 12.5, color: "#5d6c83", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
@@ -197589,7 +197607,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
             <div style={{ marginTop: 12 }}>
               {Q.options.map((opt, i) => (
                 <div key={i} style={{ background: opt.ok ? "#E6F4EC" : (i === sel ? "#FBEAE8" : C.light), borderRadius: 8, padding: "9px 11px", marginBottom: 6, fontSize: 12.5, lineHeight: 1.55 }}>
-                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#8595ad") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
+                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#5d6c83") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
                 </div>
               ))}
             </div>
@@ -197727,9 +197745,9 @@ function Home({ state, lang, t }) {
             <div key={d.id} style={{ marginBottom: 12 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
                 <span style={{ fontWeight: 600 }}>
-                  <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+                  <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
                   {domName(d.id, lang)}
-                  <span style={{ color: "#8499ad", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
+                  <span style={{ color: "#5a7288", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
                 </span>
                 <span style={{ color: "#5b6b7d" }}>{d.range} · {p.attempts ? `${rate}%` : t.notStarted}</span>
               </div>
@@ -197742,7 +197760,7 @@ function Home({ state, lang, t }) {
         <Card title={t.weakDomains}>
           {weak.slice(0, 3).map(d => (
             <div key={d.id} style={{ fontSize: 13, padding: "6px 0", borderBottom: `1px solid ${C.light}` }}>
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
               {domName(d.id, lang)} — <strong style={{ color: d.rate < PASS ? C.ng : C.ok }}>{d.rate}%</strong>
             </div>
           ))}
@@ -197757,7 +197775,7 @@ function Stat({ label, value, sub, color }) {
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
       <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
-      <div style={{ fontSize: 11, color: "#8499ad" }}>{sub}</div>
+      <div style={{ fontSize: 11, color: "#5a7288" }}>{sub}</div>
     </div>
   );
 }
@@ -197851,13 +197869,13 @@ function Quiz({ onAnswer, lang, t }) {
         {slot.meta && (
           <>
             <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
-            <span style={{ fontSize: 11, color: "#8499ad" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
+            <span style={{ fontSize: 11, color: "#5a7288" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
             <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
           </>
         )}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-        <span style={{ fontSize: 12.5, color: "#8499ad" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
+        <span style={{ fontSize: 12.5, color: "#5a7288" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
         <div style={{ display: "inline-flex", background: C.light, borderRadius: 20, padding: 4 }}>
           {[["seq", t.orderSeq], ["random", t.orderRandom]].map(([k, label]) => (
             <button key={k} onClick={() => setOrderMode(k)}
@@ -197881,7 +197899,7 @@ function Quiz({ onAnswer, lang, t }) {
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)}
         </div>
         <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, lineHeight: 1.5, display: "flex", alignItems: "flex-start", gap: 6 }}><span style={{ flex: 1 }}>{L(Q, "q", lang)}</span><StarButton id={"q#" + novaQHash(Q.q || Q.qEn || "")} text={Q.q || Q.qEn} scope={lang === "en" ? "Quiz" : "クイズ"} /></div>
@@ -197917,7 +197935,7 @@ function Quiz({ onAnswer, lang, t }) {
             color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {lang === "en" ? "← Previous" : "← 前の問題"}
         </button>
-        <span style={{ fontSize: 13, color: "#8499ad" }}>{pos + 1} / {poolCount}</span>
+        <span style={{ fontSize: 13, color: "#5a7288" }}>{pos + 1} / {poolCount}</span>
         <button onClick={goNext} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
       </div>
@@ -198091,7 +198109,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{en ? "Practice = instant explanations. Real = timed, official exam UI, scored at the end." : "演習モード＝即時解説。本番モード＝時間制・公式試験UI・終了後に採点。"}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", en ? "Practice" : "演習モード"], ["real", en ? "Real (exam UI)" : "本番モード"]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#86a6b0", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
@@ -198103,7 +198121,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         {kind === "domain" && DOMAINS.map(d => (
           <button key={d.id} onClick={() => start(d.id)} style={{ width: "100%", textAlign: "left", padding: "15px 16px", marginBottom: 10, borderRadius: 11, border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 10 }}><DoneCheck on={mockDone.has(d.id)} onToggle={(e) => mockDone.toggle(d.id, e)} />
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
               <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep }}>{en ? d.nameEn : d.name}</span>
             </span>
             <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary }}>{en ? "Start" : "開始"}</span>
@@ -198177,7 +198195,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
             <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
           </>)}
-        </div>); }) : <div style={{ fontSize: 12, color: "#8595ad", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
+        </div>); }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
     </div>);
   };
 
@@ -198190,7 +198208,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
-          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#8595ad", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
+          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
@@ -198414,9 +198432,9 @@ function Review({ lang, t, onAnswer }) {
         {list.map((it, i) => (
           <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 12, marginBottom: 9 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
-              <span style={{ background: DOM_HUE[it.q.d], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
+              <span style={{ background: DOM_HUE[it.q.d], color: nvInk("#ffffff", DOM_HUE[it.q.d]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
               <span style={{ fontSize: 10.5, color: C.ng, fontWeight: 700 }}>{t.reviewMiss(it.miss)}</span>
-              <span style={{ fontSize: 10.5, color: "#8499ad" }}>{t.reviewSource}</span>
+              <span style={{ fontSize: 10.5, color: "#5a7288" }}>{t.reviewSource}</span>
             </div>
             <div style={{ fontSize: 13, lineHeight: 1.5 }}>{L(it.q, "q", lang)}</div>
           </div>
@@ -198462,7 +198480,7 @@ function Review({ lang, t, onAnswer }) {
         <span style={{ fontSize: 12, color: "#5b6b7d" }}>{lang === "en" ? "Left" : "残り"} {remaining}{t.questionsUnit}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)} · {t.reviewMiss(entry.miss)}
         </div>
         <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{L(Q, "q", lang)}</div>
@@ -198506,14 +198524,14 @@ function Diagrams({ lang, t }) {
   ,{ h: en ? "How a generative conversational agent works" : "生成AIによる会話エージェントの仕組み", b: en ? "User utterance → generative orchestration has the LLM interpret intent → search knowledge sources for grounding (RAG) / run an action / branch to a topic → compose the reply and return it via the channel. Classic topics offer an alternate path that branches directly on trigger phrases." : "ユーザー発話 → 生成オーケストレーションがLLMで意図を判断 → 知識ソースを検索しグラウンディング(RAG)／アクションを実行／トピックへ分岐 → 応答を生成しチャネルへ返す、という流れ。クラシックトピックはトリガーフレーズで直接分岐する代替経路。" },{ h: en ? "The RAG pipeline" : "RAGのパイプライン", b: en ? "Ingest documents → convert them to embeddings → store them in a vector index → convert the user's question to an embedding too and run a similarity search → include the retrieved passages in the prompt sent to the LLM → generate an answer grounded in that evidence." : "文書を取り込み → 埋め込み(Embeddings)に変換 → ベクトルインデックスに格納 → ユーザーの質問も埋め込みに変換し類似度検索 → 見つかった関連箇所をプロンプトに含めてLLMへ渡す → 根拠付きの回答を生成。" },{ h: en ? "Model selection and cost in AI Hub" : "AI Hubでのモデル選択とコスト", b: en ? "Pick a foundation model from the model catalog (weighing task complexity, latency, and cost) → build it as a prompt or custom model → consume it from apps/flows/agents → billed as AI Builder credits → track and optimize via consumption monitoring." : "モデルカタログから基盤モデルを選択(タスクの複雑さ・レイテンシ・コストで判断) → プロンプト/カスタムモデルとして構築 → アプリ/フロー/エージェントから消費 → AI Builderクレジットとして課金 → 消費状況の監視で追跡・最適化。" },{ h: en ? "Agents, tools, and multi-agent setups" : "エージェント／ツール／マルチエージェント", b: en ? "A single agent can call actions (connectors/flows) directly as tools; you can also 'add another, more specialized agent as a tool,' letting a parent agent's generative orchestration delegate work to the right child agent in a multi-agent setup." : "1つのエージェントはアクション(コネクタ・フロー)を直接ツールとして呼べる／さらに専門化した別のエージェントを『ツールとして追加』し、親エージェントが生成オーケストレーションで適切な子エージェントに処理を委任するマルチエージェント構成も組める。" },{ h: en ? "Guardrails for generative AI (safety & governance)" : "生成AIのガードレール(安全・ガバナンス)", b: en ? "Content moderation blocks harmful input/output / DLP policy prevents connectors and data from mixing / tenant settings and Copilot Studio governance control who can build and publish / audit logs and data residency ensure traceability and data location." : "コンテンツモデレーションで入出力の有害コンテンツを防止 ／ DLPポリシーでコネクタ・データの混在を防止 ／ テナント設定・Copilot Studioガバナンスで作成・公開範囲を制御 ／ 監査ログとデータレジデンシーで追跡性とデータ所在を担保。" },{ h: en ? "The deployment & monitoring lifecycle" : "デプロイと監視のライフサイクル", b: en ? "Build the agent/app/flow in dev and verify with the test chat pane → promote it across environments as a solution (pipeline or manual transport) → publish it out to channels → keep watching operation and cost with Copilot Studio analytics, Monitor, and consumption monitoring." : "開発環境でエージェント/アプリ/フローを構築・テストチャット確認 → ソリューションとして環境間展開(パイプライン/手動移送) → 発行(Publish)してチャネルへ配信 → Copilot Studio分析・Monitor・消費状況の監視で稼働とコストを継続観察。" }];
   return (
     <div>
-      <div style={{ fontSize: 12, color: "#8499ad", marginBottom: 10 }}>{t.diagIntro}</div>
+      <div style={{ fontSize: 12, color: "#5a7288", marginBottom: 10 }}>{t.diagIntro}</div>
       {CERT_FLOWS["AB-410"] ? <FlowSection flows={CERT_FLOWS["AB-410"]} lang={lang} doneKey={STORE_KEY} terms={typeof GLOSSARY !== "undefined" ? GLOSSARY : null} /> : null}
       <div style={{ fontSize: 14, fontWeight: 800, color: C.deep, marginBottom: 10 }}>{en ? "Domain weights" : "ドメイン比率"}</div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 16 }}>
         {DOMAINS.map(d => (
           <div key={d.id} style={{ marginBottom: 10 }}>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 4 }}>
-              <span style={{ fontWeight: 700, color: C.ink }}><span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 7px", marginRight: 8, fontSize: 11, fontWeight: 800 }}>{d.id}</span>{en ? d.nameEn : d.name}</span>
+              <span style={{ fontWeight: 700, color: C.ink }}><span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 7px", marginRight: 8, fontSize: 11, fontWeight: 800 }}>{d.id}</span>{en ? d.nameEn : d.name}</span>
               <span style={{ color: "#8a6a55", fontWeight: 700 }}>{d.range}</span>
             </div>
             <div style={{ height: 9, background: C.light, borderRadius: 5, overflow: "hidden" }}><div style={{ width: d.pct + "%", height: "100%", background: d.hue }} /></div>
@@ -198545,7 +198563,7 @@ function Confuse({ lang, t }) {
           <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{t.judgeAxis}：{lang === "en" && c[5] ? c[5] : c[2]}</div>
         </div>
       ))}
-      {list.length === 0 && <div style={{ textAlign: "center", color: "#8499ad", padding: 20 }}>{t.noMatch}</div>}
+      {list.length === 0 && <div style={{ textAlign: "center", color: "#5a7288", padding: 20 }}>{t.noMatch}</div>}
     </div>
   );
 }
@@ -198794,13 +198812,13 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <button onClick={onBack} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
         </div>
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 4 }}>{lang === "ja" ? "本試験形式ケース" : "Exam-style cases"}</div>
-        <div style={{ fontSize: 12, color: "#8595ad", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
+        <div style={{ fontSize: 12, color: "#5d6c83", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
         {clist.map((c, i) => (
           <button key={i} onClick={() => openCase(i)}
             style={{ width: "100%", textAlign: "left", padding: "14px 15px", marginBottom: 10, borderRadius: 11,
               border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep, lineHeight: 1.45, paddingRight: 10 }}><DoneCheck on={caseDone.has(i)} onToggle={(e) => caseDone.toggle(i, e)} />{g(c.title)}</span>
-            <span style={{ fontSize: 11.5, color: "#8595ad", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
+            <span style={{ fontSize: 11.5, color: "#5d6c83", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
           </button>
         ))}
       </div>
@@ -198834,7 +198852,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
         <button onClick={backToList} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
-        {!finished && <span style={{ fontSize: 12, color: "#8595ad" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
+        {!finished && <span style={{ fontSize: 12, color: "#5d6c83" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 12 }}>
@@ -198859,7 +198877,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <div style={{ textAlign: "center", marginBottom: 12 }}>
             <div style={{ fontSize: 13, color: "#5a6a85", fontWeight: 600, marginBottom: 6 }}>{lang === "ja" ? "ケース完了" : "Case complete"}</div>
             <div style={{ fontSize: 32, fontWeight: 800, color: rate >= PASS ? C.ok : C.ng }}>{rate}%</div>
-            <div style={{ fontSize: 12.5, color: "#8595ad", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
+            <div style={{ fontSize: 12.5, color: "#5d6c83", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
@@ -198884,7 +198902,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
             <div style={{ marginTop: 12 }}>
               {Q.options.map((opt, i) => (
                 <div key={i} style={{ background: opt.ok ? "#E6F4EC" : (i === sel ? "#FBEAE8" : C.light), borderRadius: 8, padding: "9px 11px", marginBottom: 6, fontSize: 12.5, lineHeight: 1.55 }}>
-                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#8595ad") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
+                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#5d6c83") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
                 </div>
               ))}
             </div>
@@ -199022,9 +199040,9 @@ function Home({ state, lang, t }) {
             <div key={d.id} style={{ marginBottom: 12 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
                 <span style={{ fontWeight: 600 }}>
-                  <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+                  <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
                   {domName(d.id, lang)}
-                  <span style={{ color: "#8499ad", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
+                  <span style={{ color: "#5a7288", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
                 </span>
                 <span style={{ color: "#5b6b7d" }}>{d.range} · {p.attempts ? `${rate}%` : t.notStarted}</span>
               </div>
@@ -199037,7 +199055,7 @@ function Home({ state, lang, t }) {
         <Card title={t.weakDomains}>
           {weak.slice(0, 3).map(d => (
             <div key={d.id} style={{ fontSize: 13, padding: "6px 0", borderBottom: `1px solid ${C.light}` }}>
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
               {domName(d.id, lang)} — <strong style={{ color: d.rate < PASS ? C.ng : C.ok }}>{d.rate}%</strong>
             </div>
           ))}
@@ -199052,7 +199070,7 @@ function Stat({ label, value, sub, color }) {
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
       <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
-      <div style={{ fontSize: 11, color: "#8499ad" }}>{sub}</div>
+      <div style={{ fontSize: 11, color: "#5a7288" }}>{sub}</div>
     </div>
   );
 }
@@ -199146,13 +199164,13 @@ function Quiz({ onAnswer, lang, t }) {
         {slot.meta && (
           <>
             <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
-            <span style={{ fontSize: 11, color: "#8499ad" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
+            <span style={{ fontSize: 11, color: "#5a7288" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
             <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
           </>
         )}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-        <span style={{ fontSize: 12.5, color: "#8499ad" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
+        <span style={{ fontSize: 12.5, color: "#5a7288" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
         <div style={{ display: "inline-flex", background: C.light, borderRadius: 20, padding: 4 }}>
           {[["seq", t.orderSeq], ["random", t.orderRandom]].map(([k, label]) => (
             <button key={k} onClick={() => setOrderMode(k)}
@@ -199176,7 +199194,7 @@ function Quiz({ onAnswer, lang, t }) {
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)}
         </div>
         <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, lineHeight: 1.5, display: "flex", alignItems: "flex-start", gap: 6 }}><span style={{ flex: 1 }}>{L(Q, "q", lang)}</span><StarButton id={"q#" + novaQHash(Q.q || Q.qEn || "")} text={Q.q || Q.qEn} scope={lang === "en" ? "Quiz" : "クイズ"} /></div>
@@ -199212,7 +199230,7 @@ function Quiz({ onAnswer, lang, t }) {
             color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {lang === "en" ? "← Previous" : "← 前の問題"}
         </button>
-        <span style={{ fontSize: 13, color: "#8499ad" }}>{pos + 1} / {poolCount}</span>
+        <span style={{ fontSize: 13, color: "#5a7288" }}>{pos + 1} / {poolCount}</span>
         <button onClick={goNext} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
       </div>
@@ -199386,7 +199404,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{en ? "Practice = instant explanations. Real = timed, official exam UI, scored at the end." : "演習モード＝即時解説。本番モード＝時間制・公式試験UI・終了後に採点。"}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", en ? "Practice" : "演習モード"], ["real", en ? "Real (exam UI)" : "本番モード"]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#86a6b0", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
@@ -199398,7 +199416,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         {kind === "domain" && DOMAINS.map(d => (
           <button key={d.id} onClick={() => start(d.id)} style={{ width: "100%", textAlign: "left", padding: "15px 16px", marginBottom: 10, borderRadius: 11, border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 10 }}><DoneCheck on={mockDone.has(d.id)} onToggle={(e) => mockDone.toggle(d.id, e)} />
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
               <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep }}>{en ? d.nameEn : d.name}</span>
             </span>
             <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary }}>{en ? "Start" : "開始"}</span>
@@ -199472,7 +199490,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
             <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
           </>)}
-        </div>); }) : <div style={{ fontSize: 12, color: "#8595ad", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
+        </div>); }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
     </div>);
   };
 
@@ -199485,7 +199503,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
-          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#8595ad", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
+          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
@@ -199709,9 +199727,9 @@ function Review({ lang, t, onAnswer }) {
         {list.map((it, i) => (
           <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 12, marginBottom: 9 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
-              <span style={{ background: DOM_HUE[it.q.d], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
+              <span style={{ background: DOM_HUE[it.q.d], color: nvInk("#ffffff", DOM_HUE[it.q.d]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
               <span style={{ fontSize: 10.5, color: C.ng, fontWeight: 700 }}>{t.reviewMiss(it.miss)}</span>
-              <span style={{ fontSize: 10.5, color: "#8499ad" }}>{t.reviewSource}</span>
+              <span style={{ fontSize: 10.5, color: "#5a7288" }}>{t.reviewSource}</span>
             </div>
             <div style={{ fontSize: 13, lineHeight: 1.5 }}>{L(it.q, "q", lang)}</div>
           </div>
@@ -199757,7 +199775,7 @@ function Review({ lang, t, onAnswer }) {
         <span style={{ fontSize: 12, color: "#5b6b7d" }}>{lang === "en" ? "Left" : "残り"} {remaining}{t.questionsUnit}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)} · {t.reviewMiss(entry.miss)}
         </div>
         <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{L(Q, "q", lang)}</div>
@@ -199801,14 +199819,14 @@ function Diagrams({ lang, t }) {
   ,{ h: en ? "CI/CD/CT pipeline" : "CI/CD/CT パイプライン", b: en ? "Code push → CI (build & test) → CD (deploy to environment) → production monitoring detects drift → CT (automatic retraining) → the new model re-enters CI. The three loops connect to keep quality continuous." : "コードのプッシュ → CI（ビルド・テスト）→ CD（環境へデプロイ）→ 本番監視でドリフト検知 → CT（自動再学習）→ 新モデルが再びCIへ。三つの輪が連動して継続的に品質を保つ。" },{ h: en ? "Choosing a deployment strategy" : "デプロイ戦略の選び方", b: en ? "Can it affect production results? Want to compare with zero impact → shadow. Want to ramp risk gradually → canary. Want a downtime-free full cutover → blue-green. Choose based on rollback speed and blast radius." : "本番結果に影響してよいか？ 影響なしで比較したい→シャドウ。段階的にリスクを抑えたい→カナリア。ダウンタイムなく一括切替したい→ブルーグリーン。ロールバックの速さと影響範囲で選ぶ。" },{ h: en ? "The observability stack" : "可観測性スタック", b: en ? "Tracing (follow the request flow) + Logging (record individual events) + Metrics (aggregate latency, error rate, token cost) → consolidated in Application Insights / Azure Monitor → alerts flag anomalies." : "トレーシング（リクエストの流れを追う）＋ ロギング（個々の出来事を記録）＋ メトリクス（レイテンシ・エラー率・トークンコストを集計）→ Application Insights / Azure Monitor に集約 → アラートで異常を検知。" },{ h: en ? "Evaluation harness workflow" : "評価ハーネスのワークフロー", b: en ? "Prepare a golden dataset → run the prompt/model → score with built-in evaluators (e.g. groundedness) and custom evaluators → pass/fail against a threshold gate → wire into CI/CD to auto-detect regressions." : "ゴールデンデータセット準備 → プロンプト/モデルを実行 → 組み込み評価者（groundedness等）とカスタム評価者でスコアリング → 閾値ゲートで合否判定 → CI/CDに組み込み、回帰を自動検知。" },{ h: en ? "Levers for cost and latency optimization" : "コスト・レイテンシ最適化のレバー", b: en ? "Reserve capacity with PTU (predictable low latency) + cut repeated computation with prompt caching + lighten the model via quantization/distillation + route easy queries to a smaller model via model routing. Combine multiple levers." : "PTUで容量を予約（予測可能な低レイテンシ）＋ プロンプトキャッシュで繰り返し計算を削減 ＋ 量子化/蒸留で軽量モデル化 ＋ モデルルーティングで簡単なクエリは小型モデルへ。複数レバーの組み合わせが基本。" },{ h: en ? "Defense-in-depth guardrails" : "ガードレールの多層防御", b: en ? "Input content filter/Prompt Shields (block attacks and harmful input) → system message constrains behavior → generation → output content filter + groundedness detection (catch hallucination) → protected material detection. Each layer covers a different risk." : "入力コンテンツフィルター/Prompt Shields（攻撃・有害入力を遮断）→ システムメッセージで振る舞いを制約 → 生成 → 出力コンテンツフィルター＋根拠性検出（ハルシネーション検知）→ 保護対象素材検出。各層が異なるリスクを担当。" }];
   return (
     <div>
-      <div style={{ fontSize: 12, color: "#8499ad", marginBottom: 10 }}>{t.diagIntro}</div>
+      <div style={{ fontSize: 12, color: "#5a7288", marginBottom: 10 }}>{t.diagIntro}</div>
       {CERT_FLOWS["AI-300"] ? <FlowSection flows={CERT_FLOWS["AI-300"]} lang={lang} doneKey={STORE_KEY} terms={typeof GLOSSARY !== "undefined" ? GLOSSARY : null} /> : null}
       <div style={{ fontSize: 14, fontWeight: 800, color: C.deep, marginBottom: 10 }}>{en ? "Domain weights" : "ドメイン比率"}</div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 16 }}>
         {DOMAINS.map(d => (
           <div key={d.id} style={{ marginBottom: 10 }}>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 4 }}>
-              <span style={{ fontWeight: 700, color: C.ink }}><span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 7px", marginRight: 8, fontSize: 11, fontWeight: 800 }}>{d.id}</span>{en ? d.nameEn : d.name}</span>
+              <span style={{ fontWeight: 700, color: C.ink }}><span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 7px", marginRight: 8, fontSize: 11, fontWeight: 800 }}>{d.id}</span>{en ? d.nameEn : d.name}</span>
               <span style={{ color: "#5a7780", fontWeight: 700 }}>{d.range}</span>
             </div>
             <div style={{ height: 9, background: C.light, borderRadius: 5, overflow: "hidden" }}><div style={{ width: d.pct + "%", height: "100%", background: d.hue }} /></div>
@@ -199840,7 +199858,7 @@ function Confuse({ lang, t }) {
           <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{t.judgeAxis}：{lang === "en" && c[5] ? c[5] : c[2]}</div>
         </div>
       ))}
-      {list.length === 0 && <div style={{ textAlign: "center", color: "#8499ad", padding: 20 }}>{t.noMatch}</div>}
+      {list.length === 0 && <div style={{ textAlign: "center", color: "#5a7288", padding: 20 }}>{t.noMatch}</div>}
     </div>
   );
 }
@@ -200077,13 +200095,13 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <button onClick={onBack} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
         </div>
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 4 }}>{lang === "ja" ? "本試験形式ケース" : "Exam-style cases"}</div>
-        <div style={{ fontSize: 12, color: "#8595ad", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
+        <div style={{ fontSize: 12, color: "#5d6c83", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
         {clist.map((c, i) => (
           <button key={i} onClick={() => openCase(i)}
             style={{ width: "100%", textAlign: "left", padding: "14px 15px", marginBottom: 10, borderRadius: 11,
               border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep, lineHeight: 1.45, paddingRight: 10 }}><DoneCheck on={caseDone.has(i)} onToggle={(e) => caseDone.toggle(i, e)} />{g(c.title)}</span>
-            <span style={{ fontSize: 11.5, color: "#8595ad", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
+            <span style={{ fontSize: 11.5, color: "#5d6c83", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
           </button>
         ))}
       </div>
@@ -200117,7 +200135,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
         <button onClick={backToList} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
-        {!finished && <span style={{ fontSize: 12, color: "#8595ad" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
+        {!finished && <span style={{ fontSize: 12, color: "#5d6c83" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 12 }}>
@@ -200142,7 +200160,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <div style={{ textAlign: "center", marginBottom: 12 }}>
             <div style={{ fontSize: 13, color: "#5a6a85", fontWeight: 600, marginBottom: 6 }}>{lang === "ja" ? "ケース完了" : "Case complete"}</div>
             <div style={{ fontSize: 32, fontWeight: 800, color: rate >= PASS ? C.ok : C.ng }}>{rate}%</div>
-            <div style={{ fontSize: 12.5, color: "#8595ad", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
+            <div style={{ fontSize: 12.5, color: "#5d6c83", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
@@ -200167,7 +200185,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
             <div style={{ marginTop: 12 }}>
               {Q.options.map((opt, i) => (
                 <div key={i} style={{ background: opt.ok ? "#E6F4EC" : (i === sel ? "#FBEAE8" : C.light), borderRadius: 8, padding: "9px 11px", marginBottom: 6, fontSize: 12.5, lineHeight: 1.55 }}>
-                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#8595ad") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
+                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#5d6c83") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
                 </div>
               ))}
             </div>
@@ -200305,9 +200323,9 @@ function Home({ state, lang, t }) {
             <div key={d.id} style={{ marginBottom: 12 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
                 <span style={{ fontWeight: 600 }}>
-                  <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+                  <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
                   {domName(d.id, lang)}
-                  <span style={{ color: "#8499ad", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
+                  <span style={{ color: "#5a7288", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
                 </span>
                 <span style={{ color: "#5b6b7d" }}>{d.range} · {p.attempts ? `${rate}%` : t.notStarted}</span>
               </div>
@@ -200320,7 +200338,7 @@ function Home({ state, lang, t }) {
         <Card title={t.weakDomains}>
           {weak.slice(0, 3).map(d => (
             <div key={d.id} style={{ fontSize: 13, padding: "6px 0", borderBottom: `1px solid ${C.light}` }}>
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
               {domName(d.id, lang)} — <strong style={{ color: d.rate < PASS ? C.ng : C.ok }}>{d.rate}%</strong>
             </div>
           ))}
@@ -200335,7 +200353,7 @@ function Stat({ label, value, sub, color }) {
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
       <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
-      <div style={{ fontSize: 11, color: "#8499ad" }}>{sub}</div>
+      <div style={{ fontSize: 11, color: "#5a7288" }}>{sub}</div>
     </div>
   );
 }
@@ -200429,13 +200447,13 @@ function Quiz({ onAnswer, lang, t }) {
         {slot.meta && (
           <>
             <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
-            <span style={{ fontSize: 11, color: "#8499ad" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
+            <span style={{ fontSize: 11, color: "#5a7288" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
             <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
           </>
         )}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-        <span style={{ fontSize: 12.5, color: "#8499ad" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
+        <span style={{ fontSize: 12.5, color: "#5a7288" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
         <div style={{ display: "inline-flex", background: C.light, borderRadius: 20, padding: 4 }}>
           {[["seq", t.orderSeq], ["random", t.orderRandom]].map(([k, label]) => (
             <button key={k} onClick={() => setOrderMode(k)}
@@ -200459,7 +200477,7 @@ function Quiz({ onAnswer, lang, t }) {
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)}
         </div>
         <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, lineHeight: 1.5, display: "flex", alignItems: "flex-start", gap: 6 }}><span style={{ flex: 1 }}>{L(Q, "q", lang)}</span><StarButton id={"q#" + novaQHash(Q.q || Q.qEn || "")} text={Q.q || Q.qEn} scope={lang === "en" ? "Quiz" : "クイズ"} /></div>
@@ -200495,7 +200513,7 @@ function Quiz({ onAnswer, lang, t }) {
             color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {lang === "en" ? "← Previous" : "← 前の問題"}
         </button>
-        <span style={{ fontSize: 13, color: "#8499ad" }}>{pos + 1} / {poolCount}</span>
+        <span style={{ fontSize: 13, color: "#5a7288" }}>{pos + 1} / {poolCount}</span>
         <button onClick={goNext} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
       </div>
@@ -200668,7 +200686,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{en ? "Practice = instant explanations. Real = timed, official exam UI, scored at the end." : "演習モード＝即時解説。本番モード＝時間制・公式試験UI・終了後に採点。"}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", en ? "Practice" : "演習モード"], ["real", en ? "Real (exam UI)" : "本番モード"]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#86a6b0", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
@@ -200680,7 +200698,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         {kind === "domain" && DOMAINS.map(d => (
           <button key={d.id} onClick={() => start(d.id)} style={{ width: "100%", textAlign: "left", padding: "15px 16px", marginBottom: 10, borderRadius: 11, border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 10 }}><DoneCheck on={mockDone.has(d.id)} onToggle={(e) => mockDone.toggle(d.id, e)} />
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
               <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep }}>{en ? d.nameEn : d.name}</span>
             </span>
             <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary }}>{en ? "Start" : "開始"}</span>
@@ -200754,7 +200772,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
             <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
           </>)}
-        </div>); }) : <div style={{ fontSize: 12, color: "#8595ad", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
+        </div>); }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
     </div>);
   };
 
@@ -200767,7 +200785,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
-          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#8595ad", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
+          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
@@ -200991,9 +201009,9 @@ function Review({ lang, t, onAnswer }) {
         {list.map((it, i) => (
           <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 12, marginBottom: 9 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
-              <span style={{ background: DOM_HUE[it.q.d], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
+              <span style={{ background: DOM_HUE[it.q.d], color: nvInk("#ffffff", DOM_HUE[it.q.d]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
               <span style={{ fontSize: 10.5, color: C.ng, fontWeight: 700 }}>{t.reviewMiss(it.miss)}</span>
-              <span style={{ fontSize: 10.5, color: "#8499ad" }}>{t.reviewSource}</span>
+              <span style={{ fontSize: 10.5, color: "#5a7288" }}>{t.reviewSource}</span>
             </div>
             <div style={{ fontSize: 13, lineHeight: 1.5 }}>{L(it.q, "q", lang)}</div>
           </div>
@@ -201039,7 +201057,7 @@ function Review({ lang, t, onAnswer }) {
         <span style={{ fontSize: 12, color: "#5b6b7d" }}>{lang === "en" ? "Left" : "残り"} {remaining}{t.questionsUnit}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)} · {t.reviewMiss(entry.miss)}
         </div>
         <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{L(Q, "q", lang)}</div>
@@ -201125,7 +201143,7 @@ function Diagrams({ lang, t }) {
   return (
     <div>
       {CERT_FLOWS["AI-103"] ? <FlowSection flows={CERT_FLOWS["AI-103"]} lang={lang} doneKey={STORE_KEY} terms={typeof GLOSSARY !== "undefined" ? GLOSSARY : null} /> : null}
-      <div style={{ fontSize: 12, color: "#8499ad", marginBottom: 10 }}>{t.diagIntro}</div>
+      <div style={{ fontSize: 12, color: "#5a7288", marginBottom: 10 }}>{t.diagIntro}</div>
       <Section id="weights" cat={t.diagCat.concept} title={en ? "Exam weight by domain" : "ドメインの出題比率"}><DomainBars lang={lang} /><DomainDrillPanel domains={DOMAINS} lang={typeof lang === "undefined" ? "" : lang} sets={typeof DOMAIN_SETS !== "undefined" ? DOMAIN_SETS : (typeof SAA_DOMAIN_SETS !== "undefined" ? SAA_DOMAIN_SETS : null)} /></Section>
       <Section id="foundry" cat={t.diagCat.hier} title={en ? "Microsoft Foundry map (expandable tree)" : "Microsoft Foundry の全体像（展開ツリー）"}><InteractiveTree data={en ? CS_TREE_EN : CS_TREE} /></Section>
       <Section id="rag" cat={t.diagCat.flow} title={en ? "RAG grounding pipeline" : "RAG グラウンディングの流れ"}><Flow steps={rag} /></Section>
@@ -201150,7 +201168,7 @@ function DomainBars({ lang }) {
       {DOMAINS.map(d => (
         <div key={d.id} onClick={() => setSel(sel === d.id ? null : d.id)} style={{ marginBottom: 10, cursor: "pointer" }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 3, color: C.ink }}>
-            <span><span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6, fontWeight: 700 }}>{d.id}</span>{domName(d.id, lang)}</span>
+            <span><span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6, fontWeight: 700 }}>{d.id}</span>{domName(d.id, lang)}</span>
             <strong>{d.range}</strong>
           </div>
           <div style={{ background: C.light, borderRadius: 6, height: 18, overflow: "hidden", border: sel === d.id ? `2px solid ${C.ink}` : "none" }}>
@@ -201274,7 +201292,7 @@ function Confuse({ lang, t }) {
           <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{t.judgeAxis}：{lang === "en" && c[5] ? c[5] : c[2]}</div>
         </div>
       ))}
-      {list.length === 0 && <div style={{ textAlign: "center", color: "#8499ad", padding: 20 }}>{t.noMatch}</div>}
+      {list.length === 0 && <div style={{ textAlign: "center", color: "#5a7288", padding: 20 }}>{t.noMatch}</div>}
     </div>
   );
 }
@@ -201509,13 +201527,13 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <button onClick={onBack} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
         </div>
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 4 }}>{lang === "ja" ? "本試験形式ケース" : "Exam-style cases"}</div>
-        <div style={{ fontSize: 12, color: "#8595ad", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
+        <div style={{ fontSize: 12, color: "#5d6c83", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
         {clist.map((c, i) => (
           <button key={i} onClick={() => openCase(i)}
             style={{ width: "100%", textAlign: "left", padding: "14px 15px", marginBottom: 10, borderRadius: 11,
               border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep, lineHeight: 1.45, paddingRight: 10 }}><DoneCheck on={caseDone.has(i)} onToggle={(e) => caseDone.toggle(i, e)} />{g(c.title)}</span>
-            <span style={{ fontSize: 11.5, color: "#8595ad", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
+            <span style={{ fontSize: 11.5, color: "#5d6c83", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
           </button>
         ))}
       </div>
@@ -201549,7 +201567,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
         <button onClick={backToList} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
-        {!finished && <span style={{ fontSize: 12, color: "#8595ad" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
+        {!finished && <span style={{ fontSize: 12, color: "#5d6c83" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 12 }}>
@@ -201574,7 +201592,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <div style={{ textAlign: "center", marginBottom: 12 }}>
             <div style={{ fontSize: 13, color: "#5a6a85", fontWeight: 600, marginBottom: 6 }}>{lang === "ja" ? "ケース完了" : "Case complete"}</div>
             <div style={{ fontSize: 32, fontWeight: 800, color: rate >= PASS ? C.ok : C.ng }}>{rate}%</div>
-            <div style={{ fontSize: 12.5, color: "#8595ad", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
+            <div style={{ fontSize: 12.5, color: "#5d6c83", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
@@ -201599,7 +201617,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
             <div style={{ marginTop: 12 }}>
               {Q.options.map((opt, i) => (
                 <div key={i} style={{ background: opt.ok ? "#E6F4EC" : (i === sel ? "#FBEAE8" : C.light), borderRadius: 8, padding: "9px 11px", marginBottom: 6, fontSize: 12.5, lineHeight: 1.55 }}>
-                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#8595ad") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
+                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#5d6c83") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
                 </div>
               ))}
             </div>
@@ -201737,9 +201755,9 @@ function Home({ state, lang, t }) {
             <div key={d.id} style={{ marginBottom: 12 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
                 <span style={{ fontWeight: 600 }}>
-                  <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+                  <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
                   {domName(d.id, lang)}
-                  <span style={{ color: "#8499ad", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
+                  <span style={{ color: "#5a7288", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
                 </span>
                 <span style={{ color: "#5b6b7d" }}>{d.range} · {p.attempts ? `${rate}%` : t.notStarted}</span>
               </div>
@@ -201752,7 +201770,7 @@ function Home({ state, lang, t }) {
         <Card title={t.weakDomains}>
           {weak.slice(0, 3).map(d => (
             <div key={d.id} style={{ fontSize: 13, padding: "6px 0", borderBottom: `1px solid ${C.light}` }}>
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
               {domName(d.id, lang)} — <strong style={{ color: d.rate < PASS ? C.ng : C.ok }}>{d.rate}%</strong>
             </div>
           ))}
@@ -201767,7 +201785,7 @@ function Stat({ label, value, sub, color }) {
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
       <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
-      <div style={{ fontSize: 11, color: "#8499ad" }}>{sub}</div>
+      <div style={{ fontSize: 11, color: "#5a7288" }}>{sub}</div>
     </div>
   );
 }
@@ -201861,13 +201879,13 @@ function Quiz({ onAnswer, lang, t }) {
         {slot.meta && (
           <>
             <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
-            <span style={{ fontSize: 11, color: "#8499ad" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
+            <span style={{ fontSize: 11, color: "#5a7288" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
             <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
           </>
         )}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-        <span style={{ fontSize: 12.5, color: "#8499ad" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
+        <span style={{ fontSize: 12.5, color: "#5a7288" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
         <div style={{ display: "inline-flex", background: C.light, borderRadius: 20, padding: 4 }}>
           {[["seq", t.orderSeq], ["random", t.orderRandom]].map(([k, label]) => (
             <button key={k} onClick={() => setOrderMode(k)}
@@ -201891,7 +201909,7 @@ function Quiz({ onAnswer, lang, t }) {
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)}
         </div>
         <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, lineHeight: 1.5, display: "flex", alignItems: "flex-start", gap: 6 }}><span style={{ flex: 1 }}>{L(Q, "q", lang)}</span><StarButton id={"q#" + novaQHash(Q.q || Q.qEn || "")} text={Q.q || Q.qEn} scope={lang === "en" ? "Quiz" : "クイズ"} /></div>
@@ -201927,7 +201945,7 @@ function Quiz({ onAnswer, lang, t }) {
             color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {lang === "en" ? "← Previous" : "← 前の問題"}
         </button>
-        <span style={{ fontSize: 13, color: "#8499ad" }}>{pos + 1} / {poolCount}</span>
+        <span style={{ fontSize: 13, color: "#5a7288" }}>{pos + 1} / {poolCount}</span>
         <button onClick={goNext} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
       </div>
@@ -202100,7 +202118,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{en ? "Practice = instant explanations. Real = timed, official exam UI, scored at the end." : "演習モード＝即時解説。本番モード＝時間制・公式試験UI・終了後に採点。"}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", en ? "Practice" : "演習モード"], ["real", en ? "Real (exam UI)" : "本番モード"]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#86a6b0", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
@@ -202112,7 +202130,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         {kind === "domain" && DOMAINS.map(d => (
           <button key={d.id} onClick={() => start(d.id)} style={{ width: "100%", textAlign: "left", padding: "15px 16px", marginBottom: 10, borderRadius: 11, border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 10 }}><DoneCheck on={mockDone.has(d.id)} onToggle={(e) => mockDone.toggle(d.id, e)} />
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
               <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep }}>{en ? d.nameEn : d.name}</span>
             </span>
             <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary }}>{en ? "Start" : "開始"}</span>
@@ -202186,7 +202204,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
             <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
           </>)}
-        </div>); }) : <div style={{ fontSize: 12, color: "#8595ad", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
+        </div>); }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
     </div>);
   };
 
@@ -202199,7 +202217,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
-          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#8595ad", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
+          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
@@ -202423,9 +202441,9 @@ function Review({ lang, t, onAnswer }) {
         {list.map((it, i) => (
           <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 12, marginBottom: 9 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
-              <span style={{ background: DOM_HUE[it.q.d], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
+              <span style={{ background: DOM_HUE[it.q.d], color: nvInk("#ffffff", DOM_HUE[it.q.d]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
               <span style={{ fontSize: 10.5, color: C.ng, fontWeight: 700 }}>{t.reviewMiss(it.miss)}</span>
-              <span style={{ fontSize: 10.5, color: "#8499ad" }}>{t.reviewSource}</span>
+              <span style={{ fontSize: 10.5, color: "#5a7288" }}>{t.reviewSource}</span>
             </div>
             <div style={{ fontSize: 13, lineHeight: 1.5 }}>{L(it.q, "q", lang)}</div>
           </div>
@@ -202471,7 +202489,7 @@ function Review({ lang, t, onAnswer }) {
         <span style={{ fontSize: 12, color: "#5b6b7d" }}>{lang === "en" ? "Left" : "残り"} {remaining}{t.questionsUnit}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)} · {t.reviewMiss(entry.miss)}
         </div>
         <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{L(Q, "q", lang)}</div>
@@ -202557,7 +202575,7 @@ function Diagrams({ lang, t }) {
   return (
     <div>
       {CERT_FLOWS["AI-200"] ? <FlowSection flows={CERT_FLOWS["AI-200"]} lang={lang} doneKey={STORE_KEY} terms={typeof GLOSSARY !== "undefined" ? GLOSSARY : null} /> : null}
-      <div style={{ fontSize: 12, color: "#8499ad", marginBottom: 10 }}>{t.diagIntro}</div>
+      <div style={{ fontSize: 12, color: "#5a7288", marginBottom: 10 }}>{t.diagIntro}</div>
       <Section id="weights" cat={t.diagCat.concept} title={en ? "Exam weight by domain" : "ドメインの出題比率"}><DomainBars lang={lang} /><DomainDrillPanel domains={DOMAINS} lang={typeof lang === "undefined" ? "" : lang} sets={typeof DOMAIN_SETS !== "undefined" ? DOMAIN_SETS : (typeof SAA_DOMAIN_SETS !== "undefined" ? SAA_DOMAIN_SETS : null)} /></Section>
       <Section id="services" cat={t.diagCat.hier} title={en ? "Azure services map (expandable tree)" : "Azure サービス全体像（展開ツリー）"}><InteractiveTree data={en ? CS_TREE_EN : CS_TREE} /></Section>
       <Section id="hosting" cat={t.diagCat.para} title={en ? "Container hosting options" : "コンテナー実行環境の選択"}><Cols items={hosting} /></Section>
@@ -202581,7 +202599,7 @@ function DomainBars({ lang }) {
       {DOMAINS.map(d => (
         <div key={d.id} onClick={() => setSel(sel === d.id ? null : d.id)} style={{ marginBottom: 10, cursor: "pointer" }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 3, color: C.ink }}>
-            <span><span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6, fontWeight: 700 }}>{d.id}</span>{domName(d.id, lang)}</span>
+            <span><span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6, fontWeight: 700 }}>{d.id}</span>{domName(d.id, lang)}</span>
             <strong>{d.range}</strong>
           </div>
           <div style={{ background: C.light, borderRadius: 6, height: 18, overflow: "hidden", border: sel === d.id ? `2px solid ${C.ink}` : "none" }}>
@@ -202693,7 +202711,7 @@ function Confuse({ lang, t }) {
           <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{t.judgeAxis}：{lang === "en" && c[5] ? c[5] : c[2]}</div>
         </div>
       ))}
-      {list.length === 0 && <div style={{ textAlign: "center", color: "#8499ad", padding: 20 }}>{t.noMatch}</div>}
+      {list.length === 0 && <div style={{ textAlign: "center", color: "#5a7288", padding: 20 }}>{t.noMatch}</div>}
     </div>
   );
 }
@@ -203106,13 +203124,13 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <button onClick={onBack} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
         </div>
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 4 }}>{lang === "ja" ? "本試験形式ケース" : "Exam-style cases"}</div>
-        <div style={{ fontSize: 12, color: "#8595ad", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
+        <div style={{ fontSize: 12, color: "#5d6c83", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
         {clist.map((c, i) => (
           <button key={i} onClick={() => openCase(i)}
             style={{ width: "100%", textAlign: "left", padding: "14px 15px", marginBottom: 10, borderRadius: 11,
               border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep, lineHeight: 1.45, paddingRight: 10 }}><DoneCheck on={caseDone.has(i)} onToggle={(e) => caseDone.toggle(i, e)} />{g(c.title)}</span>
-            <span style={{ fontSize: 11.5, color: "#8595ad", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
+            <span style={{ fontSize: 11.5, color: "#5d6c83", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
           </button>
         ))}
       </div>
@@ -203146,7 +203164,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
         <button onClick={backToList} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
-        {!finished && <span style={{ fontSize: 12, color: "#8595ad" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
+        {!finished && <span style={{ fontSize: 12, color: "#5d6c83" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 12 }}>
@@ -203171,7 +203189,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <div style={{ textAlign: "center", marginBottom: 12 }}>
             <div style={{ fontSize: 13, color: "#5a6a85", fontWeight: 600, marginBottom: 6 }}>{lang === "ja" ? "ケース完了" : "Case complete"}</div>
             <div style={{ fontSize: 32, fontWeight: 800, color: rate >= PASS ? C.ok : C.ng }}>{rate}%</div>
-            <div style={{ fontSize: 12.5, color: "#8595ad", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
+            <div style={{ fontSize: 12.5, color: "#5d6c83", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
@@ -203196,7 +203214,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
             <div style={{ marginTop: 12 }}>
               {Q.options.map((opt, i) => (
                 <div key={i} style={{ background: opt.ok ? "#E6F4EC" : (i === sel ? "#FBEAE8" : C.light), borderRadius: 8, padding: "9px 11px", marginBottom: 6, fontSize: 12.5, lineHeight: 1.55 }}>
-                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#8595ad") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
+                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#5d6c83") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
                 </div>
               ))}
             </div>
@@ -203334,9 +203352,9 @@ function Home({ state, lang, t }) {
             <div key={d.id} style={{ marginBottom: 12 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
                 <span style={{ fontWeight: 600 }}>
-                  <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+                  <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
                   {domName(d.id, lang)}
-                  <span style={{ color: "#8499ad", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
+                  <span style={{ color: "#5a7288", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
                 </span>
                 <span style={{ color: "#5b6b7d" }}>{d.range} · {p.attempts ? `${rate}%` : t.notStarted}</span>
               </div>
@@ -203349,7 +203367,7 @@ function Home({ state, lang, t }) {
         <Card title={t.weakDomains}>
           {weak.slice(0, 3).map(d => (
             <div key={d.id} style={{ fontSize: 13, padding: "6px 0", borderBottom: `1px solid ${C.light}` }}>
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
               {domName(d.id, lang)} — <strong style={{ color: d.rate < PASS ? C.ng : C.ok }}>{d.rate}%</strong>
             </div>
           ))}
@@ -203364,7 +203382,7 @@ function Stat({ label, value, sub, color }) {
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
       <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
-      <div style={{ fontSize: 11, color: "#8499ad" }}>{sub}</div>
+      <div style={{ fontSize: 11, color: "#5a7288" }}>{sub}</div>
     </div>
   );
 }
@@ -203458,13 +203476,13 @@ function Quiz({ onAnswer, lang, t }) {
         {slot.meta && (
           <>
             <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
-            <span style={{ fontSize: 11, color: "#8499ad" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
+            <span style={{ fontSize: 11, color: "#5a7288" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
             <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
           </>
         )}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-        <span style={{ fontSize: 12.5, color: "#8499ad" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
+        <span style={{ fontSize: 12.5, color: "#5a7288" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
         <div style={{ display: "inline-flex", background: C.light, borderRadius: 20, padding: 4 }}>
           {[["seq", t.orderSeq], ["random", t.orderRandom]].map(([k, label]) => (
             <button key={k} onClick={() => setOrderMode(k)}
@@ -203488,7 +203506,7 @@ function Quiz({ onAnswer, lang, t }) {
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)}
         </div>
         <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, lineHeight: 1.5, display: "flex", alignItems: "flex-start", gap: 6 }}><span style={{ flex: 1 }}>{L(Q, "q", lang)}</span><StarButton id={"q#" + novaQHash(Q.q || Q.qEn || "")} text={Q.q || Q.qEn} scope={lang === "en" ? "Quiz" : "クイズ"} /></div>
@@ -203524,7 +203542,7 @@ function Quiz({ onAnswer, lang, t }) {
             color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {lang === "en" ? "← Previous" : "← 前の問題"}
         </button>
-        <span style={{ fontSize: 13, color: "#8499ad" }}>{pos + 1} / {poolCount}</span>
+        <span style={{ fontSize: 13, color: "#5a7288" }}>{pos + 1} / {poolCount}</span>
         <button onClick={goNext} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
       </div>
@@ -203697,7 +203715,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{en ? "Practice = instant explanations. Real = timed, official exam UI, scored at the end." : "演習モード＝即時解説。本番モード＝時間制・公式試験UI・終了後に採点。"}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", en ? "Practice" : "演習モード"], ["real", en ? "Real (exam UI)" : "本番モード"]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#86a6b0", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
@@ -203709,7 +203727,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         {kind === "domain" && DOMAINS.map(d => (
           <button key={d.id} onClick={() => start(d.id)} style={{ width: "100%", textAlign: "left", padding: "15px 16px", marginBottom: 10, borderRadius: 11, border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 10 }}><DoneCheck on={mockDone.has(d.id)} onToggle={(e) => mockDone.toggle(d.id, e)} />
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
               <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep }}>{en ? d.nameEn : d.name}</span>
             </span>
             <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary }}>{en ? "Start" : "開始"}</span>
@@ -203783,7 +203801,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
             <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
           </>)}
-        </div>); }) : <div style={{ fontSize: 12, color: "#8595ad", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
+        </div>); }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
     </div>);
   };
 
@@ -203796,7 +203814,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
-          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#8595ad", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
+          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
@@ -204020,9 +204038,9 @@ function Review({ lang, t, onAnswer }) {
         {list.map((it, i) => (
           <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 12, marginBottom: 9 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
-              <span style={{ background: DOM_HUE[it.q.d], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
+              <span style={{ background: DOM_HUE[it.q.d], color: nvInk("#ffffff", DOM_HUE[it.q.d]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
               <span style={{ fontSize: 10.5, color: C.ng, fontWeight: 700 }}>{t.reviewMiss(it.miss)}</span>
-              <span style={{ fontSize: 10.5, color: "#8499ad" }}>{t.reviewSource}</span>
+              <span style={{ fontSize: 10.5, color: "#5a7288" }}>{t.reviewSource}</span>
             </div>
             <div style={{ fontSize: 13, lineHeight: 1.5 }}>{L(it.q, "q", lang)}</div>
           </div>
@@ -204068,7 +204086,7 @@ function Review({ lang, t, onAnswer }) {
         <span style={{ fontSize: 12, color: "#5b6b7d" }}>{lang === "en" ? "Left" : "残り"} {remaining}{t.questionsUnit}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)} · {t.reviewMiss(entry.miss)}
         </div>
         <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{L(Q, "q", lang)}</div>
@@ -204154,7 +204172,7 @@ function Diagrams({ lang, t }) {
   return (
     <div>
       {CERT_FLOWS["GH-900"] ? <FlowSection flows={CERT_FLOWS["GH-900"]} lang={lang} doneKey={STORE_KEY} terms={typeof GLOSSARY !== "undefined" ? GLOSSARY : null} /> : null}
-      <div style={{ fontSize: 12, color: "#8499ad", marginBottom: 10 }}>{t.diagIntro}</div>
+      <div style={{ fontSize: 12, color: "#5a7288", marginBottom: 10 }}>{t.diagIntro}</div>
       <Section id="weights" cat={t.diagCat.concept} title={en ? "Exam weight by domain" : "ドメインの出題比率"}><DomainBars lang={lang} /><DomainDrillPanel domains={DOMAINS} lang={typeof lang === "undefined" ? "" : lang} sets={typeof DOMAIN_SETS !== "undefined" ? DOMAIN_SETS : (typeof SAA_DOMAIN_SETS !== "undefined" ? SAA_DOMAIN_SETS : null)} /></Section>
       <Section id="map" cat={t.diagCat.hier} title={en ? "GitHub feature map (expandable tree)" : "GitHub 機能マップ（展開ツリー）"}><InteractiveTree data={en ? CS_TREE_EN : CS_TREE} /></Section>
       <Section id="flow" cat={t.diagCat.flow} title={en ? "The GitHub Flow" : "GitHub Flow の流れ"}><Flow steps={flow} /></Section>
@@ -204181,7 +204199,7 @@ function DomainBars({ lang }) {
       {DOMAINS.map(d => (
         <div key={d.id} onClick={() => setSel(sel === d.id ? null : d.id)} style={{ marginBottom: 10, cursor: "pointer" }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 3, color: C.ink }}>
-            <span><span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6, fontWeight: 700 }}>{d.id}</span>{domName(d.id, lang)}</span>
+            <span><span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6, fontWeight: 700 }}>{d.id}</span>{domName(d.id, lang)}</span>
             <strong>{d.range}</strong>
           </div>
           <div style={{ background: C.light, borderRadius: 6, height: 18, overflow: "hidden", border: sel === d.id ? `2px solid ${C.ink}` : "none" }}>
@@ -204315,7 +204333,7 @@ function Confuse({ lang, t }) {
           <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{t.judgeAxis}：{lang === "en" && c[5] ? c[5] : c[2]}</div>
         </div>
       ))}
-      {list.length === 0 && <div style={{ textAlign: "center", color: "#8499ad", padding: 20 }}>{t.noMatch}</div>}
+      {list.length === 0 && <div style={{ textAlign: "center", color: "#5a7288", padding: 20 }}>{t.noMatch}</div>}
     </div>
   );
 }
@@ -204727,13 +204745,13 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <button onClick={onBack} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
         </div>
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 4 }}>{lang === "ja" ? "本試験形式ケース" : "Exam-style cases"}</div>
-        <div style={{ fontSize: 12, color: "#8595ad", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
+        <div style={{ fontSize: 12, color: "#5d6c83", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
         {clist.map((c, i) => (
           <button key={i} onClick={() => openCase(i)}
             style={{ width: "100%", textAlign: "left", padding: "14px 15px", marginBottom: 10, borderRadius: 11,
               border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep, lineHeight: 1.45, paddingRight: 10 }}><DoneCheck on={caseDone.has(i)} onToggle={(e) => caseDone.toggle(i, e)} />{g(c.title)}</span>
-            <span style={{ fontSize: 11.5, color: "#8595ad", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
+            <span style={{ fontSize: 11.5, color: "#5d6c83", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
           </button>
         ))}
       </div>
@@ -204767,7 +204785,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
         <button onClick={backToList} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
-        {!finished && <span style={{ fontSize: 12, color: "#8595ad" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
+        {!finished && <span style={{ fontSize: 12, color: "#5d6c83" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 12 }}>
@@ -204792,7 +204810,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <div style={{ textAlign: "center", marginBottom: 12 }}>
             <div style={{ fontSize: 13, color: "#5a6a85", fontWeight: 600, marginBottom: 6 }}>{lang === "ja" ? "ケース完了" : "Case complete"}</div>
             <div style={{ fontSize: 32, fontWeight: 800, color: rate >= PASS ? C.ok : C.ng }}>{rate}%</div>
-            <div style={{ fontSize: 12.5, color: "#8595ad", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
+            <div style={{ fontSize: 12.5, color: "#5d6c83", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
@@ -204817,7 +204835,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
             <div style={{ marginTop: 12 }}>
               {Q.options.map((opt, i) => (
                 <div key={i} style={{ background: opt.ok ? "#E6F4EC" : (i === sel ? "#FBEAE8" : C.light), borderRadius: 8, padding: "9px 11px", marginBottom: 6, fontSize: 12.5, lineHeight: 1.55 }}>
-                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#8595ad") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
+                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#5d6c83") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
                 </div>
               ))}
             </div>
@@ -204955,9 +204973,9 @@ function Home({ state, lang, t }) {
             <div key={d.id} style={{ marginBottom: 12 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
                 <span style={{ fontWeight: 600 }}>
-                  <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+                  <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
                   {domName(d.id, lang)}
-                  <span style={{ color: "#8499ad", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
+                  <span style={{ color: "#5a7288", fontSize: 11, marginLeft: 6 }}>· {BANK_COUNT[d.id]}{t.questionsUnit}</span>
                 </span>
                 <span style={{ color: "#5b6b7d" }}>{d.range} · {p.attempts ? `${rate}%` : t.notStarted}</span>
               </div>
@@ -204970,7 +204988,7 @@ function Home({ state, lang, t }) {
         <Card title={t.weakDomains}>
           {weak.slice(0, 3).map(d => (
             <div key={d.id} style={{ fontSize: 13, padding: "6px 0", borderBottom: `1px solid ${C.light}` }}>
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>
               {domName(d.id, lang)} — <strong style={{ color: d.rate < PASS ? C.ng : C.ok }}>{d.rate}%</strong>
             </div>
           ))}
@@ -204985,7 +205003,7 @@ function Stat({ label, value, sub, color }) {
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
       <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
-      <div style={{ fontSize: 11, color: "#8499ad" }}>{sub}</div>
+      <div style={{ fontSize: 11, color: "#5a7288" }}>{sub}</div>
     </div>
   );
 }
@@ -205079,13 +205097,13 @@ function Quiz({ onAnswer, lang, t }) {
         {slot.meta && (
           <>
             <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
-            <span style={{ fontSize: 11, color: "#8499ad" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
+            <span style={{ fontSize: 11, color: "#5a7288" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
             <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
           </>
         )}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-        <span style={{ fontSize: 12.5, color: "#8499ad" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
+        <span style={{ fontSize: 12.5, color: "#5a7288" }}>{t.allFields} {poolCount}{t.questionsUnit}</span>
         <div style={{ display: "inline-flex", background: C.light, borderRadius: 20, padding: 4 }}>
           {[["seq", t.orderSeq], ["random", t.orderRandom]].map(([k, label]) => (
             <button key={k} onClick={() => setOrderMode(k)}
@@ -205109,7 +205127,7 @@ function Quiz({ onAnswer, lang, t }) {
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)}
         </div>
         <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, lineHeight: 1.5, display: "flex", alignItems: "flex-start", gap: 6 }}><span style={{ flex: 1 }}>{L(Q, "q", lang)}</span><StarButton id={"q#" + novaQHash(Q.q || Q.qEn || "")} text={Q.q || Q.qEn} scope={lang === "en" ? "Quiz" : "クイズ"} /></div>
@@ -205145,7 +205163,7 @@ function Quiz({ onAnswer, lang, t }) {
             color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {lang === "en" ? "← Previous" : "← 前の問題"}
         </button>
-        <span style={{ fontSize: 13, color: "#8499ad" }}>{pos + 1} / {poolCount}</span>
+        <span style={{ fontSize: 13, color: "#5a7288" }}>{pos + 1} / {poolCount}</span>
         <button onClick={goNext} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
       </div>
@@ -205318,7 +205336,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{en ? "Practice = instant explanations. Real = timed, official exam UI, scored at the end." : "演習モード＝即時解説。本番モード＝時間制・公式試験UI・終了後に採点。"}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", en ? "Practice" : "演習モード"], ["real", en ? "Real (exam UI)" : "本番モード"]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#86a6b0", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
@@ -205330,7 +205348,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         {kind === "domain" && DOMAINS.map(d => (
           <button key={d.id} onClick={() => start(d.id)} style={{ width: "100%", textAlign: "left", padding: "15px 16px", marginBottom: 10, borderRadius: 11, border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 10 }}><DoneCheck on={mockDone.has(d.id)} onToggle={(e) => mockDone.toggle(d.id, e)} />
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
               <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep }}>{en ? d.nameEn : d.name}</span>
             </span>
             <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary }}>{en ? "Start" : "開始"}</span>
@@ -205404,7 +205422,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
             <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
           </>)}
-        </div>); }) : <div style={{ fontSize: 12, color: "#8595ad", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
+        </div>); }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
     </div>);
   };
 
@@ -205417,7 +205435,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
-          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#8595ad", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
+          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
@@ -205641,9 +205659,9 @@ function Review({ lang, t, onAnswer }) {
         {list.map((it, i) => (
           <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 12, marginBottom: 9 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
-              <span style={{ background: DOM_HUE[it.q.d], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
+              <span style={{ background: DOM_HUE[it.q.d], color: nvInk("#ffffff", DOM_HUE[it.q.d]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{it.q.d}</span>
               <span style={{ fontSize: 10.5, color: C.ng, fontWeight: 700 }}>{t.reviewMiss(it.miss)}</span>
-              <span style={{ fontSize: 10.5, color: "#8499ad" }}>{t.reviewSource}</span>
+              <span style={{ fontSize: 10.5, color: "#5a7288" }}>{t.reviewSource}</span>
             </div>
             <div style={{ fontSize: 13, lineHeight: 1.5 }}>{L(it.q, "q", lang)}</div>
           </div>
@@ -205689,7 +205707,7 @@ function Review({ lang, t, onAnswer }) {
         <span style={{ fontSize: 12, color: "#5b6b7d" }}>{lang === "en" ? "Left" : "残り"} {remaining}{t.questionsUnit}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d, lang)} · {t.reviewMiss(entry.miss)}
         </div>
         <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{L(Q, "q", lang)}</div>
@@ -205775,7 +205793,7 @@ function Diagrams({ lang, t }) {
   return (
     <div>
       {CERT_FLOWS["GH-300"] ? <FlowSection flows={CERT_FLOWS["GH-300"]} lang={lang} doneKey={STORE_KEY} terms={typeof GLOSSARY !== "undefined" ? GLOSSARY : null} /> : null}
-      <div style={{ fontSize: 12, color: "#8499ad", marginBottom: 10 }}>{t.diagIntro}</div>
+      <div style={{ fontSize: 12, color: "#5a7288", marginBottom: 10 }}>{t.diagIntro}</div>
       <Section id="weights" cat={t.diagCat.concept} title={en ? "Exam weight by domain" : "ドメインの出題比率"}><DomainBars lang={lang} /><DomainDrillPanel domains={DOMAINS} lang={typeof lang === "undefined" ? "" : lang} sets={typeof DOMAIN_SETS !== "undefined" ? DOMAIN_SETS : (typeof SAA_DOMAIN_SETS !== "undefined" ? SAA_DOMAIN_SETS : null)} /></Section>
       <Section id="map" cat={t.diagCat.hier} title={en ? "Copilot capability map (expandable tree)" : "Copilot 能力マップ（展開ツリー）"}><InteractiveTree data={en ? CS_TREE_EN : CS_TREE} /></Section>
       <Section id="lifecycle" cat={t.diagCat.flow} title={en ? "Code suggestion lifecycle" : "コード候補のライフサイクル"}><Flow steps={lifecycle} /></Section>
@@ -205801,7 +205819,7 @@ function DomainBars({ lang }) {
       {DOMAINS.map(d => (
         <div key={d.id} onClick={() => setSel(sel === d.id ? null : d.id)} style={{ marginBottom: 10, cursor: "pointer" }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 3, color: C.ink }}>
-            <span><span style={{ background: d.hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6, fontWeight: 700 }}>{d.id}</span>{domName(d.id, lang)}</span>
+            <span><span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6, fontWeight: 700 }}>{d.id}</span>{domName(d.id, lang)}</span>
             <strong>{d.range}</strong>
           </div>
           <div style={{ background: C.light, borderRadius: 6, height: 18, overflow: "hidden", border: sel === d.id ? `2px solid ${C.ink}` : "none" }}>
@@ -205925,7 +205943,7 @@ function Confuse({ lang, t }) {
           <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{t.judgeAxis}：{lang === "en" && c[5] ? c[5] : c[2]}</div>
         </div>
       ))}
-      {list.length === 0 && <div style={{ textAlign: "center", color: "#8499ad", padding: 20 }}>{t.noMatch}</div>}
+      {list.length === 0 && <div style={{ textAlign: "center", color: "#5a7288", padding: 20 }}>{t.noMatch}</div>}
     </div>
   );
 }
@@ -206593,13 +206611,13 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <button onClick={onBack} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
         </div>
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 4 }}>{lang === "ja" ? "本試験形式ケース" : "Exam-style cases"}</div>
-        <div style={{ fontSize: 12, color: "#8595ad", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
+        <div style={{ fontSize: 12, color: "#5d6c83", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
         {clist.map((c, i) => (
           <button key={i} onClick={() => openCase(i)}
             style={{ width: "100%", textAlign: "left", padding: "14px 15px", marginBottom: 10, borderRadius: 11,
               border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep, lineHeight: 1.45, paddingRight: 10 }}><DoneCheck on={caseDone.has(i)} onToggle={(e) => caseDone.toggle(i, e)} />{g(c.title)}</span>
-            <span style={{ fontSize: 11.5, color: "#8595ad", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
+            <span style={{ fontSize: 11.5, color: "#5d6c83", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
           </button>
         ))}
       </div>
@@ -206633,7 +206651,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
         <button onClick={backToList} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
-        {!finished && <span style={{ fontSize: 12, color: "#8595ad" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
+        {!finished && <span style={{ fontSize: 12, color: "#5d6c83" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 12 }}>
@@ -206658,7 +206676,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <div style={{ textAlign: "center", marginBottom: 12 }}>
             <div style={{ fontSize: 13, color: "#5a6a85", fontWeight: 600, marginBottom: 6 }}>{lang === "ja" ? "ケース完了" : "Case complete"}</div>
             <div style={{ fontSize: 32, fontWeight: 800, color: rate >= PASS ? C.ok : C.ng }}>{rate}%</div>
-            <div style={{ fontSize: 12.5, color: "#8595ad", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
+            <div style={{ fontSize: 12.5, color: "#5d6c83", marginTop: 2 }}>{lang === "ja" ? `正解 ${correct} / ${qs.length} 問` : `${correct} / ${qs.length} correct`}</div>
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
@@ -206683,7 +206701,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
             <div style={{ marginTop: 12 }}>
               {Q.options.map((opt, i) => (
                 <div key={i} style={{ background: opt.ok ? "#E6F4EC" : (i === sel ? "#FBEAE8" : C.light), borderRadius: 8, padding: "9px 11px", marginBottom: 6, fontSize: 12.5, lineHeight: 1.55 }}>
-                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#8595ad") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
+                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#5d6c83") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
                 </div>
               ))}
             </div>
@@ -206894,7 +206912,7 @@ function Stat({ label, value, sub, color }) {
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5f6368" }}>{label}</div>
       <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
-      <div style={{ fontSize: 11, color: "#9aa0a6" }}>{sub}</div>
+      <div style={{ fontSize: 11, color: "#6b7076" }}>{sub}</div>
     </div>
   );
 }
@@ -206924,7 +206942,7 @@ function QuestionCard({ Q, sel, onChoose, lang, reveal, t }) {
   const exp = en && Q.eEn ? Q.eEn : Q.e;
   return (
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
-      <div style={{ fontSize: 11, color: "#fff", background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
+      <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
         {Q.d} · {domName(Q.d, lang)}
       </div>
       <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{q}</div>
@@ -206992,7 +207010,7 @@ function Quiz({ onAnswer, lang, t }) {
         <button onClick={() => slot.save({ filter, orderMode, order, pos, picks, stats }, filter === "ALL" ? (lang === "en" ? "All" : "全分野") : filter)} style={{ padding: "6px 14px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{slot.meta ? (lang === "en" ? "💾 Saved" : "💾 保存済") : (lang === "en" ? "💾 Save" : "💾 セーブ")}</button>
         {slot.meta && (<>
           <button onClick={async () => { const d = await slot.read(); if (!d) return; resumeRef.current = { order: d.order, pos: d.pos, picks: d.picks, stats: d.stats }; setFilter(d.filter || "ALL"); setOrderMode(d.orderMode || "fixed"); setOrder(d.order || []); setPos(d.pos || 0); setPicks(d.picks || {}); setStats(d.stats || { c: 0, a: 0 }); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
-          <span style={{ fontSize: 11, color: "#8499ad" }}>{saveStamp(slot.meta.t)}</span>
+          <span style={{ fontSize: 11, color: "#5a7288" }}>{saveStamp(slot.meta.t)}</span>
           <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
         </>)}
       </div>
@@ -207025,7 +207043,7 @@ function Quiz({ onAnswer, lang, t }) {
       <QuestionCard Q={Q} sel={sel} onChoose={choose} lang={lang} reveal t={t} />
       <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
         <button onClick={prev} disabled={pos === 0}
-          style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#9aa0a6" : C.primary, fontSize: 14, fontWeight: 700, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
+          style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#6b7076" : C.primary, fontSize: 14, fontWeight: 700, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           ← {t.prevQ}
         </button>
         <button onClick={next} disabled={pos + 1 >= order.length}
@@ -207104,10 +207122,10 @@ function Exam({ onAnswer, lang, t, addToReview }) {
             style={{ width: "100%", textAlign: "left", padding: "15px 16px", marginBottom: 10, borderRadius: 11,
               border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ background: d.hue, color: "#fff", borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
               <span>
                 <span style={{ fontWeight: 700, fontSize: 14, color: C.deep }}>{lang === "en" ? d.nameEn : d.name}</span>
-                <span style={{ fontSize: 12, color: "#9aa0a6", marginLeft: 8 }}>{t.domainSetCount(DOMAIN_SETS[d.id].length)}</span>
+                <span style={{ fontSize: 12, color: "#6b7076", marginLeft: 8 }}>{t.domainSetCount(DOMAIN_SETS[d.id].length)}</span>
               </span>
             </span>
             <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, flexShrink: 0 }}>{t.start}</span>
@@ -207118,8 +207136,8 @@ function Exam({ onAnswer, lang, t, addToReview }) {
             style={{ width: "100%", textAlign: "left", padding: "15px 16px", marginBottom: 10, borderRadius: 11,
               border: `1.5px solid ${SET_READY[n] ? C.primary : C.mid}`, background: SET_READY[n] ? "#fff" : C.light, cursor: SET_READY[n] ? "pointer" : "not-allowed", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span>
-              <span style={{ fontWeight: 700, fontSize: 15, color: SET_READY[n] ? C.deep : "#9aa0a6" }}>{t.setLabel} {n}</span>
-              <span style={{ fontSize: 12, color: "#9aa0a6", marginLeft: 10 }}>65{t.questionsUnit}</span>
+              <span style={{ fontWeight: 700, fontSize: 15, color: SET_READY[n] ? C.deep : "#6b7076" }}>{t.setLabel} {n}</span>
+              <span style={{ fontSize: 12, color: "#6b7076", marginLeft: 10 }}>65{t.questionsUnit}</span>
             </span>
             <span style={{ fontSize: 12.5, fontWeight: 700, color: SET_READY[n] ? C.primary : "#bdc1c6" }}>{SET_READY[n] ? `${mode === "practice" ? t.modePractice : t.modeExam} ${t.start}` : t.preparing}</span>
           </button>
@@ -207291,7 +207309,7 @@ function Confuse({ lang, t }) {
           <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{t.judgeAxis}：{lang === "en" && c[5] ? c[5] : c[2]}</div>
         </div>
       ))}
-      {list.length === 0 && <div style={{ textAlign: "center", color: "#9aa0a6", padding: 20 }}>{t.noMatch}</div>}
+      {list.length === 0 && <div style={{ textAlign: "center", color: "#6b7076", padding: 20 }}>{t.noMatch}</div>}
     </div>
   );
 }
@@ -207498,7 +207516,7 @@ function DiagramsInner({ lang, t }) {
   );
   return (
     <div>
-      <div style={{ fontSize: 12, color: "#9aa0a6", marginBottom: 10 }}>{t.diagIntro}</div>
+      <div style={{ fontSize: 12, color: "#6b7076", marginBottom: 10 }}>{t.diagIntro}</div>
       <Section id="domains" badge={lang==="en"?"Weights":"比率"} title={lang==="en"?"Exam weight by domain":"4ドメインの出題比率"}><DomainBars lang={lang} /><DomainDrillPanel domains={DOMAINS} lang={typeof lang === "undefined" ? "" : lang} sets={typeof DOMAIN_SETS !== "undefined" ? DOMAIN_SETS : (typeof SAA_DOMAIN_SETS !== "undefined" ? SAA_DOMAIN_SETS : null)} /></Section>
       <Section id="hierarchy" badge={lang==="en"?"Hierarchy":"階層"} title={lang==="en"?"Service map (expandable tree)":"サービス階層（展開ツリー）"}><InteractiveTree data={lang==="en"?SVC_TREE_EN:SVC_TREE} /></Section>
       <Section id="ladder" badge={lang==="en"?"Up/Down":"上下"} title={lang==="en"?"Storage class hierarchy by cost/access":"ストレージクラスの上下関係（コスト/頻度）"}><StorageLadder lang={lang} /></Section>
@@ -207760,7 +207778,7 @@ function StorageTree({ lang }) {
   const leaf = leaves[cur];
   return (
     <div>
-      <div style={{ marginBottom: 10, fontSize: 12, color: "#9aa0a6" }}>{path.length > 0 && <button onClick={() => setPath(path.slice(0, -1))} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, padding: 0 }}>{en?"← Back":"← 戻る"}</button>}</div>
+      <div style={{ marginBottom: 10, fontSize: 12, color: "#6b7076" }}>{path.length > 0 && <button onClick={() => setPath(path.slice(0, -1))} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, padding: 0 }}>{en?"← Back":"← 戻る"}</button>}</div>
       {!leaf && steps[cur] && (
         <div>
           <div style={{ fontSize: 15, fontWeight: 700, color: C.deep, marginBottom: 12 }}>{steps[cur].q}</div>
@@ -208554,12 +208572,12 @@ function Home({ state, lang }) {
         <div style={{ flex:"1 1 160px", background:C.light, border:`1px solid ${C.mid}`, borderRadius:12, padding:"14px 16px" }}>
           <div style={{ fontSize:12, color:C.deep }}>{en?"Overall accuracy":"総合正答率"}</div>
           <div style={{ fontSize:30, fontWeight:800, color:C.primary }}>{rate}<span style={{ fontSize:15 }}>%</span></div>
-          <div style={{ fontSize:11, color:"#7d7aa0" }}>{tc}/{ta} {en?"correct":"正解"}</div>
+          <div style={{ fontSize:11, color:"#68648d" }}>{tc}/{ta} {en?"correct":"正解"}</div>
         </div>
         <div style={{ flex:"1 1 120px", background:C.light, border:`1px solid ${C.mid}`, borderRadius:12, padding:"14px 16px" }}>
           <div style={{ fontSize:12, color:C.deep }}>{en?"Streak":"連続学習"}</div>
-          <div style={{ fontSize:30, fontWeight:800, color:C.accent }}>🔥{state.meta?.streak || 0}</div>
-          <div style={{ fontSize:11, color:"#7d7aa0" }}>{en?"days":"日"}</div>
+          <div style={{ fontSize:30, fontWeight:800, color:nvInk(C.accent, "#E6F2EF", 3.2) }}>🔥{state.meta?.streak || 0}</div>
+          <div style={{ fontSize:11, color:"#68648d" }}>{en?"days":"日"}</div>
         </div>
       </div>
       <div style={{ fontSize:13, fontWeight:700, color:C.deep, marginBottom:10 }}>{en?"Mastery by domain (official weight)":"ドメイン別 習熟度（公式比率）"}</div>
@@ -208569,9 +208587,9 @@ function Home({ state, lang }) {
         return (
           <div key={d.id} style={{ marginBottom:11 }}>
             <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-              <span style={{ background:d.hue, color:"#fff", borderRadius:5, padding:"2px 7px", fontSize:11, fontWeight:800 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius:5, padding:"2px 7px", fontSize:11, fontWeight:800 }}>{d.id}</span>
               <span style={{ fontSize:12.5, color:C.ink }}>{en?d.nameEn:d.name}</span>
-              <span style={{ fontSize:11, color:"#7d7aa0", marginLeft:"auto" }}>{d.range} ・ {p.attempts?`${r}%`:(en?"not started":"未着手")}</span>
+              <span style={{ fontSize:11, color:"#68648d", marginLeft:"auto" }}>{d.range} ・ {p.attempts?`${r}%`:(en?"not started":"未着手")}</span>
             </div>
             <div style={{ height:7, background:C.light, borderRadius:4, overflow:"hidden", marginTop:5 }}>
               <div style={{ width:`${r}%`, height:"100%", background:d.hue, borderRadius:4 }} />
@@ -208579,7 +208597,7 @@ function Home({ state, lang }) {
           </div>
         );
       })}
-      <div style={{ marginTop:14, fontSize:11.5, color:"#7d7aa0", lineHeight:1.7 }}>
+      <div style={{ marginTop:14, fontSize:11.5, color:"#68648d", lineHeight:1.7 }}>
         {en?"Unofficial study aid for IAPP AIGP. Not affiliated with or endorsed by IAPP. Verify the current exam blueprint on the official site.":"IAPP AIGP の非公式学習補助です。IAPPとの提携・公式認定ではありません。最新の試験ブループリントは公式で確認してください。"}
       </div>
     </div>
@@ -208616,7 +208634,7 @@ function Quiz({ onAnswer, onWrong, lang }) {
   return (
     <div>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
-        <span style={{ fontSize:12.5, color:"#8499ad" }}>{en?"All":"全問"} {poolCount}{en?"":"問"}</span>
+        <span style={{ fontSize:12.5, color:"#5a7288" }}>{en?"All":"全問"} {poolCount}{en?"":"問"}</span>
         <div style={{ display:"inline-flex", background:C.light, borderRadius:20, padding:4 }}>
           {[["seq", en?"In order":"順番"],["random", en?"Random":"ランダム"]].map(([k, label]) => (
             <button key={k} onClick={() => setOrderMode(k)} style={{ border:"none", cursor:"pointer", borderRadius:16, padding:"6px 18px", fontSize:13, fontWeight:700, background:orderMode===k?"#fff":"transparent", color:orderMode===k?C.deep:"#7d93a8", boxShadow:orderMode===k?"0 1px 3px rgba(0,0,0,.12)":"none" }}>{label}</button>
@@ -208632,7 +208650,7 @@ function Quiz({ onAnswer, onWrong, lang }) {
         ))}
       </div>
       <div style={{ background:"#fff", border:`1px solid ${C.mid}`, borderRadius:12, padding:16 }}>
-        <div style={{ fontSize:11, color:"#fff", background:DOM_HUE[Q.d], display:"inline-block", borderRadius:4, padding:"2px 8px", marginBottom:10 }}>{Q.d} · {en?(DOMAINS.find(d=>d.id===Q.d)||{}).nameEn:(DOMAINS.find(d=>d.id===Q.d)||{}).name}</div>
+        <div style={{ fontSize:11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display:"inline-block", borderRadius:4, padding:"2px 8px", marginBottom:10 }}>{Q.d} · {en?(DOMAINS.find(d=>d.id===Q.d)||{}).nameEn:(DOMAINS.find(d=>d.id===Q.d)||{}).name}</div>
         <div style={{ fontSize:16, fontWeight:600, marginBottom:16, lineHeight:1.5, color:C.ink, display:"flex", alignItems:"flex-start", gap:6 }}><span style={{ flex:1 }}>{en?Q.qEn:Q.q}</span><StarButton id={"q#" + novaQHash(Q.q || Q.qEn || "")} text={Q.q || Q.qEn} scope={en ? "Quiz" : "クイズ"} /></div>
         {opts.map((opt, i) => {
           let bg = "#fff", bd = C.mid, col = C.ink;
@@ -208654,7 +208672,7 @@ function Quiz({ onAnswer, onWrong, lang }) {
         )}
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:14 }}>
           <button onClick={goPrev} disabled={pos === 0} style={{ padding:"10px 30px", borderRadius:9, fontSize:13.5, fontWeight:600, border:`1.5px solid ${C.mid}`, background:pos===0?C.light:"#fff", color:pos===0?"#a9bccf":C.ink, cursor:pos===0?"not-allowed":"pointer" }}>{en?"← Previous":"← 前の問題"}</button>
-          <span style={{ fontSize:13, color:"#8499ad" }}>{pos + 1} / {poolCount}</span>
+          <span style={{ fontSize:13, color:"#5a7288" }}>{pos + 1} / {poolCount}</span>
           <button onClick={goNext} style={{ padding:"10px 30px", borderRadius:9, fontSize:13.5, fontWeight:600, border:`1.5px solid ${C.primary}`, background:"#fff", color:C.primary, cursor:"pointer" }}>{en?"Next →":"次の問題 →"}</button>
         </div>
       </div>
@@ -208666,12 +208684,12 @@ function Review({ state, onAnswer, onResolve, onClear, lang }) {
   const en = lang === "en";
   const rev = state.review || [];
   const [sel, setSel] = useState({});
-  if (!rev.length) return <div style={{ padding:30, textAlign:"center", color:"#7d7aa0", fontSize:13 }}>{en?"No review items. Missed questions will appear here.":"復習項目はありません。間違えた問題がここに溜まります。"}</div>;
+  if (!rev.length) return <div style={{ padding:30, textAlign:"center", color:"#68648d", fontSize:13 }}>{en?"No review items. Missed questions will appear here.":"復習項目はありません。間違えた問題がここに溜まります。"}</div>;
   return (
     <div>
       <div style={{ display:"flex", alignItems:"center", marginBottom:12 }}>
         <div style={{ fontSize:13, fontWeight:700, color:C.deep }}>{en?`Missed questions (${rev.length})`:`間違えた問題（${rev.length}）`}</div>
-        <button onClick={onClear} style={{ marginLeft:"auto", fontSize:11.5, padding:"5px 11px", borderRadius:7, border:`1px solid ${C.mid}`, background:"#fff", color:"#7d7aa0", cursor:"pointer" }}>{en?"Clear all":"すべて消去"}</button>
+        <button onClick={onClear} style={{ marginLeft:"auto", fontSize:11.5, padding:"5px 11px", borderRadius:7, border:`1px solid ${C.mid}`, background:"#fff", color:"#68648d", cursor:"pointer" }}>{en?"Clear all":"すべて消去"}</button>
       </div>
       {rev.map((Q, ri) => {
         const s = sel[ri];
@@ -208738,10 +208756,10 @@ function Glossary({ lang }) {
         if (!terms.length) return null;
         return (
           <div key={d.id} style={{ marginBottom:16 }}>
-            <div style={{ fontSize:11.5, fontWeight:800, color:"#fff", background:d.hue, borderRadius:5, padding:"3px 9px", display:"inline-block", marginBottom:8 }}>{d.id} ・ {en?d.nameEn:d.name}</div>
+            <div style={{ fontSize:11.5, fontWeight:800, color: nvInk("#ffffff", d.hue), background: d.hue, borderRadius:5, padding:"3px 9px", display:"inline-block", marginBottom:8 }}>{d.id} ・ {en?d.nameEn:d.name}</div>
             {terms.map((g, i) => (
               <div key={i} style={{ padding:"8px 0", borderBottom:`1px solid ${C.mid}` }}>
-                <div style={{ fontSize:13, fontWeight:700, color:C.deep }}>{en?g.termEn:g.term} <span style={{ fontSize:10.5, color:"#7d7aa0", fontWeight:400 }}>{en?g.term:g.termEn}</span></div>
+                <div style={{ fontSize:13, fontWeight:700, color:C.deep }}>{en?g.termEn:g.term} <span style={{ fontSize:10.5, color:"#68648d", fontWeight:400 }}>{en?g.term:g.termEn}</span></div>
                 <div style={{ fontSize:12, color:C.ink, lineHeight:1.6, marginTop:2 }}>{en?g.defEn:g.def}</div>
               </div>
             ))}
@@ -208876,7 +208894,7 @@ const AIGP_FIGS = [
 function Diagrams({ lang }) {
   return (
     <div>
-      <div style={{ fontSize: 11.5, color: "#7d7aa0", marginBottom: 10, lineHeight: 1.6 }}>{lang === "en" ? "Interactive diagrams — tap a node for details, drag / zoom the canvas, toggle layout, and press ▶ to step through. Terms in a node's explanation are listed with it — tap one for its meaning." : "インタラクティブ図解 — ノードをタップで詳細、キャンバスはドラッグ／ズーム可、レイアウト切替や ▶ の順再生にも対応。ノードの解説に出てくる用語は、押すと意味が出ます。"}</div>
+      <div style={{ fontSize: 11.5, color: "#68648d", marginBottom: 10, lineHeight: 1.6 }}>{lang === "en" ? "Interactive diagrams — tap a node for details, drag / zoom the canvas, toggle layout, and press ▶ to step through. Terms in a node's explanation are listed with it — tap one for its meaning." : "インタラクティブ図解 — ノードをタップで詳細、キャンバスはドラッグ／ズーム可、レイアウト切替や ▶ の順再生にも対応。ノードの解説に出てくる用語は、押すと意味が出ます。"}</div>
       <FlowSection flows={AIGP_FIGS} lang={lang} doneKey={STORE_KEY} terms={typeof GLOSSARY !== "undefined" ? GLOSSARY : null} />
     </div>
   );
@@ -209690,12 +209708,12 @@ function Home({ state, lang }) {
         <div style={{ flex:"1 1 160px", background:C.light, border:`1px solid ${C.mid}`, borderRadius:12, padding:"14px 16px" }}>
           <div style={{ fontSize:12, color:C.deep }}>{en?"Overall accuracy":"総合正答率"}</div>
           <div style={{ fontSize:30, fontWeight:800, color:C.primary }}>{rate}<span style={{ fontSize:15 }}>%</span></div>
-          <div style={{ fontSize:11, color:"#5f8378" }}>{tc}/{ta} {en?"correct":"正解"}</div>
+          <div style={{ fontSize:11, color:"#537369" }}>{tc}/{ta} {en?"correct":"正解"}</div>
         </div>
         <div style={{ flex:"1 1 120px", background:C.light, border:`1px solid ${C.mid}`, borderRadius:12, padding:"14px 16px" }}>
           <div style={{ fontSize:12, color:C.deep }}>{en?"Streak":"連続学習"}</div>
-          <div style={{ fontSize:30, fontWeight:800, color:C.accent }}>🔥{state.meta?.streak || 0}</div>
-          <div style={{ fontSize:11, color:"#5f8378" }}>{en?"days":"日"}</div>
+          <div style={{ fontSize:30, fontWeight:800, color:nvInk(C.accent, "#E6F2EF", 3.2) }}>🔥{state.meta?.streak || 0}</div>
+          <div style={{ fontSize:11, color:"#537369" }}>{en?"days":"日"}</div>
         </div>
       </div>
       <div style={{ fontSize:13, fontWeight:700, color:C.deep, marginBottom:10 }}>{en?"Mastery by domain":"ドメイン別 習熟度"}</div>
@@ -209705,9 +209723,9 @@ function Home({ state, lang }) {
         return (
           <div key={d.id} style={{ marginBottom:11 }}>
             <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-              <span style={{ background:d.hue, color:"#fff", borderRadius:5, padding:"2px 7px", fontSize:11, fontWeight:800 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius:5, padding:"2px 7px", fontSize:11, fontWeight:800 }}>{d.id}</span>
               <span style={{ fontSize:12.5, color:C.ink }}>{en?d.nameEn:d.name}</span>
-              <span style={{ fontSize:11, color:"#5f8378", marginLeft:"auto" }}>{d.range} ・ {p.attempts?`${r}%`:(en?"not started":"未着手")}</span>
+              <span style={{ fontSize:11, color:"#537369", marginLeft:"auto" }}>{d.range} ・ {p.attempts?`${r}%`:(en?"not started":"未着手")}</span>
             </div>
             <div style={{ height:7, background:C.light, borderRadius:4, overflow:"hidden", marginTop:5 }}>
               <div style={{ width:`${r}%`, height:"100%", background:d.hue, borderRadius:4 }} />
@@ -209715,7 +209733,7 @@ function Home({ state, lang }) {
           </div>
         );
       })}
-      <div style={{ marginTop:14, fontSize:11.5, color:"#5f8378", lineHeight:1.7 }}>
+      <div style={{ marginTop:14, fontSize:11.5, color:"#537369", lineHeight:1.7 }}>
         {en?"Unofficial study aid for ISO/IEC 42001 Foundation (PECB). Not affiliated with or endorsed by PECB or ISO. Verify the current exam outline officially.":"ISO/IEC 42001 Foundation（PECB）の非公式学習補助です。PECB・ISOとの提携・公式認定ではありません。最新の試験要項は公式で確認してください。"}
       </div>
     </div>
@@ -209752,10 +209770,10 @@ function Quiz({ onAnswer, onWrong, lang }) {
   return (
     <div>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
-        <span style={{ fontSize:12.5, color:"#5f8378" }}>{en?"All":"全問"} {poolCount}{en?"":"問"}</span>
+        <span style={{ fontSize:12.5, color:"#537369" }}>{en?"All":"全問"} {poolCount}{en?"":"問"}</span>
         <div style={{ display:"inline-flex", background:C.light, borderRadius:20, padding:4 }}>
           {[["seq", en?"In order":"順番"],["random", en?"Random":"ランダム"]].map(([k, label]) => (
-            <button key={k} onClick={() => setOrderMode(k)} style={{ border:"none", cursor:"pointer", borderRadius:16, padding:"6px 18px", fontSize:13, fontWeight:700, background:orderMode===k?"#fff":"transparent", color:orderMode===k?C.deep:"#5f8378", boxShadow:orderMode===k?"0 1px 3px rgba(0,0,0,.12)":"none" }}>{label}</button>
+            <button key={k} onClick={() => setOrderMode(k)} style={{ border:"none", cursor:"pointer", borderRadius:16, padding:"6px 18px", fontSize:13, fontWeight:700, background:orderMode===k?"#fff":"transparent", color:orderMode===k?C.deep:"#537369", boxShadow:orderMode===k?"0 1px 3px rgba(0,0,0,.12)":"none" }}>{label}</button>
           ))}
         </div>
       </div>
@@ -209768,7 +209786,7 @@ function Quiz({ onAnswer, onWrong, lang }) {
         ))}
       </div>
       <div style={{ background:"#fff", border:`1px solid ${C.mid}`, borderRadius:12, padding:16 }}>
-        <div style={{ fontSize:11, color:"#fff", background:DOM_HUE[Q.d], display:"inline-block", borderRadius:4, padding:"2px 8px", marginBottom:10 }}>{Q.d} · {en?(DOMAINS.find(d=>d.id===Q.d)||{}).nameEn:(DOMAINS.find(d=>d.id===Q.d)||{}).name}</div>
+        <div style={{ fontSize:11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display:"inline-block", borderRadius:4, padding:"2px 8px", marginBottom:10 }}>{Q.d} · {en?(DOMAINS.find(d=>d.id===Q.d)||{}).nameEn:(DOMAINS.find(d=>d.id===Q.d)||{}).name}</div>
         <div style={{ fontSize:16, fontWeight:600, marginBottom:16, lineHeight:1.5, color:C.ink, display:"flex", alignItems:"flex-start", gap:6 }}><span style={{ flex:1 }}>{en?Q.qEn:Q.q}</span><StarButton id={"q#" + novaQHash(Q.q || Q.qEn || "")} text={Q.q || Q.qEn} scope={en ? "Quiz" : "クイズ"} /></div>
         {opts.map((opt, i) => {
           let bg = "#fff", bd = C.mid, col = C.ink;
@@ -209790,7 +209808,7 @@ function Quiz({ onAnswer, onWrong, lang }) {
         )}
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:14 }}>
           <button onClick={goPrev} disabled={pos === 0} style={{ padding:"10px 30px", borderRadius:9, fontSize:13.5, fontWeight:600, border:`1.5px solid ${C.mid}`, background:pos===0?C.light:"#fff", color:pos===0?"#9cc0b4":C.ink, cursor:pos===0?"not-allowed":"pointer" }}>{en?"← Previous":"← 前の問題"}</button>
-          <span style={{ fontSize:13, color:"#5f8378" }}>{pos + 1} / {poolCount}</span>
+          <span style={{ fontSize:13, color:"#537369" }}>{pos + 1} / {poolCount}</span>
           <button onClick={goNext} style={{ padding:"10px 30px", borderRadius:9, fontSize:13.5, fontWeight:600, border:`1.5px solid ${C.primary}`, background:"#fff", color:C.primary, cursor:"pointer" }}>{en?"Next →":"次の問題 →"}</button>
         </div>
       </div>
@@ -209802,12 +209820,12 @@ function Review({ state, onAnswer, onResolve, onClear, lang }) {
   const en = lang === "en";
   const rev = state.review || [];
   const [sel, setSel] = useState({});
-  if (!rev.length) return <div style={{ padding:30, textAlign:"center", color:"#5f8378", fontSize:13 }}>{en?"No review items. Missed questions will appear here.":"復習項目はありません。間違えた問題がここに溜まります。"}</div>;
+  if (!rev.length) return <div style={{ padding:30, textAlign:"center", color:"#537369", fontSize:13 }}>{en?"No review items. Missed questions will appear here.":"復習項目はありません。間違えた問題がここに溜まります。"}</div>;
   return (
     <div>
       <div style={{ display:"flex", alignItems:"center", marginBottom:12 }}>
         <div style={{ fontSize:13, fontWeight:700, color:C.deep }}>{en?`Missed questions (${rev.length})`:`間違えた問題（${rev.length}）`}</div>
-        <button onClick={onClear} style={{ marginLeft:"auto", fontSize:11.5, padding:"5px 11px", borderRadius:7, border:`1px solid ${C.mid}`, background:"#fff", color:"#5f8378", cursor:"pointer" }}>{en?"Clear all":"すべて消去"}</button>
+        <button onClick={onClear} style={{ marginLeft:"auto", fontSize:11.5, padding:"5px 11px", borderRadius:7, border:`1px solid ${C.mid}`, background:"#fff", color:"#537369", cursor:"pointer" }}>{en?"Clear all":"すべて消去"}</button>
       </div>
       {rev.map((Q, ri) => {
         const s = sel[ri];
@@ -209873,10 +209891,10 @@ function Glossary({ lang }) {
         if (!terms.length) return null;
         return (
           <div key={d.id} style={{ marginBottom:16 }}>
-            <div style={{ fontSize:11.5, fontWeight:800, color:"#fff", background:d.hue, borderRadius:5, padding:"3px 9px", display:"inline-block", marginBottom:8 }}>{d.id} ・ {en?d.nameEn:d.name}</div>
+            <div style={{ fontSize:11.5, fontWeight:800, color: nvInk("#ffffff", d.hue), background: d.hue, borderRadius:5, padding:"3px 9px", display:"inline-block", marginBottom:8 }}>{d.id} ・ {en?d.nameEn:d.name}</div>
             {terms.map((g, i) => (
               <div key={i} style={{ padding:"8px 0", borderBottom:`1px solid ${C.mid}` }}>
-                <div style={{ fontSize:13, fontWeight:700, color:C.deep }}>{en?g.termEn:g.term} <span style={{ fontSize:10.5, color:"#5f8378", fontWeight:400 }}>{en?g.term:g.termEn}</span></div>
+                <div style={{ fontSize:13, fontWeight:700, color:C.deep }}>{en?g.termEn:g.term} <span style={{ fontSize:10.5, color:"#537369", fontWeight:400 }}>{en?g.term:g.termEn}</span></div>
                 <div style={{ fontSize:12, color:C.ink, lineHeight:1.6, marginTop:2 }}>{en?g.defEn:g.def}</div>
               </div>
             ))}
@@ -210023,7 +210041,7 @@ const ISO42001F_FIGS = [
 function Diagrams({ lang }) {
   return (
     <div>
-      <div style={{ fontSize: 11.5, color: "#7d7aa0", marginBottom: 10, lineHeight: 1.6 }}>{lang === "en" ? "Interactive diagrams — tap a node for details, drag / zoom the canvas, toggle layout, and press ▶ to step through. Terms in a node's explanation are listed with it — tap one for its meaning." : "インタラクティブ図解 — ノードをタップで詳細、キャンバスはドラッグ／ズーム可、レイアウト切替や ▶ の順再生にも対応。ノードの解説に出てくる用語は、押すと意味が出ます。"}</div>
+      <div style={{ fontSize: 11.5, color: "#68648d", marginBottom: 10, lineHeight: 1.6 }}>{lang === "en" ? "Interactive diagrams — tap a node for details, drag / zoom the canvas, toggle layout, and press ▶ to step through. Terms in a node's explanation are listed with it — tap one for its meaning." : "インタラクティブ図解 — ノードをタップで詳細、キャンバスはドラッグ／ズーム可、レイアウト切替や ▶ の順再生にも対応。ノードの解説に出てくる用語は、押すと意味が出ます。"}</div>
       <FlowSection flows={ISO42001F_FIGS} lang={lang} doneKey={STORE_KEY} terms={typeof GLOSSARY !== "undefined" ? GLOSSARY : null} />
     </div>
   );
@@ -210103,7 +210121,7 @@ function makeSecGovStation(cfg){
   const { C, DOMAINS, PASS, STORE_KEY, T, BANK, CONFUSE, COMPARE, GLOSSARY, DIAGRAMS, FIGS, HARD } = cfg;
   try { SECGOV_REG.push({ code: T.ja.appTitle, hue: C.primary, bank: BANK }); } catch (e) {}
   const DOM_HUE = Object.fromEntries(DOMAINS.map(d=>[d.id,d.hue]));
-  const G = "#6b7a88";
+  const G = "#5c6975";
   function buildSets(bank, nSets){
     const by={}; bank.forEach(q=>{(by[q.d]=by[q.d]||[]).push(q);});
     const sets={};
@@ -210161,7 +210179,7 @@ function makeSecGovStation(cfg){
           </div>
           <div style={{ flex:"1 1 120px", background:C.light, border:`1px solid ${C.mid}`, borderRadius:12, padding:"14px 16px" }}>
             <div style={{ fontSize:12, color:C.deep }}>{en?"Streak":"連続学習"}</div>
-            <div style={{ fontSize:30, fontWeight:800, color:C.accent }}>🔥{state.meta?.streak || 0}</div>
+            <div style={{ fontSize:30, fontWeight:800, color:nvInk(C.accent, "#E6F2EF", 3.2) }}>🔥{state.meta?.streak || 0}</div>
             <div style={{ fontSize:11, color:G }}>{en?"days":"日"}</div>
           </div>
         </div>
@@ -210169,7 +210187,7 @@ function makeSecGovStation(cfg){
         {DOMAINS.map(d=>{ const p=prog[d.id]||{correct:0,attempts:0}; const r=p.attempts?Math.round((p.correct/p.attempts)*100):0; return (
           <div key={d.id} style={{ marginBottom:11 }}>
             <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-              <span style={{ background:d.hue, color:"#fff", borderRadius:5, padding:"2px 7px", fontSize:11, fontWeight:800 }}>{d.id}</span>
+              <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius:5, padding:"2px 7px", fontSize:11, fontWeight:800 }}>{d.id}</span>
               <span style={{ fontSize:12.5, color:C.ink }}>{en?d.nameEn:d.name}</span>
               <span style={{ fontSize:11, color:G, marginLeft:"auto" }}>{d.range} ・ {p.attempts?`${r}%`:(en?"not started":"未着手")}</span>
             </div>
@@ -210221,7 +210239,7 @@ function makeSecGovStation(cfg){
           ))}
         </div>
         <div style={{ background:"#fff", border:`1px solid ${C.mid}`, borderRadius:12, padding:16 }}>
-          <div style={{ fontSize:11, color:"#fff", background:DOM_HUE[Q.d], display:"inline-block", borderRadius:4, padding:"2px 8px", marginBottom:10 }}>{Q.d} · {en?(DOMAINS.find(d=>d.id===Q.d)||{}).nameEn:(DOMAINS.find(d=>d.id===Q.d)||{}).name}</div>
+          <div style={{ fontSize:11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display:"inline-block", borderRadius:4, padding:"2px 8px", marginBottom:10 }}>{Q.d} · {en?(DOMAINS.find(d=>d.id===Q.d)||{}).nameEn:(DOMAINS.find(d=>d.id===Q.d)||{}).name}</div>
           <div style={{ fontSize:16, fontWeight:600, marginBottom:16, lineHeight:1.5, color:C.ink, display:"flex", alignItems:"flex-start", gap:6 }}><span style={{ flex:1 }}>{en?Q.qEn:Q.q}</span><StarButton id={"q#" + novaQHash(Q.q || Q.qEn || "")} text={Q.q || Q.qEn} scope={en ? "Quiz" : "クイズ"} /></div>
           {opts.map((opt,i)=>{ let bg="#fff", bd=C.mid, col=C.ink; if(sel!==null){ if(i===ans){bg="#E6F4EF";bd=C.ok;col=C.ok;} else if(i===sel){bg="#FBEAE8";bd=C.ng;col=C.ng;} } return (
             <button key={i} onClick={()=>choose(i)} disabled={sel!==null} style={{ display:"block", width:"100%", textAlign:"left", marginBottom:10, padding:"14px 16px", borderRadius:10, border:`1.5px solid ${bd}`, background:bg, color:col, cursor:sel===null?"pointer":"default", fontSize:14, lineHeight:1.4, fontWeight:sel!==null&&i===ans?700:500, fontFamily:"inherit" }}>
@@ -210304,7 +210322,7 @@ function makeSecGovStation(cfg){
     return (
       <div>{DOMAINS.map(d=>{ const terms=(GLOSSARY||[]).filter(g=>g.d===d.id); if(!terms.length) return null; return (
         <div key={d.id} style={{ marginBottom:16 }}>
-          <div style={{ fontSize:11.5, fontWeight:800, color:"#fff", background:d.hue, borderRadius:5, padding:"3px 9px", display:"inline-block", marginBottom:8 }}>{d.id} ・ {en?d.nameEn:d.name}</div>
+          <div style={{ fontSize:11.5, fontWeight:800, color: nvInk("#ffffff", d.hue), background: d.hue, borderRadius:5, padding:"3px 9px", display:"inline-block", marginBottom:8 }}>{d.id} ・ {en?d.nameEn:d.name}</div>
           {terms.map((g,i)=>(
             <div key={i} style={{ padding:"8px 0", borderBottom:`1px solid ${C.mid}` }}>
               <div style={{ fontSize:13, fontWeight:700, color:C.deep }}>{en?g.termEn:g.term} <span style={{ fontSize:10.5, color:G, fontWeight:400 }}>{en?g.term:g.termEn}</span></div>
@@ -217022,7 +217040,7 @@ function HubApp() {
           <span style={{ color: HUB.ink, fontSize: 13, fontWeight: 700 }}>{st.code}</span>
           <span style={{ color: HUB.sub, fontSize: 12 }}>{lang === "ja" ? st.ja : st.en}</span>
           {st.official && (
-            <a href={st.official} target="_blank" rel="noopener noreferrer" style={{ marginLeft: "auto", fontSize: 11.5, color: st.accent, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
+            <a href={st.official} target="_blank" rel="noopener noreferrer" style={{ marginLeft: "auto", fontSize: 11.5, color: nvInk(st.accent, HUB.bg), fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
               {lang === "ja" ? "公式の試験ページ ↗" : "Official exam page ↗"}
             </a>
           )}
@@ -217179,14 +217197,14 @@ function HubApp() {
                           style={{
                             fontSize: 11,
                             fontWeight: 700,
-                            color: st.accent,
+                            color: nvInk(st.accent, HUB.panel),
                             letterSpacing: "0.06em",
                           }}
                         >
                           {st.code}
                         </span>
                         {st.kind === "kit" ? (
-                          <span style={{ fontSize: 9.5, fontWeight: 700, color: st.accent, border: `1px solid ${st.accent}`, borderRadius: 20, padding: "1px 7px", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                          <span style={{ fontSize: 9.5, fontWeight: 700, color: nvInk(st.accent, HUB.panel), border: `1px solid ${st.accent}`, borderRadius: 20, padding: "1px 7px", letterSpacing: "0.08em", textTransform: "uppercase" }}>
                             {lang === "ja" ? "リファレンス" : "Reference"}
                           </span>
                         ) : (() => {
@@ -217247,7 +217265,7 @@ function HubApp() {
                     <div
                       style={{
                         fontSize: 12,
-                        color: done[st.id] ? "#16A34A" : st.accent,
+                        color: done[st.id] ? "#4ADE80" : nvInk(st.accent, HUB.panel),
                         fontWeight: 700,
                         display: "flex",
                         alignItems: "center",
@@ -217437,7 +217455,7 @@ const COMPARE = {
 };
 
 const LANGS = {
-  es: { name:"スペイン語", flag:"ES", primary:"#E0533D", accent:"#F2A65A",
+  es: { name:"スペイン語", flag:"ES", primary:"#C23E2A", accent:"#F2A65A",
         soft:"#FBEDE6", deep:"#9E3320", chip:"#F7D9C6", speechLang:"es-ES" },
   de: { name:"ドイツ語", flag:"DE", primary:"#2E5C7E", accent:"#5FA8B5",
         soft:"#E8F0F4", deep:"#1C3A52", chip:"#CFE2EC", speechLang:"de-DE" },
@@ -217823,7 +217841,7 @@ function HomePanel({goto}){
                   style={{textAlign:"left",padding:"12px 14px",borderRadius:12,border:"none",cursor:"pointer",
                     background:tk.soft}}>
                   <div style={{fontSize:11,fontWeight:700,color:tk.deep,marginBottom:6}}>📇 単語カード</div>
-                  <div style={{fontSize:17,fontWeight:800,color:tk.deep}}>{knownCount}<span style={{fontSize:11,fontWeight:600,opacity:.7}}>/{vocabTotal}</span></div>
+                  <div style={{fontSize:17,fontWeight:800,color:tk.deep}}>{knownCount}<span style={{fontSize:11,fontWeight:600,opacity:.9}}>/{vocabTotal}</span></div>
                   <div style={{height:5,background:"rgba(0,0,0,.08)",borderRadius:99,marginTop:6,overflow:"hidden"}}>
                     <div style={{height:"100%",width:`${vocabTotal?knownCount/vocabTotal*100:0}%`,background:tk.primary}}/>
                   </div>
@@ -217833,7 +217851,7 @@ function HomePanel({goto}){
                   style={{textAlign:"left",padding:"12px 14px",borderRadius:12,border:"none",cursor:"pointer",
                     background:tk.soft}}>
                   <div style={{fontSize:11,fontWeight:700,color:tk.deep,marginBottom:6}}>🎧 リスニング</div>
-                  <div style={{fontSize:17,fontWeight:800,color:tk.deep}}>{listenPct}<span style={{fontSize:11,fontWeight:600,opacity:.7}}>%</span></div>
+                  <div style={{fontSize:17,fontWeight:800,color:tk.deep}}>{listenPct}<span style={{fontSize:11,fontWeight:600,opacity:.9}}>%</span></div>
                   <div style={{fontSize:10.5,opacity:.6,marginTop:4}}>累計{fmtMinutes(listenMinutes[k]||0)}</div>
                 </button>
 
@@ -219497,9 +219515,9 @@ const SideWorkHubModule = (function () {
   const SANS = 'Inter, -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif';
 
   const CSS = `
-.sw{--bg:#F2F5FA;--panel:#fff;--ink:#0B1A33;--ink2:#22324D;--sub:#44526A;--faint:#64748B;--line:#E2E8F1;--line2:#EEF2F7;
-  --nav:#0A1730;--nav2:#10284D;--blue:#2563EB;--blue-d:#1D4ED8;--blue-dd:#1E3A8A;--blue-soft:#EAF1FE;--sky:#38BDF8;
-  --ok:#059669;--ok-soft:#E6F6EF;--warn:#B45309;--warn-soft:#FEF3E2;--ng:#DC2626;--ng-soft:#FDEDED;
+.sw{--bg:#F2F5FA;--panel:#fff;--ink:#0B1A33;--ink2:#22324D;--sub:#44526A;--faint:#526074;--line:#E2E8F1;--line2:#EEF2F7;
+  --nav:#0A1730;--nav2:#10284D;--blue:#1D4ED8;--blue-d:#1D4ED8;--blue-dd:#1E3A8A;--blue-soft:#EAF1FE;--sky:#38BDF8;
+  --ok:#047857;--ok-soft:#E6F6EF;--warn:#92400E;--warn-soft:#FEF3E2;--ng:#B91C1C;--ng-soft:#FDEDED;
   --wine:#9D174D;--wine-soft:#FCEEF4;--hist:#0E7490;--hist-soft:#E4F3F6;
   display:grid;grid-template-columns:252px minmax(0,1fr);min-height:100vh;background:var(--bg);color:var(--ink);font-family:${SANS};font-size:15px;line-height:1.7}
 .sw *{box-sizing:border-box}
@@ -219516,7 +219534,7 @@ const SideWorkHubModule = (function () {
 .sw-meter-l b{color:#fff;font-variant-numeric:tabular-nums}
 .sw-bar{height:6px;border-radius:99px;background:var(--line2);overflow:hidden}
 .sw-side .sw-bar{background:rgba(255,255,255,.1)}
-.sw-bar>i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#34D399,#059669);transition:width .3s}
+.sw-bar>i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#34D399,#047857);transition:width .3s}
 .sw-grp{margin-bottom:14px}
 .sw-grp-h{font-size:11px;letter-spacing:.16em;color:#8FA3C7;font-weight:700;padding:0 10px;margin-bottom:4px}
 .sw-nav{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:none;padding:8px 10px;border-radius:9px;color:#C9D5EA;font-size:14.5px;cursor:pointer}
@@ -219622,7 +219640,7 @@ const SideWorkHubModule = (function () {
 .sw-heat td{height:36px;min-width:40px;text-align:center;font-size:12px;font-weight:700;border-radius:7px;cursor:default}
 .sw-heat td.all{box-shadow:inset 0 0 0 2px var(--ink)}
 .sw-legend{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--sub);margin-top:10px;flex-wrap:wrap}
-.sw-legend i{display:block;width:140px;height:8px;border-radius:99px;background:linear-gradient(90deg,#EFF6FF,#93C5FD,#2563EB,#172554)}
+.sw-legend i{display:block;width:140px;height:8px;border-radius:99px;background:linear-gradient(90deg,#EFF6FF,#93C5FD,#1D4ED8,#172554)}
 .sw-fit{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--sub)}
 .sw-fit-b{display:inline-flex;gap:2px;flex-shrink:0}
 .sw-fit-b i{width:14px;height:6px;border-radius:2px;background:var(--line)}
@@ -219786,7 +219804,7 @@ const SideWorkHubModule = (function () {
 .sw-lyr.l{background:#FEF3C7;color:#92400E}.sw-lyr.c{background:#E0E7FF;color:#3730A3}
 .sw-slides{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
 .sw-slide{border:1px solid var(--line);border-radius:10px;padding:10px;background:#FFFDF7;min-width:0;display:flex;flex-direction:column;gap:4px}
-.sw-slide small{font-size:11px;font-weight:800;color:#B45309}
+.sw-slide small{font-size:11px;font-weight:800;color:#92400E}
 .sw-slide b{font-size:14px;line-height:1.45}
 .sw-slide span{font-size:13px;line-height:1.6;color:var(--ink2)}
 .sw-bighook{font-size:19px;font-weight:800;line-height:1.5;padding:12px 14px;border-radius:12px;background:#FFFBEB;border:1px solid #FDE68A;margin-bottom:10px}
@@ -220024,7 +220042,7 @@ const SideWorkHubModule = (function () {
     return (
       <svg width={size} height={size} viewBox="0 0 100 100" role="img" aria-label={`${done} / ${total}`} style={{ flexShrink: 0 }}>
         <circle cx="50" cy="50" r={r} fill="none" stroke="#E2E8F1" strokeWidth="10" />
-        {p > 0 ? <circle cx="50" cy="50" r={r} fill="none" stroke="#059669" strokeWidth="10" strokeLinecap="round" strokeDasharray={`${c * p} ${c}`} transform="rotate(-90 50 50)" /> : null}
+        {p > 0 ? <circle cx="50" cy="50" r={r} fill="none" stroke="#047857" strokeWidth="10" strokeLinecap="round" strokeDasharray={`${c * p} ${c}`} transform="rotate(-90 50 50)" /> : null}
         <text x="50" y="50" textAnchor="middle" fontSize="20" fontWeight="800" fill="#0B1A33" fontFamily="Inter, sans-serif">{Math.round(p * 100)}%</text>
         <text x="50" y="66" textAnchor="middle" fontSize="10" fill="#5A6880" fontFamily="Inter, sans-serif">{done} / {total}</text>
       </svg>
@@ -220253,7 +220271,7 @@ const SideWorkHubModule = (function () {
       </>
     );
   }
-  const KIND_C = { "手本": "#2563EB", "反面教師": "#DC2626", "プラットフォームの動き": "#B45309" };
+  const KIND_C = { "手本": "#1D4ED8", "反面教師": "#B91C1C", "プラットフォームの動き": "#92400E" };
   function Cases() {
     const rows = SW_DATA.global_cases || [];
     const kinds = Array.from(new Set(rows.map((r) => r.kind)));
@@ -220377,15 +220395,15 @@ const SideWorkHubModule = (function () {
           <rect x={L} y={my} width={mx - L} height={H - B - my} fill="#FCFCFD" />
           <line x1={mx} x2={mx} y1={T} y2={H - B} stroke="#CBD5E1" strokeDasharray="4 4" />
           <line x1={L} x2={W - R} y1={my} y2={my} stroke="#CBD5E1" strokeDasharray="4 4" />
-          {[["小さいが急伸", L + 8, T + 16, "start", "#2563EB"], ["大きく伸びる", W - R - 8, T + 16, "end", "#059669"], ["大きく安定", W - R - 8, H - B - 8, "end", "#5A6880"], ["小さく緩やか", L + 8, H - B - 8, "start", "#94A3B8"]].map(([n, x, y, a, c]) => <text key={n} x={x} y={y} textAnchor={a} fontSize="12.5" fontWeight="800" fill={c} fontFamily="Inter, sans-serif">{n}</text>)}
-          {ticks.map((v) => <g key={v}><line x1={sx(v)} x2={sx(v)} y1={H - B} y2={H - B + 4} stroke="#94A3B8" /><text x={sx(v)} y={H - B + 16} textAnchor="middle" fontSize="10.5" fill="#5A6880" fontFamily="Inter, sans-serif">{tl(v)}</text></g>)}
+          {[["小さいが急伸", L + 8, T + 16, "start", "#1D4ED8"], ["大きく伸びる", W - R - 8, T + 16, "end", "#047857"], ["大きく安定", W - R - 8, H - B - 8, "end", "#5A6880"], ["小さく緩やか", L + 8, H - B - 8, "start", "#566479"]].map(([n, x, y, a, c]) => <text key={n} x={x} y={y} textAnchor={a} fontSize="12.5" fontWeight="800" fill={c} fontFamily="Inter, sans-serif">{n}</text>)}
+          {ticks.map((v) => <g key={v}><line x1={sx(v)} x2={sx(v)} y1={H - B} y2={H - B + 4} stroke="#566479" /><text x={sx(v)} y={H - B + 16} textAnchor="middle" fontSize="10.5" fill="#5A6880" fontFamily="Inter, sans-serif">{tl(v)}</text></g>)}
           {[0, 10, 20, 30, 40].filter((v) => v <= y1).map((v) => <g key={v}><text x={L - 6} y={sy(v) + 4} textAnchor="end" fontSize="10.5" fill="#5A6880" fontFamily="Inter, sans-serif">{v}%</text></g>)}
           <text x={(L + W - R) / 2} y={H - 6} textAnchor="middle" fontSize="11.5" fill="#5A6880" fontFamily="Inter, sans-serif">市場規模（米ドル、対数目盛り）→</text>
           <text x={12} y={(T + H - B) / 2} textAnchor="middle" fontSize="11.5" fill="#5A6880" fontFamily="Inter, sans-serif" transform={`rotate(-90 12 ${(T + H - B) / 2})`}>年平均成長率 →</text>
           {Object.entries(groups).map(([k, rs]) => (
             <g key={k}>
               {rs.length > 1 ? <polyline points={rs.map((r) => `${sx(r.usd_bn)},${sy(r.cagr)}`).join(" ")} fill="none" stroke="#93C5FD" strokeWidth="1.5" strokeDasharray="3 3" /> : null}
-              {rs.map((r, i) => <circle key={i} cx={sx(r.usd_bn)} cy={sy(r.cagr)} r="7" fill="#2563EB" fillOpacity=".85" stroke="#fff" strokeWidth="2" onMouseMove={(ev) => onTip(ev, `${r.name}：${r.size}・年平均${r.cagr}%（${r.year}、${r.source}）`)} />)}
+              {rs.map((r, i) => <circle key={i} cx={sx(r.usd_bn)} cy={sy(r.cagr)} r="7" fill="#1D4ED8" fillOpacity=".85" stroke="#fff" strokeWidth="2" onMouseMove={(ev) => onTip(ev, `${r.name}：${r.size}・年平均${r.cagr}%（${r.year}、${r.source}）`)} />)}
             </g>
           ))}
           {labels.map((lb) => <text key={lb.k} x={lb.x} y={lb.y} textAnchor={lb.a} fontSize="11" fontWeight="700" fill="#22324D" fontFamily="Inter, sans-serif" style={{ pointerEvents: "none" }}>{lb.k}</text>)}
@@ -220403,7 +220421,7 @@ const SideWorkHubModule = (function () {
     const col = (m) => fitAvg(m) >= 3.75 ? 2 : fitAvg(m) >= 2.75 ? 1 : 0;
     const ROWS = [["急成長", "急成長"], ["伸び始め", "伸び始め"], ["定着", "定着（主要媒体を含む）"]];
     const COLS = ["相性 低", "相性 中", "相性 高"];
-    const tone = (r, c) => c === 2 && r < 2 ? ["攻めどころ", "#ECFDF5", "#059669"] : c === 2 ? ["主戦場", "#EFF6FF", "#2563EB"] : c === 1 && r < 2 ? ["試す価値あり", "#FFFBEB", "#B45309"] : [null, "#F8FAFC", "#94A3B8"];
+    const tone = (r, c) => c === 2 && r < 2 ? ["攻めどころ", "#ECFDF5", "#047857"] : c === 2 ? ["主戦場", "#EFF6FF", "#1D4ED8"] : c === 1 && r < 2 ? ["試す価値あり", "#FFFBEB", "#92400E"] : [null, "#F8FAFC", "#566479"];
     return (
       <div className="sw-card sw-sec">
         <div className="sw-ch"><h2 className="sw-ct">伸び × テーマとの相性</h2><span className="sw-sm">主要{(SW_DATA.media || []).length}＋伸び始め{(SW_DATA.emerging_media || []).length}媒体</span></div>
@@ -220553,8 +220571,8 @@ const SideWorkHubModule = (function () {
 
   // ---------- 01 調べる：参考アカウント ----------
   const ROLES = {
-    "手本": ["企画・見せ方・つかみの参考にする", "#2563EB"],
-    "情報源": ["一次情報・公式素材の出どころ。素材の利用は許諾を取る", "#059669"],
+    "手本": ["企画・見せ方・つかみの参考にする", "#1D4ED8"],
+    "情報源": ["一次情報・公式素材の出どころ。素材の利用は許諾を取る", "#047857"],
     "ノウハウ": ["AI動画・SNS運用・自動化の具体的な手順を学ぶ", "#7C3AED"],
     "協業候補": ["将来の取材・タイアップの相手。PR表示と年齢制限が必要", "#9D174D"],
   };
@@ -220590,7 +220608,7 @@ const SideWorkHubModule = (function () {
         </div>
         <div className="sw-g sw-g3">
           {list.map((r) => {
-            const c = (ROLES[r.role] || [])[1] || "#94A3B8";
+            const c = (ROLES[r.role] || [])[1] || "#566479";
             return (
               <div key={r.u} className="sw-acc" style={{ "--c": c }}>
                 <div className="sw-acc-h">
@@ -220637,7 +220655,7 @@ const SideWorkHubModule = (function () {
   const SER = Object.fromEntries(SERIES.map((x) => [x.id, x]));
   const NETA = SW_DATA.neta || [];
   const NETA_KEY = "sw:neta:v1";
-  const TIER_INFO = { S: ["公的・学術", "#059669"], A: ["事典・専門機関", "#2563EB"], B: ["報道・業界誌", "#0EA5E9"], C: ["Wikipedia・辞書", "#94A3B8"], D: ["個人・まとめ・不明", "#B45309"] };
+  const TIER_INFO = { S: ["公的・学術", "#047857"], A: ["事典・専門機関", "#1D4ED8"], B: ["報道・業界誌", "#0EA5E9"], C: ["Wikipedia・辞書", "#566479"], D: ["個人・まとめ・不明", "#92400E"] };
   const VCLS = { "一致": "ok", "一部一致": "part", "不一致": "ng", "原文なし": "ng", "開けない": "part" };
   const VLAB = { "一致": "原文で一致", "一部一致": "原文で一部のみ一致", "不一致": "原文と食い違い", "原文なし": "原文に記述なし", "開けない": "原文を開けず" };
   const VTag = ({ v }) => v && v.verdict ? <span className={"sw-vtag " + (VCLS[v.verdict] || "part")} title={[v.note, v.date ? `確認日 ${v.date}` : ""].filter(Boolean).join("　")}>{VLAB[v.verdict] || v.verdict}{v.date ? `（${v.date.slice(5).replace("-", "/")}）` : ""}</span> : null;
@@ -220649,10 +220667,10 @@ const SideWorkHubModule = (function () {
   const yearLabel = (y) => y == null ? "—" : y < 0 ? `前${-y}` : String(y);
   const hashJ = (s, k) => { let h = 2166136261; for (const ch of s + k) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return ((h >>> 0) % 1000) / 1000 - 0.5; };
   const QUADS = [
-    ["now", "今すぐ作る", "話題性が高く、根拠も固い", "#059669"],
-    ["check", "裏取りしてから", "話題性は高いが、根拠が揺れやすい", "#B45309"],
-    ["base", "シリーズの土台", "地味だが根拠が固く、積み上げに向く", "#2563EB"],
-    ["later", "後回し", "話題性も根拠も弱め", "#94A3B8"],
+    ["now", "今すぐ作る", "話題性が高く、根拠も固い", "#047857"],
+    ["check", "裏取りしてから", "話題性は高いが、根拠が揺れやすい", "#92400E"],
+    ["base", "シリーズの土台", "地味だが根拠が固く、積み上げに向く", "#1D4ED8"],
+    ["later", "後回し", "話題性も根拠も弱め", "#566479"],
   ];
   const quadOf = (s) => !s ? null : s.appeal >= 5.5 ? (s.evidence >= 5.5 ? "now" : "check") : (s.evidence >= 5.5 ? "base" : "later");
 
@@ -220717,7 +220735,7 @@ const SideWorkHubModule = (function () {
             {BANDS.map(([a, b, n], i) => (
               <g key={n}>
                 <rect x={L + i * bw} y={T - 22} width={bw} height={H - T + 22} fill={i % 2 ? "#F7F9FD" : "#fff"} />
-                <text x={L + i * bw + bw / 2} y={T - 8} textAnchor="middle" fontSize="12" fontWeight="800" fill="#5A6880" fontFamily="Inter, sans-serif">{n}<tspan fontWeight="400" fill="#94A3B8">（{yearLabel(a)}〜{i === BANDS.length - 1 ? "" : yearLabel(b)}）</tspan></text>
+                <text x={L + i * bw + bw / 2} y={T - 8} textAnchor="middle" fontSize="12" fontWeight="800" fill="#5A6880" fontFamily="Inter, sans-serif">{n}<tspan fontWeight="400" fill="#566479">（{yearLabel(a)}〜{i === BANDS.length - 1 ? "" : yearLabel(b)}）</tspan></text>
               </g>
             ))}
             {LANES.map((ln, i) => (
@@ -221487,7 +221505,7 @@ const SideWorkHubModule = (function () {
         {stacks.length ? (
           <div className="sw-g sw-g3">
             {stacks.map((s, i) => (
-              <div key={i} className="sw-card sw-mcard" style={{ borderTop: `3px solid ${["#059669", "#2563EB", "#7C3AED"][i % 3]}` }}>
+              <div key={i} className="sw-card sw-mcard" style={{ borderTop: `3px solid ${["#047857", "#1D4ED8", "#7C3AED"][i % 3]}` }}>
                 <div className="sw-ch" style={{ marginBottom: 0 }}><h3 className="sw-ct">{s.name}</h3><span className="sw-sm">{s.cost}</span></div>
                 <p className="sw-sm" style={{ margin: 0 }}>{s.who}</p>
                 {s.steps.map(([st, tools], j) => (
@@ -221540,7 +221558,7 @@ const SideWorkHubModule = (function () {
               <div className="sw-note warn" style={{ padding: "8px 12px" }}><b>注意　</b>{r.caution}</div>
             </div>
     );
-    const FitDots = ({ v }) => <span className="sw-score" style={{ "--c": "#2563EB" }} aria-label={`相性 ${v} / 3`}>{[1, 2, 3].map((k) => <i key={k} className={k <= v ? "on" : ""} />)}</span>;
+    const FitDots = ({ v }) => <span className="sw-score" style={{ "--c": "#1D4ED8" }} aria-label={`相性 ${v} / 3`}>{[1, 2, 3].map((k) => <i key={k} className={k <= v ? "on" : ""} />)}</span>;
     return (
       <div>
         <Head kick="03 作る" title="MCP・コネクタ・プラグイン" lede={`Claude から外部サービスを動かすための連携を、この副業の工程に合わせて選びました（${C.checked || ""}に${C.source || "ディレクトリ"}で確認）。説明はディレクトリの記載にもとづき、実際に接続して動作を試したものではありません。`} />
@@ -221690,7 +221708,7 @@ const SideWorkHubModule = (function () {
       </div>
     );
   }
-  const TIERS = [["S", "一次情報", "公的統計・公文書・公式発表・原典", "#059669"], ["A", "定評ある解説", "事典・学術書・専門機関の解説", "#2563EB"], ["B", "信頼できる報道", "報道・業界メディア。独立した2つ以上で一致を確かめる", "#64748B"]];
+  const TIERS = [["S", "一次情報", "公的統計・公文書・公式発表・原典", "#047857"], ["A", "定評ある解説", "事典・学術書・専門機関の解説", "#1D4ED8"], ["B", "信頼できる報道", "報道・業界メディア。独立した2つ以上で一致を確かめる", "#526074"]];
   function Sources() {
     const [kind, setKind] = useState("wine");
     const rows = ((SW_DATA[kind] || {}).sources) || [];
@@ -227002,8 +227020,8 @@ function FontStyles() {
       .lh-root {
         --lh-bg: #ffffff;
         --lh-text: #14213d;
-        --lh-muted: #8b96a8;
-        --lh-muted2: #9aa5b8;
+        --lh-muted: #5F6B80;
+        --lh-muted2: #64738E;
         --lh-border: #e7e9ee;
         --lh-border2: #e0e4eb;
         --lh-card: #ffffff;
@@ -227644,7 +227662,7 @@ function RadialDiagram({ cat, selected, onSelect }) {
               y={y + 11}
               textAnchor="middle"
               fontSize="7"
-              fill={isSel ? "#eef3fd" : "#8b96a8"}
+              fill={isSel ? "#eef3fd" : "#5F6B80"}
               fontFamily="Inter, sans-serif"
             >
               {truncateLabel(f.en, 14)}
@@ -227698,7 +227716,7 @@ function LayersDiagram({ cat, selected, onSelect }) {
               y={y + rowH / 2 + 12}
               textAnchor="middle"
               fontSize="7.5"
-              fill={isSel ? "#eef3fd" : "#8b96a8"}
+              fill={isSel ? "#eef3fd" : "#5F6B80"}
               fontFamily="Inter, sans-serif"
             >
               {f.en}
@@ -227741,7 +227759,7 @@ function TimelineDiagram({ cat, selected, onSelect }) {
             >
               {truncateLabel(f.ja, 8)}
             </text>
-            <text x={x} y={labelY + 12} textAnchor="middle" fontSize="7.5" fill="#8b96a8" fontFamily="Inter, sans-serif">
+            <text x={x} y={labelY + 12} textAnchor="middle" fontSize="7.5" fill="#5F6B80" fontFamily="Inter, sans-serif">
               {truncateLabel(f.en, 13)}
             </text>
           </g>
@@ -227798,7 +227816,7 @@ function PipelineDiagram({ cat, selected, onSelect }) {
               y={y + boxH / 2 + 13}
               textAnchor="middle"
               fontSize="6.8"
-              fill={isSel ? "#eef3fd" : "#8b96a8"}
+              fill={isSel ? "#eef3fd" : "#5F6B80"}
               fontFamily="Inter, sans-serif"
             >
               {truncateLabel(f.en, 12)}
@@ -227865,7 +227883,7 @@ function MeshDiagram({ cat, selected, onSelect }) {
               y={p.y + 11}
               textAnchor="middle"
               fontSize="6.8"
-              fill={isSel ? "#eef3fd" : "#8b96a8"}
+              fill={isSel ? "#eef3fd" : "#5F6B80"}
               fontFamily="Inter, sans-serif"
             >
               {truncateLabel(p.f.en, 13)}
@@ -227967,7 +227985,7 @@ function DiagramInfoBox({ text }) {
         minHeight: 20,
       }}
     >
-      {text || <span style={{ color: "#9aa5b8" }}>図の要素をクリックすると説明が表示されます</span>}
+      {text || <span style={{ color: "#64738E" }}>図の要素をクリックすると説明が表示されます</span>}
     </div>
   );
 }
@@ -228017,7 +228035,7 @@ function OntologyDiagram() {
             </g>
           );
         })}
-        <text x={170} y="195" textAnchor="middle" fontSize="9" fill="#8b96a8" fontFamily="Inter, sans-serif">
+        <text x={170} y="195" textAnchor="middle" fontSize="9" fill="#5F6B80" fontFamily="Inter, sans-serif">
           is-a 関係によるクラス階層の例(クリックして各クラスを確認)
         </text>
       </svg>
@@ -228113,7 +228131,7 @@ function RDFDiagram() {
             </g>
           );
         })}
-        <text x={160} y="115" textAnchor="middle" fontSize="9" fill="#8b96a8" fontFamily="Inter, sans-serif">
+        <text x={160} y="115" textAnchor="middle" fontSize="9" fill="#5F6B80" fontFamily="Inter, sans-serif">
           RDF(Resource Description Framework)トリプルの基本構造
         </text>
       </svg>
@@ -228137,7 +228155,7 @@ function OWLDiagram() {
           <text x={105} y={40} textAnchor="middle" fontSize="10.5" fill={selected === "class" ? "#ffffff" : "#14213d"} fontFamily="Georgia, serif">
             クラス: Person
           </text>
-          <text x={105} y={58} textAnchor="middle" fontSize="8" fill={selected === "class" ? "#eef3fd" : "#8b96a8"} fontFamily="Inter, sans-serif">
+          <text x={105} y={58} textAnchor="middle" fontSize="8" fill={selected === "class" ? "#eef3fd" : "#5F6B80"} fontFamily="Inter, sans-serif">
             Class
           </text>
         </g>
@@ -228255,8 +228273,8 @@ function ReasoningDiagram() {
           </text>
         </g>
 
-        <line x1={160} y1={60} x2={160} y2={100} stroke="#8b96a8" strokeWidth="1.3" />
-        <polygon points="155,96 165,96 160,106" fill="#8b96a8" />
+        <line x1={160} y1={60} x2={160} y2={100} stroke="#5F6B80" strokeWidth="1.3" />
+        <polygon points="155,96 165,96 160,106" fill="#5F6B80" />
 
         <g onClick={() => setSelected(selected === "c" ? null : "c")} style={{ cursor: "pointer" }}>
           <rect x={80} y={110} width={160} height={46} rx={6} fill={selected === "c" ? "#7fb88a" : "#eef6ee"} stroke="#7fb88a" strokeWidth={selected === "c" ? 2.2 : 1.5} />
@@ -228290,10 +228308,10 @@ function PhoneticsDiagram() {
     <div>
       <svg viewBox="0 0 340 120" style={{ width: "100%", maxWidth: 380, display: "block", margin: "0 auto" }}>
         <line x1={20} y1={60} x2={320} y2={60} stroke="#c2c9d6" strokeWidth="1.5" />
-        <text x={20} y="14" fontSize="8.5" fill="#8b96a8" fontFamily="Inter, sans-serif">
+        <text x={20} y="14" fontSize="8.5" fill="#5F6B80" fontFamily="Inter, sans-serif">
           前(唇側)
         </text>
-        <text x={300} y="14" fontSize="8.5" fill="#8b96a8" fontFamily="Inter, sans-serif" textAnchor="end">
+        <text x={300} y="14" fontSize="8.5" fill="#5F6B80" fontFamily="Inter, sans-serif" textAnchor="end">
           後(喉側)
         </text>
         {places.map((p, i) => {
@@ -228354,7 +228372,7 @@ function SyntaxTreeDiagram() {
             </g>
           );
         })}
-        <text x={170} y="145" textAnchor="middle" fontSize="8.5" fill="#8b96a8" fontFamily="Inter, sans-serif">
+        <text x={170} y="145" textAnchor="middle" fontSize="8.5" fill="#5F6B80" fontFamily="Inter, sans-serif">
           句構造木の例: 「猫が座る」
         </text>
       </svg>
@@ -228374,7 +228392,7 @@ function NeuroBrainDiagram() {
     <div>
       <svg viewBox="0 0 340 200" style={{ width: "100%", maxWidth: 380, display: "block", margin: "0 auto" }}>
         <ellipse cx={175} cy={110} rx={150} ry={80} fill="none" stroke="#c2c9d6" strokeWidth="1.5" />
-        <text x={175} y="30" textAnchor="middle" fontSize="8.5" fill="#8b96a8" fontFamily="Inter, sans-serif">
+        <text x={175} y="30" textAnchor="middle" fontSize="8.5" fill="#5F6B80" fontFamily="Inter, sans-serif">
           脳(側面図・簡略化)
         </text>
         {regions.map((r) => {
@@ -230216,7 +230234,7 @@ function LinguisticsHub() {
             <h2 className="lh-serif" style={{ fontSize: 26, fontWeight: 500, margin: "0 0 4px" }}>
               {category.ja}
             </h2>
-            <p style={{ fontSize: 13, color: "#8b96a8", marginTop: 0, marginBottom: 20 }}>{category.en}</p>
+            <p style={{ fontSize: 13, color: "#5F6B80", marginTop: 0, marginBottom: 20 }}>{category.en}</p>
 
             <CategoryTabBar active={categoryTab} onChange={setCategoryTab} />
 
@@ -230356,7 +230374,7 @@ function LinguisticsHub() {
             <h2 className="lh-serif" style={{ fontSize: 26, fontWeight: 500, margin: "0 0 4px" }}>
               {field.ja}
             </h2>
-            <p style={{ fontSize: 13, color: "#8b96a8", marginTop: 0, marginBottom: 28 }}>{field.en}</p>
+            <p style={{ fontSize: 13, color: "#5F6B80", marginTop: 0, marginBottom: 28 }}>{field.en}</p>
             {field.sub.map((s, i) => {
               const key = `${category.id}:${field.id}:${s.id}`;
               const st = statFor(key, progress);
@@ -232972,7 +232990,7 @@ function ProjectNova() {
               style={{
                 fontSize: 11,
                 letterSpacing: 1.5,
-                color: activeStation ? activeStation.accent : NOVA.sub,
+                color: activeStation ? nvInk(activeStation.accent, "#FFFFFF") : NOVA.sub,
               }}
             >
               {activeStation ? (lang === "ja" ? activeStation.ja : activeStation.en) : ""}
