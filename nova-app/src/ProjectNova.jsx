@@ -165204,17 +165204,33 @@ function GovRegMap({ en, deep }) {
   );
 }
 
+// ---------- 業界別チェック ----------
+const GOVIND_TH = [["ai", "AIそのものの規律", "AI-specific rules", "AI", "AI"], ["pi", "個人情報・データ", "Personal data", "個人情報", "Data"], ["out", "委託・クラウド・調達", "Outsourcing, cloud, procurement", "委託・調達", "Outsourcing"], ["sec", "セキュリティ", "Security", "セキュリティ", "Security"], ["model", "モデル検証・業務規制", "Model validation & conduct", "モデル・業務", "Models & conduct"], ["prod", "製品・機器の安全と責任", "Product safety & liability", "製品安全", "Product safety"], ["info", "記録・秘密・輸出管理", "Records, secrets, export", "記録・秘密", "Records"], ["ip", "知的財産・著作権", "IP & copyright", "知財・著作権", "IP"], ["cons", "消費者保護・表示・広告", "Consumer protection & advertising", "消費者・表示", "Consumers"], ["labor", "雇用・労働", "Employment & labour", "雇用・労働", "Employment"]];
+const GOVIND_BASE = ["jp-ai-act", "jp-ai-biz-guideline", "jp-ppc-genai-alert", "jp-appi-2026", "jp-copyright-ai", "jp-ip-principle-code", "jp-aisi-guides", "eu-ai-act"];
+const govKindG = (k) => (k === "法律" || k === "判例" ? "law" : k === "基準" ? "std" : "guide");
+const GOVIND_KG = { law: ["法令・判例", "Statutes & case law"], guide: ["指針・ガイドライン・原則", "Guidance & principles"], std: ["基準・規格", "Standards"] };
+const GOVIND_KIND = { 法律: "Statute", 判例: "Case law", 基準: "Standard", ガイドライン: "Guideline", 原則: "Principles", 指針: "Guidance" };
 function GovIndustry({ en, onMode, onTab, deep }) {
   const [k, setK] = useState(deep && GOVIND.some((x) => x.key === deep.k) ? deep.k : GOVIND[0].key);
   const [th, setTh] = useState(null);
   const [sel, setSel] = useState(null);
   const [base, setBase] = useState(null);
+  const [hv, setHv] = useState(null); // { k, t, x, y }：カーソルを当てたマス
+  const [sortT, setSortT] = useState(null);
+  useEffect(() => { if (!hv) return undefined; const f = () => setHv(null); window.addEventListener("scroll", f, true); return () => window.removeEventListener("scroll", f, true); }, [hv]);
   const L = (x) => GOVX_L(x, en);
   const d = GOVIND.find((x) => x.key === k) || GOVIND[0];
   const sc = GOVDOJO_SCENARIOS.filter((x) => (d.scen || []).includes(x.industry));
   const count = (ind, t) => ind.regs.filter((r) => (r.themes || []).includes(t)).length;
   const max = Math.max(...GOVIND.flatMap((ind) => GOVIND_TH.map(([t]) => count(ind, t))));
-  const shade = (n) => (n === 0 ? C.surface : GV_RAMP[Math.min(GV_RAMP.length - 1, Math.floor(((n - 1) / Math.max(1, max - 1)) * (GV_RAMP.length - 1)))]);
+  const rampI = (n) => Math.min(GV_RAMP.length - 1, Math.floor(((n - 1) / Math.max(1, max - 1)) * (GV_RAMP.length - 1)));
+  const shade = (n) => (n === 0 ? C.surface : GV_RAMP[rampI(n)]);
+  const ink = (n) => (n > 0 && rampI(n) >= 2 ? C.bg : C.text);
+  // 凡例：濃さごとの件数の範囲
+  const bands = GV_RAMP.map((col, i) => { const ns = []; for (let n = 1; n <= max; n++) if (rampI(n) === i) ns.push(n); return ns.length ? [col, ns[0] === ns[ns.length - 1] ? `${ns[0]}` : `${ns[0]}–${ns[ns.length - 1]}`] : null; }).filter(Boolean);
+  const rowsInd = sortT ? GOVIND.slice().sort((p, q) => count(q, sortT) - count(p, sortT)) : GOVIND;
+  const hvInd = hv ? GOVIND.find((x) => x.key === hv.k) : null;
+  const hvRules = hvInd ? hvInd.regs.filter((r) => (r.themes || []).includes(hv.t)) : [];
   const regs = d.regs.map((r, i) => ({ ...r, i, tags: r.themes || [], os: !!r.os }));
   const cur = sel != null ? regs[sel] : null;
   // 地図のボタンは長い括弧書きを省く。省くと同じ名前が並ぶ規定は、括弧書きを残して見分けられるようにする
@@ -165239,18 +165255,35 @@ function GovIndustry({ en, onMode, onTab, deep }) {
       <div className="gh-figscroll">
         <div style={{ minWidth: 760, display: "grid", gridTemplateColumns: `150px repeat(${GOVIND_TH.length},minmax(0,1fr))`, gap: 3 }}>
           <div style={{ position: "sticky", left: 0, zIndex: 1, background: C.bg }} />
-          {GOVIND_TH.map(([t, ja, enl, sj, se]) => <div key={t} title={en ? enl : ja} style={{ fontSize: 10.5, fontWeight: 800, color: th === t ? C.gold : C.muted, textAlign: "center", lineHeight: 1.25, display: "flex", alignItems: "flex-end", justifyContent: "center", paddingBottom: 3, borderBottom: `2px solid ${th === t ? C.gold : C.line}` }}>{en ? se : sj}</div>)}
-          {GOVIND.map((ind) => (
+          {GOVIND_TH.map(([t, ja, enl, sj, se]) => <button key={t} onClick={() => setSortT(sortT === t ? null : t)} title={(en ? enl : ja) + (en ? " — click to sort industries by this theme" : " — 押すと、このテーマの規定が多い順に業界を並べる")} aria-pressed={sortT === t} style={{ fontSize: 10.5, fontWeight: 800, color: th === t || (hv && hv.t === t) || sortT === t ? C.gold : C.muted, textAlign: "center", lineHeight: 1.25, display: "flex", alignItems: "flex-end", justifyContent: "center", padding: "0 0 3px", background: "transparent", border: "none", borderBottom: `2px solid ${th === t || sortT === t ? C.gold : hv && hv.t === t ? C.muted : C.line}`, cursor: "pointer" }}>{en ? se : sj}{sortT === t ? " ▼" : ""}</button>)}
+          {rowsInd.map((ind) => (
             <React.Fragment key={ind.key}>
-              <button onClick={() => { setK(ind.key); setSel(null); }} style={{ position: "sticky", left: 0, zIndex: 1, background: ind.key === k ? C.surface2 : C.bg, border: "none", borderLeft: `3px solid ${ind.key === k ? C.gold : "transparent"}`, borderRadius: 4, color: ind.key === k ? C.gold : C.text, fontSize: 11.5, fontWeight: 800, padding: "3px 6px", cursor: "pointer", textAlign: "left", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 4 }}><span>{L([ind.ind, ind.ind_en])}</span><span style={{ fontSize: 10, color: C.dim, fontWeight: 600 }}>{ind.regs.length}</span></button>
+              <button onClick={() => { setK(ind.key); setSel(null); }} style={{ position: "sticky", left: 0, zIndex: 1, background: ind.key === k ? C.surface2 : hv && hv.k === ind.key ? C.surface : C.bg, border: "none", borderLeft: `3px solid ${ind.key === k ? C.gold : hv && hv.k === ind.key ? C.muted : "transparent"}`, borderRadius: 4, color: ind.key === k ? C.gold : C.text, fontSize: 11.5, fontWeight: 800, padding: "3px 6px", cursor: "pointer", textAlign: "left", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 4 }}><span>{L([ind.ind, ind.ind_en])}</span><span style={{ fontSize: 10, color: C.dim, fontWeight: 600 }}>{ind.regs.length}</span></button>
               {GOVIND_TH.map(([t, ja, enl]) => {
                 const n = count(ind, t), on = th === t && k === ind.key;
-                return <button key={t} onClick={() => { setK(ind.key); setTh(on ? null : t); setSel(null); }} title={`${L([ind.ind, ind.ind_en])} × ${en ? enl : ja}: ${n}`} style={{ background: shade(n), color: n >= 3 ? C.bg : C.text, border: `2px solid ${on ? C.gold : "transparent"}`, borderRadius: 6, height: 28, fontSize: 12, fontWeight: 800, cursor: "pointer" }}>{n || "·"}</button>;
+                const cross = hv && (hv.k === ind.key || hv.t === t), me = hv && hv.k === ind.key && hv.t === t;
+                const enter = (e) => { const r = e.currentTarget.getBoundingClientRect(); setHv({ k: ind.key, t, x: r.right, y: r.top, l: r.left }); };
+                return <button key={t} onClick={() => { setK(ind.key); setTh(on ? null : t); setSel(null); }} onMouseEnter={enter} onFocus={enter} onMouseLeave={() => setHv(null)} onBlur={() => setHv(null)} aria-label={`${L([ind.ind, ind.ind_en])} × ${en ? enl : ja}: ${n}`} style={{ background: shade(n), color: ink(n), border: `2px solid ${on ? C.gold : me ? C.text : "transparent"}`, outline: cross && !me ? `1px solid ${C.line}` : "none", borderRadius: 6, height: 28, fontSize: 12, fontWeight: 800, cursor: "pointer", opacity: hv && !cross ? 0.55 : 1, transition: "opacity .12s" }}>{n || "·"}</button>;
               })}
             </React.Fragment>
           ))}
         </div>
       </div>
+      <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", fontSize: 11, color: C.muted, marginTop: 6 }}>
+        <span>{en ? "Rules per cell:" : "1マスの規定の数："}</span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><span style={{ width: 16, height: 12, borderRadius: 3, background: C.surface, border: `1px solid ${C.line}` }} />0</span>
+        {bands.map(([col, l]) => <span key={l} style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><span style={{ width: 16, height: 12, borderRadius: 3, background: col }} />{l}</span>)}
+        <span style={{ color: C.dim }}>{sortT ? (en ? "Sorted by the marked theme — click it again for the original order." : "▼のテーマの多い順。もう一度押すと元の順。") : (en ? "Click a theme to sort industries by it." : "テーマ名を押すと、その規定が多い順に並ぶ。")}</span>
+      </div>
+      {hv && hvInd ? (
+        <div role="tooltip" style={{ position: "fixed", zIndex: 50, pointerEvents: "none", top: Math.max(8, Math.min(hv.y, (typeof window !== "undefined" ? window.innerHeight : 800) - 220)), ...(hv.x + 300 < (typeof window !== "undefined" ? window.innerWidth : 1200) ? { left: hv.x + 8 } : { left: Math.max(8, hv.l - 298) }), width: 290, background: C.surface2, border: `1px solid ${C.gold}`, borderRadius: 8, padding: "8px 10px", boxShadow: "0 6px 20px rgba(0,0,0,.45)" }}>
+          <div style={{ fontSize: 11.5, fontWeight: 800, color: C.text }}>{L([hvInd.ind, hvInd.ind_en])} × {L(GOVIND_TH.find((x) => x[0] === hv.t).slice(1, 3))}</div>
+          <div style={{ fontSize: 11, color: C.gold, margin: "2px 0 4px" }}>{en ? `${hvRules.length} rules` : `${hvRules.length}件の規定`}</div>
+          {hvRules.slice(0, 6).map((r, i) => <div key={i} style={{ fontSize: 11, color: C.muted, lineHeight: 1.5 }}>・{cut(r)}</div>)}
+          {hvRules.length > 6 ? <div style={{ fontSize: 10.5, color: C.dim }}>{en ? `+${hvRules.length - 6} more` : `ほか${hvRules.length - 6}件`}</div> : null}
+          {hvRules.length ? <div style={{ fontSize: 10.5, color: C.dim, marginTop: 4 }}>{en ? "Click to highlight them in the map below" : "押すと、下の地図でこの規定が光る"}</div> : null}
+        </div>
+      ) : null}
       <GV_H>{en ? `${L([d.ind, d.ind_en])}: the map of rules` : `${d.ind}：規定の地図`}{th ? <span style={{ fontSize: 11, color: C.gold, marginLeft: 8 }}>{en ? "highlight: " : "強調："}{L(GOVIND_TH.find((x) => x[0] === th).slice(1))}<button onClick={() => setTh(null)} style={{ marginLeft: 6, background: "transparent", border: `1px solid ${C.line}`, color: C.muted, borderRadius: 6, fontSize: 10.5, cursor: "pointer" }}>{en ? "clear" : "解除"}</button></span> : null}</GV_H>
       <div style={{ marginBottom: 6 }}><GovShare en={en} url={govLink("industry", { k })} /></div>
       <div className="gh-figscroll">

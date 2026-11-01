@@ -57,6 +57,7 @@ description: TechHub「セキュリティ・ガバナンス道場」の規制マ
    cd nova-app && npm run build                                     # prebuild で問題と事実を照合
    cd .. && python3 .claude/skills/nova-consistency-audit/scripts/stale_scan.py   # MISMATCH 0
    node .claude/skills/nova-consistency-audit/scripts/smoke.mjs     # 実行時エラー 0
+   node .claude/skills/govdojo-maintenance/scripts/dojo_modes.mjs   # 道場の全画面 × 2言語で NG 0
    ```
 
 ### B2. ユースケースの入口を足す・直す（usecases.json）
@@ -88,6 +89,7 @@ description: TechHub「セキュリティ・ガバナンス道場」の規制マ
 - **出典の格付け**：法律事務所の記事・条文の非公式サイト（artificialintelligenceact.eu など）は「二次」。それだけに拠る点は注記で明かす。
 - **期待・推奨を義務と書いた**：「期待する」「望ましい」「should」を「義務」「must」と書かない。
 - **取れない資料**：EUR-Lex・一部の米国サイトはボット確認を返す。回避せず、欧州委員会・欧州議会など取れる一次資料で確かめ、条文そのものは「未確認」と書く。PDF の文字化けは PyMuPDF で取り出し直す。e-Gov の法令は API で取る。
+- **関数を丸ごと書き換えて、後ろの定数まで消した**：「次の function まで」を置き換えたため、間にあった業界別の定数（GOVIND_TH など）が消え、業界別・自社チェック表・ユースケースが開けなくなった。TechHub のタブを開くだけのスモークテストでは気付けない。→ 書き換えは置き換え範囲を確かめ、`dojo_modes.mjs` で道場の全画面を開いて確かめる。
 - **作業の喪失**：コンテナの再起動で途中の作業が消えることがある。調査・作問は途中経過を早めにファイルへ書き出す。
 
 ## 4. 費用の目安（2026年10月の作業の実測）
