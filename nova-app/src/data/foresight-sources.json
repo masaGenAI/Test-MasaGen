@@ -1037,7 +1037,7 @@
   "url": "https://arena.ai/leaderboard",
   "desc": [
    "P（lmarena.ai拒否）。検索要約でドメイン稼働の言及のみ",
-   "P（lmarena.ai拒否）。検索要約でドメイン稼働の言及のみ"
+   "P (lmarena.ai refused the fetch). Search summaries only mention that the domain is live"
   ],
   "freq": [
    "",
@@ -1136,7 +1136,7 @@
   "url": "https://www.swebench.com/",
   "desc": [
    "N。GitHub MCPも対象リポジトリ未許可",
-   "N。GitHub MCPも対象リポジトリ未許可"
+   "N. GitHub MCP access to the repository was not permitted either"
   ],
   "freq": [
    "",
@@ -1235,7 +1235,7 @@
   "url": "https://epoch.ai/benchmarks",
   "desc": [
    "N（epoch.ai/data は検索で存在確認済み）",
-   "N（epoch.ai/data は検索で存在確認済み）"
+   "N (epoch.ai/data confirmed to exist via search)"
   ],
   "freq": [
    "",
@@ -1664,7 +1664,7 @@
   "url": "https://ourworldindata.org/artificial-intelligence",
   "desc": [
    "N（grapher URLのみB確認）",
-   "N（grapher URLのみB確認）"
+   "N (only the grapher URL checked at level B)"
   ],
   "freq": [
    "",
@@ -1730,7 +1730,7 @@
   "url": "https://www.census.gov/hfp/btos/",
   "desc": [
    "N（関連記事のみB確認）",
-   "N（関連記事のみB確認）"
+   "N (only related articles checked at level B)"
   ],
   "freq": [
    "",
@@ -2060,7 +2060,7 @@
   "url": "https://incidentdatabase.ai/",
   "desc": [
    "N。検索でも結果に出ず",
-   "N。検索でも結果に出ず"
+   "N. Not found by search either"
   ],
   "freq": [
    "",
@@ -2588,7 +2588,7 @@
   "url": "https://press.aboutamazon.com/",
   "desc": [
    "ENOTFOUND（2回）",
-   "ENOTFOUND（2回）"
+   "ENOTFOUND (twice)"
   ],
   "freq": [
    "",
@@ -2720,7 +2720,7 @@
   "url": "https://aws.amazon.com/jp/new/",
   "desc": [
    "未試行（同ドメイン遮断のため）",
-   "未試行（同ドメイン遮断のため）"
+   "Not attempted (same domain blocked)"
   ],
   "freq": [
    "",
@@ -2885,7 +2885,7 @@
   "url": "https://www.microsoft.com/en-us/investor/earnings/default",
   "desc": [
    "ロードしたがエラー様の画面（Trace Id のみ）で内容不一致",
-   "ロードしたがエラー様の画面（Trace Id のみ）で内容不一致"
+   "Loaded, but showed an error-like screen (Trace Id only); content did not match"
   ],
   "freq": [
    "",
@@ -2984,7 +2984,7 @@
   "url": "https://www.googlecloudpresscorner.com/press-releases",
   "desc": [
    "旧 URL からの 301 先。ENOTFOUND",
-   "旧 URL からの 301 先。ENOTFOUND"
+   "301 target of the old URL. ENOTFOUND"
   ],
   "freq": [
    "",
@@ -3479,7 +3479,7 @@
   "url": "https://www.googlecloudevents.com/next-vegas",
   "desc": [
    "301 先。ENOTFOUND",
-   "301 先。ENOTFOUND"
+   "301 target. ENOTFOUND"
   ],
   "freq": [
    "",
@@ -3677,7 +3677,7 @@
   "url": "https://www.gartner.com/en/articles/hype-cycle-for-artificial-intelligence",
   "desc": [
    "ENOTFOUND（URL 自体も記憶ベースで不確実）",
-   "ENOTFOUND（URL 自体も記憶ベースで不確実）"
+   "ENOTFOUND (the URL itself is from memory and uncertain)"
   ],
   "freq": [
    "",
@@ -3875,7 +3875,7 @@
   "url": "https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai",
   "desc": [
    "ENOTFOUND（未試行・ドメイン遮断のため。URL は記憶ベース）",
-   "ENOTFOUND（未試行・ドメイン遮断のため。URL は記憶ベース）"
+   "ENOTFOUND (not attempted because the domain is blocked; URL is from memory)"
   ],
   "freq": [
    "",
@@ -4073,7 +4073,7 @@
   "url": "https://menlovc.com/perspective/",
   "desc": [
    "ENOTFOUND。ただし 2025 年版レポート URL は WebSearch 結果に出現（下記）",
-   "ENOTFOUND。ただし 2025 年版レポート URL は WebSearch 結果に出現（下記）"
+   "ENOTFOUND. However, the 2025 report URL appears in WebSearch results (below)"
   ],
   "freq": [
    "",
@@ -4106,7 +4106,7 @@
   "url": "https://menlovc.com/perspective/2025-the-state-of-generative-ai-in-the-enterprise/",
   "desc": [
    "WebSearch 結果に出現するが fetch は不可（ENOTFOUND）。存在の傍証のみ",
-   "WebSearch 結果に出現するが fetch は不可（ENOTFOUND）。存在の傍証のみ"
+   "Appears in WebSearch results but cannot be fetched (ENOTFOUND). Indirect evidence of existence only"
   ],
   "freq": [
    "",
@@ -4205,7 +4205,7 @@
   "url": "https://www.bondcap.com/",
   "desc": [
    "ENOTFOUND（Mary Meeker の AI Trends レポートが現行で公開中かも未確認）",
-   "ENOTFOUND（Mary Meeker の AI Trends レポートが現行で公開中かも未確認）"
+   "ENOTFOUND (also unconfirmed whether Mary Meeker's AI Trends report is currently published)"
   ],
   "freq": [
    "",
@@ -4337,7 +4337,7 @@
   "url": "https://claude.com/ja/customers",
   "desc": [
    "308 先。未取得",
-   "308 先。未取得"
+   "308 target. Not fetched"
   ],
   "freq": [
    "",
@@ -6614,7 +6614,7 @@
   "url": "https://www.metaculus.com/questions/?topic=ai",
   "desc": [
    "検索結果に出たのは `/notebooks/16708/...` のみ（テンプレ文字列付きで壊れたURL）",
-   "検索結果に出たのは `/notebooks/16708/...` のみ（テンプレ文字列付きで壊れたURL）"
+   "Search returned only `/notebooks/16708/...` (a broken URL containing a template string)"
   ],
   "freq": [
    "常時",
@@ -6647,7 +6647,7 @@
   "url": "https://www.gjopen.com/",
   "desc": [
    "検索では GJO 本体が出ず二次要約のみ",
-   "検索では GJO 本体が出ず二次要約のみ"
+   "Search did not return GJO itself, only secondary summaries"
   ],
   "freq": [
    "常時",
@@ -6680,7 +6680,7 @@
   "url": "https://manifold.markets/",
   "desc": [
    "検索未実施",
-   "検索未実施"
+   "Search not run"
   ],
   "freq": [
    "常時",
@@ -6713,7 +6713,7 @@
   "url": "https://epoch.ai/",
   "desc": [
    "`/blog/` 配下のみ検索で出現",
-   "`/blog/` 配下のみ検索で出現"
+   "Only pages under `/blog/` appear in search"
   ],
   "freq": [
    "随時",
@@ -6746,7 +6746,7 @@
   "url": "https://www.shell.com/news-and-insights/scenarios.html",
   "desc": [
    "ブログのみ S",
-   "ブログのみ S"
+   "Blog only: S"
   ],
   "freq": [
    "版ごと",
@@ -6779,7 +6779,7 @@
   "url": "https://www.oecd.org/en/topics/policy-issues/strategic-foresight.html",
   "desc": [
    "刊行物ページのみ S",
-   "刊行物ページのみ S"
+   "Publications page only: S"
   ],
   "freq": [
    "随時",
@@ -6812,7 +6812,7 @@
   "url": "https://www.iftf.org/",
   "desc": [
    "legacy のみ S",
-   "legacy のみ S"
+   "Legacy only: S"
   ],
   "freq": [
    "随時",
@@ -6845,7 +6845,7 @@
   "url": "https://www.nistep.go.jp/research/science-and-technology-foresight-and-science-and-technology-trends/",
   "desc": [
    "検索で出たのは nistep.repo.nii.ac.jp 上のPDF（例 https://nistep.repo.nii.ac.jp/record/6657/files/NISTEP-NR183-FullJ.pdf）で、これらは S 相当だが調査ページ自体は U",
-   "検索で出たのは nistep.repo.nii.ac.jp 上のPDF（例 https://nistep.repo.nii.ac.jp/record/6657/files/NISTEP-NR183-FullJ.pdf）で、これらは S 相当だが調査ページ自体は U"
+   "Search returned PDFs on nistep.repo.nii.ac.jp (e.g. https://nistep.repo.nii.ac.jp/record/6657/files/NISTEP-NR183-FullJ.pdf); these are S-level, but the survey page itself is U"
   ],
   "freq": [
    "約5年毎",
@@ -6878,7 +6878,7 @@
   "url": "https://carlotaperez.org/",
   "desc": [
    "検索ではWikipedia/出版社(Elgar)ページのみ出現。公式サイトは出ず",
-   "検索ではWikipedia/出版社(Elgar)ページのみ出現。公式サイトは出ず"
+   "Search returned only Wikipedia and publisher (Elgar) pages, not the official site"
   ],
   "freq": [
    "不定期",
@@ -6911,7 +6911,7 @@
   "url": "https://digitaleconomy.stanford.edu/",
   "desc": [
    "検索ではDEL一次ページが出ず、ニュース二次記事（Fortune 2026-02-15 等）のみ",
-   "検索ではDEL一次ページが出ず、ニュース二次記事（Fortune 2026-02-15 等）のみ"
+   "Search did not return DEL's primary page, only secondary news articles (Fortune 2026-02-15, etc.)"
   ],
   "freq": [
    "随時",
@@ -6944,7 +6944,7 @@
   "url": "https://www.interconnects.ai/",
   "desc": [
    "検索がノイズだらけで一次ページ未出現。podcast listing の最新が2024年末",
-   "検索がノイズだらけで一次ページ未出現。podcast listing の最新が2024年末"
+   "Search results were noisy and no primary page appeared. The latest podcast listing is from late 2024"
   ],
   "freq": [
    "週1〜2回程度（要確認）",
@@ -6977,7 +6977,7 @@
   "url": "https://stratechery.com/",
   "desc": [
    "検索未実施",
-   "検索未実施"
+   "Search not run"
   ],
   "freq": [
    "平日更新（要確認）",
@@ -7010,7 +7010,7 @@
   "url": "https://www.exponentialview.co/",
   "desc": [
    "検索ではサイト自体出現せず",
-   "検索ではサイト自体出現せず"
+   "The site itself did not appear in search"
   ],
   "freq": [
    "週刊（第三者記述）",
@@ -7043,7 +7043,7 @@
   "url": "https://www.bensbites.com/",
   "desc": [
    "検索未実施",
-   "検索未実施"
+   "Search not run"
   ],
   "freq": [
    "要確認",
@@ -7076,7 +7076,7 @@
   "url": "https://xtech.nikkei.com/",
   "desc": [
    "検索結果に本体URL出ず",
-   "検索結果に本体URL出ず"
+   "The main URL did not appear in search results"
   ],
   "freq": [
    "日次",
@@ -7109,7 +7109,7 @@
   "url": "https://www.itmedia.co.jp/aiplus/",
   "desc": [
    "記事URLのみ S",
-   "記事URLのみ S"
+   "Article URLs only: S"
   ],
   "freq": [
    "日次",
@@ -7142,7 +7142,7 @@
   "url": "https://ainow.ai/",
   "desc": [
    "現行性不明",
-   "現行性不明"
+   "Whether it is current is unknown"
   ],
   "freq": [
    "要確認",
@@ -7175,7 +7175,7 @@
   "url": "https://ledge.ai/",
   "desc": [
    "現行性不明",
-   "現行性不明"
+   "Whether it is current is unknown"
   ],
   "freq": [
    "要確認",
@@ -7208,7 +7208,7 @@
   "url": "https://matsuo-institute.com/",
   "desc": [
    "検索未実施。URL自体、記憶に基づく",
-   "検索未実施。URL自体、記憶に基づく"
+   "Search not run. The URL itself is from memory"
   ],
   "freq": [
    "要確認",

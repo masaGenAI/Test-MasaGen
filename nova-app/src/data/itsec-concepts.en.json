@@ -1,0 +1,1037 @@
+[
+ {
+  "id": "epp",
+  "nameEn": "EPP",
+  "fullEn": "Endpoint Protection Platform (including next-generation AV)",
+  "defEn": "A countermeasure that monitors endpoints such as PCs, servers and smart devices and prevents the intrusion of malware and ransomware. Japan's Digital Agency positions it as one of the Zero Trust functions of “checking the state of resources”.",
+  "howEn": "It continuously monitors the behavior of files and processes on the endpoint, and also uses machine learning on the cloud side to detect and block threats. For example, Microsoft Defender Antivirus stops malicious code using local and cloud machine learning, behavioral analysis and heuristics, and blocks new threats almost immediately.",
+  "diffEn": "Whereas EDR handles detection and response after an intrusion, EPP is on the side that prevents the intrusion itself. For example, Microsoft Defender for Endpoint provides preventive defense and post-intrusion detection and response in a single endpoint platform.",
+  "aiEn": "Microsoft's next-generation protection includes a capability that blocks attacks on local AI agents running on the endpoint by monitoring the agent's operating loop. Defending the endpoints that run AI is also within the scope of EPP."
+ },
+ {
+  "id": "edr",
+  "nameEn": "EDR",
+  "fullEn": "Endpoint Detection and Response",
+  "defEn": "A mechanism that monitors the operations and behavior of endpoints (PCs, servers, smart devices, etc.), discovers that a cyberattack has occurred and responds as soon as it is found. Assuming that intrusion will happen, it is responsible for post-intrusion detection and containment.",
+  "howEn": "It continuously collects behavioral data such as processes, network communications, logins, and changes to the registry and files. For example, Microsoft Defender for Endpoint groups alerts for the same attack technique or the same attacker into a single incident, investigates by looking back through 6 months of data, and responds by means such as isolating the endpoint.",
+  "diffEn": "The main role of EPP is preventing intrusion, and that of EDR is post-intrusion detection and response. Whereas EDR looks at endpoint behavior, XDR correlates signals from multiple domains such as identity, email and apps, in addition to endpoints.",
+  "aiEn": "Because the behavior of endpoints that use generative AI can also be traced after the fact, it serves as investigative material for suspicious operations that went through AI tools. When introducing AI, include the status of EDR deployment on the target endpoints among the items to check."
+ },
+ {
+  "id": "xdr",
+  "nameEn": "XDR",
+  "fullEn": "Extended Detection and Response",
+  "defEn": "Integrated defense that coordinates detection, prevention, investigation and response across multiple domains such as endpoints, identity, email and applications. For example, Microsoft Defender XDR is an integrated defense suite that covers both pre-intrusion and post-intrusion.",
+  "howEn": "It links the alerts and suspicious events from each product into a single incident, so that the intrusion path and the affected assets can be followed on one screen. Microsoft Defender XDR correlates high-confidence signals from multiple products to contain attacks automatically, and lets you search the past 30 days of raw data across products.",
+  "diffEn": "EDR specializes in endpoint behavior. XDR adds signals from identity, email and cloud apps to that and correlates them. Whereas SIEM collects and analyzes logs from across the whole organization and raises alerts, XDR goes as far as the detection and response of each product, as one integrated whole.",
+  "aiEn": "Because signals from endpoints, identity and cloud apps can be followed together, it is a foundation for investigating, across domains, suspicious sign-ins and endpoint behavior linked to the use of generative AI services."
+ },
+ {
+  "id": "mdr",
+  "nameEn": "MDR",
+  "fullEn": "Managed Detection and Response (outsourced monitoring and response operations service)",
+  "defEn": "A service in which specialist analysts take over the operation of detection and response. For example, in Microsoft Defender Experts MDR, analysts manage the incident queue on a 24-hour basis, carry out investigations on the customer's behalf, and either respond themselves or guide the customer's response.",
+  "howEn": "It is positioned to supplement, not replace, the customer's security operations center (SOC), reducing the volume of alerts to be handled so that people can be devoted to the threats that affect the organization. Plan 2 of the service extends its scope to the logs of some third-party products collected in Microsoft Sentinel.",
+  "diffEn": "EDR and XDR are tools for detection and response, while MDR is a service in which people operate using them. The service does not include the incident response work itself after a breach has occurred; a separate service is provided for that.",
+  "aiEn": "It is an option when the number of monitored targets grows with the introduction of generative AI but your own SOC lacks staff. Before contracting, confirm the scope of covered products and logs, and the division of roles with your own company."
+ },
+ {
+  "id": "mdm-uem",
+  "nameEn": "MDM / UEM",
+  "fullEn": "Mobile Device Management / Unified Endpoint Management",
+  "defEn": "Tools for comprehensively managing mobile devices such as smartphones and tablets. In the Digital Agency's materials it is written as EMM (MDM), and it is positioned as the function that makes endpoints identifiable under Zero Trust.",
+  "howEn": "For example, Microsoft Intune enrolls, configures and updates Android, iOS/iPadOS, Linux, macOS and Windows devices in the same cloud service, and can wipe a device if it is lost. It passes the device's compliance state to conditional access, so access from non-compliant devices can be stopped.",
+  "diffEn": "MDM manages the whole device, while MAM manages only business apps and the data within them. MAM is for personally owned devices (BYOD), and can selectively wipe only the organization's data when someone leaves the company.",
+  "aiEn": "If device compliance state is linked to conditional access, you can operate so that only managed devices are allowed to use business data and generative AI services. Personally owned devices are protected with MAM, limited to the data inside apps."
+ },
+ {
+  "id": "patch-vuln",
+  "nameEn": "Patch management / vulnerability management",
+  "fullEn": "Patch Management / Vulnerability Management",
+  "defEn": "Vulnerability management is the activity of identifying and assessing vulnerabilities and misconfigurations, fixing them, and tracking them. Patch management refers to the operation of distributing and applying, in a planned manner, updates, which are the main means of that remediation, to endpoints and servers.",
+  "howEn": "For example, Microsoft Defender Vulnerability Management continuously inventories software, certificates, browser extensions and so on, and prompts remediation by prioritizing vulnerabilities that are actually being exploited and important assets. Deployment is rolled out in stages with Intune update rings, and urgent updates can override deferral settings and be distributed immediately.",
+  "diffEn": "Patch management is the work of applying updates, while vulnerability management includes finding which ones should be fixed and prioritizing them. When an update cannot be applied, other mitigations are taken, such as configuration changes or blocking vulnerable apps.",
+  "aiEn": "Include client software and browser extensions related to generative AI in the inventory as well. Not leaving out of the register the software on endpoints that grows with AI adoption is the premise for preventing missed updates."
+ },
+ {
+  "id": "app-control",
+  "nameEn": "Application control",
+  "fullEn": "Application Control (allow list)",
+  "defEn": "A countermeasure that defines by policy the code allowed to run on an endpoint and does not run anything that is not permitted. Instead of stopping what antivirus judges to be malicious, it takes the approach of running only what has been allowed.",
+  "howEn": "Windows has App Control for Business and AppLocker. The scope covers not only apps but also scripts, MSI, batch files and interactive PowerShell sessions, and code running in the kernel can also be restricted. There are also methods that let through only signed code or code that a cloud reputation service predicts to be safe.",
+  "diffEn": "Whereas EPP and antivirus judge whether something is malicious and stop it, application control runs only the code that has been allowed. The source states that it is not a substitute for antivirus and should be used together with it.",
+  "aiEn": "As a deployment policy, you can decide whether to include AI clients and development tools that run on endpoints in the allow list. A state in which only permitted executables run is a means of curbing the introduction of unapproved tools."
+ },
+ {
+  "id": "device-control",
+  "nameEn": "Device control",
+  "fullEn": "Device Control (control of peripheral device use)",
+  "defEn": "A countermeasure that controls by policy whether peripherals such as USB drives, printers and Bluetooth devices can be installed and used on an endpoint. It narrows the channels for data exfiltration and malware intrusion.",
+  "howEn": "Windows' standard device installation restrictions decide allow and deny by device ID or setup class. In the Defender for Endpoint example, you can specify in fine detail the device type, read/write/execute, user group, network location and file type, and there is also a setting that allows only media encrypted with BitLocker.",
+  "diffEn": "Whereas DLP stops exfiltration based on content such as the sensitivity of documents, device control stops it by device type and attributes. The source also says that Endpoint DLP is used to prevent copying to USB based on sensitivity.",
+  "aiEn": "It is a means of closing the route by which source data, before it is handed to AI, is taken out via USB or printing. It is positioned as a layer that manages the physical exits of the endpoint, separate from input controls for generative AI."
+ },
+ {
+  "id": "disk-encryption",
+  "nameEn": "Disk encryption",
+  "fullEn": "Full Disk Encryption (encryption of an endpoint's entire disk; e.g. BitLocker)",
+  "defEn": "A countermeasure that encrypts an endpoint's entire volume to prevent data from being read through loss, theft or improper disposal. Windows' standard feature is BitLocker, and it is basically used in combination with a TPM.",
+  "howEn": "In combination with a TPM, it can also verify that the endpoint was not tampered with while it was shut down. A PIN or startup key can be required at boot to make it multi-factor. With device encryption, BitLocker is enabled automatically and the recovery key is stored in places such as Microsoft Entra ID or AD DS.",
+  "diffEn": "Whereas encryption and key management (KMS, HSM) is a framework that deals with generating and storing keys, disk encryption is an individual countermeasure that protects an endpoint's volume. It is not something that judges exfiltration by content, as DLP does.",
+  "aiEn": "In operations where AI validation data or internal documents are brought onto endpoints, assume as a premise that they cannot be read if the endpoint is lost. The storage location of recovery keys also becomes something to manage."
+ },
+ {
+  "id": "secure-boot",
+  "nameEn": "Secure Boot / Measured Boot",
+  "fullEn": "Secure Boot / Trusted Boot / Measured Boot (integrity verification at startup)",
+  "defEn": "A mechanism that verifies that each component of the boot process has not been tampered with, in order to prevent bootkits and rootkits that run before the OS starts. It protects the stage before the security features on the OS start working.",
+  "howEn": "In Windows, Secure Boot loads only trusted boot loaders, and Trusted Boot verifies the signatures of boot components such as the kernel. ELAM inspects drivers, and Measured Boot saves a record of the boot in the TPM and, by sending it to a trusted server, allows the endpoint's health to be assessed.",
+  "diffEn": "Whereas device compliance evaluates rules about settings and state, Measured Boot is a record of the boot, which makes it possible to see through an infected endpoint even if it declares itself normal.",
+  "aiEn": "Use it as the premise that endpoints handling AI or confidential data have not been tampered with. It can be tied to a design that admits to the internal network only endpoints whose trusted boot has been verified."
+ },
+ {
+  "id": "device-compliance",
+  "nameEn": "Device compliance",
+  "fullEn": "Device Compliance (evaluation of endpoint compliance status)",
+  "defEn": "A mechanism that evaluates whether managed devices meet the configuration requirements set by the organization and determines whether they are compliant or non-compliant. If the result is used for access control, only devices that meet the requirements can be allowed to use business resources.",
+  "howEn": "In the Intune example, rules such as the minimum OS version, the absence of jailbreaking or rooting, and the threat level are distributed to devices. For non-compliant devices, actions such as notification, remote lock and retire are taken. The result is reported to Entra ID, and conditional access allows only compliant devices.",
+  "diffEn": "Conditional access is the control that decides whether to allow access, and device compliance is the evaluation of device state used in that decision. MDM / UEM is the platform that manages devices, and the evaluation is one of its functions.",
+  "aiEn": "It can be used to design the devices permitted to use generative AI for work so that they are limited to compliant devices. It serves as input for the decision when you want to stop the use of AI services from personal devices."
+ },
+ {
+  "id": "vdi",
+  "nameEn": "VDI",
+  "fullEn": "Virtual Desktop Infrastructure",
+  "defEn": "A method in which desktops and apps are run on servers in a data center or the cloud and only the screen is delivered to the user's endpoint. By keeping the actual processing and data outside the endpoint, it lets users use the same environment regardless of the device they have at hand.",
+  "howEn": "In the Azure Virtual Desktop example, either a full Windows desktop or individual apps (RemoteApp) are delivered, and users connect with a dedicated client or the HTML5 Web client. Because connections are established to the service as reverse connections, there is no need to open inbound ports. Administrators manage the images and virtual machines.",
+  "diffEn": "Whereas MDM manages settings on the endpoint side, VDI manages the OS and apps on the delivery side. It makes it easy to let people use the same environment regardless of endpoint type, but operating the infrastructure for screen delivery is required.",
+  "aiEn": "It is an option for distributing, in an isolated form, the working environment in which AI tools are used. However, introducing VDI does not in itself constitute a countermeasure against exfiltration; control of copying and printing must be designed separately."
+ },
+ {
+  "id": "asset-inventory",
+  "nameEn": "IT asset management",
+  "fullEn": "IT Asset Inventory / Discovery (inventory and visualization of IT assets)",
+  "defEn": "An activity of identifying, without omission, the endpoints, network devices and IoT on the organization's network and compiling them in a register. Unmanaged devices become vulnerability loopholes without ever being included among what is protected.",
+  "howEn": "In the Defender for Endpoint device discovery example, onboarded endpoints passively observe network communications and, as needed, actively probe, then find unmanaged endpoints, devices such as routers, and IoT such as printers, and add them to the list. Authenticated scans via SNMP can also assess vulnerabilities in network devices.",
+  "diffEn": "Whereas MDM / UEM manages registered endpoints, asset inventory includes discovering unregistered devices. Whereas shadow IT mainly refers to the unauthorized use of cloud services, this centers on devices.",
+  "aiEn": "It is a foundation for identifying the endpoints, servers and devices where AI is being used or developed. Assets that cannot be identified are also left out of the scope of AI adoption risk assessment."
+ },
+ {
+  "id": "config-baseline",
+  "nameEn": "Security baseline",
+  "fullEn": "Security Baseline / Configuration Hardening (applying recommended settings and configuration management)",
+  "defEn": "An initiative to decide in advance a set of security-recommended settings for the OS and apps, and to apply and maintain them in the same state on all endpoints. It reduces configuration weaknesses and variation between endpoints, and brings them into a uniform hardened state.",
+  "howEn": "Intune security baselines distribute templates preconfigured with recommended values to groups, and they can be adjusted to the organization's circumstances. By default, they enable, for example, BitLocker for removable drives and a password on device unlock. Version updates and checking for conflicts with other policies are the key operational points.",
+  "diffEn": "Patch management is the work of applying updates, while a baseline is the work of aligning settings. The source says that Intune baselines do not strictly conform to CIS or NIST and are used as a starting point after adjustment.",
+  "aiEn": "The source's list of baselines also includes one for AI agents running on endpoints (preview). Set standards for the settings of the AI execution environment and manage it in the same way as other endpoints."
+ },
+ {
+  "id": "iam",
+  "nameEn": "IAM",
+  "fullEn": "Identity and Access Management",
+  "defEn": "A mechanism that enables the right people, machines and software to access the right resources at the right time. It first has the user prove who they are, and then allows or denies access to resources.",
+  "howEn": "It consists of identity creation and management, federation, granting and revoking user access (provisioning), authentication, authorization, access control, and reporting and monitoring. Identities are issued not only to people but also to workloads, devices and AI agents.",
+  "diffEn": "Authentication is verifying identity and authorization is deciding what someone may do; they are separate processes. IAM is the framework that includes both; IdP, SSO and MFA are its components, and PAM is the area specialized for privileges.",
+  "aiEn": "Mechanisms such as Microsoft Entra Agent ID, which give AI agents independent identities and authenticate, authorize and govern them, are emerging. When introducing generative AI, include in the IAM design which identity the AI uses and what it is made to do."
+ },
+ {
+  "id": "idp-idaas",
+  "nameEn": "IdP / IDaaS",
+  "fullEn": "Identity Provider / Identity as a Service (cloud-based identity management)",
+  "defEn": "An IdP is a mechanism that creates, maintains and manages identity information and provides authentication, authorization and audit services. IDaaS refers to a cloud-based form that centrally manages identities configured separately for multiple systems and also manages access rights appropriately.",
+  "howEn": "Apps delegate user authentication to the IdP, and users sign in to each app with a common identity. The IdP centrally handles setting policies, monitoring user behavior and detecting suspicious activity, which reduces the need for each app to hold its own IDs and passwords.",
+  "diffEn": "IdP refers to the role that handles authentication, and IDaaS to the form of provision in which it is used as a cloud service. IAM is a higher-level framework that includes the IdP, and the app is on the side that receives and uses the IdP's authentication result.",
+  "aiEn": "Azure's design guidance recommends using a trusted IdP rather than building your own identity platform. Consolidate authentication for generative AI services in the IdP as well, and do not increase individual per-service accounts."
+ },
+ {
+  "id": "sso",
+  "nameEn": "SSO",
+  "fullEn": "Single Sign-On",
+  "defEn": "A mechanism in which, once a user has signed in, they can access multiple assigned applications without signing in again. Authentication is performed by the IdP, and the apps receive the authentication result and allow use.",
+  "howEn": "The app sends the user to the IdP, and the IdP verifies the credentials and tells the app that the user is who they claim to be. The representative integration methods are SAML 2.0, which is XML-based, and OIDC, which uses JSON tokens on OAuth 2.0; for apps that do not support them, there is also a method in which the IdP stores the credentials and enters them on the user's behalf.",
+  "diffEn": "SSO is a mechanism that reduces re-authentication and centralizes management, while MFA is a mechanism that raises authentication strength; their purposes differ and they are used together. SAML suits traditional Web apps, and OIDC suits new Web apps, mobile and APIs.",
+  "aiEn": "If generative AI services are placed under SSO, applying usage policies and cutting off access can be done in one place on the IdP side. When choosing an enterprise generative AI service, include SSO support among the requirements."
+ },
+ {
+  "id": "mfa",
+  "nameEn": "MFA",
+  "fullEn": "Multi-Factor Authentication",
+  "defEn": "An authentication method that requires another type of identity verification in addition to the password at sign-in. The factors are divided into “something you know”, “something you have” and “something you are (biometrics)”, and 2 or more types are combined.",
+  "howEn": "With a password alone, an attacker can use it if it is weak or has been leaked elsewhere. The second factor is difficult for an attacker to obtain or duplicate, so security improves. Examples of methods are authenticator apps, FIDO2 passkeys, hardware keys, and SMS or voice calls.",
+  "diffEn": "MFA is about the strength of authentication, while SSO is a mechanism that reduces the number of authentications; their purposes differ. Conditional access is on the side that decides in which situations MFA is required: on the internal network a normal sign-in is used, while from outside or on personal devices an additional factor is required.",
+  "aiEn": "The Digital Agency lists making MFA mandatory for all users as a measure when the risk of identity verification is high. For administrators of generative AI services, and for users who connect with internal data, make MFA mandatory first."
+ },
+ {
+  "id": "conditional-access",
+  "nameEn": "Conditional access",
+  "fullEn": "Conditional Access",
+  "defEn": "A mechanism that, when a user accesses a resource, gathers signals such as the user, location, device, app and risk, and decides whether to allow, to require additional requirements, or to deny. Policies are written in the form “if ..., then ...”.",
+  "howEn": "For example, Microsoft Entra Conditional Access evaluates policies after first-factor authentication. The decision is either to block, or to grant access while requiring MFA, a compliant device, a password change or the like; typical examples are requiring MFA for administrator roles and blocking legacy authentication.",
+  "diffEn": "MFA is a means of additional identity verification, while conditional access is the control that decides, according to the situation, whether to require it. Whereas authorization by role decides “who can do what”, conditional access narrows the entrance by circumstances such as device and location.",
+  "aiEn": "Microsoft Entra Conditional Access can also target the identities of AI agents (preview), extending Zero Trust principles to AI workloads. On the user side as well, conditions such as “allow only compliant devices” can be set."
+ },
+ {
+  "id": "pam",
+  "nameEn": "PAM",
+  "fullEn": "Privileged Access Management",
+  "defEn": "A mechanism that manages and governs privileged accounts such as administrators and privileged access to critical systems. In addition to human privileged accounts, application and service accounts are also covered.",
+  "howEn": "It is governed through just-in-time (JIT) access, which grants privileges only while needed, time-bound assignments with start and end dates, approval, MFA at activation, entering a reason, access reviews, and audit history. For example, Microsoft Entra Privileged Identity Management provides these.",
+  "diffEn": "Whereas ordinary IAM handles the access of all users, PAM narrows to high-impact administrator privileges, avoiding standing assignment and restricting by time and approval. It is also positioned as an operational means of applying the principle of least privilege to privileges.",
+  "aiEn": "Administrator privileges on AI platforms and service accounts called by AI can also become privileges. Include in the design an operation in which these are not assigned permanently and are activated only when needed."
+ },
+ {
+  "id": "id-lifecycle",
+  "nameEn": "Identity lifecycle management",
+  "fullEn": "Identity Lifecycle Management (provisioning and SCIM)",
+  "defEn": "An activity of consistently managing the creation, change, and disabling or deletion of accounts and access rights in step with joining, transfer and leaving the company. It includes both granting (provisioning) and revoking (deprovisioning).",
+  "howEn": "For example, the Microsoft Entra provisioning service creates, updates and deletes users and groups through the app's SCIM 2.0 API. The targets are determined by assignment and group membership; users who fall out of scope are disabled by default, and deleted identities are also deleted on the app side.",
+  "diffEn": "SSO deals with “which identity to sign in with”, while provisioning via SCIM deals with “the creation and disabling of the account itself”. SCIM is the standard protocol used for that integration.",
+  "aiEn": "Azure's design guidance calls for not leaving identity access in place longer than the lifetime of the resource, and for removing the permissions of departed employees through access reviews. Make generative AI service accounts subject to the same inventory."
+ },
+ {
+  "id": "least-privilege",
+  "nameEn": "Principle of least privilege",
+  "fullEn": "Principle of Least Privilege",
+  "defEn": "An operating principle of giving each user only the minimum privileges required for the work they are responsible for. The Digital Agency presents as Zero Trust the idea of evaluating and enforcing, through access control rules, that access between resources satisfies this principle.",
+  "howEn": "Assign to a role only the privileges needed to complete the work, and narrow the scope to the extent of the job duties. Ask whether read-only is enough, start from the minimum privileges and add as needed. Avoid permissions tied to individual resources or individuals, and manage with built-in roles and groups.",
+  "diffEn": "JIT narrows the time during which privileges are held, and least privilege narrows the size of the privileges. Combining the two can reduce the scope of impact when an identity is compromised.",
+  "aiEn": "In the Microsoft Entra Agent ID example, each AI agent is given a governed identity, made to access with least privilege, and its actions leave an audit trail. When connecting data to generative AI, also start from read-only."
+ },
+ {
+  "id": "passkey",
+  "nameEn": "Passkeys / FIDO2",
+  "fullEn": "Passkeys / FIDO2 (phishing-resistant passwordless authentication)",
+  "defEn": "A method of verifying identity not with a password but with credentials that use public-key cryptography. Based on FIDO standards, the private key stays on the device and can be used only on the site or app where it was registered, so it is hard to steal through phishing.",
+  "howEn": "At sign-in, the server sends a random number (challenge); when the user unlocks the device's private key with biometrics or a PIN, a signature is returned. The server verifies the signature with the public key and issues a token. There are types that are bound to the device and types that are synchronized in the cloud, and the synchronized type does not support attestation.",
+  "diffEn": "Ordinary MFA is a method that adds something like an SMS code to the password, and it can be stolen through phishing. With passkeys, the credential is bound to the destination, so it cannot be handed over to a fake site. It is also one means of realizing MFA.",
+  "aiEn": "The source states that phishing has become more sophisticated and larger in scale with attack tools that use AI. It is a basis for moving to phishing-resistant authentication, starting with administrators of AI services and users who handle confidential data."
+ },
+ {
+  "id": "itdr",
+  "nameEn": "ITDR",
+  "fullEn": "Identity Threat Detection and Response",
+  "defEn": "An initiative that detects attacks targeting identities through analysis of behavior such as sign-ins and privilege changes, and goes as far as investigation and response. In addition to human identities, it also covers non-human identities such as service accounts and apps for protection.",
+  "howEn": "In the Defender for Identity example, signals are collected from on-premises AD, Entra ID and other IAM, and behavioral analysis and known attack patterns are used to detect reconnaissance, credential compromise, lateral movement, domain dominance and so on. Responses include disabling a compromised account, revoking sessions, and resetting credentials.",
+  "diffEn": "Whereas IAM and PAM are on the side that grants and restricts privileges, ITDR is on the side that detects suspicious behavior and responds. It handles containment per identity, such as disabling a compromised account.",
+  "aiEn": "The source treats service accounts, service principals and AI agent identities, in addition to human identities, as protection targets. It can also be used to detect abnormal behavior of the non-human identities that AI uses."
+ },
+ {
+  "id": "federation",
+  "nameEn": "Identity federation",
+  "fullEn": "Identity Federation (identity linking and trust relationships)",
+  "defEn": "A mechanism that establishes an authentication trust relationship between organizations or systems, so that users can sign in to and use another organization's apps or other systems with the account they hold in their own organization or at an external identity provider.",
+  "howEn": "Trust is set up with the other party's IdP using SAML, WS-Fed or the like; the user is redirected from the app to their own IdP, authenticates, and returns with the result. Configuration is required on both sides, registering the issuer URI, the authentication endpoint and the signing certificate. If there is a metadata URL, certificates can be renewed automatically; if not, they are renewed manually.",
+  "diffEn": "SSO refers to the experience of a user using multiple apps with a single authentication, and federation is the trust relationship that makes that work across organizations. The source says that B2B accounts for guests do not become unnecessary even with federation.",
+  "aiEn": "When business partners or contractors enter an AI-related environment, it can be chosen as a way to let them use their own identities. Even in this case, your own side needs to manage the guest's privileges and validity period."
+ },
+ {
+  "id": "rbac-abac",
+  "nameEn": "RBAC / ABAC",
+  "fullEn": "Role-Based / Attribute-Based Access Control",
+  "defEn": "RBAC is a method of granting privileges together to roles. ABAC is a method of deciding whether to allow access based on the attributes of the user, the resource and the environment. Both are design models for access control (authorization).",
+  "howEn": "In Azure RBAC, privileges are granted by role assignments consisting of 3 elements, a principal, a role definition and a scope, and the effect is the sum of the assignments. Azure ABAC adds conditions to this, for example allowing reads only of Blobs that carry a specific tag. It can also reduce the number of assignments.",
+  "diffEn": "RBAC can be implemented simply in line with business operations, and ABAC can narrow things down finely by attributes. The source says that using both together gives advanced authorization. Least privilege is a principle, and RBAC and ABAC are methods for realizing it.",
+  "aiEn": "It can be used to design the internal data that AI references so that it is narrowed not only by role but also by attributes such as confidentiality classification and project. It becomes the premise that AI does not pull documents beyond a person's privileges."
+ },
+ {
+  "id": "workload-identity",
+  "nameEn": "Non-human identity / workload identity",
+  "fullEn": "Non-Human Identity / Workload Identity (identities assigned to apps, services, etc.)",
+  "defEn": "An identity assigned to software such as apps, services, scripts and containers so that it can authenticate to and access other services and resources. It is the identity of a machine rather than a person, and is a kind of non-human identity alongside device identities.",
+  "howEn": "In Entra, applications, service principals and managed identities correspond to this. Managed identities eliminate the need to manage credentials, and workload identity federation enables authentication without secrets in places such as GitHub Actions. Conditional access, ID Protection and access reviews can also be applied.",
+  "diffEn": "Whereas a person uses 1 identity to get into multiple resources, a workload holds multiple credentials per resource, and it is hard to keep track of their creation and revocation. The source points out that attackers tend to target non-human identities.",
+  "aiEn": "The source treats AI agents as a separate kind of machine identity and provides a dedicated identity with a human sponsor, lifecycle management and bulk policy application. It becomes the center of inventory and privilege design for identities when AI calls APIs."
+ },
+ {
+  "id": "secrets-management",
+  "nameEn": "Secrets management",
+  "fullEn": "Secrets Management (secure storage and distribution of passwords, API keys and certificates)",
+  "defEn": "An initiative to store confidential information such as tokens, passwords, certificates and API keys centrally in a dedicated vault, instead of writing it in the app's code or configuration files, and to control access to it. It reduces opportunities for leakage.",
+  "howEn": "In the Azure Key Vault example, the app accesses the vault by URI and retrieves the secret it needs. Access is authenticated with Entra ID and authorized with Azure RBAC and the like. The vault is encrypted at rest with HSM keys, and usage records are kept in logs and can be monitored. Vaults can be separated per app to narrow access.",
+  "diffEn": "Whereas encryption and key management (KMS, HSM) protect the keys for data encryption, secrets management holds credentials used by apps in general. Key Vault can be used for both, but the purposes differ.",
+  "aiEn": "Design AI apps so that they retrieve external API keys and model connection information from a vault instead of embedding them in code. Tie the keys to non-human identities and limit them to minimum privileges."
+ },
+ {
+  "id": "access-review",
+  "nameEn": "Access review",
+  "fullEn": "Access Review / Access Recertification (periodic review of access rights)",
+  "defEn": "An activity in which the responsible person or the user themselves periodically confirms whether the access rights given to users are still needed, and removes the unneeded ones. It prevents excessive privileges from remaining, and prevents being cited in an audit as a control deficiency.",
+  "howEn": "In the Entra example, reviews are created for group members, app assignments, roles and access packages. They can recur from weekly to yearly, and reviewers choose to approve or deny. It suits situations such as checking the number of people in privileged roles and the remaining external guests.",
+  "diffEn": "Whereas identity lifecycle management automatically grants and revokes in line with changes of joining, transfer and leaving, access review is where people reconfirm privileges that automation cannot catch. It also complements the time limits of PAM.",
+  "aiEn": "Include administrator roles on AI platforms, and service principals given privileges for AI, among the review targets as well. The source states that reviewing service principals assigned to privileged roles is also possible."
+ },
+ {
+  "id": "firewall",
+  "nameEn": "Firewall / NGFW",
+  "fullEn": "Firewall / Next-Generation Firewall",
+  "defEn": "A system, or a device on which it is implemented, installed at the point connecting the external network and the internal network to prevent unauthorized intrusion from outside. It is the basic defense at the network perimeter.",
+  "howEn": "It decides according to rules whether to pass or block communications. Azure Firewall, an example of the cloud type, inspects from L3 to L7 and can restrict destinations in units of FQDN or URL. Premium also provides intrusion detection and prevention (IDPS) and TLS inspection, and Microsoft positions it as an NGFW.",
+  "diffEn": "Whereas a general firewall monitors at the network level, a WAF monitors Web application communications at the application level. DDoS protection mitigates overload attacks, separately from decisions on whether to allow communications.",
+  "aiEn": "It is a foundation for allowing or denying, in units of destination FQDN or URL, communications going from inside the company out to external generative AI services. Per-user control and data exfiltration countermeasures are handled by SWG and CASB."
+ },
+ {
+  "id": "ids-ips",
+  "nameEn": "IDS / IPS",
+  "fullEn": "Intrusion Detection System / Intrusion Prevention System",
+  "defEn": "An IDS is a system that identifies packets arriving from the network, detects unauthorized intrusions and attacks, and notifies the administrator. An IPS, in addition to detection, has a function of automatically blocking unauthorized packets.",
+  "howEn": "They identify packets to find unauthorized access, and the IDS contacts the administrator by a predetermined method such as email or an alarm. The IPS blocks automatically. The IDPS of Azure Firewall Premium, a product example, detects attacks by patterns such as byte sequences and known malicious instruction sequences, records and reports them, and also blocks depending on settings.",
+  "diffEn": "The difference is that an IDS goes as far as detecting and notifying, while an IPS goes as far as blocking. Separately from a firewall's allow/deny rules, they have the role of distinguishing attacks from communication patterns.",
+  "aiEn": "If you place a generative AI or RAG platform in the cloud, they can be used as a layer that watches for suspicious behavior at the platform's entrance and in internal traffic. At the time of introduction, also decide on an operation that does not stop legitimate communications through false positives."
+ },
+ {
+  "id": "waf",
+  "nameEn": "WAF",
+  "fullEn": "Web Application Firewall",
+  "defEn": "A firewall that monitors communications with the outside for Web applications and defends against attacks on vulnerabilities and theft of information. Unlike a general firewall, it monitors at the application level.",
+  "howEn": "It checks the contents of requests against rules, allowing or blocking them, and prevents things such as SQL injection. Azure WAF, a product example, is built into Application Gateway and Front Door. The advantage is said to be that known vulnerabilities can be handled in one place with the WAF instead of being fixed in each app.",
+  "diffEn": "A firewall monitors at the network level and a WAF at the application level. Because Azure DDoS Protection protects L3/L4, a WAF needs to be added for Web app defense (L7).",
+  "aiEn": "If you have a generative AI chat UI or API exposed inside or outside the company, it serves as a layer that prevents typical Web attacks at the entrance. Countermeasures for AI-specific input such as prompts should be considered separately."
+ },
+ {
+  "id": "vpn",
+  "nameEn": "VPN (remote access VPN)",
+  "fullEn": "Virtual Private Network",
+  "defEn": "A technology, or the equipment for it, that achieves a situation like a dedicated-line connection over a shared network such as the Internet by means of encryption and traffic control. Remote access VPN refers to the use of connecting from endpoints such as those at home to the organization's network.",
+  "howEn": "A teleworking endpoint makes a VPN connection to the office network, and connects to internal file servers and cloud services to do work. Because cloud use also passes through the office's security devices, a level equivalent to that inside the office can be maintained. Because data can be stored on the endpoint, countermeasures against loss and removal are required.",
+  "diffEn": "Microsoft positions conventional VPN as something that grants broad network access with certificates alone. It presents an approach of gradually replacing it with ZTNA, which allows access per app by looking at identity and context.",
+  "aiEn": "It serves as the route for reaching, remotely, generative AI placed inside the company and internal data integration platforms. Because VPN tends to reach a wide range, also consider separating the AI platform into its own zone and narrowing access down with ZTNA."
+ },
+ {
+  "id": "forward-proxy",
+  "nameEn": "Proxy (forward proxy)",
+  "fullEn": "Forward Proxy",
+  "defEn": "A computer or software placed between a company's or organization's internal network and the Internet, which connects to the Internet as a proxy on behalf of internal computers that cannot connect to the Internet directly.",
+  "howEn": "Users' browsers and the like are configured to send communications through the proxy, and communication to external sites is carried out by the proxy on their behalf. Azure Firewall explicit proxy, a product example, distributes settings manually or by PAC file, and handles HTTP and HTTPS. For teleworking, a configuration in which authentication and access control are performed by a proxy on the cloud is presented.",
+  "diffEn": "Whereas a proxy is a mechanism that acts on behalf of internal-to-external communications, SWG refers to a cloud-based form of it that evaluates the safety of the destination URL or IP address and blocks if it is not safe.",
+  "aiEn": "If communications to generative AI services are gathered at the proxy, you can create an egress that passes only permitted services and keeps a record of use. In the case of local breakout, apply equivalent control with a cloud proxy."
+ },
+ {
+  "id": "dns-filtering",
+  "nameEn": "DNS filtering",
+  "fullEn": "DNS Filtering",
+  "defEn": "A mechanism that blocks malicious domains at the stage of DNS name resolution. DNS is the mechanism that converts domain names into IP addresses; by stopping name resolution, which is the entrance of communication, it prevents damage.",
+  "howEn": "Allow, block and alert rules are set against lists of domains. Azure DNS resolver policy, a product example, can filter and log DNS queries per virtual network, and block known malicious domains derived from MSRC at name resolution. Microsoft explains that almost all attacks start from a DNS query.",
+  "diffEn": "Among the components of SWG, Web filtering (blocking malicious Web pages) and DNS filtering (blocking malicious domains) line up as separate items. With DNS, the unit of judgment is the domain.",
+  "aiEn": "It can be used as a means to stop the domains of unapproved generative AI services at the name resolution stage. Blocking per service is the main use, and the content of use within permitted services is viewed by other mechanisms such as CASB."
+ },
+ {
+  "id": "fixed-ip",
+  "nameEn": "Static IP (IP address allow-listing)",
+  "fullEn": "Static IP address / IP address allow list",
+  "defEn": "Fixing the IP address used as the connection source to an unchanging value. The receiving side can narrow the access source by “IP address restriction (allow list)”, which allows only that IP address. A dynamic IP can change on stop or reassignment.",
+  "howEn": "For cloud services and administrator privileges where it can be configured, narrowing the access source by IP address restriction is recommended (Japan's Ministry of Internal Affairs and Communications). Azure static IPs are used to update the other party's firewall rules and to communicate with other services that use IP-address-based security.",
+  "diffEn": "Microsoft states that via a cloud proxy or VPN, the IP seen by the destination becomes the egress of each service, and keeping an up-to-date list is difficult. This is supplemented with device compliance conditions and with source IP restoration, which conveys the original IP. In Conditional Access, network location is one decision input alongside other conditions.",
+  "aiEn": "When an internal system calls an external generative AI API, if the other party requires an allow list of source IPs, fixing the egress IP is a prerequisite. Do not rely on IP alone; combine it with authentication and device state."
+ },
+ {
+  "id": "nat",
+  "nameEn": "NAT",
+  "fullEn": "Network Address Translation",
+  "defEn": "A mechanism that translates between internal private IP addresses and the global IP addresses used on the Internet. With SNAT, which rewrites the source, multiple internal devices can connect externally with the same public IP address.",
+  "howEn": "SNAT rewrites the source IP and port into a public IP and port pair, and distinguishes connections by port number. Azure NAT Gateway is for outbound communication only; it does not accept connections initiated from outside and passes only response packets. When ports run out, new connections fail.",
+  "diffEn": "NAT is a mechanism that rewrites addresses, and its role differs from a firewall that judges whether communication is permitted. With SNAT, multiple devices share the public IP, so the destination sees only the egress IP address, not the individual devices.",
+  "aiEn": "When an internal system calls an external generative AI API, the source seen by the destination is the NAT's egress IP. If the other party requires an allow list of source IPs, fix this egress IP."
+ },
+ {
+  "id": "segmentation",
+  "nameEn": "Network segmentation / micro-segmentation",
+  "fullEn": "Network Segmentation / Micro-segmentation",
+  "defEn": "A design that divides a network into segments (zones) and controls communications per zone to limit the spread of damage. Micro-segmentation is the finer division down to the unit of workload or app, and restricts the lateral movement of attackers.",
+  "howEn": "In the Azure example, subnets and virtual networks are separated per app or component, only communications from the necessary parties are allowed by NSG rules, and inspection is performed by Azure Firewall placed in the hub. Whether the division is as intended is verified with Traffic Analytics, which analyzes flow logs.",
+  "diffEn": "Macro-segmentation is large zones by function or security requirements, and micro-segmentation divides finely inside them. Microsoft lists as a principle adopting identity-based segmentation rather than the conventional IP-based one.",
+  "aiEn": "If you place the generative AI platform, reference data and business systems in separate zones and allow only the necessary communications, you can curb the spread from the AI platform to business data in the event of a compromise."
+ },
+ {
+  "id": "ddos",
+  "nameEn": "DDoS protection",
+  "fullEn": "DDoS Protection (countermeasures against distributed denial-of-service attacks)",
+  "defEn": "A DDoS attack sends a large volume of service requests from multiple computers, placing excessive load on a server or network and making it unusable. DDoS protection refers to mechanisms that detect and mitigate this attack.",
+  "howEn": "Azure DDoS Protection, a product example, monitors traffic patterns 24 hours a day and mitigates automatically when it detects signs of an attack. It automatically adjusts thresholds by learning traffic volume, and the protected targets are resources that have public IP addresses. A redundant design and a response plan are used together.",
+  "diffEn": "A DoS attack is carried out from 1 computer, whereas a DDoS attack is carried out simultaneously from multiple machines such as third-party computers infected with bots. In terms of products, DDoS Protection protects L3/L4, and the Web application layer (L7) is complemented by a WAF.",
+  "aiEn": "A published generative AI chat UI or API can be a target of attacks aimed at availability. If you have a public endpoint, include both L3/L4 mitigation and an L7 WAF in the design."
+ },
+ {
+  "id": "email-auth",
+  "nameEn": "Sender domain authentication (SPF, DKIM, DMARC)",
+  "fullEn": "Email authentication (verifying the email sender with SPF, DKIM and DMARC)",
+  "defEn": "A general term for technologies by which the receiving side verifies whether the sender domain of an email has been spoofed. SPF, DKIM and DMARC are combined to distinguish spoofed emails and phishing.",
+  "howEn": "SPF indicates, in a DNS TXT record, the senders permitted to send email for that domain. DKIM attaches a digital signature to the email header, and the receiving side checks for tampering. DMARC checks alignment with the domain of the From address, and specifies the handling on failure and the reporting destination.",
+  "diffEn": "SPF looks only at the MAIL FROM domain, and DKIM allows the signing domain to differ from From. DMARC's alignment check fills this gap, so the three are used in combination rather than alone.",
+  "aiEn": "When AI agents or SaaS integrations send email automatically, authentication may fail unless that sending service is added to SPF or made to sign with DKIM using your own domain."
+ },
+ {
+  "id": "tls-pki",
+  "nameEn": "TLS / PKI (digital certificates)",
+  "fullEn": "Transport Layer Security / Public Key Infrastructure (communication encryption and public key infrastructure)",
+  "defEn": "TLS is a protocol that encrypts communications and prevents spoofing. PKI is a mechanism in which a third-party certificate authority registers, issues and revokes digital certificates, and guarantees the binding between a public key and its owner. It is the successor to SSL.",
+  "howEn": "The server presents a server certificate bearing the CA's signature, and the client confirms the authenticity of the destination by whether it can trace back to a root certificate it trusts. After confirmation, communication is encrypted. The certificate authority handles registering, issuing and revoking certificates, and there is also a method of operating your own internal certificate authority such as AD CS.",
+  "diffEn": "Whereas encryption and key management (KMS) mainly deals with the operation of keys for stored data, TLS / PKI confirms with certificates that the communication partner is genuine and then encrypts the communication.",
+  "aiEn": "Communications of generative AI APIs and between agents are also protected by TLS. Because the authenticity of the destination depends on certificate verification, management of issuance, renewal and revocation is an operational requirement."
+ },
+ {
+  "id": "tls-inspection",
+  "nameEn": "TLS inspection (TLS decryption)",
+  "fullEn": "TLS inspection (decrypting and inspecting encrypted communications)",
+  "defEn": "A mechanism in which a firewall or proxy temporarily terminates and decrypts encrypted HTTPS communications, inspects the contents, then re-encrypts and sends them on. It is used to find unauthorized communications hidden by encryption.",
+  "howEn": "In the Azure Firewall Premium example, 2 TLS connections are established, one with the Web server and one with the client, and a temporary server certificate is created with a CA certificate provided by the customer. After decryption, IDPS and URL filtering work. Categories such as finance and healthcare can be excluded from decryption.",
+  "diffEn": "IDS / IPS and WAF are functions that look at the contents of communications, and TLS inspection is the pre-processing that enables them to see the contents of encrypted communications. Without decryption, the inside of an encrypted tunnel cannot be seen.",
+  "aiEn": "Communications to generative AI services are also HTTPS, so the content sent cannot be inspected unless decrypted. On the other hand, there is also a recommendation to exclude trusted destinations such as Microsoft 365 from decryption, so the scope needs to be designed."
+ },
+ {
+  "id": "private-connectivity",
+  "nameEn": "Private connectivity and private endpoints",
+  "fullEn": "Private connectivity (non-public connection via closed networks, dedicated lines and Private Link)",
+  "defEn": "A general term for connection methods that link to the cloud or to sites without passing communications through the public Internet, using a carrier's closed network or dedicated line, or private IP addresses within a virtual network. IP-VPN is also one of these.",
+  "howEn": "ExpressRoute connects on-premises and the cloud through a private connection via a connectivity provider, and you can choose any-to-any (IP-VPN) or dedicated Ethernet. A private endpoint brings a service such as PaaS into your own network as a NIC with a private IP of the virtual network.",
+  "diffEn": "Whereas VPN sets up an encrypted tunnel over a public network, with private connectivity the route itself does not go out to the public network. A private endpoint does not automatically stop access from the public side, so a separate control is required.",
+  "aiEn": "AI search and machine learning services are listed among the target resources of private endpoints, and it can be used to design AI platforms that handle internal data so that they are not exposed to the Internet."
+ },
+ {
+  "id": "nac",
+  "nameEn": "NAC",
+  "fullEn": "Network Access Control",
+  "defEn": "A mechanism that authenticates endpoints trying to connect to the network, checks whether they are registered and whether they conform to policy, and then controls whether to permit the connection. It is used at the entrance of wired LAN, Wi-Fi and VPN.",
+  "howEn": "IEEE 802.1X requires authentication when connecting to a LAN port or Wi-Fi, and refuses the connection if it fails. NAC products query Intune and the like about the endpoint's enrollment and compliance state, guide non-conforming endpoints to enrollment or remediation, and permit the connection once they conform.",
+  "diffEn": "Whereas conditional access decides on access to cloud apps, NAC decides at the point of connecting to a network such as the internal Wi-Fi or VPN. The two are used in coordination.",
+  "aiEn": "It is a foundation for limiting the endpoints that can enter the internal network or VPN to managed ones, and can narrow the route by which AI is reached via internal data from unmanaged endpoints."
+ },
+ {
+  "id": "wireless-lan-security",
+  "nameEn": "Wireless LAN security (WPA, 802.1X)",
+  "fullEn": "Wireless LAN security (authentication and encryption for wireless LAN)",
+  "defEn": "A mechanism that combines authentication at connection time and encryption of communications to prevent unauthorized connection to a wireless LAN (Wi-Fi) and eavesdropping on communications. WPA-family methods and IEEE 802.1X are central.",
+  "howEn": "WPA is an encryption method that compensates for the weaknesses of WEP, and has WPA-PSK for home use and WPA-EAP for enterprise. The enterprise type queries an authentication server about the user with 802.1X and EAP, and manages keys dynamically. AES is recommended for encryption, and WEP is not used.",
+  "diffEn": "Whereas the pre-shared key (PSK) method connects with a common password, the enterprise 802.1X / EAP method authenticates per user or endpoint. In exchange, operating the authentication server and certificates is required.",
+  "aiEn": "Because the entrance of the internal Wi-Fi can be narrowed by authentication per user or endpoint, it is a foundation for limiting the endpoints that reach AI services and internal data to managed ones."
+ },
+ {
+  "id": "swg",
+  "nameEn": "SWG",
+  "fullEn": "Secure Web Gateway",
+  "defEn": "A cloud-based proxy for safely performing Web access to the outside and the like. It checks and evaluates safety from the destination URL or IP address, and blocks access if it evaluates it as unsafe.",
+  "howEn": "It provides Web filtering, DNS filtering, DLP, malware detection, intrusion prevention, sandboxing and so on in a cloud form (IPA). Microsoft Entra Internet Access, a product example, links the context of user, device, location and risk with Conditional Access, and controls Web access based on identity.",
+  "diffEn": "In the past, traffic had to go through the VPN gateway and the internal LAN before going out. With SWG, that function can be moved to the cloud. Whereas CASB narrows to visibility and data control for SaaS use, SWG handles Web access in general.",
+  "aiEn": "Microsoft Entra Internet Access, a product example, lists shadow AI detection, prompt injection protection and DLP among its features. It becomes a means of controlling Web access to generative AI at the entrance."
+ },
+ {
+  "id": "casb",
+  "nameEn": "CASB",
+  "fullEn": "Cloud Access Security Broker",
+  "defEn": "A mechanism that places a single control point between users and multiple SaaS and the like, to visualize and control cloud use. It handles visibility into SaaS usage, access control, control of data exfiltration, threat detection and so on.",
+  "howEn": "IPA organizes it with 4 elements: visibility, data security, compliance and threat protection. Microsoft Defender for Cloud Apps, a product example, identifies the SaaS in use from network traffic and the app catalog, evaluates risk with 90 or more indicators, and monitors continuously with policies.",
+  "diffEn": "Whereas SWG handles safety checking and blocking of Web access in general, CASB narrows to SaaS use, visualizing it and controlling access and data exfiltration.",
+  "aiEn": "Unapproved generative AI services, as a kind of SaaS, can also be made targets of discovery of use, risk evaluation and usage control. Control of exfiltration per data type also relates to operations that do not hand sensitive information to AI."
+ },
+ {
+  "id": "ztna",
+  "nameEn": "ZTNA",
+  "fullEn": "Zero Trust Network Access",
+  "defEn": "A method that, in place of VPN, which tends to reach a wide range, looks at identity and context (such as device state and risk) to permit connections finely per app. Based on the idea of Zero Trust, it always verifies.",
+  "howEn": "In Microsoft's example, when a user requests a connection to an app, Entra ID single sign-on and Conditional Access are evaluated at the edge, and only approved apps are visible to the user. Decisions are made from signals of device state and risk, and when a risk is detected, continuous access evaluation re-evaluates or disconnects.",
+  "diffEn": "VPN tends to reach a wide network after connecting. Microsoft presents a phased migration that starts from Quick Access, which grants broad access equivalent to VPN, and moves from important apps to per-app connections.",
+  "aiEn": "It is a means of narrowing, per app and based on identity, remote access to generative AI apps that connect to internal data and to the management consoles of AI platforms."
+ },
+ {
+  "id": "fwaas",
+  "nameEn": "FWaaS",
+  "fullEn": "Firewall as a Service",
+  "defEn": "Firewall functionality provided as a cloud service. It can protect with the same security settings communications from outside sites such as remote and mobile, communications between contracted cloud services and the outside, and even communications from personally owned devices (BYOD).",
+  "howEn": "Communications are gathered at the cloud edge and inspected with the same policy. In Microsoft's classification, FWaaS is listed as an SSE function alongside SWG and CASB, and TLS inspection, URL filtering, DLP, threat intelligence and so on are applied at the edge.",
+  "diffEn": "With a physical firewall appliance, the configuration of network rules and the control based on them are done on the same device. FWaaS places that function in the cloud, so it is not tied to an installation location.",
+  "aiEn": "It is an option when you want to apply the same rules to communications to generative AI services regardless of site, home or mobile. It also serves as material for considering a design that consolidates and controls the egress."
+ },
+ {
+  "id": "sd-wan",
+  "nameEn": "SD-WAN",
+  "fullEn": "Software-Defined Wide Area Network",
+  "defEn": "Short for Software-Defined WAN. A function that controls wide area networks between sites and to the cloud by software, achieving flexible network configuration and traffic control and so on.",
+  "howEn": "Devices on the site side (SD-WAN CPE) handle optimizing and selecting routes, and connect sites to cloud hubs with IPsec and the like. Microsoft's Azure Virtual WAN is itself a cloud-based SD-WAN, and also assumes interconnection with site-side SD-WAN and SASE.",
+  "diffEn": "SASE is a framework that provides security functions such as CASB and SWG together with network functions such as SD-WAN from the cloud, and SD-WAN is positioned on its network side.",
+  "aiEn": "It is a foundation for centrally controlling the routes to generative AI platforms and business systems distributed across sites, data centers and the cloud."
+ },
+ {
+  "id": "sse",
+  "nameEn": "SSE",
+  "fullEn": "Security Service Edge",
+  "defEn": "A new category of network security that points to a cloud-delivered, identity-aware network perimeter, which becomes necessary as places of work become distributed and apps and data move to the cloud. It includes SWG, CASB, FWaaS and so on.",
+  "howEn": "In Microsoft's example, SSE is configured by combining Entra Internet Access (an identity-based SWG), which protects the Internet and SaaS, and Entra Private Access (ZTNA), which handles connections to internal resources, with Defender for Cloud Apps, a CASB. It is delivered from the edge of Microsoft's wide area network.",
+  "diffEn": "SSE refers to the security functions side. SASE is a framework that also includes network functions such as SD-WAN, and Microsoft explains it as incorporating SSE's functions into the SASE framework.",
+  "aiEn": "Global Secure Access, a product example, lists for the Internet detection of generative AI app use (shadow AI), prompt injection protection and DLP among its functions. This leads to the idea of concentrating control of AI use at the network entrance."
+ },
+ {
+  "id": "sase",
+  "nameEn": "SASE",
+  "fullEn": "Secure Access Service Edge",
+  "defEn": "A framework that consolidates security and network technologies into a single cloud platform, enabling a safe and rapid move to the cloud (Gartner's definition, as introduced by IPA). Users use systems via SASE regardless of location.",
+  "howEn": "Before communications enter SaaS or IaaS, security measures are applied with CASB, SDP, SWG and so on, and the network functions for the WAN and the Internet (CDN, SD-WAN and so on) are also provided from the cloud. In Microsoft's classification, communications are gathered at the edge and TLS inspection, URL filtering, DLP and so on are applied.",
+  "diffEn": "Zero Trust is the idea of “not trusting implicitly”, and SASE is a framework that bundles functions in the cloud; Microsoft explains the two in combination. SSE refers to the security functions side of SASE.",
+  "aiEn": "To control communications to generative AI, the configuration needs to route those communications through SASE. IPA's verification showed the finding that communications that do not pass through SASE cannot be detected."
+ },
+ {
+  "id": "shadow-it",
+  "nameEn": "Shadow IT",
+  "fullEn": "Shadow IT",
+  "defEn": "A state in which hardware, software, cloud services and the like that have not been permitted are used without authorization. Security control by administrators can no longer be performed, and the risk of leakage of the business information that should be protected increases.",
+  "howEn": "Identify the apps in use, assess their risk, and manage them by sorting them into approved and unapproved. In the Microsoft Defender for Cloud Apps example, use is discovered through integration with Defender for Endpoint and collection of firewall and proxy logs, and unapproved apps are blocked with the firewall, proxy or SWG.",
+  "diffEn": "Shadow AI is unauthorized use limited to generative AI apps and tools, and its main risks are data leakage to AI and compliance violations. Shadow IT refers to IT services in general, and its main risk is the dispersal of data.",
+  "aiEn": "Shadow AI detection finds communications to ChatGPT, Claude and the like by network traffic analysis, and visualizes users, traffic volume and risk scores (Global Secure Access example). Proceed not only by prohibition but together with preparing approved alternatives."
+ },
+ {
+  "id": "rbi",
+  "nameEn": "RBI",
+  "fullEn": "Remote Browser Isolation",
+  "defEn": "A technology that separates Web browsing from the user's endpoint, runs it in a browser in an isolated environment such as the cloud, and sends only the rendered result to the endpoint. It is introduced to protect endpoints from phishing and attacks via the browser.",
+  "howEn": "Page rendering and JavaScript execution are carried out by the browser in the isolated environment, and only an image of the screen (pixel stream) reaches the endpoint. Keystrokes and clicks are forwarded to the isolated side. Normally, all Web traffic is routed through the isolation platform by a proxy, and egress to the outside is restricted.",
+  "diffEn": "Whereas SWG inspects communications and decides to allow or block, RBI does not run malicious code on the endpoint. By execution location, there are the cloud type, the on-premises type, and a local type that uses a container or virtual machine within the endpoint.",
+  "aiEn": "In scenarios where you browse external links or unknown sites suggested by AI, it is a means of not letting the endpoint execute code. Because the flow of information in and out via the video remains, it needs to be used together with DLP and the like."
+ },
+ {
+  "id": "sspm",
+  "nameEn": "SSPM",
+  "fullEn": "SaaS Security Posture Management",
+  "defEn": "A mechanism that continuously evaluates the settings of SaaS apps, finds security deficiencies and misconfigurations, and shows the steps for improvement. It is posture management aimed at SaaS, and is abbreviated SSPM.",
+  "howEn": "When a SaaS is connected with a connector, the evaluation results of its settings are shown as recommendations and can be checked in Secure Score. Microsoft Defender for Cloud Apps, a product example, organizes recommendations from multiple perspectives such as the CIS Microsoft 365 Foundations Benchmark, and also visualizes attack paths of OAuth apps.",
+  "diffEn": "Whereas CASB monitors and controls the use and operation of SaaS, SSPM evaluates the safety of the settings of each SaaS themselves. It applies to SaaS an idea close to CSPM, which looks at the settings of cloud infrastructure.",
+  "aiEn": "The generative AI features built into SaaS, and the settings of the privileges granted through external app integrations, can also be made targets of continuous inspection."
+ },
+ {
+  "id": "api-gateway",
+  "nameEn": "API gateway / API security",
+  "fullEn": "API gateway / API security (authentication, authorization and control at the entrance of an API)",
+  "defEn": "An entrance placed between the users of an API and the backend, which applies authentication and authorization, request validation, rate limiting and so on together. An API is the input/output window that one piece of software exposes to another.",
+  "howEn": "The gateway validates JWTs and lets through only callers that hold a valid token. It validates the format of requests, and protects the backend with rate limits and quotas. mTLS with client certificates and IP restrictions can also be used. Subscription keys are not relied on as a means of authentication.",
+  "diffEn": "Whereas a WAF inspects attack patterns against Web apps, an API gateway centers on authentication and authorization of the caller and control of usage volume. A configuration that places a WAF in front of the gateway is recommended.",
+  "aiEn": "With a gateway for AI, you can authenticate with a managed identity so that API keys are unnecessary, set upper limits on token usage, and capture logs of prompts and responses (Azure API Management example)."
+ },
+ {
+  "id": "local-breakout",
+  "nameEn": "Local breakout",
+  "fullEn": "Local breakout (communication paths going directly from a site or endpoint to the Internet)",
+  "defEn": "A configuration in which Internet-bound traffic from sites and teleworking endpoints is sent directly to the Internet from an exit close to the user, instead of being gathered at a central site such as headquarters. It is adopted to reduce latency of SaaS use and load on the internal line.",
+  "howEn": "In the past, communications were gathered at headquarters, inspected, and sent out through a proxy. With local breakout, traffic goes straight out from the user's location to the nearest entry point, and DNS name resolution is also done nearby (Microsoft 365 example). What does not pass through central inspection is made up for by measures on the endpoint side and the cloud side.",
+  "diffEn": "A configuration that returns traffic to headquarters by VPN can consolidate inspection, but latency increases. Local breakout keeps latency down but disperses the position of inspection, so it becomes a design that is supplemented with SWG, CASB and the like.",
+  "aiEn": "For communications to generative AI services too, latency and the position of inspection change depending on whether they go via headquarters or a local exit. Decide where to apply inspection and DLP together with the design of the exit."
+ },
+ {
+  "id": "casb-deployment",
+  "nameEn": "CASB deployment modes (API-based and proxy-based)",
+  "fullEn": "CASB deployment modes (API connector / reverse proxy)",
+  "defEn": "The difference in connection methods when CASB visualizes and controls SaaS. The representative ones are the API integration type, which connects to the SaaS's API, and the reverse proxy type, which routes the user's communications through it, and they are used in combination.",
+  "howEn": "The API integration type (app connector) gains visibility and control through the SaaS provider's API, but because of API limits, scanning all files can take several hours to several days. The reverse proxy type routes communications in coordination with conditional access and performs actions such as blocking downloads during the session.",
+  "diffEn": "The API type centers on understanding the state and operations of connected SaaS, and the proxy type centers on immediate control during a session. The proxy type targets browser operations, and native clients may be out of scope.",
+  "aiEn": "SaaS-type generative AI can also have its settings and sharing status checked if it can be connected by API. For browser use, session control such as blocking uploads can be considered. Check whether it is supported for each product."
+ },
+ {
+  "id": "enterprise-browser",
+  "nameEn": "Secure browser (enterprise browser)",
+  "fullEn": "Enterprise / secure browser (building controls into the browser used for work)",
+  "defEn": "An approach that builds security controls into the browser used for work and manages operations such as uploading, copying and printing. Its distinguishing feature is that control takes place inside the browser, without routing traffic through a separate proxy.",
+  "howEn": "In the product example, Microsoft Edge for Business monitors and blocks downloads, uploads, copy and paste, and printing inside the browser, in sessions that use the work profile. In the Chrome Enterprise example, features include binding session Cookies to the device and enforcing the download save location.",
+  "diffEn": "RBI moves the place where browsing is executed into an isolated environment, whereas a secure browser puts the controls into the browser on the user's own device. Microsoft explains that, compared with a reverse proxy, it avoids latency and application compatibility problems.",
+  "aiEn": "Even on BYOD and contractors' devices, downloading and pasting of data can be controlled inside the browser. In some situations it can be used as a measure against data being taken out to AI services used in the browser."
+ },
+ {
+  "id": "tenant-restrictions",
+  "nameEn": "Tenant restrictions",
+  "fullEn": "Tenant restrictions (restricting the use of accounts from external tenants)",
+  "defEn": "A mechanism that restricts signing in to SaaS with accounts of external organisations or individuals from the organisation's own network or devices. Only the external tenants to be allowed are specified, and all others are denied by default.",
+  "howEn": "In the Microsoft Entra ID example, cross-tenant access settings block external accounts and external apps by default, and only the tenants to be allowed, such as business partners, are made exceptions. A proxy, Global Secure Access or a Windows policy adds a header to the request, and Entra ID enforces the restriction.",
+  "diffEn": "Whereas restriction by fixed IP narrows the connection sources on the SaaS side, tenant restrictions narrow which tenants' accounts can be used to sign in from the organisation's own devices and networks.",
+  "aiEn": "It can narrow the routes by which employees reach SaaS from the work environment using personal or external-organisation accounts. What can be controlled is limited to the range of identities supported."
+ },
+ {
+  "id": "shared-responsibility",
+  "nameEn": "Shared responsibility model",
+  "fullEn": "Shared Responsibility Model",
+  "defEn": "A concept showing how security responsibilities are divided between the cloud provider and the customer. The division changes depending on whether IaaS, PaaS or SaaS is used, and data and identities always remain the customer's responsibility.",
+  "howEn": "In Microsoft's breakdown, data, configuration, and identities and users are the customer's responsibility in every deployment type. Physical hosts, the physical network and the datacentre become the provider's responsibility from IaaS onwards. The OS, network controls and applications are shared with the provider depending on the type.",
+  "diffEn": "Google describes a shift away from merely drawing a line of responsibility, towards “shared fate”, in which the provider supplies extensive guidance and tools.",
+  "aiEn": "Microsoft extends this to generative AI and organises it into three layers: the AI platform, the AI application and AI usage. In the usage layer, updating usage policies and providing training are the customer's duties."
+ },
+ {
+  "id": "cspm",
+  "nameEn": "CSPM",
+  "fullEn": "Cloud Security Posture Management",
+  "defEn": "A mechanism that continuously inspects the configuration of cloud resources, finds misconfigurations and weaknesses that violate security policy, and presents them as recommendations for improvement. It keeps resources in the cloud in a secure state (posture).",
+  "howEn": "The policies that have been defined are converted into recommendations that point to violating settings, and the secure score rises as remediation progresses. It can also connect to multicloud environments, and attack path analysis lets you check risky routes as well (example: Microsoft Defender for Cloud).",
+  "diffEn": "Whereas CWPP protects running workloads from threats, CSPM centres on checking configuration and posture. CNAPP is what bundles the two.",
+  "aiEn": "AI SPM in Defender for Cloud detects generative AI workloads, presents an AI BOM and assesses their posture."
+ },
+ {
+  "id": "cwpp",
+  "nameEn": "CWPP",
+  "fullEn": "Cloud Workload Protection Platform",
+  "defEn": "A mechanism that protects workloads running in the cloud, such as virtual machines, containers, storage, databases and serverless functions, from threats. It provides workload-specific recommendations and alerts.",
+  "howEn": "Per-workload recommendations indicate the controls that are needed, and when a threat is detected an alert reports its nature and severity. In the example, it provides vulnerability assessment and file integrity monitoring for servers, environment hardening and runtime protection for containers, and malware scanning for storage.",
+  "diffEn": "Whereas CSPM checks that settings are correct, CWPP handles threat detection and defence for running workloads. CNAPP integrates the two.",
+  "aiEn": "The AI Services plan of Defender for Cloud identifies threats to generative AI applications in real time and helps with the response."
+ },
+ {
+  "id": "cnapp",
+  "nameEn": "CNAPP",
+  "fullEn": "Cloud-Native Application Protection Platform",
+  "defEn": "A platform that integrates multiple cloud security functions and protects applications in the cloud across the whole lifecycle from development to operation. It brings CSPM, CWPP and others together into a single experience.",
+  "howEn": "Defender for Cloud places CSPM, DevSecOps and CWPP at its core. It links misconfigurations and exposed secrets at the code stage with the state of the cloud in order to prioritise remediation. Google explains that integration with security operations is advancing.",
+  "diffEn": "Introducing CSPM and CWPP separately as single-function products increases the number of products. CNAPP is moving towards reducing the number of point products by integrating them.",
+  "aiEn": "Defender for Cloud provides posture management and threat protection for generative AI workloads. Google's SCC Enterprise also lists preventive and detective controls for AI workloads."
+ },
+ {
+  "id": "ciem",
+  "nameEn": "CIEM",
+  "fullEn": "Cloud Infrastructure Entitlement Management",
+  "defEn": "A mechanism that identifies the permissions granted to identities in the cloud, such as people, apps and service accounts, finds excessive, unused and misconfigured permissions, and brings them closer to the principle of least privilege. It looks across multiple clouds.",
+  "howEn": "For example, Microsoft Defender for Cloud tracks permissions across Azure, AWS and GCP on a single screen and, from effective permissions, identifies the identities that can reach sensitive resources. It recommends removing dormant accounts, limiting administrator permissions and right-sizing permissions based on actual usage, and also shows lateral movement from over-privileged identities as an attack path.",
+  "diffEn": "IAM is itself the mechanism that grants and manages permissions, whereas CIEM inspects, across multiple clouds, whether permissions that have already been granted are excessive. There are examples where it is provided as a function of CSPM.",
+  "aiEn": "It covers not only users but also non-human identities such as service principals, managed identities and service accounts. It can also be used to review the permissions of identities used by AI agents and inference platforms."
+ },
+ {
+  "id": "private-link",
+  "nameEn": "Private Link",
+  "fullEn": "Private Link / Private Endpoint",
+  "defEn": "A mechanism for connecting to cloud PaaS services, and to services provided by other companies, through a private address inside your own virtual network, without going over the public internet.",
+  "howEn": "In Azure Private Link, for example, a private endpoint is created inside the virtual network, and traffic to storage or SQL Database travels over Microsoft's backbone network. Because an endpoint corresponds to a specific resource rather than to the whole service, and connections to other resources are blocked, the risk of data exfiltration is reduced.",
+  "diffEn": "Whereas a VPN sets up an encrypted tunnel between networks, Private Link places the access point to a specific cloud service inside your own network. From on-premises it can be used via VPN or ExpressRoute.",
+  "aiEn": "It is a way to separate traffic to generative AI services and AI data stores from the public internet and limit it to connections from the internal network."
+ },
+ {
+  "id": "iac-security",
+  "nameEn": "IaC security",
+  "fullEn": "Infrastructure as Code Security (security of infrastructure configuration defined in code)",
+  "defEn": "For IaC, which defines cloud configuration in code (templates), the practice of inspecting the code before deployment to find misconfigurations and keep insecure configurations from reaching the production environment. Problems can be fixed at an early stage of development.",
+  "howEn": "Templates such as ARM, Bicep, Terraform and CloudFormation are statically inspected in the repository or the pipeline. Microsoft Security DevOps uses Template Analyzer, Checkov and Terrascan, can be run from GitHub Actions or an Azure DevOps extension, and lets you review the results in Defender for Cloud.",
+  "diffEn": "Whereas CSPM checks the settings of running cloud resources, IaC security checks templates before deployment to prevent misconfigurations from entering production.",
+  "aiEn": "If the network, permissions and storage of an AI platform are also built with IaC, errors in exposure settings and permissions can be checked at the code stage."
+ },
+ {
+  "id": "container-security",
+  "nameEn": "Container / Kubernetes security",
+  "fullEn": "Container and Kubernetes Security",
+  "defEn": "An approach for cloud-native environments that protects container images, registries, Kubernetes clusters, nodes and running workloads from three angles: configuration weaknesses, vulnerabilities and runtime threats.",
+  "howEn": "For example, Microsoft Defender for Containers performs continuous monitoring of configuration, vulnerability assessment of images in registries and of running containers, and runtime threat detection for clusters, nodes and workloads. Policies such as gated deployment, which audits or rejects the deployment of vulnerable images, and a ban on creating privileged containers can also be used.",
+  "diffEn": "Unlike traditional protection centred on the host (VM), it treats image vulnerabilities, cluster API settings and runtime behaviour inside containers as separate layers.",
+  "aiEn": "When generative AI inference platforms or agents are run on Kubernetes, too, scanning images for vulnerabilities and prohibiting unnecessary privileges are the starting point."
+ },
+ {
+  "id": "devsecops-pipeline",
+  "nameEn": "DevSecOps / CI/CD pipeline protection",
+  "fullEn": "DevSecOps and CI/CD Pipeline Security (building security into development and operations, and protecting the build and deployment infrastructure)",
+  "defEn": "A concept and practice with two aspects: automatically building security checks into the pipeline from development to deployment (shift left), and at the same time protecting the build and deployment infrastructure itself from attack. Vulnerabilities and misconfigurations are found at an early stage.",
+  "howEn": "For example, the Microsoft cloud security benchmark shows building SAST, secret scanning, IaC scanning and DAST into CI/CD, and managing secrets centrally in places such as Key Vault. Permissions to change the pipeline are restricted, images are inspected before deployment, and DevOps audit logs are aggregated to detect unauthorised changes.",
+  "diffEn": "Unlike the traditional approach of inspecting at the final stage, it embeds inspection and continuous monitoring in every stage. Not only the application code but also the pipeline's credentials and approval mechanisms are covered by protection.",
+  "aiEn": "Because deployment of AI apps also goes through the same pipeline, a takeover of the pipeline can lead to tampering with the AI app as a whole."
+ },
+ {
+  "id": "landing-zone-guardrails",
+  "nameEn": "Landing zone and guardrails",
+  "fullEn": "Landing Zone and Guardrails (a cloud adoption foundation, and automated rules that prevent and detect deviations)",
+  "defEn": "A concept combining the common foundation prepared before an organisation starts using the cloud (the landing zone) with the automated rules on top of it that prevent and detect deviations from the rules (guardrails). It reconciles delegating authority to teams on the front line with maintaining control.",
+  "howEn": "In Azure, for example, policies are assigned at levels of the hierarchy such as management groups and subscriptions, and are inherited by everything beneath. You can choose effects such as rejecting non-compliant changes, only logging them, or automatically deploying related settings. It is recommended to start with audit, confirm the impact, and then move to enforcement.",
+  "diffEn": "Whereas RBAC decides who is allowed to perform operations, policy evaluates whether the state of a resource conforms to the rules. Even with permission, creation or updating is denied if it is non-compliant.",
+  "aiEn": "If restricting allowed regions and making it mandatory to send diagnostic logs are applied to a subscription for AI, a minimum level of control is maintained even when teams on the front line create new AI environments."
+ },
+ {
+  "id": "sbom-supply-chain",
+  "nameEn": "SBOM and software supply chain management",
+  "fullEn": "Software Bill of Materials / Software Supply Chain Security",
+  "defEn": "An effort to prepare a list (SBOM) recording the components that make up software and their supply relationships, manage the vulnerabilities and provenance of dependencies, and reduce the risk of attacks and contamination via the supply chain.",
+  "howEn": "NIST describes an SBOM as a formal record of the details of the components used to build software and their supply relationships, and lists SPDX, CycloneDX and SWID as standard formats. The Microsoft benchmark shows maintaining a list of direct and transitive dependencies, continuously checking it against new CVEs, and preventing the introduction of risky dependencies.",
+  "diffEn": "An SBOM is a list of components and does not guarantee that the software was built securely. NIST positions it as complementing, not replacing, vulnerability management and vendor risk assessment.",
+  "aiEn": "It can be used to understand the libraries and container images that an AI app depends on. It is also a perspective for requesting component information on AI-related software introduced from outside at the time of procurement."
+ },
+ {
+  "id": "api-security",
+  "nameEn": "API security",
+  "fullEn": "API Security",
+  "defEn": "An effort to protect public and internal APIs through authentication and authorisation, usage limits, input validation, narrowing of exposure and inventory management. The OWASP API Security Top 10 is used to organise threats.",
+  "howEn": "At a gateway such as Azure API Management, for example, OAuth 2 token validation, rate limits and quotas, schema-based validation of requests and responses, and rejection of undefined endpoints are enforced in one place. Managed identities are used for backend authentication, and the list of APIs and their versions is also managed.",
+  "diffEn": "Whereas a WAF protects against traditional Web attacks and bots, API security centres on controls that follow the API's specification, such as object-level authorisation and usage limits. The two complement each other.",
+  "aiEn": "For APIs for generative AI, usage and cost can be managed by setting an upper limit on the number of tokens (token limit) and by emitting consumption metrics."
+ },
+ {
+  "id": "dlp",
+  "nameEn": "DLP",
+  "fullEn": "Data Loss Prevention",
+  "defEn": "A mechanism that prevents sensitive information such as credit card numbers and medical records from leaking to, or being shared with, unauthorised parties. It identifies and monitors sensitive information based on policy and automatically applies protection to inappropriate operations.",
+  "howEn": "Policy defines the locations and conditions to cover, and content is analysed using keywords, regular expressions, machine learning and so on. When there is a match, actions such as showing a warning, blocking sharing and quarantining are carried out, and the operation is recorded in the audit log (example: Microsoft Purview).",
+  "diffEn": "Data classification and sensitivity labels are a mechanism for attaching a mark that indicates sensitivity, and DLP controls sharing and taking data out using those marks or the content as conditions. The two are used in combination.",
+  "aiEn": "Purview DLP includes Microsoft 365 Copilot among the locations it monitors, and can also cover the sending of sensitive information to ChatGPT, Gemini, DeepSeek and others via the browser or the network."
+ },
+ {
+  "id": "encryption-kms",
+  "nameEn": "Encryption and key management (KMS, HSM)",
+  "fullEn": "Key Management Service / Hardware Security Module",
+  "defEn": "Key management (KMS) centrally manages the creation, storage and usage permissions of the keys that encrypt data. An HSM is a device that protects keys inside dedicated hardware, and in the cloud it is also provided as a service.",
+  "howEn": "In the cloud, you can choose between keys managed by the provider and customer-managed keys that the customer creates and manages. Key encryption keys protect other encryption keys, and protection levels are provided in steps, from software-protected key management to single-tenant HSMs (example: Azure).",
+  "diffEn": "Whereas the standard key management service protects keys in software, the HSM type protects keys inside certified hardware. With the single-tenant type, the customer holds the root of trust for the keys.",
+  "aiEn": "Customer-managed keys can be used for encryption at rest even on the platform that holds in-house data to be passed to generative AI. Whether to hold the keys in-house is a point to be decided from regulatory and contractual requirements."
+ },
+ {
+  "id": "data-classification",
+  "nameEn": "Data classification and sensitivity labels",
+  "fullEn": "Data Classification / Sensitivity Labels",
+  "defEn": "An effort to divide information into categories according to its sensitivity (public, company confidential and so on) and assign them as labels. Protections such as encryption, watermarks and sharing restrictions can be applied according to the label, and the label stays with the information.",
+  "howEn": "Administrators create categories that suit the organisation (example: Public, General, Confidential, Highly Confidential), and labels are applied by user action or by automatic detection. The label is stored in the file's metadata and stays with it even when the storage location changes (example: Microsoft Purview).",
+  "diffEn": "DLP is the side that stops sharing and taking data out using labels or content as conditions, while the label indicates sensitivity and serves as the starting point for protection. Retention labels are for controlling the retention period and are applied separately from sensitivity labels.",
+  "aiEn": "Microsoft 365 Copilot and agents recognise sensitivity labels. For labels that involve encryption, they return only data from items for which the user has the copy permission (EXTRACT)."
+ },
+ {
+  "id": "immutable-backup",
+  "nameEn": "Immutable backup and ransomware countermeasures",
+  "fullEn": "Immutable Backup (backup that cannot be deleted or altered)",
+  "defEn": "A backup protected so that it can be neither deleted nor altered during its retention period. Even if ransomware or a malicious operation tries to wipe out the backups themselves, the recovery points used for recovery can be preserved.",
+  "howEn": "The immutable vault of Azure Backup prohibits operations that would lead to the loss of recovery points (deletion before expiry, shortening the retention period), and, once it is locked, it can no longer be disabled (WORM storage). The Ministry of Internal Affairs and Communications lists the combined use of physical isolation, automatic encryption and network isolation.",
+  "diffEn": "With an ordinary backup, anyone with the permission can delete recovery points. An immutable setting differs in that it cannot be disabled after it is locked. Recovery drills are also needed separately.",
+  "aiEn": "Internal data that grows with the introduction of generative AI (such as documents and indexes for search) should also be included in the scope of backups, with the recovery targets and retention periods decided."
+ },
+ {
+  "id": "dspm",
+  "nameEn": "DSPM",
+  "fullEn": "Data Security Posture Management",
+  "defEn": "A mechanism that automatically discovers data stores across multiple clouds, grasps where sensitive data is located, who has access to it and how it is protected, and continuously finds and prioritises risks that could lead to data exfiltration.",
+  "howEn": "For example, Defender for Cloud discovers object stores and databases across multiple clouds and samples the data to determine the types of sensitive information. It assesses data exposure and data flows, and also shows attack paths from internet-exposed VMs to sensitive data. DSPM in Purview answers what data exists where, who can access it and how it is protected.",
+  "diffEn": "Whereas DLP detects and blocks operations that take data out, DSPM is the area that finds where sensitive data is located and the gaps in its protection. It differs from CSPM in that it starts from the data itself rather than from infrastructure or devices.",
+  "aiEn": "DSPM in Purview makes the activity of AI apps and agents visible and tracks interactions that contain sensitive data and excessive sharing."
+ },
+ {
+  "id": "tokenization",
+  "nameEn": "Tokenization",
+  "fullEn": "Tokenization",
+  "defEn": "A technique that handles sensitive values such as credit card numbers by replacing them with meaningless substitute values (tokens). If the substitute value has the same character type and length, it can also fit the format constraints of existing systems.",
+  "howEn": "For example, Cloud DLP in Google Cloud replaces input values with tokens of the same character type and length using format-preserving encryption (FPE), keeping compatibility with legacy systems that have format constraints. A prefix indicating that the value can be restored can also be added. There is also a method that replaces values with a one-way hash generated with a key; in this case the original cannot be recovered.",
+  "diffEn": "Whereas masking hides some characters with fixed characters, tokenization replaces the entire value with a substitute value. It can be stored and processed while preserving the format, and depending on the method the original can also be restored.",
+  "aiEn": "If personal information and account numbers are replaced with tokens before being passed to generative AI, processing can proceed without sending the raw values to the model or external services."
+ },
+ {
+  "id": "data-masking",
+  "nameEn": "Data masking",
+  "fullEn": "Data Masking",
+  "defEn": "A technique that hides part or all of sensitive data with masking characters or other values so that unauthorised users, and people in development and testing, do not see the real data as it is. There are methods that hide it dynamically, only at display time, and methods that process and replace the values.",
+  "howEn": "Dynamic masking does not change the values stored in the database and hides only the query results for unauthorised users (example: Azure SQL Database). Rules define the target columns and functions; for credit cards only the last 4 digits are shown, and for email only the first character. Users with the UNMASK permission, and administrators, can see the original values.",
+  "diffEn": "Dynamic masking does not change the stored values and controls only how results are displayed. It differs in its handling of the original data from tokenization, which replaces the entire value with a substitute value.",
+  "aiEn": "In AI testing and fault investigation that use production data, showing developers only the masked results can limit the exposure of personal information."
+ },
+ {
+  "id": "pseudonymization",
+  "nameEn": "Pseudonymously processed information and anonymously processed information",
+  "fullEn": "Pseudonymously / Anonymously Processed Information (processed information under the Act on the Protection of Personal Information)",
+  "defEn": "Categories under the Act on the Protection of Personal Information. Pseudonymously processed information is information processed so that an individual cannot be identified unless it is compared with other information (Article 2, paragraph 5); anonymously processed information is information processed so that an individual cannot be identified and the original cannot be restored (the same Article, paragraph 6).",
+  "howEn": "Anonymously processed information does not constitute personal information and can be provided to third parties without the consent of the individual concerned. Pseudonymously processed information, because its creator normally retains the original information, is in principle personal information, and provision to third parties is in principle prohibited, but the purpose of use can be changed beyond the scope of relevance. The obligations at the time of creation are set out in the guidelines (Pseudonymously Processed Information and Anonymously Processed Information volume).",
+  "diffEn": "Whereas anonymously processed information cannot be restored and is not personal information, pseudonymously processed information can be identified if compared with other information and is in principle personal information. Masking and tokenization are technical methods, not legal categories.",
+  "aiEn": "Before using data that contains personal information for AI analysis or training, consider which kind of processed information it can be handled as. The treatment of provision to third parties and of the purpose of use changes depending on the category."
+ },
+ {
+  "id": "cross-border-transfer",
+  "nameEn": "Data residency and cross-border transfer",
+  "fullEn": "Data Residency and Cross-Border Data Transfer",
+  "defEn": "The geographic location where data is stored and processed (data residency), and the regulation of data movement across national borders. Japan's Act on the Protection of Personal Information sets rules for providing personal data to a third party in a foreign country (Article 28).",
+  "howEn": "As a rule, the consent of the individual concerned to the provision to a foreign country must be obtained in advance. Consent is not required where the destination country is specified in rules as a country with a system of an equivalent standard, or where the recipient has put in place a system that conforms to the standards. When obtaining consent, the name of the destination country, the system of that country and the measures taken by the recipient are presented to the individual. For provision based on a standards-conforming system, the status of implementation must be checked at least about once a year.",
+  "diffEn": "Data residency is a choice of where to place data (in the cloud, chosen by region), whereas cross-border transfer regulation is the legal discipline imposed on provision to third parties in foreign countries. Both need to be checked.",
+  "aiEn": "When passing personal data to a generative AI service that runs in an overseas region, check whether this amounts to provision to a third party in a foreign country or to outsourcing. Outsourcing is likewise treated as subject to Article 28."
+ },
+ {
+  "id": "data-disposal",
+  "nameEn": "Data erasure and disposal",
+  "fullEn": "Data Sanitization and Disposal",
+  "defEn": "Processing, erasing and disposing of storage media and data that are no longer needed, to the point where access to the target data is infeasible with a given level of effort. NIST calls this processing media sanitization.",
+  "howEn": "NIST SP 800-88 provides guidance for sanitization plans that determine the erasure and disposal techniques and controls according to the sensitivity of the information. For example, after data upload is complete, Azure Data Box performs a block-level erase of the data on the device, and a certificate of erasure in line with NIST SP 800-88 can be obtained from the portal.",
+  "diffEn": "Whereas data retention determines how long data is kept, data erasure and disposal is the final step that, after the period has expired, reliably makes the target inaccessible.",
+  "aiEn": "Data copied for AI training and testing, and data inside environments that are no longer in use, are also covered. Data cannot be erased unless the locations of the copies are known."
+ },
+ {
+  "id": "encryption-states",
+  "nameEn": "Encryption at rest and in transit",
+  "fullEn": "Encryption at Rest / in Transit (encryption of stored data and encryption of communications)",
+  "defEn": "Encryption at rest, which protects stored data, and encryption in transit, which protects data flowing over a network. They are sometimes organised into three states by adding encryption in use, which protects data while it is being processed.",
+  "howEn": "For example, Azure uses server-side encryption with AES-256 at rest, and key models such as service-managed keys and customer-managed keys can be chosen. In transit, data is protected with TLS, and Azure is moving towards TLS 1.2 or later. VPNs are encrypted with IPsec. Confidential computing is used for encryption in use.",
+  "diffEn": "This is a different axis from key management (KMS, HSM), which deals with who manages keys and where; this one is a classification of which state of data is being protected. The two are used in combination.",
+  "aiEn": "Encryption is needed both on the communication path used to pass data to generative AI and at the storage location of the data placed for RAG. For data being processed, confidential computing is an option."
+ },
+ {
+  "id": "data-retention",
+  "nameEn": "Data retention and lifecycle management",
+  "fullEn": "Data Retention and Lifecycle Management (retention policies and retention labels)",
+  "defEn": "Setting and operating rules to keep data for a fixed period in accordance with laws and internal regulations and to delete it after that period. What must be kept is reliably kept, and old information that is no longer needed is deleted to reduce risk.",
+  "howEn": "For example, Microsoft Purview combines two operations, retain (prevent deletion and keep the data available to eDiscovery) and delete, and can be set to retain only, delete only, or retain and then delete. There are retention policies at the level of sites and mailboxes, and retention labels at the level of documents and emails, and a disposition review can be inserted when the period expires.",
+  "diffEn": "Whereas an immutable backup protects copies used for recovery from failures and attacks, data retention keeps the original content for legal and regulatory purposes and deletes it after the deadline.",
+  "aiEn": "Interactions with Copilot and AI apps can also be included in the scope of a retention policy. This provides a basis for deciding the retention period of prompts and responses in line with internal regulations."
+ },
+ {
+  "id": "irm",
+  "nameEn": "IRM (information rights management)",
+  "fullEn": "Information Rights Management",
+  "defEn": "A mechanism that encrypts files and emails and attaches usage permissions such as viewing, editing, printing and forwarding to the data itself, so that protection continues even after the data moves to sharing recipients, outside the company, or to unmanaged storage. Rights management is carried by the data.",
+  "howEn": "For example, Azure Rights Management protects files and emails with encryption, identity and authorisation policies. Encryption settings can be applied through sensitivity labels, and protection remains even if a file moves to unmanaged storage. “Do Not Forward” restricts forwarding, printing and copying. Auditing of usage and revoking access to Office files are also possible.",
+  "diffEn": "Whereas DLP detects and blocks taking data out by means of policy, IRM attaches protection to the data itself. However, sharing such as screen capture cannot be completely prevented, and it is assumed to be used together with other controls.",
+  "aiEn": "Material encrypted with a sensitivity label cannot be read even if it reaches an unauthorised party. Before using internal documents as a reference source for generative AI, it is a point to check whether they are handled with protection still attached."
+ },
+ {
+  "id": "ediscovery-legal-hold",
+  "nameEn": "eDiscovery / legal hold",
+  "fullEn": "Electronic Discovery and Legal Hold (electronic evidence disclosure and litigation hold)",
+  "defEn": "A procedure for identifying electronically stored information that may become evidence in an investigation or litigation, preserving and collecting it, and putting it in a state where it can be produced. The measure that stops deletion of the target data for preservation is a legal hold.",
+  "howEn": "For example, Microsoft Purview eDiscovery manages search, hold and export on a per-case basis. A hold is placed on target locations such as email, Teams and SharePoint to prevent deletion, and search results are collected into a review set, tagged and analysed before being exported.",
+  "diffEn": "Whereas data retention sets periods by company-wide rules, a legal hold is a case-by-case measure that preserves targets for a specific investigation or litigation.",
+  "aiEn": "eDiscovery also supports searching and deleting Copilot and AI app data. In preparation for cases where interactions with AI become subject to discovery, decide the policy for retention and preservation in advance."
+ },
+ {
+  "id": "siem",
+  "nameEn": "SIEM",
+  "fullEn": "Security Information and Event Management",
+  "defEn": "A security platform that aggregates and analyses logs and events from across networks, devices, the cloud, applications and other sources, and is used for threat detection, incident investigation and compliance.",
+  "howEn": "Logs are collected with agents or connectors and normalised into a common format. Correlation rules and machine learning link related events to find anomalies, and prioritised alerts according to severity are raised. Analysts investigate using search and visualisation.",
+  "diffEn": "The SOC is the people and team who use a SIEM, and SOAR is a mechanism for automating response after detection. SIEM is the technical platform responsible for collecting, analysing and detecting data.",
+  "aiEn": "In Google's explanation, machine learning models are used for detection in SIEM. If logs of generative AI use are also ingested, they can be correlated with logs from other systems on the same platform to investigate suspicious use."
+ },
+ {
+  "id": "soar",
+  "nameEn": "SOAR",
+  "fullEn": "Security Orchestration, Automation and Response",
+  "defEn": "A mechanism that links multiple security tools (orchestration), automates routine alert-handling tasks (automation), and speeds up the process from detection to response.",
+  "howEn": "Depending on conditions, predefined response procedures (playbooks) are run automatically or manually. As an example, when malware is detected on a device, isolation, evidence collection, searching other systems for similar indicators and ticket creation are carried out automatically, and the case is passed on for confirmation by the person in charge.",
+  "diffEn": "Whereas SIEM handles collection, analysis and detection, SOAR coordinates and automates the response after detection. SOAR is used alongside SIEM, in the form of automating the response to threats that SIEM has detected.",
+  "aiEn": "In a SOC with many alerts, it automates routine investigation and response so that people can concentrate on investigating advanced threats. Alerts related to generative AI can also be put through the same procedures."
+ },
+ {
+  "id": "soc",
+  "nameEn": "SOC",
+  "fullEn": "Security Operation Center",
+  "defEn": "A team or organisation in which security specialists monitor information systems and carry out threat detection, investigation and response. It uses technical platforms such as SIEM as its main tools and analyses signs of attack.",
+  "howEn": "It analyses logs and alerts to investigate suspicious access and takes action as necessary. The Digital Agency's policy cites an approach in which, when suspicious access is recognised, the organisation responds jointly with SOCs inside and outside the organisation, and both sides monitor through log integration and shared dashboards.",
+  "diffEn": "SIEM is a tool that a SOC uses. The glossary of the Ministry of Internal Affairs and Communications explains a CSIRT as a structure for monitoring and analysis of causes, so the roles of a SOC and a CSIRT overlap.",
+  "aiEn": "Add the usage logs and control status of generative AI apps to what is monitored, and build the handling of alerts into operating procedures. Whether to operate it in-house or outsource it is also a decision point."
+ },
+ {
+  "id": "log-management",
+  "nameEn": "Log management and audit logs",
+  "fullEn": "Log Management / Audit Log",
+  "defEn": "An effort to acquire and store records of communications and operations (audit logs) from firewalls, authentication, servers, applications and so on, and to use them for early detection of incidents, investigation of causes, investigation of the scope of impact, and consideration of measures to prevent recurrence.",
+  "howEn": "The types of logs to acquire and their retention periods are decided from the data handled and the attacks anticipated. Time is synchronised with NTP, and logs are stored in a log management system separate from the devices to prevent tampering. Because logs may contain personal information and the like, they are treated as confidential information.",
+  "diffEn": "SIEM includes log management at its core while also handling correlation analysis, detection and response. Log management is the foundation of acquisition, storage and search, and SIEM layers detection on top of it.",
+  "aiEn": "For generative AI use as well, logs that make it possible to trace who handled which data and when are needed for investigation and audit. Decide in advance what is acquired, the retention period, and how confidential information inside logs is handled."
+ },
+ {
+  "id": "threat-intel",
+  "nameEn": "Threat intelligence",
+  "fullEn": "Cyber Threat Intelligence",
+  "defEn": "The series of processes in which an organisation makes security decisions based on intelligence obtained by collecting, processing and analysing threat information about cyberattacks. It is not a term that refers to a specific tool or service.",
+  "howEn": "It runs in a cycle of policy setting, collection and processing, analysis, dissemination and evaluation. By user, it is organised into three types (IPA): strategic, for executive management; operational, used to understand attack methods and for penetration testing; and tactical, such as IoCs for the SOC.",
+  "diffEn": "IoCs such as malicious IPs and hash values are one kind of tactical intelligence and are only a part of threat intelligence. IPA also cites use at the strategic and operational levels as an issue.",
+  "aiEn": "Include trends in attacks targeting generative AI, and in its misuse, in threat information, and use them as material for judging the impact on your own organisation and the priority of responses."
+ },
+ {
+  "id": "vuln-pentest",
+  "nameEn": "Vulnerability assessment and penetration testing",
+  "fullEn": "Vulnerability Assessment / Penetration Test",
+  "defEn": "A vulnerability assessment is work that comprehensively inspects the whole target system to identify weaknesses. A penetration test is an examination that attacks from the same viewpoint as an attacker and confirms, on a risk basis, whether the attack actually succeeds.",
+  "howEn": "A vulnerability assessment covers servers, network devices, Web apps and Web APIs, smartphone apps and so on, and, measured against standards, also identifies points that do not immediately lead to an attack. A penetration test checks whether the objective can be achieved in an anticipated attack scenario and also confirms the extent of damage.",
+  "diffEn": "An assessment centres on comprehensiveness; a penetration test centres on whether the attack succeeds and confirming the damage. The Digital Agency states that vulnerabilities that are hard to anticipate in an assessment need to be checked by testing from the attacker's viewpoint.",
+  "aiEn": "Microsoft cloud security benchmark v2 (preview) lists, as controls, regular red team exercises and, in addition, continuous AI red teaming (AI-7)."
+ },
+ {
+  "id": "csirt",
+  "nameEn": "Incident response (CSIRT)",
+  "fullEn": "Computer Security Incident Response Team",
+  "defEn": "A structure in companies and government agencies that monitors whether any problems are occurring in information systems and, when they do, analyses causes and investigates the scope of impact. Incident response refers to the response activities that proceed from the detection of an incident to recovery.",
+  "howEn": "The flow of detection, initial response (contacting the relevant departments, preventing the spread of damage, providing information to security response organisations), analysis, recovery and prevention of recurrence is turned into procedures in advance. Because there are cases where delays in conveying information to senior management led to mistakes in the initial response, rules for communication are set in advance.",
+  "diffEn": "In the glossary of the Ministry of Internal Affairs and Communications, CERT is an organisation that carries out activities to respond to incidents, and is a name also used in handling international cooperation. CSIRT refers to a structure within an organisation and overlaps with the SOC in terms of monitoring.",
+  "aiEn": "Incidents of information leakage or erroneous output by generative AI are also to be put on the existing response procedures. Decide in advance who makes the decisions, the contact points, and the criteria for escalating to senior management."
+ },
+ {
+  "id": "ueba",
+  "nameEn": "UEBA",
+  "fullEn": "User and Entity Behavior Analytics",
+  "defEn": "An analytical technique that learns the baseline of normal behaviour not only for users but also for entities such as hosts, IP addresses and applications, and detects deviations from it as anomalies.",
+  "howEn": "Machine learning builds behavioural profiles, and current activity is compared with the subject's own past, with its peer group (peers determined dynamically from, for example, the group it belongs to) and with the organisation as a whole. Anomalies are given a risk score based on deviations in location, device and frequency, and the score is used to prioritise investigation.",
+  "diffEn": "It is an analytics function that runs on top of a SIEM and is not the SIEM itself. As an example, Microsoft Sentinel has UEBA built in, and its results can be brought into investigation and hunting queries.",
+  "aiEn": "Because applications are also treated as entities, the approach can be applied to detecting unusual behaviour of generative AI user accounts and integrated apps."
+ },
+ {
+  "id": "asm",
+  "nameEn": "ASM / EASM",
+  "fullEn": "Attack Surface Management / External Attack Surface Management",
+  "defEn": "An activity that continuously discovers and inventories the organisation's own assets visible from the internet side (domains, IP addresses, hosts and so on) and grasps the weaknesses of the attack surface that extends outside the firewall.",
+  "howEn": "Known legitimate assets are used as the starting points of discovery (seeds), and observable connections are followed to explore recursively domains, IP address blocks, hosts, email contacts, ASNs and so on. The assets found are classified and made into an inventory, and are examined from the perspective of vulnerabilities and security hygiene.",
+  "diffEn": "Whereas a vulnerability assessment examines targets that have been decided in advance, ASM starts by following relationships from known assets to find assets that the IT department has not identified.",
+  "aiEn": "It is a means of identifying externally exposed assets that the IT department is not aware of, such as test sites and public API entry points hurriedly put together for generative AI."
+ },
+ {
+  "id": "threat-hunting",
+  "nameEn": "Threat hunting",
+  "fullEn": "Threat Hunting",
+  "defEn": "An activity in which analysts form hypotheses, search the data and verify those hypotheses to proactively look for undetected threats and malicious behaviour that have not appeared in alerts. The results are linked to new detections and investigations.",
+  "howEn": "Hypotheses are formed from suspicious behaviour, new attack campaigns, gaps in detection and so on. Logs are examined with queries such as KQL, evidence is kept in bookmarks, and findings are reflected in new detection rules, threat intelligence and incidents. Results are measured by, for example, the number of validated hypotheses.",
+  "diffEn": "Whereas SIEM detection rules react to known patterns, hunting looks for threats that have no alert. The insights gained are fed back into SIEM as detection rules.",
+  "aiEn": "If logs such as authentication and API calls of generative AI and integrated apps are being collected, unusual usage patterns can be taken as hypotheses and investigated."
+ },
+ {
+  "id": "digital-forensics",
+  "nameEn": "Digital forensics",
+  "fullEn": "Digital Forensics",
+  "defEn": "A science that supports criminal and civil proceedings through the recovery and investigation of digital data. The field that acquires and analyses data from computers, virtual machines and storage media is called computer forensics.",
+  "howEn": "To withstand legal requirements, the chain of custody of evidence is maintained at each stage of acquisition, preservation and access. In the example, a snapshot of the disk is saved in immutable (WORM) storage, the hash value is recorded in a separate key vault, and access is logged.",
+  "diffEn": "Whereas incident response (CSIRT) carries out containment and recovery, forensics takes on the aspect of preserving and analysing the acquired data as evidence.",
+  "aiEn": "If logs of prompts and outputs are to be used as evidence in a generative-AI-related incident, the retention period, tamper prevention and restriction of who can view them need to be decided in advance."
+ },
+ {
+  "id": "bcp-dr",
+  "nameEn": "BCP / DR",
+  "fullEn": "Business Continuity Plan / Disaster Recovery",
+  "defEn": "A BCP is a plan for continuing business even when failures or disasters occur, and is based on risk assessment. DR is the part that plans recovery from rare and critical outages (natural disasters, serious human errors, ransomware, etc.).",
+  "howEn": "Business functions are classified by importance, risks are identified and divided into those handled by high availability (HA) and those handled by DR, and mitigation measures are designed. For DR, the maximum tolerable period of data loss (RPO) and the maximum duration of downtime (RTO) are determined, procedure manuals are prepared, and they are verified through drills.",
+  "diffEn": "HA is resilience to everyday temporary failures, whereas DR is the response to rare, critical outages. Backup is one means of DR, and restoring from it involves data loss and time.",
+  "aiEn": "When a generative AI service has been built into business operations, decide in advance on falling back to manual work when that service stops, and on RTO and RPO according to the importance of the business function."
+ },
+ {
+  "id": "mitre-attack",
+  "nameEn": "MITRE ATT&CK",
+  "fullEn": "MITRE ATT&CK (a knowledge base of attacker tactics and techniques)",
+  "defEn": "A publicly available knowledge base that anyone can consult, compiling the tactics and techniques that attackers commonly use. It is created and maintained on the basis of real-world observations and is used for purposes such as building threat models.",
+  "howEn": "Techniques are mapped to detection rules, hunting queries, bookmarks and incidents, and a matrix visualises which techniques have detections, revealing gaps in detection. In the example, Microsoft Sentinel aligns with version 18 of ATT&CK and displays active detections overlaid with those not yet configured.",
+  "diffEn": "Whereas CIS Controls and NIST CSF organise the defender's measures and outcomes, ATT&CK organises from the side of attacker behaviour and is used for threat models and for checking detection.",
+  "aiEn": "Even for attacks targeting generative AI and AI agents, mapping them to existing techniques such as credential theft and privilege escalation makes it possible to check for gaps in detection."
+ },
+ {
+  "id": "security-awareness",
+  "nameEn": "Security awareness training and targeted-attack email drills",
+  "fullEn": "Security Awareness Training / Phishing Simulation (training and simulated-email drills)",
+  "defEn": "An effort combining training that teaches employees attack methods and correct responses with drills that send simulated attack emails to check whether they can respond appropriately on receiving a suspicious email; targeted-attack email drills are a representative example.",
+  "howEn": "It is carried out after deciding the attack to be assumed, what is to be checked and the target people. Metrics include, besides the open rate, the rate of appropriate responses achieved, the time until a report reaches the responsible department, and whether there are any problems in the CSIRT's response flow. Recipients report to the internal responsible department, not to the sender. Some products also assign training according to the user's actions.",
+  "diffEn": "Whereas a vulnerability assessment examines flaws in devices and systems, this checks whether people's responses and reporting routes work in an emergency. Drills that pose as a real organisation should be avoided.",
+  "aiEn": "Include the rules for using generative AI (approved tools, information that may be entered) in the training content, and also check in drills the reporting route for when misuse is found."
+ },
+ {
+  "id": "zero-trust",
+  "nameEn": "Zero trust",
+  "fullEn": "Zero Trust (the concept in NIST SP 800-207)",
+  "defEn": "A concept in which implicit trust is not granted on the basis of network location or asset ownership alone, and access is permitted resource by resource after authentication and authorisation of the user and the device. It arose as a response to the growth of remote users, BYOD and cloud assets.",
+  "howEn": "NIST shifts the focus of defence from static network perimeters to users, assets and resources. The Digital Agency sets out six application policies: identification of resources, identity proofing and user authentication, network protection, checking the state of resources, policy evaluation, and observation of resources and access.",
+  "diffEn": "Perimeter-based defence assumes that the inside is trusted, and zero trust removes that assumption. The Digital Agency explains that zero trust does not negate perimeter-based or network measures, nor does it refer to a specific product.",
+  "aiEn": "Access to generative AI services can also be made subject to permission after evaluating the state of the user and the device. Because zero trust is a concept rather than a product, it is advanced step by step."
+ },
+ {
+  "id": "perimeter-defense",
+  "nameEn": "Perimeter-based defence",
+  "fullEn": "Perimeter-based Security",
+  "defEn": "The traditional concept that tries to block external attacks and internal information leakage by separating the inside from the outside at a boundary. It rests on the assumption that “untrusted things” do not enter the inside and that only “trusted things” exist inside.",
+  "howEn": "A boundary is established using the network, and communications are controlled. A policy that permits only specific source and destination addresses and specific ports also falls under this concept. It centres on building a secure network, and the Digital Agency regards this as the basis of conventional security.",
+  "diffEn": "Zero trust assumes that even the inside of the boundary can be compromised and evaluates resource by resource. The weakness of the perimeter-based approach is said to be that it is hard to stop free movement inside after an intrusion.",
+  "aiEn": "Cloud generative AI services lie outside the internal boundary. The Digital Agency points out the risk that, as cloud use spreads, the perimeter-based approach alone will become insufficient."
+ },
+ {
+  "id": "nist-csf",
+  "nameEn": "NIST CSF 2.0",
+  "fullEn": "NIST Cybersecurity Framework 2.0",
+  "defEn": "NIST's framework that systematises outcomes for managing and reducing cybersecurity risk. It can be used regardless of industry or size, and many organisations use it voluntarily.",
+  "howEn": "The Core consists of six Functions, Govern, Identify, Protect, Detect, Respond and Recover, which are run concurrently and continuously. Organisational Profiles describe the current state and the target, and priorities are set from the gap between them.",
+  "diffEn": "The CSF only indicates the outcomes to be achieved and does not specify concrete actions. The means of realisation are supplemented by informative references to 50 or more documents, such as SP 800-53.",
+  "aiEn": "NIST says it currently has no plans to update the CSF Core for AI, while explaining that existing outcomes can be used, such as monitoring the risks of third-party AI tools (GV.SC-07) and taking inventory of software including AI (ID.AM-02)."
+ },
+ {
+  "id": "isms",
+  "nameEn": "ISMS (ISO/IEC 27001)",
+  "fullEn": "Information Security Management System",
+  "defEn": "The mechanism by which an organisation operates and manages information security (information security management system). It is standardised as the international standard ISO/IEC 27001, and the standard defines the requirements for an ISMS.",
+  "howEn": "In addition to requirements, the standard presents a list of controls for managing information risk, but does not make any specific control mandatory. An organisation obtains certification by undergoing assessment by an independent third party. A cloud provider's certificate can serve as a reference for obtaining your own certification.",
+  "diffEn": "SOC 2 is a report in which an auditor evaluates the design and operating effectiveness of controls. ISMS differs in that it certifies the management mechanism against the standard.",
+  "aiEn": "Because certification is obtained for each scope of target services, check whether the generative AI service you use is within the scope. Your own certification is needed separately."
+ },
+ {
+  "id": "cis-controls",
+  "nameEn": "CIS Controls",
+  "fullEn": "CIS Critical Security Controls",
+  "defEn": "A set of controls for cyber defence developed by the non-profit organisation CIS (Center for Internet Security) by consensus. They are mapped to standards such as NIST CSF and the ISO 27000 series.",
+  "howEn": "Controls are numbered and are referred to by section numbers such as “3.11”. The Microsoft cloud security benchmark maps its own controls to the numbers of CIS Controls v8.1 (example: encryption at rest is 3.11).",
+  "diffEn": "CIS Benchmarks are configuration standards for individual products (Level 1 and 2), and each recommendation refers to the CIS Controls. The CSF is a framework of outcomes, and CIS Controls is on the side of concrete controls.",
+  "aiEn": "Microsoft's AI security controls (use of approved models AI-1, AI red teaming AI-7, and so on) are also mapped to the numbers of CIS Controls v8.1."
+ },
+ {
+  "id": "soc2",
+  "nameEn": "SOC 2",
+  "fullEn": "System and Organization Controls 2 (internal control report for service organisations)",
+  "defEn": "A report in which a third party evaluates the controls of a service organisation against the criteria of security, availability, processing integrity, confidentiality and privacy, based on the framework of the American Institute of Certified Public Accountants (AICPA).",
+  "howEn": "The auditor evaluates the description of the system and the controls. Type I covers the design of controls at a specific point in time, and Type II covers the design and operating effectiveness over a period of time. The gap from the end of the reporting period to the user's period end is covered by management's bridge letter.",
+  "diffEn": "Whereas ISMS certification is certification of the management mechanism, SOC 2 is a report for users to evaluate the risk of an outsourced provider. Responses to exceptions are also included in the report.",
+  "aiEn": "When procuring an AI service, check whether the service is within the scope of the report, the period covered, the exceptions, and the controls that the user side should implement (User Entity Responsibilities)."
+ },
+ {
+  "id": "ismap",
+  "nameEn": "ISMAP",
+  "fullEn": "Information system Security Management and Assessment Program (security assessment scheme for government information systems)",
+  "defEn": "A scheme that assesses and registers in advance cloud services that satisfy the security requirements demanded by the government, aiming to secure the security level in government cloud procurement and to enable smooth adoption. Registered services are published in the ISMAP Cloud Service List.",
+  "howEn": "The provider builds controls according to the ISMAP Management Criteria (incorporating the JIS Q 27000 series, the Government Unified Standards and NIST SP800-53), and undergoes an external audit by a registered audit organisation and an examination by the operations support organisation (IPA). Whether to register is decided by the steering committee, and the process is repeated every year.",
+  "diffEn": "ISMAP-LIU is a framework for SaaS used for low-risk operations and information. Whereas ISMS certification and SOC 2 reports are private-sector third-party evaluations, ISMAP is a list registration scheme for government procurement.",
+  "aiEn": "Government agencies and the like, as a rule, procure from the ISMAP Cloud Service List. When proposing a cloud-based generative AI service for the public sector, whether it is registered is a point to check."
+ },
+ {
+  "id": "cyber-mgmt-guideline",
+  "nameEn": "METI Cybersecurity Management Guidelines",
+  "fullEn": "METI Cybersecurity Management Guidelines Ver 3.0 (Ministry of Economy, Trade and Industry and IPA)",
+  "defEn": "Guidelines by the Ministry of Economy, Trade and Industry and IPA, aimed at executives, that compile the 3 principles executives should recognise and the 10 important items they should instruct the responsible officer (CISO, etc.) to address. Ver 3.0 was published on 24 March 2023 (Reiwa 5).",
+  "howEn": "The 3 principles are executive leadership, attention to the whole supply chain, and communication with internal and external parties in both normal times and emergencies. The 10 items give instructions covering policy formulation, management structure, securing resources, risk response, PDCA, emergency response and recovery structure, the supply chain, information sharing and so on.",
+  "diffEn": "It is not a collection of controls listing individual technical measures (such as CIS Controls) but a document that sets out executives' responsibilities and items to instruct. IPA separately publishes a collection of practices for implementation.",
+  "aiEn": "The policy, structure and emergency response for risks that come with introducing generative AI can be explained to senior management within the framework of the 10 items and used as material for obtaining approval."
+ },
+ {
+  "id": "risk-assessment",
+  "nameEn": "Risk assessment and risk treatment",
+  "fullEn": "Risk Assessment / Risk Treatment (risk evaluation and response)",
+  "defEn": "The process of estimating the magnitude of risk from the threats, vulnerabilities and impacts for the information assets to be protected, and judging by comparison with risk criteria whether it is acceptable, together with the choice among avoidance, reduction, transfer and acceptance according to the result.",
+  "howEn": "The approaches are baseline, which uses existing standards; informal, which relies on experience; detailed risk analysis, which looks at asset value, threats and vulnerabilities for each asset; and combinations of these. Detailed analysis proceeds in the order of identifying assets, calculating risk values and deciding on measures. Exceptions such as acceptance require the approval of management.",
+  "diffEn": "A vulnerability assessment is a means of finding technical flaws, whereas risk assessment is the process of combining those results with the importance of assets and with threats to decide the priority of responses.",
+  "aiEn": "For generative AI, identify the sensitivity of input data and the scope of integration destinations as information assets. The Financial Services Agency's guidelines also call for risk assessment when providing new products and services."
+ },
+ {
+  "id": "security-policy",
+  "nameEn": "Information security policy",
+  "fullEn": "Information Security Policy (basic policy, countermeasure standards and implementation procedures)",
+  "defEn": "A system of regulations documenting an organisation's policy and how it protects itself, in whose formulation senior management is involved. It is organised through the relationship among the basic policy, the countermeasure standards (standards to be observed) and the implementation procedures (concrete procedures for individual operations and systems).",
+  "howEn": "Based on the basic policy, countermeasure standards are defined in light of the results of risk assessment, and implementation procedures for carrying them out in individual operations and systems are prepared. The responsible person decides after deliberation by a committee, and the policy is reviewed in response to changes in the environment. The Financial Services Agency's guidelines call for regulations to be reviewed at least once a year.",
+  "diffEn": "Whereas the government's Unified Standards are common compliance requirements for agencies and the like to observe, countermeasure standards are documents that define concrete measures to suit the characteristics of the organisation itself. Different measures are acceptable if they are of an equivalent or higher level.",
+  "aiEn": "Rules for using generative AI (available tools, information that may be entered, approval procedures) can be kept consistent by adding to the existing countermeasure standards and implementation procedures rather than creating a separate new document."
+ },
+ {
+  "id": "third-party-risk",
+  "nameEn": "Third-party risk management (outsourced providers and the supply chain)",
+  "fullEn": "Third-Party Risk Management / Cyber Supply Chain Risk Management (C-SCRM)",
+  "defEn": "An effort to manage, consistently from selection through to contract termination, cybersecurity risks originating from third parties and the supply chain, such as outsourced providers, cloud providers and the suppliers of products and services.",
+  "howEn": "Third parties are managed in a register (services provided, level of access to systems, type and location of data handled), and risk is assessed according to importance. Due diligence is performed before the transaction, the contract states the demarcation of responsibility, audit rights, subcontracting, incident reporting and data handling, and monitoring is continuous.",
+  "diffEn": "Whereas the shared responsibility model shows how responsibility is divided between the cloud provider and the customer, third-party risk management refers to the whole management mechanism from selecting business partners through contracts and monitoring to termination.",
+  "aiEn": "In procuring AI models and SaaS as well, the arrangements for the location, storage and disposal of data, the subcontracting procedures, and checking third-party assurance reports (SOC 2, etc.) can be made evaluation items."
+ },
+ {
+  "id": "appi-safety",
+  "nameEn": "Security control measures under the Act on the Protection of Personal Information",
+  "fullEn": "Security control measures based on the Act on the Protection of Personal Information (Personal Information Protection Commission guidelines)",
+  "defEn": "The necessary and appropriate measures that a personal information handling business operator takes to prevent leakage and the like of personal data. The content is decided according to the magnitude of the infringement of the rights and interests of the individual, the scale and nature of the business, the handling situation and so on.",
+  "howEn": "The attachment to the guidelines sets out formulation of a basic policy, establishment of rules for handling, 4 types of measures (organisational, human, physical and technical), and understanding of the external environment. The example methods do not all have to be adopted. Supervision of outsourced providers through selection, contracts and understanding of how they handle data is also required.",
+  "diffEn": "Whereas ISMS is voluntary certification for business operators, these are measures that the law requires of business operators that handle personal data. Reporting to the Commission when a leakage or the like occurs is also stipulated.",
+  "aiEn": "When having an external AI service handle personal data, supervision of the outsourced provider and, when it is handled in a foreign country, understanding the external environment (checking that country's system) become issues."
+ },
+ {
+  "id": "fsa-cyber-guideline",
+  "nameEn": "Cybersecurity guidelines for the financial sector",
+  "fullEn": "Guidelines for Cybersecurity in the Financial Sector (Financial Services Agency, 4 October 2024; Reiwa 6)",
+  "defEn": "A document in which the Financial Services Agency sets out supervisory points of focus on the cybersecurity management systems of financial institutions and the like. It is organised in the order of governance, identification, protection, detection, response and recovery, and third-party risk management, and became applicable on 4 October 2024 (Reiwa 6).",
+  "howEn": "Each item is divided into “basic items for action”, covering fundamentals such as cyber hygiene, and advanced “items for which action is desirable”, which large institutions and the like should refer to. In neither case is a uniform response expected; the premise is a risk-based approach in which the organisation identifies and assesses its own risks and takes commensurate measures.",
+  "diffEn": "Whereas the METI Cybersecurity Management Guidelines present 3 principles and 10 items for executives, these target financial institutions and the like and make concrete the points of focus that the Financial Services Agency uses in inspections and monitoring.",
+  "aiEn": "Even outside financial institutions, it can serve as a reference example for conducting risk assessments once a year, for assessing new products and services, and for gauging the level of third-party management."
+ },
+ {
+  "id": "nist-sp800-53",
+  "nameEn": "NIST SP 800-53",
+  "fullEn": "Security and Privacy Controls for Information Systems and Organizations (NIST SP 800-53 Rev.5)",
+  "defEn": "A catalogue of security and privacy controls for information systems and organisations, published by the US NIST. With Rev.5, the security and privacy controls became a single integrated catalogue.",
+  "howEn": "Rev.5 changed the description of controls to an outcome basis that does not depend on the entity that satisfies them (system or organisation), and separated the control selection process from the main body. A control family for supply chain risk management (SCRM) was newly established, and that perspective was also built into the catalogue as a whole.",
+  "diffEn": "Whereas the NIST CSF presents a framework for an organisation's cyber risk management, SP 800-53 is a catalogue containing the individual controls.",
+  "aiEn": "When the explanations of US government-related customers or of cloud and AI vendors are expressed in terms of these control names, it can be used to map them to your own controls. The fact that SCRM now stands on its own is a useful reference for procurement management."
+ },
+ {
+  "id": "iso-cloud-privacy",
+  "nameEn": "ISO/IEC 27017, 27018 and 27701",
+  "fullEn": "Cloud security controls (27017), protection of PII in the cloud (27018), privacy information management (27701)",
+  "defEn": "A group of standards that, on the foundation of ISO/IEC 27001 and 27002, add guidance on cloud-specific controls (27017), PII protection in public clouds (27018) and a privacy information management system (27701).",
+  "howEn": "27017 adds cloud-specific guidance to the 37 controls of 27002, and adds controls such as division of responsibilities, return and deletion of assets at contract termination, and separation of customer environments. 27018 is for cloud providers that are PII processors. 27701 is an extension of 27001 and cannot obtain certification on its own.",
+  "diffEn": "Whereas ISMS (27001) covers an organisation's information security as a whole, these are extensions specialised in the cloud and the handling of personal information. Certification to 27701 cannot be regarded as proof of GDPR compliance.",
+  "aiEn": "In selecting AI and SaaS providers, it is material for checking whether certification exists and the scope of the services covered. Certification does not guarantee that your own usage configuration complies, and your own assessment is needed separately."
+ }
+]
