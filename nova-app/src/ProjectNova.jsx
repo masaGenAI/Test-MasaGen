@@ -165685,6 +165685,9 @@ function GovUseCase({ en, deep, go, onIncident, onTab }) {
   const [k, setK] = useState(deep && list.some((u) => u.key === deep.u) ? deep.u : list.length ? list[0].key : null);
   const [reg, setReg] = useState(null);
   const [rule, setRule] = useState(null);
+  const [hov, setHov] = useState(null);
+  // 一覧：使い方ごとの件数（横断の規制・業界の規定・事例・シナリオ・問題）
+  const ov = useMemo(() => list.map((x) => ({ key: x.key, name: x.name, n: [x.regs.length, x.rules.length, GOVDOJO_INCIDENTS.filter((i) => x.inc.includes(i.id)).length, GOVDOJO_SCENARIOS.filter((i) => x.scen.includes(i.id)).length, govUcQuiz(x).length] })), []);
   const u = list.find((x) => x.key === k);
   if (!u) return null;
   const pick = (key) => { setK(key); setReg(null); setRule(null); };
@@ -165712,7 +165715,29 @@ function GovUseCase({ en, deep, go, onIncident, onTab }) {
         {en ? "Start from what the AI is used for. Each use case pulls together the cross-sector rules, industry rules, real incidents, scenarios and drill questions that are likely to matter." : "AIの使い方から引く。使い方を選ぶと、関係しそうな横断の規制・指針、業界の規定、実際の事例、シナリオ、判定演習の問題がまとまって出る。"}
       </div>
       <div style={{ fontSize: 11, color: C.gold, background: C.surface2, border: `1px solid ${C.line}`, borderRadius: 8, padding: "6px 10px", marginBottom: 12, lineHeight: 1.6 }}>{en ? "Judgement: " : "判断："}{L(GOVUC.note)}{en ? " Whether a rule applies to your case still has to be checked against its text." : "自社の案件に当てはまるかは、各規定の本文で確かめる。"}</div>
-      <GovPills items={list.map((x) => [x.key, L(x.name)])} val={k} onPick={pick} />
+      <div className="gh-figscroll" style={{ marginBottom: 10 }}>
+        {(() => {
+          const heads = en ? ["Cross-sector rules", "Industry rules", "Incidents", "Scenarios", "Questions"] : ["横断の規制", "業界の規定", "事例", "シナリオ", "問題"];
+          const mx = heads.map((_, j) => Math.max(1, ...ov.map((o) => o.n[j])));
+          const ri = (n, j) => (n === 0 ? -1 : Math.min(GV_RAMP.length - 1, Math.floor((n / mx[j]) * GV_RAMP.length - 1e-9)));
+          return (
+            <div role="group" aria-label={en ? "Use cases at a glance" : "ユースケースの一覧"} style={{ minWidth: 540, display: "grid", gridTemplateColumns: `minmax(170px,1.6fr) repeat(${heads.length},minmax(56px,1fr))`, gap: 3 }}>
+              <div style={{ fontSize: 10.5, color: C.dim, alignSelf: "end", paddingBottom: 3 }}>{en ? "Pick a row" : "行を押して選ぶ"}</div>
+              {heads.map((h) => <div key={h} style={{ fontSize: 10.5, fontWeight: 800, color: C.muted, textAlign: "center", alignSelf: "end", paddingBottom: 3, borderBottom: `2px solid ${C.line}` }}>{h}</div>)}
+              {ov.map((o) => {
+                const on = o.key === k, hv = hov === o.key;
+                return (
+                  <React.Fragment key={o.key}>
+                    <button onClick={() => pick(o.key)} onMouseEnter={() => setHov(o.key)} onMouseLeave={() => setHov(null)} aria-pressed={on} style={{ textAlign: "left", fontSize: 11.5, fontWeight: 800, color: on ? C.bg : C.text, background: on ? C.teal : hv ? C.surface2 : C.surface, border: `1px solid ${on ? C.teal : C.line}`, borderRadius: 6, padding: "5px 8px", cursor: "pointer", lineHeight: 1.35 }}>{L(o.name)}</button>
+                    {o.n.map((n, j) => { const i = ri(n, j); return <button key={j} onClick={() => pick(o.key)} onMouseEnter={() => setHov(o.key)} onMouseLeave={() => setHov(null)} aria-label={`${L(o.name)} ${heads[j]} ${n}`} style={{ background: i < 0 ? C.surface : GV_RAMP[i], color: i >= 2 ? C.bg : C.text, border: `2px solid ${on ? C.teal : hv ? C.line : "transparent"}`, borderRadius: 6, fontSize: 12.5, fontWeight: 800, cursor: "pointer", fontVariantNumeric: "tabular-nums", opacity: hov && !hv && !on ? 0.6 : 1 }}>{n || "·"}</button>; })}
+                  </React.Fragment>
+                );
+              })}
+            </div>
+          );
+        })()}
+        <div style={{ fontSize: 10.5, color: C.dim, marginTop: 4 }}>{en ? "Darker = more within that column (each column has its own scale). Counts follow the mapping above, which is judgement." : "濃いほど、その列の中で多い（列ごとの相対）。件数は上の対応づけ（判断）による。"}</div>
+      </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, flexWrap: "wrap", marginBottom: 8 }}>
         <div>
           <div style={{ fontWeight: 800, color: C.text, fontSize: 15 }}>{L(u.name)}</div>
