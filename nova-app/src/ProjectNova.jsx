@@ -216969,6 +216969,39 @@ function CertOverlapMap({ lang }) {
   );
 }
 
+// 公式ページで試験の現行版を確かめた結果（2026-11-01）。kind: changed=出題範囲の改定あり / ok=改定・廃止の告知なし / none=公式ページを確認できず。
+// Microsoft・GitHub は Microsoft Learn の試験ガイド、AWS・Google・IAPP は公式ページで確認。ここに書くのは公式ページに書いてあったことだけ。
+const CERT_CHECK_DATE = "2026-11-01";
+const CERT_CHECK = {
+  clf: ["ok", "公式ページで提供中を確認。試験ガイドの版・日付はページに記載なし。", "Confirmed as offered on the official page. The page gives no exam-guide version or date."],
+  saa: ["ok", "公式ページで提供中を確認。英語版に変更を反映したとの記載はあるが、日付・内容の記載なし。", "Confirmed as offered. The page mentions a change applied to the English exam but gives no date or detail."],
+  pl900: ["changed", "2026年7月24日に出題範囲を改定（英語版。他の言語は約8週間後に更新とされる）。Power Pages の分野とキャンバス／モデル駆動アプリの作成を削除し、「Copilot Studio のエージェント」（20〜25%）を追加。このページの分野構成（D5 Power Pages 14%）は改定前のもの。", "Skills measured changed on 24 July 2026 (English first; other languages about eight weeks later). Power Pages and building canvas/model-driven apps were removed, and 'agents in Copilot Studio' (20–25%) was added. This station's domains (D5 Power Pages 14%) follow the earlier version."],
+  sc900: ["changed", "2026年10月21日に小さな改定（Entra の ID の種類、Defender XDR の項目）。このページへの反映は未確認。", "Minor update on 21 October 2026 (Entra identity types, Defender XDR). Not yet checked against this station."],
+  dp900: ["changed", "2026年7月21日に小さな改定。このページへの反映は未確認。", "Minor update on 21 July 2026. Not yet checked against this station."],
+  gh300: ["changed", "2026年8月7日に小さな改定（IDE での利用、機能、安全策の項目）。このページへの反映は未確認。", "Minor update on 7 August 2026 (IDE use, features, safeguards). Not yet checked against this station."],
+  gh900: ["changed", "2026年1月に大きく改定（認定ページの更新日 2026-02-19）。このページへの反映は未確認。", "Significantly changed in January 2026 (certification page updated 19 Feb 2026). Not yet checked against this station."],
+  ab100: ["changed", "公式の試験ガイドは2026年11月16日からの出題範囲だけを掲載（出題比率と表現の小さな調整）。", "The official guide shows only the skills measured from 16 November 2026 (small shifts in weights and wording)."],
+  ai103: ["ok", "出題範囲は2026年4月16日時点のもの。改定・廃止の告知なし。", "Skills measured as of 16 April 2026. No change or retirement notice."],
+  ab620: ["ok", "改定・廃止の告知なし（出題範囲の日付はページに記載なし）。", "No change or retirement notice (no skills-measured date on the page)."],
+  sc500: ["ok", "改定・廃止の告知なし（出題範囲の日付はページに記載なし）。", "No change or retirement notice (no skills-measured date on the page)."],
+  ab410: ["ok", "改定・廃止の告知なし（出題範囲の日付はページに記載なし）。", "No change or retirement notice (no skills-measured date on the page)."],
+  ai300: ["ok", "改定・廃止の告知なし（出題範囲の日付はページに記載なし）。", "No change or retirement notice (no skills-measured date on the page)."],
+  ai200: ["ok", "改定・廃止の告知なし（出題範囲の日付はページに記載なし）。", "No change or retirement notice (no skills-measured date on the page)."],
+  gh600: ["ok", "改定・廃止の告知なし（出題範囲の日付はページに記載なし）。", "No change or retirement notice (no skills-measured date on the page)."],
+  adp: ["changed", "公式ページに「ブランド名の変更を反映して近く更新」とある（日付の記載なし）。", "The official page says the exam will soon be updated for recent branding changes (no date given)."],
+  aigp: ["ok", "公式ページを確認。試験の版・日付はページに記載なし。", "Official page checked; it gives no exam version or date."],
+  ccaf: ["none"], aicx: ["none"], iso42001f: ["none"], iso42001li: ["none"], ccsk: ["none"], cism: ["none"], cisa: ["none"], aaism: ["none"], aair: ["none"], aaia: ["none"],
+};
+function CertCheckNote({ id, lang }) {
+  const c = CERT_CHECK[id];
+  if (!c) return null;
+  const en = lang === "en";
+  const sty = { changed: ["#FFF7E6", "#7A4B00"], ok: ["#ECF7F2", "#1E5C45"], none: ["#F1F3F6", "#4A5563"] }[c[0]];
+  const head = en ? `Official exam page checked ${CERT_CHECK_DATE}: ` : `公式ページの確認（${CERT_CHECK_DATE}）：`;
+  const body = c[0] === "none" ? (en ? "not checked — the official site could not be reached from the checking environment. Check the official page for the current version." : "未確認（確認した環境から公式サイトに接続できなかったため）。現行の版は公式ページで確かめてください。") : c[en ? 2 : 1];
+  return <div style={{ fontSize: 12, lineHeight: 1.6, color: sty[1], background: sty[0], padding: "6px 14px", borderBottom: `1px solid ${HUB.border}` }}>{head}{body}</div>;
+}
+
 function HubApp() {
   const [active, setActive] = useState(null);
   // 開いている資格を URL に残す（#certification/<資格>）。「戻る」で資格一覧に戻る
@@ -217045,6 +217078,7 @@ function HubApp() {
             </a>
           )}
         </div>
+        <CertCheckNote id={st.id} lang={lang} />
         {lang === "en" && st.jaOnly && (
           <div style={{ fontSize: 12.5, color: "#7A4B00", background: "#FFF7E6", padding: "7px 14px" }}>This station is available in Japanese only: its questions and screens have not been translated.</div>
         )}
