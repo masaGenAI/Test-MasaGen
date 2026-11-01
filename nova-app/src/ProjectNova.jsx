@@ -122529,6 +122529,8 @@ SECTIONS.push({
   });
 })();
 
+  // ポータルの横断検索に出すセクション
+  App.PORTAL_INDEX = (en) => SECTIONS.map((x) => ({ label: (x.no ? x.no + ". " : "") + (x.title ? x.title[en ? "en" : "ja"] : x.id), sub: (en ? "Finance · " : "Finance・") + (x.sub ? x.sub[en ? "en" : "ja"] : ""), hash: "finance/" + x.id, extra: x.title ? [x.title.ja, x.title.en, x.sub && x.sub.ja].join(" ") : "" }));
   return App;
 })();
 
@@ -166885,6 +166887,26 @@ function GafaHub() {
     if (j && j.tab) setTab(j.tab);
     setJumpState(j ? { ...j, nonce: Date.now() } : null);
   };
+  // ポータルの検索から来たとき：#megatech/lexicon?lex=… / #megatech/factbook?fbq=… で該当の項目を開く。
+  // タブ名を URL に書き戻す処理が先に動いて ?lex= を消すため、最初の描画の時点の URL を控えておく
+  const initHashRef = useRef(typeof window !== "undefined" ? window.location.hash : "");
+  useEffect(() => {
+    let first = true;
+    const f = () => {
+      try {
+        const h = first ? initHashRef.current : window.location.hash;
+        first = false;
+        const m = (h || "").match(/^#megatech\/(lexicon|factbook)\?(lex|fbq)=([^&]+)/);
+        if (!m) return;
+        const v = decodeURIComponent(m[3]);
+        setJump(m[2] === "lex" ? { tab: "lexicon", lexTerm: v } : { tab: "factbook", fbq: v });
+        window.history.replaceState(null, "", "#megatech/" + m[1]);
+      } catch (e) {}
+    };
+    f();
+    window.addEventListener("hashchange", f);
+    return () => window.removeEventListener("hashchange", f);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -167036,6 +167058,23 @@ function GafaHub() {
 }
   // ポータルの Mastery Track が問題数を実データから数えるために、バンクを外へ渡す。
   GafaHub.TAB_COUNT = TABS.length;
+  // ポータルの横断検索に出す項目。結果は URL（#megatech/…）で開く。用語集・ファクトブックは ?lex= / ?fbq= で該当の項目を開く
+  GafaHub.PORTAL_INDEX = (en) => {
+    const lang = en ? "en" : "ja";
+    const L = (x) => (Array.isArray(x) ? x[en ? 1 : 0] : x || "");
+    const out = [];
+    const add = (label, sub, hash, extra) => out.push({ label, sub, hash, extra });
+    TABS.forEach((tb) => add(t(lang, tb.k), en ? "TechHub tab" : "TechHub のタブ", "megatech/" + tb.id, [t("ja", tb.k), t("en", tb.k)].join(" ")));
+    ((typeof GOVUC !== "undefined" && GOVUC && GOVUC.list) || []).forEach((u) => add(L(u.name), en ? "Governance Dojo · use case" : "ガバナンス道場・使い方から引く", "megatech/govdojo/usecase?u=" + u.key, u.name.join(" ")));
+    ((typeof GOVTPL !== "undefined" && GOVTPL && GOVTPL.list) || []).forEach((x) => add(L(x.name), en ? "Governance Dojo · template" : "ガバナンス道場・ひな形", "megatech/govdojo/templates?t=" + x.id, x.name.join(" ")));
+    GOVREG_ITEMS.forEach((x) => add(L(x.short || x.name), en ? "Governance Dojo · regulation" : "ガバナンス道場・規制", "megatech/govdojo/regmap?id=" + x.id, [x.name.join(" "), (x.short || []).join(" ")].join(" ")));
+    GOVIND.forEach((d) => add(L([d.ind, d.ind_en]), en ? "Governance Dojo · industry" : "ガバナンス道場・業界", "megatech/govdojo/industry?k=" + d.key, [d.ind, d.ind_en].join(" ")));
+    GOVDOJO_INCIDENTS.forEach((x) => add(L(x.t), (en ? "Incident · " : "事例・") + x.date, "megatech/govdojo/incidents?id=" + x.id, x.t.join(" ")));
+    LEXICON.forEach((g) => add(en ? (g.en || g.t) : g.t, en ? "TechHub glossary" : "TechHub 用語集", "megatech/lexicon?lex=" + encodeURIComponent(g.t), [g.t, g.en].filter(Boolean).join(" ")));
+    MEGATECH_FACTBOOK.forEach((it) => add(en ? (it.hEn || it.h) : it.h, en ? "TechHub factbook" : "TechHub ファクトブック", "megatech/factbook?fbq=" + encodeURIComponent(it.h), [it.h, it.hEn].filter(Boolean).join(" ")));
+    COMPANIES.forEach((c) => add(c.name, en ? "TechHub companies" : "TechHub 企業", "megatech/companies", [c.org, c.prod].filter(Boolean).join(" ")));
+    return out;
+  };
   GafaHub.MASTERY_BANKS = { MCQS, DEV_QUIZ, ACAD_QUIZ, CHECK_CORE_BANK, CHECK_AX_BANK, CHECK_DOMAINS_CORE, CHECK_DOMAINS_AX, GOVDOJO_BANK, ITSEC_BANK, NOTEISSUE_BANK, NOTEISSUE_DOMAINS, SLALOM_BANK, SLALOM_DOMAINS, COMPANIES };
   return GafaHub;
 })();
@@ -173053,6 +173092,8 @@ function ProgressTab({ lang, stats, resetAll, importAll, tt, t }) {
     </div>
   );
 }
+  // ポータルの横断検索に出すタブ
+  ConsultingThinkingHub.PORTAL_INDEX = (en) => Object.entries(L.tabs).map(([k, v]) => ({ label: v[en ? "en" : "ja"], sub: en ? "Consulting Hub tab" : "Consulting Hub のタブ", hash: "consulting/" + k, extra: [v.ja, v.en].join(" ") }));
   return ConsultingThinkingHub;
 })();
 // ================= CertHubModule (source: Certification-Dashboard-Hub.jsx) =================
@@ -217327,6 +217368,8 @@ function HubApp() {
 function App() {
   return <HubApp />;
 }
+  // ポータルの横断検索に出す資格
+  App.PORTAL_INDEX = (en) => HUB_STATIONS.filter((s) => s.Comp).map((s) => ({ label: s.code + "  " + (en ? s.en : s.ja), sub: (en ? "Certification · " : "資格・") + (s.vendor || ""), hash: "certification/" + s.id, extra: [s.ja, s.en, s.vendor].join(" ") }));
   return App;
 })();
 // ================= LanguageHubModule (source: LanguageHub.jsx) =================
@@ -219272,6 +219315,8 @@ function QuizPanel({lang,t,voiceURI}){
     </div>
   );
 }
+  // ポータルの横断検索に出す言語
+  App.PORTAL_INDEX = (en) => Object.entries(LANGS).map(([k, v]) => ({ label: v.name + (en ? " (" + v.flag + ")" : ""), sub: "Language Hub", hash: "languagehub/" + k + "/home", extra: v.flag }));
   return App;
 })();
 // ================= 別ファイルのハブ HTML の読み込み =================
@@ -219378,7 +219423,9 @@ const BookSummaryModule = (function () {
         if (!alive) return;
         const html = src.replace("<head>", "<head>" + bridge + assetBase);
         url = URL.createObjectURL(new Blob([html], { type: "text/html" }));
-        iframe.src = url;
+        // #booksummary/book/<id> などで開かれたら、Book-Summary の中の同じ位置（#/book/<id>）から始める
+        const sub = novaHubPath("booksummary");
+        iframe.src = url + (sub && sub.length ? "#/" + sub.map(encodeURIComponent).join("/") : "");
         setSt("ok");
       }).catch(() => { if (alive) setSt("fail"); });
       return () => {
@@ -229729,6 +229776,15 @@ function categoryStat(cat, progress) {
 function LinguisticsHub() {
   // view: {level:'home'} | {level:'category', catId} | {level:'field', catId, fieldId} | {level:'sub', catId, fieldId, subId}
   const [view, setView] = useState({ level: "home" });
+  // 開いている分類・分野を URL に残す（#linguisticshub/<分類>/<分野>/<細目>）
+  useNovaHubRoute("linguisticshub",
+    view.level === "category" ? [view.catId] : view.level === "field" ? [view.catId, view.fieldId] : view.level === "sub" ? [view.catId, view.fieldId, view.subId] : view.level === "exam" ? ["exam"] : [],
+    (p) => {
+      const c = CATEGORIES.find((x) => x.id === p[0]);
+      const f = c && (c.fields || []).find((x) => x.id === p[1]);
+      const sb = f && (f.sub || []).find((x) => x.id === p[2]);
+      setView(sb ? { level: "sub", catId: c.id, fieldId: f.id, subId: sb.id } : f ? { level: "field", catId: c.id, fieldId: f.id } : c ? { level: "category", catId: c.id } : { level: "home" });
+    });
   const [progress, setProgress] = useState({});
   const [, setLoaded] = useState(false);
   const [categoryTab, setCategoryTab] = useState("fields");
@@ -230558,6 +230614,15 @@ function LinguisticsHub() {
 }
   // ポータルの目次タグに分野数を出すため。
   LinguisticsHub.FIELD_STATS = { cats: CATEGORIES.length, fields: CATEGORIES.reduce((a, c) => a + (c.fields || []).length, 0) };
+  // ポータルの横断検索に出す分類・分野
+  LinguisticsHub.PORTAL_INDEX = (en) => {
+    const out = [];
+    CATEGORIES.forEach((c) => {
+      out.push({ label: en ? c.en : c.ja, sub: en ? "Linguistics category" : "Linguistics の分類", hash: "linguisticshub/" + c.id, extra: [c.ja, c.en].join(" ") });
+      (c.fields || []).forEach((f) => out.push({ label: en ? (f.en || f.ja) : f.ja, sub: "Linguistics · " + (en ? c.en : c.ja), hash: "linguisticshub/" + c.id + "/" + f.id, extra: [f.ja, f.en].join(" ") }));
+    });
+    return out;
+  };
   return LinguisticsHub;
 })();
 
@@ -230768,6 +230833,82 @@ const novaStats = () => {
   return __novaStats;
 };
 const nf = (n) => Number(n).toLocaleString();
+// ================= ポータルの横断検索 =================
+// 各ハブが出す PORTAL_INDEX と、ビルド時に作った Book-Summary の書名索引（__NOVA_BOOK_INDEX__）をまとめて引く。
+// 結果は URL（#ハブ/位置）で開くので、各ハブの「URL に位置を残す」仕組みでそのまま目的の画面に着く。
+function novaNorm(str) {
+  return String(str || "").replace(/[Ａ-Ｚａ-ｚ０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xFEE0)).toLowerCase().replace(/[ー・\s　]/g, "");
+}
+const NOVA_SEARCH_GROUP = { hub: ["ハブ", "Hubs"], megatech: ["TechHub", "TechHub"], certification: ["資格", "Certification"], finance: ["Finance", "Finance"], consulting: ["Consulting", "Consulting"], linguisticshub: ["Linguistics", "Linguistics"], languagehub: ["Language", "Language"], booksummary: ["Book-Summary", "Book-Summary"] };
+function novaSearchIndex(en) {
+  const out = [];
+  const add = (g, label, sub, hash, extra) => { if (!label) return; out.push({ g, label, sub: sub || "", hash, nl: novaNorm(label), hay: novaNorm([label, sub, extra].filter(Boolean).join(" ")) }); };
+  NOVA_STATIONS.forEach((st) => add("hub", en ? st.en : st.ja, en ? st.tagEn : st.tagJa, st.id, [st.ja, st.en].join(" ")));
+  const take = (mod, g) => { try { if (mod && mod.PORTAL_INDEX) mod.PORTAL_INDEX(en).forEach((x) => add(g, x.label, x.sub, x.hash, x.extra)); } catch (e) {} };
+  take(MegaTechHubModule, "megatech"); take(CertHubModule, "certification"); take(FinanceHubModule, "finance");
+  take(ConsultingHubModule, "consulting"); take(LinguisticsHubModule, "linguisticshub"); take(LanguageHubModule, "languagehub");
+  (typeof __NOVA_BOOK_INDEX__ !== "undefined" ? __NOVA_BOOK_INDEX__ : []).forEach(([id, title, author, kind]) => add("booksummary", title, [author, kind].filter(Boolean).join(" ・ "), "booksummary/book/" + encodeURIComponent(id), author));
+  return out;
+}
+function NovaSearch({ lang }) {
+  const en = lang === "en";
+  const [q, setQ] = useState("");
+  const [hi, setHi] = useState(0);
+  const inp = useRef(null);
+  const index = useMemo(() => (q.trim() ? novaSearchIndex(en) : null), [en, !!q.trim()]);
+  const parts = q.trim().split(/[\s　]+/).map(novaNorm).filter(Boolean);
+  const all = useMemo(() => (index && parts.length ? index.filter((x) => parts.every((p) => x.hay.includes(p))) : []), [index, q]);
+  const res = useMemo(() => {
+    const order = Object.keys(NOVA_SEARCH_GROUP);
+    const hits = all.map((x) => ({ ...x, s: x.nl.startsWith(parts[0]) ? 0 : x.nl.includes(parts[0]) ? 1 : 2 })).sort((a, b) => order.indexOf(a.g) - order.indexOf(b.g) || a.s - b.s);
+    const per = {}; const out = [];
+    hits.forEach((x) => { per[x.g] = (per[x.g] || 0) + 1; if (per[x.g] <= 8 && out.length < 48) out.push(x); });
+    return out;
+  }, [all]);
+  useEffect(() => { setHi(0); }, [q]);
+  useEffect(() => {
+    const f = (e) => { const tg = (e.target && e.target.tagName) || ""; if (e.key === "/" && tg !== "INPUT" && tg !== "TEXTAREA" && tg !== "SELECT") { e.preventDefault(); inp.current && inp.current.focus(); } };
+    window.addEventListener("keydown", f); return () => window.removeEventListener("keydown", f);
+  }, []);
+  const go = (x) => { if (!x) return; try { window.location.hash = "#" + x.hash; } catch (e) {} };
+  const onKey = (e) => {
+    if (e.key === "ArrowDown") { e.preventDefault(); setHi((h) => Math.min(h + 1, res.length - 1)); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); setHi((h) => Math.max(h - 1, 0)); }
+    else if (e.key === "Enter") { e.preventDefault(); go(res[hi]); }
+    else if (e.key === "Escape") setQ("");
+  };
+  let lastG = null;
+  return (
+    <div style={{ margin: "18px 0 6px" }}>
+      <input ref={inp} value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={onKey} type="search"
+        aria-label={en ? "Search all of Project Nova" : "Project Nova 全体を検索"}
+        placeholder={en ? "Search everything — exams, sections, terms, books…  ( / )" : "全体を検索 — 資格・セクション・用語・本の書名など（ / で移動）"}
+        style={{ width: "100%", boxSizing: "border-box", padding: "11px 14px", fontSize: 15, border: `1px solid ${NOVA.line}`, borderRadius: 8, background: "#fff", color: NOVA.ink, outline: "none" }} />
+      {q.trim() ? (
+        <div role="listbox" aria-label={en ? "Search results" : "検索結果"} style={{ marginTop: 6, border: `1px solid ${NOVA.line}`, borderRadius: 8, background: "#fff", maxHeight: 420, overflowY: "auto" }}>
+          <div style={{ fontSize: 11.5, color: NOVA.sub, padding: "7px 12px", borderBottom: `1px solid ${NOVA.line}` }}>
+            {en ? `${all.length} matches${all.length > res.length ? ` · showing ${res.length}` : ""}` : `${all.length}件${all.length > res.length ? `（${res.length}件を表示。語を足すと絞れる）` : ""}`}
+          </div>
+          {res.length === 0 ? <div style={{ padding: "12px", fontSize: 13, color: NOVA.sub }}>{en ? "No matches." : "見つからない。"}</div> : null}
+          {res.map((x, i) => {
+            const head = x.g !== lastG ? (lastG = x.g, <div key={"h" + i} style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: NOVA.sub, padding: "8px 12px 2px" }}>{NOVA_SEARCH_GROUP[x.g][en ? 1 : 0]}</div>) : null;
+            return (
+              <React.Fragment key={i}>
+                {head}
+                <button role="option" aria-selected={i === hi} onMouseEnter={() => setHi(i)} onClick={() => go(x)}
+                  style={{ display: "block", width: "100%", textAlign: "left", border: "none", background: i === hi ? "#EEF3FA" : "transparent", padding: "7px 12px", cursor: "pointer" }}>
+                  <div style={{ fontSize: 13.5, color: NOVA.ink, fontWeight: 600, lineHeight: 1.45 }}>{x.label}</div>
+                  {x.sub ? <div style={{ fontSize: 11.5, color: NOVA.sub, lineHeight: 1.4 }}>{x.sub}</div> : null}
+                </button>
+              </React.Fragment>
+            );
+          })}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 const NOVA_STATIONS = [
   {
     id: "consulting",
@@ -233120,6 +233261,8 @@ function ProjectNova() {
             </button>
           </div>
           <NovaRule />
+
+          <NovaSearch lang={lang} />
 
           <PortalBootcamp lang={lang} onResume={(id) => setActive(id)} />
 

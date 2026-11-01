@@ -23,10 +23,31 @@ function hubStats() {
   };
 }
 
+// ポータルの横断検索用：Book-Summary の書名・著者の索引 [[id, title, author, kind], ...]（要約があるものだけ）
+function bookIndex() {
+  let h = "";
+  try { h = fs.readFileSync(new URL("./public/booksummaryhub.html", import.meta.url), "utf8"); } catch (e) { return []; }
+  const out = [];
+  const re = /\{"id":"([^"]+)","title":"((?:[^"\\]|\\.)*)"(?:,"author":"((?:[^"\\]|\\.)*)")?/g;
+  const un = (x) => { try { return JSON.parse('"' + (x || "") + '"'); } catch (e) { return x || ""; } };
+  let m;
+  while ((m = re.exec(h))) {
+    const tail = h.slice(m.index, m.index + 4000);
+    const next = tail.indexOf('{"id":"', 7);
+    const rec = next > 0 ? tail.slice(0, next) : tail;
+    if (!rec.includes('"oneLiner":') || rec.includes('"listOnly":true')) continue;
+    const id = m[1];
+    const kind = id.startsWith("yt_") ? "YouTube" : id.startsWith("note_") ? "note" : id.startsWith("ig_") ? "Instagram" : "";
+    out.push([id, un(m[2]), un(m[3]), kind]);
+  }
+  return out;
+}
+
 export default defineConfig({
   plugins: [react(), viteSingleFile()],
   define: {
     __NOVA_HUB_STATS__: JSON.stringify(hubStats()),
+    __NOVA_BOOK_INDEX__: JSON.stringify(bookIndex()),
   },
   esbuild: {
     legalComments: "none",
