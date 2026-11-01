@@ -138531,6 +138531,16 @@ const CAT_EN = {
   "AI導入戦略": "Adoption Strategy",
   "Expertise": "Expertise",
   "最新動向": "Trends & new techniques (mostly 2024–25)",
+  "用語：AI企業・エコシステム": "Terms: AI companies & ecosystem",
+  "用語：深層学習": "Terms: Deep learning",
+  "用語：データ基盤・MLOps": "Terms: Data platforms & MLOps",
+  "用語：学習・チューニング": "Terms: Training & tuning",
+  "用語：RAG・検索": "Terms: RAG & retrieval",
+  "用語：機械学習基礎": "Terms: ML basics",
+  "用語：推論最適化": "Terms: Inference optimisation",
+  "用語：AIエージェント": "Terms: AI agents",
+  "用語：生成AI・基盤モデル": "Terms: Generative AI & foundation models",
+  "用語：アルゴリズム・統計": "Terms: Algorithms & statistics",
   "Key numbers": "Key Numbers",
 };
 // テーマ表示順（関連性順・基礎→応用→運用→戦略→メタ。基礎とアルゴリズムを隣接）
@@ -147924,9 +147934,9 @@ function TabCompanies() {
                   <div style={{ cursor: "pointer" }} onClick={() => setOpenCo(open ? null : co.name)}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                       <span className="gh-display" style={{ fontSize: 19 }}>{co.name}</span>
-                      <span style={{ fontSize: 11, color: C.muted }}>{co.org}</span>
+                      <span style={{ fontSize: 11, color: C.muted }}>{thEn(co.org, clang === "en")}</span>
                     </div>
-                    <div style={{ fontSize: 11, color: C.teal, margin: "6px 0 10px" }}>{co.prod}</div>
+                    <div style={{ fontSize: 11, color: C.teal, margin: "6px 0 10px" }}>{thEn(co.prod, clang === "en")}</div>
                   </div>
                   <div style={{ fontSize: 12, lineHeight: 1.7 }}>
                     <div style={{ marginBottom: 8 }}>
@@ -148383,7 +148393,7 @@ function TabFactbook() {
                 <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 4 }}>{p.t[en ? 1 : 0]}</div>
                 <div style={{ fontSize: 11, color: C.teal, marginBottom: 8 }}>{en ? "Aim: " : "狙い："}{p.aim[en ? 1 : 0]}</div>
                 <ul style={{ margin: 0, paddingLeft: 16, display: "flex", flexDirection: "column", gap: 4 }}>
-                  {p.pts.map((pt, j) => <li key={j} style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.55 }}>{pt}</li>)}
+                  {p.pts.map((pt, j) => <li key={j} style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.55 }}>{thEn(pt, en)}</li>)}
                 </ul>
                 {p.f ? (
                   <button onClick={() => { if (p.f.cat) { setCat(p.f.cat); setRegion("all"); } if (p.f.region) { setRegion(p.f.region); setCat("all"); } setQ(""); setPropOpen(false); }}
@@ -151316,7 +151326,7 @@ function TabIndustry() {
           {cur.uc.map((u, i) => (
             <div key={i} style={{ display: "flex", gap: 7, alignItems: "flex-start", marginBottom: 4 }}>
               <span style={{ fontSize: 11, fontWeight: 800, color: C.dim, flexShrink: 0, marginTop: 1 }}>{i + 1}</span>
-              <span style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.6 }}>{u}</span>
+              <span style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.6 }}>{thEn(u, en)}</span>
             </div>
           ))}
         </div>
@@ -151325,7 +151335,7 @@ function TabIndustry() {
           {cur.iss.map((u, i) => (
             <div key={i} style={{ display: "flex", gap: 7, alignItems: "flex-start", marginBottom: 4 }}>
               <span style={{ fontSize: 11, color: C.gold, flexShrink: 0, marginTop: 1 }}>▶</span>
-              <span style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.6 }}>{u}</span>
+              <span style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.6 }}>{thEn(u, en)}</span>
             </div>
           ))}
         </div>
@@ -152111,7 +152121,7 @@ function LiveDealDojo() {
             <div key={p.id} onClick={() => start(p)} style={{ cursor: "pointer", background: C.surface, border: `1px solid ${C.line}`, borderRadius: 10, padding: "13px 15px" }}>
               <div className="gh-display" style={{ fontSize: 14, fontWeight: 800, marginBottom: 5 }}>{p.icon} {p.name[en ? 1 : 0]}</div>
               <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.65, marginBottom: 7 }}>{p.setting[en ? 1 : 0]}</div>
-              <div style={{ fontSize: 11.5, color: C.teal, lineHeight: 1.6 }}>{(en ? "Watch for: " : "見られる点：") + p.focus.join(" / ")}</div>
+              <div style={{ fontSize: 11.5, color: C.teal, lineHeight: 1.6 }}>{(en ? "Watch for: " : "見られる点：") + p.focus.map((f) => thEn(f, en)).join(" / ")}</div>
             </div>
           ))}
         </div>
@@ -153588,6 +153598,11 @@ function CaseCanvas({ spec, en, label }) {
     </div>
   );
 }
+// 英語表示の辞書：日本語の原文をキーに訳を引く（データ本体は変えない）。訳が無ければ原文のまま
+const TH_EN = {};
+const thEn = (s, en) => (en && typeof s === "string" && TH_EN[s]) || s;
+// 図の箱の幅に収まらない長い英語は、文字の間隔を詰めて収める
+const fitW = (t, size, w) => { const est = String(t || "").length * size * 0.56; return est > w ? { textLength: Math.max(10, w), lengthAdjust: "spacingAndGlyphs" } : {}; };
 function ArchCanvas({ spec, en, sel, onPick, label }) {
   const byId = {};
   (spec.n || []).forEach((nd) => { byId[nd.id] = nd; });
@@ -153601,7 +153616,7 @@ function ArchCanvas({ spec, en, sel, onPick, label }) {
       {(spec.g || []).map((g, i) => (
         <g key={`g${i}`}>
           <rect x={g.x} y={g.y} width={g.w} height={g.h} rx="8" fill={C.bg} fillOpacity="0.55" stroke={g.c || C.line} strokeWidth="1.1" strokeDasharray={g.d ? "5 4" : "0"} />
-          <text x={g.x + 8} y={g.y + 12} fill={g.c || C.dim} fontSize="8.5" fontWeight="800">{g.t}</text>
+          <text x={g.x + 8} y={g.y + 12} fill={g.c || C.dim} fontSize="8.5" fontWeight="800" {...(en ? fitW(thEn(g.t, en), 8.5, g.w - 14) : {})}>{thEn(g.t, en)}</text>
         </g>
       ))}
       {(spec.e || []).map((ed, i) => {
@@ -153621,8 +153636,8 @@ function ArchCanvas({ spec, en, sel, onPick, label }) {
             ) : (
               <rect x={nd.x} y={nd.y} width={nd.w} height={nd.h} rx="5" fill={on ? col : C.surface} fillOpacity={on ? 0.28 : 1} stroke={col} strokeWidth={on ? 2.1 : 1.2} strokeDasharray={nd.d ? "4 3" : "0"} />
             )}
-            <text x={nd.x + nd.w / 2} y={nd.y + (nd.s ? nd.h / 2 - 1 : nd.h / 2 + 3)} textAnchor="middle" fill={nd.a ? col : C.text} fontSize={nd.a ? "7.5" : "8"} fontWeight={nd.a ? "800" : "700"}>{nd.t}</text>
-            {nd.s ? <text x={nd.x + nd.w / 2} y={nd.y + nd.h / 2 + 10} textAnchor="middle" fill={C.dim} fontSize="6.8">{nd.s}</text> : null}
+            <text x={nd.x + nd.w / 2} y={nd.y + (nd.s ? nd.h / 2 - 1 : nd.h / 2 + 3)} textAnchor="middle" fill={nd.a ? col : C.text} fontSize={nd.a ? "7.5" : "8"} fontWeight={nd.a ? "800" : "700"} {...(en ? fitW(thEn(nd.t, en), nd.a ? 7.5 : 8, nd.w - 6) : {})}>{thEn(nd.t, en)}</text>
+            {nd.s ? <text x={nd.x + nd.w / 2} y={nd.y + nd.h / 2 + 10} textAnchor="middle" fill={C.dim} fontSize="6.8" {...(en ? fitW(thEn(nd.s, en), 6.8, nd.w - 6) : {})}>{thEn(nd.s, en)}</text> : null}
           </g>
         );
       })}
@@ -153634,7 +153649,7 @@ function ArchCanvas({ spec, en, sel, onPick, label }) {
         const mx = (x1 + x2) / 2 + (ed.lx || 0), my = (y1 + y2) / 2 + (ed.ly || 0);
         return (
           <text key={`el${i}`} x={mx} y={my - 3} textAnchor="middle" fill={C.dim} fontSize="7"
-            stroke={C.bg} strokeWidth="2.4" strokeLinejoin="round" style={{ paintOrder: "stroke" }}>{ed.l}</text>
+            stroke={C.bg} strokeWidth="2.4" strokeLinejoin="round" style={{ paintOrder: "stroke" }}>{thEn(ed.l, en)}</text>
         );
       })}
     </svg>
@@ -156402,7 +156417,7 @@ function TabSalesDojo() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(min(100%,290px),1fr))", gap: 10 }}>
           {SALES_DRILLS.map((sc, i) => (
             <button key={i} onClick={() => setScIdx(i)} style={{ textAlign: "left", background: C.surface, border: `1px solid ${C.line}`, borderRadius: 10, padding: "13px 15px", cursor: "pointer", color: C.text, fontFamily: "inherit" }}>
-              <div style={{ fontSize: 10.5, fontWeight: 800, color: C.teal, marginBottom: 4 }}>{sc.ind}</div>
+              <div style={{ fontSize: 10.5, fontWeight: 800, color: C.teal, marginBottom: 4 }}>{thEn(sc.ind, en)}</div>
               <div style={{ fontSize: 13.5, fontWeight: 700, lineHeight: 1.5, marginBottom: 5 }}>{(en ? sc.tEn : sc.t)}</div>
               <div style={{ fontSize: 11.5, color: C.dim, lineHeight: 1.55 }}>{(en ? sc.personaEn : sc.persona)}</div>
             </button>
@@ -156414,7 +156429,7 @@ function TabSalesDojo() {
         <div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
             {DISC_INDS.map(x => (
-              <button key={x} className="gh-btn" onClick={() => setDInd(x)} style={dInd === x ? { borderColor: C.gold, color: C.gold, fontWeight: 700 } : { fontSize: 12 }}>{x}</button>
+              <button key={x} className="gh-btn" onClick={() => setDInd(x)} style={dInd === x ? { borderColor: C.gold, color: C.gold, fontWeight: 700 } : { fontSize: 12 }}>{thEn(x, en)}</button>
             ))}
           </div>
           <div style={{ fontSize: 11.5, color: C.dim, lineHeight: 1.65, marginBottom: 12 }}>
@@ -156559,7 +156574,7 @@ function TabCaseWork() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(min(100%,290px),1fr))", gap: 10 }}>
         {CASE_CARDS.map((cd, i) => (
           <button key={i} onClick={() => setIdx(i)} style={{ textAlign: "left", background: C.surface, border: `1px solid ${C.line}`, borderRadius: 10, padding: "13px 15px", cursor: "pointer", color: C.text, fontFamily: "inherit" }}>
-            <div style={{ fontSize: 10.5, fontWeight: 800, color: C.teal, marginBottom: 4 }}>CASE {i + 1} ・ {cd.ind}</div>
+            <div style={{ fontSize: 10.5, fontWeight: 800, color: C.teal, marginBottom: 4 }}>CASE {i + 1} ・ {thEn(cd.ind, en)}</div>
             <div style={{ fontSize: 13.5, fontWeight: 700, lineHeight: 1.5, marginBottom: 5 }}>{(en ? cd.tEn : cd.t)}</div>
             <div style={{ fontSize: 11.5, color: C.dim, lineHeight: 1.55 }}>{(en ? cd.briefEn : cd.brief).slice(0, 64)}…</div>
           </button>
@@ -160913,10 +160928,10 @@ function NoteMapView({ en }) {
       {NOTE_CORPORA.map((c) => (
         <div key={c.id} style={{ marginBottom: 22 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 8, marginBottom: 6 }}>
-            <span className="gh-display" style={{ fontSize: 18 }}>{c.title}</span>
-            <span style={{ fontSize: 11, color: C.muted }}>{c.sub} ・ {c.period} ・ {c.n}{en ? " articles" : "本"}</span>
+            <span className="gh-display" style={{ fontSize: 18 }}>{thEn(c.title, en)}</span>
+            <span style={{ fontSize: 11, color: C.muted }}>{thEn(c.sub, en)} ・ {c.period} ・ {c.n}{en ? " articles" : "本"}</span>
           </div>
-          {c.axis && <div style={{ fontSize: 11, color: C.teal, marginBottom: 10 }}>{en ? "Axis: " : "分類軸："}{c.axis}</div>}
+          {c.axis && <div style={{ fontSize: 11, color: C.teal, marginBottom: 10 }}>{en ? "Axis: " : "分類軸："}{thEn(c.axis, en)}</div>}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%, 340px),1fr))", gap: 12 }}>
             {c.themes.map((th) => {
               const key = c.id + th.t;
@@ -160925,15 +160940,15 @@ function NoteMapView({ en }) {
                 <Card key={key} style={isOpen ? { borderColor: C.gold } : {}}>
                   <div style={{ cursor: "pointer" }} onClick={() => setOpen(isOpen ? null : key)}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
-                      <span style={{ fontWeight: 700, fontSize: 13 }}>{th.t}</span>
+                      <span style={{ fontWeight: 700, fontSize: 13 }}>{thEn(th.t, en)}</span>
                       {th.n && <NoteBadge>{th.n}{en ? "" : "件"}</NoteBadge>}
                     </div>
-                    <div style={{ fontSize: 12, lineHeight: 1.75, marginTop: 6, color: C.text }}>{th.c}</div>
+                    <div style={{ fontSize: 12, lineHeight: 1.75, marginTop: 6, color: C.text }}>{thEn(th.c, en)}</div>
                   </div>
                   {isOpen && (
                     <div style={{ borderTop: `1px solid ${C.line}`, marginTop: 10, paddingTop: 4 }}>
-                      <NoteField label={en ? "Representative evidence" : "代表エビデンス"} value={th.e} />
-                      <NoteField label={en ? "Practical implication" : "実務示唆"} value={th.a} color={C.wine} />
+                      <NoteField label={en ? "Representative evidence" : "代表エビデンス"} value={thEn(th.e, en)} />
+                      <NoteField label={en ? "Practical implication" : "実務示唆"} value={thEn(th.a, en)} color={C.wine} />
                       <NoteField label={en ? "Who writes this" : "書き手"} value={th.who} color={C.teal} />
                     </div>
                   )}
@@ -161074,14 +161089,14 @@ function NoteArticleView({ en }) {
             : `記事・動画${NOTE_ARTICLES.length}本を、中心主張・引用された数値・実務示唆つきで一覧します。強度A/B/Cはダイジェスト作成者による根拠の評価です。`}
       </div>
       <div style={{ display: "flex", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
-        {[["ALL", en ? "All" : "すべて"]].concat(NOTE_CORPORA.map((c) => [c.id, c.title])).map(([v, l]) => (
+        {[["ALL", en ? "All" : "すべて"]].concat(NOTE_CORPORA.map((c) => [c.id, thEn(c.title, en)])).map(([v, l]) => (
           <button key={v} className="gh-btn" onClick={() => { setCorpus(v); setTheme("ALL"); }} style={corpus === v ? { borderColor: C.gold, color: C.gold, fontWeight: 700 } : {}}>{l}</button>
         ))}
       </div>
       <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
         <select className="gh-btn" value={theme} onChange={(e) => setTheme(e.target.value)} style={{ maxWidth: "100%" }}>
           <option value="ALL">{en ? "All themes" : "テーマすべて"}</option>
-          {themes.map((th) => <option key={th} value={th}>{th}</option>)}
+          {themes.map((th) => <option key={th} value={th}>{thEn(th, en)}</option>)}
         </select>
         <input className="gh-btn" value={qstr} onChange={(e) => setQstr(e.target.value)} aria-label={en ? "search" : "本文を検索"} placeholder={en ? "search" : "本文を検索"} style={{ minWidth: 160 }} />
         <span style={{ fontSize: 11, color: C.muted }}>{list.length}{en ? " hits" : "件"}</span>
