@@ -164453,6 +164453,9 @@ const GOVTRI_LEGS = [
 // 図1：致死的三要素（3つがそろうと流出が成立。1つ欠ければ経路は閉じる）
 function GovTrifecta({ en, onOpen }) {
   const [sel, setSel] = useState(3);
+  const [cut, setCut] = useState([false, false, false]); // 断った足
+  const closed = cut.some(Boolean);
+  const toggleCut = (i) => { setCut(cut.map((v, j) => (j === i ? !v : v))); setSel(3); };
   const all3 = GOVDOJO_INCIDENTS.filter((x) => x.trifecta && x.trifecta.every(Boolean));
   const CX = [[160, 112], [280, 112], [220, 210]];
   const LBL = [[110, 70], [330, 70], [220, 275]];
@@ -164464,23 +164467,34 @@ function GovTrifecta({ en, onOpen }) {
           {CX.map(([cx, cy], i) => (
             <g key={i} className="gh-node" onClick={() => setSel(i)} role="button" tabIndex={0}
               onKeyDown={(ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); setSel(i); } }}>
-              <circle cx={cx} cy={cy} r="92" fill={COL[i]} fillOpacity={sel === i ? 0.32 : 0.14} stroke={COL[i]} strokeWidth={sel === i ? 2.4 : 1.3} />
+              <circle cx={cx} cy={cy} r="92" fill={COL[i]} fillOpacity={cut[i] ? 0.03 : sel === i ? 0.32 : 0.14} stroke={COL[i]} strokeWidth={sel === i ? 2.4 : 1.3} strokeDasharray={cut[i] ? "6 5" : undefined} strokeOpacity={cut[i] ? 0.55 : 1} />
             </g>
           ))}
           {LBL.map(([x, y], i) => (
-            <text key={i} x={x} y={y} textAnchor="middle" fill={COL[i]} fontSize="11.5" fontWeight="800" style={{ pointerEvents: "none" }}>{GOVTRI_LEGS[i].t[en ? 1 : 0].replace(/^[①②③] /, "")}</text>
+            <text key={i} x={x} y={y} textAnchor="middle" fill={COL[i]} fillOpacity={cut[i] ? 0.55 : 1} fontSize="11.5" fontWeight="800" style={{ pointerEvents: "none", textDecoration: cut[i] ? "line-through" : "none" }}>{cut[i] ? "✂ " : ""}{GOVTRI_LEGS[i].t[en ? 1 : 0].replace(/^[①②③] /, "")}</text>
           ))}
           <g className="gh-node" onClick={() => setSel(3)} role="button" tabIndex={0}
             onKeyDown={(ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); setSel(3); } }}>
-            <circle cx="220" cy="146" r="30" fill={sel === 3 ? C.wine : C.surface} stroke={C.wine} strokeWidth="2" />
-            <text x="220" y="143" textAnchor="middle" fill={sel === 3 ? C.text : C.wine} fontSize="10.5" fontWeight="800">{en ? "Leak" : "流出が"}</text>
-            <text x="220" y="156" textAnchor="middle" fill={sel === 3 ? C.text : C.wine} fontSize="10.5" fontWeight="800">{en ? "works" : "成立"}</text>
+            <circle cx="220" cy="146" r="30" fill={closed ? (sel === 3 ? C.teal : C.surface) : sel === 3 ? C.wine : C.surface} stroke={closed ? C.teal : C.wine} strokeWidth="2" />
+            <text x="220" y="143" textAnchor="middle" fill={sel === 3 ? (closed ? C.bg : C.text) : closed ? C.teal : C.wine} fontSize="10.5" fontWeight="800">{closed ? (en ? "Path" : "経路が") : (en ? "Leak" : "流出が")}</text>
+            <text x="220" y="156" textAnchor="middle" fill={sel === 3 ? (closed ? C.bg : C.text) : closed ? C.teal : C.wine} fontSize="10.5" fontWeight="800">{closed ? (en ? "closed" : "閉じる") : (en ? "works" : "成立")}</text>
           </g>
         </svg>
       </div>
-      <div style={DGM_HINT}>{en ? "Click a circle or the centre" : "円か中央をクリック"}</div>
-      <div style={{ ...DGM_DETAIL, borderLeftColor: sel === 3 ? C.wine : COL[sel] }}>
-        {sel === 3 ? (
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "center", margin: "8px 0 2px" }}>
+        {GOVTRI_LEGS.map((g, i) => <button key={i} onClick={() => toggleCut(i)} aria-pressed={cut[i]} style={{ fontSize: 11.5, padding: "4px 11px", borderRadius: 99, cursor: "pointer", border: `1px solid ${COL[i]}`, background: cut[i] ? COL[i] : "transparent", color: cut[i] ? C.bg : COL[i], fontWeight: 700 }}>✂ {g.t[en ? 1 : 0]}{cut[i] ? (en ? " — cut" : "（断った）") : (en ? " — cut it" : "を断つ")}</button>)}
+        {closed ? <button className="gh-btn" onClick={() => setCut([false, false, false])} style={{ fontSize: 11, padding: "3px 10px" }}>{en ? "Restore all" : "元に戻す"}</button> : null}
+      </div>
+      <div style={DGM_HINT}>{en ? "Click a circle or the centre, or cut a leg to see the path close" : "円か中央をクリック。足を断つと、経路が閉じる様子が見られる"}</div>
+      <div style={{ ...DGM_DETAIL, borderLeftColor: sel === 3 ? (closed ? C.teal : C.wine) : COL[sel] }}>
+        {sel === 3 && closed ? (
+          <div>
+            <div style={{ fontWeight: 800, fontSize: 13, color: C.teal, marginBottom: 5 }}>{en ? "One leg missing = the exfiltration path closes" : "足が1本欠けると、流出の経路は閉じる"}</div>
+            {cut.map((v, i) => (v ? <p key={i} style={{ margin: "0 0 6px", fontSize: 12, color: C.muted, lineHeight: 1.7 }}><b style={{ color: COL[i] }}>✂ {GOVTRI_LEGS[i].t[en ? 1 : 0]}：</b>{GOVTRI_LEGS[i].cut[en ? 1 : 0]}</p> : null))}
+            <p style={{ margin: "4px 0 0", fontSize: 11.5, color: C.dim, lineHeight: 1.6 }}>{en ? `The ${all3.length} real cases below had all three legs in one session. Cutting any one leg is how the trifecta model says the path is closed; filters that try to spot injected text are not enough on their own.` : `下の実例${all3.length}件は、1つのセッションに3つがそろっていた。致死的三要素の考え方では、どれか1本を断てば経路が閉じる。注入の文を見つけようとするフィルターだけでは足りない。`}</p>
+            {all3.length ? <div style={{ marginTop: 6 }}>{all3.map((x) => <GovIncLink key={x.id} id={x.id} en={en} onOpen={onOpen} />)}</div> : null}
+          </div>
+        ) : sel === 3 ? (
           <div>
             <div style={{ fontWeight: 800, fontSize: 13, color: C.text, marginBottom: 5 }}>{en ? "All three together = data can be stolen" : "3つがそろうと、データを盗み出せる"}</div>
             <p style={{ margin: "0 0 8px", fontSize: 12, color: C.muted, lineHeight: 1.7 }}>
@@ -164726,20 +164740,50 @@ const GOVLAYER_ROWS = [
   [["プロセス", "Process"], [["ユースケース審査・ベンダー審査（学習利用・保持・再委託・連携先）", "Use-case and vendor review (training use, retention, subprocessors, integrations)"], ["脅威モデリング・レッドチーム・リリースゲート", "Threat modelling, red teaming, release gates"], ["権限の棚卸し・MCPや依存の更新審査・定期監査", "Access reviews, review of MCP and dependency updates, periodic audits"], ["初動手順書・訓練・責めない事後レビュー", "Runbooks, drills, blameless reviews"]]],
   [["技術", "Technical"], [["評価環境・サンドボックス・AI-BOM", "Eval environment, sandbox, AI-BOM"], ["最小権限・送信先の許可リスト・入力の分離・承認ゲート", "Least privilege, egress allow-lists, input separation, approval gates"], ["全呼び出しのログ・異常検知・DLP・秘密情報の検出", "Log every call, anomaly detection, DLP, secret scanning"], ["キルスイッチ・トークンの一括失効・ロールバック", "Kill switch, bulk token revocation, rollback"]]],
 ];
-function GovLayerGrid({ en }) {
+function GovLayerGrid({ en, onOpen }) {
   const COL = ["#8FA8E8", "#D6B152", "#5FD3C2"];
+  const KEY = ["gov", "proc", "tech"]; // ポリシー＝ガバナンス・規程、プロセス＝プロセス・運用、技術＝技術（事例集の3層の原因）
+  const [lay, setLay] = useState(null);
+  const [cat, setCat] = useState("all");
+  const [more, setMore] = useState(false);
+  const L = (x) => GOVX_L(x, en);
+  const list = lay == null ? [] : GOVDOJO_INCIDENTS.filter((x) => x.cause && x.cause[KEY[lay]] && (cat === "all" || x.cat === cat)).slice().sort((a, b) => b.date.localeCompare(a.date));
+  const shownL = more ? list : list.slice(0, 6);
   return (
-    <div style={{ ...DGM_WRAP, overflowX: "auto" }}>
-      <div style={{ display: "grid", gridTemplateColumns: "84px repeat(4, minmax(120px, 1fr))", gap: 5, minWidth: 580 }}>
-        <div />
-        {GOVLAYER_COLS.map((c, i) => <div key={i} style={{ fontSize: 11, fontWeight: 800, color: C.muted, textAlign: "center", padding: "2px 0" }}>{c[en ? 1 : 0]}</div>)}
-        {GOVLAYER_ROWS.map(([lab, cells], r) => (
-          <React.Fragment key={r}>
-            <div style={{ fontSize: 12, fontWeight: 800, color: COL[r], display: "flex", alignItems: "center" }}>{lab[en ? 1 : 0]}</div>
-            {cells.map((c, i) => <div key={i} style={{ background: C.surface, border: `1px solid ${C.line}`, borderTop: `2px solid ${COL[r]}`, borderRadius: 7, padding: "7px 8px", fontSize: 11, color: C.text, lineHeight: 1.5 }}>{c[en ? 1 : 0]}</div>)}
-          </React.Fragment>
-        ))}
+    <div>
+      <div style={{ ...DGM_WRAP, overflowX: "auto" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "92px repeat(4, minmax(120px, 1fr))", gap: 5, minWidth: 580 }}>
+          <div />
+          {GOVLAYER_COLS.map((c, i) => <div key={i} style={{ fontSize: 11, fontWeight: 800, color: C.muted, textAlign: "center", padding: "2px 0" }}>{c[en ? 1 : 0]}</div>)}
+          {GOVLAYER_ROWS.map(([lab, cells], r) => (
+            <React.Fragment key={r}>
+              <button onClick={() => { setLay(lay === r ? null : r); setMore(false); }} aria-pressed={lay === r} title={en ? "Show where real cases failed at this layer" : "実例がこの層のどこで破れていたかを見る"} style={{ fontSize: 12, fontWeight: 800, color: lay === r ? C.bg : COL[r], background: lay === r ? COL[r] : "transparent", border: `1px solid ${COL[r]}`, borderRadius: 7, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "4px 7px" }}>{lab[en ? 1 : 0]}<span aria-hidden="true">{lay === r ? "▾" : "▸"}</span></button>
+              {cells.map((c, i) => <div key={i} style={{ background: C.surface, border: `1px solid ${lay === r ? COL[r] : C.line}`, borderTop: `2px solid ${COL[r]}`, borderRadius: 7, padding: "7px 8px", fontSize: 11, color: C.text, lineHeight: 1.5, opacity: lay != null && lay !== r ? 0.45 : 1, transition: "opacity .15s" }}>{c[en ? 1 : 0]}</div>)}
+            </React.Fragment>
+          ))}
+        </div>
       </div>
+      <div style={DGM_HINT}>{en ? "Click a layer to see, case by case, what failed there and the fix" : "層の名前を押すと、実例ごとに、その層で何が欠けていたかと対策が出る"}</div>
+      {lay != null ? (
+        <div style={{ ...DGM_DETAIL, borderLeftColor: COL[lay] }}>
+          <div style={{ fontWeight: 800, fontSize: 13, color: COL[lay], marginBottom: 6 }}>{en ? `${GOVLAYER_ROWS[lay][0][1]} layer: what failed in the real cases` : `${GOVLAYER_ROWS[lay][0][0]}の層：実例で欠けていたこと`}<span style={{ fontSize: 11, color: C.dim, fontWeight: 500, marginLeft: 6 }}>{en ? `${list.length} cases` : `${list.length}件`}</span></div>
+          <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 8 }}>
+            {[["all", [en ? "All" : "すべて", ""], C.gold], ...Object.entries(GOVINC_CAT).map(([k, v]) => [k, v, v[2]])].map(([k, v, col]) => <button key={k} onClick={() => { setCat(k); setMore(false); }} aria-pressed={cat === k} style={{ fontSize: 10.5, padding: "2px 9px", borderRadius: 99, border: `1px solid ${cat === k ? col : C.line}`, background: cat === k ? C.surface2 : "transparent", color: cat === k ? C.text : C.muted, cursor: "pointer" }}>{k === "all" ? v[0] : v[en ? 1 : 0]}</button>)}
+          </div>
+          {shownL.map((x) => {
+            const col = (GOVINC_CAT[x.cat] || [])[2] || C.muted;
+            return (
+              <div key={x.id} style={{ borderTop: `1px solid ${C.line}`, padding: "6px 0" }}>
+                <button onClick={() => onOpen && onOpen(x.id)} style={{ background: "transparent", border: "none", padding: 0, cursor: "pointer", color: col, fontSize: 11.5, fontWeight: 700, textAlign: "left" }}>{x.date} {L(x.t)} →</button>
+                <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.6, marginTop: 2 }}><b style={{ color: C.text }}>{en ? "Cause: " : "原因："}</b>{L(x.cause[KEY[lay]])}</div>
+                {x.fix && x.fix[KEY[lay]] ? <div style={{ fontSize: 11.5, color: C.teal, lineHeight: 1.6, whiteSpace: "pre-line" }}><b>{en ? "Fix: " : "対策："}</b>{L(x.fix[KEY[lay]])}</div> : null}
+              </div>
+            );
+          })}
+          {list.length > 6 ? <button className="gh-btn" onClick={() => setMore(!more)} style={{ fontSize: 11, padding: "3px 10px", marginTop: 4 }}>{more ? (en ? "Show fewer" : "少なく表示") : (en ? `Show all ${list.length}` : `${list.length}件すべて表示`)}</button> : null}
+          {!list.length ? <div style={{ fontSize: 11.5, color: C.dim }}>{en ? "No cases in this category." : "この分類の事例はない。"}</div> : null}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -164765,7 +164809,7 @@ function GovDiagrams({ en, onOpen }) {
       <GovIRClock en={en} />
       <H n="04" t={en ? "Three layers × four moments — what to have ready" : "統制の三層 × 4つの時期 ― 何を用意しておくか"}
         d={en ? "A rule on paper is not a control. Each incident in the casebook failed in at least one of these cells." : "棚の規程は統制ではない。事例集の各インシデントは、この表の少なくとも1マスで穴が開いていた。"} />
-      <GovLayerGrid en={en} />
+      <GovLayerGrid en={en} onOpen={onOpen} />
     </div>
   );
 }
