@@ -122857,6 +122857,10 @@ const GLOBAL_CSS = `
 .gh-root{overflow-wrap:break-word;word-break:normal;}
 /* 図面SVGは横長。狭い画面では横スクロールで可読性を確保するラッパ */
 .gh-figscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+/* 図の横に詳細を固定する2列（狭い画面では1列にして、詳細は図の下） */
+.gv-split{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:14px;align-items:start;}
+.gv-split>.gv-side{position:sticky;top:60px;max-height:calc(100vh - 76px);overflow-y:auto;}
+@media (max-width: 960px){.gv-split{grid-template-columns:1fr;}.gv-split>.gv-side{position:static;max-height:none;overflow:visible;}}
 .gh-figscroll svg{min-width:640px;}
 /* モバイル最適化 */
 @media (max-width: 640px){
@@ -165049,21 +165053,53 @@ function GovRegNext({ en, onPick }) {
 }
 function GovRegMap({ en, deep }) {
   const [sel, setSel] = useState(() => (deep && deep.id ? GOVREG_ITEMS.find((x) => x.id === deep.id) || null : null));
+  const [hov, setHov] = useState(null);
   const [view, setView] = useState("map");
+  const [bind, setBind] = useState("all");
+  const [ahead, setAhead] = useState(false);
+  const side = useRef(null);
   const L = (v) => GOVX_L(v, en);
   const regions = GOVREG_ORDER.filter((r) => GOVREG_ITEMS.some((x) => x.region === r));
   const cnt = (b) => GOVREG_ITEMS.filter((x) => govBind(x.kind) === b).length;
-  const fut = GOVREG_ITEMS.flatMap((x) => x.dates || []).filter((d) => govDay(d.d) > Math.max(govDay(GOVREG_ASOF), govDay(govToday()))).length;
+  const now = Math.max(govDay(GOVREG_ASOF), govDay(govToday()));
+  const hasAhead = (x) => (x.dates || []).some((d) => govDay(d.d) > now);
+  const fut = GOVREG_ITEMS.flatMap((x) => x.dates || []).filter((d) => govDay(d.d) > now).length;
   const nNext = (GOVREG_CMP.upcoming || []).filter((u) => govEnd(u.d) >= govToday()).length;
-  const pick = (x) => setSel(sel && sel.id === x.id ? null : x);
-  const chip = (x) => {
-    const b = govBind(x.kind), on = sel && sel.id === x.id;
+  const show = (x) => (bind === "all" || govBind(x.kind) === bind) && (!ahead || hasAhead(x));
+  const nShown = GOVREG_ITEMS.filter(show).length;
+  // 選んだら詳細を見せる：広い画面は横に固定、狭い画面や地図以外の表示では詳細までスクロールする
+  const pick = (x) => {
+    const off = sel && sel.id === x.id;
+    setSel(off ? null : x);
+    if (!off) setTimeout(() => { try { const el = side.current; if (!el) return; const r = el.getBoundingClientRect(); if (r.top > window.innerHeight - 80 || r.top < 0 || window.innerWidth <= 960 || view !== "map") el.scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) {} }, 30);
+  };
+  const chip = (x, wide) => {
+    const b = govBind(x.kind), on = sel && sel.id === x.id, vis = show(x);
     return (
-      <button key={x.id} onClick={() => pick(x)} title={L(x.name)} style={{ display: "block", width: "100%", textAlign: "left", background: on ? C.surface2 : C.surface, border: `1px solid ${on ? C.gold : C.line}`, borderLeft: `4px solid ${GV_COL[b]}`, borderRadius: 7, padding: "4px 7px", marginBottom: 4, cursor: "pointer", color: C.text, fontSize: 11.5, lineHeight: 1.35 }}>
-        {L(x.short || x.name)}<span style={{ display: "block", fontSize: 10, color: C.dim }}>{L(govStage(x))}</span>
+      <button key={x.id} onClick={() => pick(x)} onMouseEnter={() => setHov(x)} onMouseLeave={() => setHov(null)} onFocus={() => setHov(x)} onBlur={() => setHov(null)}
+        title={L(x.name) + "\n" + L(govStage(x))} aria-pressed={!!on}
+        style={{ display: wide ? "block" : "inline-flex", alignItems: "center", gap: 5, width: wide ? "100%" : "auto", textAlign: "left", background: on ? C.surface2 : C.surface, border: `1px solid ${on ? C.gold : C.line}`, borderLeft: `4px solid ${GV_COL[b]}`, borderRadius: 7, padding: "3px 8px", margin: "0 4px 4px 0", cursor: "pointer", color: C.text, fontSize: 11.5, lineHeight: 1.35, opacity: vis ? 1 : 0.22, transition: "opacity .15s" }}>
+        {L(x.short || x.name)}{hasAhead(x) ? <span aria-label={en ? "has dates ahead" : "これからの予定あり"} style={{ color: C.gold, fontSize: 10.5 }}>◷</span> : null}
+        {wide ? <span style={{ display: "block", fontSize: 10, color: C.dim }}>{L(govStage(x))}</span> : null}
       </button>
     );
   };
+  const cur = sel || hov;
+  const panel = (
+    <div ref={side} className={view === "map" ? "gv-side" : undefined}>
+      {cur ? (
+        <>
+          {!sel ? <div style={{ fontSize: 10.5, color: C.dim, margin: "2px 0 -4px" }}>{en ? "Preview — click to pin" : "プレビュー（押すと固定）"}</div> : (
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: -6 }}>
+              <span style={{ fontSize: 10.5, color: C.gold }}>{en ? "Pinned" : "固定中"}</span>
+              <button className="gh-btn" onClick={() => setSel(null)} style={{ fontSize: 11, padding: "2px 9px" }}>{en ? "Close ×" : "閉じる ×"}</button>
+            </div>
+          )}
+          <GovRegDetail x={cur} en={en} />
+        </>
+      ) : <div style={{ ...DGM_HINT, textAlign: "left", marginTop: 4 }}>{en ? "Hover over an entry for a preview; click to pin it here with its sources." : "項目にカーソルを当てると中身を先に見られる。押すとここに固定し、出典も出る。"}</div>}
+    </div>
+  );
   return (
     <div>
       <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.75, marginBottom: 10 }}>
@@ -165071,40 +165107,59 @@ function GovRegMap({ en, deep }) {
       </div>
       <GvKpi items={[[GOVREG_ITEMS.length, en ? "laws & guidelines" : "法令・ガイドライン", C.gold], [cnt("law"), L(GV_BIND_L.law), GV_COL.law], [cnt("gov"), L(GV_BIND_L.gov), GV_COL.gov], [cnt("soft"), L(GV_BIND_L.soft), GV_COL.soft], [fut, en ? "milestones still ahead" : "これからの予定", C.gold]]} />
       <GovPills items={[["map", en ? "Map: jurisdiction × binding force" : "地図：地域 × 拘束力"], ["cmp", en ? "Compare 8 jurisdictions" : "比較表（8法域）"], ["time", en ? "Timeline" : "年表"], ["next", en ? `Coming up (${nNext})` : `これからの期限（${nNext}）`], ["list", en ? "List" : "一覧"]]} val={view} onPick={setView} col={C.gold} />
+      {view === "map" || view === "list" ? (
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", marginBottom: 8 }}>
+          <span style={{ fontSize: 11, color: C.dim }}>{en ? "Show" : "絞る"}</span>
+          {[["all", en ? "All" : "すべて", C.gold], ["law", L(GV_BIND_L.law), GV_COL.law], ["gov", L(GV_BIND_L.gov), GV_COL.gov], ["soft", L(GV_BIND_L.soft), GV_COL.soft]].map(([k, l, col]) => (
+            <button key={k} onClick={() => setBind(k)} aria-pressed={bind === k} style={{ fontSize: 11, padding: "3px 10px", borderRadius: 99, border: `1px solid ${bind === k ? col : C.line}`, background: bind === k ? C.surface2 : "transparent", color: bind === k ? C.text : C.muted, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5 }}>
+              {k !== "all" ? <span style={{ width: 8, height: 8, borderRadius: 2, background: col }} /> : null}{l}{k !== "all" ? `（${cnt(k)}）` : ""}
+            </button>
+          ))}
+          <button onClick={() => setAhead(!ahead)} aria-pressed={ahead} style={{ fontSize: 11, padding: "3px 10px", borderRadius: 99, border: `1px solid ${ahead ? C.gold : C.line}`, background: ahead ? C.surface2 : "transparent", color: ahead ? C.gold : C.muted, cursor: "pointer" }}>◷ {en ? "Only those with dates ahead" : "これからの予定があるものだけ"}</button>
+          <span style={{ fontSize: 11, color: C.dim }}>{en ? `${nShown} of ${GOVREG_ITEMS.length}` : `${GOVREG_ITEMS.length}件中 ${nShown}件`}</span>
+        </div>
+      ) : null}
       {view === "map" ? (
-        <div className="gh-figscroll">
-          <div style={{ minWidth: 620, display: "grid", gridTemplateColumns: "96px repeat(3,minmax(0,1fr))", gap: 6 }}>
-            <div />
-            {["law", "gov", "soft"].map((b) => <div key={b} style={{ fontSize: 11, fontWeight: 800, color: GV_COL[b], borderBottom: `2px solid ${GV_COL[b]}`, paddingBottom: 3 }}>{L(GV_BIND_L[b])}</div>)}
-            {regions.map((r) => (
-              <React.Fragment key={r}>
-                <div style={{ fontSize: 12, fontWeight: 800, color: C.text, paddingTop: 5 }}>{L(GOVREG_RL[r] || [r, r])}<div style={{ fontSize: 10, color: C.dim, fontWeight: 400 }}>{GOVREG_ITEMS.filter((x) => x.region === r).length}{en ? " items" : "件"}</div></div>
-                {["law", "gov", "soft"].map((b) => <div key={b} style={{ background: "rgba(255,255,255,0.02)", borderRadius: 8, padding: 4, minHeight: 30 }}>{GOVREG_ITEMS.filter((x) => x.region === r && govBind(x.kind) === b).map(chip)}</div>)}
-              </React.Fragment>
-            ))}
+        <div className="gv-split">
+          <div className="gh-figscroll">
+            <div style={{ minWidth: 560, display: "grid", gridTemplateColumns: "92px minmax(0,1.1fr) minmax(0,0.75fr) minmax(0,1.25fr)", gap: 4 }}>
+              <div />
+              {["law", "gov", "soft"].map((b) => (
+                <button key={b} onClick={() => setBind(bind === b ? "all" : b)} title={en ? "Show only this column (click again for all)" : "この列だけ見る（もう一度押すと全部）"} style={{ textAlign: "left", fontSize: 11, fontWeight: 800, color: GV_COL[b], background: "transparent", border: "none", borderBottom: `2px solid ${GV_COL[b]}`, padding: "0 0 3px", cursor: "pointer", opacity: bind === "all" || bind === b ? 1 : 0.4 }}>{L(GV_BIND_L[b])} <span style={{ color: C.dim, fontWeight: 600 }}>{cnt(b)}</span></button>
+              ))}
+              {regions.map((r) => {
+                const all = GOVREG_ITEMS.filter((x) => x.region === r);
+                return (
+                  <React.Fragment key={r}>
+                    <div style={{ fontSize: 12, fontWeight: 800, color: C.text, paddingTop: 4, opacity: all.some(show) ? 1 : 0.35 }}>{L(GOVREG_RL[r] || [r, r])}<div style={{ fontSize: 10, color: C.dim, fontWeight: 400 }}>{all.length}{en ? " items" : "件"}</div></div>
+                    {["law", "gov", "soft"].map((b) => {
+                      const xs = all.filter((x) => govBind(x.kind) === b);
+                      return <div key={b} style={{ background: xs.length ? "rgba(255,255,255,0.025)" : "transparent", borderRadius: 8, padding: xs.length ? "4px 4px 0" : 0, minHeight: 26, display: "flex", flexWrap: "wrap", alignContent: "flex-start" }}>{xs.map((x) => chip(x, false))}</div>;
+                    })}
+                  </React.Fragment>
+                );
+              })}
+            </div>
+            <GvLegend en={en} items={[[GV_COL.law, L(GV_BIND_L.law)], [GV_COL.gov, L(GV_BIND_L.gov)], [GV_COL.soft, L(GV_BIND_L.soft)]]} />
+            <div style={{ fontSize: 11, color: C.dim, marginTop: -4 }}>◷ {en ? "has a date still ahead (from today)" : "今日より先の予定がある"}</div>
           </div>
+          {panel}
         </div>
       ) : null}
       {view === "time" ? <GovRegTimeline en={en} list={GOVREG_ITEMS} sel={sel} onPick={pick} /> : null}
-      {view === "cmp" ? <GovRegCompare en={en} onPick={(x) => setSel(x)} /> : null}
-      {view === "next" ? <GovRegNext en={en} onPick={(x) => setSel(x)} /> : null}
+      {view === "cmp" ? <GovRegCompare en={en} onPick={(x) => pick(x)} /> : null}
+      {view === "next" ? <GovRegNext en={en} onPick={(x) => pick(x)} /> : null}
       {view === "list" ? GOVREG_ORDER.filter((r) => regions.includes(r)).map((r) => (
         <div key={r} style={{ marginBottom: 8 }}>
           <div style={{ fontSize: 12, fontWeight: 800, color: C.teal, margin: "6px 0 4px" }}>{L(GOVREG_RL[r] || [r, r])}</div>
-          {GOVREG_ITEMS.filter((x) => x.region === r).map(chip)}
+          {GOVREG_ITEMS.filter((x) => x.region === r && show(x)).map((x) => chip(x, true))}
         </div>
       )) : null}
-      {sel ? <GovRegDetail x={sel} en={en} /> : <div style={DGM_HINT}>{en ? "Pick an entry to see what it requires and its sources." : "項目を押すと、中身と出典が開く。"}</div>}
+      {view !== "map" ? panel : null}
     </div>
   );
 }
 
-// ---------- 業界別チェック ----------
-const GOVIND_TH = [["ai", "AIそのものの規律", "AI-specific rules", "AI", "AI"], ["pi", "個人情報・データ", "Personal data", "個人情報", "Data"], ["out", "委託・クラウド・調達", "Outsourcing, cloud, procurement", "委託・調達", "Outsourcing"], ["sec", "セキュリティ", "Security", "セキュリティ", "Security"], ["model", "モデル検証・業務規制", "Model validation & conduct", "モデル・業務", "Models & conduct"], ["prod", "製品・機器の安全と責任", "Product safety & liability", "製品安全", "Product safety"], ["info", "記録・秘密・輸出管理", "Records, secrets, export", "記録・秘密", "Records"], ["ip", "知的財産・著作権", "IP & copyright", "知財・著作権", "IP"], ["cons", "消費者保護・表示・広告", "Consumer protection & advertising", "消費者・表示", "Consumers"], ["labor", "雇用・労働", "Employment & labour", "雇用・労働", "Employment"]];
-const GOVIND_BASE = ["jp-ai-act", "jp-ai-biz-guideline", "jp-ppc-genai-alert", "jp-appi-2026", "jp-copyright-ai", "jp-ip-principle-code", "jp-aisi-guides", "eu-ai-act"];
-const govKindG = (k) => (k === "法律" || k === "判例" ? "law" : k === "基準" ? "std" : "guide");
-const GOVIND_KG = { law: ["法令・判例", "Statutes & case law"], guide: ["指針・ガイドライン・原則", "Guidance & principles"], std: ["基準・規格", "Standards"] };
-const GOVIND_KIND = { 法律: "Statute", 判例: "Case law", 基準: "Standard", ガイドライン: "Guideline", 原則: "Principles", 指針: "Guidance" };
 function GovIndustry({ en, onMode, onTab, deep }) {
   const [k, setK] = useState(deep && GOVIND.some((x) => x.key === deep.k) ? deep.k : GOVIND[0].key);
   const [th, setTh] = useState(null);
