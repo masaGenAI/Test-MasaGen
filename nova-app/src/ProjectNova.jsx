@@ -138353,6 +138353,91 @@ function LearningHome() {
   );
 }
 
+// ---------- TechHub 全体の学習記録（各道場の正答率・弱い領域・復習待ちを1枚に。読むだけ） ----------
+const THR_CHECK = [
+  { key: "govdojo_stats_v1", name: ["セキュリティ・ガバナンス道場（判定演習）", "Security & Governance Dojo (drills)"], bank: () => GOVDOJO_BANK, dom: () => GOVDOJO_DOMAINS, open: { hash: "#megatech/govdojo/quiz" } },
+  { key: "itsec_stats_v1", name: ["ITセキュリティ基盤", "IT Security Foundations"], bank: () => ITSEC_BANK, dom: () => ITSEC_DOMAINS, open: { tab: "itsec" } },
+  { key: "noteissue_stats_v1", name: ["実務論点マップ", "Practice Issue Map"], bank: () => NOTEISSUE_BANK, dom: () => NOTEISSUE_DOMAINS, open: { tab: "noteissues" } },
+  { key: "slalom_stats_v1", name: ["Slalom変革道場", "Slalom Transformation Dojo"], bank: () => SLALOM_BANK, dom: () => SLALOM_DOMAINS, open: { tab: "slalom" } },
+  { key: "axcheck_core_stats_v1", name: ["理解度チェック 基礎", "Check — Core"], bank: () => CHECK_CORE_BANK, dom: () => CHECK_DOMAINS_CORE, open: { tab: "checkcore" } },
+  { key: "axcheck_ax_stats_v1", name: ["理解度チェック AX実務", "Check — AX"], bank: () => CHECK_AX_BANK, dom: () => CHECK_DOMAINS_AX, open: { tab: "checkax" } },
+];
+function TechHubRecords() {
+  const lang = useLang();
+  const en = lang === "en";
+  const L = (x) => (Array.isArray(x) ? x[en ? 1 : 0] : x || "");
+  const { setJump } = useJump();
+  const [rows, setRows] = useState(null);
+  useEffect(() => {
+    let live = true;
+    (async () => {
+      const get = async (k) => { try { const r = await window.storage.get(k); return r && r.value ? JSON.parse(r.value) : null; } catch (e) { return null; } };
+      const out = [];
+      // 技術道場：間隔反復の記録（問題ごと）
+      const srs = (await get("gafa_srs_v1")) || {};
+      const qis = Object.keys(srs).map(Number).filter((q) => q < MCQS.length);
+      const now = Date.now();
+      out.push({ id: "dojo", name: ["技術道場（クイズ）", "Tech Dojo (quiz)"], size: MCQS.length, seen: qis.length, ans: null, acc: null, weak: null, review: qis.filter((q) => srs[q] && srs[q].due <= now).length, reviewL: ["復習の期限", "due for review"], open: { jump: qis.some((q) => srs[q] && srs[q].due <= now) ? { tab: "dojo", dojoView: "mcq", srsReview: true } : { tab: "dojo", dojoView: "mcq" } } });
+      // AIアーキテクト道場：問題ごとの正誤
+      const ac = (await get("acad_quiz_score_v1")) || {};
+      const ks = Object.keys(ac).filter((k) => ACAD_QUIZ[k]);
+      const byT = {};
+      ks.forEach((k) => { const tp = ACAD_QUIZ[k].topic || "-"; byT[tp] = byT[tp] || { c: 0, a: 0 }; byT[tp].a++; if (ac[k] === true) byT[tp].c++; });
+      const wt = Object.entries(byT).filter(([, v]) => v.a >= 3).sort((p, q) => p[1].c / p[1].a - q[1].c / q[1].a)[0];
+      const okN = ks.filter((k) => ac[k] === true).length;
+      out.push({ id: "architect", name: ["AIアーキテクト道場", "AI Architect Dojo"], size: ACAD_QUIZ.length, seen: ks.length, ans: ks.length, acc: ks.length ? Math.round((okN / ks.length) * 100) : null, weak: wt ? `${wt[0]}（${Math.round((wt[1].c / wt[1].a) * 100)}%）` : null, review: ks.filter((k) => ac[k] === false).length, reviewL: ["不正解のまま", "still wrong"], open: { tab: "architect" } });
+      // 判定演習の各エンジン：テーマごとの正答数と、復習キュー
+      for (const c of THR_CHECK) {
+        const st = (await get(c.key)) || {};
+        const wr = (await get(c.key.replace("_stats_", "_wrong_"))) || {};
+        const doms = c.dom();
+        let a = 0, ok = 0; Object.values(st).forEach((v) => { a += v.a || 0; ok += v.c || 0; });
+        const w = doms.map((d) => ({ d, v: st[d.id] })).filter((x) => x.v && x.v.a >= 3).sort((p, q) => p.v.c / p.v.a - q.v.c / q.v.a)[0];
+        out.push({ id: c.key, name: c.name, size: c.bank().length, seen: null, ans: a, acc: a ? Math.round((ok / a) * 100) : null, weak: w ? `${en ? w.d.en : w.d.ja}（${Math.round((w.v.c / w.v.a) * 100)}%）` : null, review: Object.keys(wr).length, reviewL: ["復習キュー", "in review queue"], open: c.open });
+      }
+      if (live) setRows(out);
+    })();
+    return () => { live = false; };
+  }, []);
+  if (!rows) return null;
+  const active = rows.filter((r) => (r.ans || 0) + (r.seen || 0) > 0);
+  const totA = rows.reduce((p, r) => p + (r.ans || 0), 0);
+  const totRev = rows.reduce((p, r) => p + (r.review || 0), 0);
+  const go = (o) => { if (o.hash) { try { window.location.hash = o.hash; } catch (e) {} } else if (o.jump) setJump(o.jump); else setJump({ tab: o.tab }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} };
+  const sorted = rows.slice().sort((p, q) => ((q.ans || 0) + (q.seen || 0) > 0) - ((p.ans || 0) + (p.seen || 0) > 0) || (q.review || 0) - (p.review || 0));
+  const accCol = (a) => (a == null ? C.dim : a >= 80 ? C.teal : a >= 60 ? C.gold : C.wineInk);
+  return (
+    <Card style={{ borderColor: C.line, marginBottom: 16 }}>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap", marginBottom: 4 }}>
+        <span className="gh-display" style={{ fontSize: 16, color: C.gold }}>{en ? "Records across TechHub" : "道場ごとの記録（TechHub全体）"}</span>
+        <span style={{ fontSize: 11.5, color: C.muted }}>{en ? `${active.length} of ${rows.length} dojos started · ${totA} answers · ${totRev} to review` : `${rows.length}道場中 ${active.length}つに記録・解答 ${totA}回・復習待ち ${totRev}問`}</span>
+      </div>
+      <div style={{ fontSize: 11, color: C.dim, marginBottom: 10 }}>{en ? "Read from what each dojo saves on this device. Answers count every attempt; the weakest area needs at least 3 answers." : "各道場がこの端末に保存している記録を読んで並べた。解答は回答した回数。弱い領域は3回以上答えた領域から出す。"}</div>
+      <div className="gh-figscroll">
+        <div style={{ minWidth: 620, display: "grid", gridTemplateColumns: "minmax(170px,1.6fr) 70px 70px minmax(90px,1fr) minmax(130px,1.3fr) 92px 64px", gap: "4px 8px", alignItems: "center", fontSize: 11.5 }}>
+          {(en ? ["Dojo", "Questions", "Answers", "Accuracy", "Weakest area", "To review", ""] : ["道場", "問題数", "解答", "正答率", "弱い領域", "復習待ち", ""]).map((h, i) => <div key={i} style={{ fontSize: 10.5, color: C.dim, fontWeight: 700, borderBottom: `1px solid ${C.line}`, paddingBottom: 3 }}>{h}</div>)}
+          {sorted.map((r) => {
+            const has = (r.ans || 0) + (r.seen || 0) > 0;
+            return (
+              <React.Fragment key={r.id}>
+                <div style={{ color: has ? C.text : C.muted, fontWeight: 700 }}>{L(r.name)}</div>
+                <div style={{ color: C.muted, fontVariantNumeric: "tabular-nums" }}>{r.size}</div>
+                <div style={{ color: C.text, fontVariantNumeric: "tabular-nums" }}>{r.ans != null ? r.ans : `${r.seen}${en ? " seen" : "問"}`}</div>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  {r.acc != null ? <><div style={{ flex: 1, height: 6, background: C.surface2, borderRadius: 3, overflow: "hidden" }}><div style={{ width: r.acc + "%", height: "100%", background: accCol(r.acc) }} /></div><span style={{ color: C.text, fontVariantNumeric: "tabular-nums", width: 34, textAlign: "right" }}>{r.acc}%</span></> : <span style={{ color: C.dim }}>—</span>}
+                </div>
+                <div style={{ color: r.weak ? C.wineInk : C.dim }}>{r.weak || "—"}</div>
+                <div style={{ color: r.review ? C.gold : C.dim, fontVariantNumeric: "tabular-nums" }}>{r.review ? `${r.review}` : "0"}<span style={{ fontSize: 10, color: C.dim }}> {L(r.reviewL)}</span></div>
+                <button className="gh-btn" onClick={() => go(r.open)} style={{ fontSize: 11, padding: "3px 9px" }}>{has ? (en ? "Open" : "開く") : (en ? "Start" : "始める")}</button>
+              </React.Fragment>
+            );
+          })}
+        </div>
+      </div>
+    </Card>
+  );
+}
+
 function TabStrategy({ radarCur, onRadarChange }) {
   const lang = useLang();
   const axisLabels = lang === "en" ? RADAR.axesEn : RADAR.axes;
@@ -138360,6 +138445,7 @@ function TabStrategy({ radarCur, onRadarChange }) {
     <div>
       <SectionTitle jp="ビジネスサイドからAIアーキテクトへ" en="Positioning" />
       <LearningHome />
+      <TechHubRecords />
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%, 300px),1fr))", gap: 16 }}>
         <Card>
           <div style={{ fontSize: 13, color: C.gold, marginBottom: 8, fontWeight: 700 }}>{t(lang, "st_radar")}</div>
