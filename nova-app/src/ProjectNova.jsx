@@ -122529,6 +122529,8 @@ SECTIONS.push({
   });
 })();
 
+  // 弱点レーダー用：セクションごとのクイズの正誤（kb_<セクション>_progress_v1 = { 問題id: { picked, correct } }）
+  App.WEAK_KEYS = () => SECTIONS.map((x) => ({ key: "kb_" + x.id + "_progress_v1", label: [(x.no ? x.no + ". " : "") + (x.title ? x.title.ja : x.id), (x.no ? x.no + ". " : "") + (x.title ? x.title.en : x.id)] }));
   // ポータルの横断検索に出すセクション
   App.PORTAL_INDEX = (en) => SECTIONS.map((x) => ({ label: (x.no ? x.no + ". " : "") + (x.title ? x.title[en ? "en" : "ja"] : x.id), sub: (en ? "Finance · " : "Finance・") + (x.sub ? x.sub[en ? "en" : "ja"] : ""), hash: "finance/" + x.id, extra: x.title ? [x.title.ja, x.title.en, x.sub && x.sub.ja].join(" ") : "" }));
   return App;
@@ -230614,6 +230616,24 @@ function LinguisticsHub() {
 }
   // ポータルの目次タグに分野数を出すため。
   LinguisticsHub.FIELD_STATS = { cats: CATEGORIES.length, fields: CATEGORIES.reduce((a, c) => a + (c.fields || []).length, 0) };
+  // 弱点レーダー用：進捗（"分類:分野:問題id" = 正解済み、"wrong:分類:分野:問題id" = 間違えた）から分類ごとの解答数・正解数を数える
+  LinguisticsHub.WEAK_TABLE = (prog) => {
+    if (!prog || typeof prog !== "object") return [];
+    const cats = Object.fromEntries(CATEGORIES.map((c) => [c.id, c]));
+    const subIds = new Set();
+    CATEGORIES.forEach((c) => (c.fields || []).forEach((f) => (f.sub || []).forEach((sb) => subIds.add(c.id + ":" + f.id + ":" + sb.id))));
+    const att = {}, ok = {};
+    Object.entries(prog).forEach(([k, v]) => {
+      if (v !== true) return;
+      const wrong = k.startsWith("wrong:");
+      const base = wrong ? k.slice(6) : k;
+      const seg = base.split(":");
+      if (seg.length < 3 || !cats[seg[0]] || subIds.has(base) || !(cats[seg[0]].fields || []).some((f) => f.id === seg[1])) return;
+      (att[seg[0]] = att[seg[0]] || new Set()).add(base);
+      if (!wrong) (ok[seg[0]] = ok[seg[0]] || new Set()).add(base);
+    });
+    return Object.keys(att).map((cid) => ({ dom: [cats[cid].ja, cats[cid].en], a: att[cid].size, c: ok[cid] ? ok[cid].size : 0 }));
+  };
   // ポータルの横断検索に出す分類・分野
   LinguisticsHub.PORTAL_INDEX = (en) => {
     const out = [];
@@ -231709,6 +231729,31 @@ const NOVA_REVIEW_KEYS = [
   "gh300_review_v1", "gh600_review_v1", "gh900_review_v1",
   "sc500_review_v1", "sc900_review_v1", "cca_f_wrong_v1",
 ];
+// 形式が WEAK_SOURCES と違うハブ（Finance・Linguistics・Language・Liberal Arts・Book-Summary）。
+// keys() の値を読み、read() で [{ dom: [日本語, English], a: 解答数, c: 正解数 }] に直す。
+const NOVA_WEAK_EXTRA = [
+  { hub: ["Finance Hub", "Finance Hub"], keys: () => (FinanceHubModule.WEAK_KEYS ? FinanceHubModule.WEAK_KEYS() : []).map((x) => x.key),
+    read: (vals) => (FinanceHubModule.WEAK_KEYS ? FinanceHubModule.WEAK_KEYS() : []).map((x) => {
+      const v = vals[x.key]; if (!v || typeof v !== "object") return null;
+      let a = 0, c = 0; Object.values(v).forEach((r) => { if (r && typeof r === "object" && "picked" in r) { a++; if (r.correct) c++; } });
+      return a ? { dom: x.label, a, c } : null;
+    }).filter(Boolean) },
+  { hub: ["Linguistics Hub", "Linguistics Hub"], keys: () => ["linguistics-hub-progress-v2"],
+    read: (vals) => (LinguisticsHubModule.WEAK_TABLE ? LinguisticsHubModule.WEAK_TABLE(vals["linguistics-hub-progress-v2"]) : []) },
+  { hub: ["Language Hub", "Language Hub"], keys: () => ["quiz-stats"],
+    read: (vals) => { const v = vals["quiz-stats"] || {}; const N = { es: ["スペイン語", "Spanish"], de: ["ドイツ語", "German"], fr: ["フランス語", "French"] };
+      return Object.keys(N).map((k) => (v[k] && Number(v[k].totalAttempts) > 0 ? { dom: N[k], a: Number(v[k].totalAttempts), c: Number(v[k].totalCorrect) || 0 } : null)).filter(Boolean); } },
+  { hub: ["Liberal Arts", "Liberal Arts"], keys: () => ["lah:store:v1"],
+    read: (vals) => { let st = null; try { st = JSON.parse((vals["lah:store:v1"] || {})["lah:v1"] || "null"); } catch (e) {}
+      const q = st && st.quiz; return q && Number(q.asked) > 0 ? [{ dom: ["雑学クイズ", "Trivia quiz"], a: Number(q.asked), c: Number(q.right) || 0 }] : []; } },
+  { hub: ["Book-Summary", "Book-Summary"], keys: () => ["bsh:store:v1"],
+    read: (vals) => { let qz = null; try { qz = JSON.parse((vals["bsh:store:v1"] || {})["booksummaryhub:quiz:v1"] || "null"); } catch (e) {}
+      const g = {};
+      Object.entries((qz && qz.q) || {}).forEach(([k, r]) => { const id = k.slice(0, k.lastIndexOf("#")); const kind = id.startsWith("yt_") ? "yt" : id.startsWith("note_") ? "note" : "book";
+        g[kind] = g[kind] || { a: 0, c: 0 }; g[kind].a += Number(r && r.seen) || 0; g[kind].c += Number(r && r.correct) || 0; });
+      const LB = { book: ["書籍のクイズ", "Book quizzes"], yt: ["YouTube のクイズ", "YouTube quizzes"], note: ["note のクイズ", "note quizzes"] };
+      return Object.entries(g).filter(([, v]) => v.a > 0).map(([k, v]) => ({ dom: LB[k], a: v.a, c: v.c })); } },
+];
 const novaReviewLabel = (k) => NOVA_CERT_NAME(k.replace(/_(review|wrong)_v\d+$/, ""));
 
 function NovaWeakRadar({ lang }) {
@@ -231734,6 +231779,14 @@ function NovaWeakRadar({ lang }) {
         out.push({ hub: src.hub, dom: lb, a, c, acc: c / a });
       });
       if (!found) out.push({ hub: src.hub, empty: true });
+    }
+    for (const ex of NOVA_WEAK_EXTRA) {
+      const vals = {};
+      for (const k of ex.keys()) { try { const r = await window.storage.get(k); if (r && r.value) vals[k] = JSON.parse(r.value); } catch (e) {} }
+      let got = [];
+      try { got = ex.read(vals) || []; } catch (e) { got = []; }
+      if (!got.length) { out.push({ hub: ex.hub, empty: true }); continue; }
+      got.forEach((r) => out.push({ hub: ex.hub, dom: r.dom[en ? 1 : 0], a: r.a, c: r.c, acc: r.a ? r.c / r.a : 0 }));
     }
     const q = [];
     for (const k of NOVA_REVIEW_KEYS) {
@@ -231837,7 +231890,7 @@ function NovaWeakRadar({ lang }) {
                 );
               })()}
               <div style={{ fontSize: 10.5, color: NOVA.faint, marginTop: 10, lineHeight: 1.6 }}>
-                {en ? "Records live in this device's storage only; the radar covers the hubs whose formats it can read (Consulting Hub applied quizzes and mocks, TechHub checks, AICX, the nine governance stations, the governance dojo, PL-900) plus the review queues of 14 certification banks." : "記録はこの端末内のみ。対応形式のハブ（Consulting Hub の応用クイズ・模試、TechHub理解度チェック・AICX・ガバナンス9資格・ガバナンス道場・PL-900）と、資格14バンクの誤答キューを対象にしています。"}
+                {en ? "Records live in this device's storage only; the radar covers the hubs whose formats it can read (Consulting Hub applied quizzes and mocks, TechHub checks, AICX, the nine governance stations, the governance dojo, PL-900, Finance section quizzes, Linguistics fields, Language Hub quizzes, Liberal Arts trivia and Book-Summary quizzes) plus the review queues of 14 certification banks." : "記録はこの端末内のみ。対応形式のハブ（Consulting Hub の応用クイズ・模試、TechHub理解度チェック・AICX・ガバナンス9資格・ガバナンス道場・PL-900、Finance の各セクションのクイズ、Linguistics の各分野、Language Hub のクイズ、Liberal Arts の雑学、Book-Summary のクイズ）と、資格14バンクの誤答キューを対象にしています。"}
               </div>
             </>
           )}
