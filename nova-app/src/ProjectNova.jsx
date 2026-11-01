@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback, useContext, createContext } from "react";
 import { Waves, Clock3, Users, Brain, Cpu, BookOpen, Layers, ChevronRight, ArrowLeft, Check, Circle, X, Star, Sun, Moon, Globe, RotateCcw } from "lucide-react";
-// 完成版 Book-Summary ハブ（flier・Kindle・YouTube・note・Instagram の要約、検索・クイズ・メモ付き。件数はポータルがこの文字列から数える）を素の文字列として取り込み、
-// 実行時に Blob URL 化して iframe に読み込む（単一ファイルでもスクリプトが実行される）。
-import BOOK_SUMMARY_HTML from "../public/booksummaryhub.html?raw";
+// Book-Summary ハブ（public/booksummaryhub.html）とリベラルアーツ（public/liberal-arts.html）は本体に埋め込まず、
+// ハブを開いたときに別ファイルとして読み込む（novaHubHtml）。ポータルの件数はビルド時に数えた __NOVA_HUB_STATS__ を使う。
 // 学習ロードマップ トラッカー（資格/Tools/講座/書籍/Udemy の一元管理・自動保存つき表アプリ）
 import LEARNING_TRACKER_HTML from "../public/learning-tracker.html?raw";
 // Anything Memo トラッカー（調べ済みノートの一覧・検索・ジャンル別・自動保存）
 import ANYTHING_MEMO_HTML from "../public/anything-memo.html?raw";
-import LIBERAL_ARTS_HTML from "../public/liberal-arts.html?raw";
 // TechHub「AIフォーサイト」のブリーフと情報源ライブラリ（情報源は月次メンテナンスで nova-app/scripts/foresight_linkcheck.py が更新する）
 import FORESIGHT from "./data/foresight-briefs.json";
 import FORESIGHT_SOURCES from "./data/foresight-sources.json";
@@ -219169,7 +219167,35 @@ function QuizPanel({lang,t,voiceURI}){
 }
   return App;
 })();
-// ================= BookSummaryModule (source: booksummaryhub.html, embedded as isolated iframe) =================
+// ================= 別ファイルのハブ HTML の読み込み =================
+// 大きいハブ（Book-Summary・リベラルアーツ）は本体の index.html に埋め込まず、同じ場所に置いた別ファイルを
+// 開いたときに1回だけ読み込む。読み込めない場合（file:// で直接開いたときは fetch が使えない）は、ファイルを直接開く案内を出す。
+const __novaHubHtml = {};
+function novaHubHtml(file) {
+  if (!__novaHubHtml[file]) {
+    const pr = fetch(new URL(file, window.location.href).href).then((r) => { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); });
+    __novaHubHtml[file] = pr;
+    pr.catch(() => { if (__novaHubHtml[file] === pr) delete __novaHubHtml[file]; });
+  }
+  return __novaHubHtml[file];
+}
+function NovaHubStatus({ state, file, name }) {
+  const box = { maxWidth: 560, margin: "48px auto", padding: "20px 22px", borderRadius: 12, border: "1px solid #3A3350", background: "#1E1832", color: "#EDE8F4", fontSize: 14, lineHeight: 1.8 };
+  if (state === "fail") {
+    return (
+      <div role="alert" style={box}>
+        <div style={{ fontWeight: 800, marginBottom: 6 }}>{name} を読み込めませんでした</div>
+        <div style={{ color: "#ADA4C6" }}>
+          ネット接続を確かめて、もう一度開いてください。index.html をファイルとして直接開いている場合は、同じフォルダにある
+          <a href={file} target="_blank" rel="noreferrer" style={{ color: "#8FA2FF", margin: "0 4px" }}>{file}</a>
+          を直接開いてください（その場合の進捗は、この画面の中で開いたときとは別に保存されます）。
+        </div>
+      </div>
+    );
+  }
+  return <div role="status" style={{ ...box, textAlign: "center", color: "#ADA4C6" }}>{name} を読み込んでいます…</div>;
+}
+// ================= BookSummaryModule (source: booksummaryhub.html, loaded on open into an isolated iframe) =================
 // ユーザーが作り込んだ完成版 Book-Summary ハブ（独自ダークモード / 全書籍検索 / クイズ /
 // メモ / localStorage 永続化 / 履歴ナビ）を、React へ変換せずそのまま iframe に埋め込む。
 // srcDoc の iframe は親ページと同一オリジンで動くため localStorage を共有し、進捗も残る。
@@ -219189,10 +219215,11 @@ const BookSummaryModule = (function () {
     // これで Book-Summary の既読・クイズ・メモ・テーマがダブルクリック起動でも永続化される。
     // 親の localStorage は右下「進捗を保存/復元」のバックアップ対象にも含まれる。
     const ref = useRef(null);
+    const [st, setSt] = useState("loading");
     useEffect(() => {
       const iframe = ref.current;
       if (!iframe) return;
-
+      let alive = true, url = null;
       let mirror = {};
       try {
         mirror = JSON.parse(window.localStorage.getItem(BSH_STORE_KEY) || "{}") || {};
@@ -219224,7 +219251,6 @@ const BookSummaryModule = (function () {
         "/script>";
       // iframe は blob: の文書なので相対 URL が解決できない。図解などの静的ファイル（public/ 配下）は親ページの場所から読む
       const assetBase = "<script>window.__NOVA_ASSET_BASE__=" + JSON.stringify(new URL(".", window.location.href).href) + ";</" + "script>";
-      const html = BOOK_SUMMARY_HTML.replace("<head>", "<head>" + bridge + assetBase);
 
       const onMsg = (ev) => {
         const d = ev.data;
@@ -219241,20 +219267,28 @@ const BookSummaryModule = (function () {
       };
       window.addEventListener("message", onMsg);
 
-      const blob = new Blob([html], { type: "text/html" });
-      const url = URL.createObjectURL(blob);
-      iframe.src = url;
+      novaHubHtml("booksummaryhub.html").then((src) => {
+        if (!alive) return;
+        const html = src.replace("<head>", "<head>" + bridge + assetBase);
+        url = URL.createObjectURL(new Blob([html], { type: "text/html" }));
+        iframe.src = url;
+        setSt("ok");
+      }).catch(() => { if (alive) setSt("fail"); });
       return () => {
+        alive = false;
         window.removeEventListener("message", onMsg);
-        URL.revokeObjectURL(url);
+        if (url) URL.revokeObjectURL(url);
       };
     }, []);
     return (
-      <iframe
-        ref={ref}
-        title="Book Summary 統合戦略ハブ"
-        style={{ width: "100%", height: "calc(100vh - 46px)", border: "none", display: "block" }}
-      />
+      <>
+        {st !== "ok" ? <NovaHubStatus state={st} file="booksummaryhub.html" name="Book-Summary" /> : null}
+        <iframe
+          ref={ref}
+          title="Book Summary 統合戦略ハブ"
+          style={{ width: "100%", height: "calc(100vh - 46px)", border: "none", display: st === "ok" ? "block" : "none" }}
+        />
+      </>
     );
   }
   return BookSummaryModule;
@@ -221708,15 +221742,17 @@ const SideWorkHubModule = (function () {
   }
   return SideWorkHub;
 })();
-// ================= LiberalArtsModule（source: liberal-arts.html, Blob-embedded） =================
+// ================= LiberalArtsModule（source: liberal-arts.html, loaded on open, Blob iframe） =================
 // 領域（音楽など）→ 年表 → 人物カード → 関連する言葉、とたどるリベラルアーツ。既読と成績は端末に保存する。
 const LiberalArtsModule = (function () {
   const LAH_STORE_KEY = "lah:store:v1";
   function LiberalArtsModule() {
     const ref = useRef(null);
+    const [st, setSt] = useState("loading");
     useEffect(() => {
       const iframe = ref.current;
       if (!iframe) return;
+      let alive = true, url = null;
       let mirror = {};
       try { mirror = JSON.parse(window.localStorage.getItem(LAH_STORE_KEY) || "{}") || {}; } catch (e) { mirror = {}; }
       const seedJson = JSON.stringify(mirror).replace(/</g, "\\u003c");
@@ -221735,7 +221771,6 @@ const LiberalArtsModule = (function () {
         "try{Object.defineProperty(window,'localStorage',{configurable:true,get:function(){return fake;}});}catch(e){}" +
         "}catch(e){}})();<" +
         "/script>";
-      const html = LIBERAL_ARTS_HTML.replace("<head>", "<head>" + bridge);
       const onMsg = (ev) => {
         const d = ev.data;
         if (!d || d.__lah !== 1) return;
@@ -221748,13 +221783,20 @@ const LiberalArtsModule = (function () {
         } catch (e) { /* ignore */ }
       };
       window.addEventListener("message", onMsg);
-      const blob = new Blob([html], { type: "text/html" });
-      const url = URL.createObjectURL(blob);
-      iframe.src = url;
-      return () => { window.removeEventListener("message", onMsg); URL.revokeObjectURL(url); };
+      novaHubHtml("liberal-arts.html").then((src) => {
+        if (!alive) return;
+        const html = src.replace("<head>", "<head>" + bridge);
+        url = URL.createObjectURL(new Blob([html], { type: "text/html" }));
+        iframe.src = url;
+        setSt("ok");
+      }).catch(() => { if (alive) setSt("fail"); });
+      return () => { alive = false; window.removeEventListener("message", onMsg); if (url) URL.revokeObjectURL(url); };
     }, []);
     return (
-      <iframe ref={ref} title="リベラルアーツ" style={{ width: "100%", height: "calc(100vh - 46px)", border: "none", display: "block" }} />
+      <>
+        {st !== "ok" ? <NovaHubStatus state={st} file="liberal-arts.html" name="リベラルアーツ" /> : null}
+        <iframe ref={ref} title="リベラルアーツ" style={{ width: "100%", height: "calc(100vh - 46px)", border: "none", display: st === "ok" ? "block" : "none" }} />
+      </>
     );
   }
   return LiberalArtsModule;
@@ -230604,14 +230646,13 @@ function IconMemo({ color, size }) {
 let __novaStats = null;
 const novaStats = () => {
   if (__novaStats) return __novaStats;
-  const h = BOOK_SUMMARY_HTML;
-  const cnt = (needle) => { let n = 0, i = h.indexOf(needle); while (i >= 0) { n++; i = h.indexOf(needle, i + needle.length); } return n; };
+  const hs = __NOVA_HUB_STATS__;
   const sum = (rows) => rows.reduce((a, r) => a + r.qn, 0);
   __novaStats = {
-    books: cnt('"oneLiner":'), yt: cnt('{"id":"yt_'), note: cnt('{"id":"note_'), flier: (h.slice(h.indexOf('const DATA = ['), h.indexOf('const THEME_SYNTHESIS')).match(/"oneLiner":/g) || []).length, listOnly: cnt('"listOnly":true'),
+    books: hs.books, yt: hs.yt, note: hs.note, flier: hs.flier, listOnly: hs.listOnly,
     mega: sum(BOOTCAMP_QUEST.mega), cons: sum(BOOTCAMP_QUEST.cons),
     tabs: MegaTechHubModule.TAB_COUNT, ling: LinguisticsHubModule.FIELD_STATS,
-    la: { people: (LIBERAL_ARTS_HTML.match(/"born":\d+/g) || []).length, inst: (LIBERAL_ARTS_HTML.match(/"people":\[/g) || []).length, trivia: (LIBERAL_ARTS_HTML.match(/"f":"/g) || []).length, domains: (LIBERAL_ARTS_HTML.match(/"ready":(true|false)/g) || []).length },
+    la: hs.la,
   };
   return __novaStats;
 };
