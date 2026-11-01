@@ -166102,6 +166102,40 @@ const govHasUnc = (o) => GOV_UNCONF.test(JSON.stringify({ ...o, src: undefined }
 const govIsApp = (r) => /当てはめ/.test(JSON.stringify(r.note || "")) || /当てはめ/.test(JSON.stringify(r.ai || ""));
 const GOVGAP_ST = [["", "未評価", "Not assessed", C.line], ["done", "対応済", "Done", C.teal], ["part", "一部", "Partly", C.gold], ["todo", "未対応", "Not done", C.wine], ["na", "対象外", "Not applicable", C.dim]];
 const GOVGAP_KEY = "govdojo_gap_v1", GOVPROF_KEY = "govdojo_profile_v1";
+// これから12か月の期限を1本の帯に並べる（点の色は拘束力。近い点は段をずらす）
+const GOV_MON_EN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+function GovYearStrip({ en, today, list }) {
+  const [hi, setHi] = useState(null);
+  const W = 900, P = 16, t0 = govDay(today), t1 = t0 + 365 * 86400000;
+  const X = (d) => P + ((Math.min(t1, Math.max(t0, govDay(govEnd(d)))) - t0) / (t1 - t0)) * (W - 2 * P);
+  const pts = list.map((u, i) => ({ ...u, i, x: X(u.d) })).sort((a, b) => a.x - b.x);
+  const ends = []; // 段ごとの、ラベルの右端
+  pts.forEach((p) => { const w = Math.min(150, 10 + Math.min(14, p.label.length) * (en ? 5.6 : 9.5)); let lane = ends.findIndex((e) => e < p.x - 4); if (lane < 0) { lane = ends.length; ends.push(0); } ends[lane] = p.x + w; p.lane = lane; p.w = w; });
+  const lanes = Math.max(1, ends.length), H = 34 + lanes * 16;
+  const [y0, m0] = today.split("-").map(Number);
+  const ticks = Array.from({ length: 13 }, (_, k) => { const m = (m0 - 1 + k) % 12, y = y0 + Math.floor((m0 - 1 + k) / 12); const d = `${y}-${String(m + 1).padStart(2, "0")}-01`; return { d, x: X(d), l: en ? GOV_MON_EN[m] : `${m + 1}月`, y: m === 0 ? String(y) : "" }; }).filter((t) => govDay(t.d) >= t0);
+  return (
+    <div style={{ margin: "4px 0 8px" }}>
+      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", display: "block" }} role="img" aria-label={en ? "Deadlines in the next 12 months" : "これから12か月の期限"}>
+        <line x1={P} y1="20" x2={W - P} y2="20" stroke={C.line} strokeWidth="2" />
+        {ticks.map((t) => <g key={t.d}><line x1={t.x} y1="16" x2={t.x} y2="24" stroke={C.line} /><text x={t.x} y="11" textAnchor="middle" fill={C.dim} fontSize="8.5">{t.l}{t.y ? ` ${t.y}` : ""}</text></g>)}
+        <text x={P} y={H - 2} fill={C.dim} fontSize="8">{en ? "today" : "今日"}</text>
+        {pts.map((p) => {
+          const y = 34 + p.lane * 16, on = hi === p.i;
+          return (
+            <g key={p.i} onMouseEnter={() => setHi(p.i)} onMouseLeave={() => setHi(null)} style={{ cursor: "default" }}>
+              <line x1={p.x} y1="20" x2={p.x} y2={y - 4} stroke={p.col} strokeOpacity={on ? 1 : 0.45} />
+              <circle cx={p.x} cy="20" r={on ? 5.5 : 4.5} fill={p.col} stroke={C.surface} strokeWidth="2" />
+              <text x={p.x + 3} y={y} fill={on ? C.text : C.muted} fontSize="9" fontWeight={on ? 700 : 500}>{p.label.length > 14 ? p.label.slice(0, 13) + "…" : p.label}</text>
+              <title>{`${p.d}　${p.label}：${p.ev}`}</title>
+            </g>
+          );
+        })}
+      </svg>
+      <GvLegend en={en} items={[[GV_COL.law, GOVX_L(GV_BIND_L.law, en)], [GV_COL.gov, GOVX_L(GV_BIND_L.gov, en)], [GV_COL.soft, GOVX_L(GV_BIND_L.soft, en)]]} />
+    </div>
+  );
+}
 function GovProfile({ en, init, onTab }) {
   const L = (v) => GOVX_L(v, en);
   const today = govToday();
@@ -166114,6 +166148,8 @@ function GovProfile({ en, init, onTab }) {
   const [dec, setDec] = useState([]);
   const [open, setOpen] = useState(null);
   const [only, setOnly] = useState("all");
+  const [focus, setFocus] = useState(null); // { a: 領域, st: 状態 or null }：充足度のバーから絞る
+  const listTop = useRef(null);
   const [loaded, setLoaded] = useState(false);
   // 端末に保存した評価と選択を読み込む（共有リンクで開いたときは、リンクの選択を優先する）
   useEffect(() => {
@@ -166156,7 +166192,8 @@ function GovProfile({ en, init, onTab }) {
   ];
   const G = (k) => gap[k] || {};
   const noEv = (k) => G(k).st === "done" && !(G(k).ev || "").trim();
-  const shown = (k) => only === "all" || (only === "unrated" && !G(k).st) || (only === "gap" && (G(k).st === "todo" || G(k).st === "part")) || (only === "noev" && noEv(k));
+  const shown = (k) => inFocus(k) && shownBy(k);
+  const shownBy = (k) => only === "all" || (only === "unrated" && !G(k).st) || (only === "gap" && (G(k).st === "todo" || G(k).st === "part")) || (only === "noev" && noEv(k));
   const cnt = (st) => items.filter((it) => (G(it.k).st || "") === st).length;
   const scored = items.filter((it) => G(it.k).st !== "na");
   const pct = (list) => { const n = list.filter((it) => G(it.k).st !== "na").length; return n ? Math.round((list.filter((it) => G(it.k).st === "done").length + 0.5 * list.filter((it) => G(it.k).st === "part").length) / n * 100) : null; };
@@ -166165,6 +166202,12 @@ function GovProfile({ en, init, onTab }) {
     ...(base.length + regs.length ? [[en ? "Laws & guidelines in your markets" : "選んだ地域の規制・指針", items.filter((it) => it.sec !== "ind")]] : []),
     ...GOVIND_TH.map(([t, ja, enl]) => [en ? enl : ja, items.filter((it) => it.sec === "ind" && (it.r.themes || []).includes(t))]).filter(([, l]) => l.length),
   ];
+  const focusKeys = focus ? new Set(((bars.find((x) => x[0] === focus.a) || [null, []])[1]).map((it) => it.k)) : null;
+  const inFocus = (k) => !focusKeys || (focusKeys.has(k) && (focus.st == null || (G(k).st || "") === focus.st));
+  const pickFocus = (a, st) => {
+    setFocus(focus && focus.a === a && focus.st === st ? null : { a, st });
+    setTimeout(() => { try { listTop.current && listTop.current.scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) {} }, 30);
+  };
   const upcoming12 = dl.filter((u) => govDay(govEnd(u.d)) <= govDay(today) + 365 * 86400000);
   const binding = items.filter((it) => it.sec !== "ind" && it.bind);
   const soonIds = new Set(upcoming12.map((u) => u.id));
@@ -166229,11 +166272,17 @@ function GovProfile({ en, init, onTab }) {
       {k ? <Assess k={k} /> : null}
     </div>
   );
-  const Bar = ({ list }) => {
+  // 状態ごとの積み上げ。区切りを押すと、その領域のその状態の規定に絞る
+  const Bar = ({ list, label }) => {
     const n = list.length || 1;
     return (
-      <div style={{ display: "flex", height: 12, borderRadius: 6, overflow: "hidden", background: C.surface2 }}>
-        {[["done", C.teal], ["part", C.gold], ["todo", C.wine], ["", C.line], ["na", C.surface2]].map(([st, col]) => { const c = list.filter((it) => (G(it.k).st || "") === st).length; return c ? <div key={st || "none"} title={`${stL(st)}: ${c}`} style={{ width: `${(c / n) * 100}%`, background: col }} /> : null; })}
+      <div style={{ display: "flex", height: 18, borderRadius: 6, overflow: "hidden", background: C.surface2, gap: 2 }}>
+        {[["done", C.teal, C.bg], ["part", C.gold, C.bg], ["todo", C.wine, C.text], ["", C.line, C.text], ["na", C.dim, C.text]].map(([st, col, ink]) => {
+          const c = list.filter((it) => (G(it.k).st || "") === st).length;
+          if (!c) return null;
+          const on = focus && focus.a === label && focus.st === st;
+          return <button key={st || "none"} onClick={() => pickFocus(label, st)} title={`${label} — ${stL(st)}: ${c}${en ? " (click to list them)" : "（押すと一覧で絞る）"}`} aria-label={`${label} ${stL(st)} ${c}`} style={{ width: `${(c / n) * 100}%`, minWidth: 6, background: col, border: "none", padding: 0, cursor: "pointer", color: ink, fontSize: 10, fontWeight: 800, outline: on ? `2px solid ${C.text}` : "none", outlineOffset: -2 }}>{c / n >= 0.09 ? c : ""}</button>;
+        })}
       </div>
     );
   };
@@ -166301,11 +166350,19 @@ ${dec.length ? "<table><tr><th>" + esc(en ? "Decision" : "事項") + "</th><th>"
           {bars.length ? (
             <>
               <GV_H>{en ? "Coverage by area" : "領域ごとの充足度"}</GV_H>
-              <GV_SUB>{en ? "Teal done, gold partly, red not done, grey not assessed. Industry rules count under each of their themes." : "緑＝対応済、金＝一部、赤＝未対応、灰＝未評価。業界の規定は、付いているテーマごとに数える。"}</GV_SUB>
+              <GV_SUB>{en ? "Industry rules count under each of their themes. Click an area name or a coloured part to list those rules below." : "業界の規定は、付いているテーマごとに数える。領域名や色の部分を押すと、下の一覧をその規定に絞る。"}</GV_SUB>
+              <GvLegend en={en} items={[[C.teal, stL("done")], [C.gold, stL("part")], [C.wine, stL("todo")], [C.line, stL("")], [C.dim, stL("na")]]} />
               <div style={{ display: "grid", gridTemplateColumns: "minmax(110px,190px) minmax(0,1fr) 44px", gap: "4px 8px", alignItems: "center", marginBottom: 6 }}>
-                {bars.map(([label, list]) => <React.Fragment key={label}><div style={{ fontSize: 11.5, color: C.muted }}>{label}<span style={{ color: C.dim }}>（{list.length}）</span></div><Bar list={list} /><div style={{ fontSize: 11.5, color: C.text, textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{pct(list) == null ? "-" : pct(list) + "%"}</div></React.Fragment>)}
+                {bars.map(([label, list]) => <React.Fragment key={label}><button onClick={() => pickFocus(label, null)} title={en ? "List the rules in this area" : "この領域の規定を一覧で見る"} style={{ fontSize: 11.5, color: focus && focus.a === label ? C.gold : C.muted, background: "transparent", border: "none", padding: 0, textAlign: "left", cursor: "pointer" }}>{label}<span style={{ color: C.dim }}>（{list.length}）</span></button><Bar list={list} label={label} /><div style={{ fontSize: 11.5, color: C.text, textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{pct(list) == null ? "-" : pct(list) + "%"}</div></React.Fragment>)}
               </div>
             </>
+          ) : null}
+          <div ref={listTop} style={{ scrollMarginTop: 70 }} />
+          {focus ? (
+            <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", background: C.surface2, border: `1px solid ${C.gold}`, borderRadius: 8, padding: "5px 10px", margin: "8px 0", fontSize: 11.5, color: C.text }}>
+              <span>{en ? "Showing: " : "絞り込み中："}<b>{focus.a}</b>{focus.st != null ? `・${stL(focus.st)}` : ""}（{items.filter((it) => inFocus(it.k)).length}{en ? "" : "件"}）</span>
+              <button onClick={() => setFocus(null)} style={{ fontSize: 11, padding: "1px 9px", borderRadius: 99, border: `1px solid ${C.line}`, background: "transparent", color: C.muted, cursor: "pointer" }}>{en ? "Clear ×" : "解除 ×"}</button>
+            </div>
           ) : null}
           <div style={{ display: "flex", gap: 5, flexWrap: "wrap", margin: "8px 0" }}>
             {[["all", en ? "All" : "すべて"], ["unrated", en ? "Not assessed" : "未評価"], ["gap", en ? "Not done / partly" : "未対応・一部"], ["noev", en ? "'Done' without evidence" : "根拠未記入"]].map(([k, lb]) => <Chip key={k} on={only === k} onClick={() => setOnly(k)}>{lb}</Chip>)}
@@ -166322,6 +166379,12 @@ ${dec.length ? "<table><tr><th>" + esc(en ? "Decision" : "事項") + "</th><th>"
           <div style={{ fontSize: 16, fontWeight: 800, color: C.text }}>{en ? "AI governance: where we stand (for executives)" : "AIガバナンス 現状の要点（経営層向け）"}</div>
           <div style={{ fontSize: 11, color: C.dim, margin: "2px 0 8px" }}>{(en ? "Industries: " : "業界：") + (sel.map(indL).join("・") || "-")}　{(en ? "Markets: " : "地域：") + mk.map(regL).join("・")}　{(en ? "Check date " : "確認日 ") + GOVREG_ASOF}　{(en ? "Made " : "作成日 ") + today}</div>
           <div style={{ fontSize: 11, color: C.wine, marginBottom: 10 }}>{en ? "Self-assessment, not audited. A learning summary, not legal advice — confirm at source." : "自己評価・未監査。学習用の整理で法的助言ではない。原典で確かめること。"}</div>
+          {upcoming12.length ? (
+            <div className="gov-noprint" style={{ marginBottom: 10 }}>
+              <div style={{ fontSize: 12, fontWeight: 800, color: C.text }}>{en ? "The next 12 months at a glance" : "これから12か月（一目で）"}<span style={{ fontSize: 10.5, color: C.dim, fontWeight: 500, marginLeft: 6 }}>{en ? "hover a point for the date and what happens" : "点にカーソルを当てると、日付と中身が出る"}</span></div>
+              <div className="gh-figscroll"><GovYearStrip en={en} today={today} list={upcoming12.map((u) => ({ d: u.d, label: L(u.x.short || u.x.name), ev: L(u.ev), col: GV_COL[govBind(u.x.kind)] }))} /></div>
+            </div>
+          ) : null}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,300px),1fr))", gap: 12 }}>
             <div>
               <div style={{ fontSize: 13, fontWeight: 800, color: C.text, marginBottom: 4 }}>{en ? `1. Deadlines in the next 12 months (${upcoming12.length})` : `1. これから12か月の期限（${upcoming12.length}件）`}</div>
