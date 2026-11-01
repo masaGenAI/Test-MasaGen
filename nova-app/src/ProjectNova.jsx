@@ -122832,7 +122832,8 @@ function diagramTitle(d, lang) { return lang === "en" ? (DIAGRAM_TITLE_EN[d.titl
 const C = {
   bg: "#141020", surface: "#1E1832", surface2: "#292044", line: "#3A3158",
   wine: "#B84A5E", wineDeep: "#7E2F44", teal: "#5FD3C2", gold: "#D8A94E",
-  text: "#EDE8F4", muted: "#9A90B4", dim: "#6E6488", fore: "#8FA2FF"
+  // 文字の色は背景（bg・surface・surface2）に対し 4.5:1 以上。wineInk は赤の文字用（wine は塗り・線・点に使う）
+  text: "#EDE8F4", muted: "#ADA4C6", dim: "#9187AE", fore: "#8FA2FF", wineInk: "#E57B89"
 };
 
 const GLOBAL_CSS = `
@@ -137860,7 +137861,7 @@ function IndustryView() {
                       <span style={{ fontSize: 12, lineHeight: 1.7 }}>{lang === "en" ? p.keyEn : p.key}</span>
                     </div>
                     <div style={{ background: C.surface2, borderRadius: 8, padding: "9px 11px", borderLeft: `3px solid ${C.wine}` }}>
-                      <span style={{ color: C.wine, fontWeight: 700, fontSize: 12 }}>⚠ {t(lang, "iv_watch")}</span>
+                      <span style={{ color: C.wineInk, fontWeight: 700, fontSize: 12 }}>⚠ {t(lang, "iv_watch")}</span>
                       <span style={{ fontSize: 12, lineHeight: 1.7 }}>{lang === "en" ? p.watchEn : p.watch}</span>
                     </div>
                   </div>
@@ -138051,14 +138052,14 @@ function ArchQuizView() {
       {lang === "en" && (
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10, fontSize: 11 }}>
           {transBusy && !tq && <span style={{ color: C.teal }}>{t(lang, "qz_translating")}</span>}
-          {transErr && !tq && <span style={{ color: C.wine }}>{transErr} <button className="gh-btn" style={{ fontSize: 10, padding: "2px 8px" }} onClick={() => translateItem(mode, idx, list[idx])}>↻</button></span>}
+          {transErr && !tq && <span style={{ color: C.wineInk }}>{transErr} <button className="gh-btn" style={{ fontSize: 10, padding: "2px 8px" }} onClick={() => translateItem(mode, idx, list[idx])}>↻</button></span>}
           {tq && <button className="gh-btn" style={{ fontSize: 10, padding: "2px 10px" }} onClick={() => setShowOrig((v) => !v)}>{showOrig ? t(lang, "qz_translate") : t(lang, "qz_showoriginal")}</button>}
         </div>
       )}
 
       {done && (
         <Card>
-          <div style={{ fontSize: 11, color: C.wine, letterSpacing: ".2em", marginBottom: 6 }}>{modeLabel}</div>
+          <div style={{ fontSize: 11, color: C.wineInk, letterSpacing: ".2em", marginBottom: 6 }}>{modeLabel}</div>
           <div className="gh-display" style={{ fontSize: 18, marginBottom: 8 }}>{lang === "en" ? "Mode complete" : "このモードを一周しました"}</div>
           <div style={{ fontSize: 14, color: C.teal, marginBottom: 14 }}>{t(lang, "aq_score")} {score[mode]} / {seen[mode]}（{seen[mode] ? Math.round(score[mode] / seen[mode] * 100) : 0}%）</div>
           <button className="gh-btn gh-btn-primary" onClick={restart}>{lang === "en" ? "Restart this mode" : "このモードをもう一度"}</button>
@@ -138069,7 +138070,7 @@ function ArchQuizView() {
       {/* ノード当て */}
       {!done && mode === "node" && (
         <Card>
-          <div style={{ fontSize: 11, color: C.wine, letterSpacing: ".2em", marginBottom: 6 }}>{modeLabel}（{idx + 1}/{list.length}）</div>
+          <div style={{ fontSize: 11, color: C.wineInk, letterSpacing: ".2em", marginBottom: 6 }}>{modeLabel}（{idx + 1}/{list.length}）</div>
           <div className="gh-display" style={{ fontSize: 17, marginBottom: 4 }}>{tq ? tq.ask : q.ask}</div>
           <div style={{ fontSize: 11.5, color: C.muted, marginBottom: 10 }}>{t(lang, "aq_clicknode")}</div>
           <ArchQuizDiagram diagram={DIAGRAMS[q.fig]} answered={answered} picked={picked} answer={q.answer}
@@ -138091,7 +138092,7 @@ function ArchQuizView() {
       {/* 四択 */}
       {!done && (mode === "choice" || mode === "order") && (
         <Card>
-          <div style={{ fontSize: 11, color: C.wine, letterSpacing: ".2em", marginBottom: 6 }}>{modeLabel}{lang === "en" ? " (" + (idx + 1) + "/" + list.length + ")" : "（" + (idx + 1) + "/" + list.length + "）"}</div>
+          <div style={{ fontSize: 11, color: C.wineInk, letterSpacing: ".2em", marginBottom: 6 }}>{modeLabel}{lang === "en" ? " (" + (idx + 1) + "/" + list.length + ")" : "（" + (idx + 1) + "/" + list.length + "）"}</div>
           <div className="gh-display" style={{ fontSize: 17, marginBottom: 12 }}>{tq ? tq.q : q.q}</div>
           <div style={{ display: "grid", gap: 8 }}>
             {q.opts.map((o, i) => {
@@ -138102,7 +138103,7 @@ function ArchQuizView() {
                 <button key={i} onClick={() => choose(i, isCorrect)} disabled={answered}
                         style={{ textAlign: "left", background: bg, border: `1px solid ${bd}`, borderRadius: 8, padding: "10px 12px", color: C.text, fontSize: 13, cursor: answered ? "default" : "pointer", lineHeight: 1.6 }}>
                   {answered && isCorrect && <span style={{ color: C.teal, fontWeight: 700 }}>✓ </span>}
-                  {answered && isPicked && !isCorrect && <span style={{ color: C.wine, fontWeight: 700 }}>✗ </span>}
+                  {answered && isPicked && !isCorrect && <span style={{ color: C.wineInk, fontWeight: 700 }}>✗ </span>}
                   {tq ? tq.opts[i] : o}
                 </button>
               );
@@ -138123,7 +138124,7 @@ function ArchQuizView() {
       {/* 空欄埋め */}
       {!done && mode === "fill" && (
         <Card>
-          <div style={{ fontSize: 11, color: C.wine, letterSpacing: ".2em", marginBottom: 6 }}>{modeLabel}（{idx + 1}/{list.length}）</div>
+          <div style={{ fontSize: 11, color: C.wineInk, letterSpacing: ".2em", marginBottom: 6 }}>{modeLabel}（{idx + 1}/{list.length}）</div>
           <div className="gh-display" style={{ fontSize: 16, marginBottom: 4 }}>{tq ? tq.title : q.title}</div>
           <div style={{ fontSize: 12, color: C.muted, marginBottom: 12 }}>{tq ? tq.desc : q.desc}</div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", marginBottom: 14 }}>
@@ -138167,14 +138168,14 @@ function ArchQuizView() {
       {/* アンチパターン */}
       {!done && mode === "anti" && (
         <Card>
-          <div style={{ fontSize: 11, color: C.wine, letterSpacing: ".2em", marginBottom: 6 }}>{modeLabel}（{idx + 1}/{list.length}）</div>
+          <div style={{ fontSize: 11, color: C.wineInk, letterSpacing: ".2em", marginBottom: 6 }}>{modeLabel}（{idx + 1}/{list.length}）</div>
           <div style={{ fontSize: 13.5, lineHeight: 1.8, background: C.surface2, borderRadius: 8, padding: "12px 14px", marginBottom: 12, borderLeft: `3px solid ${C.wine}` }}>
             {tq ? tq.scene : q.scene}
           </div>
           <div style={{ fontSize: 12, color: C.muted, marginBottom: 10 }}>{t(lang, "aq_antiq")}</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             <button className="gh-btn" onClick={() => choose("ok", false)} disabled={answered}
-                    style={answered && picked === "ok" ? { borderColor: C.wine, color: C.wine } : {}}>{t(lang, "aq_sound")}</button>
+                    style={answered && picked === "ok" ? { borderColor: C.wine, color: C.wineInk } : {}}>{t(lang, "aq_sound")}</button>
             <button className="gh-btn" onClick={() => choose("bad", true)} disabled={answered}
                     style={answered && picked === "bad" ? { borderColor: C.teal, color: C.teal } : {}}>{t(lang, "aq_hasproblem")}</button>
           </div>
@@ -138184,7 +138185,7 @@ function ArchQuizView() {
                 {(picked === "bad" ? t(lang, "correct") : t(lang, "wrong")) + " — " + t(lang, "aq_isanti")}
               </div>
               <div style={{ background: C.bg, borderRadius: 8, padding: "10px 12px", border: `1px solid ${C.line}` }}>
-                <div style={{ marginBottom: 6 }}><span style={{ color: C.wine, fontWeight: 700 }}>{t(lang, "aq_problem")}（{tq ? tq.bad : q.bad}）：</span>{tq ? tq.why : q.why}</div>
+                <div style={{ marginBottom: 6 }}><span style={{ color: C.wineInk, fontWeight: 700 }}>{t(lang, "aq_problem")}（{tq ? tq.bad : q.bad}）：</span>{tq ? tq.why : q.why}</div>
                 <div><span style={{ color: C.teal, fontWeight: 700 }}>{t(lang, "aq_fix")}</span>{tq ? tq.fix : q.fix}</div>
               </div>
             </div>
@@ -138323,7 +138324,7 @@ function LearningHome() {
       {/* 弱点テーマ */}
       {byWeak.length > 0 && (
         <div style={{ marginBottom: 12 }}>
-          <div style={{ fontSize: 11, color: C.wine, letterSpacing: ".1em", marginBottom: 8 }}>{t(lang, "lh_weak")}</div>
+          <div style={{ fontSize: 11, color: C.wineInk, letterSpacing: ".1em", marginBottom: 8 }}>{t(lang, "lh_weak")}</div>
           <div style={{ display: "grid", gap: 6 }}>
             {byWeak.slice(0, 5).map((r) => (
               <div key={r.cat} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11.5 }}>
@@ -138375,7 +138376,7 @@ function TabStrategy({ radarCur, onRadarChange }) {
             ))}
           </div>
           <div style={{ fontSize: 11, color: C.muted }}>
-            <span style={{ color: C.wine }}>{t(lang, "st_now")}</span>　<span style={{ color: C.teal }}>{t(lang, "st_target")}</span><br />
+            <span style={{ color: C.wineInk }}>{t(lang, "st_now")}</span>　<span style={{ color: C.teal }}>{t(lang, "st_target")}</span><br />
             {t(lang, "st_radarnote")}
           </div>
         </Card>
@@ -138827,7 +138828,7 @@ function McqView() {
           const catLabel2 = (c) => (lang === "en" ? (CAT_EN[c] || c) : c);
           return (
             <div style={{ marginBottom: 16, padding: "12px 14px", background: C.surface2, border: `1px solid ${weak.length > 0 ? C.wine : C.line}`, borderRadius: 8 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: C.wine, marginBottom: 6 }}>{t(lang, "qz_weak_title")}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: C.wineInk, marginBottom: 6 }}>{t(lang, "qz_weak_title")}</div>
               <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.7, marginBottom: weak.length > 0 ? 10 : 0 }}>
                 {weak.length > 0 ? t(lang, "qz_weak_desc") : t(lang, "qz_weak_none")}
               </div>
@@ -138839,7 +138840,7 @@ function McqView() {
                       <span key={r.cat} style={{ color: C.text }}>{i > 0 ? "、" : ""}{catLabel2(r.cat)}<span style={{ color: C.dim, fontSize: 10 }}>{lang === "en" ? " (" + r.dueCnt + " due)" : "（" + r.dueCnt + "問要復習）"}</span></span>
                     ))}
                   </div>
-                  <button className="gh-btn" style={{ borderColor: C.wine, color: C.wine }}
+                  <button className="gh-btn" style={{ borderColor: C.wine, color: C.wineInk }}
                           onClick={() => { const q = weakQuiz(); if (q.length > 0) { setCat(ALL); setDiff(0); setTermFilter(null); start(q); } }}>
                     {t(lang, "qz_weak_start")}
                   </button>
@@ -138995,7 +138996,7 @@ function McqView() {
         </div>
         {wrong.length > 0 && (
           <div style={{ fontSize: 12, lineHeight: 1.8, marginBottom: 12 }}>
-            <div style={{ color: C.wine, fontWeight: 700, marginBottom: 6 }}>{t(lang, "qz_wrongq")}（{wrong.length}）</div>
+            <div style={{ color: C.wineInk, fontWeight: 700, marginBottom: 6 }}>{t(lang, "qz_wrongq")}（{wrong.length}）</div>
             {wrong.map((qi) => {
               const wm = MCQS[qi];
               const wEn = lang === "en" && !showOrig;
@@ -139143,7 +139144,7 @@ function McqView() {
       {lang === "en" && (
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10, fontSize: 11 }}>
           {transBusy && !tr && !hasStatic && <span style={{ color: C.teal }}>{t(lang, "qz_translating")}</span>}
-          {transErr && !tr && !hasStatic && <span style={{ color: C.wine }}>{transErr} <button className="gh-btn" style={{ fontSize: 10, padding: "2px 8px" }} onClick={() => translateQ(qi, m)}>↻</button></span>}
+          {transErr && !tr && !hasStatic && <span style={{ color: C.wineInk }}>{transErr} <button className="gh-btn" style={{ fontSize: 10, padding: "2px 8px" }} onClick={() => translateQ(qi, m)}>↻</button></span>}
           {(tr || hasStatic || showOrig) && (
             <button className="gh-btn" style={{ fontSize: 10, padding: "2px 10px" }} onClick={() => setShowOrig((v) => !v)}>
               {showOrig ? t(lang, "qz_translate") : t(lang, "qz_showoriginal")}
@@ -139156,7 +139157,7 @@ function McqView() {
           const isAns = op.i === m.a;
           const st = picked === null ? {} :
             isAns ? { borderColor: C.teal, color: C.teal, fontWeight: 700 } :
-            k === picked ? { borderColor: C.wine, color: C.wine } : { opacity: 0.5 };
+            k === picked ? { borderColor: C.wine, color: C.wineInk } : { opacity: 0.5 };
           return (
             <button key={k} className="gh-btn" onClick={() => pick(k)}
                     style={{ textAlign: "left", lineHeight: 1.6, ...st }}>
@@ -139852,7 +139853,7 @@ function SysDesignDojo({ lang }) {
             {g(o.tradeoffs).map((x, i) => (<div key={i} style={{ fontSize: 12, color: C.text, lineHeight: 1.65, marginBottom: 3 }}>▸ {x}</div>))}
           </div>
           <div style={{ background: "rgba(180,70,70,.10)", borderRadius: 8, padding: "11px 13px", marginTop: 10 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: C.wine, marginBottom: 6 }}>{en ? "Weak-answer traps" : "弱い回答の罠"}</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: C.wineInk, marginBottom: 6 }}>{en ? "Weak-answer traps" : "弱い回答の罠"}</div>
             {g(o.pitfalls).map((x, i) => (<div key={i} style={{ fontSize: 12, color: C.text, lineHeight: 1.65, marginBottom: 3 }}>✗ {x}</div>))}
           </div>
           {diagram && (
@@ -139923,7 +139924,7 @@ function StarDrill({ lang }) {
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <button onClick={startAll} style={{ background: C.gold, color: "#1a1410", border: "none", borderRadius: 8, padding: "9px 18px", fontSize: 12.5, fontWeight: 800, cursor: "pointer" }}>{en ? `Start all (${N})` : `全${N}問を開始`}</button>
-          {weak.length ? <button onClick={() => start(shuffle(weak))} style={{ background: "transparent", color: C.wine, border: `1px solid ${C.wine}`, borderRadius: 8, padding: "9px 16px", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{en ? `Weak only (${weak.length})` : `弱点のみ (${weak.length})`}</button> : null}
+          {weak.length ? <button onClick={() => start(shuffle(weak))} style={{ background: "transparent", color: C.wineInk, border: `1px solid ${C.wine}`, borderRadius: 8, padding: "9px 16px", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{en ? `Weak only (${weak.length})` : `弱点のみ (${weak.length})`}</button> : null}
           {(c.o + c.d + c.x) ? <button onClick={() => setRatings({})} style={{ background: "transparent", color: C.muted, border: `1px solid ${C.line}`, borderRadius: 8, padding: "9px 14px", fontSize: 12, cursor: "pointer" }}>{en ? "Reset" : "記録リセット"}</button> : null}
         </div>
       </div>
@@ -139942,7 +139943,7 @@ function StarDrill({ lang }) {
         </div>
         {weak.length ? (
           <div style={{ marginBottom: 12 }}>
-            <div style={{ fontSize: 11.5, fontWeight: 700, color: C.wine, marginBottom: 5 }}>{en ? "Review these:" : "要復習のLP:"}</div>
+            <div style={{ fontSize: 11.5, fontWeight: 700, color: C.wineInk, marginBottom: 5 }}>{en ? "Review these:" : "要復習のLP:"}</div>
             <div style={{ display: "grid", gap: 3 }}>
               {weak.map((i) => (<div key={i} style={{ fontSize: 12, color: C.text }}><span style={{ color: RATE_COL[ratings[i]], fontWeight: 800, marginRight: 6 }}>{ratings[i] === "x" ? "×" : "△"}</span>{en ? B.lps[i].name : B.lps[i].nameJa}</div>))}
             </div>
@@ -140552,7 +140553,7 @@ function MockInterview() {
                 <div style={{ marginBottom: 6 }}><div style={{ color: C.teal, fontSize: 11, fontWeight: 700 }}>{en ? "Strengths" : "強み"}</div>{report.strengths.map((s, i) => <div key={i} style={{ color: C.muted }}>◎ {s}</div>)}</div>
               )}
               {Array.isArray(report.weaknesses) && report.weaknesses.length > 0 && (
-                <div style={{ marginBottom: 6 }}><div style={{ color: C.wine, fontSize: 11, fontWeight: 700 }}>{en ? "Weaknesses" : "弱み"}</div>{report.weaknesses.map((s, i) => <div key={i} style={{ color: C.muted }}>△ {s}</div>)}</div>
+                <div style={{ marginBottom: 6 }}><div style={{ color: C.wineInk, fontSize: 11, fontWeight: 700 }}>{en ? "Weaknesses" : "弱み"}</div>{report.weaknesses.map((s, i) => <div key={i} style={{ color: C.muted }}>△ {s}</div>)}</div>
               )}
               {Array.isArray(report.next) && report.next.length > 0 && (
                 <div><div style={{ color: C.gold, fontSize: 11, fontWeight: 700 }}>{en ? "Next steps" : "次のアクション"}</div>{report.next.map((s, i) => <div key={i} style={{ color: C.muted }}>→ {s}</div>)}</div>
@@ -140560,7 +140561,7 @@ function MockInterview() {
             </div>
           )}
         </div>
-        {err && <div style={{ fontSize: 11.5, color: C.wine, marginBottom: 8 }}>{err}</div>}
+        {err && <div style={{ fontSize: 11.5, color: C.wineInk, marginBottom: 8 }}>{err}</div>}
         <div style={{ display: "grid", gap: 10, marginBottom: 14 }}>
           {session.map((item, i) => (
             <div key={i} style={{ fontSize: 12, borderLeft: `2px solid ${C.line}`, paddingLeft: 10 }}>
@@ -140581,7 +140582,7 @@ function MockInterview() {
         <button className="gh-btn" style={{ fontSize: 10.5, padding: "2px 8px" }} onClick={() => { setSession(null); setPos(0); setAnswer(""); setDone(false); }}>{en ? "← Setup" : "← 設定へ"}</button>
         <button className="gh-btn" style={{ fontSize: 10.5, padding: "2px 8px", opacity: pos === 0 ? 0.45 : 1 }} disabled={pos === 0} onClick={() => { setPos(pos - 1); setAnswer(""); setErr(""); }}>{en ? "← Prev" : "← 前へ"}</button>
         <span>{t(lang, "mock_q")} {pos + 1} / {session.length}</span>
-        <span style={{ color: C.wine, flex: 1 }}>{typeLabel(cur)}</span>
+        <span style={{ color: C.wineInk, flex: 1 }}>{typeLabel(cur)}</span>
         <button className="gh-btn" style={{ fontSize: 10.5, padding: "2px 8px", borderColor: C.teal, color: C.teal }} onClick={() => slot.save({ session, sessionLen, fixedMode, industry, realMode, times, report, pos, answer, feedback, done }, (en ? "Q" : "問") + (pos + 1))}>{slot.meta ? (en ? "💾 Saved" : "💾 保存済") : (en ? "💾 Save" : "💾 セーブ")}</button>
       </div>
       <div className="gh-display" style={{ fontSize: 16, marginBottom: 8, lineHeight: 1.6 }}>{promptText(cur)}</div>
@@ -140614,7 +140615,7 @@ function MockInterview() {
       <textarea value={answer} onChange={(e) => setAnswer(e.target.value)} disabled={!!fb}
                 aria-label={t(lang, "mock_answer_ph")} placeholder={t(lang, "mock_answer_ph")} rows={5}
                 className="gh-input" style={{ width: "100%", boxSizing: "border-box", fontFamily: "inherit", resize: "vertical", marginBottom: 10 }} />
-      {err && <div style={{ fontSize: 11.5, color: C.wine, marginBottom: 8 }}>{err}</div>}
+      {err && <div style={{ fontSize: 11.5, color: C.wineInk, marginBottom: 8 }}>{err}</div>}
       {!fb && (
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <button className="gh-btn gh-btn-primary" onClick={gradeAnswer} disabled={busy || !answer.trim()}>
@@ -140628,7 +140629,7 @@ function MockInterview() {
           <div style={{ fontSize: 12.5, lineHeight: 1.8, background: C.bg, border: `1px solid ${C.gold}`, borderRadius: 8, padding: "10px 12px" }}>
             <div style={{ color: C.gold, fontWeight: 700, marginBottom: 4 }}>{t(lang, "mock_score")} ★{fb.score}/5</div>
             <div style={{ color: C.teal }}>◎ {fb.good}</div>
-            <div style={{ color: C.wine, marginTop: 2 }}>△ {fb.improve}</div>
+            <div style={{ color: C.wineInk, marginTop: 2 }}>△ {fb.improve}</div>
             <div style={{ color: C.muted, marginTop: 4, fontSize: 11.5 }}>{t(lang, "mock_ref")}: {fb.model}</div>
           </div>
           <button className="gh-btn gh-btn-primary" onClick={next} style={{ marginTop: 10 }}>
@@ -145014,7 +145015,7 @@ function CaseDrillView() {
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
                   <span style={{ fontSize: 10, fontWeight: 700, color: "#fff", background: catColor(c.cat), borderRadius: 4, padding: "2px 7px" }}>{catLabel(c.cat)}</span>
                   <span style={{ fontSize: 10.5, color: C.gold }}>{"★".repeat(c.d)}{"☆".repeat(4 - c.d)}</span>
-                  {cleared[c.id] ? <span style={{ fontSize: 12, color: "#16A34A", marginLeft: "auto" }}>✓</span> : (missed[c.id] ? <span style={{ fontSize: 12, color: C.wine, marginLeft: "auto" }}>↻</span> : null)}
+                  {cleared[c.id] ? <span style={{ fontSize: 12, color: "#16A34A", marginLeft: "auto" }}>✓</span> : (missed[c.id] ? <span style={{ fontSize: 12, color: C.wineInk, marginLeft: "auto" }}>↻</span> : null)}
                 </div>
                 <div style={{ fontSize: 13.5, fontWeight: 700, color: C.text }}>{en ? c.titleEn : c.titleJa}</div>
               </button>
@@ -145117,7 +145118,7 @@ function CaseDrillView() {
                   </button>
                 </div>
                 <div style={{ fontSize: 12, color: C.text, lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{note}</div>
-                {gradeErr && <div style={{ fontSize: 11.5, color: C.wine, marginTop: 6 }}>{gradeErr}</div>}
+                {gradeErr && <div style={{ fontSize: 11.5, color: C.wineInk, marginTop: 6 }}>{gradeErr}</div>}
                 {gradeResult && (
                   <div style={{ marginTop: 8, borderTop: `1px solid ${C.line}`, paddingTop: 8 }}>
                     <div style={{ fontSize: 12.5, fontWeight: 700, color: C.gold, marginBottom: 3 }}>{en ? "AI score" : "AI採点"} ★{gradeResult.score}/5</div>
@@ -145934,7 +145935,7 @@ function ReviewSimulatorView() {
   const LAYER_META = [
     { key: "policy", ja: "ポリシー層", en: "Policy layer", color: C.gold },
     { key: "process", ja: "プロセス層", en: "Process layer", color: C.teal },
-    { key: "tech", ja: "技術層", en: "Technical layer", color: C.wine },
+    { key: "tech", ja: "技術層", en: "Technical layer", color: C.wineInk },
   ];
 
   return (
@@ -145986,7 +145987,7 @@ function ReviewSimulatorView() {
 
           {r.flags.length > 0 && (
             <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: C.wine, marginBottom: 6 }}>{en ? "Regulatory flags" : "規制フラグ"}</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: C.wineInk, marginBottom: 6 }}>{en ? "Regulatory flags" : "規制フラグ"}</div>
               <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
                 {r.flags.map((x, i) => (
                   <span key={i} style={{ fontSize: 11.5, color: C.text, background: "rgba(158,43,75,0.12)", border: `1px solid ${C.wine}`, borderRadius: 6, padding: "4px 10px" }}>{en ? x.en : x.ja}</span>
@@ -146486,7 +146487,7 @@ function DashboardView() {
 
   // カテゴリ別の習熟（ケース演習クリア率）
   const CATS = [
-    { key: "セキュリティ", ja: "セキュリティ", en: "Security", color: C.wine },
+    { key: "セキュリティ", ja: "セキュリティ", en: "Security", color: C.wineInk },
     { key: "ガバナンス", ja: "ガバナンス", en: "Governance", color: C.teal },
     { key: "共通", ja: "共通", en: "Cross-cutting", color: C.gold },
   ];
@@ -146565,7 +146566,7 @@ function DashboardView() {
       {/* 弱点フォーカス */}
       {(weakest || reviewCount > 0) && (
         <div style={{ background: "rgba(158,43,75,0.08)", border: `1px solid ${C.wine}`, borderRadius: 10, padding: "13px 15px", marginBottom: 14 }}>
-          <div style={{ fontSize: 11.5, fontWeight: 700, color: C.wine, marginBottom: 5 }}>{en ? "Focus your weak spots" : "弱点にフォーカス"}</div>
+          <div style={{ fontSize: 11.5, fontWeight: 700, color: C.wineInk, marginBottom: 5 }}>{en ? "Focus your weak spots" : "弱点にフォーカス"}</div>
           {weakest && (
             <div style={{ fontSize: 13, color: C.text, lineHeight: 1.6 }}>
               {en ? `Weakest category: ` : `最も手薄なカテゴリ：`}<span style={{ fontWeight: 700, color: weakest.color }}>{en ? weakest.en : weakest.ja}</span>{` (${weakest.done}/${weakest.total}) — `}{en ? "in Case Drills, filter to this category." : "ケース演習でこのカテゴリに絞って埋めよう。"}
@@ -147211,7 +147212,7 @@ function SGExamView() {
 
         {missed.length > 0 && (
           <div style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.wine, marginBottom: 8 }}>{en ? "Review — missed questions" : "復習 — 間違えた問題"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.wineInk, marginBottom: 8 }}>{en ? "Review — missed questions" : "復習 — 間違えた問題"}</div>
             {missed.map(({ q, i }) => { const ok = q.opts.find((o) => o.ok); return (
               <div key={i} style={{ background: C.surface2, border: `1px solid ${C.line}`, borderRadius: 8, padding: "10px 12px", marginBottom: 8 }}>
                 <div style={{ fontSize: 12.5, color: C.text, fontWeight: 700, marginBottom: 4 }}>{en ? q.qEn : q.qJa}</div>
@@ -147370,7 +147371,7 @@ function GeneratorView() {
       <button className="gh-btn gh-btn-primary" onClick={generate} disabled={busy} style={{ padding: "10px 22px" }}>
         {busy ? (en ? "Generating…" : "生成中…") : (scen ? (en ? "↻ Another scenario" : "↻ 別のシナリオ") : (en ? "Generate scenario" : "シナリオを生成"))}
       </button>
-      {err && <div style={{ fontSize: 11.5, color: C.wine, marginTop: 10 }}>{err}</div>}
+      {err && <div style={{ fontSize: 11.5, color: C.wineInk, marginTop: 10 }}>{err}</div>}
 
       {scen && (
         <div style={{ background: C.surface2, border: `1px solid ${C.line}`, borderRadius: 12, padding: 16, marginTop: 16 }}>
@@ -147515,7 +147516,7 @@ function TabDojo() {
       <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
         {[["dashboard", "d_dashboard"], ["curriculum", "d_curriculum"], ["cert", "d_cert"], ["exam", "d_exam"], ["mcq", "d_mcq"], ["cases", "d_cases"], ["playbook", "d_playbook"], ["sim", "d_sim"], ["generator", "d_generator"], ["diagrams", "d_diagrams"], ["archquiz", "d_archquiz"], ["industry", "d_industry"], ["versus", "d_versus"], ["drills", "d_drills"], ["mock", "d_mock"], ["devlang", "d_devlang"], ["cloud", "d_cloud"]].map(([v, k]) => (
           <button key={v} className="gh-btn" onClick={() => { setView(v); if (v === "diagrams") setPicked(false); }}
-                  style={{ display: "inline-flex", alignItems: "center", gap: 6, ...(view === v ? { borderColor: C.wine, color: C.wine, fontWeight: 700 } : {}), ...(tabDone[v] ? { borderColor: "#16A34A" } : {}) }}>
+                  style={{ display: "inline-flex", alignItems: "center", gap: 6, ...(view === v ? { borderColor: C.wine, color: C.wineInk, fontWeight: 700 } : {}), ...(tabDone[v] ? { borderColor: "#16A34A" } : {}) }}>
             <span
               role="checkbox"
               aria-checked={!!tabDone[v]}
@@ -147567,7 +147568,7 @@ function TabDojo() {
               <button className="gh-btn" onClick={resetLayout} style={{ fontSize: 11 }}>{t(dlang, "reset_layout")}</button>
             )}
             <button className="gh-btn" onClick={toggleDrill}
-                    style={drill ? { borderColor: C.wine, color: C.wine, fontWeight: 700 } : {}}>
+                    style={drill ? { borderColor: C.wine, color: C.wineInk, fontWeight: 700 } : {}}>
               {drill ? t(dlang, "oral_off") : t(dlang, "oral_on")}
             </button>
           </div>
@@ -147580,7 +147581,7 @@ function TabDojo() {
 
           {drill && node && (
             <Card style={{ marginTop: 12, borderColor: C.wine }}>
-              <div style={{ fontSize: 11, color: C.wine, letterSpacing: ".2em", marginBottom: 6 }}>{t(dlang, "oe_title")}</div>
+              <div style={{ fontSize: 11, color: C.wineInk, letterSpacing: ".2em", marginBottom: 6 }}>{t(dlang, "oe_title")}</div>
               <div className="gh-display" style={{ fontSize: 18, marginBottom: 6 }}>
                 {t(dlang, "oe_prompt_a")}{nodeLabel(node, dlang)}{t(dlang, "oe_prompt_b")}
               </div>
@@ -147596,7 +147597,7 @@ function TabDojo() {
                 <button className="gh-btn" onClick={() => nextDrill()}>{t(dlang, "oe_next")}</button>
                 {gradeBusy && <span className="gh-pulse" style={{ fontSize: 12, color: C.gold }}>{t(dlang, "oe_grading")}</span>}
               </div>
-              {gradeErr && <div style={{ color: C.wine, fontSize: 12, marginTop: 8 }}>{gradeErr}</div>}
+              {gradeErr && <div style={{ color: C.wineInk, fontSize: 12, marginTop: 8 }}>{gradeErr}</div>}
               {grade && (
                 <div style={{ marginTop: 10, fontSize: 12.5, lineHeight: 1.8, background: C.bg, border: `1px solid ${C.gold}`, borderRadius: 8, padding: "10px 12px", whiteSpace: "pre-wrap" }}>
                   <span style={{ color: C.gold, fontWeight: 700 }}>{t(dlang, "oe_result")}</span>{"\n"}{grade}
@@ -147610,7 +147611,7 @@ function TabDojo() {
               <div className="gh-display" style={{ fontSize: 17, marginBottom: 10 }}>{nodeLabel(node, dlang)} <span style={{ fontSize: 11, color: C.muted }}>{dlang === "en" ? node.label : node.en}</span></div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 10, fontSize: 12.5, lineHeight: 1.7 }}>
                 <div><span style={{ color: C.teal, fontWeight: 700 }}>{t(dlang, "dp_role")}</span><br />{dlang === "en" ? (det.roleEn || det.role) : det.role}<br /><br /><span style={{ color: C.teal, fontWeight: 700 }}>{t(dlang, "dp_tech")}</span><br />{dlang === "en" ? (det.techEn || det.tech) : det.tech}</div>
-                <div><span style={{ color: C.gold, fontWeight: 700 }}>{t(dlang, "dp_biz")}</span><br />{dlang === "en" ? (det.bizEn || det.biz) : det.biz}<br /><br /><span style={{ color: C.wine, fontWeight: 700 }}>{t(dlang, "dp_qa")}</span><br />{dlang === "en" ? (det.qaEn || det.qa) : det.qa}</div>
+                <div><span style={{ color: C.gold, fontWeight: 700 }}>{t(dlang, "dp_biz")}</span><br />{dlang === "en" ? (det.bizEn || det.biz) : det.biz}<br /><br /><span style={{ color: C.wineInk, fontWeight: 700 }}>{t(dlang, "dp_qa")}</span><br />{dlang === "en" ? (det.qaEn || det.qa) : det.qa}</div>
                 <div><span style={{ color: "#C9A0DC", fontWeight: 700 }}>{t(dlang, "dp_cost")}</span><br />{dlang === "en" ? (det.costEn || det.cost) : det.cost}</div>
               </div>
               {(() => {
@@ -147659,7 +147660,7 @@ function TabDojo() {
                         {opts.map((o, oi) => (
                           <span key={oi} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
                             <span style={{ fontSize: 12.5, fontWeight: 800, color: C.gold, background: C.surface2, border: `1px solid ${C.gold}`, borderRadius: 7, padding: "4px 10px", lineHeight: 1.3 }}>{o}</span>
-                            {oi < opts.length - 1 ? <span style={{ fontSize: 10, fontWeight: 800, color: C.wine }}>VS</span> : null}
+                            {oi < opts.length - 1 ? <span style={{ fontSize: 10, fontWeight: 800, color: C.wineInk }}>VS</span> : null}
                           </span>
                         ))}
                       </div>
@@ -147672,7 +147673,7 @@ function TabDojo() {
                         </div>
                       </div>
                       <div style={{ background: C.surface2, borderLeft: `3px solid ${C.wine}`, borderRadius: 8, padding: "8px 11px", marginBottom: 8, fontSize: 12, lineHeight: 1.75, color: C.text }}>
-                        <span style={{ color: C.wine, fontWeight: 700 }}>{t(dlang, "vs_rule")}</span>{en && v.ruleEn ? v.ruleEn : v.rule}
+                        <span style={{ color: C.wineInk, fontWeight: 700 }}>{t(dlang, "vs_rule")}</span>{en && v.ruleEn ? v.ruleEn : v.rule}
                       </div>
                       <div style={{ fontSize: 11.5, color: C.muted, fontStyle: "italic", borderTop: `1px solid ${C.line}`, paddingTop: 8 }}>{en && v.sayEn ? v.sayEn : v.say}</div>
                     </div>
@@ -147740,7 +147741,7 @@ function TabDojo() {
                         <span style={{ fontSize: 15 }}>🎯</span>
                         <span style={{ fontSize: 13, fontWeight: 700, color: C.teal, lineHeight: 1.55 }}><span style={{ color: C.gold }}>{t(dlang, "dr_ans")}</span>{en && dr.ansEn ? dr.ansEn : dr.ans}</span>
                       </div>
-                      <div style={{ background: C.surface2, borderLeft: `3px solid ${C.wine}`, borderRadius: 8, padding: "8px 11px", fontSize: 12, color: C.muted, lineHeight: 1.75 }}><span style={{ color: C.wine, fontWeight: 700 }}>{t(dlang, "dr_lesson")}</span>{en && dr.lessonEn ? dr.lessonEn : dr.lesson}</div>
+                      <div style={{ background: C.surface2, borderLeft: `3px solid ${C.wine}`, borderRadius: 8, padding: "8px 11px", fontSize: 12, color: C.muted, lineHeight: 1.75 }}><span style={{ color: C.wineInk, fontWeight: 700 }}>{t(dlang, "dr_lesson")}</span>{en && dr.lessonEn ? dr.lessonEn : dr.lesson}</div>
                     </div>
                   )}
                   <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
@@ -147820,7 +147821,7 @@ function TabCompanies() {
       <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
         {[["orgs", "c_orgs"], ["compare", "c_compare"], ["roles", "c_roles"], ["cases", "c_cases"], ["playbook", "c_playbook"], ["reverseq", "c_reverseq"], ["jpmarket", "c_jpmarket"], ["delivery", "c_delivery"]].map(([v, k]) => (
           <button key={v} className="gh-btn" onClick={() => setView(v)}
-                  style={view === v ? { borderColor: C.wine, color: C.wine, fontWeight: 700 } : {}}>{t(clang, k)}</button>
+                  style={view === v ? { borderColor: C.wine, color: C.wineInk, fontWeight: 700 } : {}}>{t(clang, k)}</button>
         ))}
       </div>
 
@@ -147850,7 +147851,7 @@ function TabCompanies() {
                     </div>
                     <div style={{ marginBottom: 8 }}><span style={{ color: C.gold, fontWeight: 700 }}>{t(clang, "co_loop")}</span>{clang === "en" ? co.loopEn : co.loop}</div>
                     <div style={{ background: C.surface2, borderRadius: 8, padding: "8px 10px", borderLeft: `3px solid ${C.wine}` }}>
-                      <span style={{ color: C.wine, fontWeight: 700 }}>{t(clang, "co_fit")}</span>{clang === "en" ? co.fitEn : co.fit}
+                      <span style={{ color: C.wineInk, fontWeight: 700 }}>{t(clang, "co_fit")}</span>{clang === "en" ? co.fitEn : co.fit}
                     </div>
                     {open && (
                       <div style={{ marginTop: 10, display: "grid", gap: 8 }}>
@@ -147894,7 +147895,7 @@ function TabCompanies() {
                 </div>
                 <div style={{ fontSize: 12, lineHeight: 1.75, margin: "8px 0" }}>{clang === "en" ? c.whatEn : c.what}</div>
                 <div style={{ fontSize: 12, lineHeight: 1.7, background: C.surface2, borderRadius: 8, padding: "8px 10px", borderLeft: `3px solid ${C.wine}`, marginBottom: 8 }}>
-                  <span style={{ color: C.wine, fontWeight: 700 }}>{t(clang, "cs_lesson")}</span>{clang === "en" ? c.lessonEn : c.lesson}
+                  <span style={{ color: C.wineInk, fontWeight: 700 }}>{t(clang, "cs_lesson")}</span>{clang === "en" ? c.lessonEn : c.lesson}
                 </div>
                 <div style={{ fontSize: 11.5, color: C.muted, fontStyle: "italic" }}>{clang === "en" ? c.sayEn : c.say}</div>
               </Card>
@@ -147911,12 +147912,12 @@ function TabCompanies() {
               <Card key={p.type}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
                   <span className="gh-display" style={{ fontSize: 16, color: C.gold }}>{clang === "en" ? p.typeEn : p.type}</span>
-                  <span style={{ fontSize: 10.5, color: C.wine, fontWeight: 700 }}>{clang === "en" ? p.weightEn : p.weight}</span>
+                  <span style={{ fontSize: 10.5, color: C.wineInk, fontWeight: 700 }}>{clang === "en" ? p.weightEn : p.weight}</span>
                 </div>
                 <div style={{ fontSize: 12, color: C.teal, margin: "8px 0", fontWeight: 600 }}>{clang === "en" ? p.flowEn : p.flow}</div>
                 <div style={{ fontSize: 12, lineHeight: 1.75, display: "grid", gap: 6 }}>
                   <div><span style={{ color: C.teal, fontWeight: 700 }}>{t(clang, "pb_win")}</span>{clang === "en" ? p.winEn : p.win}</div>
-                  <div><span style={{ color: C.wine, fontWeight: 700 }}>{t(clang, "pb_trap")}</span>{clang === "en" ? p.trapEn : p.trap}</div>
+                  <div><span style={{ color: C.wineInk, fontWeight: 700 }}>{t(clang, "pb_trap")}</span>{clang === "en" ? p.trapEn : p.trap}</div>
                   <div style={{ background: C.bg, borderRadius: 8, padding: "8px 10px", borderLeft: `3px solid ${C.gold}` }}>
                     <span style={{ color: C.gold, fontWeight: 700 }}>{t(clang, "pb_drill")}</span>{clang === "en" ? p.drillEn : p.drill}
                   </div>
@@ -147963,7 +147964,7 @@ function TabCompanies() {
                   <div><span style={{ color: C.teal, fontWeight: 700 }}>{t(clang, "rl_need")}</span>{clang === "en" ? r.needEn : r.need}</div>
                   <div><span style={{ color: C.teal, fontWeight: 700 }}>{t(clang, "rl_story")}</span>{clang === "en" ? r.storyEn : r.story}</div>
                   <div style={{ background: C.surface2, borderRadius: 8, padding: "8px 10px", borderLeft: `3px solid ${C.wine}` }}>
-                    <span style={{ color: C.wine, fontWeight: 700 }}>{t(clang, "rl_edge")}</span>{clang === "en" ? r.edgeEn : r.edge}
+                    <span style={{ color: C.wineInk, fontWeight: 700 }}>{t(clang, "rl_edge")}</span>{clang === "en" ? r.edgeEn : r.edge}
                   </div>
                 </div>
               </Card>
@@ -148074,7 +148075,7 @@ function TabLexicon() {
   const [query, setQuery] = useState("");
   const [tier, setTier] = useState("all"); // all/prod/emerg/res
   const TIERS = [["all", "lx_tier_all"], ["prod", "lx_tier_prod"], ["emerg", "lx_tier_emerg"], ["res", "lx_tier_res"]];
-  const tierMeta = { prod: { label: "lx_tier_prod", color: C.teal }, emerg: { label: "lx_tier_emerg", color: C.gold }, res: { label: "lx_tier_res", color: C.wine } };
+  const tierMeta = { prod: { label: "lx_tier_prod", color: C.teal }, emerg: { label: "lx_tier_emerg", color: C.gold }, res: { label: "lx_tier_res", color: C.wineInk } };
   // クイズ解説からのジャンプを受けたら、その用語で絞り込む
   useEffect(() => {
     if (jump && jump.tab === "lexicon" && jump.lexTerm) {
@@ -148321,7 +148322,7 @@ function TabFactbook() {
             <div style={{ fontSize: 20, fontWeight: 800, color: C.teal, lineHeight: 1.2 }}>{FB(it, "v")}</div>
             {it.y ? <div style={{ fontSize: 11.5, color: C.muted }}>{FB(it, "y")}</div> : null}
             {it.n ? <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.6 }}>{FB(it, "n")}</div> : null}
-            {it.use ? <div style={{ fontSize: 11, color: C.dim, lineHeight: 1.55, borderTop: `1px solid ${C.line}`, paddingTop: 6 }}><span style={{ color: C.wine, fontWeight: 700 }}>{en ? "Use: " : "使いどころ："}</span>{FB(it, "use")}</div> : null}
+            {it.use ? <div style={{ fontSize: 11, color: C.dim, lineHeight: 1.55, borderTop: `1px solid ${C.line}`, paddingTop: 6 }}><span style={{ color: C.wineInk, fontWeight: 700 }}>{en ? "Use: " : "使いどころ："}</span>{FB(it, "use")}</div> : null}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, marginTop: 2, fontSize: 10.5, color: C.dim }}>
               <span>{[FB(it, "r"), it.yr].filter(Boolean).join(" · ")}</span>
               {it.u ? <a href={it.u} target="_blank" rel="noreferrer" style={{ color: C.gold, textDecoration: "none", fontWeight: 700, whiteSpace: "nowrap" }}>{en ? "Source ↗" : "出典 ↗"}</a> : null}
@@ -148897,7 +148898,7 @@ function TabIssues() {
       <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginBottom: 10, fontSize: 11, color: C.dim }}>
         <span style={{ color: C.teal, fontWeight: 700 }}>{en ? "Upstream A–C" : "上流 A–C"}</span><span>→</span>
         <span style={{ color: C.gold, fontWeight: 700 }}>{en ? "Midstream D–F" : "中流 D–F"}</span><span>→</span>
-        <span style={{ color: C.wine, fontWeight: 700 }}>{en ? "Downstream G–I" : "川下 G–I"}</span>
+        <span style={{ color: C.wineInk, fontWeight: 700 }}>{en ? "Downstream G–I" : "川下 G–I"}</span>
         <span style={{ marginLeft: "auto" }}>{en ? "Scrolls sideways on narrow screens" : "※画面が狭い場合は横スクロール"}</span>
       </div>
       <div style={{ overflowX: "auto", paddingBottom: 4 }}>
@@ -150687,7 +150688,7 @@ function TabProposal() {
             <div className="gh-display" style={{ fontSize: 14, fontWeight: 800, color: bt.col, marginBottom: 7 }}>{bt.vs[en ? 1 : 0]}</div>
             <div style={{ fontSize: 11.5, fontWeight: 800, color: C.teal, marginBottom: 2 }}>{en ? "WIN WHEN" : "勝てる案件"}</div>
             <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.65, marginBottom: 7 }}>{bt.win[en ? 1 : 0]}</div>
-            <div style={{ fontSize: 11.5, fontWeight: 800, color: C.wine, marginBottom: 2 }}>{en ? "WALK AWAY WHEN" : "引くべき案件"}</div>
+            <div style={{ fontSize: 11.5, fontWeight: 800, color: C.wineInk, marginBottom: 2 }}>{en ? "WALK AWAY WHEN" : "引くべき案件"}</div>
             <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.65, marginBottom: 7 }}>{bt.lose[en ? 1 : 0]}</div>
             <div style={{ fontSize: 11.5, fontWeight: 800, color: C.gold, marginBottom: 2 }}>{en ? "THE TALK & EVIDENCE" : "効くトークと証拠"}</div>
             <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.65 }}>{bt.talk[en ? 1 : 0]}</div>
@@ -150708,7 +150709,7 @@ function TabProposal() {
           return (
             <Card key={i} style={on ? { borderColor: C.teal } : {}}>
               <div onClick={() => setQaOpen((s) => ({ ...s, [i]: !on }))} style={{ cursor: "pointer", display: "flex", gap: 10, alignItems: "center" }}>
-                <span style={{ fontSize: 12, fontWeight: 800, color: C.wine, flexShrink: 0 }}>{i + 1}</span>
+                <span style={{ fontSize: 12, fontWeight: 800, color: C.wineInk, flexShrink: 0 }}>{i + 1}</span>
                 <span className="gh-display" style={{ flex: 1, fontSize: 14, fontWeight: 700 }}>{qa.q[en ? 1 : 0]}</span>
                 <span style={{ fontSize: 10, color: C.dim, flexShrink: 0 }}>{on ? "▲" : "▼"}</span>
               </div>
@@ -150733,7 +150734,7 @@ function TabProposal() {
             <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.65, marginBottom: 7 }}>{cf.fix[en ? 1 : 0]}</div>
             <div style={{ fontSize: 11, fontWeight: 800, color: C.teal, marginBottom: 2 }}>{en ? "FITS" : "向く場面"}</div>
             <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.65, marginBottom: 7 }}>{cf.fit[en ? 1 : 0]}</div>
-            <div style={{ fontSize: 11, fontWeight: 800, color: C.wine, marginBottom: 2 }}>{en ? "AI-DEAL CAUTION" : "AI案件での注意"}</div>
+            <div style={{ fontSize: 11, fontWeight: 800, color: C.wineInk, marginBottom: 2 }}>{en ? "AI-DEAL CAUTION" : "AI案件での注意"}</div>
             <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.65 }}>{cf.warn[en ? 1 : 0]}</div>
           </Card>
         ))}
@@ -150781,7 +150782,7 @@ function TabProposal() {
           return (
             <Card key={i}>
               <div onClick={() => setGgOpen((s) => ({ ...s, [i]: !s[i] }))} style={{ cursor: "pointer", display: "flex", gap: 8, alignItems: "baseline" }}>
-                <span style={{ fontSize: 11, fontWeight: 800, color: C.wine, flexShrink: 0 }}>Q{i + 1}</span>
+                <span style={{ fontSize: 11, fontWeight: 800, color: C.wineInk, flexShrink: 0 }}>Q{i + 1}</span>
                 <span className="gh-display" style={{ flex: 1, fontSize: 13, fontWeight: 700, lineHeight: 1.5 }}>{en ? "" : "「"}{g.q[en ? 1 : 0]}{en ? "" : "」"}</span>
                 <span style={{ fontSize: 10, color: C.dim, flexShrink: 0 }}>{on ? "▲" : "▼"}</span>
               </div>
@@ -150819,7 +150820,7 @@ function TabProposal() {
       <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 10 }}>
         {GOV_GATE_WORLD.map((l, i) => (
           <div key={i} style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 8, padding: "9px 12px", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,220px),1fr))", gap: "4px 14px" }}>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.wine }}>{l.t[en ? 1 : 0]}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.wineInk }}>{l.t[en ? 1 : 0]}</div>
             <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.6 }}>{l.p[en ? 1 : 0]}</div>
             <div style={{ fontSize: 11.5, color: C.gold, lineHeight: 1.6 }}>▸ {l.u[en ? 1 : 0]}</div>
           </div>
@@ -151812,7 +151813,7 @@ function TabAgentShelf() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,280px),1fr))", gap: 8, marginBottom: 10 }}>
         {SHELF_CROSS.map((x, i) => (
           <div key={i} style={{ background: C.surface2, border: `1px solid ${C.line}`, borderRadius: 8, padding: "9px 12px" }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: C.wine, marginBottom: 3 }}>{x.t[en ? 1 : 0]}</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: C.wineInk, marginBottom: 3 }}>{x.t[en ? 1 : 0]}</div>
             <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.6 }}>{x.d[en ? 1 : 0]}</div>
           </div>
         ))}
@@ -153197,7 +153198,7 @@ function TabToolbox() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,300px),1fr))", gap: 10 }}>
           {TBX_CHARTER.map((m, i) => (
             <div key={i} style={{ background: C.surface2, borderRadius: 10, padding: "11px 13px" }}>
-              <div style={{ fontSize: 12.5, fontWeight: 800, color: C.wine, marginBottom: 4 }}>{i + 1}. {m.t[en ? 1 : 0]}</div>
+              <div style={{ fontSize: 12.5, fontWeight: 800, color: C.wineInk, marginBottom: 4 }}>{i + 1}. {m.t[en ? 1 : 0]}</div>
               <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.65 }}>{m.d[en ? 1 : 0]}</div>
             </div>
           ))}
@@ -153279,7 +153280,7 @@ function TabToolbox() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,300px),1fr))", gap: 10, marginBottom: 10 }}>
           {TBX_EVAL_OPS.slice(0, 3).map((m, i) => (
             <div key={i} style={{ background: C.surface2, borderRadius: 10, padding: "11px 13px" }}>
-              <div style={{ fontSize: 12.5, fontWeight: 800, color: C.wine, marginBottom: 4 }}>{m.t[en ? 1 : 0]}</div>
+              <div style={{ fontSize: 12.5, fontWeight: 800, color: C.wineInk, marginBottom: 4 }}>{m.t[en ? 1 : 0]}</div>
               <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.65 }}>{m.d[en ? 1 : 0]}</div>
             </div>
           ))}
@@ -153315,7 +153316,7 @@ function TabToolbox() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,300px),1fr))", gap: 10 }}>
           {TBX_DATA_OPS.map((m, i) => (
             <div key={i} style={{ background: C.surface2, borderRadius: 10, padding: "11px 13px" }}>
-              <div style={{ fontSize: 12.5, fontWeight: 800, color: C.wine, marginBottom: 4 }}>{m.t[en ? 1 : 0]}</div>
+              <div style={{ fontSize: 12.5, fontWeight: 800, color: C.wineInk, marginBottom: 4 }}>{m.t[en ? 1 : 0]}</div>
               <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.65 }}>{m.d[en ? 1 : 0]}</div>
             </div>
           ))}
@@ -153859,7 +153860,7 @@ function ArchCaseExplorer({ en }) {
       <div style={DGM_HINT}>{en ? `${filled} of ${ARCH_LAYERS.length} layers covered publicly` : `7層のうち公開情報で埋まるのは ${filled} 層`}</div>
       <div style={{ ...DGM_DETAIL, borderLeftColor: C.wine }}>
         <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap", marginBottom: 5 }}>
-          <span style={{ fontSize: 13, fontWeight: 800, color: C.wine }}>{c.n[en ? 1 : 0]}</span>
+          <span style={{ fontSize: 13, fontWeight: 800, color: C.wineInk }}>{c.n[en ? 1 : 0]}</span>
           <span style={{ fontSize: 10.5, color: C.dim }}>{c.org[en ? 1 : 0]}</span>
         </div>
         <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.65, marginBottom: 6 }}>{c.k[en ? 1 : 0]}</div>
@@ -154697,7 +154698,7 @@ function FtArchExplorer({ en }) {
           ) : null}
           {c.ch.length ? (
             <div style={{ marginBottom: 9, borderLeft: `3px solid ${C.wine}`, paddingLeft: 9 }}>
-              <div style={{ fontSize: 11, fontWeight: 800, color: C.wine, marginBottom: 3 }}>{en ? "What they say is still unsolved" : "まだ解けていないと書かれていること"}</div>
+              <div style={{ fontSize: 11, fontWeight: 800, color: C.wineInk, marginBottom: 3 }}>{en ? "What they say is still unsolved" : "まだ解けていないと書かれていること"}</div>
               {c.ch.map((s, j) => (
                 <div key={j} style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.65, marginBottom: 2 }}>・{s}</div>
               ))}
@@ -154769,7 +154770,7 @@ function FtPitfalls({ en }) {
           : `${FT_META.nRev}件のレビューのうち${FT_META.revWithCh}件が、導入後も残っている問題を挙げている。テーマ別に並べると身も蓋もない傾向が出る — コストが最多で、精度の2倍以上の頻度で語られる。ツールを約束して請求書の話をしない提案は、現場で最も多い不満に正面から逆らっていることになる。`}
       </div>
       <div style={{ background: C.surface2, borderRadius: 10, padding: "11px 13px", marginBottom: 12 }}>
-        <div style={{ fontSize: 12, fontWeight: 800, color: C.wine, marginBottom: 7 }}>
+        <div style={{ fontSize: 12, fontWeight: 800, color: C.wineInk, marginBottom: 7 }}>
           {en ? `Themes across ${FT_META.revWithCh} reviews that report a problem` : `課題を挙げた${FT_META.revWithCh}件のテーマ分布`}
         </div>
         {FT_THEME.map((t) => (
@@ -154802,7 +154803,7 @@ function FtPitfalls({ en }) {
         ) : null}
         {cur.ch.length ? (
           <div style={{ marginBottom: 8, borderLeft: `3px solid ${C.wine}`, paddingLeft: 9 }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: C.wine, marginBottom: 3 }}>{en ? "Still a problem after adoption" : "導入後も残っている問題"}</div>
+            <div style={{ fontSize: 11, fontWeight: 800, color: C.wineInk, marginBottom: 3 }}>{en ? "Still a problem after adoption" : "導入後も残っている問題"}</div>
             {cur.ch.map((s, j) => (<div key={j} style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.65, marginBottom: 2 }}>・{s}</div>))}
           </div>
         ) : null}
@@ -154905,7 +154906,7 @@ function FtOpenProblems({ en }) {
           : `セクションXが数えているのは「買ったツールへの不満」。こちらはそれとは別物で、より使える — ${FT_META.nArch}件のうち${FT_OPEN.withCh}件が、すでに本番で動いているシステムについて「まだ解けていない」と書いた項目、計${FT_OPEN.total}件の集計。ツールの不満は購買時の注意点を教えるが、こちらは相手のエンジニアが今まさに抱えているものを教える。初回面談の問いとしては、後者の方が効く。`}
       </div>
       <div style={{ background: C.surface2, borderRadius: 10, padding: "11px 13px", marginBottom: 12 }}>
-        <div style={{ fontSize: 12, fontWeight: 800, color: C.wine, marginBottom: 7 }}>
+        <div style={{ fontSize: 12, fontWeight: 800, color: C.wineInk, marginBottom: 7 }}>
           {en ? `Themes across ${FT_OPEN.withCh} architectures that state an open problem` : `未解決課題を書いた${FT_OPEN.withCh}件のテーマ分布`}
         </div>
         {FT_OPEN.rows.map((r) => (
@@ -155941,7 +155942,7 @@ function SgPatterns({ en }) {
         <div style={{ fontSize: 13, fontWeight: 800, color: p.col, marginBottom: 3 }}>{p.t[en ? 1 : 0]}</div>
         <div style={{ fontSize: 11, color: C.dim, marginBottom: 5 }}>{en ? "Cases: " : "該当事例: "}{p.who[en ? 1 : 0]}</div>
         <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.65, marginBottom: 5 }}>{p.d[en ? 1 : 0]}</div>
-        <div style={{ fontSize: 12, color: C.wine, lineHeight: 1.65 }}>{en ? "Failure mode: " : "落とし穴: "}<span style={{ color: C.muted }}>{p.r[en ? 1 : 0]}</span></div>
+        <div style={{ fontSize: 12, color: C.wineInk, lineHeight: 1.65 }}>{en ? "Failure mode: " : "落とし穴: "}<span style={{ color: C.muted }}>{p.r[en ? 1 : 0]}</span></div>
       </div>
     </div>
   );
@@ -156031,7 +156032,7 @@ function TabSGlobal() {
           {SG_JPN.map((f, i) => (
             <div key={i} style={card}>
               <div style={{ display: "flex", gap: 7, alignItems: "baseline", marginBottom: 4 }}>
-                <span style={{ fontSize: 12.5, fontWeight: 800, color: C.wine }}>{f.k[en ? 1 : 0]}</span>
+                <span style={{ fontSize: 12.5, fontWeight: 800, color: C.wineInk }}>{f.k[en ? 1 : 0]}</span>
                 <span style={{ marginLeft: "auto", fontSize: 10.5, color: C.bg, background: C.dim, borderRadius: 999, padding: "1px 8px", fontWeight: 700 }}>{f.s[en ? 1 : 0]}</span>
               </div>
               <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.65 }}>{f.v[en ? 1 : 0]}</div>
@@ -156096,7 +156097,7 @@ function TabSGlobal() {
         <div style={G}>
           {SG_JP.map((x, i) => (
             <div key={i} style={card}>
-              <div style={{ fontSize: 12.5, fontWeight: 800, color: C.wine, marginBottom: 4 }}>{x.t[en ? 1 : 0]}</div>
+              <div style={{ fontSize: 12.5, fontWeight: 800, color: C.wineInk, marginBottom: 4 }}>{x.t[en ? 1 : 0]}</div>
               <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.65 }}>{x.d[en ? 1 : 0]}</div>
             </div>
           ))}
@@ -157503,7 +157504,7 @@ function BprSystemize({ en }) {
         <div style={{ fontSize: 12.5, fontWeight: 800, color: qq.col, marginBottom: 4 }}>{qq.t[en ? 1 : 0]}</div>
         <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.7 }}>{qq.d[en ? 1 : 0]}</div>
       </div>
-      <div style={{ fontSize: 11, color: C.wine, fontWeight: 800, margin: "12px 0 6px" }}>{en ? "FOUR SYSTEM TRAPS" : "システム化の罠 4つ"}</div>
+      <div style={{ fontSize: 11, color: C.wineInk, fontWeight: 800, margin: "12px 0 6px" }}>{en ? "FOUR SYSTEM TRAPS" : "システム化の罠 4つ"}</div>
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
         {BPR_TRAPS.map((x, i) => <span key={i} style={{ fontSize: 11.5, color: C.text, background: C.surface2, border: `1px solid ${C.line}`, borderRadius: 999, padding: "3px 11px" }}>{x[en ? 1 : 0]}</span>)}
       </div>
@@ -157568,7 +157569,7 @@ function BprAdoption({ en }) {
           [["必要な能力が変わる", "The skills required change"], ["AI前提の業務では求められる能力が変わる。", "AI-first work calls for different skills."]],
           [["研修が実務に接続しない", "Training doesn't reach the work"], ["研修より先に、アクション単位の手順書を渡す。", "Hand over action-level procedures before any training."]]].map(([t, d], i) => (
           <div key={i} style={{ background: C.surface2, borderRadius: 8, padding: "8px 11px" }}>
-            <div style={{ fontSize: 12, fontWeight: 800, color: C.wine, marginBottom: 3 }}>{t[en ? 1 : 0]}</div>
+            <div style={{ fontSize: 12, fontWeight: 800, color: C.wineInk, marginBottom: 3 }}>{t[en ? 1 : 0]}</div>
             <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.6 }}>{d[en ? 1 : 0]}</div>
           </div>
         ))}
@@ -157610,7 +157611,7 @@ function BprAdoption({ en }) {
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,240px),1fr))", gap: 8, marginTop: 8 }}>
         <div style={{ background: C.surface2, borderRadius: 8, padding: "8px 11px" }}>
-          <div style={{ fontSize: 11, color: C.wine, fontWeight: 800, marginBottom: 4 }}>{en ? "FOUR CAUSES" : "戻ってしまう4つの原因"}</div>
+          <div style={{ fontSize: 11, color: C.wineInk, fontWeight: 800, marginBottom: 4 }}>{en ? "FOUR CAUSES" : "戻ってしまう4つの原因"}</div>
           <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12, color: C.muted, lineHeight: 1.7 }}>{BPR_DECAY_CAUSE.map((x, i) => <li key={i}>{x[en ? 1 : 0]}</li>)}</ul>
         </div>
         <div style={{ background: C.surface2, borderRadius: 8, padding: "8px 11px", outline: fix ? `1.5px solid ${C.teal}` : "none" }}>
@@ -157689,7 +157690,7 @@ function BprKpi({ en }) {
             <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.6, marginTop: 3 }}>{k.d[en ? 1 : 0]}</div>
           </div>
         )) : (
-          <div style={{ background: C.surface2, borderRadius: 8, padding: "9px 11px", border: `1px dashed ${C.wine}`, fontSize: 11.5, color: C.wine, lineHeight: 1.6 }}>
+          <div style={{ background: C.surface2, borderRadius: 8, padding: "9px 11px", border: `1px dashed ${C.wine}`, fontSize: 11.5, color: C.wineInk, lineHeight: 1.6 }}>
             {en ? "Missing: where the time goes, who can take over, how fast decisions are made, whether the tool is used." : "欠けているもの：時間の行き先、担当を替われるか、判断の速さ、ツールが使われているか。"}
           </div>
         )}
@@ -157787,7 +157788,7 @@ function BprCross({ en }) {
               {on ? (
                 <div style={{ padding: "0 12px 10px", fontSize: 12, lineHeight: 1.75 }}>
                   <div style={{ color: C.muted, marginBottom: 6 }}><span style={{ color: C.text, fontWeight: 700 }}>{en ? "Evidence  " : "エビデンス  "}</span>{x.e}</div>
-                  <div style={{ color: C.muted, marginBottom: 6 }}><span style={{ color: C.wine, fontWeight: 700 }}>{en ? "Implication  " : "示唆  "}</span>{x.a}</div>
+                  <div style={{ color: C.muted, marginBottom: 6 }}><span style={{ color: C.wineInk, fontWeight: 700 }}>{en ? "Implication  " : "示唆  "}</span>{x.a}</div>
                   <BprRefs refs={x.refs} en={en} />
                 </div>
               ) : null}
@@ -159636,7 +159637,7 @@ function ArchQuiz({ lang }) {
         <div style={{ fontSize: 12.5, color: C.muted, fontWeight: 700 }}>{order.length ? (en ? `Q ${i + 1} / ${order.length}` : `第 ${i + 1} 問 / 全 ${order.length} 問`) : (en ? "No questions" : "該当なし")}</div>
         <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
           <span style={{ fontSize: 12, fontWeight: 700, color: answered ? (correct === answered ? C.teal : C.text) : C.muted }}>{en ? "Score" : "スコア"}: {correct} / {answered}{answered ? ` (${Math.round((correct / answered) * 100)}%)` : ""}</span>
-          <button className="gh-btn" onClick={() => setWrongOnly((v) => !v)} disabled={!wrongOnly && wrongCount === 0} style={{ fontSize: 10.5, ...(wrongOnly ? { borderColor: C.wine, color: C.wine, fontWeight: 700 } : {}) }}>{en ? `Wrong only (${wrongCount})` : `間違いのみ (${wrongCount})`}</button>
+          <button className="gh-btn" onClick={() => setWrongOnly((v) => !v)} disabled={!wrongOnly && wrongCount === 0} style={{ fontSize: 10.5, ...(wrongOnly ? { borderColor: C.wine, color: C.wineInk, fontWeight: 700 } : {}) }}>{en ? `Wrong only (${wrongCount})` : `間違いのみ (${wrongCount})`}</button>
           <button className="gh-btn" onClick={() => setShowStats((v) => !v)} style={{ fontSize: 10.5, ...(showStats ? { borderColor: C.gold, color: C.gold, fontWeight: 700 } : {}) }}>{en ? "Stats" : "分野別"}</button>
           <button className="gh-btn" onClick={exportCSV} disabled={!answered} style={{ fontSize: 10.5 }}>CSV</button>
           <button className="gh-btn" onClick={() => setResults({})} style={{ fontSize: 10.5 }}>{en ? "Reset" : "初期化"}</button>
@@ -159671,7 +159672,7 @@ function ArchQuiz({ lang }) {
                 style={{ textAlign: "left", padding: "11px 14px", borderRadius: 8, border: `1px solid ${bd}`, background: bg, cursor: sel === null ? "pointer" : "default", fontSize: 13, color: C.text, lineHeight: 1.6, display: "flex", gap: 8 }}>
                 <span style={{ flexShrink: 0, minWidth: 16, color: C.muted, fontWeight: 800 }}>{k + 1}</span>
                 <span style={{ flex: 1 }}>
-                  <span>{sel !== null && isCorrect ? <span style={{ color: C.teal, fontWeight: 700 }}>✓ </span> : null}{sel !== null && isPicked && !isCorrect ? <span style={{ color: C.wine, fontWeight: 700 }}>✗ </span> : null}{en ? o.en : o.ja}</span>
+                  <span>{sel !== null && isCorrect ? <span style={{ color: C.teal, fontWeight: 700 }}>✓ </span> : null}{sel !== null && isPicked && !isCorrect ? <span style={{ color: C.wineInk, fontWeight: 700 }}>✗ </span> : null}{en ? o.en : o.ja}</span>
                   {sel !== null && q.oe && q.oe[k] ? <span style={{ display: "block", marginTop: 5, fontSize: 11.5, lineHeight: 1.6, color: isCorrect ? C.teal : (isPicked ? C.wine : C.muted) }}>{isCorrect ? "◎ " : "✗ "}{en ? q.oe[k].en : q.oe[k].ja}</span> : null}
                 </span>
               </button>
@@ -159840,7 +159841,7 @@ function FtStackDrill({ lang }) {
           ) : null}
           {c.ch.length ? (
             <div style={{ marginBottom: 8 }}>
-              <div style={{ fontSize: 11, fontWeight: 800, color: C.wine, marginBottom: 3 }}>{en ? "What is still unsolved" : "まだ解けていないこと"}</div>
+              <div style={{ fontSize: 11, fontWeight: 800, color: C.wineInk, marginBottom: 3 }}>{en ? "What is still unsolved" : "まだ解けていないこと"}</div>
               {c.ch.map((s, j) => (<div key={j} style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.65, marginBottom: 2 }}>・{s}</div>))}
             </div>
           ) : null}
@@ -159981,7 +159982,7 @@ function ArchAcademy() {
       <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
         {ARCH_SECTIONS.map((s) => (
           <button key={s.id} className="gh-btn" onClick={() => setSec(s.id)}
-            style={sec === s.id ? { borderColor: C.wine, color: C.wine, fontWeight: 700 } : {}}>{en ? s.titleEn : s.titleJa}</button>
+            style={sec === s.id ? { borderColor: C.wine, color: C.wineInk, fontWeight: 700 } : {}}>{en ? s.titleEn : s.titleJa}</button>
         ))}
         <button className="gh-btn" onClick={() => setSec("__ref__")}
           style={sec === "__ref__" ? { borderColor: C.teal, color: C.teal, fontWeight: 700 } : { borderColor: C.teal, color: C.teal }}>{en ? "◇ Reference diagrams" : "◇ 参照アーキテクチャ（図解）"}</button>
@@ -160840,7 +160841,7 @@ function NoteGovView({ en }) {
             <div style={{ fontSize: 10, color: C.muted, marginTop: 4 }}>{g.d}</div>
             <div style={{ fontSize: 12, lineHeight: 1.75, marginTop: 8 }}>{g.c}</div>
             <div style={{ background: C.surface2, borderRadius: 8, padding: "8px 10px", borderLeft: `3px solid ${C.wine}`, marginTop: 10 }}>
-              <div style={{ color: C.wine, fontWeight: 700, fontSize: 11, marginBottom: 3 }}>{en ? "Tension" : "対立軸"}</div>
+              <div style={{ color: C.wineInk, fontWeight: 700, fontSize: 11, marginBottom: 3 }}>{en ? "Tension" : "対立軸"}</div>
               <div style={{ fontSize: 12, lineHeight: 1.7 }}>{g.x}</div>
             </div>
             <NoteField label={en ? "Caveat" : "留意"} value={g.n} color={C.muted} />
@@ -161000,7 +161001,7 @@ function TabNoteIssues() {
       <SectionTitle jp={`実務論点マップ — note・YouTube ${NOTE_CORPORA.length}コーパス／記事・動画${NOTE_ARTICLES.length}本の論点・根拠・示唆`} en={`Practice Issue Map — claims, evidence and implications across ${NOTE_ARTICLES.length} note articles and videos`} />
       <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
         {views.map(([v, l]) => (
-          <button key={v} className="gh-btn" onClick={() => setView(v)} style={view === v ? { borderColor: C.wine, color: C.wine, fontWeight: 700 } : {}}>{en ? l[1] : l[0]}</button>
+          <button key={v} className="gh-btn" onClick={() => setView(v)} style={view === v ? { borderColor: C.wine, color: C.wineInk, fontWeight: 700 } : {}}>{en ? l[1] : l[0]}</button>
         ))}
       </div>
       {view === "map" && <NoteMapView en={en} />}
@@ -162127,7 +162128,7 @@ function SlSkillsView({ en }) {
                     {s.good.map((g, i) => <div key={i} style={{ fontSize: 12, color: C.text, lineHeight: 1.65 }}>・{L(g)}</div>)}
                   </div>
                   <div style={{ fontSize: 12, lineHeight: 1.65 }}><span style={{ color: C.teal, fontWeight: 700 }}>{en ? "Drill: " : "演習: "}</span>{L(s.drill)}</div>
-                  <div style={{ fontSize: 12, lineHeight: 1.65, background: C.bg, borderRadius: 8, padding: "7px 9px", borderLeft: `3px solid ${C.wine}` }}><span style={{ color: C.wine, fontWeight: 700 }}>{en ? "Trap: " : "落とし穴: "}</span>{L(s.trap)}</div>
+                  <div style={{ fontSize: 12, lineHeight: 1.65, background: C.bg, borderRadius: 8, padding: "7px 9px", borderLeft: `3px solid ${C.wine}` }}><span style={{ color: C.wineInk, fontWeight: 700 }}>{en ? "Trap: " : "落とし穴: "}</span>{L(s.trap)}</div>
                 </div>
               ) : (
                 <div style={{ fontSize: 11, color: C.dim, textAlign: "right", cursor: "pointer" }} onClick={() => setOpen(s.id)}>{en ? "Open details" : "詳しく見る"}</div>
@@ -162150,7 +162151,7 @@ function SlSkillsView({ en }) {
         <div style={{ display: "grid", gap: 8 }}>
           {SL_COUNCIL.conflicts.map((c, i) => (
             <div key={i} style={card}>
-              <div style={{ fontSize: 12, fontWeight: 800, color: C.wine }}>{L(c[0])}</div>
+              <div style={{ fontSize: 12, fontWeight: 800, color: C.wineInk }}>{L(c[0])}</div>
               <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.65, margin: "3px 0" }}>{L(c[1])}</div>
               <div style={{ fontSize: 12, color: C.text, lineHeight: 1.65 }}>→ {L(c[2])}</div>
             </div>
@@ -162163,7 +162164,7 @@ function SlSkillsView({ en }) {
             {SL_COUNCIL.assume.map((a, i) => <div key={i} style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.6 }}>・{L(a)}</div>)}
           </div>
           <div style={card}>
-            <div style={{ fontSize: 11.5, fontWeight: 700, color: C.wine, marginBottom: 4 }}>{en ? "What would change this" : "この結論が変わる条件"}</div>
+            <div style={{ fontSize: 11.5, fontWeight: 700, color: C.wineInk, marginBottom: 4 }}>{en ? "What would change this" : "この結論が変わる条件"}</div>
             {SL_COUNCIL.falsify.map((a, i) => <div key={i} style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.6 }}>・{L(a)}</div>)}
           </div>
         </div>
@@ -162186,7 +162187,7 @@ function SlCasesView({ en }) {
             </div>
             <div style={{ fontSize: 12, lineHeight: 1.7, margin: "8px 0" }}>{L(c.what)}</div>
             <div style={{ fontSize: 12, lineHeight: 1.7, background: C.surface2, borderRadius: 8, padding: "8px 10px", borderLeft: `3px solid ${C.wine}`, marginBottom: 8 }}>
-              <span style={{ color: C.wine, fontWeight: 700 }}>{en ? "Transformation lesson: " : "変革の学び: "}</span>{L(c.lesson)}
+              <span style={{ color: C.wineInk, fontWeight: 700 }}>{en ? "Transformation lesson: " : "変革の学び: "}</span>{L(c.lesson)}
             </div>
             <div style={{ fontSize: 12, lineHeight: 1.7, color: C.muted }}><span style={{ color: C.teal, fontWeight: 700 }}>{en ? "In Japan: " : "日本への翻訳: "}</span>{L(c.jp)}</div>
           </Card>
@@ -162270,7 +162271,7 @@ function SlPlanView({ en }) {
           ))}
         </div>
         <div style={{ marginTop: 10, background: C.surface2, borderLeft: `3px solid ${C.wine}`, borderRadius: 8, padding: "9px 12px" }}>
-          <div style={{ fontSize: 12, fontWeight: 800, color: C.wine, marginBottom: 4 }}>{en ? "Largest gaps to your target" : "目標との差が大きい順"}</div>
+          <div style={{ fontSize: 12, fontWeight: 800, color: C.wineInk, marginBottom: 4 }}>{en ? "Largest gaps to your target" : "目標との差が大きい順"}</div>
           {unrated > 0 && <div style={{ fontSize: 11.5, color: C.dim, marginBottom: 4 }}>{en ? `${unrated} area(s) not yet rated. Levels are stored on this device only.` : `未評価 ${unrated} 領域（評価はこの端末にのみ保存）`}</div>}
           {gaps.length === 0 ? <div style={{ fontSize: 12, color: C.muted }}>{rated.length ? (en ? "Every rated area meets your target." : "評価した領域はすべて目標に届いています。") : (en ? "Rate each area to see your gaps." : "各領域を評価すると差が表示されます。")}</div>
             : gaps.slice(0, 3).map((x) => <div key={x.d.id} style={{ fontSize: 12, color: C.text, lineHeight: 1.7 }}>・{en ? x.d.en : x.d.ja}（{en ? `gap ${x.g}` : `差 ${x.g}`}）— {en ? "open the skill card's drill, then the quiz for this area" : "スキルの演習を行い、同じ領域のクイズで確かめる"}</div>)}
@@ -162302,7 +162303,7 @@ function TabSlalom() {
       </div>
       <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
         {views.map(([v, l]) => (
-          <button key={v} className="gh-btn" onClick={() => setView(v)} style={view === v ? { borderColor: C.wine, color: C.wine, fontWeight: 700 } : {}}>{en ? l[1] : l[0]}</button>
+          <button key={v} className="gh-btn" onClick={() => setView(v)} style={view === v ? { borderColor: C.wine, color: C.wineInk, fontWeight: 700 } : {}}>{en ? l[1] : l[0]}</button>
         ))}
       </div>
       {view === "skills" && <SlSkillsView en={en} />}
@@ -164145,7 +164146,7 @@ function GovTaxonomy({ en, sec = GTX_SEC, gov = GTX_GOV, xref = GTX_XREF, intro,
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,300px),1fr))", gap: 12, marginBottom: 10 }}>
         <div>
-          <div style={{ fontSize: 11.5, fontWeight: 800, color: C.wine, marginBottom: 6, letterSpacing: 1 }}>{labels ? labels.sec[en ? 1 : 0] : (en ? "SECURITY — S1-S11" : "セキュリティ論点 S1〜S11")}</div>
+          <div style={{ fontSize: 11.5, fontWeight: 800, color: C.wineInk, marginBottom: 6, letterSpacing: 1 }}>{labels ? labels.sec[en ? 1 : 0] : (en ? "SECURITY — S1-S11" : "セキュリティ論点 S1〜S11")}</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>{sec.map((x) => chip(x, "s"))}</div>
         </div>
         <div>
@@ -164701,7 +164702,7 @@ function GovIRClock({ en, rows: rowsIn, foot, steps: stepsIn }) {
           </div>
           {t == null ? <div style={{ fontSize: 11, color: C.dim, marginTop: 4 }}>{en ? "Move the slider to see which deadlines have passed at that point and which comes next." : "スライダーを動かすと、その時点で過ぎた期限と、次に来る期限が出る。"}</div> : (
             <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.7, marginTop: 6, background: C.surface, border: `1px solid ${C.line}`, borderRadius: 8, padding: "6px 10px" }}>
-              <div><b style={{ color: C.wine }}>{en ? `Passed (${passed.length}): ` : `過ぎた期限（${passed.length}）：`}</b>{passed.length ? passed.map((o) => `${o.c.reg[en ? 1 : 0]} ${short(o.m)}`).join(en ? "; " : "／") : (en ? "none yet" : "まだ無い")}</div>
+              <div><b style={{ color: C.wineInk }}>{en ? `Passed (${passed.length}): ` : `過ぎた期限（${passed.length}）：`}</b>{passed.length ? passed.map((o) => `${o.c.reg[en ? 1 : 0]} ${short(o.m)}`).join(en ? "; " : "／") : (en ? "none yet" : "まだ無い")}</div>
               <div><b style={{ color: C.gold }}>{en ? "Next: " : "次の期限："}</b>{nextM ? `${nextM.c.reg[en ? 1 : 0]} ${short(nextM.m)}${exact(nextM.m) ? (en ? ` (in about ${fmtH(nextM.m.h - t)})` : `（あと約${fmtH(nextM.m.h - t)}）`) : (en ? " (not counted in plain hours: click the row for how it is counted)" : "（時間では数えられない期限。数え方は行を押して確かめる）")}` : (en ? "none on this chart" : "この図の中には無い")}</div>
               <div style={{ fontSize: 10.5, color: C.dim, marginTop: 2 }}>{en ? "A rough guide on one shared axis: each rule starts its clock at a different point. Click a row for its trigger." : "同じ軸に並べた目安。期限の起点は規制ごとに違うので、行を押して起点を確かめる。"}</div>
             </div>
@@ -165605,7 +165606,7 @@ function GovKit({ en, tab0 }) {
           <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.6 }}>{L(E.what)}</div>
           <div style={{ fontSize: 11.5, color: C.dim, lineHeight: 1.6 }}>{en ? "When: " : "いつ："}{L(E.when)}　{en ? "Who: " : "誰が："}{L(E.who)}</div>
           <div style={{ fontSize: 11.5, color: C.dim, lineHeight: 1.6 }}>{en ? "How: " : "方法・指標："}{L(E.how)}</div>
-          {E.trap ? <div style={{ fontSize: 11.5, color: C.wine, lineHeight: 1.6 }}>{en ? "Trap: " : "落とし穴："}{L(E.trap)}</div> : null}
+          {E.trap ? <div style={{ fontSize: 11.5, color: C.wineInk, lineHeight: 1.6 }}>{en ? "Trap: " : "落とし穴："}{L(E.trap)}</div> : null}
           <GovSrc src={E.src} en={en} />
         </div>
         <GV_H>{en ? "Setting the pass mark" : "合格基準の決め方"}</GV_H>
@@ -165621,7 +165622,7 @@ function GovKit({ en, tab0 }) {
               <div style={{ background: "rgba(57,135,229,0.12)", borderLeft: `4px solid ${GV_COL.law}`, borderRadius: 7, padding: "5px 8px", fontSize: 11.5, color: C.text, lineHeight: 1.55 }}>🤖 {L(x.ai)}</div>
               <div style={{ background: "rgba(217,89,38,0.12)", borderLeft: `4px solid ${GV_COL.gov}`, borderRadius: 7, padding: "5px 8px", fontSize: 11.5, color: C.text, lineHeight: 1.55 }}>🧑‍⚖️ {L(x.human)}</div>
             </div>
-            <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.55, marginTop: 4 }}><b style={{ color: C.wine }}>{en ? "Risk: " : "リスク："}</b>{L(x.risk)}　<b style={{ color: C.teal }}>{en ? "Controls: " : "統制："}</b>{L(x.ctl)}</div>
+            <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.55, marginTop: 4 }}><b style={{ color: C.wineInk }}>{en ? "Risk: " : "リスク："}</b>{L(x.risk)}　<b style={{ color: C.teal }}>{en ? "Controls: " : "統制："}</b>{L(x.ctl)}</div>
             <GovSrc src={x.src} en={en} />
           </div>
         ))}
@@ -166320,7 +166321,7 @@ function GovProfile({ en, init, onTab }) {
         <div style={{ display: "flex", gap: 4, flexWrap: "wrap", alignItems: "center" }}>
           {GOVGAP_ST.map(([st, ja, enl, col]) => <button key={st || "none"} onClick={() => setG(k, "st", st)} style={{ fontSize: 10.5, padding: "2px 8px", borderRadius: 99, cursor: "pointer", border: `1px solid ${(g.st || "") === st ? col : C.line}`, background: (g.st || "") === st ? col : "transparent", color: (g.st || "") === st ? C.bg : C.muted, fontWeight: (g.st || "") === st ? 800 : 500 }}>{en ? enl : ja}</button>)}
           <button onClick={() => setOpen(op ? null : k)} style={{ fontSize: 10.5, padding: "2px 8px", borderRadius: 99, cursor: "pointer", border: `1px solid ${C.line}`, background: "transparent", color: C.text }}>{op ? (en ? "Close" : "閉じる") : (en ? "Owner, due, evidence" : "担当・期限・根拠")}{g.ow || g.due || g.ev || g.memo ? " ●" : ""}</button>
-          {noEv(k) ? <span style={{ fontSize: 10.5, color: C.wine }}>{en ? "Add evidence for 'Done'" : "「対応済」には根拠資料を書く"}</span> : null}
+          {noEv(k) ? <span style={{ fontSize: 10.5, color: C.wineInk }}>{en ? "Add evidence for 'Done'" : "「対応済」には根拠資料を書く"}</span> : null}
         </div>
         {op ? (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,180px),1fr))", gap: 6, marginTop: 6 }}>
@@ -166447,7 +166448,7 @@ ${dec.length ? "<table><tr><th>" + esc(en ? "Decision" : "事項") + "</th><th>"
           <div className="gov-noprint" style={{ display: "flex", justifyContent: "flex-end", marginBottom: 6 }}><button onClick={printExec} style={{ background: C.teal, color: C.bg, border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 12, fontWeight: 800, cursor: "pointer" }}>{en ? "Print / save as PDF" : "印刷・PDFで保存"}</button></div>
           <div style={{ fontSize: 16, fontWeight: 800, color: C.text }}>{en ? "AI governance: where we stand (for executives)" : "AIガバナンス 現状の要点（経営層向け）"}</div>
           <div style={{ fontSize: 11, color: C.dim, margin: "2px 0 8px" }}>{(en ? "Industries: " : "業界：") + (sel.map(indL).join("・") || "-")}　{(en ? "Markets: " : "地域：") + mk.map(regL).join("・")}　{(en ? "Check date " : "確認日 ") + GOVREG_ASOF}　{(en ? "Made " : "作成日 ") + today}</div>
-          <div style={{ fontSize: 11, color: C.wine, marginBottom: 10 }}>{en ? "Self-assessment, not audited. A learning summary, not legal advice — confirm at source." : "自己評価・未監査。学習用の整理で法的助言ではない。原典で確かめること。"}</div>
+          <div style={{ fontSize: 11, color: C.wineInk, marginBottom: 10 }}>{en ? "Self-assessment, not audited. A learning summary, not legal advice — confirm at source." : "自己評価・未監査。学習用の整理で法的助言ではない。原典で確かめること。"}</div>
           {upcoming12.length ? (
             <div className="gov-noprint" style={{ marginBottom: 10 }}>
               <div style={{ fontSize: 12, fontWeight: 800, color: C.text }}>{en ? "The next 12 months at a glance" : "これから12か月（一目で）"}<span style={{ fontSize: 10.5, color: C.dim, fontWeight: 500, marginLeft: 6 }}>{en ? "hover a point for the date and what happens" : "点にカーソルを当てると、日付と中身が出る"}</span></div>
@@ -166633,7 +166634,7 @@ function GafaHub() {
             <div>
               <div style={{ fontSize: 11, color: C.gold, letterSpacing: ".3em" }}>{t(lang, "track")}</div>
               <h1 className="gh-display gh-h1" style={{ fontSize: 30, margin: "6px 0 4px", fontWeight: 700 }}>
-                Tech<span style={{ color: C.wine }}>Hub</span>
+                Tech<span style={{ color: C.wineInk }}>Hub</span>
               </h1>
               <div style={{ fontSize: 12.5, color: C.muted }}>{t(lang, "tagline")}</div>
             </div>
