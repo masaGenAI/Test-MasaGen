@@ -16,6 +16,21 @@ h1{ font-size:19px; margin:0 0 2px; font-weight:700; color:var(--accent-d); }
 .tab:hover{ background:#eaf1fb; } .tab.on{ color:#fff; border-color:transparent; }
 .cards{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:20px; }
 @media(max-width:680px){ .cards{ grid-template-columns:repeat(2,1fr);} }
+/* スマホ幅：表を1行1枚のカードにして、各項目を「列名：値」で縦に並べる（並べ替えは上の絞り込み欄から） */
+@media(max-width:640px){
+  .tblwrap{ overflow-x:visible; border:none; background:transparent; }
+  #tbl{ display:block; width:auto !important; table-layout:auto !important; }
+  #tbl thead{ display:none; }
+  #tbl tbody{ display:block; }
+  #tbl tbody tr{ display:block; background:#fff; border:1px solid #d6e0ee; border-radius:12px; margin:0 0 10px; padding:6px 12px; }
+  #tbl tbody tr.rdone{ background:#e9edf2; }
+  #tbl tbody td{ display:flex; align-items:center; gap:10px; width:auto !important; max-width:none !important; min-height:36px; padding:4px 0 !important; border:none !important; border-bottom:1px solid #eef2f7 !important; white-space:normal !important; overflow:visible !important; }
+  #tbl tbody td:last-child{ border-bottom:none !important; }
+  #tbl tbody td, #tbl tbody td.c{ text-align:left !important; justify-content:flex-start; }
+  #tbl tbody td[data-label]::before{ content:attr(data-label); flex:0 0 88px; font-size:11.5px; font-weight:700; color:#56657a; }
+  #tbl tbody td input, #tbl tbody td select, #tbl tbody td textarea{ flex:1; min-width:0; min-height:36px; font-size:15px; }
+  #tbl tbody td:empty{ display:none; }
+}
 .card{ background:#fff; border:1px solid #e3ebf5; border-radius:12px; padding:12px 13px; }
 .card .ttl{ font-size:12.5px; font-weight:700; display:flex; align-items:center; gap:6px; }
 .card .dot{ width:9px; height:9px; border-radius:50%; display:inline-block; }
@@ -627,6 +642,8 @@ function renderTable(k){
     th.addEventListener("drop",function(e){ e.preventDefault(); th.classList.remove("dragover"); var tgt=+th.dataset.ci; if(dragSrc!=null&&dragSrc!==tgt)moveCol(k,dragSrc,tgt); dragSrc=null; });
     th.addEventListener("click",function(){ var ci=+th.dataset.ci; var cur=sortState[k]||{col:0,dir:1}; sortState[k]= cur.col===ci?{col:ci,dir:-cur.dir}:{col:ci,dir:1}; renderTable(k); });
   });
+  // スマホ幅のカード表示で「見出し：値」と出すため、各セルに列名を持たせる
+  tbody.querySelectorAll("tr").forEach(function(tr){ Array.prototype.forEach.call(tr.children,function(td,pos){ var th=thsArr[pos]; if(!th||th.dataset.ci===undefined)return; var c=fullCols[+th.dataset.ci]; if(c&&c.h)td.setAttribute("data-label",c.h); td.querySelectorAll("input,select,textarea").forEach(function(f){ if(c&&c.h&&!f.getAttribute("aria-label"))f.setAttribute("aria-label",c.h); }); }); });
   if(!WIDTHS[k])WIDTHS[k]={}; fullCols.forEach(function(c,ci){ if(WIDTHS[k][ci]==null)WIDTHS[k][ci]=colWidth(c); });
   applyColResize(k, thead, tbl);
   updateRestore();

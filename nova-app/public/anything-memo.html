@@ -34,6 +34,8 @@
 #amt .memo .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
 #amt .memo .t{color:var(--accent);font-weight:800;font-size:.98rem;margin-bottom:6px;}
 #amt .memo .note{font-size:.83rem;color:#3a4051;margin-bottom:10px;}
+/* 「Business/People/Governance/…」のような空白のない長い語でスマホ幅を超えないよう、必要なときだけ折り返す */
+#amt{overflow-wrap:anywhere;}
 #amt .memo .meta{display:flex;align-items:center;gap:10px;font-size:.74rem;color:var(--muted);}
 #amt .badge{border-radius:999px;padding:3px 10px;font-weight:700;font-size:.72rem;}
 #amt .empty{color:var(--muted);font-size:.85rem;padding:20px;text-align:center;}
