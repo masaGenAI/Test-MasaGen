@@ -148238,6 +148238,8 @@ function TabFactbook() {
   const [region, setRegion] = useState("all"); // all | world | jp
   const [propOpen, setPropOpen] = useState(true);
   const [fbN, setFbN] = usePaged([cat, q, region].join("|"), 24);
+  const { jump } = useJump();
+  useEffect(() => { if (jump && jump.tab === "factbook" && jump.fbq) { setCat("all"); setRegion("all"); setQ(jump.fbq); } }, [jump && jump.nonce]);
   const qn = q.trim().toLowerCase();
   // v4は本体データに日本市場も含む（対象地域=日本）。地域トグルは各項目のr列で判定する。
   const ALL = MEGATECH_FACTBOOK;
@@ -148250,7 +148252,7 @@ function TabFactbook() {
   };
   const isJp = (it) => (it.r || "").indexOf("日本") >= 0;
   const inRegion = (it) => region === "all" || (region === "jp" ? isJp(it) : !isJp(it));
-  const list = ALL.filter((it) => inRegion(it) && (cat === "all" || it.c === cat) && (!qn || (it.h + it.v + it.n + it.s + (it.lens || "") + (it.src || "") + (it.use || "")).toLowerCase().indexOf(qn) >= 0));
+  const list = ALL.filter((it) => inRegion(it) && (cat === "all" || it.c === cat) && (!qn || (it.h + it.v + it.n + it.s + (it.lens || "") + (it.src || "") + (it.use || "") + (it.hEn || "") + (it.vEn || "") + (it.nEn || "") + (it.useEn || "")).toLowerCase().indexOf(qn) >= 0));
   const cnt = (c) => ALL.filter((it) => inRegion(it) && (c === "all" || it.c === c)).length;
   const chip = (k, label) => (
     <button key={k} onClick={() => setCat(k)} style={{ background: cat === k ? C.wineDeep : C.surface2, border: `1px solid ${cat === k ? C.wine : C.line}`, color: C.text, borderRadius: 999, padding: "5px 12px", fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>{label} <span style={{ color: C.dim }}>{cnt(k)}</span></button>
@@ -166520,10 +166522,10 @@ function GovDojo({ onTab } = {}) {
   const en = lang === "en";
   const [deep] = useState(() => govDeep());
   const [mode, setMode] = useState(deep && deep.mode ? deep.mode : "home");
-  useEffect(() => { if (deep) { try { window.history.replaceState(null, "", "#megatech"); } catch (e) {} } }, []);
+  useEffect(() => { if (deep) { try { window.history.replaceState(null, "", "#megatech/govdojo"); } catch (e) {} } }, []);
   const __opBack = useLocalHistory([[mode, setMode]]);
   useRegisterBack(__opBack.back, __opBack.canBack);
-  const [focusInc, setFocusInc] = useState(null);
+  const [focusInc, setFocusInc] = useState(() => (deep && deep.mode === "incidents" && deep.q.id ? { id: deep.q.id, n: 1 } : null));
   const openIncident = (id) => { setFocusInc({ id, n: Date.now() }); setMode("incidents"); };
   // 画面の間の移動（ユースケースから判定演習・業界・実務キットへ）。上の画面切替を押したら消す
   const [nav, setNav] = useState(null);
@@ -166565,15 +166567,98 @@ function GovDojo({ onTab } = {}) {
 
 const STORE_KEY = "gafa_hub_v1";
 
+// ---------- TechHub 横断検索（タブ・用語・定量データ・規制・業界・事例・ユースケース・ひな形・企業・問題） ----------
+const THS_KIND = { tab: ["タブ", "Tab"], lex: ["用語", "Term"], fb: ["定量データ", "Figure"], reg: ["規制・指針", "Regulation"], ind: ["業界", "Industry"], rule: ["業界の規定", "Industry rule"], inc: ["事例", "Incident"], uc: ["ユースケース", "Use case"], tpl: ["ひな形", "Template"], co: ["企業", "Company"], quiz: ["問題", "Questions"] };
+const THS_ORDER = ["tab", "uc", "tpl", "reg", "ind", "lex", "inc", "fb", "rule", "co", "quiz"];
+function thsTabFromHash() {
+  try { const m = (window.location.hash || "").replace(/^#\/?/, "").match(/^megatech\/([a-z0-9_]+)(?:[/?]|$)/); return m && TABS.some((x) => x.id === m[1]) ? m[1] : null; } catch (e) { return null; }
+}
+function TechHubSearch({ lang, setTab, setJump, narrow }) {
+  const en = lang === "en";
+  const L = (x) => (Array.isArray(x) ? x[en ? 1 : 0] : x || "");
+  const [q, setQ] = useState("");
+  const [open, setOpen] = useState(false);
+  const [hi, setHi] = useState(0);
+  const inp = useRef(null);
+  const goHash = (h) => { try { window.location.hash = h; } catch (e) {} };
+  const index = useMemo(() => {
+    const out = [];
+    const add = (k, label, sub, extra, act) => out.push({ k, label, sub, act, nl: normalizeSearch(label), hay: normalizeSearch([label, sub, extra].filter(Boolean).join(" ")) });
+    TABS.forEach((tb) => add("tab", t(lang, tb.k), "", [t("ja", tb.k), t("en", tb.k), tb.id].join(" "), () => setTab(tb.id)));
+    ((typeof GOVUC !== "undefined" && GOVUC && GOVUC.list) || []).forEach((u) => add("uc", L(u.name), L(u.ex), [u.name.join(" "), u.ex.join(" ")].join(" "), () => goHash("#megatech/govdojo/usecase?u=" + u.key)));
+    ((typeof GOVTPL !== "undefined" && GOVTPL && GOVTPL.list) || []).forEach((x) => add("tpl", L(x.name), L(x.purpose), x.name.join(" "), () => goHash("#megatech/govdojo/templates?t=" + x.id)));
+    GOVREG_ITEMS.forEach((x) => add("reg", L(x.short || x.name), L(GOVREG_RL[x.region] || [x.region, x.region]), [x.name.join(" "), (x.short || []).join(" "), x.id].join(" "), () => goHash("#megatech/govdojo/regmap?id=" + encodeURIComponent(x.id))));
+    GOVIND.forEach((d) => {
+      add("ind", L([d.ind, d.ind_en]), en ? `${d.regs.length} rules` : `規定${d.regs.length}件`, [d.ind, d.ind_en, d.key].join(" "), () => goHash("#megatech/govdojo/industry?k=" + d.key));
+      d.regs.forEach((r) => add("rule", L(r.name).replace(/（[^）]{12,}）/, ""), L([d.ind, d.ind_en]), r.name.join(" "), () => goHash("#megatech/govdojo/industry?k=" + d.key)));
+    });
+    LEXICON.forEach((g) => add("lex", en ? (g.en || g.t) : g.t, String(en ? (g.dEn || g.d || "") : (g.d || "")).slice(0, 70), [g.t, g.en].filter(Boolean).join(" "), () => setJump({ tab: "lexicon", lexTerm: g.t })));
+    GOVDOJO_INCIDENTS.forEach((x) => add("inc", L(x.t), x.date + (x.org ? " ・ " + L(x.org) : ""), x.t.join(" "), () => goHash("#megatech/govdojo/incidents?id=" + x.id)));
+    MEGATECH_FACTBOOK.forEach((it) => add("fb", en ? (it.hEn || it.h) : it.h, en ? (it.vEn || it.v) : it.v, [it.h, it.hEn, it.src].filter(Boolean).join(" "), () => setJump({ tab: "factbook", fbq: it.h })));
+    COMPANIES.forEach((c) => add("co", c.name, c.org || "", c.prod || "", () => setTab("companies")));
+    return out;
+  }, [lang]);
+  const parts = q.trim().split(/[\s　]+/).map(normalizeSearch).filter(Boolean);
+  const res = useMemo(() => {
+    if (!parts.length) return [];
+    const hits = index.filter((x) => parts.every((p) => x.hay.includes(p)))
+      .map((x) => ({ ...x, s: x.nl.startsWith(parts[0]) ? 0 : x.nl.includes(parts[0]) ? 1 : 2 }))
+      .sort((a, b) => a.s - b.s || THS_ORDER.indexOf(a.k) - THS_ORDER.indexOf(b.k));
+    const per = {}; const out = [];
+    hits.forEach((x) => { per[x.k] = (per[x.k] || 0) + 1; if (per[x.k] <= 6 && out.length < 36) out.push(x); });
+    out.push({ k: "quiz", label: en ? `Drill Tech Dojo questions on “${q.trim()}”` : `技術道場の問題を「${q.trim()}」で絞って解く`, sub: "", act: () => setJump({ tab: "dojo", dojoView: "mcq", quizQuery: q.trim() }) });
+    return out;
+  }, [q, index]);
+  const total = useMemo(() => (parts.length ? index.filter((x) => parts.every((p) => x.hay.includes(p))).length : 0), [q, index]);
+  useEffect(() => { setHi(0); }, [q]);
+  // 「/」で検索窓へ
+  useEffect(() => {
+    const f = (e) => { const tg = (e.target && e.target.tagName) || ""; if (e.key === "/" && tg !== "INPUT" && tg !== "TEXTAREA" && tg !== "SELECT") { e.preventDefault(); inp.current && inp.current.focus(); } };
+    window.addEventListener("keydown", f);
+    return () => window.removeEventListener("keydown", f);
+  }, []);
+  const run = (x) => { if (!x) return; setOpen(false); setQ(""); try { inp.current && inp.current.blur(); } catch (e) {} x.act(); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} };
+  return (
+    <div style={{ position: "relative", flex: narrow ? "1 1 100%" : "1 1 240px", maxWidth: narrow ? "none" : 360, marginLeft: narrow ? 0 : "auto" }}>
+      <input ref={inp} type="search" value={q} onChange={(e) => { setQ(e.target.value); setOpen(true); }} onFocus={() => setOpen(true)} onBlur={() => setTimeout(() => setOpen(false), 160)}
+        onKeyDown={(e) => { if (e.key === "ArrowDown") { e.preventDefault(); setHi(Math.min(res.length - 1, hi + 1)); } else if (e.key === "ArrowUp") { e.preventDefault(); setHi(Math.max(0, hi - 1)); } else if (e.key === "Enter") { e.preventDefault(); run(res[hi]); } else if (e.key === "Escape") { setOpen(false); e.currentTarget.blur(); } }}
+        placeholder={en ? "Search TechHub — terms, rules, incidents, figures… ( / )" : "TechHubを検索 — 用語・規制・事例・データ…（ / ）"} aria-label={en ? "Search TechHub" : "TechHubを検索"} role="combobox" aria-expanded={open && res.length > 0} aria-controls="ths-list"
+        className="gh-input" style={{ width: "100%", boxSizing: "border-box", fontSize: 12.5, padding: "6px 10px" }} />
+      {open && parts.length ? (
+        <div id="ths-list" role="listbox" style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, minWidth: narrow ? 0 : 340, zIndex: 60, background: C.surface2, border: `1px solid ${C.gold}`, borderRadius: 10, boxShadow: "0 10px 28px rgba(0,0,0,.5)", maxHeight: "60vh", overflowY: "auto", padding: 4 }}>
+          <div style={{ fontSize: 10.5, color: C.dim, padding: "3px 8px" }}>{en ? `${total} matches${total > res.length - 1 ? " (top shown)" : ""} · ↑↓ to move, Enter to open` : `${total}件${total > res.length - 1 ? "（上位を表示）" : ""}・↑↓で選び Enter で開く`}</div>
+          {res.map((x, i) => (
+            <button key={i} role="option" aria-selected={i === hi} onMouseDown={(e) => e.preventDefault()} onClick={() => run(x)} onMouseEnter={() => setHi(i)}
+              style={{ display: "flex", gap: 8, alignItems: "baseline", width: "100%", textAlign: "left", background: i === hi ? C.surface : "transparent", border: "none", borderRadius: 7, padding: "6px 8px", cursor: "pointer", color: C.text }}>
+              <span style={{ flex: "0 0 auto", fontSize: 10, fontWeight: 800, color: x.k === "quiz" ? C.teal : C.gold, border: `1px solid ${C.line}`, borderRadius: 99, padding: "0 7px" }}>{L(THS_KIND[x.k])}</span>
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <span style={{ fontSize: 12.5, fontWeight: 700 }}>{x.label}</span>
+                {x.sub ? <span style={{ display: "block", fontSize: 11, color: C.muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{x.sub}</span> : null}
+              </span>
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function GafaHub() {
-  const [tab, _setTab] = useState(() => (govDeep() ? "govdojo" : "strategy"));
+  const [tab, _setTab] = useState(() => (govDeep() ? "govdojo" : thsTabFromHash() || "strategy"));
   const [resetKey, setResetKey] = useState(0); // 「↑トップへ」で現在タブを再マウント→初期化（道場以外）
   // 開いている画面に道場の共有リンクを貼ったとき：道場のタブへ移り、道場を開き直してリンクの位置を読む
   useEffect(() => {
-    const f = () => { if (govDeep()) { _setTab("govdojo"); setResetKey((n) => n + 1); } };
+    const f = () => {
+      if (govDeep() && govDeep().mode) { _setTab("govdojo"); setResetKey((n) => n + 1); return; }
+      const id = thsTabFromHash(); if (id) _setTab((cur) => (cur === id ? cur : id));
+    };
     window.addEventListener("hashchange", f);
     return () => window.removeEventListener("hashchange", f);
   }, []);
+  // 今のタブをアドレスに書く（#megatech/<タブ>）。共有・ブックマーク・再読み込みで同じタブを開ける
+  useEffect(() => {
+    try { const want = "#megatech/" + tab; const cur = window.location.hash || ""; if (cur !== want && !(tab === "govdojo" && /^#megatech\/govdojo[/?]/.test(cur))) window.history.replaceState(null, "", want); } catch (e) {}
+  }, [tab]);
   // 1つ前の画面に戻る（閲覧履歴。setTab 経由のタブ遷移を自動記録）
   const [tabHist, setTabHist] = useState([]);
   const setTab = (k) => { if (k !== tab) setTabHist((h) => [...h, tab]); _setTab(k); };
@@ -166691,6 +166776,8 @@ function GafaHub() {
                 <button className="gh-btn" onClick={() => setNavOpen(!open)} aria-expanded={open} aria-controls="techhub-tabs" style={{ fontSize: 12, padding: "5px 11px" }}>{open ? (lang === "en" ? "Hide tabs ▲" : "タブ一覧をたたむ ▲") : (lang === "en" ? `All tabs (${TABS.length}) ▼` : `タブ一覧（${TABS.length}） ▼`)}</button>
                 {rec.length ? <span style={{ fontSize: 10.5, color: C.dim, marginLeft: 4 }}>{lang === "en" ? "Recent" : "最近"}</span> : null}
                 {rec.map((id) => { const tb = TABS.find((x) => x.id === id); const g = NAV_G.find((x) => x.ids.includes(id)) || curG; return <button key={id} onClick={() => pick(id)} style={{ fontSize: 11.5, padding: "3px 10px", borderRadius: 99, border: `1px solid ${C.line}`, borderLeft: `3px solid ${g.col}`, background: "transparent", color: C.text, cursor: "pointer" }}>{t(lang, tb.k)}</button>; })}
+                <TechHubSearch lang={lang} setTab={pick} setJump={setJump} narrow={narrow} />
+                <GovShare en={lang === "en"} url={(typeof window !== "undefined" ? window.location.href.split("#")[0] : "") + "#megatech/" + tab} />
               </div>
               {open ? (
                 <nav id="techhub-tabs" style={{ display: "flex", flexDirection: "column", gap: narrow ? 12 : 10, marginBottom: 22 }} aria-label="tabs">
