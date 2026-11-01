@@ -2598,6 +2598,53 @@ function saveStamp(ms) {
 // ============================================================
 const HubBackCtx = createContext(null);
 
+// ============================================================
+// ハブの中の位置（第1階層：どの資格・どのセクション・どの画面か）を URL のハッシュ #hub/a/b に残す。
+// - 開いたとき：URL に位置があれば、そこから始める（再読み込み・共有したリンク）
+// - 位置が変わったとき：ブラウザの履歴に積む（「戻る」でひとつ前の位置へ）
+// - 「戻る」「進む」：URL の位置を画面に戻す
+// parts は今の状態を表す文字列の配列、apply(arr) は配列から状態を戻す関数（不正な値は既定に戻すこと）。
+// それより深い位置（資格の中のタブなど）は、各ハブのアプリ内「戻る」に任せる。
+// ============================================================
+function novaHubPath(hub) {
+  try {
+    const h = (window.location.hash || "").replace(/^#\/?/, "").split("?")[0];
+    const [head, ...rest] = h.split("/");
+    return head === hub ? rest.filter(Boolean).map((x) => { try { return decodeURIComponent(x); } catch (e) { return x; } }) : null;
+  } catch (e) { return null; }
+}
+function useNovaHubRoute(hub, parts, apply) {
+  const key = parts.filter((x) => x != null && x !== "").map(String).join("/");
+  const applyRef = useRef(apply);
+  applyRef.current = apply;
+  const lastRef = useRef(null);
+  const fromUrlRef = useRef(false);
+  useEffect(() => {
+    const p = novaHubPath(hub);
+    // URL から位置を戻した直後の描画は、まだ古い状態のままなので、下の書き込みで履歴を積まない
+    if (p && p.length) { lastRef.current = p.join("/"); fromUrlRef.current = true; applyRef.current(p); }
+    else lastRef.current = key;
+    const onNav = () => {
+      const q = novaHubPath(hub);
+      if (q === null) return; // ハブの外へ出た（ポータル側が処理する）
+      const k = q.join("/");
+      if (k === lastRef.current) return;
+      lastRef.current = k;
+      applyRef.current(q);
+    };
+    window.addEventListener("popstate", onNav);
+    window.addEventListener("hashchange", onNav);
+    return () => { window.removeEventListener("popstate", onNav); window.removeEventListener("hashchange", onNav); };
+  }, [hub]);
+  useEffect(() => {
+    if (fromUrlRef.current) { fromUrlRef.current = false; if (key !== lastRef.current) return; }
+    if (lastRef.current === null || key === lastRef.current) return;
+    lastRef.current = key;
+    const url = "#" + [hub, ...key.split("/").filter(Boolean).map(encodeURIComponent)].join("/");
+    try { if (novaHubPath(hub) !== null) window.history.pushState(null, "", url); } catch (e) {}
+  }, [key, hub]);
+}
+
 function useLocalHistory(pairs) {
   const values = pairs.map((p) => p[0]);
   const setters = pairs.map((p) => p[1]);
@@ -2806,6 +2853,8 @@ function App() {
   // 1つ前の操作画面に戻る：子(セクション内タブ/クイズ等)の深い履歴を優先し、無ければセクション履歴を戻る
   const hubBack = useHubBack();
   const sectionBack = useLocalHistory([[activeId, setActiveId], [showHub, setShowHub]]);
+  // 開いているセクションを URL に残す（#finance/<セクション>）
+  useNovaHubRoute("finance", [activeId], (p) => { const id = p[0] && SECTIONS.some((x) => x.id === p[0]) ? p[0] : (SECTIONS.length ? SECTIONS[0].id : null); setActiveId(id); setShowHub(false); });
   // セクションの「完了」チェック状態（端末内に自動保存）
   const [secDone, setSecDone] = useState({});
   useEffect(() => {
@@ -171937,6 +171986,8 @@ function ConsultingThinkingHub() {
   // 1つ前の画面に戻る（閲覧履歴。setTab 経由のタブ遷移を自動記録）
   const [tabHist, setTabHist] = useState([]);
   const setTab = (k) => { if (k !== tab) setTabHist((h) => [...h, tab]); _setTab(k); };
+  // 開いているタブを URL に残す（#consulting/<タブ>）
+  useNovaHubRoute("consulting", [tab === "basics" ? "" : tab], (p) => { const ok = ["basics", "cases", "confuse", "daily", "diagrams", "glossary", "grand", "mock", "progress", "quiz", "srs"]; _setTab(p[0] && ok.includes(p[0]) ? p[0] : "basics"); });
   // アクティブな子コンポーネントの深い操作履歴（無ければタブ履歴を戻る）
   const hubBack = useHubBack();
   const goBackTab = () => {
@@ -216902,6 +216953,8 @@ function CertOverlapMap({ lang }) {
 
 function HubApp() {
   const [active, setActive] = useState(null);
+  // 開いている資格を URL に残す（#certification/<資格>）。「戻る」で資格一覧に戻る
+  useNovaHubRoute("certification", [active], (p) => setActive(p[0] && HUB_STATIONS.some((s) => s.id === p[0]) ? p[0] : null));
   const [lang, setLang] = useState("ja");
   const t = HUB_L[lang];
   // 資格の「取得済み」チェック状態（端末内に自動保存）
@@ -217612,6 +217665,8 @@ function App(){
   const t=LANGS[lang];
 
   const goto=(sec,lg)=>{ if(lg) setLang(lg); setSection(sec); };
+  // 言語と画面を URL に残す（#languagehub/<言語>/<画面>）
+  useNovaHubRoute("languagehub", section==="home" && lang==="es" ? [] : [lang, section], (p)=>{ const lg=["es","de","fr"].includes(p[0])?p[0]:"es"; const sec=["home","vocab","listen","compare","quiz","grammar"].includes(p[1])?p[1]:"home"; setLang(lg); setSection(sec); });
 
   // 音声選択の好み(言語別)を永続化
   const [voicePrefs,setVoicePrefs]=useState({});
@@ -221688,6 +221743,8 @@ const SideWorkHubModule = (function () {
   function SideWorkHub() {
     const [pg, setPg] = useState("home");
     const [focus, setFocus] = useState(null);
+    // 開いている画面を URL に残す（#sidework/<画面>）
+    useNovaHubRoute("sidework", [pg === "home" ? "" : pg], (p) => { const ok = ["accounts", "connect", "gate", "home", "market", "media", "neta", "pipeline", "plans", "planx", "quality", "rules", "sources", "tools", "video"]; setPg(p[0] && ok.includes(p[0]) ? p[0] : "home"); });
     const [checked, setChecked] = useState(() => load(CHECK_KEY));
     const toggle = (k) => { const c = { ...checked }; if (c[k]) delete c[k]; else c[k] = 1; setChecked(c); save(CHECK_KEY, c); };
     const done = FACTS.filter((f) => f.v || checked[f.key]).length;
@@ -223083,6 +223140,8 @@ const TrainingHubModule = (function () {
   function TrainingHub() {
     const [data, setData] = useState(null);
     const [tab, setTab] = useState("log");
+    // 開いているタブを URL に残す（#training/<タブ>）
+    useNovaHubRoute("training", [tab === "log" ? "" : tab], (p) => setTab(["adjust", "log", "meal", "plan", "weight"].includes(p[0]) ? p[0] : "log"));
     const todayK = keyOf(new Date());
     const [ym, setYm] = useState(() => partsOf(todayK).slice(0, 2));
     const [sel, setSel] = useState(null);
@@ -232724,7 +232783,7 @@ class HubErrorBoundary extends React.Component {
   }
 }
 // ハッシュの先頭（ハブ名）。#megatech/govdojo/... のように深い位置が続いてもハブとして読む
-const NOVA_HUBS = ["finance", "megatech", "consulting", "certification", "languagehub", "booksummary", "tracker", "anythingmemo", "linguisticshub", "liberalarts", "sidework"];
+const NOVA_HUBS = ["finance", "megatech", "consulting", "certification", "languagehub", "booksummary", "tracker", "anythingmemo", "linguisticshub", "liberalarts", "sidework", "training"];
 function novaHashHub() {
   try { const h = (window.location.hash || "").replace(/^#\/?/, "").split(/[/?]/)[0]; return NOVA_HUBS.includes(h) ? h : null; } catch (e) { return null; }
 }
@@ -232738,12 +232797,14 @@ function ProjectNova() {
     const apply = () => setActive(novaHashHub());
     apply();
     window.addEventListener("hashchange", apply);
-    return () => window.removeEventListener("hashchange", apply);
+    window.addEventListener("popstate", apply);
+    return () => { window.removeEventListener("hashchange", apply); window.removeEventListener("popstate", apply); };
   }, []);
   useEffect(() => {
     const want = active || "";
     const cur = (window.location.hash || "").replace(/^#\/?/, "").split(/[/?]/)[0];
-    if (cur !== want) { try { window.history.replaceState(null, "", want ? ("#" + want) : (window.location.pathname + window.location.search)); } catch (e) {} }
+    // ハブを開く・ポータルへ戻るは履歴に積む（ブラウザの「戻る」でポータルに戻れるように）
+    if (cur !== want) { try { window.history.pushState(null, "", want ? ("#" + want) : (window.location.pathname + window.location.search)); } catch (e) {} }
   }, [active]);
 
   useEffect(() => {
