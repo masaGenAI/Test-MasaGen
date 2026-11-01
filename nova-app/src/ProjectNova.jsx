@@ -148064,6 +148064,22 @@ function expandQuery(rawQuery) {
   return { norm, extra };
 }
 
+// 長い一覧を少しずつ出す（スマホで縦に長くなりすぎないように）。絞り込み・検索が変わったら最初の件数に戻す
+function usePaged(sig, step) {
+  const [n, setN] = useState(step);
+  useEffect(() => { setN(step); }, [sig]);
+  return [n, setN];
+}
+function MoreRow({ shown, total, step, setN, en, span }) {
+  if (shown >= total) return null;
+  return (
+    <div style={{ gridColumn: span ? "1 / -1" : undefined, display: "flex", gap: 8, justifyContent: "center", alignItems: "center", flexWrap: "wrap", padding: "12px 0" }}>
+      <span style={{ fontSize: 11.5, color: C.dim }}>{en ? `Showing ${shown} of ${total}` : `${total}件中 ${shown}件を表示`}</span>
+      <button className="gh-btn" onClick={() => setN(shown + step)}>{en ? `Show ${Math.min(step, total - shown)} more` : `さらに${Math.min(step, total - shown)}件`}</button>
+      <button className="gh-btn" onClick={() => setN(total)}>{en ? "Show all" : "すべて表示"}</button>
+    </div>
+  );
+}
 function TabLexicon() {
   const lang = useLang();
   const { jump, setJump } = useJump();
@@ -148074,6 +148090,7 @@ function TabLexicon() {
   const [cat, setCat] = useState(ALL);
   const [query, setQuery] = useState("");
   const [tier, setTier] = useState("all"); // all/prod/emerg/res
+  const [lxN, setLxN] = usePaged([cat, query, tier].join("|"), 30);
   const TIERS = [["all", "lx_tier_all"], ["prod", "lx_tier_prod"], ["emerg", "lx_tier_emerg"], ["res", "lx_tier_res"]];
   const tierMeta = { prod: { label: "lx_tier_prod", color: C.teal }, emerg: { label: "lx_tier_emerg", color: C.gold }, res: { label: "lx_tier_res", color: C.wineInk } };
   // クイズ解説からのジャンプを受けたら、その用語で絞り込む
@@ -148134,7 +148151,7 @@ function TabLexicon() {
         <div style={{ fontSize: 12, color: C.muted, padding: "20px 0", textAlign: "center" }}>{t(lang, "lx_nomatch")}</div>
       ) : (
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%, 290px),1fr))", gap: 12 }}>
-        {list.map((g) => (
+        {list.slice(0, lxN).map((g) => (
           <Card key={g.t}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
               <span className="gh-display" style={{ fontSize: 16, color: C.gold }}>{lang === "en" ? (g.en || g.t) : g.t}</span>
@@ -148159,6 +148176,7 @@ function TabLexicon() {
             </div>
           </Card>
         ))}
+        <MoreRow shown={Math.min(lxN, list.length)} total={list.length} step={30} setN={setLxN} en={lang === "en"} span />
       </div>
       )}
     </div>
@@ -148219,6 +148237,7 @@ function TabFactbook() {
   const [q, setQ] = useState("");
   const [region, setRegion] = useState("all"); // all | world | jp
   const [propOpen, setPropOpen] = useState(true);
+  const [fbN, setFbN] = usePaged([cat, q, region].join("|"), 24);
   const qn = q.trim().toLowerCase();
   // v4は本体データに日本市場も含む（対象地域=日本）。地域トグルは各項目のr列で判定する。
   const ALL = MEGATECH_FACTBOOK;
@@ -148308,7 +148327,7 @@ function TabFactbook() {
         {(cat !== "all" || region !== "all" || q) ? <button onClick={() => { setCat("all"); setRegion("all"); setQ(""); }} style={{ background: "transparent", border: `1px solid ${C.line}`, color: C.muted, borderRadius: 999, padding: "2px 10px", fontSize: 10, cursor: "pointer" }}>{en ? "clear" : "クリア"}</button> : null}
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(min(100%,320px),1fr))", gap: 12 }}>
-        {list.map((it, i) => (
+        {list.slice(0, fbN).map((it, i) => (
           <Card key={i} style={{ display: "flex", flexDirection: "column", gap: 6, ...(isJp(it) ? { borderColor: C.teal } : {}) }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
               <span style={{ fontSize: 10, fontWeight: 800, color: C.gold, letterSpacing: ".05em" }}>{isJp(it) ? "🗾 " : ""}{FB(it, "c")}{it.s ? " · " + FB(it, "s") : ""}</span>
@@ -148331,6 +148350,7 @@ function TabFactbook() {
             {it.nu ? <div style={{ fontSize: 9.5, lineHeight: 1.4, color: it.nu.indexOf("◎") >= 0 ? C.teal : it.nu.indexOf("△") >= 0 || it.nu.indexOf("▲") >= 0 ? C.gold : C.dim }}>{en ? "Neutrality: " : "中立度："}{FB(it, "nu")}</div> : null}
           </Card>
         ))}
+        <MoreRow shown={Math.min(fbN, list.length)} total={list.length} step={24} setN={setFbN} en={en} span />
       </div>
     </div>
   );
@@ -156959,6 +156979,7 @@ function FsBrief({ b, en }) {
 }
 function FsLibrary({ en }) {
   const [q, setQ] = useState(""); const [ly, setLy] = useState(""); const [sub, setSub] = useState(""); const [rg, setRg] = useState(""); const [st, setSt] = useState("");
+  const [libN, setLibN] = usePaged([q, ly, sub, rg, st].join("|"), 40);
   const subs = useMemo(() => [...new Set(FORESIGHT_SOURCES.filter((s) => !ly || s.layer === ly).map((s) => s.layer + "|" + FS_PICK(s.sub, false)))], [ly]);
   const rows = FORESIGHT_SOURCES.filter((s) => (!ly || s.layer === ly) && (!sub || s.layer + "|" + FS_PICK(s.sub, false) === sub) && (!st || s.status === st)
     && (!rg || (rg === "jp") === s.jp) && (!q || [FS_PICK(s.name, false), FS_PICK(s.name, true), s.org, FS_PICK(s.desc, false), FS_PICK(s.desc, true)].join(" ").toLowerCase().includes(q.toLowerCase())));
@@ -156985,7 +157006,7 @@ function FsLibrary({ en }) {
       <FsLegend en={en} />
       <div style={{ fontSize: 11.5, color: C.dim, marginBottom: 8 }}>{rows.length} {en ? "sources" : "件"}</div>
       <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 12, overflow: "hidden" }}>
-        {rows.map((s) => { const [l, col] = FS_STATUS[s.status] || FS_STATUS.unverified; return (
+        {rows.slice(0, libN).map((s) => { const [l, col] = FS_STATUS[s.status] || FS_STATUS.unverified; return (
           <div key={s.id} className="fs-row" style={{ borderTop: `1px solid ${C.line}` }}>
             <div className="gh-display" style={{ fontWeight: 700, color: C.gold, fontSize: 15 }}>{s.layer}</div>
             <div><a href={s.url} target="_blank" rel="noopener noreferrer" style={{ color: C.text, textDecoration: "none", fontWeight: 700, borderBottom: `1px solid ${C.line}` }}>{FS_PICK(s.name, en)}</a>
@@ -156995,9 +157016,11 @@ function FsLibrary({ en }) {
             <div><span style={{ display: "inline-block", fontSize: 11, fontWeight: 700, padding: "2px 9px", borderRadius: 999, border: `1px solid ${col}`, color: col }}>{l[en ? 1 : 0]}</span></div>
           </div>); })}
       </div>
+      <MoreRow shown={Math.min(libN, rows.length)} total={rows.length} step={40} setN={setLibN} en={en} />
     </div>
   );
 }
+
 function FsRefresh({ en }) {
   const n = (k) => FORESIGHT_SOURCES.filter((s) => s.status === k).length;
   const kpi = [[FORESIGHT_SOURCES.length, "SOURCES", C.text], [n("ok"), "VERIFIED", C.teal], [n("reachable"), "REACHABLE", C.gold], [n("pending") + n("unverified"), "PENDING", C.dim]];
