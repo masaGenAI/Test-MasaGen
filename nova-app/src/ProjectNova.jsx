@@ -164605,10 +164605,25 @@ function GovIRClock({ en, rows: rowsIn, foot, steps: stepsIn }) {
   const steps = stepsIn || GOVIR_STEPS;
   const [step, setStep] = useState(0);
   const [row, setRow] = useState(0);
+  const [t, setT] = useState(null); // 把握からの経過（時間）。null は線を出さない
   const X = (h) => 22 + (Math.log(h) / Math.log(2000)) * 400;
+  const fmtH = (h) => (h < 48 ? (en ? `${Math.round(h)} h` : `${Math.round(h)}時間`) : (en ? `${Math.round(h / 24)} days` : `${Math.round(h / 24)}日`));
+  // 点のラベル：「2日：…」の前半。前半に数字が無い（速報・確報など）ときは、後半が短ければ足す
+  const short = (m) => {
+    const t0 = m.l[en ? 1 : 0], sep = en ? ":" : "：";
+    const i = t0.indexOf(sep); if (i < 0) return t0.slice(0, 10);
+    const head = t0.slice(0, i).replace(/（[^）]*）|\([^)]*\)/g, "").trim(), tail = t0.slice(i + 1).trim();
+    return /\d/.test(head) ? head : tail.length <= 8 ? `${head} ${tail}` : head;
+  };
   const ticks = [[1, "1h"], [24, "24h"], [72, "72h"], [168, en ? "7d" : "7日"], [720, en ? "30d" : "30日"], [1440, en ? "60d" : "60日"]];
   const rows = rowsIn || GOVDOJO_CLOCKS;
-  const RH = 38, H = 24 + rows.length * RH;
+  const RH = 52, H = 24 + rows.length * RH;
+  // 「4営業日」「速やかに（概ね3〜5日）」のように時間で数えられない期限には、残り時間を出さない
+  const exact = (m) => /\d/.test(short(m)) && !/営業日|business day|概ね|roughly|promptly/i.test(m.l[en ? 1 : 0]);
+  const marksAll = rows.flatMap((c) => c.marks.map((m) => ({ c, m })));
+  const passed = t == null ? [] : marksAll.filter((o) => o.m.h <= t);
+  const nextM = t == null ? null : marksAll.filter((o) => o.m.h > t).sort((p, q) => p.m.h - q.m.h)[0];
+  const sv = t == null ? 0 : Math.round((Math.log(t) / Math.log(2000)) * 1000);
   const r = rows[row];
   return (
     <div>
@@ -164639,17 +164654,46 @@ function GovIRClock({ en, rows: rowsIn, foot, steps: stepsIn }) {
                 onKeyDown={(ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); setRow(i); } }}>
                 <rect x="2" y={y} width="436" height={RH - 4} rx="5" fill={on ? C.surface : "transparent"} stroke={on ? C.gold : "transparent"} />
                 <text x="10" y={y + 13} fill={on ? C.gold : C.text} fontSize="10.5" fontWeight="700">{c.reg[en ? 1 : 0]}</text>
-                <rect x={X(1)} y={y + 20} width={X(maxH) - X(1)} height="8" rx="4" fill={C.wine} fillOpacity="0.35" />
-                {c.marks.map((m, j) => (
-                  <g key={j}>
-                    <circle cx={X(m.h)} cy={y + 24} r="4.5" fill={C.wine} stroke={C.bg} />
-                    <title>{m.l[en ? 1 : 0]}</title>
-                  </g>
-                ))}
+                <rect x={X(1)} y={y + 20} width={X(maxH) - X(1)} height="8" rx="4" fill={C.wine} fillOpacity="0.3" />
+                {t != null ? <rect x={X(1)} y={y + 20} width={Math.max(0, Math.min(X(t), X(maxH)) - X(1))} height="8" rx="4" fill={C.wine} fillOpacity="0.85" /> : null}
+                {(() => { let pl = 0; return c.marks.map((m, j) => { const close = j > 0 && X(m.h) - X(c.marks[j - 1].h) < 46; pl = close ? 1 - pl : 0; return pl; }); })().map((lane, j) => {
+                  const m = c.marks[j];
+                  const done = t != null && m.h <= t, lx = Math.min(418, Math.max(22, X(m.h)));
+                  return (
+                    <g key={j}>
+                      <circle cx={X(m.h)} cy={y + 24} r={done ? 5 : 4.5} fill={t == null || done ? C.wine : C.surface} stroke={done ? C.text : t == null ? C.bg : C.wine} strokeWidth={done ? 1.5 : t == null ? 1 : 1.6} />
+                      <text x={lx} y={y + 39 + lane * 9} textAnchor="middle" fill={done ? C.text : C.muted} fontSize="8.5" fontWeight={done ? 700 : 500}>{short(m)}</text>
+                      <title>{m.l[en ? 1 : 0]}</title>
+                    </g>
+                  );
+                })}
               </g>
             );
           })}
+          {t != null ? (
+            <g pointerEvents="none">
+              <line x1={X(t)} y1="14" x2={X(t)} y2={H - 2} stroke={C.gold} strokeWidth="1.5" />
+              <rect x={Math.min(372, Math.max(2, X(t) - 34))} y="12" width="68" height="13" rx="3" fill={C.gold} />
+              <text x={Math.min(406, Math.max(36, X(t)))} y="21.5" textAnchor="middle" fill={C.bg} fontSize="8.5" fontWeight="800">{en ? "+" : "把握から"}{fmtH(t)}</text>
+            </g>
+          ) : null}
         </svg>
+        <div style={{ margin: "8px auto 0", maxWidth: 620 }}>
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+            <label style={{ fontSize: 11.5, color: C.text, fontWeight: 700 }} htmlFor="gov-ir-t">{en ? "Time since you became aware" : "把握からの経過"}</label>
+            <input id="gov-ir-t" type="range" min="0" max="1000" value={sv} onChange={(e) => setT(Math.max(1, Math.exp((Number(e.target.value) / 1000) * Math.log(2000))))} style={{ flex: "1 1 200px", accentColor: C.gold }} aria-valuetext={t == null ? "" : fmtH(t)} />
+            {[[24, "24h"], [72, "72h"], [168, en ? "7d" : "7日"], [360, en ? "15d" : "15日"], [720, en ? "30d" : "30日"]].map(([h, l]) => <button key={h} className="gh-btn" onClick={() => setT(h)} style={{ fontSize: 11, padding: "2px 8px", ...(t != null && Math.abs(t - h) < 0.5 ? { borderColor: C.gold, color: C.gold } : {}) }}>{l}</button>)}
+            {t != null ? <button className="gh-btn" onClick={() => setT(null)} style={{ fontSize: 11, padding: "2px 8px" }}>{en ? "Clear" : "消す"}</button> : null}
+          </div>
+          {t == null ? <div style={{ fontSize: 11, color: C.dim, marginTop: 4 }}>{en ? "Move the slider to see which deadlines have passed at that point and which comes next." : "スライダーを動かすと、その時点で過ぎた期限と、次に来る期限が出る。"}</div> : (
+            <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.7, marginTop: 6, background: C.surface, border: `1px solid ${C.line}`, borderRadius: 8, padding: "6px 10px" }}>
+              <div><b style={{ color: C.wine }}>{en ? `Passed (${passed.length}): ` : `過ぎた期限（${passed.length}）：`}</b>{passed.length ? passed.map((o) => `${o.c.reg[en ? 1 : 0]} ${short(o.m)}`).join(en ? "; " : "／") : (en ? "none yet" : "まだ無い")}</div>
+              <div><b style={{ color: C.gold }}>{en ? "Next: " : "次の期限："}</b>{nextM ? `${nextM.c.reg[en ? 1 : 0]} ${short(nextM.m)}${exact(nextM.m) ? (en ? ` (in about ${fmtH(nextM.m.h - t)})` : `（あと約${fmtH(nextM.m.h - t)}）`) : (en ? " (not counted in plain hours: click the row for how it is counted)" : "（時間では数えられない期限。数え方は行を押して確かめる）")}` : (en ? "none on this chart" : "この図の中には無い")}</div>
+              <div style={{ fontSize: 10.5, color: C.dim, marginTop: 2 }}>{en ? "A rough guide on one shared axis: each rule starts its clock at a different point. Click a row for its trigger." : "同じ軸に並べた目安。期限の起点は規制ごとに違うので、行を押して起点を確かめる。"}</div>
+            </div>
+          )}
+          {t != null ? <GvLegend en={en} items={[[C.wine, en ? "passed" : "過ぎた期限"], [C.wine, en ? "still ahead" : "まだ先の期限", true]]} /> : null}
+        </div>
         <div style={DGM_HINT}>{en ? "Log time scale. Click a row for the trigger and recipient" : "時間軸は対数。行をクリックすると起点と報告先が出ます"}</div>
         <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.65, marginTop: 6 }}>
           {foot ? foot[en ? 1 : 0] : (en ? "Japan's AI Promotion Act (enacted May 2025) sets only best-effort duties for businesses and no incident-reporting deadline; the government can investigate rights-infringing cases and give guidance. A personal-data leak through AI still falls under the APPI row above (checked October 2026)."
