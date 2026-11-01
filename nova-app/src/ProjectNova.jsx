@@ -122644,7 +122644,7 @@ const UI = {
   dg_draghint: ["💡 ノードをドラッグで動かせます。クリックで詳細と出典が開きます。", "💡 Drag nodes to rearrange. Click a node for details and sources."],
   // クイズ画面
   qz_title: ["クイズ — 全{n}問", "Quiz — {n} questions"],
-  qz_intro: ["計算・誤り選択・状況判断に加え、統計数値(Key numbers)・高度専門用語(Expertise)・最新動向(2024–2026)まで15テーマ。選択肢は毎回シャッフルし、正解が最長になる偏りも是正済み。テーマを押すと出題開始（大きなテーマは最初の出題範囲から。出題中の画面で難易度・出題範囲を切り替えられます）。各問に難易度★を表示。", "15 themes — from calculation, error-spotting and judgment to key statistics (Key numbers), advanced terminology (Expertise), and the latest trends (2024–2026). Options are shuffled each time and length bias is corrected. Tap a theme to start (large themes begin with the first range; switch difficulty and range from within the quiz). Each question shows a difficulty ★."],
+  qz_intro: ["計算・誤り選択・状況判断に加え、統計数値(Key numbers)・高度専門用語(Expertise)・動向・新技術（主に2024〜2025年）まで15テーマ。選択肢は毎回シャッフルし、正解が最長になる偏りも是正済み。テーマを押すと出題開始（大きなテーマは最初の出題範囲から。出題中の画面で難易度・出題範囲を切り替えられます）。各問に難易度★を表示。", "15 themes — from calculation, error-spotting and judgment to key statistics (Key numbers), advanced terminology (Expertise), and trends and new techniques (mostly 2024–25). Options are shuffled each time and length bias is corrected. Tap a theme to start (large themes begin with the first range; switch difficulty and range from within the quiz). Each question shows a difficulty ★."],
   qz_theme: ["テーマを選ぶ", "Pick a theme"],
   qz_diff: ["難易度を選ぶ", "Pick difficulty"],
   qz_order: ["出題順", "Question order"],
@@ -138288,7 +138288,7 @@ function LearningHome() {
   const byRetention = [...themeRows].sort((a, b) => b.retention - a.retention);
   // 弱点順(要復習が多い順→定着率が低い順)
   const byWeak = [...themeRows].sort((a, b) => (b.dueCnt - a.dueCnt) || (a.retention - b.retention)).filter((r) => r.dueCnt > 0 || r.retention < 100);
-  const catLabel = (c) => (lang === "en" ? (CAT_EN[c] || c) : c);
+  const catLabel = (c) => (lang === "en" ? (CAT_EN[c] || c) : (CAT_JA[c] || c));
   const startReview = () => setJump({ tab: "dojo", dojoView: "mcq", srsReview: true });
   const bar = (pct, color) => (
     <div style={{ flex: 1, height: 6, background: C.bg, borderRadius: 3, overflow: "hidden" }}>
@@ -138514,6 +138514,8 @@ const DIFF_LABEL = { 1: "★☆☆ 基礎", 2: "★★☆ 標準", 3: "★★★
 function stars(d) { return "★★★".slice(0, d) + "☆☆☆".slice(0, 3 - d); }
 
 // テーマの英語ラベル（データ側の日本語キー→英語表示名）
+// 表示名だけを変えるカテゴリ（記録のキーは元の名前のまま）。「最新動向」は2024〜2025年の動向が中心で、2026年の今は「最新」ではないため
+const CAT_JA = { "最新動向": "動向・新技術（主に2024〜2025年）" };
 const CAT_EN = {
   "アルゴリズム基礎": "Algorithm Basics",
   "アルゴリズム": "Algorithms",
@@ -138528,7 +138530,7 @@ const CAT_EN = {
   "ガバナンス": "Governance",
   "AI導入戦略": "Adoption Strategy",
   "Expertise": "Expertise",
-  "最新動向": "Latest Trends",
+  "最新動向": "Trends & new techniques (mostly 2024–25)",
   "Key numbers": "Key Numbers",
 };
 // テーマ表示順（関連性順・基礎→応用→運用→戦略→メタ。基礎とアルゴリズムを隣接）
@@ -138551,7 +138553,7 @@ function McqView() {
   const YOGO_PREFIX = "用語：";
   const topCats = cats.filter((c) => !String(c).startsWith(YOGO_PREFIX));
   const yogoCats = cats.filter((c) => String(c).startsWith(YOGO_PREFIX));
-  const catLabel = (c) => (c === ALL ? t(lang, "qz_all") : (lang === "en" ? (CAT_EN[c] || c) : c));
+  const catLabel = (c) => (c === ALL ? t(lang, "qz_all") : (lang === "en" ? (CAT_EN[c] || c) : (CAT_JA[c] || c)));
   const [cat, setCat] = useState(ALL);
   const [diff, setDiff] = useState(0); // 0=すべて,1,2,3
   const [part, setPart] = useState(0); // パート分割インデックス（0..N-1）／"all"=分割なし
@@ -138911,7 +138913,7 @@ function McqView() {
           const weak = weakThemes();
           const tracked = Object.keys(srs).length;
           if (tracked === 0) return null; // 履歴ゼロなら非表示
-          const catLabel2 = (c) => (lang === "en" ? (CAT_EN[c] || c) : c);
+          const catLabel2 = (c) => (lang === "en" ? (CAT_EN[c] || c) : (CAT_JA[c] || c));
           return (
             <div style={{ marginBottom: 16, padding: "12px 14px", background: C.surface2, border: `1px solid ${weak.length > 0 ? C.wine : C.line}`, borderRadius: 8 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: C.wineInk, marginBottom: 6 }}>{t(lang, "qz_weak_title")}</div>
@@ -139008,7 +139010,7 @@ function McqView() {
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14, paddingLeft: 10, borderLeft: `2px solid ${C.gold}` }}>
             {yogoCats.map((c) => {
               const n = poolCount(c, diff);
-              const label = (lang === "en" ? (CAT_EN[c] || c) : c).replace(/^用語：/, "");
+              const label = (lang === "en" ? (CAT_EN[c] || c) : (CAT_JA[c] || c)).replace(/^用語：/, "");
               return (
                 <button key={c} className="gh-btn" onClick={() => chooseCat(c)} disabled={n === 0}
                         style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, padding: "3px 10px", ...(cat === c ? { background: C.gold, borderColor: C.gold, color: "#fff", fontWeight: 700 } : {}), ...(themeDone[c] ? { borderColor: "#16A34A" } : {}), ...(n === 0 ? { opacity: 0.4 } : {}) }}>
@@ -139193,7 +139195,7 @@ function McqView() {
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
             {yogoCats.map((c) => {
               const n = poolCount(c, diff);
-              const label = (lang === "en" ? (CAT_EN[c] || c) : c).replace(/^用語：/, "");
+              const label = (lang === "en" ? (CAT_EN[c] || c) : (CAT_JA[c] || c)).replace(/^用語：/, "");
               return (
                 <button key={c} className="gh-btn" onClick={() => switchCat(c)} disabled={n === 0}
                         style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, padding: "3px 9px", ...(cat === c ? { background: C.gold, borderColor: C.gold, color: "#fff", fontWeight: 700 } : {}), ...(themeDone[c] ? { borderColor: "#16A34A" } : {}), ...(n === 0 ? { opacity: 0.4 } : {}) }}>
@@ -148316,6 +148318,17 @@ function FbBadge({ st }) {
   const label = sec ? "⚠️ 二次確認" : s.indexOf("一次") >= 0 ? "✅ 一次確認" : (s || "—");
   return <span style={{ fontSize: 10, fontWeight: 700, color: col, border: `1px solid ${col}`, borderRadius: 999, padding: "1px 8px", whiteSpace: "nowrap" }}>{label}</span>;
 }
+// 定量データの「年」表記からデータの年を読む。公表年と別に（YYYY年データ／調査／時点）があればそれを、範囲（2024-25 など）は終わりの年を使う
+function fbDataYear(yr) {
+  if (!yr) return null;
+  const t = String(yr);
+  const m1 = t.match(/(19|20)(\d\d)\s*年(?:度)?(?:データ|調査|時点|12月末時点)/);
+  if (m1) return Number(m1[1] + m1[2]);
+  const m2 = t.match(/^((?:19|20)\d\d)\s*[-–〜]\s*((?:19|20)?\d\d)/);
+  if (m2) { const e = m2[2].length === 2 ? Number(m2[1].slice(0, 2) + m2[2]) : Number(m2[2]); return e; }
+  const m3 = t.match(/(?:19|20)\d\d/);
+  return m3 ? Number(m3[0]) : null;
+}
 function TabFactbook() {
   const lang = useLang();
   const en = lang === "en";
@@ -148323,7 +148336,8 @@ function TabFactbook() {
   const [q, setQ] = useState("");
   const [region, setRegion] = useState("all"); // all | world | jp
   const [propOpen, setPropOpen] = useState(true);
-  const [fbN, setFbN] = usePaged([cat, q, region].join("|"), 24);
+  const [age, setAge] = useState("all"); // all | new（2025年以降） | mid（2023〜2024年） | old（2022年以前）
+  const [fbN, setFbN] = usePaged([cat, q, region, age].join("|"), 24);
   const { jump } = useJump();
   useEffect(() => { if (jump && jump.tab === "factbook" && jump.fbq) { setCat("all"); setRegion("all"); setQ(jump.fbq); } }, [jump && jump.nonce]);
   const qn = q.trim().toLowerCase();
@@ -148338,7 +148352,9 @@ function TabFactbook() {
   };
   const isJp = (it) => (it.r || "").indexOf("日本") >= 0;
   const inRegion = (it) => region === "all" || (region === "jp" ? isJp(it) : !isJp(it));
-  const list = ALL.filter((it) => inRegion(it) && (cat === "all" || it.c === cat) && (!qn || (it.h + it.v + it.n + it.s + (it.lens || "") + (it.src || "") + (it.use || "") + (it.hEn || "") + (it.vEn || "") + (it.nEn || "") + (it.useEn || "")).toLowerCase().indexOf(qn) >= 0));
+  const ageOf = (it) => { const y = fbDataYear(it.yr); return y == null ? null : (y >= 2025 ? "new" : y >= 2023 ? "mid" : "old"); };
+  const inAge = (it) => age === "all" || ageOf(it) === age;
+  const list = ALL.filter((it) => inRegion(it) && inAge(it) && (cat === "all" || it.c === cat) && (!qn || (it.h + it.v + it.n + it.s + (it.lens || "") + (it.src || "") + (it.use || "") + (it.hEn || "") + (it.vEn || "") + (it.nEn || "") + (it.useEn || "")).toLowerCase().indexOf(qn) >= 0));
   const cnt = (c) => ALL.filter((it) => inRegion(it) && (c === "all" || it.c === c)).length;
   const chip = (k, label) => (
     <button key={k} onClick={() => setCat(k)} style={{ background: cat === k ? C.wineDeep : C.surface2, border: `1px solid ${cat === k ? C.wine : C.line}`, color: C.text, borderRadius: 999, padding: "5px 12px", fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>{label} <span style={{ color: C.dim }}>{cnt(k)}</span></button>
@@ -148405,6 +148421,12 @@ function TabFactbook() {
         ))}
       </div>
       <input value={q} onChange={(e) => setQ(e.target.value)} aria-label={en ? "search figures…" : "数値・キーワードで検索…"} placeholder={en ? "search figures…" : "数値・キーワードで検索…"} className="gh-input" style={{ width: "100%", boxSizing: "border-box", marginBottom: 10, fontSize: 13 }} />
+      {/* データの年で絞る（数値は出典の時点のもの。古いものは新しい数値が出ている可能性がある） */}
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", marginBottom: 8 }}>
+        <span style={{ fontSize: 11, color: C.muted }}>{en ? "Data year:" : "データの年："}</span>
+        {[["all", en ? "All" : "すべて"], ["new", en ? "2025 or later" : "2025年以降"], ["mid", en ? "2023–2024" : "2023〜2024年"], ["old", en ? "2022 or earlier" : "2022年以前"]].map(([k, l]) => { const n = k === "all" ? ALL.filter(inRegion).length : ALL.filter((it) => inRegion(it) && ageOf(it) === k).length; return <button key={k} onClick={() => setAge(k)} aria-pressed={age === k} style={{ background: age === k ? C.surface2 : "transparent", border: `1px solid ${age === k ? (k === "old" ? C.wine : k === "mid" ? C.gold : C.teal) : C.line}`, color: age === k ? C.text : C.muted, borderRadius: 999, padding: "3px 10px", fontSize: 11, cursor: "pointer" }}>{l}（{n}）</button>; })}
+        <span style={{ fontSize: 10.5, color: C.dim }}>{en ? "Figures are as of their source; older ones may have newer releases — check the source before quoting." : "数値は出典の時点のもの。古いものは新しい数値が出ている可能性がある。使う前に出典で確かめる。"}</span>
+      </div>
       {/* 現在地（いま何で絞り込んでいるか） */}
       <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 10, fontSize: 11 }}>
         <span style={{ color: C.muted }}>{en ? "Showing:" : "表示中："}</span>
@@ -148419,7 +148441,7 @@ function TabFactbook() {
           <Card key={i} style={{ display: "flex", flexDirection: "column", gap: 6, ...(isJp(it) ? { borderColor: C.teal } : {}) }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
               <span style={{ fontSize: 10, fontWeight: 800, color: C.gold, letterSpacing: ".05em" }}>{isJp(it) ? "🗾 " : ""}{FB(it, "c")}{it.s ? " · " + FB(it, "s") : ""}</span>
-              <FbBadge st={it.st} />
+              <span style={{ display: "inline-flex", gap: 4, alignItems: "center" }}>{(() => { const y = fbDataYear(it.yr); if (y == null) return null; const old = ageOf(it); const col = old === "old" ? C.wineInk : old === "mid" ? C.gold : C.teal; return <span title={en ? `Data year ${y} (from: ${it.yr})` : `データの年 ${y}（表記：${it.yr}）`} style={{ fontSize: 9.5, fontWeight: 700, color: col, border: `1px solid ${col}`, borderRadius: 4, padding: "0 5px", whiteSpace: "nowrap" }}>{en ? `data ${y}` : `${y}年のデータ`}</span>; })()}<FbBadge st={it.st} /></span>
             </div>
             <div style={{ display: "flex", gap: 5, flexWrap: "wrap", alignItems: "center" }}>
               {it.tp ? <span style={{ fontSize: 9, fontWeight: 800, color: C.deep || C.bg, background: C.gold, borderRadius: 4, padding: "1px 6px" }}>{FB(it, "tp")}</span> : null}
