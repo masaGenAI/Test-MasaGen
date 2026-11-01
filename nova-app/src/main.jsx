@@ -102,7 +102,35 @@ function BackupBar() {
   React.useEffect(() => {
     const h = (e) => setOnLauncher(!!(e && e.detail));
     window.addEventListener("nova:launcher", h);
+    // ハブを URL で直接開いたときは、本体の通知がこの購読より先に出るため、ここで現在の状態に合わせる
+    setOnLauncher(window.__novaLauncher !== false);
     return () => window.removeEventListener("nova:launcher", h);
+  }, []);
+  // スマホ幅では小さな丸いアイコンだけにし、下へスクロールしている間は隠す（本文のボタンや入力欄に重ならないように）。
+  // 上へ戻すか、ページの末尾まで来ると再び出る。iframe のハブ（Book-Summary など）は中のスクロールを拾えないので、小さくするだけ。
+  const [narrow, setNarrow] = useState(() => {
+    try { return window.matchMedia("(max-width: 640px)").matches; } catch { return false; }
+  });
+  const [tucked, setTucked] = useState(false);
+  React.useEffect(() => {
+    let mq;
+    try { mq = window.matchMedia("(max-width: 640px)"); } catch { return undefined; }
+    const h = () => setNarrow(mq.matches);
+    if (mq.addEventListener) mq.addEventListener("change", h); else mq.addListener(h);
+    return () => { if (mq.removeEventListener) mq.removeEventListener("change", h); else mq.removeListener(h); };
+  }, []);
+  React.useEffect(() => {
+    let last = window.scrollY || 0;
+    const h = () => {
+      const y = window.scrollY || 0;
+      const atEnd = window.innerHeight + y >= document.documentElement.scrollHeight - 80;
+      if (atEnd || y < 120) setTucked(false);
+      else if (y > last + 6) setTucked(true);
+      else if (y < last - 6) setTucked(false);
+      last = y;
+    };
+    window.addEventListener("scroll", h, { passive: true });
+    return () => window.removeEventListener("scroll", h);
   }, []);
   if (onLauncher) return null;
 
@@ -187,6 +215,7 @@ function BackupBar() {
   };
 
   const expanded = showBackup || hovered;
+  const hide = tucked && !expanded && !msg;
   return (
     <div
       onMouseEnter={() => setHovered(true)}
@@ -200,9 +229,11 @@ function BackupBar() {
         flexDirection: "column",
         alignItems: "flex-start",
         gap: 6,
-        // 常時はっきり表示（別PC/ブラウザへ移すためのバックアップ入口）。ホバー/クリックで展開。
-        opacity: expanded || msg ? 1 : 0.92,
-        transition: "opacity .18s ease",
+        // 別PC/ブラウザへ移すためのバックアップ入口。ホバー/クリックで展開。下へスクロール中は隠す。
+        opacity: hide ? 0 : 1,
+        transform: hide ? "translateY(72px)" : "none",
+        pointerEvents: hide ? "none" : "auto",
+        transition: "opacity .18s ease, transform .18s ease",
       }}
     >
       {msg ? (
@@ -251,26 +282,32 @@ function BackupBar() {
         </div>
       ) : null}
 
-      {/* 常時: 小さなアイコンのみ（クリックでバックアップ操作を固定表示） */}
+      {/* 常時: 小さなボタンのみ（クリックでバックアップ操作を固定表示）。背景は不透明にして下の文字が透けないようにする */}
       <button
         onClick={() => setShowBackup((v) => !v)}
         title={LS_OK ? "進捗は自動保存されています。別のPC/ブラウザへ移すにはここから書き出し/読み込み" : "自動保存オフ。ここからバックアップ"}
         aria-label="進捗バックアップ"
+        aria-expanded={showBackup}
         style={{
           borderRadius: 999,
-          border: "1px solid " + (LS_OK ? "#cfe3d6" : "#f0d9a8"),
-          background: LS_OK ? "rgba(22,163,74,0.12)" : "rgba(180,83,9,0.14)",
-          color: LS_OK ? "#166534" : "#b45309",
-          fontSize: 12.5,
+          border: "1px solid " + (LS_OK ? "#b9d9c4" : "#e8c98d"),
+          background: LS_OK ? "#E9F6EE" : "#FBF0E1",
+          color: LS_OK ? "#166534" : "#9a4a07",
+          fontSize: narrow ? 17 : 12.5,
           fontWeight: 700,
           lineHeight: 1,
           cursor: "pointer",
-          boxShadow: "0 1px 4px rgba(11,31,63,0.14)",
-          padding: "8px 14px",
+          boxShadow: "0 1px 4px rgba(11,31,63,0.18)",
+          padding: narrow ? 0 : "8px 14px",
+          width: narrow ? 40 : "auto",
+          height: narrow ? 40 : "auto",
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
           fontFamily: "'Inter',-apple-system,'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif",
         }}
       >
-        {LS_OK ? "💾 進捗バックアップ" : "⚠ 進捗バックアップ"}
+        {narrow ? (LS_OK ? "💾" : "⚠") : LS_OK ? "💾 進捗バックアップ" : "⚠ 進捗バックアップ"}
       </button>
     </div>
   );
