@@ -166561,6 +166561,21 @@ function GafaHub() {
     const prev = tabHist[tabHist.length - 1]; setTabHist(tabHist.slice(0, -1)); _setTab(prev);
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   };
+  // タブ一覧：狭い画面では最初たたみ、選んだらたたむ。開閉の選択と最近のタブは端末に保存
+  const [narrow, setNarrow] = useState(() => typeof window !== "undefined" && window.innerWidth < 760);
+  const [navOpen, setNavOpen] = useState(null); // null は画面幅に任せる
+  const [recent, setRecent] = useState([]);
+  const [navLoaded, setNavLoaded] = useState(false);
+  const navBar = useRef(null);
+  useEffect(() => { const f = () => setNarrow(window.innerWidth < 760); window.addEventListener("resize", f); return () => window.removeEventListener("resize", f); }, []);
+  useEffect(() => {
+    (async () => {
+      try { const r = await window.storage.get("techhub_nav_v1"); if (r && r.value) { const v = JSON.parse(r.value); if (Array.isArray(v.recent)) setRecent(v.recent); if (typeof v.open === "boolean" && !(typeof window !== "undefined" && window.innerWidth < 760)) setNavOpen(v.open); } } catch (e) {}
+      setNavLoaded(true);
+    })();
+  }, []);
+  useEffect(() => { setRecent((r) => [tab, ...r.filter((x) => x !== tab)].slice(0, 8)); }, [tab]);
+  useEffect(() => { if (navLoaded) { try { window.storage.set("techhub_nav_v1", JSON.stringify({ recent, open: navOpen })); } catch (e) {} } }, [recent, navOpen, navLoaded]);
   const [lang, setLang] = useState("ja");
   const [radarCur, setRadarCur] = useState(RADAR.current);
   const [jump, setJumpState] = useState(null);
@@ -166632,28 +166647,48 @@ function GafaHub() {
           <div style={{ height: 2, background: `linear-gradient(90deg,${C.wine},${C.gold},transparent)`, marginTop: 14 }} />
         </header>
 
-        <nav style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 26 }} aria-label="tabs">
-          {[
+        {(() => {
+          const NAV_G = [
             { g: ["基礎", "CORE"], col: C.gold, ids: ["strategy", "issues", "consult", "tacit", "factbook", "checkcore"] },
             { g: ["AX実務", "AX PRACTICE"], col: C.teal, ids: ["value", "assess", "toolbox", "xform", "bpr", "gfirm", "slalom", "sglobal", "proposal", "salesdojo", "casework", "livedojo", "industry", "agentshelf", "agi", "checkax"] },
             { g: ["道場・リサーチ", "DOJO & RESEARCH"], col: C.wine, ids: ["dojo", "architect", "archcase", "frontier", "govdojo", "itsec", "postmortem", "companies", "noteissues", "lexicon"] },
             { g: ["AIフォーサイト", "AI FORESIGHT"], col: C.fore, ids: ["fs_macro", "fs_market", "fs_client", "fs_craft", "fs_library", "fs_refresh", "fs_collection"] },
-          ].map((gr, gi) => (
-            <div key={gi} style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-              <span style={{ fontSize: 10.5, fontWeight: 800, color: gr.col, letterSpacing: 2, flexShrink: 0, width: 152, textAlign: "right", opacity: 0.95 }}>{lang === "en" ? gr.g[1] : gr.g[0]}</span>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", borderLeft: `2px solid ${gr.col}`, paddingLeft: 12, flex: "1 1 0", minWidth: 0 }}>
-                {gr.ids.map((id) => { const tb = TABS.find((x) => x.id === id); return tb ? (
-                  <button key={id} className="gh-btn" onClick={() => setTab(id)}
-                          style={tab === id ? { borderColor: gr.col, background: gr.col, color: C.bg, fontWeight: 700, fontSize: 13 } : { fontWeight: 700, fontSize: 13, color: C.muted }}>
-                    {t(lang, tb.k)}
-                  </button>
-                ) : null; })}
+          ];
+          const curG = NAV_G.find((g) => g.ids.includes(tab)) || NAV_G[0];
+          const curT = TABS.find((x) => x.id === tab);
+          const open = navOpen == null ? !narrow : navOpen;
+          const pick = (id) => { setTab(id); if (narrow) { setNavOpen(false); try { const el = navBar.current; if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 56, behavior: "smooth" }); } catch (e) {} } };
+          const rec = recent.filter((id) => id !== tab && TABS.some((x) => x.id === id)).slice(0, narrow ? 3 : 5);
+          return (
+            <>
+              <div ref={navBar} style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: open ? 12 : 18, background: C.surface, border: `1px solid ${C.line}`, borderLeft: `4px solid ${curG.col}`, borderRadius: 10, padding: "8px 10px" }}>
+                <span style={{ fontSize: 10.5, fontWeight: 800, color: curG.col, letterSpacing: 1.5 }}>{lang === "en" ? curG.g[1] : curG.g[0]}</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: C.text, marginRight: 4 }}>{curT ? t(lang, curT.k) : ""}</span>
+                <button className="gh-btn" onClick={() => setNavOpen(!open)} aria-expanded={open} aria-controls="techhub-tabs" style={{ fontSize: 12, padding: "5px 11px" }}>{open ? (lang === "en" ? "Hide tabs ▲" : "タブ一覧をたたむ ▲") : (lang === "en" ? `All tabs (${TABS.length}) ▼` : `タブ一覧（${TABS.length}） ▼`)}</button>
+                {rec.length ? <span style={{ fontSize: 10.5, color: C.dim, marginLeft: 4 }}>{lang === "en" ? "Recent" : "最近"}</span> : null}
+                {rec.map((id) => { const tb = TABS.find((x) => x.id === id); const g = NAV_G.find((x) => x.ids.includes(id)) || curG; return <button key={id} onClick={() => pick(id)} style={{ fontSize: 11.5, padding: "3px 10px", borderRadius: 99, border: `1px solid ${C.line}`, borderLeft: `3px solid ${g.col}`, background: "transparent", color: C.text, cursor: "pointer" }}>{t(lang, tb.k)}</button>; })}
               </div>
-            </div>
-          ))}
-        </nav>
-
-        <GuideStrip setTab={setTab} />
+              {open ? (
+                <nav id="techhub-tabs" style={{ display: "flex", flexDirection: "column", gap: narrow ? 12 : 10, marginBottom: 22 }} aria-label="tabs">
+                  {NAV_G.map((gr, gi) => (
+                    <div key={gi} style={{ display: "flex", flexDirection: narrow ? "column" : "row", alignItems: narrow ? "flex-start" : "center", gap: narrow ? 6 : 12, flexWrap: "wrap" }}>
+                      <span style={{ fontSize: 10.5, fontWeight: 800, color: gr.col, letterSpacing: 2, flexShrink: 0, width: narrow ? "auto" : 152, textAlign: narrow ? "left" : "right", opacity: 0.95 }}>{lang === "en" ? gr.g[1] : gr.g[0]}</span>
+                      <div style={{ display: "flex", gap: narrow ? 6 : 8, flexWrap: "wrap", borderLeft: `2px solid ${gr.col}`, paddingLeft: narrow ? 8 : 12, flex: "1 1 0", minWidth: 0 }}>
+                        {gr.ids.map((id) => { const tb = TABS.find((x) => x.id === id); return tb ? (
+                          <button key={id} className="gh-btn" onClick={() => pick(id)} aria-current={tab === id ? "page" : undefined}
+                                  style={{ ...(tab === id ? { borderColor: gr.col, background: gr.col, color: C.bg } : { color: C.muted }), fontWeight: 700, fontSize: narrow ? 12 : 13, ...(narrow ? { padding: "6px 10px", minHeight: 34 } : {}) }}>
+                            {t(lang, tb.k)}
+                          </button>
+                        ) : null; })}
+                      </div>
+                    </div>
+                  ))}
+                </nav>
+              ) : null}
+              {open || !narrow ? <GuideStrip setTab={pick} /> : null}
+            </>
+          );
+        })()}
 
         <HubBackCtx.Provider value={hubBack.ctx}>
         {tab === "strategy" && <TabStrategy key={resetKey} radarCur={radarCur} onRadarChange={changeRadar} />}
