@@ -45,7 +45,7 @@ const TAG_RE = /（[^）]*(?:推奨されない|非推奨|アンチパターン|
 const STATIONS = [
   { name: 'Station_CLF', arrays: [['SET1','obj'],['SET2','obj'],['SET3','obj'],['SET4','obj'],['SET5','obj'],['MOCK1','obj'],['MOCK2','obj'],['MOCK3','obj'],['MOCK4','obj'],['MOCK5','obj']] },
   { name: 'Station_SAA', arrays: [['BANK_D1','obj'],['BANK_D2','obj'],['BANK_D3','obj'],['BANK_D4','obj'],['SAA_EXAM_HARD','obj']] },
-  { name: 'Station_CCAF', arrays: [['BANK','obj'],['EXTRA','obj'],['SET1','obj'],['SCEN_BANK','obj'],['CCAF_EXAM_HARD','obj']] },
+  { name: 'Station_CCAF', arrays: [['BANK','obj'],['EXTRA','obj'],['SCEN_BANK','obj'],['CCAF_EXAM_HARD','obj']] },
   { name: 'Station_AICX', arrays: [['EXAM_POOL','domRowQ1'],['QUIZ_EXTRA','domRowQ1']] },
   { name: 'Station_PL900', arrays: [['BANK','obj'],['BANK_EXTRA','obj'],['BANK_EXTRA2','obj'],['BANK_EXTRA3','obj'],['PL900_HARD','obj']] },
   { name: 'Station_AB620', arrays: [['BANK','obj']] },
