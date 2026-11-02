@@ -16,11 +16,11 @@ const len = (s) => [...String(s)].length;
 const norm = (s) => String(s).trim().replace(/\s+/g, '');
 
 // `const/var/let NAME = [ ... ]` または `{ ... }` を波括弧対応で切り出して eval する
-function extract(name, afterIdx = 0) {
+function extract(name, afterIdx = 0, beforeIdx = Infinity) {
   const re = new RegExp('(?:const|var|let)\\s+' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*=\\s*', 'g');
   re.lastIndex = afterIdx;
   const m = re.exec(text);
-  if (!m) throw new Error('not found: ' + name);
+  if (!m || m.index >= beforeIdx) throw new Error('not found: ' + name);
   let i = m.index + m[0].length;
   const open = text[i], close = open === '{' ? '}' : ']';
   if (open !== '{' && open !== '[') throw new Error(name + ' is not an array/object literal');
@@ -44,8 +44,8 @@ const TAG_RE = /（[^）]*(?:推奨されない|非推奨|アンチパターン|
 //   rowDQOAE : [[d, q, o:[...], a:<idx>, e, ...], ...]
 const STATIONS = [
   { name: 'Station_CLF', arrays: [['SET1','obj'],['SET2','obj'],['SET3','obj'],['SET4','obj'],['SET5','obj'],['MOCK1','obj'],['MOCK2','obj'],['MOCK3','obj'],['MOCK4','obj'],['MOCK5','obj']] },
-  { name: 'Station_SAA', arrays: [['BANK_D1','obj'],['BANK_D2','obj'],['BANK_D3','obj'],['BANK_D4','obj'],['EXAM_SET1','obj'],['EXAM_SET2','obj'],['EXAM_SET3','obj'],['EXAM_SET4','obj'],['EXAM_SET5','obj']] },
-  { name: 'Station_CCAF', arrays: [['BANK','obj'],['EXTRA','obj'],['SET1','obj'],['SET2','obj'],['SET3','obj'],['SET4','obj'],['SCEN_BANK','obj']] },
+  { name: 'Station_SAA', arrays: [['BANK_D1','obj'],['BANK_D2','obj'],['BANK_D3','obj'],['BANK_D4','obj'],['SAA_EXAM_HARD','obj']] },
+  { name: 'Station_CCAF', arrays: [['BANK','obj'],['EXTRA','obj'],['SET1','obj'],['SCEN_BANK','obj'],['CCAF_EXAM_HARD','obj']] },
   { name: 'Station_AICX', arrays: [['EXAM_POOL','domRowQ1'],['QUIZ_EXTRA','domRowQ1']] },
   { name: 'Station_PL900', arrays: [['BANK','obj'],['BANK_EXTRA','obj'],['BANK_EXTRA2','obj'],['BANK_EXTRA3','obj'],['PL900_HARD','obj']] },
   { name: 'Station_AB620', arrays: [['BANK','obj']] },
@@ -85,9 +85,12 @@ const log = (s) => process.stdout.write(s + '\n');
 for (const st of STATIONS) {
   const anchor = text.indexOf('const ' + st.name);
   if (anchor < 0) { log(`✗ ${st.name}: station not found`); hardFail++; continue; }
+  // その資格ページの中だけを探す（以前は先を探し続けたため、同名の配列を別の資格から拾うことがあった）
+  const nextSt = text.indexOf('\nconst Station_', anchor + 1);
+  const stEnd = nextSt < 0 ? Infinity : nextSt;
   for (const [arrName, fmt] of st.arrays) {
     let value;
-    try { value = extract(arrName, anchor); } catch (e) { log(`✗ ${st.name}.${arrName}: ${e.message}`); hardFail++; continue; }
+    try { value = extract(arrName, anchor, stEnd); } catch (e) { log(`✗ ${st.name}.${arrName}: ${e.message}`); hardFail++; continue; }
     const seenQ = new Set();
     let n = 0, taggedRows = 0, dupQ = 0, fails = 0;
     for (const { q, opts, correct } of rows(value, fmt)) {
