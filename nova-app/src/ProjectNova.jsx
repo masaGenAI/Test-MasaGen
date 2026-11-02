@@ -180751,11 +180751,11 @@ const C = {
 
 const DOMAINS = [
   { id: "D1", name: "生成AIとAIエージェントの基礎", pct: 22, hue: "#1E3A8A" },
-  { id: "D2", name: "業務プロセスと業務分析", pct: 18, hue: "#2554C7" },
-  { id: "D3", name: "データリテラシーとナレッジ管理", pct: 18, hue: "#2563EB" },
+  { id: "D2", name: "業務の基礎", pct: 18, hue: "#2554C7" },
+  { id: "D3", name: "AIデータリテラシーとマネジメント", pct: 18, hue: "#2563EB" },
   { id: "D4", name: "自動化レベルとワークフロー設計", pct: 18, hue: "#3B82F6" },
-  { id: "D5", name: "組織変革とチェンジマネジメント", pct: 12, hue: "#5B9BF8" },
-  { id: "D6", name: "5D実装モデルとプロジェクト推進", pct: 12, hue: "#7DB1FA" },
+  { id: "D5", name: "人と組織から考えるAI時代の組織設計", pct: 12, hue: "#5B9BF8" },
+  { id: "D6", name: "AIエージェントを実装する5Dモデル", pct: 12, hue: "#7DB1FA" },
 ];
 const DOM_HUE = Object.fromEntries(DOMAINS.map(d => [d.id, d.hue]));
 
@@ -208474,11 +208474,11 @@ const Station_ISO42001F = (function(){
 const C = { primary:"#0E8A6E", deep:"#0B5B49", light:"#E5F5F0", mid:"#A6DBCB", ink:"#0C2B24", ok:"#1F8A70", ng:"#C0392B", accent:"#2FB89A" };
 // ISO/IEC 42001 Foundation（PECB）の試験は2コンピテンシー領域。学習用に5ドメインへ展開。
 const DOMAINS = [
-  { id:"D1", name:"AIMSの基本原則と概念", nameEn:"AIMS fundamental principles & concepts", pct:20, range:"約20%", hue:"#0B5B49" },
-  { id:"D2", name:"ISO/IEC 42001 の要求事項（Clause 4–10）", nameEn:"ISO/IEC 42001 requirements (Clauses 4–10)", pct:30, range:"約30%", hue:"#0E8A6E" },
-  { id:"D3", name:"Annex A 管理策と適用宣言書（SoA）", nameEn:"Annex A controls & Statement of Applicability", pct:20, range:"約20%", hue:"#2FB89A" },
-  { id:"D4", name:"AIリスクと影響評価", nameEn:"AI risk & impact assessment", pct:15, range:"約15%", hue:"#59C9AE" },
-  { id:"D5", name:"PDCA・内部監査・継続的改善", nameEn:"PDCA, internal audit & continual improvement", pct:15, range:"約15%", hue:"#86D9C6" },
+  { id:"D1", name:"AIMSの基本原則と概念", nameEn:"AIMS fundamental principles & concepts", pct:20, range:"目安20%", hue:"#0B5B49" },
+  { id:"D2", name:"ISO/IEC 42001 の要求事項（Clause 4–10）", nameEn:"ISO/IEC 42001 requirements (Clauses 4–10)", pct:30, range:"目安30%", hue:"#0E8A6E" },
+  { id:"D3", name:"Annex A 管理策と適用宣言書（SoA）", nameEn:"Annex A controls & Statement of Applicability", pct:20, range:"目安20%", hue:"#2FB89A" },
+  { id:"D4", name:"AIリスクと影響評価", nameEn:"AI risk & impact assessment", pct:15, range:"目安15%", hue:"#59C9AE" },
+  { id:"D5", name:"PDCA・内部監査・継続的改善", nameEn:"PDCA, internal audit & continual improvement", pct:15, range:"目安15%", hue:"#86D9C6" },
 ];
 const DOM_HUE = Object.fromEntries(DOMAINS.map(d=>[d.id,d.hue]));
 const PASS = 70;
@@ -209924,12 +209924,12 @@ const Station_ISO42001LI = makeSecGovStation({
     en: { appTitle:"ISO/IEC 42001 Lead Implementer", appSub:"Leading AIMS implementation · PECB", tabHome:"Progress", tabQuiz:"Quiz", tabExam:"Mock exam", tabReview:"Review", tabDiagram:"Diagrams", tabCompare:"Compare", tabConfuse:"Confusables", tabGlossary:"Glossary", loading:"Loading..." },
   },
   DOMAINS: [
-    { id:"D1", name:"AIMSの基本原則と概念", nameEn:"Fundamental principles & concepts of an AIMS", pct:15, range:"約15%", hue:"#0E4A76" },
-    { id:"D2", name:"AIMSの要求事項", nameEn:"AIMS requirements", pct:20, range:"約20%", hue:"#1569A6" },
-    { id:"D3", name:"実装の計画", nameEn:"Planning the AIMS implementation", pct:20, range:"約20%", hue:"#3B8FCB" },
-    { id:"D4", name:"AIMSの実装", nameEn:"Implementing the AIMS", pct:20, range:"約20%", hue:"#5AA6DA" },
-    { id:"D5", name:"監視と測定", nameEn:"Monitoring & measurement", pct:15, range:"約15%", hue:"#84C0E6" },
-    { id:"D6", name:"継続的改善と認証審査準備", nameEn:"Continual improvement & certification-audit prep", pct:10, range:"約10%", hue:"#AFD6EF" },
+    { id:"D1", name:"AIMSの基本原則と概念", nameEn:"Fundamental principles & concepts of an AIMS", pct:21, range:"80問中17問", hue:"#0E4A76" },
+    { id:"D2", name:"AIMSの要求事項", nameEn:"AIMS requirements", pct:6, range:"80問中5問", hue:"#1569A6" },
+    { id:"D3", name:"実装の計画", nameEn:"Planning the AIMS implementation", pct:25, range:"80問中20問", hue:"#3B8FCB" },
+    { id:"D4", name:"AIMSの実装", nameEn:"Implementing the AIMS", pct:22, range:"80問中18問", hue:"#5AA6DA" },
+    { id:"D5", name:"監視と測定", nameEn:"Monitoring & measurement", pct:13, range:"80問中10問", hue:"#84C0E6" },
+    { id:"D6", name:"継続的改善と認証審査準備", nameEn:"Continual improvement & certification-audit prep", pct:13, range:"80問中10問", hue:"#AFD6EF" },
   ],
   BANK: [
     // D1 基礎
@@ -210714,12 +210714,12 @@ const Station_CCSK = makeSecGovStation({
     en: { appTitle:"CCSK v5", appSub:"Certificate of Cloud Security Knowledge · CSA", tabHome:"Progress", tabQuiz:"Quiz", tabExam:"Mock exam", tabReview:"Review", tabDiagram:"Diagrams", tabCompare:"Compare", tabConfuse:"Confusables", tabGlossary:"Glossary", loading:"Loading..." },
   },
   DOMAINS: [
-    { id:"D1", name:"クラウドの概念とアーキテクチャ", nameEn:"Cloud concepts & architectures", pct:17, range:"約17%", hue:"#0A5D66" },
-    { id:"D2", name:"ガバナンス・リスク・監査・コンプライアンス", nameEn:"Governance, risk, audit & compliance", pct:17, range:"約17%", hue:"#0E9AA7" },
-    { id:"D3", name:"IDアクセス管理とセキュリティ監視", nameEn:"IAM & security monitoring", pct:17, range:"約17%", hue:"#2FB6C2" },
-    { id:"D4", name:"インフラ・ネットワーク・ワークロード", nameEn:"Infrastructure, network & workloads", pct:17, range:"約17%", hue:"#4FC3CE" },
-    { id:"D5", name:"データとアプリケーションセキュリティ", nameEn:"Data & application security", pct:16, range:"約16%", hue:"#7BD4DC" },
-    { id:"D6", name:"インシデント対応・レジリエンス・関連技術", nameEn:"Incident response, resilience & related tech", pct:16, range:"約16%", hue:"#A6E3E8" },
+    { id:"D1", name:"クラウドの概念とアーキテクチャ", nameEn:"Cloud concepts & architectures", pct:17, range:"公式D1・目安17%", hue:"#0A5D66" },
+    { id:"D2", name:"ガバナンス・リスク・監査・コンプライアンス", nameEn:"Governance, risk, audit & compliance", pct:17, range:"公式D2・D3・目安17%", hue:"#0E9AA7" },
+    { id:"D3", name:"IDアクセス管理とセキュリティ監視", nameEn:"IAM & security monitoring", pct:17, range:"公式D5・D6・目安17%", hue:"#2FB6C2" },
+    { id:"D4", name:"インフラ・ネットワーク・ワークロード", nameEn:"Infrastructure, network & workloads", pct:17, range:"公式D7・D8・目安17%", hue:"#4FC3CE" },
+    { id:"D5", name:"データとアプリケーションセキュリティ", nameEn:"Data & application security", pct:16, range:"公式D9・D10・目安16%", hue:"#7BD4DC" },
+    { id:"D6", name:"インシデント対応・レジリエンス・関連技術", nameEn:"Incident response, resilience & related tech", pct:16, range:"公式D11・D12・目安16%", hue:"#A6E3E8" },
   ],
   BANK: [
     // D1 クラウドの概念とアーキテクチャ
@@ -211528,17 +211528,17 @@ const Station_CCSK = makeSecGovStation({
 const Station_CISM = makeSecGovStation({
   C: { primary:"#9B2D5E", deep:"#6E1F44", light:"#F6E7EF", mid:"#E1B9CE", ink:"#2B1520", ok:"#1F8A70", ng:"#C0392B", accent:"#C24E86" },
   PASS: 70, STORE_KEY: "cism_hub_study_v1",
-  noteJa: "CISM（ISACA）の非公式学習補助です。ISACAとの提携・公式認定ではありません。問題と配点は2022年版の試験範囲（17/20/33/30%）に基づきます。ISACAは2026年11月3日から新しい試験範囲（配点18/20/33/29%、セキュリティアーキテクチャ関連の内容を追加）に改定すると発表しています（2026年10月時点）。受験日に合わせて公式の Exam Content Outline を確認してください。",
-  noteEn: "Unofficial study aid for CISM (ISACA). Not affiliated with or endorsed by ISACA. Questions and weights follow the 2022 exam content outline (17/20/33/30%). ISACA has announced a new outline from 3 November 2026 (weights 18/20/33/29%, adding security architecture content), as of October 2026. Check the official Exam Content Outline for your exam date.",
+  noteJa: "CISM（ISACA）の非公式学習補助です。ISACAとの提携・公式認定ではありません。問題は2022年版の試験範囲（配点17/20/33/30%）をもとに作っています。分野の配点の表示は、2026年11月3日からの新しい試験範囲（18/20/33/29%）に合わせました。新しい範囲で加わるエンタープライズアーキテクチャと情報セキュリティアーキテクチャの問題はまだありません（どの分野に入るかは未確認）。受験日に合わせて公式の Exam Content Outline を確認してください。",
+  noteEn: "Unofficial study aid for CISM (ISACA). Not affiliated with or endorsed by ISACA. Questions were written for the 2022 exam content outline (weights 17/20/33/30%). Domain weights shown here follow the new outline from 3 November 2026 (18/20/33/29%). There are no questions yet on the two areas the new outline adds, enterprise architecture and information security architecture (which domain they sit in is not confirmed). Check the official Exam Content Outline for your exam date.",
   T: {
     ja: { appTitle:"CISM", appSub:"公認情報セキュリティマネージャ・ISACA", tabHome:"進捗", tabQuiz:"クイズ", tabExam:"模擬試験", tabReview:"復習", tabDiagram:"図解", tabCompare:"比較表", tabConfuse:"混同", tabGlossary:"用語集", loading:"読み込み中..." },
     en: { appTitle:"CISM", appSub:"Certified Information Security Manager · ISACA", tabHome:"Progress", tabQuiz:"Quiz", tabExam:"Mock exam", tabReview:"Review", tabDiagram:"Diagrams", tabCompare:"Compare", tabConfuse:"Confusables", tabGlossary:"Glossary", loading:"Loading..." },
   },
   DOMAINS: [
-    { id:"D1", name:"情報セキュリティガバナンス", nameEn:"Information security governance", pct:17, range:"約17%", hue:"#6E1F44" },
-    { id:"D2", name:"情報セキュリティリスク管理", nameEn:"Information security risk management", pct:20, range:"約20%", hue:"#9B2D5E" },
-    { id:"D3", name:"情報セキュリティプログラム", nameEn:"Information security program", pct:33, range:"約33%", hue:"#C24E86" },
-    { id:"D4", name:"インシデント管理", nameEn:"Incident management", pct:30, range:"約30%", hue:"#DB86AE" },
+    { id:"D1", name:"情報セキュリティガバナンス", nameEn:"Information security governance", pct:18, range:"18%", hue:"#6E1F44" },
+    { id:"D2", name:"情報セキュリティリスク管理", nameEn:"Information security risk management", pct:20, range:"20%", hue:"#9B2D5E" },
+    { id:"D3", name:"情報セキュリティプログラム", nameEn:"Information security program", pct:33, range:"33%", hue:"#C24E86" },
+    { id:"D4", name:"インシデント管理", nameEn:"Incident management", pct:29, range:"29%", hue:"#DB86AE" },
   ],
   BANK: [
     // D1 ガバナンス
@@ -212049,8 +212049,8 @@ const Station_CISM = makeSecGovStation({
   COMPARE: [
     { title:"CISM 4ドメインと配点", titleEn:"CISM's four domains and weighting",
       cols:["ドメイン","焦点","配点目安"], colsEn:["Domain","Focus","Weight"],
-      rows:[["D1 ガバナンス","戦略・方針・役割の整合","約17%"],["D2 リスク管理","評価・対応・モニタリング","約20%"],["D3 プログラム","統制の実装・運用・指標","約33%"],["D4 インシデント管理","検知・対応・復旧・改善","約30%"]],
-      rowsEn:[["D1 Governance","Align strategy, policy, roles","~17%"],["D2 Risk mgmt","Assess, treat, monitor","~20%"],["D3 Program","Implement/operate controls, metrics","~33%"],["D4 Incident mgmt","Detect, respond, recover, improve","~30%"]] },
+      rows:[["D1 ガバナンス","戦略・方針・役割の整合","18%"],["D2 リスク管理","評価・対応・モニタリング","20%"],["D3 プログラム","統制の実装・運用・指標","33%"],["D4 インシデント管理","検知・対応・復旧・改善","29%"]],
+      rowsEn:[["D1 Governance","Align strategy, policy, roles","18%"],["D2 Risk mgmt","Assess, treat, monitor","20%"],["D3 Program","Implement/operate controls, metrics","33%"],["D4 Incident mgmt","Detect, respond, recover, improve","29%"]] },
     { title:"統制の分類（機能別）", titleEn:"Control types by function",
       cols:["種類","目的","例"], colsEn:["Type","Goal","Example"],
       rows:[["予防","発生を防ぐ","アクセス制御・暗号化"],["検知","発生を見つける","ログ監視・IDS"],["是正","影響を回復/縮小","バックアップ復元・パッチ"]],
@@ -212222,10 +212222,10 @@ const Station_CISM = makeSecGovStation({
   {
     kind: "layers", titleJa: "CISM 4ドメイン", titleEn: "The Four CISM Domains",
     nodes: [
-      { id: "d1", labelJa: "D1 情報セキュリティガバナンス（約17%）", labelEn: "D1 Information Security Governance (~17%)", detailJa: "戦略・方針・役割を事業目標に整合させ、方向付けと監督を行う。", detailEn: "Align strategy, policy, and roles to business goals, providing direction and oversight." },
-      { id: "d2", labelJa: "D2 情報セキュリティリスク管理（約20%）", labelEn: "D2 Information Security Risk Management (~20%)", detailJa: "リスクを識別・評価し、対応を選びモニタリングする。", detailEn: "Identify and assess risk, then choose treatment and monitor it." },
-      { id: "d3", labelJa: "D3 情報セキュリティプログラム（約33%）", labelEn: "D3 Information Security Program (~33%)", detailJa: "戦略を統制・活動・資源として実装し運用する。", detailEn: "Implement and operate the strategy as controls, activities, and resources." },
-      { id: "d4", labelJa: "D4 インシデント管理（約30%）", labelEn: "D4 Incident Management (~30%)", detailJa: "インシデントを検知・対応・復旧し、教訓を反映する。", detailEn: "Detect, respond to, and recover from incidents, then apply lessons learned." },
+      { id: "d1", labelJa: "D1 情報セキュリティガバナンス（18%）", labelEn: "D1 Information Security Governance (18%)", detailJa: "戦略・方針・役割を事業目標に整合させ、方向付けと監督を行う。", detailEn: "Align strategy, policy, and roles to business goals, providing direction and oversight." },
+      { id: "d2", labelJa: "D2 情報セキュリティリスク管理（20%）", labelEn: "D2 Information Security Risk Management (20%)", detailJa: "リスクを識別・評価し、対応を選びモニタリングする。", detailEn: "Identify and assess risk, then choose treatment and monitor it." },
+      { id: "d3", labelJa: "D3 情報セキュリティプログラム（33%）", labelEn: "D3 Information Security Program (33%)", detailJa: "戦略を統制・活動・資源として実装し運用する。", detailEn: "Implement and operate the strategy as controls, activities, and resources." },
+      { id: "d4", labelJa: "D4 インシデント管理（29%）", labelEn: "D4 Incident Management (29%)", detailJa: "インシデントを検知・対応・復旧し、教訓を反映する。", detailEn: "Detect, respond to, and recover from incidents, then apply lessons learned." },
     ],
   },
   {
@@ -212316,7 +212316,7 @@ const Station_CISM = makeSecGovStation({
   },
 ],
   DIAGRAMS: [
-    { titleJa:"CISM 4ドメイン（配点）", titleEn:"CISM's four domains (weighting)", kind:"stack", items:[{ja:"D1 ガバナンス（約17%）",en:"D1 Governance (~17%)",c:"#6E1F44"},{ja:"D2 リスク管理（約20%）",en:"D2 Risk management (~20%)",c:"#9B2D5E"},{ja:"D3 プログラム（約33%）",en:"D3 Program (~33%)",c:"#C24E86"},{ja:"D4 インシデント管理（約30%）",en:"D4 Incident management (~30%)",c:"#DB86AE"}] },
+    { titleJa:"CISM 4ドメイン（配点）", titleEn:"CISM's four domains (weighting from 3 Nov 2026)", kind:"stack", items:[{ja:"D1 ガバナンス（18%）",en:"D1 Governance (18%)",c:"#6E1F44"},{ja:"D2 リスク管理（20%）",en:"D2 Risk management (20%)",c:"#9B2D5E"},{ja:"D3 プログラム（33%）",en:"D3 Program (33%)",c:"#C24E86"},{ja:"D4 インシデント管理（29%）",en:"D4 Incident management (29%)",c:"#DB86AE"}] },
     { titleJa:"リスク管理の流れ", titleEn:"Risk-management flow", kind:"flow", items:[{ja:"識別",en:"Identify"},{ja:"分析/評価",en:"Analyze/Assess"},{ja:"対応",en:"Treat"},{ja:"モニタリング",en:"Monitor"},{ja:"報告",en:"Report"}] },
     { titleJa:"インシデント対応の段階", titleEn:"Incident-response phases", kind:"flow", items:[{ja:"準備",en:"Prepare"},{ja:"検知/分析",en:"Detect/Analyze"},{ja:"封じ込め",en:"Contain"},{ja:"根絶",en:"Eradicate"},{ja:"復旧",en:"Recover"},{ja:"事後",en:"Post-incident"}] },
   ],
@@ -213128,9 +213128,9 @@ const Station_AAIR = makeSecGovStation({
     en: { appTitle:"AAIR", appSub:"Advanced in AI Risk · ISACA", tabHome:"Progress", tabQuiz:"Quiz", tabExam:"Mock exam", tabReview:"Review", tabDiagram:"Diagrams", tabCompare:"Compare", tabConfuse:"Confusables", tabGlossary:"Glossary", loading:"Loading..." },
   },
   DOMAINS: [
-    { id:"D1", name:"AIリスクガバナンスとフレームワーク統合", nameEn:"AI risk governance & framework integration", pct:34, range:"約34%", hue:"#8A5B12" },
-    { id:"D2", name:"AIライフサイクルリスク管理", nameEn:"AI lifecycle risk management", pct:33, range:"約33%", hue:"#B7791F" },
-    { id:"D3", name:"AIリスクプログラム管理", nameEn:"AI risk program management", pct:33, range:"約33%", hue:"#D69A32" },
+    { id:"D1", name:"AIリスクガバナンスとフレームワーク統合", nameEn:"AI risk governance & framework integration", pct:37, range:"37%", hue:"#8A5B12" },
+    { id:"D2", name:"AIライフサイクルリスク管理", nameEn:"AI lifecycle risk management", pct:21, range:"21%", hue:"#B7791F" },
+    { id:"D3", name:"AIリスクプログラム管理", nameEn:"AI risk program management", pct:42, range:"42%", hue:"#D69A32" },
   ],
   BANK: [
     // D1 ガバナンスとフレームワーク統合
@@ -216467,7 +216467,7 @@ function CertOverlapMap({ lang }) {
   );
 }
 
-// 公式ページで試験の現行版を確かめた結果（2026-11-01）。kind: changed=出題範囲の改定あり / ok=改定・廃止の告知なし / none=公式ページを確認できず。
+// 公式ページで試験の現行版を確かめた結果（既定は2026-11-01。4つ目の要素があればその日付に確認）。kind: changed=出題範囲の改定あり / ok=改定・廃止の告知なし / none=公式ページを確認できず。
 // Microsoft・GitHub は Microsoft Learn の試験ガイド、AWS・Google・IAPP は公式ページで確認。ここに書くのは公式ページに書いてあったことだけ。
 const CERT_CHECK_DATE = "2026-11-01";
 const CERT_CHECK = {
@@ -216488,14 +216488,25 @@ const CERT_CHECK = {
   gh600: ["ok", "改定・廃止の告知なし（出題範囲の日付はページに記載なし）。", "No change or retirement notice (no skills-measured date on the page)."],
   adp: ["changed", "公式ページに「ブランド名の変更を反映して近く更新」とある（日付の記載なし）。", "The official page says the exam will soon be updated for recent branding changes (no date given)."],
   aigp: ["ok", "公式ページを確認。試験の版・日付はページに記載なし。", "Official page checked; it gives no exam version or date."],
-  ccaf: ["none"], aicx: ["none"], iso42001f: ["none"], iso42001li: ["none"], ccsk: ["none"], cism: ["none"], cisa: ["none"], aaism: ["none"], aair: ["none"], aaia: ["none"],
+  // 以下の10資格は 2026-11-02 に公式ページで確認（それまでは公式サイトに接続できず未確認だった）
+  ccaf: ["ok", "公式の試験ガイド（Version 1.0・2026年7月から有効・試験コード CCAR-F）の5分野と比率は、このページと一致。60問・120分・合格はスケールスコア720（100〜1,000）。受験は Claude Partner Network の組織に限られる。", "Matches the official exam guide (Version 1.0, effective July 2026, exam code CCAR-F): five domains and weights. 60 items, 120 minutes, passing scaled score 720 (100–1,000). Available only to organizations in the Claude Partner Network.", "2026-11-02"],
+  aicx: ["changed", "公式シラバスは2026年8月に Version 1.3 へ改訂（Section 3・20・27 の記述を整理）。シラバスは6章・32セクションで、分野ごとの出題比率は公表されていない。このページの6分野は公式の6章に対応する（名前を章名に合わせた）。改訂の中身がこのページに反映されているかは未確認。試験時間は第2回から90分（従来75分）。", "Official syllabus revised to Version 1.3 in August 2026 (Sections 3, 20 and 27). It has 6 chapters and 32 sections and publishes no weights per area. This station's six areas follow the six chapters (names aligned). Whether the revision is reflected here is not checked. Exam time is 90 minutes from the 2nd sitting (formerly 75).", "2026-11-02"],
+  iso42001f: ["ok", "改定・廃止の告知なし。公式の試験範囲は2つの能力領域（AIMS の基本原則と概念／AIMS）で、比率は公表されていない。このページの5区分と比率は学習用の目安。", "No change or retirement notice. The official exam covers two competency domains (fundamental principles and concepts of an AIMS; the AIMS) with no published weights. This station's five areas and weights are a study guide only.", "2026-11-02"],
+  iso42001li: ["ok", "改定・廃止の告知なし。公式の認証スキーム文書（v1.2・2026年3月16日）では6領域・80問・3時間・合格70%。領域ごとの出題数は17・5・20・18・10・10問で、このページの比率をこれに合わせて直した。", "No change or retirement notice. The official certification scheme (v1.2, 16 March 2026): six domains, 80 questions, 3 hours, pass mark 70%. Questions per domain are 17/5/20/18/10/10; this station's weights were corrected to match.", "2026-11-02"],
+  ccsk: ["ok", "改定・廃止の告知なし。CCSK v5 の公式は12分野で、比率は公表されていない。このページは12分野を6つにまとめた学習用の区分で（各分野の横に対応する公式の分野番号を表示）、公式の D4『組織管理』に当たる区分はない。60問・120分・合格80%・オープンブック（同じページの別の箇所には90分ともある）。", "No change or retirement notice. CCSK v5 has 12 official domains with no published weights. This station groups them into six study areas (the matching official domain numbers are shown next to each area); official D4 'Organization Management' has no group here. 60 questions, 120 minutes, pass mark 80%, open book (the same page also mentions 90 minutes).", "2026-11-02"],
+  cism: ["changed", "2026年11月3日から新しい出題範囲（ISACA の2026年9月10日の発表）。4分野は変わらず、比率は D1 18%・D2 20%・D3 33%・D4 29%（11月2日までは17・20・33・30%）。このページの比率は新しい値に合わせた。新たに加わる『エンタープライズアーキテクチャ』と『情報セキュリティアーキテクチャ』がどの分野に入るかは未確認で、この2つの問題はまだない。", "New exam content outline from 3 November 2026 (ISACA announcement, 10 September 2026). The four domains stay; weights become D1 18%, D2 20%, D3 33%, D4 29% (17/20/33/30 until 2 November). This station uses the new weights. Two content areas are added — enterprise architecture and information security architecture; which domain they sit in is not confirmed, and this station has no questions on them yet.", "2026-11-02"],
+  cisa: ["ok", "改定・廃止の告知なし。公式の5分野と比率（18・18・12・26・26%）はこのページと一致。", "No change or retirement notice. The five official domains and weights (18/18/12/26/26%) match this station.", "2026-11-02"],
+  aaism: ["ok", "改定・廃止の告知なし。公式の3分野と比率（31・31・38%）はこのページと一致。", "No change or retirement notice. The three official domains and weights (31/31/38%) match this station.", "2026-11-02"],
+  aair: ["ok", "改定・廃止の告知なし。公式の比率は D1 37%・D2 21%・D3 42%。このページの比率（約34・33・33%）は誤りだったので、公式の値に直した。", "No change or retirement notice. Official weights are D1 37%, D2 21%, D3 42%; this station had about 34/33/33%, now corrected.", "2026-11-02"],
+  aaia: ["ok", "改定・廃止の告知なし。公式の3分野と比率（33・46・21%）はこのページと一致。", "No change or retirement notice. The three official domains and weights (33/46/21%) match this station.", "2026-11-02"],
 };
 function CertCheckNote({ id, lang }) {
   const c = CERT_CHECK[id];
   if (!c) return null;
   const en = lang === "en";
   const sty = { changed: ["#FFF7E6", "#7A4B00"], ok: ["#ECF7F2", "#1E5C45"], none: ["#F1F3F6", "#4A5563"] }[c[0]];
-  const head = en ? `Official exam page checked ${CERT_CHECK_DATE}: ` : `公式ページの確認（${CERT_CHECK_DATE}）：`;
+  const date = c[3] || CERT_CHECK_DATE;
+  const head = en ? `Official exam page checked ${date}: ` : `公式ページの確認（${date}）：`;
   const body = c[0] === "none" ? (en ? "not checked — the official site could not be reached from the checking environment. Check the official page for the current version." : "未確認（確認した環境から公式サイトに接続できなかったため）。現行の版は公式ページで確かめてください。") : c[en ? 2 : 1];
   return <div style={{ fontSize: 12, lineHeight: 1.6, color: sty[1], background: sty[0], padding: "6px 14px", borderBottom: `1px solid ${HUB.border}` }}>{head}{body}</div>;
 }
@@ -230692,7 +230703,7 @@ function novaLogStudy() {
 }
 // 全クイズ横断の弱点集計レジストリ（各資格モジュールの state.progress をドメイン名に解決するための対応表。
 // DOMAINS は各モジュール定義から機械抽出。値は [日本語名, 英語名]）。
-const NOVA_DOM_REG = {"saa_c03_study_v1":{"cert":"SAA-C03","doms":{"D1":["セキュアなアーキテクチャの設計","Design Secure Architectures"],"D2":["弾力性に優れたアーキテクチャの設計","Design Resilient Architectures"],"D3":["高パフォーマンスなアーキテクチャの設計","Design High-Performing Architectures"],"D4":["コストを最適化したアーキテクチャの設計","Design Cost-Optimized Architectures"]}},"cca_f_study_v1":{"cert":"CCA-F","doms":{"D1":["エージェント アーキテクチャとオーケストレーション","Agentic Architecture & Orchestration"],"D2":["ツール設計とMCP統合","Tool Design & MCP Integration"],"D3":["Claude Code 設定とワークフロー","Claude Code Config & Workflows"],"D4":["プロンプト エンジニアリングと構造化出力","Prompt Engineering & Structured Output"],"D5":["コンテキスト管理と信頼性","Context Management & Reliability"]}},"aics_study_v2":{"cert":"AICS","doms":{"D1":["生成AIとAIエージェントの基礎","生成AIとAIエージェントの基礎"],"D2":["業務プロセスと業務分析","業務プロセスと業務分析"],"D3":["データリテラシーとナレッジ管理","データリテラシーとナレッジ管理"],"D4":["自動化レベルとワークフロー設計","自動化レベルとワークフロー設計"],"D5":["組織変革とチェンジマネジメント","組織変革とチェンジマネジメント"],"D6":["5D実装モデルとプロジェクト推進","5D実装モデルとプロジェクト推進"]}},"pl900_study_v2":{"cert":"PL-900","doms":{"D1":["Power Platform のビジネス価値","Power Platform のビジネス価値"],"D2":["Power Platform 環境の管理 / Dataverse","Power Platform 環境の管理 / Dataverse"],"D3":["Power Apps の機能","Power Apps の機能"],"D4":["Power Automate の機能","Power Automate の機能"],"D5":["Copilot Studio のエージェント","Agents in Copilot Studio"],"PP":["旧範囲：Power Pages","Former scope: Power Pages"]}},"ab620_study_v2":{"cert":"AB-620","doms":{"D1":["エージェント ソリューションの計画と構成","Plan & Configure Agent Solutions"],"D2":["エージェントの統合と拡張","Integrate & Extend Agents"],"D3":["エージェントのテストと管理","Test & Manage Agents"]}},"dp900_study_v1":{"cert":"DP-900","doms":{"D1":["データの中核概念","Core Data Concepts"],"D2":["Azure のリレーショナルデータ","Relational Data on Azure"],"D3":["Azure の非リレーショナルデータ","Non-relational Data on Azure"],"D4":["Azure の分析ワークロード","Analytics Workload on Azure"]}},"sc500_study_v1":{"cert":"SC-500","doms":{"D1":["ID・アクセス・ガバナンスの管理","Manage Identity, Access, and Governance"],"D2":["ストレージ・データベース・ネットワークの保護","Secure Storage, Databases, and Networking"],"D3":["コンピュートの保護（AIセキュリティ含む）","Secure Compute (including AI)"],"D4":["セキュリティ態勢の管理と監視","Manage and Monitor Security Posture"]}},"sc900_study_v1":{"cert":"SC-900","doms":{"D1":["セキュリティ・コンプライアンス・ID の概念","Concepts of Security, Compliance, and Identity"],"D2":["Microsoft Entra の機能","Capabilities of Microsoft Entra"],"D3":["Microsoft セキュリティ ソリューションの機能","Capabilities of Microsoft Security Solutions"],"D4":["Microsoft コンプライアンス ソリューションの機能","Capabilities of Microsoft Compliance Solutions"]}},"gh600_study_v2":{"cert":"GH-600","doms":{"D1":["エージェントアーキテクチャとSDLCの準備","Prepare Agent Architecture & SDLC"],"D2":["ツール使用と環境操作の実装","Implement Tool Use & Environment Interaction"],"D3":["メモリ・状態・実行の管理","Manage Memory, State & Execution"],"D4":["評価・エラー分析・チューニング","Evaluation, Error Analysis & Tuning"],"D5":["マルチエージェント連携のオーケストレーション","Orchestrate Multi-agent Coordination"],"D6":["ガードレールと説明責任の実装","Implement Guardrails & Accountability"]}},"ab100_study_v2":{"cert":"AB-100","doms":{"D1":["AIビジネスソリューションの計画","Plan AI-powered Business Solutions"],"D2":["AIビジネスソリューションの設計","Design AI-powered Business Solutions"],"D3":["AIビジネスソリューションの展開","Deploy AI-powered Business Solutions"]}},"ab410_study_v2":{"cert":"AB-410","doms":{"D1":["インテリジェントアプリの基盤構築","Create a Foundation for Intelligent Applications"],"D2":["インテリジェントアプリの作成","Create Intelligent Applications"],"D3":["ビジネスロジックと自動化の構築","Build Business Logic & Automation"]}},"ai300_study_v2":{"cert":"AI-300","doms":{"D1":["MLOps基盤の設計と実装","Design & Implement an MLOps Infrastructure"],"D2":["機械学習モデルのライフサイクルと運用","ML Model Lifecycle & Operations"],"D3":["GenAIOps基盤の設計と実装","Design & Implement a GenAIOps Infrastructure"],"D4":["生成AIの品質保証と可観測性","GenAI Quality Assurance & Observability"],"D5":["生成AIシステムとモデル性能の最適化","Optimize GenAI Systems & Model Performance"]}},"ai103_study_v1":{"cert":"AI-103","doms":{"D1":["Azure AI ソリューションの計画と管理","Plan & manage an Azure AI solution"],"D2":["生成AI・エージェントソリューションの実装","Implement generative AI & agentic solutions"],"D3":["コンピュータービジョンソリューションの実装","Implement computer vision solutions"],"D4":["テキスト分析ソリューションの実装","Implement text analysis solutions"],"D5":["情報抽出ソリューションの実装","Implement information extraction solutions"]}},"ai200_study_v1":{"cert":"AI-200","doms":{"D1":["コンテナー化ソリューションの開発","Develop containerized solutions on Azure"],"D2":["Azureデータ管理サービスでのAI開発","AI solutions with Azure data management services"],"D3":["Azureサービスへの接続と利用","Connect to & consume Azure services"],"D4":["セキュリティ・監視・トラブルシュート","Secure, monitor, troubleshoot"]}},"gh900_study_v1":{"cert":"GH-900","doms":{"D1":["Git と GitHub の基礎","Understand Git & GitHub basics"],"D2":["GitHubリポジトリの操作","Work with GitHub repositories"],"D3":["GitHubでのコラボレーション","Collaborate using GitHub"],"D4":["モダン開発プラクティス","Apply modern development practices"],"D5":["GitHubでのプロジェクト管理","Manage projects with GitHub"],"D6":["プライバシー・セキュリティ・管理","Privacy, security & administration"],"D7":["GitHubコミュニティ","Explore the GitHub community"]}},"gh300_study_v1":{"cert":"GH-300","doms":{"D1":["Copilot を責任を持って使う","Use GitHub Copilot responsibly"],"D2":["GitHub Copilot の機能を使う","Use GitHub Copilot features"],"D3":["Copilot のデータとアーキテクチャ","Copilot data & architecture"],"D4":["プロンプトエンジニアリング","Prompt engineering & context"],"D5":["開発生産性の向上","Improve developer productivity"],"D6":["プライバシー・除外・セーフガード","Privacy, exclusions & safeguards"]}},"adp_study_v3":{"cert":"ADP","doms":{"D1":["データの準備と取り込み","Data Preparation & Ingestion"],"D2":["データ分析とプレゼンテーション","Data Analysis & Presentation"],"D3":["データ パイプラインのオーケストレーション","Data Pipeline Orchestration"],"D4":["データ マネジメント","Data Management"]}}};
+const NOVA_DOM_REG = {"saa_c03_study_v1":{"cert":"SAA-C03","doms":{"D1":["セキュアなアーキテクチャの設計","Design Secure Architectures"],"D2":["弾力性に優れたアーキテクチャの設計","Design Resilient Architectures"],"D3":["高パフォーマンスなアーキテクチャの設計","Design High-Performing Architectures"],"D4":["コストを最適化したアーキテクチャの設計","Design Cost-Optimized Architectures"]}},"cca_f_study_v1":{"cert":"CCA-F","doms":{"D1":["エージェント アーキテクチャとオーケストレーション","Agentic Architecture & Orchestration"],"D2":["ツール設計とMCP統合","Tool Design & MCP Integration"],"D3":["Claude Code 設定とワークフロー","Claude Code Config & Workflows"],"D4":["プロンプト エンジニアリングと構造化出力","Prompt Engineering & Structured Output"],"D5":["コンテキスト管理と信頼性","Context Management & Reliability"]}},"aics_study_v2":{"cert":"AICS","doms":{"D1":["生成AIとAIエージェントの基礎","生成AIとAIエージェントの基礎"],"D2":["業務の基礎","業務の基礎"],"D3":["AIデータリテラシーとマネジメント","AIデータリテラシーとマネジメント"],"D4":["自動化レベルとワークフロー設計","自動化レベルとワークフロー設計"],"D5":["人と組織から考えるAI時代の組織設計","人と組織から考えるAI時代の組織設計"],"D6":["AIエージェントを実装する5Dモデル","AIエージェントを実装する5Dモデル"]}},"pl900_study_v2":{"cert":"PL-900","doms":{"D1":["Power Platform のビジネス価値","Power Platform のビジネス価値"],"D2":["Power Platform 環境の管理 / Dataverse","Power Platform 環境の管理 / Dataverse"],"D3":["Power Apps の機能","Power Apps の機能"],"D4":["Power Automate の機能","Power Automate の機能"],"D5":["Copilot Studio のエージェント","Agents in Copilot Studio"],"PP":["旧範囲：Power Pages","Former scope: Power Pages"]}},"ab620_study_v2":{"cert":"AB-620","doms":{"D1":["エージェント ソリューションの計画と構成","Plan & Configure Agent Solutions"],"D2":["エージェントの統合と拡張","Integrate & Extend Agents"],"D3":["エージェントのテストと管理","Test & Manage Agents"]}},"dp900_study_v1":{"cert":"DP-900","doms":{"D1":["データの中核概念","Core Data Concepts"],"D2":["Azure のリレーショナルデータ","Relational Data on Azure"],"D3":["Azure の非リレーショナルデータ","Non-relational Data on Azure"],"D4":["Azure の分析ワークロード","Analytics Workload on Azure"]}},"sc500_study_v1":{"cert":"SC-500","doms":{"D1":["ID・アクセス・ガバナンスの管理","Manage Identity, Access, and Governance"],"D2":["ストレージ・データベース・ネットワークの保護","Secure Storage, Databases, and Networking"],"D3":["コンピュートの保護（AIセキュリティ含む）","Secure Compute (including AI)"],"D4":["セキュリティ態勢の管理と監視","Manage and Monitor Security Posture"]}},"sc900_study_v1":{"cert":"SC-900","doms":{"D1":["セキュリティ・コンプライアンス・ID の概念","Concepts of Security, Compliance, and Identity"],"D2":["Microsoft Entra の機能","Capabilities of Microsoft Entra"],"D3":["Microsoft セキュリティ ソリューションの機能","Capabilities of Microsoft Security Solutions"],"D4":["Microsoft コンプライアンス ソリューションの機能","Capabilities of Microsoft Compliance Solutions"]}},"gh600_study_v2":{"cert":"GH-600","doms":{"D1":["エージェントアーキテクチャとSDLCの準備","Prepare Agent Architecture & SDLC"],"D2":["ツール使用と環境操作の実装","Implement Tool Use & Environment Interaction"],"D3":["メモリ・状態・実行の管理","Manage Memory, State & Execution"],"D4":["評価・エラー分析・チューニング","Evaluation, Error Analysis & Tuning"],"D5":["マルチエージェント連携のオーケストレーション","Orchestrate Multi-agent Coordination"],"D6":["ガードレールと説明責任の実装","Implement Guardrails & Accountability"]}},"ab100_study_v2":{"cert":"AB-100","doms":{"D1":["AIビジネスソリューションの計画","Plan AI-powered Business Solutions"],"D2":["AIビジネスソリューションの設計","Design AI-powered Business Solutions"],"D3":["AIビジネスソリューションの展開","Deploy AI-powered Business Solutions"]}},"ab410_study_v2":{"cert":"AB-410","doms":{"D1":["インテリジェントアプリの基盤構築","Create a Foundation for Intelligent Applications"],"D2":["インテリジェントアプリの作成","Create Intelligent Applications"],"D3":["ビジネスロジックと自動化の構築","Build Business Logic & Automation"]}},"ai300_study_v2":{"cert":"AI-300","doms":{"D1":["MLOps基盤の設計と実装","Design & Implement an MLOps Infrastructure"],"D2":["機械学習モデルのライフサイクルと運用","ML Model Lifecycle & Operations"],"D3":["GenAIOps基盤の設計と実装","Design & Implement a GenAIOps Infrastructure"],"D4":["生成AIの品質保証と可観測性","GenAI Quality Assurance & Observability"],"D5":["生成AIシステムとモデル性能の最適化","Optimize GenAI Systems & Model Performance"]}},"ai103_study_v1":{"cert":"AI-103","doms":{"D1":["Azure AI ソリューションの計画と管理","Plan & manage an Azure AI solution"],"D2":["生成AI・エージェントソリューションの実装","Implement generative AI & agentic solutions"],"D3":["コンピュータービジョンソリューションの実装","Implement computer vision solutions"],"D4":["テキスト分析ソリューションの実装","Implement text analysis solutions"],"D5":["情報抽出ソリューションの実装","Implement information extraction solutions"]}},"ai200_study_v1":{"cert":"AI-200","doms":{"D1":["コンテナー化ソリューションの開発","Develop containerized solutions on Azure"],"D2":["Azureデータ管理サービスでのAI開発","AI solutions with Azure data management services"],"D3":["Azureサービスへの接続と利用","Connect to & consume Azure services"],"D4":["セキュリティ・監視・トラブルシュート","Secure, monitor, troubleshoot"]}},"gh900_study_v1":{"cert":"GH-900","doms":{"D1":["Git と GitHub の基礎","Understand Git & GitHub basics"],"D2":["GitHubリポジトリの操作","Work with GitHub repositories"],"D3":["GitHubでのコラボレーション","Collaborate using GitHub"],"D4":["モダン開発プラクティス","Apply modern development practices"],"D5":["GitHubでのプロジェクト管理","Manage projects with GitHub"],"D6":["プライバシー・セキュリティ・管理","Privacy, security & administration"],"D7":["GitHubコミュニティ","Explore the GitHub community"]}},"gh300_study_v1":{"cert":"GH-300","doms":{"D1":["Copilot を責任を持って使う","Use GitHub Copilot responsibly"],"D2":["GitHub Copilot の機能を使う","Use GitHub Copilot features"],"D3":["Copilot のデータとアーキテクチャ","Copilot data & architecture"],"D4":["プロンプトエンジニアリング","Prompt engineering & context"],"D5":["開発生産性の向上","Improve developer productivity"],"D6":["プライバシー・除外・セーフガード","Privacy, exclusions & safeguards"]}},"adp_study_v3":{"cert":"ADP","doms":{"D1":["データの準備と取り込み","Data Preparation & Ingestion"],"D2":["データ分析とプレゼンテーション","Data Analysis & Presentation"],"D3":["データ パイプラインのオーケストレーション","Data Pipeline Orchestration"],"D4":["データ マネジメント","Data Management"]}}};
 // 全クイズ横断「弱点フォーカス」。各資格モジュールが端末に保存した正答実績(state.progress: ドメイン別 correct/attempts)と
 // AIアーキ確認クイズ(acad_quiz_score_v1: トピック別)を集約し、正答率が低い分野トップ3を提示する。
 function WeaknessFocus({ lang, onResume }) {
