@@ -183601,13 +183601,35 @@ const DOMAINS = [
 ];
 const DOM_NAME = Object.fromEntries(DOMAINS.map(d => [d.id, d.name]).concat([["PP", "旧範囲（2026年7月の改定で出題範囲から外れた内容：Power Pages の分野、M365・Dynamics 365・Azure による拡張の価値など）"]]));
 const DOM_HUE = Object.fromEntries(DOMAINS.map(d => [d.id, d.hue]).concat([["PP", "#8A9BA3"]]));
+// 英語の領域名（Microsoft Learn の PL-900 学習ガイド「Skills measured as of July 24, 2026」の表記）。DOMAINS に nameEn が無いときだけ補う
+const DOM_NAME_EN0 = {
+  D1: "Describe the business value of Microsoft Power Platform",
+  D2: "Manage the Microsoft Power Platform environment (Dataverse, administration and governance)",
+  D3: "Demonstrate the capabilities of Power Apps",
+  D4: "Demonstrate the capabilities of Power Automate",
+  D5: "Describe features and capabilities of agents in Microsoft Copilot Studio",
+  PP: "Legacy scope (removed in the July 2026 revision: the Power Pages area, the value of extending solutions with Microsoft 365, Dynamics 365, Azure, etc.)",
+};
+DOMAINS.forEach(d => { if (!d.nameEn && DOM_NAME_EN0[d.id]) d.nameEn = DOM_NAME_EN0[d.id]; });
+const DOM_NAME_EN = Object.fromEntries(DOMAINS.map(d => [d.id, d.nameEn]).concat([["PP", DOM_NAME_EN0.PP]]));
 
 const PASS = 70;
 const DAILY_GOAL = 20;
 const STORE_KEY = "pl900_study_v2";
+// ===== 表示言語（日本語 / English）=====
+// App が描画のたびに XL.v を更新する。子のビューは Lx() で英語欄（xxxEn）を拾い、英語欄が無ければ日本語に戻す
+const LANG_KEY = "pl900_study_v2_lang";
+const XL = { v: "ja" };
+const enArr = (v, n) => Array.isArray(v) && v.length === n;
+function Lx(o, k) { if (!o) return undefined; if (XL.v === "en") { const v = o[k + "En"]; if (v !== undefined && v !== null && v !== "") return v; } return o[k]; }
+function LxA(o, k, i) { if (!o) return undefined; const base = o[k] || []; if (XL.v === "en" && enArr(o[k + "En"], base.length)) { const v = o[k + "En"][i]; if (v !== undefined && v !== null && v !== "") return v; } return base[i]; }
+const enOpt = (arr, i, d) => (XL.v === "en" && Array.isArray(arr) && arr[i] !== undefined && arr[i] !== null && arr[i] !== "") ? arr[i] : d;
+const TX = () => T[XL.v] || T.ja;
+// アクティブスクリーンの正解値（日本語の選択肢）を表示用ラベルにする。値そのものは照合に使うので変えない
+const scrOptLabel = (c, v) => { const i = (c.options || []).indexOf(v); return i >= 0 ? LxA(c, "options", i) : v; };
 
-// ===== UI辞書（日本語のみ）=====
-const T = {
+// ===== UI辞書（日本語 / English）=====
+const T = { ja: {
   appTitle: "PL-900 試験対策学習キット", appSub: "Microsoft Power Platform Fundamentals",
   tabHome: "進捗", tabQuiz: "クイズ", tabExam: "模擬試験", tabScenario: "シナリオ", tabCompare: "比較表", tabDiagram: "図解", tabConfuse: "混同", tabGlossary: "用語集",
   tabReview: "復習", reviewTitle: "復習（模試の誤答）", reviewEmpty: "まだ復習する問題はありません。模擬試験で間違えるとここに貯まります。", reviewCount: (n) => `復習対象 ${n}問`, reviewClear: "削除", reviewClearAll: "すべて削除",
@@ -183623,7 +183645,7 @@ const T = {
   weakDomains: "苦手領域（正答率の低い順）",
   allFields: "全分野", sessionRate: "このセッション 正答率",
   correct: "正解", incorrect: "不正解", answerIs: (l) => `正解は${l}。`, nextQ: "次の問題 →",
-  examTitle: "模擬試験 — 各50問・本番相当の長文シナリオ",
+  examTitle: "模擬試験 — 各50問＋複数選択などの形式問題・本番相当の長文シナリオ",
   examDesc: `本番同様の領域配分（D1:4 / D2:12 / D3:11 / D4:11 / D5:12 ≒ 2026年7月24日改定の公式比率）。各問は本番相当の長文シナリオ形式です。\n合格ラインは${PASS}%。ドメイン重点では分野別に集中演習できます。`,
   setLabel: "セット", start: "開始 →", preparing: "準備中",
   kindNormal: "通常セット", kindDomain: "ドメイン重点", domainSetCount: (n) => `${n}問`,
@@ -183634,7 +183656,94 @@ const T = {
   diagIntro: "各図はタップ・操作できます。要素を選ぶと詳しい解説が出ます。図の下に出る用語を押すと意味が分かります。「ラベルを隠して思い出す」で暗記でき、＋で拡大できます。",
   confuseSearch: "混同ポイントを検索...", judgeAxis: "判断軸", noMatch: "該当なし",
   glossarySearch: "用語を検索...",
-};
+  tabExamCase: "本試験形式ケース", backBtn: "戻る", topBtn: "トップへ", langGroup: "表示言語",
+  daysUnit: (n) => `${n}日`, slotSaved: "💾 保存済", slotSave: "💾 セーブ", slotResume: "▶ 続きから", slotDelete: "削除",
+  slotLabel: (l) => l, labelSep: "／", quizTotal: (n) => `全${n}問`, orderFixed: "固定順", orderRandom: "ランダム",
+  sessionStat: (r, c, a) => `${r}%（${c}/${a}）`, prevQ: "← 前の問題", dot: "・", sepDot: " ・ ", sp: "　", colon: "：", listSep: "・",
+  selectPh: "— 選択 —", buildCands: "候補（タップで解答欄へ追加）", buildNone: "（候補なし）", buildArea: "解答欄（上から順に並べる）",
+  buildHint: (n) => `候補をタップして追加してください（${n}項目）。`, onMark: "オン ✓", on: "オン", off: "オフ",
+  pausedExam: "中断した模試", startIn: (m) => `${m}で開始 →`, unansweredNote: (n) => `（未解答 ${n}）`,
+  yes: "はい", no: "いいえ", mxCorrect: (l) => `（正解：${l}）`, hotSelectN: (n) => `（${n}箇所選択）`,
+  realQ: (n) => `問題 ${n}`, timeLeft: "残り時間:", progressLbl: "進行状況", flagLbl: "見直し", standalone: "スタンドアロンの問題",
+  toolDetail: "試験問題の詳細", toolProgress: "試験の進行状況", toolBreak: "休憩する", toolCalc: "電卓", toolColor: "配色", toolHelp: "ヘルプ",
+  confirmEnd: "テスト ウィンドウを終了します。ここまでの解答で採点しますか？", endTest: "テスト ウィンドウの終了",
+  dDomain: "領域：", dNo: "問題番号：", dSection: "セクション：", dFormat: "形式：", singleChoice: "単一選択（1つ選択）", dStatus: "状態：", flaggedNote: " / 見直しフラグあり",
+  progressNote: (a, n, f) => `解答済み ${a} / ${n}・見直し ${f}。番号をタップで移動。`,
+  breakNote: "休憩中は試験タイマーは継続します（本番と同じ挙動）。準備ができたら「閉じる」で再開してください。",
+  helpLines: ["・選択肢のラジオボタンで解答を1つ選びます。", "・「解答のリセット」で現在の問題の解答だけを取り消せます。", "・「この問題をあとで見直す」で見直しフラグを付けられます（解答とは独立）。", "・「戻る／次へ」で移動しても解答は保持されます。", "・「配色」でハイコントラスト表示に切り替えられます。"],
+  calcClear: "クリア", calcError: "エラー", close: "閉じる",
+  mxInstr: "資料を参照し、各記述が正しいか（はい／いいえ）を判定してください。", hotInstr: "要件を満たす領域をクリックしてください。",
+  dndInstr: "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。", buildInstr: (n) => `必要な手順を${n}つ選び、正しい順序に並べてください。`,
+  scrInstr: "要件を満たすよう、各設定を選択してください。", multiInstr: (n, k) => `正しい回答を${n}つ選択してください。（${k}/${n} 選択中）`, singleInstr: "正しい回答を1つ選択してください。",
+  resetAns: "↺ 解答のリセット", flagLater: "この問題をあとで見直す", backNav: "‹ 戻る", nextNav: "次へ ›", submitAns: "解答する",
+  answerLbl: "正解：", dndMap: "正しい対応：", buildOrder: "正しい順序：", scrSettings: "正しい設定：",
+  prevShort: "← 前へ", nextShort: "次へ →", refSource: "出典（Microsoft Learn）↗",
+  diagTitles: { domains: "① 5領域の出題比率", overview: "② Power Platform 全体構成（タップで解説）", appchoice: "③ アプリ形式の決定木（クイズ形式）", trigger: "④ クラウドフローのトリガー（タップ）", security: "⑤ セキュリティの多層モデル（タップ）", roi: "⑥ 自動化の削減効果シミュレータ", data: "⑦ Dataverse のデータ構造（展開ツリー）", admin: "⑧ 管理階層（展開ツリー）" },
+  ovHint: "各タイルをタップ。Dataverseとコネクタが基盤、その上に5つのサービスが乗る。",
+  decBack: "← 戻る", decResult: "結論", decRestart: "最初から", trigStart: "開始: ",
+  trigHint: "各段をタップ。トリガーはフローを開始するきっかけで、開始条件で種類が決まる。",
+  secHint: "各層をタップ。本人確認→権限→絞り込み→流出防止の多層で守る。",
+  roiPer: (n) => `1件あたり削減分：${n}分`, roiCount: (n) => `月あたり件数：${n}`, roiMonth: "月の削減", roiMin: (n) => `${n}分`, roiHours: "時間換算", roiHr: (h) => `約${h}時間`,
+  roiNote: "→ Power Automate の効果は件数が多いほど大きい。繰り返し作業を自動化し、人を価値の高い業務へ振り向けられる。",
+  domBarsNote: "→ D2〜D5（環境の管理・Power Apps・Power Automate・Copilot Studio）が各23%前後で並び、D1（ビジネス価値）は8%前後。学習の重点配分の指針に。",
+}, en: {
+  appTitle: "PL-900 Exam Prep Kit", appSub: "Microsoft Power Platform Fundamentals",
+  tabHome: "Progress", tabQuiz: "Quiz", tabExam: "Mock Exam", tabScenario: "Scenarios", tabCompare: "Compare", tabDiagram: "Diagrams", tabConfuse: "Confusion", tabGlossary: "Glossary",
+  tabReview: "Review", reviewTitle: "Review (mock exam misses)", reviewEmpty: "Nothing to review yet. Questions you miss in the mock exams collect here.", reviewCount: (n) => `${n} to review`, reviewClear: "Delete", reviewClearAll: "Delete all",
+  scenarioTitle: "Scenario questions", scenarioDesc: "Case-style questions: pick the service or feature that fits a business situation. Builds practical, on-the-job judgment.",
+  showAnswer: "Show answer", scenarioCount: (n) => `${n} questions`,
+  typeScenario: "Scenario", typeCalc: "Calculation", compareIntro: "The key comparisons tested on PL-900 in one place. Switch tables with the tabs.",
+  modePractice: "Practice mode", modeReal: "Exam mode",
+  finish: "Score →", answered: "Answered", unanswered: "Unanswered",
+  loading: "Loading...",
+  overallRate: "Overall accuracy", streak: "Study streak", streakSub: "Streak", questionsUnit: " Q",
+  dailyGoal: "Today's goal", dailyDone: "Today's goal reached!", dailyRemain: (n) => `${n} more to reach it`,
+  domMastery: "Domain mastery (official weights)", notStarted: "Not started",
+  weakDomains: "Weak domains (lowest accuracy first)",
+  allFields: "All", sessionRate: "This session's accuracy",
+  correct: "Correct", incorrect: "Incorrect", answerIs: (l) => `The answer is ${l}. `, nextQ: "Next →",
+  examTitle: "Mock Exam — 50 questions per set plus multi-select and other formats, exam-style long scenarios",
+  examDesc: `Same domain mix as the real exam (D1:4 / D2:12 / D3:11 / D4:11 / D5:12 ≈ the official weights revised on July 24, 2026). Every question is an exam-style long scenario.\nThe passing line is ${PASS}%. Use Domain focus to drill one area at a time.`,
+  setLabel: "Set ", start: "Start →", preparing: "Coming soon",
+  kindNormal: "Standard sets", kindDomain: "Domain focus", domainSetCount: (n) => `${n} Q`,
+  result: "result", reachedPass: "Passing line reached", needMore: (n) => `${n} points to go`, correctOf: (c, t) => `${c}/${t} correct`,
+  domBreakdown: "Domain breakdown", wrongTitle: (n) => `Missed questions (${n})`, allCorrect: "All correct.",
+  yourAnswer: "Your answer", answer: "Answer", retrySet: "Retry this set", toSetSelect: "Back to set selection",
+  seeResult: "See result →", questionNo: (n, t) => `Q${n} / ${t}`,
+  diagIntro: "Every figure can be tapped or operated. Select an element to see a detailed explanation. Tap a term listed under a figure to see its meaning. Use “Hide labels (recall)” to memorize, and ＋ to enlarge.",
+  confuseSearch: "Search confusion points...", judgeAxis: "Key axis", noMatch: "No match",
+  glossarySearch: "Search terms...",
+  tabExamCase: "Exam Cases", backBtn: "Back", topBtn: "Top", langGroup: "Display language",
+  daysUnit: (n) => `${n} ${n === 1 ? "day" : "days"}`, slotSaved: "💾 Saved", slotSave: "💾 Save", slotResume: "▶ Resume", slotDelete: "Delete",
+  slotLabel: (l) => (l ? String(l).replace(/^セット/, "Set ").replace(/^全分野$/, "All domains") : l), labelSep: " / ", quizTotal: (n) => `${n} questions`, orderFixed: "Fixed order", orderRandom: "Random",
+  sessionStat: (r, c, a) => `${r}% (${c}/${a})`, prevQ: "← Previous", dot: " · ", sepDot: " · ", sp: " ", colon: ": ", listSep: ", ",
+  selectPh: "— Select —", buildCands: "Candidates (tap to add to the answer area)", buildNone: "(no candidates left)", buildArea: "Answer area (order from top to bottom)",
+  buildHint: (n) => `Tap candidates to add them (${n} items).`, onMark: "On ✓", on: "On", off: "Off",
+  pausedExam: "Paused mock exam", startIn: (m) => `Start in ${m} →`, unansweredNote: (n) => ` (unanswered: ${n})`,
+  yes: "Yes", no: "No", mxCorrect: (l) => ` (answer: ${l})`, hotSelectN: (n) => ` (select ${n})`,
+  realQ: (n) => `Question ${n}`, timeLeft: "Time left:", progressLbl: "Progress", flagLbl: "Review", standalone: "Standalone questions",
+  toolDetail: "Question details", toolProgress: "Exam progress", toolBreak: "Take a break", toolCalc: "Calculator", toolColor: "High contrast", toolHelp: "Help",
+  confirmEnd: "This closes the test window. Score your answers so far?", endTest: "Close test window",
+  dDomain: "Domain: ", dNo: "Question: ", dSection: "Section: ", dFormat: "Format: ", singleChoice: "Single choice (select one)", dStatus: "Status: ", flaggedNote: " / flagged for review",
+  progressNote: (a, n, f) => `Answered ${a} / ${n} · flagged ${f}. Tap a number to jump to it.`,
+  breakNote: "The exam timer keeps running during a break (same as the real exam). Press “Close” when you are ready to resume.",
+  helpLines: ["• Select one answer with the option's radio button.", "• “Reset answer” clears the answer for the current question only.", "• “Review this question later” adds a review flag (independent of your answer).", "• Answers are kept when you move with Back / Next.", "• “High contrast” switches to a high-contrast display."],
+  calcClear: "Clear", calcError: "Error", close: "Close",
+  mxInstr: "Refer to the exhibits and decide whether each statement is true (Yes / No).", hotInstr: "Click the area that meets the requirement.",
+  dndInstr: "Match each item to the correct category (use the drop-down on each row).", buildInstr: (n) => `Select the ${n} required steps and arrange them in the correct order.`,
+  scrInstr: "Choose each setting so that the requirements are met.", multiInstr: (n, k) => `Select ${n} correct answers. (${k}/${n} selected)`, singleInstr: "Select one correct answer.",
+  resetAns: "↺ Reset answer", flagLater: "Review this question later", backNav: "‹ Back", nextNav: "Next ›", submitAns: "Submit answer",
+  answerLbl: "Answer: ", dndMap: "Correct matching: ", buildOrder: "Correct order: ", scrSettings: "Correct settings: ",
+  prevShort: "← Prev", nextShort: "Next →", refSource: "Source (Microsoft Learn) ↗",
+  diagTitles: { domains: "① Exam weights of the 5 domains", overview: "② Power Platform at a glance (tap for details)", appchoice: "③ App type decision tree (quiz style)", trigger: "④ Cloud flow triggers (tap)", security: "⑤ Layered security model (tap)", roi: "⑥ Automation savings simulator", data: "⑦ Dataverse data structure (expandable tree)", admin: "⑧ Administration hierarchy (expandable tree)" },
+  ovHint: "Tap each tile. Dataverse and connectors are the foundation; the five services sit on top.",
+  decBack: "← Back", decResult: "Result", decRestart: "Start over", trigStart: "Starts on: ",
+  trigHint: "Tap each row. A trigger is what starts a flow; the start condition decides its type.",
+  secHint: "Tap each layer. Protection is layered: identity → permissions → narrowing access → leak prevention.",
+  roiPer: (n) => `Minutes saved per item: ${n} min`, roiCount: (n) => `Items per month: ${n}`, roiMonth: "Saved per month", roiMin: (n) => `${n} min`, roiHours: "In hours", roiHr: (h) => `≈ ${h} h`,
+  roiNote: "→ The more items, the bigger Power Automate's impact. Automating repetitive work frees people for higher-value tasks.",
+  domBarsNote: "→ D2–D5 (environment management, Power Apps, Power Automate, Copilot Studio) are about 23% each, and D1 (business value) is about 8%. Use this as a guide for where to focus your study.",
+} };
 
 // ===== 問題バンク（クイズ用）=====
 // { d:領域ID, q:問題, o:[4択], a:正解index(元データ上の位置), e:解説 }
@@ -183706,7 +183815,7 @@ function buildHardSets(bank, plan, nSets){
 }
 const EXAM_SETS = buildHardSets(PL900_HARD, { D1:4, D2:12, D3:11, D4:11, D5:12 }, 5);
 // 新しく足した問題には根拠にした Microsoft Learn のページ（ref）がある。解説の後ろにリンクで出す
-const RefLink = ({ r }) => (r && /^https:\/\/learn\.microsoft\.com\//.test(r)) ? <a href={r} target="_blank" rel="noreferrer" style={{ marginLeft: 6, fontSize: 12, color: "#0B6E8F", whiteSpace: "nowrap" }}>出典（Microsoft Learn）↗</a> : null;
+const RefLink = ({ r }) => (r && /^https:\/\/learn\.microsoft\.com\//.test(r)) ? <a href={r} target="_blank" rel="noreferrer" style={{ marginLeft: 6, fontSize: 12, color: "#0B6E8F", whiteSpace: "nowrap" }}>{TX().refSource}</a> : null;
 const DOMAIN_SETS = Object.fromEntries(DOMAINS.map(d => [d.id, PL900_HARD.filter(q => q.d === d.id)]));
 const SET_READY = { 1: true, 2: true, 3: true, 4: true, 5: true };
 
@@ -184187,7 +184296,7 @@ async function saveState(s) {
 }
 
 function todayStr() { return new Date().toISOString().slice(0, 10); }
-function domName(id) { return DOM_NAME[id]; }
+function domName(id) { return XL.v === "en" ? (DOM_NAME_EN[id] || DOM_NAME[id]) : DOM_NAME[id]; }
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -184235,7 +184344,9 @@ function shuffleOptions(Q) {
     pos = idx.indexOf(Q.a);
   }
   const opts = idx.map(i => Q.o[i]);
-  return { opts, a: pos };
+  // 英語の選択肢（oEn）も同じ並びで返す（表示用。シードは日本語の Q.q、正解判定は a のまま）
+  const oEn = enArr(Q.oEn, Q.o.length) ? idx.map(i => Q.oEn[i]) : undefined;
+  return { opts, a: pos, oEn };
 }
 
 // 複数選択（multiple_select）用：選択肢を決定的シャッフルし、正解indexの配列を新位置へ再マップ
@@ -184245,7 +184356,8 @@ function shuffleMultiOptions(Q) {
   for (let i = idx.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [idx[i], idx[j]] = [idx[j], idx[i]]; }
   const opts = idx.map(i => Q.o[i]);
   const a = Q.a.map(orig => idx.indexOf(orig)).sort((x, y) => x - y);
-  return { opts, a };
+  const oEn = enArr(Q.oEn, Q.o.length) ? idx.map(i => Q.oEn[i]) : undefined;
+  return { opts, a, oEn };
 }
 
 // 複数選択バンク（本番モードの模試に interleave）
@@ -184300,7 +184412,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <button key={i} onClick={() => openCase(i)}
             style={{ width: "100%", textAlign: "left", padding: "14px 15px", marginBottom: 10, borderRadius: 11,
               border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep, lineHeight: 1.45, paddingRight: 10 }}><DoneCheck on={caseDone.has(i)} onToggle={(e) => caseDone.toggle(i, e)} />{g(c.title)}</span>
+            <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep, lineHeight: 1.45, paddingRight: 10 }}><DoneCheck on={caseDone.has(i)} onToggle={(e) => caseDone.toggle(i, e)} en={lang === "en"} />{g(c.title)}</span>
             <span style={{ fontSize: 11.5, color: "#5d6c83", whiteSpace: "nowrap" }}>{c.questions.length}{lang === "ja" ? "問" : "Q"}</span>
           </button>
         ))}
@@ -184409,7 +184521,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
             return (
               <button key={i} onClick={() => choose(i)} disabled={sel !== null}
                 style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: sel === null ? "pointer" : "default", fontSize: 13.5, lineHeight: 1.5, fontWeight: sel !== null && opt.ok ? 700 : 500 }}>
-                <span style={{ fontWeight: 700, marginRight: 8 }}>{sel !== null && opt.ok ? "✓" : sel !== null && i === sel ? "✗" : "ABCD"[i]}</span>{g(opt.label)}
+                <span style={{ fontWeight: 700, marginRight: 8 }}>{sel !== null && opt.ok ? "✓" : sel !== null && i === sel ? "✗" : "ABCDE"[i]}</span>{g(opt.label)}
               </button>
             );
           })}
@@ -184417,7 +184529,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
             <div style={{ marginTop: 12 }}>
               {Q.options.map((opt, i) => (
                 <div key={i} style={{ background: opt.ok ? "#E6F4EC" : (i === sel ? "#FBEAE8" : C.light), borderRadius: 8, padding: "9px 11px", marginBottom: 6, fontSize: 12.5, lineHeight: 1.55 }}>
-                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#5d6c83") }}>{"ABCD"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
+                  <span style={{ fontWeight: 700, marginRight: 6, color: opt.ok ? C.ok : (i === sel ? C.ng : "#5d6c83") }}>{"ABCDE"[i]}{opt.ok ? (lang === "ja" ? "（正解）" : " (correct)") : ""}</span>{g(opt.exp)}
                 </div>
               ))}
             </div>
@@ -184442,7 +184554,10 @@ function App() {
   const goBackTab = () => { if (backRef.current && backRef.current()) { if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); return; } if (!tabHist.length) return; const prev = tabHist[tabHist.length - 1]; setTabHist(tabHist.slice(0, -1)); _setTab(prev); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); };
   const [state, setState] = useState(null);
   const [loaded, setLoaded] = useState(false);
-  const t = T;
+  const [lang, setLangState] = useState(() => { try { return localStorage.getItem(LANG_KEY) === "en" ? "en" : "ja"; } catch (e) { return "ja"; } });
+  const setLang = (l) => { setLangState(l); try { localStorage.setItem(LANG_KEY, l); } catch (e) {} };
+  XL.v = lang;
+  const t = T[lang] || T.ja;
 
   useEffect(() => {
     loadState().then(s => {
@@ -184476,15 +184591,26 @@ function App() {
   const clearReviewAll = () => { const next = JSON.parse(JSON.stringify(state)); next.review = []; persist(next); };
 
   const TABS = [
-    ["home", t.tabHome], ["quiz", t.tabQuiz], ["exam", t.tabExam], ["examcase", "本試験形式ケース"], ["review", t.tabReview], ["scenario", t.tabScenario],
+    ["home", t.tabHome], ["quiz", t.tabQuiz], ["exam", t.tabExam], ["examcase", t.tabExamCase], ["review", t.tabReview], ["scenario", t.tabScenario],
     ["compare", t.tabCompare], ["diagram", t.tabDiagram], ["confuse", t.tabConfuse], ["glossary", t.tabGlossary],
   ];
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", color: C.ink, background: "#FAFEFF", minHeight: "100vh" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "16px 18px" }}>
-        <div style={{ fontSize: 19, fontWeight: 700 }}>{t.appTitle}</div>
-        <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>{t.appSub}</div>
+      <div style={{ background: C.deep, color: "#fff", padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
+        <div>
+          <div style={{ fontSize: 19, fontWeight: 700 }}>{t.appTitle}</div>
+          <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>{t.appSub}</div>
+        </div>
+        <div role="group" aria-label={t.langGroup} style={{ display: "flex", background: "rgba(255,255,255,.15)", borderRadius: 20, padding: 3, flexShrink: 0 }}>
+          {["ja", "en"].map(l => (
+            <button key={l} onClick={() => setLang(l)} aria-pressed={lang === l}
+              style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "5px 12px", fontSize: 12, fontWeight: 700,
+                background: lang === l ? "#fff" : "transparent", color: lang === l ? C.deep : "#fff" }}>
+              {l === "ja" ? "日本語" : "English"}
+            </button>
+          ))}
+        </div>
       </div>
       <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `2px solid ${C.mid}`, background: C.light }}>
         {TABS.map(([k, label]) => (
@@ -184503,14 +184629,14 @@ function App() {
         <button onClick={goBackTab}
           aria-label="Back"
           style={{ position: "fixed", right: 16, bottom: 104, zIndex: 45, border: `1.5px solid ${C.deep}`, cursor: "pointer", borderRadius: 22, padding: "9px 15px", background: "#fff", color: C.deep, fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.20)" }}>
-          ← 戻る
+          ← {t.backBtn}
         </button>
       )}
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
           style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
-          ↑ トップへ
+          ↑ {t.topBtn}
         </button>
       )}
       <div style={{ padding: 16, maxWidth: 820, margin: "0 auto" }}>
@@ -184523,7 +184649,7 @@ function App() {
         {tab === "diagram" && <Diagrams t={t} />}
         {tab === "confuse" && <Confuse t={t} />}
         {tab === "glossary" && <Glossary t={t} />}
-        {tab === "examcase" && <ExamCaseRunner ck="PL900_EXAM_CASES" cases={PL900_EXAM_CASES} lang="ja" onBack={() => setTab("home")} backRef={backRef} />}
+        {tab === "examcase" && <ExamCaseRunner ck="PL900_EXAM_CASES" cases={PL900_EXAM_CASES} lang={lang} onBack={() => setTab("home")} backRef={backRef} />}
       </div>
     </div>
   );
@@ -184551,7 +184677,7 @@ function Home({ state, t }) {
     <div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
         <Stat label={t.overallRate} value={`${totals.rate}%`} sub={`${totals.c}/${totals.a}${t.questionsUnit}`} color={totals.rate >= PASS ? C.ok : C.primary} />
-        <Stat label={t.streak} value={`${state.meta.streak}日`} sub={t.streakSub} color={C.primary} />
+        <Stat label={t.streak} value={t.daysUnit(state.meta.streak)} sub={t.streakSub} color={C.primary} />
       </div>
 
       <Card title={`${t.dailyGoal} (${state.meta.dailyCount}/${DAILY_GOAL})`}>
@@ -184643,7 +184769,7 @@ function Quiz({ onAnswer, t, questions }) {
   const qi = pool[pos];
   const Q = questions[qi];
   // 選択肢を決定的にシャッフル（正解が先頭固定にならない）
-  const { opts, a: correctIdx } = useMemo(() => shuffleOptions(Q), [qi]);
+  const { opts, a: correctIdx, oEn: optsEn } = useMemo(() => shuffleOptions(Q), [qi]);
   const sel = history[qi] ?? null;
 
   const choose = (i) => {
@@ -184661,17 +184787,17 @@ function Quiz({ onAnswer, t, questions }) {
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
-        <button onClick={() => slot.save({ filter, orderMode, shufKey, pos, history, stats }, filter === "ALL" ? "全分野" : filter)} style={{ padding: "6px 14px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{slot.meta ? "💾 保存済" : "💾 セーブ"}</button>
+        <button onClick={() => slot.save({ filter, orderMode, shufKey, pos, history, stats }, filter === "ALL" ? "全分野" : filter)} style={{ padding: "6px 14px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{slot.meta ? t.slotSaved : t.slotSave}</button>
         {slot.meta && (<>
-          <button onClick={async () => { const d = await slot.read(); if (!d) return; resumeRef.current = { pos: d.pos, history: d.history, stats: d.stats }; setFilter(d.filter || "ALL"); setOrderMode(d.orderMode || "fixed"); setShufKey(d.shufKey || 0); setPos(d.pos || 0); setHistory(d.history || {}); setStats(d.stats || { c: 0, a: 0 }); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>▶ 続きから</button>
+          <button onClick={async () => { const d = await slot.read(); if (!d) return; resumeRef.current = { pos: d.pos, history: d.history, stats: d.stats }; setFilter(d.filter || "ALL"); setOrderMode(d.orderMode || "fixed"); setShufKey(d.shufKey || 0); setPos(d.pos || 0); setHistory(d.history || {}); setStats(d.stats || { c: 0, a: 0 }); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{t.slotResume}</button>
           <span style={{ fontSize: 11, color: "#5a7288" }}>{saveStamp(slot.meta.t)}</span>
-          <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>削除</button>
+          <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{t.slotDelete}</button>
         </>)}
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
-        <span style={{ fontSize: 12.5, color: "#476770" }}>全{total}問</span>
+        <span style={{ fontSize: 12.5, color: "#476770" }}>{t.quizTotal(total)}</span>
         <div style={{ display: "inline-flex", gap: 4, marginLeft: "auto", background: "#eef4f5", borderRadius: 8, padding: 3 }}>
-          {[["fixed", "固定順"], ["random", "ランダム"]].map(([k, label]) => (
+          {[["fixed", t.orderFixed], ["random", t.orderRandom]].map(([k, label]) => (
             <button key={k} onClick={() => { setOrderMode(k); if (k === "random") setShufKey(x => x + 1); }}
               style={{ padding: "4px 10px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 700,
                 background: orderMode === k ? "#fff" : "transparent", color: orderMode === k ? "#0B6E8F" : "#8a8275",
@@ -184686,14 +184812,14 @@ function Quiz({ onAnswer, t, questions }) {
               padding: "5px 11px", borderRadius: 16, fontSize: 12, cursor: "pointer",
               border: `1px solid ${filter === k ? C.primary : C.mid}`,
               background: filter === k ? C.primary : "#fff", color: filter === k ? "#fff" : C.ink, fontWeight: 600,
-            }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
+            }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} en={XL.v === "en"} /><span>{k === "ALL" ? t.allFields : k}</span></button>
         ))}
       </div>
 
       {stats.a > 0 && (
         <div style={{ marginBottom: 10 }}>
           <div style={{ fontSize: 12, color: "#5a7780", marginBottom: 3 }}>
-            {t.sessionRate} {rate}%（{stats.c}/{stats.a}）
+            {t.sessionRate} {t.sessionStat(rate, stats.c, stats.a)}
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
         </div>
@@ -184703,7 +184829,7 @@ function Quiz({ onAnswer, t, questions }) {
         <div style={{ fontSize: 11, color: nvInk("#ffffff", DOM_HUE[Q.d]), background: DOM_HUE[Q.d], display: "inline-block", borderRadius: 4, padding: "2px 8px", marginBottom: 10 }}>
           {Q.d} · {domName(Q.d)}
         </div>
-        <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{Q.q}</div>
+        <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{Lx(Q, "q")}</div>
         {opts.map((opt, i) => {
           let bg = "#fff", bd = C.mid, col = C.ink;
           if (sel !== null) {
@@ -184718,7 +184844,7 @@ function Quiz({ onAnswer, t, questions }) {
                 background: bg, color: col, cursor: sel === null ? "pointer" : "default",
                 fontSize: 13.5, lineHeight: 1.4, fontWeight: sel !== null && i === correctIdx ? 700 : 500,
               }}>
-              <span style={{ fontWeight: 700, marginRight: 8 }}>{sel !== null && (i === correctIdx) ? "✓" : sel !== null && (i === sel) ? "✗" : "ABCD"[i]}</span>{opt}
+              <span style={{ fontWeight: 700, marginRight: 8 }}>{sel !== null && (i === correctIdx) ? "✓" : sel !== null && (i === sel) ? "✗" : "ABCDE"[i]}</span>{enOpt(optsEn, i, opt)}
             </button>
           );
         })}
@@ -184726,7 +184852,7 @@ function Quiz({ onAnswer, t, questions }) {
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
               <strong style={{ color: sel === correctIdx ? C.ok : C.ng }}>{sel === correctIdx ? t.correct : t.incorrect}</strong>
-              ・{t.answerIs("ABCD"[correctIdx])}{Q.e}<RefLink r={Q.ref} />
+              {t.dot}{t.answerIs("ABCDE"[correctIdx])}{Lx(Q, "e")}<RefLink r={Q.ref} />
             </div>
             {pos + 1 < total && (
               <button onClick={next}
@@ -184741,7 +184867,7 @@ function Quiz({ onAnswer, t, questions }) {
         <button onClick={prev} disabled={pos === 0}
           style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600,
             border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : C.primary, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
-          ← 前の問題
+          {t.prevQ}
         </button>
         <span style={{ fontSize: 13, color: "#5a7780", fontWeight: 600 }}>{pos + 1} / {total}</span>
         <button onClick={next} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
@@ -184749,6 +184875,20 @@ function Quiz({ onAnswer, t, questions }) {
     </div>
   );
 }
+
+// 復習タブ：保存済みの項目（日本語の q/o/e）から元の問題を引き、英語欄を表示に使う（保存値は変えない）
+let EN_SRC = null;
+function enSrc(qText) {
+  if (!EN_SRC) {
+    EN_SRC = new Map();
+    [PL900_HARD, ALL_QUESTIONS, PL900_MULTI, PL900_EXHIBIT, PL900_DND, PL900_BUILD, PL900_SCR, PL900_HOT].forEach(arr => (arr || []).forEach(x => { if (x && x.q && !EN_SRC.has(x.q)) EN_SRC.set(x.q, x); }));
+  }
+  return EN_SRC.get(qText) || null;
+}
+const rvSrc = (r) => (XL.v === "en" && r ? enSrc(r.q) : null);
+const rvQ = (r) => { const s = rvSrc(r); return (s && s.qEn) || r.q; };
+const rvE = (r) => { const s = rvSrc(r); return (s && s.eEn) || r.e; };
+const rvO = (r, o) => { const s = rvSrc(r); if (!s || !enArr(s.oEn, (s.o || []).length)) return o; const j = s.o.indexOf(o); return j >= 0 ? s.oEn[j] : o; };
 
 // ===== 模擬試験（演習モード / 本番モード）=====
 function ReviewTab({ state, onClearOne, onClearAll, t }) {
@@ -184770,16 +184910,16 @@ function ReviewTab({ state, onClearOne, onClearAll, t }) {
         <div key={idx} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 11, padding: 14, marginBottom: 11 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
             <div style={{ fontSize: 14, fontWeight: 600, lineHeight: 1.55, marginBottom: 8 }}>
-              <span style={{ background: DOM_HUE[q.d], color: nvInk("#ffffff", DOM_HUE[q.d]), borderRadius: 4, padding: "1px 7px", fontSize: 10.5, marginRight: 6 }}>{q.d}</span>{q.q}
+              <span style={{ background: DOM_HUE[q.d], color: nvInk("#ffffff", DOM_HUE[q.d]), borderRadius: 4, padding: "1px 7px", fontSize: 10.5, marginRight: 6 }}>{q.d}</span>{rvQ(q)}
             </div>
             <button onClick={() => onClearOne(idx)} style={{ flexShrink: 0, padding: "4px 9px", borderRadius: 7, border: `1px solid ${C.mid}`, background: "#fff", color: "#53757f", fontSize: 11.5, cursor: "pointer" }}>{t.reviewClear}</button>
           </div>
-          {q.o.map((o, i) => (
+          {(q.o || []).map((o, i) => (
             <div key={i} style={{ padding: "7px 11px", marginBottom: 6, borderRadius: 8, border: `1.5px solid ${i === q.a ? C.ok : C.mid}`, background: i === q.a ? "#E6F4EF" : "#fff", color: i === q.a ? C.ok : C.ink, fontSize: 13, lineHeight: 1.5, fontWeight: i === q.a ? 700 : 500 }}>
-              <span style={{ fontWeight: 700, marginRight: 8 }}>{i === q.a ? "✓" : "ABCD"[i]}</span>{o}
+              <span style={{ fontWeight: 700, marginRight: 8 }}>{i === q.a ? "✓" : "ABCDE"[i]}</span>{rvO(q, o)}
             </div>
           ))}
-          <div style={{ background: C.light, borderRadius: 8, padding: 10, fontSize: 12.5, color: "#476770", lineHeight: 1.55, marginTop: 2 }}>{q.e}<RefLink r={q.ref} /></div>
+          <div style={{ background: C.light, borderRadius: 8, padding: 10, fontSize: 12.5, color: "#476770", lineHeight: 1.55, marginTop: 2 }}>{rvE(q)}<RefLink r={q.ref} /></div>
         </div>
       ))}
     </div>
@@ -184811,7 +184951,7 @@ function Exam({ onAnswer, t, onWrong }) {
   const rawQs = setNo ? (kind === "domain" ? (DOMAIN_SETS[setNo] || []) : EXAM_SETS[setNo]) : [];
   // 各問の選択肢を決定的シャッフル（セット固定でも並びは安定）。本番モードの通常セットには複数選択問題を interleave。
   const qs = useMemo(() => {
-    let arr = rawQs.map(Q => { const { opts, a } = shuffleOptions(Q); return { ...Q, o: opts, a }; });
+    let arr = rawQs.map(Q => { const { opts, a, oEn } = shuffleOptions(Q); return { ...Q, o: opts, a, oEn }; });
     if (!setNo) return arr;
     // ドメイン別は同一ドメインから、通常セットは全プールからセット番号でローテーション。複数形式を interleave。
     const isDom = kind === "domain";
@@ -184820,7 +184960,7 @@ function Exam({ onAnswer, t, onWrong }) {
     if (PL900_MULTI.length) {
       const pool = isDom ? PL900_MULTI.filter(q => q.d === setNo) : PL900_MULTI.filter(q => q.d !== "PP"); // 旧範囲（Power Pages）は通常セットに入れない
       const k = isDom ? Math.min(3, pool.length) : Math.min(8, pool.length);
-      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, a } = shuffleMultiOptions(Q); specials.push({ ...Q, o: opts, a, multi: true }); }
+      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, a, oEn } = shuffleMultiOptions(Q); specials.push({ ...Q, o: opts, a, oEn, multi: true }); }
     }
     if (PL900_DND.length) {
       const pool = isDom ? PL900_DND.filter(q => q.d === setNo) : PL900_DND.filter(q => q.d !== "PP"); // 旧範囲（Power Pages）は通常セットに入れない
@@ -184840,7 +184980,7 @@ function Exam({ onAnswer, t, onWrong }) {
     if (PL900_EXHIBIT.length) {
       const pool = isDom ? PL900_EXHIBIT.filter(q => q.d === setNo) : PL900_EXHIBIT.filter(q => q.d !== "PP"); // 旧範囲（Power Pages）は通常セットに入れない
       const k = isDom ? Math.min(1, pool.length) : Math.min(2, pool.length);
-      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, a } = shuffleOptions(Q); specials.push({ ...Q, o: opts, a, ex: true }); }
+      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, a, oEn } = shuffleOptions(Q); specials.push({ ...Q, o: opts, a, oEn, ex: true }); }
     }
     if (PL900_MATRIX.length) {
       const pool = isDom ? PL900_MATRIX.filter(q => q.d === setNo) : PL900_MATRIX.filter(q => q.d !== "PP"); // 旧範囲（Power Pages）は通常セットに入れない
@@ -184924,11 +185064,11 @@ function Exam({ onAnswer, t, onWrong }) {
           const ok = chosen === Q.correct[it.id];
           return (
             <div key={it.id} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, padding: "9px 11px", border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, borderRadius: 8, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
-              <span style={{ flex: 1, fontSize: 13.5, lineHeight: 1.4, color: C.ink }}>{it.text}</span>
+              <span style={{ flex: 1, fontSize: 13.5, lineHeight: 1.4, color: C.ink }}>{Lx(it, "text")}</span>
               <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)}
                 style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, background: "#fff", color: C.ink }}>
-                <option value="">— 選択 —</option>
-                {(Q.targets || []).map(tg => (<option key={tg.id} value={tg.id}>{tg.label}</option>))}
+                <option value="">{t.selectPh}</option>
+                {(Q.targets || []).map(tg => (<option key={tg.id} value={tg.id}>{Lx(tg, "label")}</option>))}
               </select>
               {submitted && <span style={{ fontSize: 14, fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
             </div>
@@ -184947,17 +185087,17 @@ function Exam({ onAnswer, t, onWrong }) {
   const renderBuildBody = (Q, submitted) => {
     const chosen = Array.isArray(picks[pos]) ? picks[pos] : [];
     const remaining = (Q.candidates || []).filter(c => !chosen.includes(c.id));
-    const txt = (id) => ((Q.candidates || []).find(c => c.id === id) || {}).text;
+    const txt = (id) => Lx((Q.candidates || []).find(c => c.id === id) || {}, "text");
     return (
       <div>
-        <div style={{ fontSize: 11.5, fontWeight: 700, color: C.deep, margin: "4px 0 6px" }}>候補（タップで解答欄へ追加）</div>
+        <div style={{ fontSize: 11.5, fontWeight: 700, color: C.deep, margin: "4px 0 6px" }}>{t.buildCands}</div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 }}>
           {remaining.length ? remaining.map(c => (
             <button key={c.id} onClick={() => !submitted && addBuild(c.id)} disabled={submitted}
-              style={{ padding: "7px 11px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: C.ink, fontSize: 12.5, cursor: submitted ? "default" : "pointer" }}>＋ {c.text}</button>
-          )) : <span style={{ fontSize: 12, color: "#5d6c83" }}>（候補なし）</span>}
+              style={{ padding: "7px 11px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: C.ink, fontSize: 12.5, cursor: submitted ? "default" : "pointer" }}>＋ {Lx(c, "text")}</button>
+          )) : <span style={{ fontSize: 12, color: "#5d6c83" }}>{t.buildNone}</span>}
         </div>
-        <div style={{ fontSize: 11.5, fontWeight: 700, color: C.deep, marginBottom: 6 }}>解答欄（上から順に並べる）</div>
+        <div style={{ fontSize: 11.5, fontWeight: 700, color: C.deep, marginBottom: 6 }}>{t.buildArea}</div>
         {chosen.length ? chosen.map((id, idx) => {
           const ok = submitted && Q.answer[idx] === id;
           const bad = submitted && Q.answer[idx] !== id;
@@ -184972,7 +185112,7 @@ function Exam({ onAnswer, t, onWrong }) {
               </>)}
             </div>
           );
-        }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>候補をタップして追加してください（{Q.answer.length}項目）。</div>}
+        }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{t.buildHint(Q.answer.length)}</div>}
       </div>
     );
   };
@@ -184987,11 +185127,11 @@ function Exam({ onAnswer, t, onWrong }) {
     <div>
       {Q.refTable && (
         <div style={{ marginBottom: 12 }}>
-          {Q.refTable.title && <div style={{ fontSize: 12, fontWeight: 700, color: C.deep, marginBottom: 5 }}>{Q.refTable.title}</div>}
+          {Q.refTable.title && <div style={{ fontSize: 12, fontWeight: 700, color: C.deep, marginBottom: 5 }}>{Lx(Q.refTable, "title")}</div>}
           <div style={{ overflowX: "auto", border: `1px solid ${C.mid}`, borderRadius: 8 }}>
             <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 260 }}>
-              <thead><tr>{(Q.refTable.headers || []).map((h, i) => (<th key={i} style={{ textAlign: "left", padding: "6px 9px", background: "#EDE9E0", color: C.deep, fontSize: 11.5, fontWeight: 700, borderBottom: `1px solid ${C.mid}` }}>{h}</th>))}</tr></thead>
-              <tbody>{(Q.refTable.rows || []).map((r, ri) => (<tr key={ri}>{r.map((cell, ci) => (<td key={ci} style={{ padding: "6px 9px", fontSize: 12, borderBottom: `1px solid ${C.mid}` }}>{cell}</td>))}</tr>))}</tbody>
+              <thead><tr>{(Lx(Q.refTable, "headers") || []).map((h, i) => (<th key={i} style={{ textAlign: "left", padding: "6px 9px", background: "#EDE9E0", color: C.deep, fontSize: 11.5, fontWeight: 700, borderBottom: `1px solid ${C.mid}` }}>{h}</th>))}</tr></thead>
+              <tbody>{(Lx(Q.refTable, "rows") || []).map((r, ri) => (<tr key={ri}>{r.map((cell, ci) => (<td key={ci} style={{ padding: "6px 9px", fontSize: 12, borderBottom: `1px solid ${C.mid}` }}>{cell}</td>))}</tr>))}</tbody>
             </table>
           </div>
         </div>
@@ -185001,16 +185141,16 @@ function Exam({ onAnswer, t, onWrong }) {
         const ok = String(cur) === String(Q.correct[c.id]);
         return (
           <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, padding: "9px 11px", borderRadius: 8, border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
-            <span style={{ flex: 1, fontSize: 13, color: C.ink }}>{c.label}</span>
+            <span style={{ flex: 1, fontSize: 13, color: C.ink }}>{Lx(c, "label")}</span>
             {c.type === "dropdown" && (
               <select value={cur} disabled={submitted} onChange={e => setCtrl(c.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, background: "#fff", color: C.ink }}>
-                <option value="">— 選択 —</option>
-                {(c.options || []).map(o => (<option key={o} value={o}>{o}</option>))}
+                <option value="">{t.selectPh}</option>
+                {(c.options || []).map((o, oi) => (<option key={o} value={o}>{LxA(c, "options", oi)}</option>))}
               </select>
             )}
             {c.type === "checkbox" && (
               <button onClick={() => !submitted && setCtrl(c.id, !cur)} disabled={submitted}
-                style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 16, border: `1.5px solid ${cur ? C.primary : C.mid}`, background: cur ? C.light : "#fff", color: cur ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{cur ? "オン ✓" : "オフ"}</button>
+                style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 16, border: `1.5px solid ${cur ? C.primary : C.mid}`, background: cur ? C.light : "#fff", color: cur ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{cur ? t.onMark : t.off}</button>
             )}
             {c.type === "spin" && (
               <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
@@ -185065,12 +185205,12 @@ function Exam({ onAnswer, t, onWrong }) {
           <div style={{ marginBottom: 14, padding: "12px 14px", background: C.light, border: `1.5px solid ${C.primary}`, borderRadius: 10, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
             <span style={{ fontSize: 20 }}>💾</span>
             <div style={{ flex: 1, minWidth: 150 }}>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: C.deep }}>中断した模試</div>
-              <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: C.deep }}>{t.pausedExam}</div>
+              <div style={{ fontSize: 11, color: "#7d93a8" }}>{t.slotLabel(slot.meta.label)}{slot.meta.label ? t.labelSep : ""}{saveStamp(slot.meta.t)}</div>
             </div>
             <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
-              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>▶ 続きから</button>
-            <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>削除</button>
+              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{t.slotResume}</button>
+            <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{t.slotDelete}</button>
           </div>
         )}
         <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 14 }}>
@@ -185111,7 +185251,7 @@ function Exam({ onAnswer, t, onWrong }) {
             <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
               <span>
-                <span style={{ fontWeight: 700, fontSize: 14, color: C.deep }}>{d.name}</span>
+                <span style={{ fontWeight: 700, fontSize: 14, color: C.deep }}>{Lx(d, "name")}</span>
                 <span style={{ fontSize: 12, color: "#53757f", marginLeft: 8 }}>{t.domainSetCount(DOMAIN_SETS[d.id].length)}</span>
               </span>
             </span>
@@ -185131,7 +185271,7 @@ function Exam({ onAnswer, t, onWrong }) {
               <span style={{ fontSize: 12, color: "#53757f", marginLeft: 10 }}>50{t.questionsUnit}</span>
             </span>
             <span style={{ fontSize: 12.5, fontWeight: 700, color: SET_READY[n] ? C.primary : "#a8c2cc" }}>
-              {SET_READY[n] ? `${mode === "practice" ? t.modePractice : t.modeReal}で${t.start}` : t.preparing}
+              {SET_READY[n] ? t.startIn(mode === "practice" ? t.modePractice : t.modeReal) : t.preparing}
             </span>
           </button>
         ))}
@@ -185160,7 +185300,7 @@ function Exam({ onAnswer, t, onWrong }) {
           <div style={{ fontSize: 13, color: "#5a7780" }}>{t.setLabel}{setNo} · {mode === "practice" ? t.modePractice : t.modeReal} {t.result}</div>
           <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : C.ng }}>{rate}%</div>
           <div style={{ fontSize: 14, fontWeight: 700, color: passed ? C.ok : C.ng }}>{passed ? t.reachedPass : t.needMore(PASS - rate)}</div>
-          <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{t.correctOf(c, qs.length)}{answered.length < qs.length ? `（${t.unanswered} ${qs.length - answered.length}）` : ""}</div>
+          <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{t.correctOf(c, qs.length)}{answered.length < qs.length ? t.unansweredNote(qs.length - answered.length) : ""}</div>
         </div>
 
         <Card title={t.domBreakdown}>
@@ -185182,20 +185322,20 @@ function Exam({ onAnswer, t, onWrong }) {
             <div key={idx} style={{ padding: "8px 0", borderBottom: `1px solid ${C.light}`, fontSize: 13 }}>
               <div style={{ fontWeight: 600, marginBottom: 4 }}>
                 <span style={{ background: DOM_HUE[a.q.d], color: nvInk("#ffffff", DOM_HUE[a.q.d]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5, marginRight: 6 }}>{a.q.d}</span>
-                {a.q.q}
+                {Lx(a.q, "q")}
               </div>
               {Array.isArray(a.q.o) && (Array.isArray(a.q.a) || a.q.multi) ? (
                 <>
-                  <div style={{ color: C.ng, fontSize: 12.5 }}>{t.yourAnswer}：{Array.isArray(a.sel) && a.sel.length ? a.sel.map(i => `${"ABCD"[i]} ${a.q.o[i]}`).join(" / ") : "—"}</div>
-                  <div style={{ color: C.ok, fontSize: 12.5 }}>{t.answer}：{(Array.isArray(a.q.a) ? a.q.a : []).map(i => `${"ABCD"[i]} ${a.q.o[i]}`).join(" / ")}</div>
+                  <div style={{ color: C.ng, fontSize: 12.5 }}>{t.yourAnswer}{t.colon}{Array.isArray(a.sel) && a.sel.length ? a.sel.map(i => `${"ABCDE"[i]} ${enOpt(a.q.oEn, i, a.q.o[i])}`).join(" / ") : "—"}</div>
+                  <div style={{ color: C.ok, fontSize: 12.5 }}>{t.answer}{t.colon}{(Array.isArray(a.q.a) ? a.q.a : []).map(i => `${"ABCDE"[i]} ${enOpt(a.q.oEn, i, a.q.o[i])}`).join(" / ")}</div>
                 </>
               ) : Array.isArray(a.q.o) ? (
                 <>
-                  <div style={{ color: C.ng, fontSize: 12.5 }}>{t.yourAnswer}：{typeof a.sel === "number" ? `${"ABCD"[a.sel]} ${a.q.o[a.sel]}` : "—"}</div>
-                  <div style={{ color: C.ok, fontSize: 12.5 }}>{t.answer}：{typeof a.q.a === "number" ? `${"ABCD"[a.q.a]} ${a.q.o[a.q.a]}` : "—"}</div>
+                  <div style={{ color: C.ng, fontSize: 12.5 }}>{t.yourAnswer}{t.colon}{typeof a.sel === "number" ? `${"ABCDE"[a.sel]} ${enOpt(a.q.oEn, a.sel, a.q.o[a.sel])}` : "—"}</div>
+                  <div style={{ color: C.ok, fontSize: 12.5 }}>{t.answer}{t.colon}{typeof a.q.a === "number" ? `${"ABCDE"[a.q.a]} ${enOpt(a.q.oEn, a.q.a, a.q.o[a.q.a])}` : "—"}</div>
                 </>
               ) : null}
-              <div style={{ color: "#476770", fontSize: 12.5, marginTop: 2 }}>{a.q.e}</div>
+              <div style={{ color: "#476770", fontSize: 12.5, marginTop: 2 }}>{Lx(a.q, "e")}</div>
             </div>
           ))}
         </Card>
@@ -185217,19 +185357,19 @@ function Exam({ onAnswer, t, onWrong }) {
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
           {exhibits.map((e, i) => (
             <button key={e.id} onClick={() => setExTab(i)}
-              style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{e.tab}</button>
+              style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{Lx(e, "tab")}</button>
           ))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
             <div style={{ overflowX: "auto" }}>
               <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 260 }}>
-                <thead><tr>{ex.table.headers.map((h, i) => (<th key={i} style={{ textAlign: "left", padding: "6px 9px", background: "#EDE9E0", color: C.deep, fontSize: 11.5, fontWeight: 700, borderBottom: `1px solid ${C.mid}` }}>{h}</th>))}</tr></thead>
-                <tbody>{ex.table.rows.map((r, ri) => (<tr key={ri}>{r.map((cell, ci) => (<td key={ci} style={{ padding: "6px 9px", fontSize: 12, borderBottom: `1px solid ${C.mid}`, verticalAlign: "top" }}>{cell}</td>))}</tr>))}</tbody>
+                <thead><tr>{Lx(ex.table, "headers").map((h, i) => (<th key={i} style={{ textAlign: "left", padding: "6px 9px", background: "#EDE9E0", color: C.deep, fontSize: 11.5, fontWeight: 700, borderBottom: `1px solid ${C.mid}` }}>{h}</th>))}</tr></thead>
+                <tbody>{Lx(ex.table, "rows").map((r, ri) => (<tr key={ri}>{r.map((cell, ci) => (<td key={ci} style={{ padding: "6px 9px", fontSize: 12, borderBottom: `1px solid ${C.mid}`, verticalAlign: "top" }}>{cell}</td>))}</tr>))}</tbody>
               </table>
             </div>
           ) : (
-            <div style={{ fontSize: 12.5, lineHeight: 1.6, whiteSpace: "pre-line", color: C.ink }}>{ex.text}</div>
+            <div style={{ fontSize: 12.5, lineHeight: 1.6, whiteSpace: "pre-line", color: C.ink }}>{Lx(ex, "text")}</div>
           )}
         </div>
       </div>
@@ -185249,14 +185389,14 @@ function Exam({ onAnswer, t, onWrong }) {
           const ok = chosen === Q.correct[s.id];
           return (
             <div key={s.id} style={{ marginBottom: 8, padding: "10px 11px", borderRadius: 8, border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
-              <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{s.text}</div>
+              <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{Lx(s, "text")}</div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                {[["yes", "はい"], ["no", "いいえ"]].map(([v, label]) => {
+                {[["yes", t.yes], ["no", t.no]].map(([v, label]) => {
                   const on = chosen === v;
                   return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted}
                     style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? "#fff" : "#5a7780", fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>);
                 })}
-                {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（正解：{Q.correct[s.id] === "yes" ? "はい" : "いいえ"}）</span>}
+                {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}{t.mxCorrect(Q.correct[s.id] === "yes" ? t.yes : t.no)}</span>}
               </div>
             </div>
           );
@@ -185274,7 +185414,7 @@ function Exam({ onAnswer, t, onWrong }) {
     const need = Q.n || Q.correct.length;
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, overflow: "hidden" }}>
-        <div style={{ background: C.deep, color: "#fff", padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {Q.screen}{need > 1 ? `（${need}箇所選択）` : ""}</div>
+        <div style={{ background: C.deep, color: "#fff", padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {Lx(Q, "screen")}{need > 1 ? t.hotSelectN(need) : ""}</div>
         <div style={{ padding: 10, display: "flex", flexDirection: "column", gap: 6, background: "#f6f8f9" }}>
           {(Q.hotspots || []).map(h => {
             const on = chosen.includes(h.id);
@@ -185285,7 +185425,7 @@ function Exam({ onAnswer, t, onWrong }) {
             return (
               <button key={h.id} onClick={() => !submitted && toggleHot(h.id, need)} disabled={submitted}
                 style={{ textAlign: "left", padding: "10px 12px", borderRadius: 6, border: `1.5px ${(on || (submitted && isC)) ? "solid" : "dashed"} ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13, fontWeight: on ? 700 : 500, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span>{h.label}</span>
+                <span>{Lx(h, "label")}</span>
                 {submitted && (isC ? <span style={{ color: C.ok, fontWeight: 900 }}>✓</span> : on ? <span style={{ color: C.ng, fontWeight: 900 }}>✗</span> : null)}
               </button>
             );
@@ -185323,34 +185463,34 @@ function Exam({ onAnswer, t, onWrong }) {
         <div style={{ background: "#fff", borderBottom: `1px solid ${LINE}`, padding: "11px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <span onClick={() => setMenuOpen(o => !o)} style={{ fontSize: 21, color: INK, lineHeight: 1, cursor: "pointer", userSelect: "none" }}>☰</span>
-            <span style={{ fontWeight: 800, fontSize: 16, color: INK }}>問題 {pos + 1}</span>
+            <span style={{ fontWeight: 800, fontSize: 16, color: INK }}>{t.realQ(pos + 1)}</span>
           </div>
           <div style={{ textAlign: "right" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "flex-end", fontSize: 12, color: SUB }}>残り時間: <Toggle on={showTimer} onToggle={() => setShowTimer(v => !v)} /></div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "flex-end", fontSize: 12, color: SUB }}>{t.timeLeft} <Toggle on={showTimer} onToggle={() => setShowTimer(v => !v)} /></div>
             <div style={{ fontVariantNumeric: "tabular-nums", fontWeight: 800, fontSize: 19, color: remain <= 60 ? "#c0392b" : INK, letterSpacing: 1 }}>{showTimer ? `${hh} : ${mm} : ${ss}` : "-- : -- : --"}</div>
           </div>
           {menuOpen && (
             <div style={{ position: "absolute", top: 50, left: 12, background: "#fff", border: "1px solid #d5dde2", borderRadius: 8, boxShadow: "0 6px 22px rgba(0,0,0,.18)", zIndex: 5, overflow: "hidden", minWidth: 232 }}>
-              {[["detail", "試験問題の詳細"], ["progress", "試験の進行状況"], ["break", "休憩する"], ["calc", "電卓"], ["color", "配色"], ["help", "ヘルプ"]].map(([k, label]) => (
+              {[["detail", t.toolDetail], ["progress", t.toolProgress], ["break", t.toolBreak], ["calc", t.toolCalc], ["color", t.toolColor], ["help", t.toolHelp]].map(([k, label]) => (
                 <button key={k} onClick={() => { setMenuOpen(false); if (k === "color") setContrast(c => !c); else setTool(k); }}
                   style={{ display: "block", width: "100%", textAlign: "left", padding: "11px 16px", border: "none", borderBottom: "1px solid #eef2f5", background: "#fff", color: "#1b2a33", fontSize: 13.5, fontWeight: 600, cursor: "pointer" }}>{label}{k === "color" && contrast ? " ✓" : ""}</button>
               ))}
-              <button onClick={() => { setMenuOpen(false); if (typeof window === "undefined" || window.confirm("テスト ウィンドウを終了します。ここまでの解答で採点しますか？")) finishExam(); }}
-                style={{ display: "block", width: "100%", textAlign: "left", padding: "11px 16px", border: "none", background: "#f5f7f8", color: "#c0392b", fontSize: 13.5, fontWeight: 700, cursor: "pointer" }}>テスト ウィンドウの終了</button>
+              <button onClick={() => { setMenuOpen(false); if (typeof window === "undefined" || window.confirm(t.confirmEnd)) finishExam(); }}
+                style={{ display: "block", width: "100%", textAlign: "left", padding: "11px 16px", border: "none", background: "#f5f7f8", color: "#c0392b", fontSize: 13.5, fontWeight: 700, cursor: "pointer" }}>{t.endTest}</button>
             </div>
           )}
           {tool && (
             <div onClick={() => setTool(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.45)", zIndex: 20, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
               <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 10, maxWidth: 460, width: "100%", maxHeight: "80vh", overflowY: "auto", boxShadow: "0 12px 40px rgba(0,0,0,.3)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", borderBottom: "1px solid #e3e9ed" }}>
-                  <b style={{ fontSize: 14.5, color: "#1b2a33" }}>{{ detail: "試験問題の詳細", progress: "試験の進行状況", break: "休憩する", calc: "電卓", help: "ヘルプ" }[tool]}</b>
+                  <b style={{ fontSize: 14.5, color: "#1b2a33" }}>{{ detail: t.toolDetail, progress: t.toolProgress, break: t.toolBreak, calc: t.toolCalc, help: t.toolHelp }[tool]}</b>
                   <button onClick={() => setTool(null)} style={{ border: "none", background: "none", fontSize: 20, color: "#5a7780", cursor: "pointer", lineHeight: 1 }}>×</button>
                 </div>
                 <div style={{ padding: 16, fontSize: 13.5, color: "#1b2a33", lineHeight: 1.7 }}>
-                  {tool === "detail" && (<div>領域：<b>{Q.d} {domName(Q.d)}</b><br />問題番号：{pos + 1} / {qs.length}<br />セクション：スタンドアロンの問題<br />形式：単一選択（1つ選択）<br />状態：{curPick !== null ? "解答済み" : "未解答"}{flags[pos] ? " / 見直しフラグあり" : ""}</div>)}
+                  {tool === "detail" && (<div>{t.dDomain}<b>{Q.d} {domName(Q.d)}</b><br />{t.dNo}{pos + 1} / {qs.length}<br />{t.dSection}{t.standalone}<br />{t.dFormat}{t.singleChoice}<br />{t.dStatus}{curPick !== null ? t.answered : t.unanswered}{flags[pos] ? t.flaggedNote : ""}</div>)}
                   {tool === "progress" && (
                     <div>
-                      <div style={{ fontSize: 12.5, color: "#5a7780", marginBottom: 8 }}>解答済み {answeredN} / {qs.length}・見直し {flaggedN}。番号をタップで移動。</div>
+                      <div style={{ fontSize: 12.5, color: "#5a7780", marginBottom: 8 }}>{t.progressNote(answeredN, qs.length, flaggedN)}</div>
                       <div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>
                         {qs.map((_, i) => (
                           <button key={i} onClick={() => { setPos(i); setTool(null); }}
@@ -185361,23 +185501,23 @@ function Exam({ onAnswer, t, onWrong }) {
                       </div>
                     </div>
                   )}
-                  {tool === "break" && (<div>休憩中は試験タイマーは継続します（本番と同じ挙動）。準備ができたら「閉じる」で再開してください。</div>)}
-                  {tool === "help" && (<div>・選択肢のラジオボタンで解答を1つ選びます。<br />・「解答のリセット」で現在の問題の解答だけを取り消せます。<br />・「この問題をあとで見直す」で見直しフラグを付けられます（解答とは独立）。<br />・「戻る／次へ」で移動しても解答は保持されます。<br />・「配色」でハイコントラスト表示に切り替えられます。</div>)}
+                  {tool === "break" && (<div>{t.breakNote}</div>)}
+                  {tool === "help" && (<div>{t.helpLines.map((l, i) => <span key={i}>{i > 0 && <br />}{l}</span>)}</div>)}
                   {tool === "calc" && (
                     <div>
-                      <input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8, fontVariantNumeric: "tabular-nums" }} />
+                      <input readOnly value={calcExpr === "エラー" ? t.calcError : calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8, fontVariantNumeric: "tabular-nums" }} />
                       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>
                         {["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(b => (
                           <button key={b} onClick={() => { if (b === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("エラー"); } } else setCalcExpr(e => (e === "エラー" ? "" : e) + b); }}
                             style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: b === "=" ? "#12324a" : /[/*\-+]/.test(b) ? "#eef2f5" : "#fff", color: b === "=" ? "#fff" : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{b}</button>
                         ))}
-                        <button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>クリア</button>
+                        <button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{t.calcClear}</button>
                       </div>
                     </div>
                   )}
                 </div>
                 <div style={{ padding: "10px 16px", borderTop: "1px solid #e3e9ed", textAlign: "right" }}>
-                  <button onClick={() => setTool(null)} style={{ padding: "8px 18px", borderRadius: 6, border: "none", background: "#12324a", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>閉じる</button>
+                  <button onClick={() => setTool(null)} style={{ padding: "8px 18px", borderRadius: 6, border: "none", background: "#12324a", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{t.close}</button>
                 </div>
               </div>
             </div>
@@ -185385,15 +185525,15 @@ function Exam({ onAnswer, t, onWrong }) {
         </div>
 
         <div style={{ maxWidth: 720, width: "100%", margin: "0 auto", padding: "14px 16px 0", boxSizing: "border-box" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8, fontSize: 12, color: SUB }}>進行状況 <Toggle on={showProg} onToggle={() => setShowProg(v => !v)} /></div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8, fontSize: 12, color: SUB }}>{t.progressLbl} <Toggle on={showProg} onToggle={() => setShowProg(v => !v)} /></div>
           {showProg && (
             <div style={{ display: "flex", gap: 18, marginTop: 6 }}>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 12, color: SUB, marginBottom: 4 }}>スタンドアロンの問題 ({pos + 1}/{total})</div>
+                <div style={{ fontSize: 12, color: SUB, marginBottom: 4 }}>{t.standalone} ({pos + 1}/{total})</div>
                 <div style={{ display: "flex", gap: 2 }}>{qs.map((_, i) => (<div key={i} style={{ flex: 1, height: 7, borderRadius: 2, background: i === pos ? NAVY : picks[i] !== undefined ? STEEL : "#cbd5db" }} />))}</div>
               </div>
               <div style={{ width: 96 }}>
-                <div style={{ fontSize: 12, color: SUB, marginBottom: 4 }}>見直し</div>
+                <div style={{ fontSize: 12, color: SUB, marginBottom: 4 }}>{t.flagLbl}</div>
                 <div style={{ display: "flex", gap: 2 }}>{qs.map((_, i) => (<div key={i} style={{ flex: 1, height: 7, borderRadius: 2, background: flags[i] ? "#E8A33D" : "#cbd5db" }} />))}</div>
               </div>
             </div>
@@ -185402,52 +185542,52 @@ function Exam({ onAnswer, t, onWrong }) {
           <div style={{ background: "#fff", border: `1px solid ${LINE}`, borderRadius: 6, padding: 20, marginTop: 14 }}>
             {Q.exhibits && renderExhibits(Q.exhibits)}
             {(() => { if (Q.mx) { return (<>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: STEEL, marginBottom: 8 }}>資料を参照し、各記述が正しいか（はい／いいえ）を判定してください。</div>
-              <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.75, color: INK }}>{Q.scenario}</div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: STEEL, marginBottom: 8 }}>{t.mxInstr}</div>
+              <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.75, color: INK }}>{Lx(Q, "scenario")}</div>
               {renderMxBody(Q, false)}
             </>); } if (Q.hot) { return (<>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: STEEL, marginBottom: 8 }}>要件を満たす領域をクリックしてください。</div>
-              <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.75, color: INK }}>{Q.q}</div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: STEEL, marginBottom: 8 }}>{t.hotInstr}</div>
+              <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.75, color: INK }}>{Lx(Q, "q")}</div>
               {renderHotBody(Q, false)}
             </>); } if (Q.dnd) { return (<>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: STEEL, marginBottom: 8 }}>各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。</div>
-              <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 16, lineHeight: 1.75, color: INK }}>{Q.q}</div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: STEEL, marginBottom: 8 }}>{t.dndInstr}</div>
+              <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 16, lineHeight: 1.75, color: INK }}>{Lx(Q, "q")}</div>
               {renderDndBody(Q, false)}
             </>); } if (Q.build) { return (<>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: STEEL, marginBottom: 8 }}>{`必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
-              <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 16, lineHeight: 1.75, color: INK }}>{Q.q}</div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: STEEL, marginBottom: 8 }}>{t.buildInstr(Q.answer.length)}</div>
+              <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 16, lineHeight: 1.75, color: INK }}>{Lx(Q, "q")}</div>
               {renderBuildBody(Q, false)}
             </>); } if (Q.scr) { return (<>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: STEEL, marginBottom: 8 }}>要件を満たすよう、各設定を選択してください。</div>
-              <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 16, lineHeight: 1.75, color: INK }}>{Q.q}</div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: STEEL, marginBottom: 8 }}>{t.scrInstr}</div>
+              <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 16, lineHeight: 1.75, color: INK }}>{Lx(Q, "q")}</div>
               {renderScrBody(Q, false)}
             </>); } const isMulti = !!Q.multi; const selArr = Array.isArray(curPick) ? curPick : []; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: STEEL, marginBottom: 8 }}>{isMulti ? `正しい回答を${need}つ選択してください。（${selArr.length}/${need} 選択中）` : "正しい回答を1つ選択してください。"}</div>
-            <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 18, lineHeight: 1.75, color: INK }}>{Q.q}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: STEEL, marginBottom: 8 }}>{isMulti ? t.multiInstr(need, selArr.length) : t.singleInstr}</div>
+            <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 18, lineHeight: 1.75, color: INK }}>{Lx(Q, "q")}</div>
             {opts.map((opt, i) => {
               const on = isMulti ? selArr.includes(i) : curPick === i;
               return (
                 <button key={i} onClick={() => isMulti ? chooseMulti(i) : chooseReal(on ? null : i)}
                   style={{ display: "flex", alignItems: "flex-start", gap: 12, width: "100%", textAlign: "left", marginBottom: 10, padding: "13px 15px", borderRadius: 6, border: `1px solid ${on ? STEEL : "#cbd5db"}`, background: on ? "#eaf3f7" : "#fff", color: INK, cursor: "pointer", fontSize: 14, lineHeight: 1.55 }}>
                   <span style={{ flexShrink: 0, width: 18, height: 18, borderRadius: isMulti ? 4 : "50%", border: `2px solid ${on ? STEEL : "#9fb2ba"}`, display: "inline-flex", alignItems: "center", justifyContent: "center", marginTop: 1 }}>{on && (isMulti ? <span style={{ color: STEEL, fontSize: 13, fontWeight: 900, lineHeight: 1 }}>✓</span> : <span style={{ width: 9, height: 9, borderRadius: "50%", background: STEEL }} />)}</span>
-                  <span><b style={{ marginRight: 6 }}>{"ABCDE"[i]}.</b>{opt}</span>
+                  <span><b style={{ marginRight: 6 }}>{"ABCDE"[i]}.</b>{enOpt(Q.oEn, i, opt)}</span>
                 </button>
               );
             })}
             </>); })()}
             <button onClick={resetPick}
-              style={{ marginTop: 8, display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 16px", borderRadius: 22, border: "none", background: "#4a5b64", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>↺ 解答のリセット</button>
+              style={{ marginTop: 8, display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 16px", borderRadius: 22, border: "none", background: "#4a5b64", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>{t.resetAns}</button>
             <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 16, fontSize: 13.5, color: INK, cursor: "pointer" }}>
               <input type="checkbox" checked={!!flags[pos]} onChange={e => setFlags(f => ({ ...f, [pos]: e.target.checked }))} style={{ width: 16, height: 16 }} />
-              <span>この問題をあとで見直す</span>
+              <span>{t.flagLater}</span>
             </label>
           </div>
 
           <div style={{ display: "flex", gap: 16, margin: "16px 0 30px" }}>
             <button onClick={prev} disabled={pos === 0}
-              style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ 戻る</button>
+              style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>{t.backNav}</button>
             <button onClick={next}
-              style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? t.finish : "次へ ›"}</button>
+              style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? t.finish : t.nextNav}</button>
           </div>
         </div>
       </div>
@@ -185478,12 +185618,12 @@ function Exam({ onAnswer, t, onWrong }) {
             const mOk = mxRight(Q, picks[pos]);
             const done = mxComplete(Q, picks[pos]);
             return (<>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>資料を参照し、各記述が正しいか（はい／いいえ）を判定してください。</div>
-              <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{Q.scenario}</div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{t.mxInstr}</div>
+              <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{Lx(Q, "scenario")}</div>
               {renderMxBody(Q, submitted)}
-              {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>解答する</button>)}
+              {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{t.submitAns}</button>)}
               {submitted && (<div style={{ marginTop: 12 }}>
-                <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mOk ? C.ok : C.ng }}>{mOk ? t.correct : t.incorrect}</strong>　{Q.e}</div>
+                <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mOk ? C.ok : C.ng }}>{mOk ? t.correct : t.incorrect}</strong>{t.sp}{Lx(Q, "e")}</div>
                 <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? t.seeResult : t.nextQ}</button>
               </div>)}
             </>);
@@ -185492,12 +185632,12 @@ function Exam({ onAnswer, t, onWrong }) {
             const hOk = hotRight(Q, picks[pos]);
             const done = hotComplete(Q, picks[pos]);
             return (<>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>要件を満たす領域をクリックしてください。</div>
-              <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{Q.q}</div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{t.hotInstr}</div>
+              <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{Lx(Q, "q")}</div>
               {renderHotBody(Q, submitted)}
-              {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>解答する</button>)}
+              {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{t.submitAns}</button>)}
               {submitted && (<div style={{ marginTop: 12 }}>
-                <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hOk ? C.ok : C.ng }}>{hOk ? t.correct : t.incorrect}</strong>　正解：{Q.correct.map(id => ((Q.hotspots.find(h => h.id === id)) || {}).label).join("・")}　{Q.e}</div>
+                <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hOk ? C.ok : C.ng }}>{hOk ? t.correct : t.incorrect}</strong>{t.sp}{t.answerLbl}{Q.correct.map(id => Lx((Q.hotspots.find(h => h.id === id)) || {}, "label")).join(t.listSep)}{t.sp}{Lx(Q, "e")}</div>
                 <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? t.seeResult : t.nextQ}</button>
               </div>)}
             </>);
@@ -185506,18 +185646,18 @@ function Exam({ onAnswer, t, onWrong }) {
             const dndOk = dndRight(Q, picks[pos]);
             const done = dndComplete(Q, picks[pos]);
             return (<>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。</div>
-              <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{Q.q}</div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{t.dndInstr}</div>
+              <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{Lx(Q, "q")}</div>
               {renderDndBody(Q, submitted)}
               {!submitted && (
                 <button onClick={submitDndPractice} disabled={!done}
-                  style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>解答する</button>
+                  style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{t.submitAns}</button>
               )}
               {submitted && (
                 <div style={{ marginTop: 12 }}>
                   <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
                     <strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? t.correct : t.incorrect}</strong>
-                    ・正しい対応：{(Q.items || []).map(it => `${it.text}→${(Q.targets.find(tg => tg.id === Q.correct[it.id]) || {}).label}`).join(" / ")}　{Q.e}
+                    {t.dot}{t.dndMap}{(Q.items || []).map(it => `${Lx(it, "text")}→${Lx(Q.targets.find(tg => tg.id === Q.correct[it.id]) || {}, "label")}`).join(" / ")}{t.sp}{Lx(Q, "e")}
                   </div>
                   <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? t.seeResult : t.nextQ}</button>
                 </div>
@@ -185528,18 +185668,18 @@ function Exam({ onAnswer, t, onWrong }) {
             const bOk = buildRight(Q, picks[pos]);
             const done = buildComplete(Q, picks[pos]);
             return (<>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{`必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
-              <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{Q.q}</div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{t.buildInstr(Q.answer.length)}</div>
+              <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{Lx(Q, "q")}</div>
               {renderBuildBody(Q, submitted)}
               {!submitted && (
                 <button onClick={submitBuildPractice} disabled={!done}
-                  style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>解答する</button>
+                  style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{t.submitAns}</button>
               )}
               {submitted && (
                 <div style={{ marginTop: 12 }}>
                   <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
                     <strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? t.correct : t.incorrect}</strong>
-                    ・正しい順序：{Q.answer.map((id, i) => `${i + 1}.${((Q.candidates.find(c => c.id === id)) || {}).text}`).join(" / ")}　{Q.e}
+                    {t.dot}{t.buildOrder}{Q.answer.map((id, i) => `${i + 1}.${Lx((Q.candidates.find(c => c.id === id)) || {}, "text")}`).join(" / ")}{t.sp}{Lx(Q, "e")}
                   </div>
                   <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? t.seeResult : t.nextQ}</button>
                 </div>
@@ -185550,18 +185690,18 @@ function Exam({ onAnswer, t, onWrong }) {
             const sOk = scrRight(Q, picks[pos]);
             const done = scrComplete(Q, picks[pos]);
             return (<>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>要件を満たすよう、各設定を選択してください。</div>
-              <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{Q.q}</div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{t.scrInstr}</div>
+              <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{Lx(Q, "q")}</div>
               {renderScrBody(Q, submitted)}
               {!submitted && (
                 <button onClick={submitScrPractice} disabled={!done}
-                  style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>解答する</button>
+                  style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{t.submitAns}</button>
               )}
               {submitted && (
                 <div style={{ marginTop: 12 }}>
                   <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
                     <strong style={{ color: sOk ? C.ok : C.ng }}>{sOk ? t.correct : t.incorrect}</strong>
-                    ・正しい設定：{(Q.controls || []).map(c => `${c.label}=${String(Q.correct[c.id] === true ? "オン" : Q.correct[c.id] === false ? "オフ" : Q.correct[c.id])}`).join(" / ")}　{Q.e}
+                    {t.dot}{t.scrSettings}{(Q.controls || []).map(c => `${Lx(c, "label")}=${String(Q.correct[c.id] === true ? t.on : Q.correct[c.id] === false ? t.off : scrOptLabel(c, Q.correct[c.id]))}`).join(" / ")}{t.sp}{Lx(Q, "e")}
                   </div>
                   <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? t.seeResult : t.nextQ}</button>
                 </div>
@@ -185574,8 +185714,8 @@ function Exam({ onAnswer, t, onWrong }) {
           const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isRight = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
           return (<>
-            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{`正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
-            <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{Q.q}</div>
+            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{t.multiInstr(need, submitted ? selSet.length : mSel.length)}</div>}
+            <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{Lx(Q, "q")}</div>
             {opts.map((opt, i) => {
               if (isMulti) {
                 const chosen = submitted ? selSet.includes(i) : mSel.includes(i);
@@ -185587,7 +185727,7 @@ function Exam({ onAnswer, t, onWrong }) {
                   <button key={i} onClick={() => toggleMultiPractice(i, need)} disabled={submitted}
                     style={{ display: "flex", alignItems: "flex-start", gap: 10, width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.45, fontWeight: (submitted && isCorrect) ? 700 : 500 }}>
                     <span style={{ flexShrink: 0, width: 18, height: 18, borderRadius: 4, border: `2px solid ${(!submitted && chosen) ? C.primary : (submitted && isCorrect) ? C.ok : (submitted && chosen) ? C.ng : "#b7ccd3"}`, display: "inline-flex", alignItems: "center", justifyContent: "center", marginTop: 1, fontWeight: 900, fontSize: 12, color: col }}>{submitted ? (isCorrect ? "✓" : (chosen ? "✗" : "")) : (chosen ? "✓" : "")}</span>
-                    <span><b style={{ marginRight: 5 }}>{"ABCDE"[i]}.</b>{opt}</span>
+                    <span><b style={{ marginRight: 5 }}>{"ABCDE"[i]}.</b>{enOpt(Q.oEn, i, opt)}</span>
                   </button>
                 );
               }
@@ -185596,19 +185736,19 @@ function Exam({ onAnswer, t, onWrong }) {
               return (
                 <button key={i} onClick={() => choosePractice(i)} disabled={submitted}
                   style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4, fontWeight: (submitted && i === Q.a) ? 700 : 500 }}>
-                  <span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}
+                  <span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{enOpt(Q.oEn, i, opt)}
                 </button>
               );
             })}
             {isMulti && !submitted && (
               <button onClick={submitMultiPractice} disabled={mSel.length !== need}
-                style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>解答する</button>
+                style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{t.submitAns}</button>
             )}
             {submitted && (
               <div style={{ marginTop: 12 }}>
                 <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
                   <strong style={{ color: isRight ? C.ok : C.ng }}>{isRight ? t.correct : t.incorrect}</strong>
-                  ・{isMulti ? `正解：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : t.answerIs("ABCD"[Q.a])}{Q.e}<RefLink r={Q.ref} />
+                  {t.dot}{isMulti ? `${t.answerLbl}${correctSet.map(i => "ABCDE"[i]).join(t.listSep)}${t.sp}` : t.answerIs("ABCDE"[Q.a])}{Lx(Q, "e")}<RefLink r={Q.ref} />
                 </div>
                 <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
                   {isLast ? t.seeResult : t.nextQ}
@@ -185619,7 +185759,7 @@ function Exam({ onAnswer, t, onWrong }) {
         })()}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
-        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : C.primary, cursor: pos === 0 ? "not-allowed" : "pointer" }}>← 前の問題</button>
+        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : C.primary, cursor: pos === 0 ? "not-allowed" : "pointer" }}>{t.prevQ}</button>
         <span style={{ fontSize: 13, color: "#5a7780", fontWeight: 600 }}>{pos + 1} / {qs.length}</span>
         <button onClick={next} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
@@ -185629,6 +185769,7 @@ function Exam({ onAnswer, t, onWrong }) {
 
 // ===== 図解（インタラクティブ）=====
 function Diagrams({ t }) {
+  const lang = XL.v; // FigFrame・DomainDrillPanel に渡す表示言語
   const [open, setOpen] = useState("domains");
   const Section = ({ id, title, children }) => (
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, marginBottom: 12, overflow: "hidden" }}>
@@ -185637,27 +185778,35 @@ function Diagrams({ t }) {
         <span>{title}</span><span>{open === id ? "−" : "+"}</span>
       </button>
       {open === id && <div style={{ padding: 15, borderTop: `1px solid ${C.light}` }}><FigFrame id={"cert:" + id} lang={typeof lang === "undefined" ? "" : lang}
-        terms={typeof GLOSSARY !== "undefined" ? GLOSSARY : null} topic={title}>{children}</FigFrame></div>}
+        terms={typeof GLOSSARY !== "undefined" ? (XL.v === "en" ? glossTermsEn() : GLOSSARY) : null} topic={title}>{children}</FigFrame></div>}
     </div>
   );
   return (
     <div>
       <div style={{ fontSize: 12, color: "#53757f", marginBottom: 10 }}>{t.diagIntro}</div>
-      <Section id="domains" title="① 5領域の出題比率"><DomainBars /><DomainDrillPanel domains={DOMAINS} lang={typeof lang === "undefined" ? "" : lang} sets={typeof DOMAIN_SETS !== "undefined" ? DOMAIN_SETS : (typeof SAA_DOMAIN_SETS !== "undefined" ? SAA_DOMAIN_SETS : null)} /></Section>
-      <Section id="overview" title="② Power Platform 全体構成（タップで解説）"><Overview /></Section>
-      <Section id="appchoice" title="③ アプリ形式の決定木（クイズ形式）"><AppDecision /></Section>
-      <Section id="trigger" title="④ クラウドフローのトリガー（タップ）"><Triggers /></Section>
-      <Section id="security" title="⑤ セキュリティの多層モデル（タップ）"><SecurityLadder /></Section>
-      <Section id="roi" title="⑥ 自動化の削減効果シミュレータ"><RoiSim /></Section>
-      <Section id="data" title="⑦ Dataverse のデータ構造（展開ツリー）"><InteractiveTree data={DV_TREE} /></Section>
-      <Section id="admin" title="⑧ 管理階層（展開ツリー）"><InteractiveTree data={ADMIN_TREE} /></Section>
+      <Section id="domains" title={t.diagTitles.domains}><DomainBars /><DomainDrillPanel domains={DOMAINS} lang={typeof lang === "undefined" ? "" : lang} sets={typeof DOMAIN_SETS !== "undefined" ? DOMAIN_SETS : (typeof SAA_DOMAIN_SETS !== "undefined" ? SAA_DOMAIN_SETS : null)} /></Section>
+      <Section id="overview" title={t.diagTitles.overview}><Overview /></Section>
+      <Section id="appchoice" title={t.diagTitles.appchoice}><AppDecision /></Section>
+      <Section id="trigger" title={t.diagTitles.trigger}><Triggers /></Section>
+      <Section id="security" title={t.diagTitles.security}><SecurityLadder /></Section>
+      <Section id="roi" title={t.diagTitles.roi}><RoiSim /></Section>
+      <Section id="data" title={t.diagTitles.data}><InteractiveTree data={DV_TREE} /></Section>
+      <Section id="admin" title={t.diagTitles.admin}><InteractiveTree data={ADMIN_TREE} /></Section>
     </div>
   );
 }
 
 // ① 全体構成
 function Overview() {
-  const items = [
+  const items = XL.v === "en" ? [
+    ["Power Apps", "Build", "Build business apps with low code (canvas / model-driven)"],
+    ["Power Automate", "Automate", "Automate repetitive work with cloud flows and RPA"],
+    ["Copilot Studio", "Agents", "Build agents by combining topics, knowledge and tools, and publish them to channels such as Teams and websites"],
+    ["Power Pages", "Publish", "Build external-facing self-service websites"],
+    ["Power BI", "Visualize", "Visualize and analyze data to support decision-making"],
+    ["Dataverse", "Data platform", "Secure data platform shared by all the services"],
+    ["Connectors", "Connect", "Connect to more than 1,000 external services without code"],
+  ] : [
     ["Power Apps", "作る", "ローコードで業務アプリを構築(キャンバス/モデル駆動型)"],
     ["Power Automate", "自動化", "クラウドフローとRPAで繰り返し作業を自動化"],
     ["Copilot Studio", "エージェント", "トピック・ナレッジ・ツールを組み合わせてエージェントを作り、Teams や Web サイトなどのチャネルに公開する"],
@@ -185685,7 +185834,7 @@ function Overview() {
           <div style={{ fontSize: 13, marginTop: 4, lineHeight: 1.5 }}>{items[sel][2]}</div>
         </div>
       ) : (
-        <div style={{ fontSize: 12.5, color: "#476770" }}>各タイルをタップ。Dataverseとコネクタが基盤、その上に5つのサービスが乗る。</div>
+        <div style={{ fontSize: 12.5, color: "#476770" }}>{TX().ovHint}</div>
       )}
     </div>
   );
@@ -185693,11 +185842,18 @@ function Overview() {
 
 // ② アプリ形式の決定木
 function AppDecision() {
-  const steps = {
+  const steps = XL.v === "en" ? {
+    start: { q: "Who are the users?", opts: [["Internal staff", "internal"], ["External customers", "pages"]] },
+    internal: { q: "What matters most?", opts: [["Free-form design, a specific task", "canvas"], ["Complex data, many tables", "model"]] },
+  } : {
     start: { q: "利用者は誰か？", opts: [["社内の担当者", "internal"], ["外部の顧客", "pages"]] },
     internal: { q: "重視するのは？", opts: [["自由なデザイン・特定タスク", "canvas"], ["複雑なデータ・多数の表", "model"]] },
   };
-  const leaves = {
+  const leaves = XL.v === "en" ? {
+    canvas: ["Canvas app", "Design-first; place controls freely. Suited to lightweight, task-focused mobile apps"],
+    model: ["Model-driven app", "Data-first; generated automatically from Dataverse. Suited to managing complex data"],
+    pages: ["Power Pages", "External-facing self-service site with authentication and web roles"],
+  } : {
     canvas: ["キャンバスアプリ", "デザイン主導で自由に配置。軽量・タスク特化のモバイルアプリに向く"],
     model: ["モデル駆動型アプリ", "データ主導でDataverseから自動生成。複雑なデータ管理に向く"],
     pages: ["Power Pages", "認証とWebロールを備えた外部向けセルフサービスサイト"],
@@ -185708,7 +185864,7 @@ function AppDecision() {
   return (
     <div>
       <div style={{ marginBottom: 10, fontSize: 12, color: "#53757f" }}>
-        {path.length > 0 && <button onClick={() => setPath(p => p.slice(0, -1))} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, padding: 0 }}>← 戻る</button>}
+        {path.length > 0 && <button onClick={() => setPath(p => p.slice(0, -1))} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, padding: 0 }}>{TX().decBack}</button>}
       </div>
       {!leaf && steps[cur] && (
         <div>
@@ -185723,10 +185879,10 @@ function AppDecision() {
       )}
       {leaf && (
         <div style={{ background: "#E4F6EC", border: `2px solid ${C.ok}`, borderRadius: 10, padding: 14 }}>
-          <div style={{ fontSize: 11, color: C.ok, fontWeight: 700 }}>結論</div>
+          <div style={{ fontSize: 11, color: C.ok, fontWeight: 700 }}>{TX().decResult}</div>
           <div style={{ fontSize: 16, fontWeight: 800, color: C.deep, margin: "4px 0" }}>{leaf[0]}</div>
           <div style={{ fontSize: 13, lineHeight: 1.5 }}>{leaf[1]}</div>
-          <button onClick={() => setPath([])} style={{ marginTop: 12, padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>最初から</button>
+          <button onClick={() => setPath([])} style={{ marginTop: 12, padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>{TX().decRestart}</button>
         </div>
       )}
     </div>
@@ -185735,7 +185891,11 @@ function AppDecision() {
 
 // ③ トリガー
 function Triggers() {
-  const items = [
+  const items = XL.v === "en" ? [
+    ["Automated", "event", "Starts automatically when an event occurs, such as an email arriving. No manual action needed"],
+    ["Instant", "manual", "Started manually with a button when needed. Suited to on-demand processing"],
+    ["Scheduled", "time", "Starts at a set time, such as 9:00 every morning. Automates routine processing"],
+  ] : [
     ["自動化", "イベント", "メール受信時などイベント発生で自動開始。手動操作が不要"],
     ["インスタント", "手動", "必要なときボタンで手動開始。即時の処理に向く"],
     ["スケジュール", "時刻", "毎朝9時など指定時刻で開始。定型処理を自動化"],
@@ -185748,14 +185908,14 @@ function Triggers() {
         <div key={i} onClick={() => setSel(sel === i ? null : i)} style={{ display: "flex", alignItems: "center", marginBottom: 8, cursor: "pointer" }}>
           <div style={{ flex: 1, background: colors[i], color: "#fff", borderRadius: 8, padding: "10px 13px", border: sel === i ? `2px solid ${C.ink}` : "2px solid transparent" }}>
             <span style={{ fontWeight: 700, fontSize: 13.5 }}>{it[0]}</span>
-            <span style={{ fontSize: 11.5, marginLeft: 8, opacity: 0.9 }}>開始: {it[1]}</span>
+            <span style={{ fontSize: 11.5, marginLeft: 8, opacity: 0.9 }}>{TX().trigStart}{it[1]}</span>
           </div>
         </div>
       ))}
       {sel !== null ? (
         <div style={{ background: C.light, borderRadius: 9, padding: 11, fontSize: 13, lineHeight: 1.5, marginTop: 4 }}>{items[sel][2]}</div>
       ) : (
-        <div style={{ fontSize: 12, color: "#476770", marginTop: 6 }}>各段をタップ。トリガーはフローを開始するきっかけで、開始条件で種類が決まる。</div>
+        <div style={{ fontSize: 12, color: "#476770", marginTop: 6 }}>{TX().trigHint}</div>
       )}
     </div>
   );
@@ -185763,7 +185923,12 @@ function Triggers() {
 
 // ④ セキュリティ多層モデル
 function SecurityLadder() {
-  const items = [
+  const items = XL.v === "en" ? [
+    ["Authentication (Entra ID)", "Who are you?", "Verifies the user's identity at sign-in"],
+    ["Authorization (security roles)", "What is allowed?", "Grants, per role, what each user can access (least privilege)"],
+    ["Row/column-level security", "Narrow access", "Controls access per record and per field"],
+    ["DLP policies", "Prevent leaks", "Restricts connector combinations to prevent data leaks"],
+  ] : [
     ["認証(Entra ID)", "誰かを確認", "サインイン時にユーザーの本人確認を行う"],
     ["認可(セキュリティロール)", "何を許すか", "役割ごとに何にアクセスできるか付与(最小権限)"],
     ["行/列レベルセキュリティ", "アクセスを絞る", "レコード単位・項目単位でアクセスを制御"],
@@ -185785,7 +185950,7 @@ function SecurityLadder() {
       {sel !== null ? (
         <div style={{ background: C.light, borderRadius: 9, padding: 11, fontSize: 13, lineHeight: 1.5, marginTop: 4 }}>{items[sel][2]}</div>
       ) : (
-        <div style={{ fontSize: 12, color: "#476770", marginTop: 6 }}>各層をタップ。本人確認→権限→絞り込み→流出防止の多層で守る。</div>
+        <div style={{ fontSize: 12, color: "#476770", marginTop: 6 }}>{TX().secHint}</div>
       )}
     </div>
   );
@@ -185801,24 +185966,24 @@ function RoiSim() {
   return (
     <div>
       <div style={{ marginBottom: 14 }}>
-        <label style={{ fontSize: 12.5, fontWeight: 600 }}>1件あたり削減分：{minPer}分</label>
+        <label style={{ fontSize: 12.5, fontWeight: 600 }}>{TX().roiPer(minPer)}</label>
         <input type="range" min="1" max="60" step="1" value={minPer} onChange={e => setMinPer(+e.target.value)} style={{ width: "100%", accentColor: C.primary }} />
       </div>
       <div style={{ marginBottom: 14 }}>
-        <label style={{ fontSize: 12.5, fontWeight: 600 }}>月あたり件数：{count}</label>
+        <label style={{ fontSize: 12.5, fontWeight: 600 }}>{TX().roiCount(count)}</label>
         <input type="range" min="10" max="2000" step="10" value={count} onChange={e => setCount(+e.target.value)} style={{ width: "100%", accentColor: C.primary }} />
       </div>
       <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
         <div style={{ flex: 1, background: C.light, borderRadius: 9, padding: 11, textAlign: "center" }}>
-          <div style={{ fontSize: 11, color: "#5a7780" }}>月の削減</div>
-          <div style={{ fontSize: 19, fontWeight: 800, color: C.deep }}>{fmt(savedMin)}分</div>
+          <div style={{ fontSize: 11, color: "#5a7780" }}>{TX().roiMonth}</div>
+          <div style={{ fontSize: 19, fontWeight: 800, color: C.deep }}>{TX().roiMin(fmt(savedMin))}</div>
         </div>
         <div style={{ flex: 1, background: "#E4F6EC", borderRadius: 9, padding: 11, textAlign: "center" }}>
-          <div style={{ fontSize: 11, color: "#5a7780" }}>時間換算</div>
-          <div style={{ fontSize: 19, fontWeight: 800, color: C.ok }}>約{savedHr}時間</div>
+          <div style={{ fontSize: 11, color: "#5a7780" }}>{TX().roiHours}</div>
+          <div style={{ fontSize: 19, fontWeight: 800, color: C.ok }}>{TX().roiHr(savedHr)}</div>
         </div>
       </div>
-      <div style={{ fontSize: 12, color: "#476770", lineHeight: 1.5 }}>→ Power Automate の効果は件数が多いほど大きい。繰り返し作業を自動化し、人を価値の高い業務へ振り向けられる。</div>
+      <div style={{ fontSize: 12, color: "#476770", lineHeight: 1.5 }}>{TX().roiNote}</div>
     </div>
   );
 }
@@ -185840,7 +186005,7 @@ function DomainBars() {
           </div>
         </div>
       ))}
-      <div style={{ fontSize: 12, color: "#476770", marginTop: 6 }}>→ Power Apps(D3, 28%)が最大比率。学習の重点配分の指針に。</div>
+      <div style={{ fontSize: 12, color: "#476770", marginTop: 6 }}>{TX().domBarsNote}</div>
     </div>
   );
 }
@@ -185862,10 +186027,10 @@ function TreeNode({ node, depth, defaultOpen }) {
         style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? "#fff" : C.ink, marginBottom: 3 }}>
         {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : C.primary }}>{open ? "▼" : "▶"}</span>}
         {!hasKids && <span style={{ color: C.mid }}>•</span>}
-        <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{node.label}</span>
+        <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{Lx(node, "label")}</span>
       </div>
       {node.note && (!hasKids || open) && (
-        <div style={{ fontSize: 12, color: "#476770", marginLeft: 22, marginBottom: 5, lineHeight: 1.4 }}>{node.note}</div>
+        <div style={{ fontSize: 12, color: "#476770", marginLeft: 22, marginBottom: 5, lineHeight: 1.4 }}>{Lx(node, "note")}</div>
       )}
       {hasKids && open && (
         <div style={{ borderLeft: `2px solid ${C.light}`, marginLeft: 8 }}>
@@ -185874,6 +186039,55 @@ function TreeNode({ node, depth, defaultOpen }) {
       )}
     </div>
   );
+}
+
+// シナリオ問題の解答（選択肢にも使う）の英語。照合は日本語の a のまま行い、表示だけ置き換える。データに aEn があればそちらを優先
+const SCEN_A_EN = {
+  "Power Apps（ローコードでアプリを構築）": "Power Apps (build apps with low code)",
+  "Power Automate（ワークフローの自動化）": "Power Automate (workflow automation)",
+  "Power Pages（セルフサービスWebサイトの構築）": "Power Pages (build self-service websites)",
+  "Power BI（データの可視化と分析）": "Power BI (data visualization and analysis)",
+  "Microsoft Dataverse（共通データ基盤）": "Microsoft Dataverse (common data platform)",
+  "開発・テスト・本番で環境を分離する": "Separate the development, test and production environments",
+  "データ損失防止(DLP)ポリシー": "Data loss prevention (DLP) policy",
+  "Dataverse のセキュリティロールと行レベルセキュリティ": "Dataverse security roles and row-level security",
+  "Dataverse for Teams": "Dataverse for Teams",
+  "Copilot（生成AIによる作成支援）": "Copilot (generative AI–assisted authoring)",
+  "月額 $5×100人=$500/月、年間 $500×12=$6,000": "$5 × 100 users = $500/month; per year $500 × 12 = $6,000",
+  "(15分−1分)×200件=2,800分=約46.7時間/月の削減": "(15 min − 1 min) × 200 items = 2,800 min ≈ 46.7 hours saved per month",
+  "10GB×$40=$400/月": "10 GB × $40 = $400/month",
+  "ソリューション(Solution)によるパッケージ化と移行": "Package and move them with a solution",
+  "Power Apps(入力)+Dataverse(保管)+Power BI(集計・可視化)": "Power Apps (input) + Dataverse (storage) + Power BI (aggregation and visualization)",
+  "モデル駆動型アプリ": "Model-driven app",
+  "キャンバスアプリ": "Canvas app",
+  "自動化トリガー(Automated)": "Automated trigger",
+  "スケジュールトリガー(Scheduled)": "Scheduled trigger",
+  "インスタントトリガー(Instant)": "Instant trigger",
+  "Power Automate のデスクトップフロー(RPA)": "Power Automate desktop flow (RPA)",
+  "Power Pages": "Power Pages",
+  "承認(Approvals)機能": "Approvals",
+  "Microsoft Dataverse": "Microsoft Dataverse",
+  "AI Builder の文書処理(Power Automate と連携)": "AI Builder document processing (used with Power Automate)",
+  "Power Apps と Dataverse for Teams": "Power Apps and Dataverse for Teams",
+  "10分×50件×20日=10,000分=約166.7時間/月の削減": "10 min × 50 items × 20 days = 10,000 min ≈ 166.7 hours saved per month",
+  "$5×3アプリ×50人=$750/月": "$5 × 3 apps × 50 users = $750/month",
+  "Database 5×$40=$200、File 20×$2=$40、合計 $240/月": "Database 5 × $40 = $200, File 20 × $2 = $40, total $240/month",
+  "認証とWebロールによるアクセス制御": "Access control with authentication and web roles",
+  "プロセスマイニング": "Process mining",
+  "($8−$2)×300件=$1,800/月、年間 $1,800×12=$21,600": "($8 − $2) × 300 items = $1,800/month; per year $1,800 × 12 = $21,600",
+  "SharePoint をナレッジとして追加する（質問した本人の認証で検索される）": "Add SharePoint as a knowledge source (searched with the asking user's own authentication)",
+  "システムトピック「Fallback」": "The Fallback system topic",
+  "生成オーケストレーションをオンにし、MCP サーバーをツールとして追加する": "Turn on generative orchestration and add the MCP server as a tool",
+  "公開時に作られるデモ Web サイトの URL を関係者に共有する": "Share the URL of the demo website created at publish time with stakeholders",
+  "分析画面の解決率（エンゲージしたセッションのうち解決で終わった割合）": "The resolution rate on the Analytics page (share of engaged sessions that ended as resolved)",
+  "Microsoft Agent 365 のエージェントレジストリ": "The agent registry in Microsoft Agent 365",
+  "エージェント評価（テストセットをまとめて実行して採点する）": "Agent evaluation (run a test set in bulk and score it)",
+};
+let SCEN_A_MAP = null;
+function scenA(a) {
+  if (XL.v !== "en") return a;
+  if (!SCEN_A_MAP) { SCEN_A_MAP = Object.assign({}, SCEN_A_EN); SCENARIOS.forEach(s => { if (s.aEn) SCEN_A_MAP[s.a] = s.aEn; }); }
+  return SCEN_A_MAP[a] || a;
 }
 
 // ===== シナリオ問題 =====
@@ -185943,14 +186157,14 @@ function Scenario({ t }) {
       {(() => {
         const idx = Math.min(cur, Math.max(0, list.length - 1));
         const s = list[idx];
-        if (!s) return <div style={{ fontSize: 13, color: "#53757f" }}>{t.noMatch || "該当なし"}</div>;
+        if (!s) return <div style={{ fontSize: 13, color: "#53757f" }}>{t.noMatch}</div>;
         const card = (() => {
           if (s.type === "calc") {
             const isOpen = open[s.id];
             return (
               <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 11, padding: 14 }}>
                 {head(s)}
-                <div style={{ fontSize: 14, fontWeight: 600, lineHeight: 1.55, marginBottom: 10 }}>{s.q}</div>
+                <div style={{ fontSize: 14, fontWeight: 600, lineHeight: 1.55, marginBottom: 10 }}>{Lx(s, "q")}</div>
                 {!isOpen ? (
                   <button onClick={() => setOpen(o => ({ ...o, [s.id]: true }))}
                     style={{ padding: "8px 16px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
@@ -185958,8 +186172,8 @@ function Scenario({ t }) {
                   </button>
                 ) : (
                   <div style={{ background: C.light, borderRadius: 9, padding: 12 }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: C.deep, marginBottom: 5 }}>{s.a}</div>
-                    <div style={{ fontSize: 13, lineHeight: 1.55, color: "#476770" }}>{s.e}</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: C.deep, marginBottom: 5 }}>{scenA(s.a)}</div>
+                    <div style={{ fontSize: 13, lineHeight: 1.55, color: "#476770" }}>{Lx(s, "e")}</div>
                   </div>
                 )}
               </div>
@@ -185970,21 +186184,21 @@ function Scenario({ t }) {
           return (
             <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 11, padding: 14 }}>
               {head(s)}
-              <div style={{ fontSize: 14, fontWeight: 600, lineHeight: 1.55, marginBottom: 10 }}>{s.q}</div>
+              <div style={{ fontSize: 14, fontWeight: 600, lineHeight: 1.55, marginBottom: 10 }}>{Lx(s, "q")}</div>
               {opts.map((o, i) => {
                 let bg = "#fff", bd = C.mid, col = C.ink;
                 if (sel != null) { if (i === ans) { bg = "#E6F4EF"; bd = C.ok; col = C.ok; } else if (i === sel) { bg = "#FBEAE8"; bd = C.ng; col = C.ng; } }
                 return (
                   <button key={i} onClick={() => { if (sel == null) setPicked(p => ({ ...p, [s.id]: i })); }} disabled={sel != null}
                     style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 7, padding: "10px 12px", borderRadius: 8, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: sel == null ? "pointer" : "default", fontSize: 13, lineHeight: 1.5, fontWeight: sel != null && i === ans ? 700 : 500 }}>
-                    <span style={{ fontWeight: 700, marginRight: 8 }}>{sel != null && i === ans ? "✓" : sel != null && i === sel ? "✗" : "ABCD"[i]}</span>{o}
+                    <span style={{ fontWeight: 700, marginRight: 8 }}>{sel != null && i === ans ? "✓" : sel != null && i === sel ? "✗" : "ABCDE"[i]}</span>{scenA(o)}
                   </button>
                 );
               })}
               {sel != null && (
                 <div style={{ background: C.light, borderRadius: 9, padding: 12, marginTop: 4 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: sel === ans ? C.ok : C.ng, marginBottom: 5 }}>{sel === ans ? "正解" : "不正解"} ・ {s.a}</div>
-                  <div style={{ fontSize: 13, lineHeight: 1.55, color: "#476770" }}>{s.e}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: sel === ans ? C.ok : C.ng, marginBottom: 5 }}>{sel === ans ? t.correct : t.incorrect}{t.sepDot}{scenA(s.a)}</div>
+                  <div style={{ fontSize: 13, lineHeight: 1.55, color: "#476770" }}>{Lx(s, "e")}</div>
                 </div>
               )}
             </div>
@@ -185999,9 +186213,9 @@ function Scenario({ t }) {
             {card}
             <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
               <button onClick={() => setCur(c => Math.max(0, c - 1))} disabled={idx === 0}
-                style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.mid}`, background: "#fff", color: idx === 0 ? "#a8c2cc" : C.deep, fontSize: 14, fontWeight: 700, cursor: idx === 0 ? "default" : "pointer" }}>← 前の問題</button>
+                style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.mid}`, background: "#fff", color: idx === 0 ? "#a8c2cc" : C.deep, fontSize: 14, fontWeight: 700, cursor: idx === 0 ? "default" : "pointer" }}>{t.prevQ}</button>
               <button onClick={() => setCur(c => Math.min(list.length - 1, c + 1))} disabled={idx >= list.length - 1}
-                style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: idx >= list.length - 1 ? C.mid : C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: idx >= list.length - 1 ? "default" : "pointer" }}>次の問題 →</button>
+                style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: idx >= list.length - 1 ? C.mid : C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: idx >= list.length - 1 ? "default" : "pointer" }}>{t.nextQ}</button>
             </div>
           </div>
         );
@@ -186024,41 +186238,75 @@ function Compare({ t }) {
               border: `1px solid ${idx === i ? C.primary : C.mid}`,
               background: idx === i ? C.primary : "#fff", color: idx === i ? "#fff" : C.ink, fontWeight: 600,
             }}>
-            {c.title}
+            {Lx(c, "title")}
           </button>
         ))}
       </div>
 
-      <CmpOne c={{ title: table.title, axisJa: (table.headers || [])[0], axisEn: (table.headers || [])[0], cols: (table.headers || []).slice(1), colsEn: (table.headers || []).slice(1), rows: table.rows, rowsEn: table.rows }} C={C} en={false} />
+      <CmpOne c={{ title: table.title, titleEn: Lx(table, "title"), axisJa: (table.headers || [])[0], axisEn: (Lx(table, "headers") || [])[0], cols: (table.headers || []).slice(1), colsEn: (Lx(table, "headers") || []).slice(1), rows: table.rows, rowsEn: Lx(table, "rows") || table.rows }} C={C} en={XL.v === "en"} />
 
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12 }}>
         <button onClick={() => setIdx(i => (i - 1 + COMPARE.length) % COMPARE.length)}
           style={{ padding: "9px 16px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
-          ← 前へ
+          {t.prevShort}
         </button>
         <span style={{ fontSize: 12, color: "#53757f", alignSelf: "center" }}>{idx + 1} / {COMPARE.length}</span>
         <button onClick={() => setIdx(i => (i + 1) % COMPARE.length)}
           style={{ padding: "9px 16px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
-          次へ →
+          {t.nextShort}
         </button>
       </div>
     </div>
   );
 }
 
+// 混同ポイントの英語（CONFUSE の先頭要素をキーに [用語, 整理, 判断軸] を引く）
+const CONFUSE_EN = {
+  "Power Apps / Power Automate": ["Power Apps / Power Automate", "Building apps / Automating business processes", "Build, or automate?"],
+  "Power Pages / Power Apps": ["Power Pages / Power Apps", "External-facing websites / Mainly internal apps", "Is the audience outside or inside?"],
+  "キャンバス / モデル駆動型": ["Canvas / Model-driven", "Design-first / Data-first", "Look, or data?"],
+  "クラウドフロー / デスクトップフロー": ["Cloud flow / Desktop flow", "API integration / RPA (UI automation)", "Online, or on the PC?"],
+  "トピック / ナレッジ": ["Topic / Knowledge", "A defined conversation path / Sources used to ground answers", "Building the path, or material for answers?"],
+  "Fallback / Escalate": ["Fallback / Escalate", "When nothing matches any topic / Handing off to a human agent", "Not understood, or handed to a person?"],
+  "テストチャット / デモ Web サイト": ["Test chat / Demo website", "Checking it yourself while building / Letting stakeholders try it", "Who is testing?"],
+  "自動化 / インスタント / スケジュール": ["Automated / Instant / Scheduled", "Event / Manual / Time", "What starts the flow"],
+  "トリガー / アクション": ["Trigger / Action", "What starts the flow / A step that runs", "Starting point, or step?"],
+  "テーブル / 列 / 行": ["Table / Column / Row", "The table / A field / One record", "Granularity of the data"],
+  "標準 / プレミアム コネクタ": ["Standard / Premium connectors", "Included in the base license / Needs an additional license", "Extra cost or not?"],
+  "認証 / 認可": ["Authentication / Authorization", "Verifying identity / Granting permissions", "Who you are / What you can do"],
+  "行レベル / 列レベル セキュリティ": ["Row-level / Column-level security", "Per record / Per field", "What is hidden"],
+  "テナント / 環境": ["Tenant / Environment", "The whole organization / A workspace", "Breadth of scope"],
+  "環境 / ソリューション": ["Environment / Solution", "Container / Package for moving", "Storing, or moving?"],
+  "既定 / サンドボックス環境": ["Default / Sandbox environment", "Shared, for trying things out / Development and testing", "Can it affect production?"],
+  "Dataverse / SharePoint リスト": ["Dataverse / SharePoint list", "Full data platform / Lightweight list", "Scale and capabilities"],
+  "Dataverse / Excel": ["Dataverse / Excel", "Secure, large-scale / Easy, small-scale", "Production-grade or not?"],
+  "セキュリティロール / DLP": ["Security role / DLP", "A user's permissions / Preventing data leaks", "What is being protected"],
+  "Copilot / Copilot Studio": ["Copilot / Copilot Studio", "Helps you build / Builds chatbots", "Assist, or build?"],
+  "Copilot / AI Builder": ["Copilot / AI Builder", "Natural-language assistance / Embedding AI models", "Conversation, or added capability?"],
+  "ギャラリー / フォーム": ["Gallery / Form", "List of many records / Entry for one record", "List, or single record?"],
+  "ビュー / フォーム": ["View / Form", "List display / Data-entry screen", "Viewing, or entering?"],
+  "変数 / コレクション": ["Variable / Collection", "A single value / Multi-row data", "Value, or table?"],
+  "管理ソリューション / アンマネージド": ["Managed / Unmanaged solution", "For distribution and production / For development and editing", "Editable or not?"],
+  "管理者 / 作成者 / ユーザー": ["Admin / Maker / User", "Governs / Builds / Uses", "Difference in role"],
+  "1対多 / 多対多 リレーション": ["One-to-many / Many-to-many relationship", "Many on one side / Many on both sides", "Direction of the relationship"],
+  "標準テーブル / カスタムテーブル": ["Standard table / Custom table", "Ready-made / Created by you", "Provided, or self-made?"],
+  "有人 / 無人 RPA実行": ["Attended / Unattended RPA", "Started by a person / Started automatically", "Is a person involved?"],
+};
+
 // ===== 混同ポイント =====
 function Confuse({ t }) {
   const [q, setQ] = useState("");
-  const list = CONFUSE.filter(c => !q || c.join("").toLowerCase().includes(q.toLowerCase()));
+  const ce = (c) => (XL.v === "en" && CONFUSE_EN[c[0]]) || c;
+  const list = CONFUSE.filter(c => !q || (c.join("") + (XL.v === "en" && CONFUSE_EN[c[0]] ? CONFUSE_EN[c[0]].join("") : "")).toLowerCase().includes(q.toLowerCase()));
   return (
     <div>
       <input value={q} onChange={e => setQ(e.target.value)} aria-label={t.confuseSearch} placeholder={t.confuseSearch}
         style={{ width: "100%", padding: 11, borderRadius: 9, border: `1.5px solid ${C.mid}`, fontSize: 14, marginBottom: 14, boxSizing: "border-box" }} />
       {list.map((c, i) => (
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 10 }}>
-          <div style={{ fontWeight: 700, color: C.deep, fontSize: 13.5, marginBottom: 5 }}>{c[0]}</div>
-          <div style={{ fontSize: 13, lineHeight: 1.5, marginBottom: 4 }}>{c[1]}</div>
-          <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{t.judgeAxis}：{c[2]}</div>
+          <div style={{ fontWeight: 700, color: C.deep, fontSize: 13.5, marginBottom: 5 }}>{ce(c)[0]}</div>
+          <div style={{ fontSize: 13, lineHeight: 1.5, marginBottom: 4 }}>{ce(c)[1]}</div>
+          <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{t.judgeAxis}{t.colon}{ce(c)[2]}</div>
         </div>
       ))}
       {list.length === 0 && <div style={{ textAlign: "center", color: "#53757f", padding: 20 }}>{t.noMatch}</div>}
@@ -186066,14 +186314,91 @@ function Confuse({ t }) {
   );
 }
 
+// 用語集の英語（"領域|用語" をキーに [英語の用語, 英語の説明, 補足（省略可）] を引く）
+const GLOSSARY_EN = {
+  "D1|Power Platform": ["Power Platform", "Integrated low-code platform for building apps, automation, websites, analytics and AI"],
+  "D1|ローコード/ノーコード": ["Low-code/No-code", "Ways of building with minimal code, or with no code at all"],
+  "D1|市民開発者": ["Citizen developer", "A business user, not a professional developer, who builds apps and automation"],
+  "D1|コネクタ": ["Connector", "Mechanism for connecting to and integrating external services and data (more than 1,000 available)"],
+  "D1|Power BI": ["Power BI", "Service that visualizes and analyzes data to support decision-making"],
+  "D1|Copilot": ["Copilot", "AI that helps you build and operate through natural-language instructions"],
+  "D1|Copilot Studio": ["Copilot Studio", "Service for building custom chatbots with low code"],
+  "D1|AI Builder": ["AI Builder", "Capability for bringing AI models into business processes with low code"],
+  "D1|Power Fx": ["Power Fx", "Excel-like low-code formula language"],
+  "D1|RPA": ["RPA", "Technology that automates routine work by recording and replaying PC operations"],
+  "D1|DX": ["DX", "Transforming the organization by digitizing and automating work"],
+  "D1|ガバナンス": ["Governance", "Controls for using Power Platform safely and efficiently"],
+  "D2|Microsoft Dataverse": ["Microsoft Dataverse", "Secure, common data platform used across Power Platform"],
+  "D2|テーブル": ["Table", "Container that stores data organized in rows and columns (formerly: entity)"],
+  "D2|列": ["Column", "Attribute representing each data item in a table (formerly: field)"],
+  "D2|行": ["Row", "One record of data in a table (formerly: record)"],
+  "D2|リレーションシップ": ["Relationship", "Mechanism that links tables to each other (one-to-many, many-to-many)"],
+  "D2|環境": ["Environment", "A bounded space that holds apps, flows and data"],
+  "D2|サンドボックス": ["Sandbox", "Environment isolated from production, used for development and testing"],
+  "D2|DLPポリシー": ["DLP policy", "Mechanism that restricts connector combinations to prevent data leaks"],
+  "D2|Microsoft Entra ID": ["Microsoft Entra ID", "Service that manages authentication and access", "formerly Azure AD"],
+  "D2|セキュリティロール": ["Security role", "A set of access permissions for users"],
+  "D2|ソリューション": ["Solution", "Unit for bundling apps and flows so they can be moved and managed together"],
+  "D2|ALM": ["ALM", "Managing the lifecycle of development, testing, deployment and maintenance"],
+  "D2|テナント": ["Tenant", "Top-level cloud unit that represents the whole organization"],
+  "D3|Power Apps": ["Power Apps", "Service for building business apps with low code"],
+  "D3|キャンバスアプリ": ["Canvas app", "Design-first app built by placing controls freely"],
+  "D3|モデル駆動型アプリ": ["Model-driven app", "Data-first app generated automatically from the data structure"],
+  "D3|コントロール": ["Control", "Screen parts such as buttons and input boxes"],
+  "D3|ギャラリー": ["Gallery", "Control that repeats and lists multiple records"],
+  "D3|フォーム": ["Form", "Control for viewing, editing or creating a single record"],
+  "D3|Power Fx": ["Power Fx", "Excel-like formula language for writing logic"],
+  "D3|委任": ["Delegation", "Having the data source do the data processing"],
+  "D3|コレクション": ["Collection", "Holds a set of data temporarily inside the app"],
+  "D3|コンポーネント": ["Component", "Controls bundled into a reusable part"],
+  "D4|Power Automate": ["Power Automate", "Service for automating business processes with workflows"],
+  "D4|クラウドフロー": ["Cloud flow", "Workflow that automates across online services"],
+  "D4|デスクトップフロー": ["Desktop flow", "Workflow that records and replays PC operations (RPA)"],
+  "D4|トリガー": ["Trigger", "The event that starts a flow"],
+  "D4|アクション": ["Action", "Each individual step that runs after the trigger"],
+  "D4|承認": ["Approvals", "Feature that routes a request to approvers and records the decision"],
+  "D4|Apply to each": ["Apply to each", "Action that repeats steps for each item in an array"],
+  "D4|条件": ["Condition", "Action that branches processing by yes/no"],
+  "PP|Power Pages": ["Power Pages", "Service for building external-facing websites with low code"],
+  "PP|デザインスタジオ": ["Design studio", "Workspace for editing a site visually"],
+  "PP|Webロール": ["Web role", "Mechanism for assigning permissions to external users"],
+  "PP|認証": ["Authentication", "Mechanism for external users to sign in and verify their identity"],
+  "PP|顧客ポータル": ["Customer portal", "Site where customers view information and submit requests themselves"],
+  "PP|セルフサービス": ["Self-service", "Lets customers complete their business on their own"],
+  "D5|Copilot Studio": ["Copilot Studio", "Service for creating, testing, publishing and managing agents"],
+  "D5|トピック": ["Topic", "Defines one part of a conversation; a combination of nodes (messages, questions, etc.) sets the conversation path"],
+  "D5|トリガーフレーズ": ["Trigger phrases", "Typical example phrasings that call a topic; about 5–10 is the guideline for a new topic"],
+  "D5|システムトピック": ["System topics", "Built-in topics (Conversation Start, Escalate, Fallback, etc.); they can't be deleted but can be turned off"],
+  "D5|Fallback（フォールバック）": ["Fallback", "System topic that runs when an utterance matches no topic; by default it asks the user to rephrase, then hands off to Escalate"],
+  "D5|Escalate（エスカレート）": ["Escalate", "System topic that handles the handoff to a human agent"],
+  "D5|ナレッジ": ["Knowledge", "Sources used to ground answers (public websites, uploaded files, SharePoint, Dataverse, etc.)"],
+  "D5|利用者の認証によるナレッジ": ["Knowledge with user authentication", "Knowledge such as SharePoint and Dataverse is searched with the asking user's own authentication, so answers use only content that person can see"],
+  "D5|生成オーケストレーション": ["Generative orchestration", "Generative AI interprets the intent of an utterance, then selects and combines the topics, knowledge and tools to use"],
+  "D5|ツール": ["Tools", "Components the agent calls to get work done (connectors, agent flows, MCP servers, etc.)"],
+  "D5|エージェントフロー": ["Agent flow", "Automation flow built in Copilot Studio; one with the “When an agent calls the flow” trigger can be added to an agent as a tool"],
+  "D5|MCP サーバー": ["MCP server", "Connects the tools and resources an external server exposes to an agent; requires generative orchestration"],
+  "D5|チャネル": ["Channel", "Where users use a published agent (Teams and Microsoft 365 Copilot, SharePoint, websites, etc.)"],
+  "D5|デモ Web サイト": ["Demo website", "Trial site created at publish time for the team and stakeholders to check; not for production use or for sharing with customers"],
+  "D5|分析（エンゲージ率・解決率）": ["Analytics (engagement and resolution rates)", "Page showing the share of sessions in which a topic etc. ran (engagement rate), the resolved / escalated / abandoned rates, and satisfaction (CSAT)", ""],
+  "D5|エージェント評価（テストセット）": ["Agent evaluation (test sets)", "Runs a set of test cases in bulk and scores the answers against the expected answers or quality criteria", ""],
+  "D5|Microsoft Agent 365": ["Microsoft Agent 365", "Management platform to observe, govern and secure an organization's agents; it manages the list (registry) of agents, including third-party ones, in one place"],
+};
+// 図解の用語チップ（FigFrame）に渡す英語つき用語集（[分野, 和, 英, 説明和, 説明英] の形）
+let GLOSS_TERMS_EN = null;
+function glossTermsEn() {
+  if (!GLOSS_TERMS_EN) GLOSS_TERMS_EN = GLOSSARY.map(g => { const e = GLOSSARY_EN[g[0] + "|" + g[1]]; return e ? [g[0], g[1], e[0], g[3], e[1]] : g; });
+  return GLOSS_TERMS_EN;
+}
+
 // ===== 用語集 =====
 function Glossary({ t }) {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("すべて");
+  const gl = (g) => { const e = XL.v === "en" ? GLOSSARY_EN[g[0] + "|" + g[1]] : null; if (!e) return g; const sub = e.length > 2 ? (e[2] || "-") : (g[2] !== "-" && g[2].toLowerCase() !== e[0].toLowerCase() ? g[2] : "-"); return [g[0], e[0], sub, e[1]]; };
   const list = GLOSSARY.filter(g => {
     if (cat !== "すべて" && g[0] !== cat) return false;
     if (!q) return true;
-    return (g[1] + g[2] + g[3]).toLowerCase().includes(q.toLowerCase());
+    return (g[1] + g[2] + g[3] + (XL.v === "en" && GLOSSARY_EN[g[0] + "|" + g[1]] ? GLOSSARY_EN[g[0] + "|" + g[1]].slice(0, 2).join("") : "")).toLowerCase().includes(q.toLowerCase());
   });
   return (
     <div>
@@ -186091,10 +186416,10 @@ function Glossary({ t }) {
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 9 }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
             <span style={{ background: DOM_HUE[g[0]], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{g[0]}</span>
-            <span style={{ fontWeight: 700, fontSize: 14, color: C.deep }}>{g[1]}</span>
-            {g[2] !== "-" && <span style={{ fontSize: 11.5, color: "#53757f" }}>{g[2]}</span>}
+            <span style={{ fontWeight: 700, fontSize: 14, color: C.deep }}>{gl(g)[1]}</span>
+            {gl(g)[2] !== "-" && <span style={{ fontSize: 11.5, color: "#53757f" }}>{gl(g)[2]}</span>}
           </div>
-          <div style={{ fontSize: 13, lineHeight: 1.5 }}>{g[3]}</div>
+          <div style={{ fontSize: 13, lineHeight: 1.5 }}>{gl(g)[3]}</div>
         </div>
       ))}
       {list.length === 0 && <div style={{ textAlign: "center", color: "#53757f", padding: 20 }}>{t.noMatch}</div>}
@@ -215393,7 +215718,6 @@ const HUB_STATIONS = [
   {
     id: "clf",
     official: "https://aws.amazon.com/certification/certified-cloud-practitioner/",
-    jaOnly: true, // 問題・画面とも日本語のみ（英語モードでその旨を出す）
     code: "CLF-C02",
     ja: "AWS Certified Cloud Practitioner",
     en: "AWS Certified Cloud Practitioner",
@@ -215450,7 +215774,6 @@ const HUB_STATIONS = [
   {
     id: "pl900",
     official: "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/pl-900",
-    jaOnly: true, // 問題・画面とも日本語のみ（英語モードでその旨を出す）
     code: "PL-900",
     ja: "Microsoft Power Platform Fundamentals",
     en: "Microsoft Power Platform Fundamentals",
