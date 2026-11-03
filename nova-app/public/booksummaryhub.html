@@ -7139,6 +7139,25 @@ const IG_BOOKS = [
   if(lost) console.warn('IG_BOOKS: 書架が見つからず未収録', lost);
 })();
 
+/* ============================================================
+   分割配信との橋渡し
+   この HTML（原稿）はデータを全部含む1ファイルで、そのまま開いても動く。npm run build は dist に、最初の画面に要る分
+   （書架の木と、各本の書名・著者などの軽い項目）だけを入れた booksummaryhub.html と、要約の本文・クイズ・出典の総括を
+   分けた booksummary-*.js を作る（nova-app/scripts/booksummary-split.mjs）。dist では読み込み係が window.__BSH_LAZY__ に
+   入り、画面を開く前に要る別ファイルを読み込む。原稿では BSH_LAZY は null で、下の関数はすぐに戻る。
+   本文・クイズ・出典の総括を使う画面を開く関数は、先頭で bshDefer(...) を呼ぶ。本文の項目やクイズを読む関数を新しく
+   足したら、booksummary-split.mjs の BODY_READERS・LAZY_READERS にも足す（足していないとビルドが止まって場所を教える）。
+============================================================ */
+const BSH_LAZY = window.__BSH_LAZY__ || null;
+/* need: { book: 本の id（本文）, quiz: [クイズを読む本の id], note: 出典のパス（'yt/sam/psych' など。出典の総括） }
+   まだ読み込めていなければ読み込みを始めて true を返す（呼び出し側はそこで戻る）。読み込めたら、同じ状態で retry() をやり直す。
+   読み込み中に別の画面へ移ったら retry() は呼ばない。読み込めなければ、もう一度読み込むボタンつきの案内を出す。 */
+function bshDefer(need, retry){
+  if(!BSH_LAZY) return false;
+  const sup = SUPPRESS_PUSH;   /* 戻る／進むで開いた画面は履歴に積まない、という状態も引き継ぐ */
+  return BSH_LAZY.defer(need, () => { const prev = SUPPRESS_PUSH; SUPPRESS_PUSH = sup; try{ retry(); } finally { SUPPRESS_PUSH = prev; } });
+}
+
 /* 件数の単位。YouTube は動画、note は記事なので「件」、本の出典は「冊」。 */
 function unitFor(path){ return (path && (path[0] === 'yt' || path[0] === 'note' || path[0] === 'ig')) ? '件' : '冊'; }
 /* 今どのノードの書架を見ているか。ルートからのパス。 */
@@ -7210,6 +7229,7 @@ let viewStack = [];
 let SUPPRESS_PUSH = false;
 
 function showView(id){
+  if(BSH_LAZY) BSH_LAZY.cancel();   /* 読み込みを待っている画面があれば、もう開かない（別の画面へ移ったので） */
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   const el = document.getElementById(id);
   if(el) el.classList.add('active');
@@ -7485,6 +7505,8 @@ const SEARCH_HAY = {};
 function bookHay(id){
   if(SEARCH_HAY[id] !== undefined) return SEARCH_HAY[id];
   const e = BOOK_INDEX[id]; const b = e.book;
+  /* dist で本文がまだ届いていない本は、書名・紹介書籍・著者と棚の名前だけで照合する（全文の一部なので、届いたあとの結果に必ず含まれる。キャッシュしない） */
+  if(BSH_LAZY && !BSH_LAZY.bodyReady(id)) return normStr([b.title, b.refBooks || '', b.author].join(' ')) + '\u0000' + normStr(e.crumbs.join(''));
   const pts = Array.isArray(b.points) ? b.points.map(p => typeof p === 'string' ? p : [p.h, p.b].join(' ')).join(' ') : '';
   return (SEARCH_HAY[id] = normStr([b.title, b.refBooks || '', b.author, b.oneLiner, b.overview, pts, b.takeaway || '', e.crumbs.join('')].join(' ')));
 }
@@ -7517,8 +7539,10 @@ function renderSearchResults(query){
   if(!query.trim()){ box.classList.remove('open'); box.innerHTML = ''; return; }
   const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean).map(normStr);
   box.classList.add('open');
-  if(!ids.length){ box.innerHTML = '<p class="search-empty">「' + escapeHTML(query) + '」に一致する要約は見つかりませんでした。</p>'; return; }
-  box.innerHTML = '<p class="search-count">' + ids.length + ' 件' + (ids.length > SEARCH_SHOW ? '（先頭の' + SEARCH_SHOW + '件を表示。語を足すと絞り込めます）' : '') + '</p>' +
+  /* dist で本文を読み込んでいる間は、その案内を先頭に出す（そろえば空になり、原稿と同じ表示。原稿では常に空） */
+  const wait = BSH_LAZY ? BSH_LAZY.searchWait(() => renderSearchResults(document.getElementById('globalSearch').value)) : '';
+  if(!ids.length){ box.innerHTML = wait || '<p class="search-empty">「' + escapeHTML(query) + '」に一致する要約は見つかりませんでした。</p>'; return; }
+  box.innerHTML = wait + '<p class="search-count">' + ids.length + ' 件' + (ids.length > SEARCH_SHOW ? '（先頭の' + SEARCH_SHOW + '件を表示。語を足すと絞り込めます）' : '') + '</p>' +
     ids.slice(0, SEARCH_SHOW).map(id => {
       const e = BOOK_INDEX[id]; const b = e.book; const on = isChecked(id);
       const nmemo = normStr(getMemo(id));
@@ -7569,6 +7593,7 @@ function renderDashboard(){
 
 /* ---- 復習モード ---- */
 function startReview(){
+  if(bshDefer({ quiz: wrongKeys().map(k => k.slice(0, k.lastIndexOf('#'))) }, startReview)) return;
   const qs = wrongQuestions();
   if(!qs.length) return;
   const viewId = 'view-review';
@@ -7979,6 +8004,7 @@ function themeNoteHTML(path, key){
 }
 
 function openThemeGroup(path, i){
+  if(bshDefer({ note: path.join('/') }, () => openThemeGroup(path, i))) return;
   const groups = themeGroupsUnder(path);
   const g = groups[i];
   if(!g){ openSourceNode(path); return; }
@@ -8017,6 +8043,7 @@ function openThemeGroup(path, i){
 
 /* 出典ノードを開く。子があれば子の一覧、なければテーマ索引（なければ書架）。 */
 function openSourceNode(path){
+  if(bshDefer({ note: path.join('/') }, () => openSourceNode(path))) return;
   const node = srcNodeAt(path);
   if(!node){ showView('view-root'); return; }
   CURRENT_PATH = path.slice();
@@ -8414,6 +8441,7 @@ function mountBookQuiz(bookId){
 }
 
 function openCategory(cat, color){
+  if(bshDefer({ quiz: THEME_QUIZ_BOOKS[cat.id] || [] }, () => openCategory(cat, color))) return;
   const viewId = `view-cat-${cat.id}`;
   const el = ensureView(viewId);
   let bodyHTML = '';
@@ -8908,6 +8936,7 @@ function diagramHTML(d){
 function hasVal(v){ return !!v && v !== '記載なし'; }
 
 function openBook(book, color, crumbs){
+  if(bshDefer({ book: book.id, quiz: [book.id] }, () => openBook(book, color, crumbs))) return;
   const viewId = `view-book-${book.id}`;
   const el = ensureView(viewId);
   const parentLabel = crumbs[crumbs.length - 1];
@@ -9065,6 +9094,8 @@ setTimeout(() => window.addEventListener('popstate', onPopState), 0);
   const input = document.getElementById('globalSearch');
   const clear = document.getElementById('searchClear');
   if(input){
+    /* dist では、検索欄に入ったら本文の読み込みを先に始めておく（全文検索に要る） */
+    if(BSH_LAZY) input.addEventListener('focus', () => BSH_LAZY.warmSearch());
     input.addEventListener('input', () => { renderSearchResults(input.value); clear.classList.toggle('show', !!input.value); });
     input.addEventListener('keydown', e => { if(e.key === 'Escape'){ input.value = ''; renderSearchResults(''); clear.classList.remove('show'); } });
   }

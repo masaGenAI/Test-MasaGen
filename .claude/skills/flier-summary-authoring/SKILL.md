@@ -58,6 +58,7 @@ python3 -E -P $SK/match_records.py "$WORK"           # → WORK/plan.json（既�
    - **新しい棚（サブカテゴリ）に入れるとき**は、先に `DATA` の親グループの `children` に `{ id:"<id>", title:"<表示名>", sub:"<説明>", books:[\n]}` を手で足し、親グループの `sub` の説明も合わせて直す。空の棚にも `apply_summary.py` で追加できる。
    - **ユーザーが渡した本がすでに別の棚にある**ときは、移す・残す・両方に出すのどれにするかをユーザーに確かめる（同じ id を2か所に置くと冊数が二重に数えられる）。
 8. **ビルドと横断点検**: `cd nova-app && npm run build`（Hard errors 0）。本を**追加**したときは冊数が変わるので、必ず `nova-consistency-audit` スキルで件数の食い違いを直す（`stale_scan.py` の MISMATCH 0、`smoke.mjs` の実行時エラー 0）。
+   - 直すのは原稿の `nova-app/public/booksummaryhub.html` だけ（このスキルの道具もそれを読み書きする）。ビルドはこれを dist 用に「索引だけの小さい booksummaryhub.html」と「本文・クイズ・出典の総括の booksummary-*.js」に分ける（`nova-app/scripts/booksummary-split.mjs`）。`dist/` のそれらは生成物なので直さない。原稿のデータの形が崩れている（`DATA` などがリテラルでない、データの文が画面のコードを読む等）とビルドがここで止まり、場所を示す。
 9. コミットしてプッシュし、デプロイの完了を確かめてから報告する。報告には、書いた冊数、長さ、読み取れず書かなかった数字、要約者レビュー由来として書き分けた箇所を含める。
 
 ## 手本

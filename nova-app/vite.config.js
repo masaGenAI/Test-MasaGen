@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import { viteSingleFile } from "vite-plugin-singlefile";
 import fs from "node:fs";
 import { novaLazyHubs } from "./scripts/lazy-hubs.mjs";
+import { novaBookSummarySplit } from "./scripts/booksummary-split.mjs";
 
 // ProjectNova.jsx は 15 万行超の巨大な単一コンポーネント。
 // esbuild の変換上限に触れないよう、また .jsx を JSX として扱えるよう明示設定する。
@@ -11,6 +12,9 @@ import { novaLazyHubs } from "./scripts/lazy-hubs.mjs";
 // Book-Summary（約40MB）とリベラルアーツ（約5MB）の HTML は本体に埋め込まず、
 // public/ から dist/ に置かれる別ファイルを、ハブを開いたときに読み込む（本体の読み込みを軽くするため）。
 // ポータルの目次に出す件数だけは、ビルド時にその2ファイルから数えて埋め込む。
+// Book-Summary は dist ではさらに分ける（novaBookSummarySplit・scripts/booksummary-split.mjs）：dist/booksummaryhub.html は
+// 最初の画面に要る分（書架の木と各本の書名などの索引）だけの約2MB にし、要約の本文・クイズ・出典の総括は
+// dist/booksummary-*.js に分けて、本や出典を開いたとき（と手すきの時間）に <script> で読み込む。原稿は public/ の1ファイルのまま。
 //
 // 大きい React のハブ（下の hubs：TechHub・Certification Hub・Finance Hub・Consulting Hub・Linguistics Hub・Side Work Hub。
 // 合わせて ProjectNova.jsx の 98% ほど）も本体に埋め込まない。
@@ -67,6 +71,8 @@ export default defineConfig({
         { decl: "SideWorkHubModule", key: "sidework", name: "Side Work Hub", values: [], byLang: [] },
       ],
     }),
+    // public/booksummaryhub.html（原稿）を、dist では小さい HTML と booksummary-*.js に分けて置き換える
+    novaBookSummarySplit({ src: "public/booksummaryhub.html", file: "booksummaryhub.html" }),
     react(),
     viteSingleFile(),
   ],

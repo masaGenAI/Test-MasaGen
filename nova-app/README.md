@@ -53,12 +53,15 @@ npm run build
 | `nova-hub-certification-<hash>.js` | Certification Hub（約38MB） | Certification Hub を開いたとき（弱点レーダーで CLF の記録を数えるときも） |
 | `nova-hub-linguisticshub-<hash>.js` | Linguistics Hub（約4MB） | Linguistics Hub を開いたとき（弱点レーダーで Linguistics の記録を数えるときも） |
 | `nova-hub-sidework-<hash>.js` | Side Work Hub（約5MB） | Side Work Hub を開いたとき |
-| `booksummaryhub.html` / `liberal-arts.html` | Book-Summary / リベラルアーツ | そのハブを開いたとき |
+| `booksummaryhub.html` | Book-Summary の最初の画面（出典の一覧・件数・進捗・検索の書名一致。約2MB、gzip で約0.4MB） | Book-Summary を開いたとき |
+| `booksummary-b<N>-<hash>.js` / `-n<N>-` / `-q<N>-` | Book-Summary の要約本文とクイズ（約600KB ずつ）／出典の総括／本文のない本のクイズ | その本・出典を開いたとき、検索したとき（ほかは最初の画面のあと手すきの時間に順に） |
+| `liberal-arts.html` | リベラルアーツ | そのハブを開いたとき |
 
 `dist/` は**フォルダごと**配置・コピーしてください。`index.html` だけを持ち出すと、上の別ファイルのハブは
 「読み込めませんでした」という案内を出して開きません（ポータルとほかのハブは動きます）。
 `nova-hub-*.js` は通常の `<script>` で読み込むので、`index.html` をダブルクリック（file://）で開いても、
-同じフォルダに `nova-hub-*.js` があれば開けます（Book-Summary とリベラルアーツは file:// では開けず、案内が出ます）。
+同じフォルダに `nova-hub-*.js` があれば開けます（Book-Summary とリベラルアーツはポータルの中からは file:// で開けず、案内が出ます。
+`booksummaryhub.html` を直接ダブルクリックすれば、同じフォルダの `booksummary-*.js` を読み込んで開けます）。
 
 これらのハブの原稿は `src/ProjectNova.jsx` の中のまま（検査スクリプトやスキルが直接読むため）で、
 ビルドのときにだけ `scripts/lazy-hubs.mjs`（Vite プラグイン）が切り出します。ポータルが最初の描画で使う値
@@ -66,12 +69,26 @@ npm run build
 ビルド時に計算して本体に埋め込みます。切り出すハブの一覧と、ハブの外からその中身を読む箇所を増やすときの決まりは、
 `vite.config.js` の `novaLazyHubs` を参照してください。
 
+### Book-Summary の分割配信（dist だけ）
+原稿の `public/booksummaryhub.html` は約40MB の1ファイル（データも画面のコードも入り、そのまま開いても動く）で、
+スキル（flier-summary-authoring・youtube-summary-authoring）や検査スクリプトはこのファイルを読み書きします。
+`npm run build` のときにだけ `scripts/booksummary-split.mjs`（Vite プラグイン）が、データの部分を Node で実行して
+（書架へのぶら下げなどもブラウザと同じ元のコードで済ませて）、`dist/booksummaryhub.html`（索引だけの小さい HTML）と
+`dist/booksummary-*.js`（本文・クイズ・出典の総括）に分けます。別ファイルは `<script>` で読み込むので、file:// でも
+GitHub Pages のサブパスでも、ポータルの iframe（`window.__NOVA_ASSET_BASE__` で場所を知る）でも動きます。
+読み込み中は小さな案内を出し、読み込めないときはファイル名と「もう一度読み込む」ボタンを出します。
+検索は書名・著者などの一致をすぐ出し、本文が届いた分から全文での一致を足していきます（そろえば原稿と同じ結果）。
+画面のコードが別ファイルに移した項目を読み込みを待たずに読むと、ビルドが場所を示して止まります
+（決まりは `scripts/booksummary-split.mjs` 冒頭のコメント）。単体でも `node scripts/booksummary-split.mjs public/booksummaryhub.html <出力先>` で試せます。
+`dist/` の `booksummaryhub.html`・`booksummary-*.js` は生成物なので直接直さないでください。
+
 ### Book-Summary の埋め込み方式（Blob URL）
-Book-Summary は 7MB 超の巨大な単一HTML（独自スクリプト多数）。`srcDoc` で埋め込むと
+Book-Summary は巨大な HTML（独自スクリプト多数）。`srcDoc` で埋め込むと
 「親のロード後に注入」される形になり、ブラウザが大容量インラインスクリプトを実行しない制約に
 当たる。そこで実行時に `Blob` 化して `iframe.src = URL.createObjectURL(blob)` で読み込む。
 これにより単一ファイルのままスクリプト実行・履歴ナビ(#/route)・検索・ダークモードが動作する。
-（`public/booksummaryhub.html` を `?raw` で取り込み、build 時に本体へインライン化している。）
+（ポータルは開いたときに `booksummaryhub.html` を fetch して Blob 化する。dist では上の小さい HTML で、
+本文などの別ファイルは iframe の中から `__NOVA_ASSET_BASE__` を基準に読み込む。）
 
 ### 進捗の保存について
 - 本体（Finance 等）の進捗＝右下「進捗を保存 / 復元」＋ localStorage で保存。

@@ -30,6 +30,9 @@
 `.claude/skills/youtube-summary-authoring/` の手順と基準に従う（既存の実測値に合わせた長さ・体裁・帰属、根拠の量に応じた段、水増し禁止）。
 差し込みは `apply_yt.py` 経由で行い、`check_yt.py` の不合格を 0 にしてから入れる。
 
+Book-Summary の原稿は `nova-app/public/booksummaryhub.html` の1ファイルだけ。`npm run build` が dist 用に
+小さい `booksummaryhub.html` と `booksummary-*.js` に分ける（`nova-app/scripts/booksummary-split.mjs`）ので、dist 側は直さない。
+
 ## Project Nova を更新したあと・全体を点検するとき
 `.claude/skills/nova-consistency-audit/` の手順に従う（ポータルのタグ・Mastery Track・説明文・コメントに残る古い件数や名称を洗い出す）。
 `python3 .claude/skills/nova-consistency-audit/scripts/stale_scan.py` で MISMATCH が 0 になるまで直す。

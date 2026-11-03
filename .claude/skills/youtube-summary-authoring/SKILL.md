@@ -57,7 +57,8 @@ description: Book-Summary（nova-app/public/booksummaryhub.html）の「YouTube�
 9. **差し込み**: `python3 -I scripts/apply_yt.py <作業フォルダ> nova-app/public/booksummaryhub.html`（何度流しても同じ結果。不合格は入らない）。
    YT_BOOKS 先頭のコメント（チャンネル数・件数）を実数に直す。
 10. **点検**: `cd nova-app && npm run build`、`node .claude/skills/nova-consistency-audit/scripts/smoke.mjs`（Book-Summary の出典一覧と実行時エラー0）、
-    `python3 .claude/skills/nova-consistency-audit/scripts/stale_scan.py`（MISMATCH 0）、ブラウザで新チャンネルを開いて表示を確認する。
+    `python3 .claude/skills/nova-consistency-audit/scripts/stale_scan.py`（MISMATCH 0）、ブラウザで新チャンネルを開いて表示を確認する（原稿の `public/booksummaryhub.html` はそのまま開ける。配布する分割版は `npm run build` 後の `dist/booksummaryhub.html`）。
+    - 直すのは原稿の `nova-app/public/booksummaryhub.html` だけ（このスキルの道具もそれを読み書きする）。ビルドはこれを dist 用に「索引だけの小さい booksummaryhub.html」と「本文・クイズ・出典の総括の booksummary-*.js」に分ける（`nova-app/scripts/booksummary-split.mjs`）。`dist/` のそれらは生成物なので直さない。原稿のデータの形が崩れている（`DATA` などがリテラルでない、データの文が画面のコードを読む等）とビルドがここで止まり、場所を示す。
 
 ## 書き方の約束（agent_brief.md に詳細）
 - 誰の主張かを書く:「〜と動画は論じる」「本書は〜と説く」「解説者は〜と補足する」「〜と（発言者）は語る」
@@ -69,4 +70,5 @@ description: Book-Summary（nova-app/public/booksummaryhub.html）の「YouTube�
 ## やってはいけないこと
 - 長さを合わせるために、入力・字幕にない研究・数値・評価・注意書きを足す
 - 既存の要約・ツリーを手で書き換える（必ず `apply_yt.py` 経由。同じ id は置き換えになる）
+- `dist/booksummaryhub.html`・`dist/booksummary-*.js` を直す（ビルドの生成物。原稿は `public/booksummaryhub.html`）
 - コンテナから YouTube へ大量アクセスして字幕を取ろうとする（ボット判定を回避しようとしない）
