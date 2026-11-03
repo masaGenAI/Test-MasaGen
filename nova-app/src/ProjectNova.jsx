@@ -216817,6 +216817,7 @@ function CertOverlapMap({ lang }) {
 
 // 公式ページで試験の現行版を確かめた結果（既定は2026-11-01。4つ目の要素があればその日付に確認）。kind: changed=出題範囲の改定あり / ok=改定・廃止の告知なし / none=公式ページを確認できず。
 // Microsoft・GitHub は Microsoft Learn の試験ガイド、AWS・Google・IAPP は公式ページで確認。ここに書くのは公式ページに書いてあったことだけ。
+// 各資格の公式ページを確かめた記録（画面には出さない。保守用の控え）
 const CERT_CHECK_DATE = "2026-11-01";
 const CERT_CHECK = {
   clf: ["ok", "公式ページで提供中を確認。試験ガイドの版・日付はページに記載なし。", "Confirmed as offered on the official page. The page gives no exam-guide version or date."],
@@ -216875,28 +216876,6 @@ function CertStudyLinks({ id, lang }) {
   );
 }
 
-// 模擬試験（本番モード）の制限時間の根拠を、資格ページの上部に1行で示す
-const CERT_TIMED = ["clf", "saa", "ccaf", "aicx", "adp", "aigp", "iso42001f", "iso42001li", "ccsk", "cism", "aaism", "aair", "aaia", "cisa", "pl900", "ab620", "dp900", "sc500", "sc900", "gh600", "ab100", "ab410", "ai300", "ai103", "ai200", "gh900", "gh300"];
-function CertExamTimeNote({ id, lang }) {
-  if (!CERT_TIMED.includes(id)) return null;
-  const t = CERT_EXAM_TIME[id]; const en = lang === "en";
-  const range = t && /〜/.test(t.qText);
-  const text = t
-    ? (en ? `Mock exam (real mode) time limit: the official ${t.min} minutes for ${t.qText.replace("〜", "-")} questions, scaled to the number of questions in each set${range ? ` (a range, so ${t.q} questions is used)` : ""}. Official pages checked on 3 Nov 2026.`
-          : `模擬試験（本番モード）の制限時間：公式の試験時間（${t.min}分・${t.qText}問）を、各セットの問題数に比例させています${range ? `（問題数が幅で示されているため${t.q}問で換算）` : ""}。公式ページは2026年11月3日に確認。`)
-    : (en ? "Mock exam (real mode) time limit: 60 seconds per question. The official exam duration has not been confirmed." : "模擬試験（本番モード）の制限時間：1問60秒。公式の試験時間は確認できていません。");
-  return <div style={{ fontSize: 11.5, lineHeight: 1.6, color: "#4A5563", background: "#F7F8FA", padding: "4px 14px", borderBottom: `1px solid ${HUB.border}` }}>{text}</div>;
-}
-function CertCheckNote({ id, lang }) {
-  const c = CERT_CHECK[id];
-  if (!c) return null;
-  const en = lang === "en";
-  const sty = { changed: ["#FFF7E6", "#7A4B00"], ok: ["#ECF7F2", "#1E5C45"], none: ["#F1F3F6", "#4A5563"] }[c[0]];
-  const date = c[3] || CERT_CHECK_DATE;
-  const head = en ? `Official exam page checked ${date}: ` : `公式ページの確認（${date}）：`;
-  const body = c[0] === "none" ? (en ? "not checked — the official site could not be reached from the checking environment. Check the official page for the current version." : "未確認（確認した環境から公式サイトに接続できなかったため）。現行の版は公式ページで確かめてください。") : c[en ? 2 : 1];
-  return <div style={{ fontSize: 12, lineHeight: 1.6, color: sty[1], background: sty[0], padding: "6px 14px", borderBottom: `1px solid ${HUB.border}` }}>{head}{body}</div>;
-}
 
 // 資格ごとの学習記録（端末内）の保存キー。一覧のカードに解答数と正答率を出すために読む
 const CERT_STORE = { clf: "clf_c02_dashboard_v1", saa: "saa_c03_study_v1", ccaf: "cca_f_study_v1", aicx: "aics_study_v2", pl900: "pl900_study_v2", ab620: "ab620_study_v2", sc500: "sc500_study_v1", sc900: "sc900_study_v1", gh600: "gh600_study_v2", ab100: "ab100_study_v2", ab410: "ab410_study_v2", ai300: "ai300_study_v2", ai103: "ai103_study_v1", ai200: "ai200_study_v1", gh900: "gh900_study_v1", gh300: "gh300_study_v1", adp: "adp_study_v3", dp900: "dp900_study_v1", aigp: "aigp_hub_study_v1", iso42001f: "iso42001f_hub_study_v1", iso42001li: "iso42001li_hub_study_v1", ccsk: "ccsk_hub_study_v1", cism: "cism_hub_study_v1", cisa: "cisa_hub_study_v1", aaism: "aaism_hub_study_v1", aair: "aair_hub_study_v1", aaia: "aaia_hub_study_v1" };
@@ -216989,8 +216968,6 @@ function HubApp() {
             </a>
           )}
         </div>
-        <CertCheckNote id={st.id} lang={lang} />
-        <CertExamTimeNote id={st.id} lang={lang} />
         <CertStudyLinks id={st.id} lang={lang} />
         {lang === "en" && st.jaOnly && (
           <div style={{ fontSize: 12.5, color: "#7A4B00", background: "#FFF7E6", padding: "7px 14px" }}>This station is available in Japanese only: its questions and screens have not been translated.</div>
