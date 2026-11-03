@@ -41,8 +41,25 @@ npm run preview      # ビルド結果をローカル確認
 ```bash
 npm run build
 ```
-`dist/index.html` が **すべて入りの単一HTMLファイル**（約20MB）です。Book-Summary（971冊）も
-含め、全ハブがこの1ファイルに統合されています。リネームしてダブルクリックで開けます。
+`dist/index.html` が本体（ポータルと多くのハブ）の HTML ファイルです（約25MB）。大きいハブは本体に埋め込まず、
+同じフォルダの別ファイルを、そのハブを開いたときに読み込みます。
+
+| ファイル | 中身 | 読み込むとき |
+|---|---|---|
+| `index.html` | ポータル・Finance・Consulting・Language・Linguistics などのハブ | 最初に開いたとき |
+| `nova-hub-megatech-<hash>.js` | TechHub（約25MB） | TechHub を開いたとき |
+| `nova-hub-certification-<hash>.js` | Certification Hub（約38MB） | Certification Hub を開いたとき（弱点レーダーで CLF の記録を数えるときも） |
+| `booksummaryhub.html` / `liberal-arts.html` | Book-Summary / リベラルアーツ | そのハブを開いたとき |
+
+`dist/` は**フォルダごと**配置・コピーしてください。`index.html` だけを持ち出すと、上の別ファイルのハブは
+「読み込めませんでした」という案内を出して開きません（ポータルとほかのハブは動きます）。
+TechHub と Certification Hub は通常の `<script>` で読み込むので、`index.html` をダブルクリック（file://）で開いても、
+同じフォルダに `nova-hub-*.js` があれば開けます（Book-Summary とリベラルアーツは file:// では開けず、案内が出ます）。
+
+TechHub と Certification Hub の原稿は `src/ProjectNova.jsx` の中のまま（検査スクリプトやスキルが直接読むため）で、
+ビルドのときにだけ `scripts/lazy-hubs.mjs`（Vite プラグイン）が切り出します。ポータルが最初の描画で使う値
+（TechHub のタブ数・Mastery Track の問題数・横断検索の項目）はビルド時に計算して本体に埋め込みます。
+ハブの外からこの2つのハブの中身を読む箇所を増やすときは、`vite.config.js` の `novaLazyHubs` の説明を参照してください。
 
 ### Book-Summary の埋め込み方式（Blob URL）
 Book-Summary は 7MB 超の巨大な単一HTML（独自スクリプト多数）。`srcDoc` で埋め込むと
@@ -63,7 +80,7 @@ Book-Summary は 7MB 超の巨大な単一HTML（独自スクリプト多数）�
   「進捗を保存」でファイルにバックアップするか、下記ホスティングを利用する。
 
 ### 一番おすすめ: ホスティング
-`dist/index.html` を Netlify / Vercel / GitHub Pages に置くと URL ひとつで全機能が動き、
+`dist/` を（フォルダごと）Netlify / Vercel / GitHub Pages に置くと URL ひとつで全機能が動き、
 Book-Summary の進捗も含めて自動保存が全ブラウザで確実に効く。
 
 ## 静的ホスティング（任意）

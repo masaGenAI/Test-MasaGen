@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { viteSingleFile } from "vite-plugin-singlefile";
 import fs from "node:fs";
+import { novaLazyHubs } from "./scripts/lazy-hubs.mjs";
 
 // ProjectNova.jsx は 15 万行超の巨大な単一コンポーネント。
 // esbuild の変換上限に触れないよう、また .jsx を JSX として扱えるよう明示設定する。
@@ -10,6 +11,11 @@ import fs from "node:fs";
 // Book-Summary（約40MB）とリベラルアーツ（約5MB）の HTML は本体に埋め込まず、
 // public/ から dist/ に置かれる別ファイルを、ハブを開いたときに読み込む（本体の読み込みを軽くするため）。
 // ポータルの目次に出す件数だけは、ビルド時にその2ファイルから数えて埋め込む。
+//
+// TechHub（MegaTechHubModule・約26MB）と Certification Hub（CertHubModule・約39MB）も本体に埋め込まない。
+// 原稿は ProjectNova.jsx のまま（検査スクリプトやスキルが直接読むため）で、ビルドのときにだけ novaLazyHubs が
+// 2つのハブを別ファイル dist/nova-hub-<key>-<hash>.js に切り出し、ハブを開いたときに <script> で読み込む（scripts/lazy-hubs.mjs）。
+// ポータルが最初の描画で使う値（下の values / byLang）は、ビルド時に計算して本体に埋め込む。
 function hubStats() {
   const read = (p) => { try { return fs.readFileSync(new URL(p, import.meta.url), "utf8"); } catch (e) { return ""; } };
   const h = read("./public/booksummaryhub.html");
@@ -44,7 +50,18 @@ function bookIndex() {
 }
 
 export default defineConfig({
-  plugins: [react(), viteSingleFile()],
+  plugins: [
+    novaLazyHubs({
+      entry: "src/ProjectNova.jsx",
+      hubs: [
+        // values: ポータルが読む静的プロパティ（そのまま埋め込む）／byLang: (en) => 値 の関数（日英の結果を埋め込む）
+        { decl: "MegaTechHubModule", key: "megatech", name: "TechHub", values: ["TAB_COUNT", "MASTERY_COUNTS"], byLang: ["PORTAL_INDEX"] },
+        { decl: "CertHubModule", key: "certification", name: "Certification Hub", values: [], byLang: ["PORTAL_INDEX"] },
+      ],
+    }),
+    react(),
+    viteSingleFile(),
+  ],
   define: {
     __NOVA_HUB_STATS__: JSON.stringify(hubStats()),
     __NOVA_BOOK_INDEX__: JSON.stringify(bookIndex()),

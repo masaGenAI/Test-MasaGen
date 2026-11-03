@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo, useRef, useCallback, useContext, c
 import { Waves, Clock3, Users, Brain, Cpu, BookOpen, Layers, ChevronRight, ArrowLeft, Check, Circle, X, Star, Sun, Moon, Globe, RotateCcw } from "lucide-react";
 // Book-Summary ハブ（public/booksummaryhub.html）とリベラルアーツ（public/liberal-arts.html）は本体に埋め込まず、
 // ハブを開いたときに別ファイルとして読み込む（novaHubHtml）。ポータルの件数はビルド時に数えた __NOVA_HUB_STATS__ を使う。
+// TechHub（MegaTechHubModule）と Certification Hub（CertHubModule）はこのファイルの中で書くが、ビルドでは別ファイルに切り出して
+// 開いたときに読み込む（scripts/lazy-hubs.mjs・novaLazyHub）。ポータルからこの2つのハブの中身を読むときは、その説明を参照。
 // 学習ロードマップ トラッカー（資格/Tools/講座/書籍/Udemy の一元管理・自動保存つき表アプリ）
 import LEARNING_TRACKER_HTML from "../public/learning-tracker.html?raw";
 // Anything Memo トラッカー（調べ済みノートの一覧・検索・ジャンル別・自動保存）
@@ -167058,7 +167060,7 @@ function GafaHub() {
     </LangContext.Provider>
   );
 }
-  // ポータルの Mastery Track が問題数を実データから数えるために、バンクを外へ渡す。
+  // ポータルの目次タグ（タブ数）。ポータルの最初の描画で使うので、ビルドでは vite の lazy-hubs プラグインが計算して埋め込む。
   GafaHub.TAB_COUNT = TABS.length;
   // ポータルの横断検索に出す項目。結果は URL（#megatech/…）で開く。用語集・ファクトブックは ?lex= / ?fbq= で該当の項目を開く
   GafaHub.PORTAL_INDEX = (en) => {
@@ -167077,7 +167079,25 @@ function GafaHub() {
     COMPANIES.forEach((c) => add(c.name, en ? "TechHub companies" : "TechHub 企業", "megatech/companies", [c.org, c.prod].filter(Boolean).join(" ")));
     return out;
   };
-  GafaHub.MASTERY_BANKS = { MCQS, DEV_QUIZ, ACAD_QUIZ, CHECK_CORE_BANK, CHECK_AX_BANK, CHECK_DOMAINS_CORE, CHECK_DOMAINS_AX, GOVDOJO_BANK, ITSEC_BANK, NOTEISSUE_BANK, NOTEISSUE_DOMAINS, SLALOM_BANK, SLALOM_DOMAINS, COMPANIES };
+  // ポータルの Mastery Track が問題数を実データから数えるための集計。バンク本体ではなく件数だけを渡す
+  // （ビルドではこのハブを開いたときに読み込むので、ポータルの最初の描画に要るこの値はビルド時に計算して埋め込む）。
+  //   mcqs: { テーマ名(cat): [問題数, Lv1, Lv2, Lv3, Lv4] }、doms 系: { n: 問題数, doms: [{ id, ja, en, q: 領域の問題数 }] }
+  GafaHub.MASTERY_COUNTS = (() => {
+    const doms = (bank, ds) => ({ n: bank.length, doms: ds.map((d) => ({ id: d.id, ja: d.ja, en: d.en, q: bank.filter((x) => x.d === d.id).length })) });
+    const mcqs = {};
+    MCQS.forEach((x) => {
+      if (Object.prototype.hasOwnProperty.call(mcqs, x.cat)) return;
+      const xs = MCQS.filter((y) => y.cat === x.cat);
+      mcqs[x.cat] = [xs.length, ...[1, 2, 3, 4].map((d) => xs.filter((y) => y.d === d).length)];
+    });
+    return {
+      mcqs, glossary: MCQS.filter((x) => String(x.cat).startsWith("用語：")).length,
+      dev: DEV_QUIZ.reduce((a, c) => a + (c.questions || []).length, 0),
+      acad: ACAD_QUIZ.length, govdojo: GOVDOJO_BANK.length, itsec: ITSEC_BANK.length, companies: COMPANIES.length,
+      checkCore: doms(CHECK_CORE_BANK, CHECK_DOMAINS_CORE), checkAx: doms(CHECK_AX_BANK, CHECK_DOMAINS_AX),
+      noteIssue: doms(NOTEISSUE_BANK, NOTEISSUE_DOMAINS), slalom: doms(SLALOM_BANK, SLALOM_DOMAINS),
+    };
+  })();
   return GafaHub;
 })();
 // ================= ConsultingHubModule (source: consulting-thinking-hub.jsx) =================
@@ -218677,8 +218697,27 @@ function novaHubHtml(file) {
   }
   return __novaHubHtml[file];
 }
-function NovaHubStatus({ state, file, name }) {
+function NovaHubStatus({ state, file, name, kind, onRetry }) {
   const box = { maxWidth: 560, margin: "48px auto", padding: "20px 22px", borderRadius: 12, border: "1px solid #3A3350", background: "#1E1832", color: "#EDE8F4", fontSize: 14, lineHeight: 1.8 };
+  // kind="script"：ビルドで別ファイル（JS）にしたハブ（TechHub・Certification Hub）。英語の画面があるハブなので、ポータルの言語に合わせる
+  const en = kind === "script" && typeof window !== "undefined" && window.__novaLang === "en";
+  if (state === "fail" && kind === "script") {
+    return (
+      <div role="alert" style={box}>
+        <div style={{ fontWeight: 800, marginBottom: 6 }}>{en ? `Could not load ${name}` : `${name} を読み込めませんでした`}</div>
+        <div style={{ color: "#ADA4C6" }}>
+          {en ? "Check your connection and try again. If you opened index.html as a file, keep " : "ネット接続を確かめて、もう一度開いてください。index.html をファイルとして直接開いている場合は、同じフォルダに"}
+          <code style={{ color: "#8FA2FF", margin: en ? 0 : "0 4px", wordBreak: "break-all" }}>{file}</code>
+          {en ? " next to it (index.html alone cannot open this hub)." : "が必要です（index.html だけを別の場所へ移すと、このハブは開けません）。"}
+        </div>
+        {onRetry ? (
+          <button onClick={onRetry} style={{ marginTop: 12, padding: "6px 16px", borderRadius: 8, border: "1px solid #8FA2FF", background: "transparent", color: "#EDE8F4", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+            {en ? "Try again" : "もう一度読み込む"}
+          </button>
+        ) : null}
+      </div>
+    );
+  }
   if (state === "fail") {
     return (
       <div role="alert" style={box}>
@@ -218691,7 +218730,76 @@ function NovaHubStatus({ state, file, name }) {
       </div>
     );
   }
-  return <div role="status" style={{ ...box, textAlign: "center", color: "#ADA4C6" }}>{name} を読み込んでいます…</div>;
+  return <div role="status" style={{ ...box, textAlign: "center", color: "#ADA4C6" }}>{en ? `Loading ${name}…` : `${name} を読み込んでいます…`}</div>;
+}
+// ================= 別ファイルに分けた React のハブ（TechHub・Certification Hub）の読み込み =================
+// npm run build では、この2つのハブ（MegaTechHubModule・CertHubModule）の中身を index.html に埋め込まず、
+// 同じ場所の別ファイル（nova-hub-*.js）にして、開いたときに1回だけ読み込む（scripts/lazy-hubs.mjs が ProjectNova.jsx から
+// 切り出し、ここの novaLazyHub(...) の呼び出しに置き換える）。中身はトップレベルの共通部品（React・StarButton など）を
+// 引数で受け取るので、二重に評価されない。開発サーバー（npm run dev）と検査スクリプトは切り出さない元のファイルをそのまま使う。
+// ポータルの最初の描画で使う値（タブ数・Mastery Track の件数・横断検索の項目）は、ビルド時に計算して埋め込むので読み込みを待たない。
+// それ以外の中身（関数など）がポータル側で要るときは novaHubReady(…) で読み込みを待つ。
+// 読み込みは <script>（module ではない）で行うので、index.html をファイルとして直接開いても、別ファイルが同じフォルダにあれば開ける。
+const __novaHubScripts = {};
+function novaLoadHubScript(key, file) {
+  if (!__novaHubScripts[key]) {
+    const pr = new Promise((resolve, reject) => {
+      const reg = (window.__NOVA_HUB_CHUNKS__ = window.__NOVA_HUB_CHUNKS__ || {});
+      if (reg[key]) { resolve(reg[key]); return; }
+      const s = document.createElement("script");
+      s.src = new URL(file, document.baseURI).href;
+      s.async = true;
+      s.charset = "utf-8";
+      s.onload = () => { s.remove(); if (reg[key]) resolve(reg[key]); else reject(Object.assign(new Error(file + " を実行できませんでした"), { novaEval: true })); };
+      s.onerror = () => { s.remove(); reject(new Error(file + " を読み込めませんでした")); };
+      document.head.appendChild(s);
+    });
+    __novaHubScripts[key] = pr;
+    pr.catch(() => { if (__novaHubScripts[key] === pr) delete __novaHubScripts[key]; });
+  }
+  return __novaHubScripts[key];
+}
+// cfg: { key, name, file, deps: () => ({ 共通部品 }), statics: { 名前: 値 }, byLang: { 名前: [日本語版の値, 英語版の値] } }
+function novaLazyHub(cfg) {
+  let mod = null, pending = null;
+  const load = () => {
+    if (mod) return Promise.resolve(mod);
+    if (!pending) {
+      pending = novaLoadHubScript(cfg.key, cfg.file).then((factory) => {
+        if (!mod) { try { mod = factory(cfg.deps()); } catch (e) { throw Object.assign(e instanceof Error ? e : new Error(String(e)), { novaEval: true }); } }
+        return mod;
+      });
+      pending.catch(() => { pending = null; });
+    }
+    return pending;
+  };
+  function NovaLazyHub(props) {
+    const [st, setSt] = useState(mod ? "ok" : "loading");
+    const [err, setErr] = useState(null);
+    useEffect(() => {
+      if (st !== "loading") return undefined;
+      let alive = true;
+      load().then(() => { if (alive) setSt("ok"); }, (e) => {
+        try { console.error("[Nova] hub load failed:", cfg.key, e); } catch (x) {}
+        if (!alive) return;
+        if (e && e.novaEval) setErr(e); else setSt("fail");
+      });
+      return () => { alive = false; };
+    }, [st]);
+    // 読み込めたが中身の実行で失敗した（コードの誤り）→ ハブ単位のエラー境界に出す
+    if (err) throw err;
+    if (st === "ok" && mod) return React.createElement(mod, props);
+    return <NovaHubStatus state={st} file={cfg.file} name={cfg.name} kind="script" onRetry={() => setSt("loading")} />;
+  }
+  Object.assign(NovaLazyHub, cfg.statics || {});
+  Object.entries(cfg.byLang || {}).forEach(([k, v]) => { NovaLazyHub[k] = (en) => v[en ? 1 : 0]; });
+  NovaLazyHub.load = load;
+  NovaLazyHub.displayName = "NovaLazyHub(" + cfg.key + ")";
+  return NovaLazyHub;
+}
+// 別ファイルに分けたハブの中身を使う前に読み込みを待つ（開発サーバーでは本体に入っているので、そのまま返す）
+function novaHubReady(mod) {
+  return mod && typeof mod.load === "function" ? mod.load() : Promise.resolve(mod);
 }
 // ================= BookSummaryModule (source: booksummaryhub.html, loaded on open into an isolated iframe) =================
 // ユーザーが作り込んだ完成版 Book-Summary ハブ（独自ダークモード / 全書籍検索 / クイズ /
@@ -230955,10 +231063,11 @@ const BOOTCAMP_QMILE = [{ k: "q1", label: ["¼", "¼"] }, { k: "q2", label: ["½
 // Mastery Track の問題数と内訳は、各バンクの実データから数える。
 // 手で書いた数値は、問題の追加・重複削除のたびに実数とずれていたため。
 const MQ_LV = [["Lv1 基礎", "Lv1 basics"], ["Lv2 標準", "Lv2 core"], ["Lv3 応用", "Lv3 applied"], ["Lv4 発展", "Lv4 advanced"]];
-const MQB = MegaTechHubModule.MASTERY_BANKS;
-const mqRow = (cat) => { const xs = MQB.MCQS.filter((x) => x.cat === cat); return { qn: xs.length, cats: MQ_LV.map((n, i) => ({ n, q: xs.filter((x) => x.d === i + 1).length })) }; };
-const mqDoms = (bank, doms) => doms.map((d) => ({ n: [d.id + " " + d.ja, d.id + " " + d.en], q: bank.filter((x) => x.d === d.id).length }));
-const MQ_GLOSSARY = MQB.MCQS.filter((x) => String(x.cat).startsWith("用語：")).length;
+// TechHub は集計（MASTERY_COUNTS）だけを渡す。ビルドでは TechHub の本体を開いたときに読み込むので、ここでバンク本体には触れない。
+const MQC = MegaTechHubModule.MASTERY_COUNTS;
+const mqRow = (cat) => { const r = Object.prototype.hasOwnProperty.call(MQC.mcqs, cat) ? MQC.mcqs[cat] : [0, 0, 0, 0, 0]; return { qn: r[0], cats: MQ_LV.map((n, i) => ({ n, q: r[i + 1] })) }; };
+const mqDoms = (b) => b.doms.map((d) => ({ n: [d.id + " " + d.ja, d.id + " " + d.en], q: d.q }));
+const MQ_GLOSSARY = MQC.glossary;
 const BOOTCAMP_QUEST = {
   mega: [
     { id: "Q-M1", name: ["アルゴリズム基礎", "Algorithm Basics"], ...mqRow("アルゴリズム基礎"), s: 1, e: 1, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, mk: "mega", mi: 0 },
@@ -230968,29 +231077,29 @@ const BOOTCAMP_QUEST = {
     { id: "Q-M5", name: ["RAG", "RAG"], ...mqRow("RAG"), s: 2, e: 2, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, mk: "mega", mi: 4 },
     { id: "Q-M6", name: ["エージェント", "Agents"], ...mqRow("エージェント"), s: 2, e: 2, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, mk: "mega", mi: 5 },
     { id: "Q-M7", name: ["アーキテクチャ", "Architecture"], ...mqRow("アーキテクチャ"), s: 2, e: 2, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, mk: "mega", mi: 6 },
-    { id: "Q-MCHKC", name: ["理解度チェック 基礎", "Comprehension check — Core"], qn: MQB.CHECK_CORE_BANK.length, s: 2, e: 3, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, cats: mqDoms(MQB.CHECK_CORE_BANK, MQB.CHECK_DOMAINS_CORE) },
+    { id: "Q-MCHKC", name: ["理解度チェック 基礎", "Comprehension check — Core"], qn: MQC.checkCore.n, s: 2, e: 3, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, cats: mqDoms(MQC.checkCore) },
     { id: "Q-M8", name: ["基盤", "Infrastructure"], ...mqRow("基盤"), s: 3, e: 3, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, mk: "mega", mi: 7 },
     { id: "Q-M9", name: ["AI駆動開発", "AI-Driven Dev"], ...mqRow("AI駆動開発"), s: 3, e: 3, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, mk: "mega", mi: 8 },
     { id: "Q-M10", name: ["セキュリティ", "Security"], ...mqRow("セキュリティ"), s: 3, e: 4, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, mk: "mega", mi: 9 },
-    { id: "Q-MCHKA", name: ["理解度チェック AX実務", "Comprehension check — AX"], qn: MQB.CHECK_AX_BANK.length, s: 3, e: 4, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, cats: mqDoms(MQB.CHECK_AX_BANK, MQB.CHECK_DOMAINS_AX) },
+    { id: "Q-MCHKA", name: ["理解度チェック AX実務", "Comprehension check — AX"], qn: MQC.checkAx.n, s: 3, e: 4, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, cats: mqDoms(MQC.checkAx) },
     { id: "Q-M11", name: ["ガバナンス", "Governance"], ...mqRow("ガバナンス"), s: 4, e: 4, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, mk: "mega", mi: 10 },
     { id: "Q-M12", name: ["AI導入戦略", "Adoption Strategy"], ...mqRow("AI導入戦略"), s: 4, e: 4, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, mk: "mega", mi: 11 },
     { id: "Q-M13", name: ["Expertise", "Expertise"], ...mqRow("Expertise"), s: 5, e: 5, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, mk: "mega", mi: 12 },
     { id: "Q-M14", name: ["最新動向", "Latest Trends"], ...mqRow("最新動向"), s: 5, e: 5, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, mk: "mega", mi: 13 },
     { id: "Q-MK", name: ["Key Numbers", "Key Numbers"], ...mqRow("Key numbers"), s: 5, e: 5, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE },
-    { id: "Q-MDEV", name: ["AI駆動開発ドリル​（DEV_QUIZ）", "Dev drills"], qn: MQB.DEV_QUIZ.reduce((a, c) => a + (c.questions || []).length, 0), s: 5, e: 6, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, mk: "mega", mi: 8 },
+    { id: "Q-MDEV", name: ["AI駆動開発ドリル​（DEV_QUIZ）", "Dev drills"], qn: MQC.dev, s: 5, e: 6, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, mk: "mega", mi: 8 },
     { id: "Q-MBANK", name: ["クラウド開発クイズ​（BANK）", "Cloud/dev quiz"], qn: 482, s: 6, e: 7, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, mk: "mega", mi: 7 },
     { id: "Q-MARCH", name: ["アーキテクチャ演習​（ARCH）", "Architecture exercises"], qn: 200, s: 7, e: 7, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, mk: "mega", mi: 6 },
-    { id: "Q-MACAD", name: ["AIアーキテクト道場​（ACAD）", "Architect academy"], qn: MQB.ACAD_QUIZ.length, s: 7, e: 7, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, mk: "mega", mi: 6 },
-    { id: "Q-MGOV", name: ["セキュリティ・​ガバナンス道場", "Sec & Gov dojo"], qn: MQB.GOVDOJO_BANK.length, s: 7, e: 8, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, mk: "mega", mi: 9 },
-    { id: "Q-MITSEC", name: ["ITセキュリティ基盤", "IT security foundations"], qn: MQB.ITSEC_BANK.length, s: 8, e: 8, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, mk: "mega", mi: 9 },
+    { id: "Q-MACAD", name: ["AIアーキテクト道場​（ACAD）", "Architect academy"], qn: MQC.acad, s: 7, e: 7, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, mk: "mega", mi: 6 },
+    { id: "Q-MGOV", name: ["セキュリティ・​ガバナンス道場", "Sec & Gov dojo"], qn: MQC.govdojo, s: 7, e: 8, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, mk: "mega", mi: 9 },
+    { id: "Q-MITSEC", name: ["ITセキュリティ基盤", "IT security foundations"], qn: MQC.itsec, s: 8, e: 8, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, mk: "mega", mi: 9 },
     { id: "Q-MGOVS", name: ["道場シナリオ", "Dojo scenarios"], qn: 45, s: 8, e: 8, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, mk: "mega", mi: 10 },
     { id: "Q-MSAINT", name: ["SA面接Q&A", "SA interview Q&A"], qn: 162, s: 8, e: 8, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, mk: "mega", mi: 6 },
     { id: "Q-MOTHER", name: ["その他ドリル・演習​・資格クイズ", "Other drills & cert quizzes"], qn: 236, s: 8, e: 8, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE },
-    { id: "Q-MNOTE", name: ["実務論点マップ​（論点クイズ）", "Practice issue map quiz"], qn: MQB.NOTEISSUE_BANK.length, s: 9, e: 9, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, cats: mqDoms(MQB.NOTEISSUE_BANK, MQB.NOTEISSUE_DOMAINS) },
-    { id: "Q-MSLQ", name: ["Slalom変革道場​（スキルクイズ）", "Slalom dojo skill quiz"], qn: MQB.SLALOM_BANK.length, s: 11, e: 12, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, cats: mqDoms(MQB.SLALOM_BANK, MQB.SLALOM_DOMAINS) },
+    { id: "Q-MNOTE", name: ["実務論点マップ​（論点クイズ）", "Practice issue map quiz"], qn: MQC.noteIssue.n, s: 9, e: 9, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, cats: mqDoms(MQC.noteIssue) },
+    { id: "Q-MSLQ", name: ["Slalom変革道場​（スキルクイズ）", "Slalom dojo skill quiz"], qn: MQC.slalom.n, s: 11, e: 12, hub: "megatech", qmile: true, mile: BOOTCAMP_QMILE, cats: mqDoms(MQC.slalom) },
   ],
-  practice: [{"id": "Q-P1", "name": ["基礎", "Core Reading"], "qn": 4, "unit": 1, "s": 9, "e": 9, "hub": "megatech", "cats": [{"n": ["戦略", "Strategy"], "q": 1}, {"n": ["論点マップ", "Issue Map"], "q": 1}, {"n": ["全体像（サービスマップ）", "Service Map"], "q": 1}, {"n": ["定量データ（ファクトブック）", "Factbook"], "q": 1}]}, {"id": "Q-P10", "name": ["暗黙知の形式知化", "Tacit → Explicit"], "qn": 9, "unit": 1, "s": 9, "e": 10, "hub": "megatech", "cats": [{"n": ["I 学問的土台 SECI×CTA", "I SECI x CTA"], "q": 1}, {"n": ["II 表出化の4特徴", "II Externalization"], "q": 1}, {"n": ["III 3+1 Step", "III 3+1 Steps"], "q": 1}, {"n": ["IV 8視点フレーム", "IV 8 Viewpoints"], "q": 1}, {"n": ["V CTA 5技法マッピング", "V CTA Techniques"], "q": 1}, {"n": ["VI OK&NG問答集", "VI OK & NG"], "q": 1}, {"n": ["VII 世界の関連手法13", "VII World Catalog"], "q": 1}, {"n": ["VIII 手法の選び方", "VIII Method Picker"], "q": 1}, {"n": ["IX 実装難易度スコアラー", "IX Difficulty Scorer"], "q": 1}]}, {"id": "Q-P11", "name": ["AX手法箱", "Method Toolbox"], "qn": 5, "unit": 1, "s": 10, "e": 11, "hub": "megatech", "cats": [{"n": ["I 業務可視化の記法5", "I Process Notations"], "q": 1}, {"n": ["II 発掘・優先順位付け", "II Discovery & Scoring"], "q": 1}, {"n": ["III PoC設計・効果測定", "III PoC & Benefits"], "q": 1}, {"n": ["IV Evals設計", "IV Evals Design"], "q": 1}, {"n": ["V データレディネス評価", "V Data Readiness"], "q": 1}]}, {"id": "Q-P2", "name": ["価値と診断", "Value & Assessment"], "qn": 5, "unit": 1, "s": 9, "e": 10, "hub": "megatech", "cats": [{"n": ["価値ドライバー", "Value Drivers"], "q": 1}, {"n": ["AX成熟度診断", "Maturity Assessment"], "q": 1}, {"n": ["ADOPT DESIGN（定着の設計図）", "Adoption Design"], "q": 1}, {"n": ["効果不振の診断ツリー", "Underperformance Triage"], "q": 1}, {"n": ["近未来レーダー", "Near-future Radar"], "q": 1}]}, {"id": "Q-P3", "name": ["提案の型 I〜XI", "Proposal Kit I-XI"], "qn": 11, "unit": 1, "s": 10, "e": 11, "hub": "megatech", "cats": [{"n": ["I 骨子7ステップ", "I Skeleton"], "q": 1}, {"n": ["II 案件検査10項目", "II Deal Check"], "q": 1}, {"n": ["III CFOに耐える計算", "III CFO Math"], "q": 1}, {"n": ["IV バトルカード", "IV Battlecards"], "q": 1}, {"n": ["V 想定問答12", "V Objections"], "q": 1}, {"n": ["VI 契約形態の型", "VI Contract Forms"], "q": 1}, {"n": ["VII フル提案書12P", "VII Sample Deck"], "q": 1}, {"n": ["VIII GOV GATE", "VIII GOV GATE"], "q": 1}, {"n": ["IX FIN GATE", "IX FIN GATE"], "q": 1}, {"n": ["X LAYER MAP", "X Layer Map"], "q": 1}, {"n": ["XI 契約・ステークホルダー", "XI Contracts & Stakeholders"], "q": 1}]}, {"id": "Q-P4", "name": ["商談実戦", "Deal Practice"], "qn": 4, "unit": 1, "s": 12, "e": 12, "hub": "megatech", "cats": [{"n": ["商談ドリル10", "Sales Drills"], "q": 1}, {"n": ["ディスカバリー質問8業種", "Discovery Questions"], "q": 1}, {"n": ["ケース演習10（AI採点）", "Case Work"], "q": 1}, {"n": ["模擬商談LIVE 5ペルソナ", "Live Deal Dojo"], "q": 1}]}, {"id": "Q-P5", "name": ["業界別（深掘り＋ツール）", "Industry Maps"], "qn": 8, "unit": 1, "s": 13, "e": 14, "hub": "megatech", "cats": [{"n": ["製造", "Manufacturing"], "q": 1}, {"n": ["金融", "Finance"], "q": 1}, {"n": ["小売・消費財", "Retail"], "q": 1}, {"n": ["物流・運輸", "Logistics"], "q": 1}, {"n": ["ヘルスケア・製薬", "Pharma"], "q": 1}, {"n": ["公共・自治体", "Public"], "q": 1}, {"n": ["エネルギー・公益", "Energy"], "q": 1}, {"n": ["建設・不動産", "Construction"], "q": 1}]}, {"id": "Q-P6", "name": ["エージェント棚", "Agent Shelf"], "qn": 4, "unit": 1, "s": 14, "e": 14, "hub": "megatech", "cats": [{"n": ["金融・保険", "Finance & Insurance"], "q": 1}, {"n": ["製造・建設・インフラ", "Mfg & Infra"], "q": 1}, {"n": ["小売・流通", "Retail & Dist."], "q": 1}, {"n": ["サービス・IT", "Service & IT"], "q": 1}]}, {"id": "Q-P7", "name": ["先端メニュー 15ドメイン", "Frontier Menu"], "qn": 15, "unit": 1, "s": 15, "e": 16, "hub": "megatech", "cats": [{"n": ["エージェントハーネス", "Agent Harness"], "q": 1}, {"n": ["エッジ・軽量化", "Edge & Quantization"], "q": 1}, {"n": ["トークン最適化", "Token Optimization"], "q": 1}, {"n": ["暗黙知の顕在化", "Tacit Knowledge"], "q": 1}, {"n": ["AI駆動開発", "AI-driven Dev"], "q": 1}, {"n": ["AgentOps・運用", "AgentOps"], "q": 1}, {"n": ["Physical AI", "Physical AI"], "q": 1}, {"n": ["Spatial AI", "Spatial AI"], "q": 1}, {"n": ["ロボット活用", "Robotics"], "q": 1}, {"n": ["データセンター・GPU", "DC & GPU"], "q": 1}, {"n": ["音声AI・対話", "Voice AI"], "q": 1}, {"n": ["ドキュメントAI・IDP", "Document AI"], "q": 1}, {"n": ["ドメイン特化モデル", "Custom Models"], "q": 1}, {"n": ["クリエイティブ・マーケAI", "Creative AI"], "q": 1}, {"n": ["AIサービス事業化", "AI Service Biz"], "q": 1}]}, {"id": "Q-P12", "name": ["統制の実務", "Governance Practice"], "qn": 2, "unit": 1, "s": 16, "e": 16, "hub": "megatech", "cats": [{"n": ["リスク評価実務（8行シート）", "Risk Sheet Practice"], "q": 1}, {"n": ["論点体系 S11×G16", "Issue Taxonomy S/G"], "q": 1}]}, {"id": "Q-P13", "name": ["変革の実務", "Transformation Practice"], "qn": 6, "unit": 1, "s": 11, "e": 11, "hub": "megatech", "cats": [{"n": ["I 役割の正体（3つの帽子）", "I Three Hats"], "q": 1}, {"n": ["II オペレーティングモデル6要素", "II Operating Model"], "q": 1}, {"n": ["III ADKAR 定着診断", "III ADKAR"], "q": 1}, {"n": ["IV デリバリーリードの5習慣", "IV Delivery Habits"], "q": 1}, {"n": ["V ベネフィット実現", "V Benefit Realization"], "q": 1}, {"n": ["VI データ人材の再設計", "VI Data Talent"], "q": 1}]}, {"id": "Q-P19", "name": ["ITセキュリティ基盤", "IT Security Foundations"], "qn": 8, "unit": 1, "s": 12, "e": 12, "hub": "megatech", "cats": [{"n": ["エンドポイント", "Endpoint"], "q": 1}, {"n": ["ID・アクセス", "Identity"], "q": 1}, {"n": ["ネットワーク境界", "Network"], "q": 1}, {"n": ["クラウドアクセス・SASE", "SASE"], "q": 1}, {"n": ["クラウド基盤", "Cloud"], "q": 1}, {"n": ["データ保護", "Data"], "q": 1}, {"n": ["監視・運用", "Operations"], "q": 1}, {"n": ["ガバナンス・フレームワーク", "Frameworks"], "q": 1}]}, {"id": "Q-P18", "name": ["業務再設計（BPR）", "Process Redesign (BPR)"], "qn": 7, "unit": 1, "s": 11, "e": 11, "hub": "megatech", "cats": [{"n": ["I 改善ロードマップ", "I Roadmap"], "q": 1}, {"n": ["II 消せる仕事10類型", "II Removable Work"], "q": 1}, {"n": ["III システム化の判定", "III System or Excel"], "q": 1}, {"n": ["IV 定着の構造", "IV Adoption"], "q": 1}, {"n": ["V KPIの付け替え", "V KPI Swap"], "q": 1}, {"n": ["VI 着手前の関門", "VI Gates"], "q": 1}, {"n": ["VII 横断8論点", "VII Eight Shifts"], "q": 1}]}, {"id": "Q-P14", "name": ["ファーム実務", "Global Firm Practice"], "qn": 4, "unit": 1, "s": 11, "e": 12, "hub": "megatech", "cats": [{"n": ["I 案件の入口2型", "I Deal Origination"], "q": 1}, {"n": ["II ラダーと昇進", "II Ladder & Promotion"], "q": 1}, {"n": ["III 面接想定問答5", "III Interview Q&A"], "q": 1}, {"n": ["IV 最初の90日", "IV First 90 Days"], "q": 1}]}, {"id": "Q-P15", "name": ["グローバル事例", "Global Cases"], "qn": 5, "unit": 1, "s": 12, "e": 12, "hub": "megatech", "cats": [{"n": ["I 事例11件（課題・打ち手・指標）", "I Eleven Cases"], "q": 1}, {"n": ["II 4つの型", "II Four Patterns"], "q": 1}, {"n": ["III 日本法人", "III The Japan Entity"], "q": 1}, {"n": ["VI 調査数値の扱い", "VI Handling Survey Figures"], "q": 1}, {"n": ["VIII 日本への翻訳の落とし穴", "VIII Translating to Japan"], "q": 1}]}, {"id": "Q-P16", "name": ["Slalom変革道場", "Slalom Dojo"], "qn": 5, "unit": 1, "s": 11, "e": 12, "hub": "megatech", "cats": [{"n": ["求められるスキル", "Skills"], "q": 1}, {"n": ["会社とTransformation", "Firm & practice"], "q": 1}, {"n": ["Slalomの事例", "Slalom cases"], "q": 1}, {"n": ["場面演習", "Scenario drills"], "q": 1}, {"n": ["90日計画・自己評価", "90 days & self-check"], "q": 1}]}, {"id": "Q-P17", "name": ["実務論点マップ", "Practice Issue Map"], "qn": 4, "unit": 1, "s": 9, "e": 9, "hub": "megatech", "cats": [{"n": ["論点マップ", "Issue map"], "q": 1}, {"n": ["統治の論点", "Governance"], "q": 1}, {"n": ["一次ソースと検証", "Sources & checks"], "q": 1}, {"n": ["記事エクスプローラ", "Articles"], "q": 1}]}, {"id": "Q-P8", "name": ["失敗学・事象", "Postmortems & Phenomena"], "qn": 13, "unit": 1, "s": 17, "e": 17, "hub": "megatech", "cats": [{"n": ["事象ファイル24", "Phenomena File"], "q": 1}, {"n": ["Zillow", "Zillow"], "q": 1}, {"n": ["Watson Health", "Watson Health"], "q": 1}, {"n": ["Air Canada", "Air Canada"], "q": 1}, {"n": ["McDonald's", "McDonald's"], "q": 1}, {"n": ["NYC MyCity", "NYC MyCity"], "q": 1}, {"n": ["Samsung", "Samsung"], "q": 1}, {"n": ["Amazon採用AI", "Amazon HR"], "q": 1}, {"n": ["英A-level", "UK A-levels"], "q": 1}, {"n": ["Avianca判例", "Avianca"], "q": 1}, {"n": ["Klarna", "Klarna"], "q": 1}, {"n": ["Bardデモ", "Bard demo"], "q": 1}, {"n": ["Deloitte豪", "Deloitte AU"], "q": 1}]}, {"id": "Q-P9", "name": ["リサーチ", "Research"], "qn": 5, "unit": 1, "s": 18, "e": 19, "hub": "megatech", "cats": [{"n": [`企業研究${MQB.COMPANIES.length}社`, `${MQB.COMPANIES.length} Companies`], "q": 1}, {"n": ["提供モデルの型", "Delivery Models"], "q": 1}, {"n": ["日本市場ビュー", "JP Market"], "q": 1}, {"n": ["AGI・ASI仮説トレ", "AGI/ASI Gym"], "q": 1}, {"n": ["PLAYBOOK 5ガイド", "Playbook Guides"], "q": 1}]}],
+  practice: [{"id": "Q-P1", "name": ["基礎", "Core Reading"], "qn": 4, "unit": 1, "s": 9, "e": 9, "hub": "megatech", "cats": [{"n": ["戦略", "Strategy"], "q": 1}, {"n": ["論点マップ", "Issue Map"], "q": 1}, {"n": ["全体像（サービスマップ）", "Service Map"], "q": 1}, {"n": ["定量データ（ファクトブック）", "Factbook"], "q": 1}]}, {"id": "Q-P10", "name": ["暗黙知の形式知化", "Tacit → Explicit"], "qn": 9, "unit": 1, "s": 9, "e": 10, "hub": "megatech", "cats": [{"n": ["I 学問的土台 SECI×CTA", "I SECI x CTA"], "q": 1}, {"n": ["II 表出化の4特徴", "II Externalization"], "q": 1}, {"n": ["III 3+1 Step", "III 3+1 Steps"], "q": 1}, {"n": ["IV 8視点フレーム", "IV 8 Viewpoints"], "q": 1}, {"n": ["V CTA 5技法マッピング", "V CTA Techniques"], "q": 1}, {"n": ["VI OK&NG問答集", "VI OK & NG"], "q": 1}, {"n": ["VII 世界の関連手法13", "VII World Catalog"], "q": 1}, {"n": ["VIII 手法の選び方", "VIII Method Picker"], "q": 1}, {"n": ["IX 実装難易度スコアラー", "IX Difficulty Scorer"], "q": 1}]}, {"id": "Q-P11", "name": ["AX手法箱", "Method Toolbox"], "qn": 5, "unit": 1, "s": 10, "e": 11, "hub": "megatech", "cats": [{"n": ["I 業務可視化の記法5", "I Process Notations"], "q": 1}, {"n": ["II 発掘・優先順位付け", "II Discovery & Scoring"], "q": 1}, {"n": ["III PoC設計・効果測定", "III PoC & Benefits"], "q": 1}, {"n": ["IV Evals設計", "IV Evals Design"], "q": 1}, {"n": ["V データレディネス評価", "V Data Readiness"], "q": 1}]}, {"id": "Q-P2", "name": ["価値と診断", "Value & Assessment"], "qn": 5, "unit": 1, "s": 9, "e": 10, "hub": "megatech", "cats": [{"n": ["価値ドライバー", "Value Drivers"], "q": 1}, {"n": ["AX成熟度診断", "Maturity Assessment"], "q": 1}, {"n": ["ADOPT DESIGN（定着の設計図）", "Adoption Design"], "q": 1}, {"n": ["効果不振の診断ツリー", "Underperformance Triage"], "q": 1}, {"n": ["近未来レーダー", "Near-future Radar"], "q": 1}]}, {"id": "Q-P3", "name": ["提案の型 I〜XI", "Proposal Kit I-XI"], "qn": 11, "unit": 1, "s": 10, "e": 11, "hub": "megatech", "cats": [{"n": ["I 骨子7ステップ", "I Skeleton"], "q": 1}, {"n": ["II 案件検査10項目", "II Deal Check"], "q": 1}, {"n": ["III CFOに耐える計算", "III CFO Math"], "q": 1}, {"n": ["IV バトルカード", "IV Battlecards"], "q": 1}, {"n": ["V 想定問答12", "V Objections"], "q": 1}, {"n": ["VI 契約形態の型", "VI Contract Forms"], "q": 1}, {"n": ["VII フル提案書12P", "VII Sample Deck"], "q": 1}, {"n": ["VIII GOV GATE", "VIII GOV GATE"], "q": 1}, {"n": ["IX FIN GATE", "IX FIN GATE"], "q": 1}, {"n": ["X LAYER MAP", "X Layer Map"], "q": 1}, {"n": ["XI 契約・ステークホルダー", "XI Contracts & Stakeholders"], "q": 1}]}, {"id": "Q-P4", "name": ["商談実戦", "Deal Practice"], "qn": 4, "unit": 1, "s": 12, "e": 12, "hub": "megatech", "cats": [{"n": ["商談ドリル10", "Sales Drills"], "q": 1}, {"n": ["ディスカバリー質問8業種", "Discovery Questions"], "q": 1}, {"n": ["ケース演習10（AI採点）", "Case Work"], "q": 1}, {"n": ["模擬商談LIVE 5ペルソナ", "Live Deal Dojo"], "q": 1}]}, {"id": "Q-P5", "name": ["業界別（深掘り＋ツール）", "Industry Maps"], "qn": 8, "unit": 1, "s": 13, "e": 14, "hub": "megatech", "cats": [{"n": ["製造", "Manufacturing"], "q": 1}, {"n": ["金融", "Finance"], "q": 1}, {"n": ["小売・消費財", "Retail"], "q": 1}, {"n": ["物流・運輸", "Logistics"], "q": 1}, {"n": ["ヘルスケア・製薬", "Pharma"], "q": 1}, {"n": ["公共・自治体", "Public"], "q": 1}, {"n": ["エネルギー・公益", "Energy"], "q": 1}, {"n": ["建設・不動産", "Construction"], "q": 1}]}, {"id": "Q-P6", "name": ["エージェント棚", "Agent Shelf"], "qn": 4, "unit": 1, "s": 14, "e": 14, "hub": "megatech", "cats": [{"n": ["金融・保険", "Finance & Insurance"], "q": 1}, {"n": ["製造・建設・インフラ", "Mfg & Infra"], "q": 1}, {"n": ["小売・流通", "Retail & Dist."], "q": 1}, {"n": ["サービス・IT", "Service & IT"], "q": 1}]}, {"id": "Q-P7", "name": ["先端メニュー 15ドメイン", "Frontier Menu"], "qn": 15, "unit": 1, "s": 15, "e": 16, "hub": "megatech", "cats": [{"n": ["エージェントハーネス", "Agent Harness"], "q": 1}, {"n": ["エッジ・軽量化", "Edge & Quantization"], "q": 1}, {"n": ["トークン最適化", "Token Optimization"], "q": 1}, {"n": ["暗黙知の顕在化", "Tacit Knowledge"], "q": 1}, {"n": ["AI駆動開発", "AI-driven Dev"], "q": 1}, {"n": ["AgentOps・運用", "AgentOps"], "q": 1}, {"n": ["Physical AI", "Physical AI"], "q": 1}, {"n": ["Spatial AI", "Spatial AI"], "q": 1}, {"n": ["ロボット活用", "Robotics"], "q": 1}, {"n": ["データセンター・GPU", "DC & GPU"], "q": 1}, {"n": ["音声AI・対話", "Voice AI"], "q": 1}, {"n": ["ドキュメントAI・IDP", "Document AI"], "q": 1}, {"n": ["ドメイン特化モデル", "Custom Models"], "q": 1}, {"n": ["クリエイティブ・マーケAI", "Creative AI"], "q": 1}, {"n": ["AIサービス事業化", "AI Service Biz"], "q": 1}]}, {"id": "Q-P12", "name": ["統制の実務", "Governance Practice"], "qn": 2, "unit": 1, "s": 16, "e": 16, "hub": "megatech", "cats": [{"n": ["リスク評価実務（8行シート）", "Risk Sheet Practice"], "q": 1}, {"n": ["論点体系 S11×G16", "Issue Taxonomy S/G"], "q": 1}]}, {"id": "Q-P13", "name": ["変革の実務", "Transformation Practice"], "qn": 6, "unit": 1, "s": 11, "e": 11, "hub": "megatech", "cats": [{"n": ["I 役割の正体（3つの帽子）", "I Three Hats"], "q": 1}, {"n": ["II オペレーティングモデル6要素", "II Operating Model"], "q": 1}, {"n": ["III ADKAR 定着診断", "III ADKAR"], "q": 1}, {"n": ["IV デリバリーリードの5習慣", "IV Delivery Habits"], "q": 1}, {"n": ["V ベネフィット実現", "V Benefit Realization"], "q": 1}, {"n": ["VI データ人材の再設計", "VI Data Talent"], "q": 1}]}, {"id": "Q-P19", "name": ["ITセキュリティ基盤", "IT Security Foundations"], "qn": 8, "unit": 1, "s": 12, "e": 12, "hub": "megatech", "cats": [{"n": ["エンドポイント", "Endpoint"], "q": 1}, {"n": ["ID・アクセス", "Identity"], "q": 1}, {"n": ["ネットワーク境界", "Network"], "q": 1}, {"n": ["クラウドアクセス・SASE", "SASE"], "q": 1}, {"n": ["クラウド基盤", "Cloud"], "q": 1}, {"n": ["データ保護", "Data"], "q": 1}, {"n": ["監視・運用", "Operations"], "q": 1}, {"n": ["ガバナンス・フレームワーク", "Frameworks"], "q": 1}]}, {"id": "Q-P18", "name": ["業務再設計（BPR）", "Process Redesign (BPR)"], "qn": 7, "unit": 1, "s": 11, "e": 11, "hub": "megatech", "cats": [{"n": ["I 改善ロードマップ", "I Roadmap"], "q": 1}, {"n": ["II 消せる仕事10類型", "II Removable Work"], "q": 1}, {"n": ["III システム化の判定", "III System or Excel"], "q": 1}, {"n": ["IV 定着の構造", "IV Adoption"], "q": 1}, {"n": ["V KPIの付け替え", "V KPI Swap"], "q": 1}, {"n": ["VI 着手前の関門", "VI Gates"], "q": 1}, {"n": ["VII 横断8論点", "VII Eight Shifts"], "q": 1}]}, {"id": "Q-P14", "name": ["ファーム実務", "Global Firm Practice"], "qn": 4, "unit": 1, "s": 11, "e": 12, "hub": "megatech", "cats": [{"n": ["I 案件の入口2型", "I Deal Origination"], "q": 1}, {"n": ["II ラダーと昇進", "II Ladder & Promotion"], "q": 1}, {"n": ["III 面接想定問答5", "III Interview Q&A"], "q": 1}, {"n": ["IV 最初の90日", "IV First 90 Days"], "q": 1}]}, {"id": "Q-P15", "name": ["グローバル事例", "Global Cases"], "qn": 5, "unit": 1, "s": 12, "e": 12, "hub": "megatech", "cats": [{"n": ["I 事例11件（課題・打ち手・指標）", "I Eleven Cases"], "q": 1}, {"n": ["II 4つの型", "II Four Patterns"], "q": 1}, {"n": ["III 日本法人", "III The Japan Entity"], "q": 1}, {"n": ["VI 調査数値の扱い", "VI Handling Survey Figures"], "q": 1}, {"n": ["VIII 日本への翻訳の落とし穴", "VIII Translating to Japan"], "q": 1}]}, {"id": "Q-P16", "name": ["Slalom変革道場", "Slalom Dojo"], "qn": 5, "unit": 1, "s": 11, "e": 12, "hub": "megatech", "cats": [{"n": ["求められるスキル", "Skills"], "q": 1}, {"n": ["会社とTransformation", "Firm & practice"], "q": 1}, {"n": ["Slalomの事例", "Slalom cases"], "q": 1}, {"n": ["場面演習", "Scenario drills"], "q": 1}, {"n": ["90日計画・自己評価", "90 days & self-check"], "q": 1}]}, {"id": "Q-P17", "name": ["実務論点マップ", "Practice Issue Map"], "qn": 4, "unit": 1, "s": 9, "e": 9, "hub": "megatech", "cats": [{"n": ["論点マップ", "Issue map"], "q": 1}, {"n": ["統治の論点", "Governance"], "q": 1}, {"n": ["一次ソースと検証", "Sources & checks"], "q": 1}, {"n": ["記事エクスプローラ", "Articles"], "q": 1}]}, {"id": "Q-P8", "name": ["失敗学・事象", "Postmortems & Phenomena"], "qn": 13, "unit": 1, "s": 17, "e": 17, "hub": "megatech", "cats": [{"n": ["事象ファイル24", "Phenomena File"], "q": 1}, {"n": ["Zillow", "Zillow"], "q": 1}, {"n": ["Watson Health", "Watson Health"], "q": 1}, {"n": ["Air Canada", "Air Canada"], "q": 1}, {"n": ["McDonald's", "McDonald's"], "q": 1}, {"n": ["NYC MyCity", "NYC MyCity"], "q": 1}, {"n": ["Samsung", "Samsung"], "q": 1}, {"n": ["Amazon採用AI", "Amazon HR"], "q": 1}, {"n": ["英A-level", "UK A-levels"], "q": 1}, {"n": ["Avianca判例", "Avianca"], "q": 1}, {"n": ["Klarna", "Klarna"], "q": 1}, {"n": ["Bardデモ", "Bard demo"], "q": 1}, {"n": ["Deloitte豪", "Deloitte AU"], "q": 1}]}, {"id": "Q-P9", "name": ["リサーチ", "Research"], "qn": 5, "unit": 1, "s": 18, "e": 19, "hub": "megatech", "cats": [{"n": [`企業研究${MQC.companies}社`, `${MQC.companies} Companies`], "q": 1}, {"n": ["提供モデルの型", "Delivery Models"], "q": 1}, {"n": ["日本市場ビュー", "JP Market"], "q": 1}, {"n": ["AGI・ASI仮説トレ", "AGI/ASI Gym"], "q": 1}, {"n": ["PLAYBOOK 5ガイド", "Playbook Guides"], "q": 1}]}],
   cons: [
     { id: "Q-CG", name: ["基礎暗記・用語辞典", "Basics/Glossary 167"], qn: 167, s: 1, e: 1, hub: "consulting", qmile: true, mile: BOOTCAMP_QMILE, mk: "cons", mi: 7, cats: [{n:["ロジカル","Logical"],q:22},{n:["クリティカル","Critical"],q:25},{n:["ラテラル","Lateral"],q:16},{n:["クリエイティブ","Creative"],q:17},{n:["構造化","Structuring"],q:21},{n:["DX","DX"],q:15},{n:["AI","AI"],q:15},{n:["論点思考","Issue"],q:18},{n:["仮説思考","Hypothesis"],q:18}] },
     { id: "Q-C0", name: ["ロジカル​シンキング", "Logical Thinking"], qn: 237, s: 1, e: 1, hub: "consulting", qmile: true, mile: BOOTCAMP_QMILE, mk: "cons", mi: 0, cats: [{n:["Lv1 基礎","Lv1 basics"],q:10},{n:["Lv2 標準","Lv2 core"],q:122},{n:["Lv3 応用","Lv3 applied"],q:70},{n:["Lv4 発展","Lv4 advanced"],q:35}] },
@@ -231076,8 +231185,14 @@ const NOVA_REVIEW_KEYS = [
 // 形式が WEAK_SOURCES と違うハブ（Finance・Linguistics・Language・Liberal Arts・Book-Summary）。
 // keys() の値を読み、read() で [{ dom: [日本語, English], a: 解答数, c: 正解数 }] に直す。
 const NOVA_WEAK_EXTRA = [
+  // CLF の分野表は Certification Hub の中にある（ビルドでは開いたときに読み込む別ファイル）。記録があるときだけ読み込んで数える
   { hub: ["AWS CLF-C02", "AWS CLF-C02"], keys: () => ["clf_c02_dashboard_v1"],
-    read: (vals) => (CertHubModule.CLF_WEAK ? CertHubModule.CLF_WEAK(vals["clf_c02_dashboard_v1"]) : []) },
+    read: async (vals) => {
+      const st = vals["clf_c02_dashboard_v1"];
+      if (!st || !st.results || typeof st.results !== "object" || !Object.keys(st.results).length) return [];
+      const m = await novaHubReady(CertHubModule);
+      return m && m.CLF_WEAK ? m.CLF_WEAK(st) : [];
+    } },
   { hub: ["Finance Hub", "Finance Hub"], keys: () => (FinanceHubModule.WEAK_KEYS ? FinanceHubModule.WEAK_KEYS() : []).map((x) => x.key),
     read: (vals) => (FinanceHubModule.WEAK_KEYS ? FinanceHubModule.WEAK_KEYS() : []).map((x) => {
       const v = vals[x.key]; if (!v || typeof v !== "object") return null;
@@ -231129,9 +231244,10 @@ function NovaWeakRadar({ lang }) {
     for (const ex of NOVA_WEAK_EXTRA) {
       const vals = {};
       for (const k of ex.keys()) { try { const r = await window.storage.get(k); if (r && r.value) vals[k] = JSON.parse(r.value); } catch (e) {} }
-      let got = [];
-      try { got = ex.read(vals) || []; } catch (e) { got = []; }
-      if (!got.length) { out.push({ hub: ex.hub, empty: true }); continue; }
+      let got = [], failed = false;
+      try { got = (await ex.read(vals)) || []; } catch (e) { got = []; failed = true; }
+      // 読み込めなかったハブ（別ファイルのハブをネットなしで開いたときなど）は「記録なし」と区別する
+      if (!got.length) { out.push({ hub: failed ? [ex.hub[0] + "（読み込めず）", ex.hub[1] + " (could not load)"] : ex.hub, empty: true }); continue; }
       got.forEach((r) => out.push({ hub: ex.hub, dom: r.dom[en ? 1 : 0], a: r.a, c: r.c, acc: r.a ? r.c / r.a : 0 }));
     }
     const q = [];

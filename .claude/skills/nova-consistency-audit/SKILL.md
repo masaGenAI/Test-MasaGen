@@ -80,8 +80,13 @@ python3 .claude/skills/nova-consistency-audit/scripts/stale_scan.py --review   #
 
 - **モジュールの内側は外から見えない。** 各ハブは `const XxxHubModule = (function () { ... return Component; })();` の中に
   閉じている。MCQS などのバンクはトップレベルからは参照できず、参照すると「MCQS is not defined」で**ポータルごと白画面になる**。
-  返すコンポーネントの静的プロパティとして渡し（例：`GafaHub.MASTERY_BANKS`、`GafaHub.TAB_COUNT`、
-  `LinguisticsHub.FIELD_STATS`）、外側では `MegaTechHubModule.MASTERY_BANKS` のように読む。
+  返すコンポーネントの静的プロパティとして渡し（例：`GafaHub.MASTERY_COUNTS`、`GafaHub.TAB_COUNT`、
+  `LinguisticsHub.FIELD_STATS`）、外側では `MegaTechHubModule.MASTERY_COUNTS` のように読む。
+- **TechHub と Certification Hub は、ビルドでは別ファイル。** `npm run build` のとき `nova-app/scripts/lazy-hubs.mjs` が
+  `MegaTechHubModule`・`CertHubModule` を `dist/nova-hub-*.js` に切り出し、ハブを開いたときに読み込む。ポータルの最初の描画で
+  読む静的プロパティは、`vite.config.js` の `novaLazyHubs` の `values`／`byLang` に書いたものだけがビルド時に計算されて埋め込まれる
+  （書いていないものを外側で読むとビルドが止まる）。値は件数などの素のデータにする（バンク本体を渡すと切り出した意味がなくなる）。
+  関数など、その場で中身が要るものは `await novaHubReady(CertHubModule)` で読み込みを待ってから使う（弱点レーダーの CLF が例）。
 - **宣言順（TDZ）。** トップレベルの `const` は上から順に評価される。ポータルの `NOVA_STATIONS` は `BOOTCAMP_QUEST` より前にあるので、
   タグは getter（`get tagJa() {...}`）と遅延計算（`novaStats()`）で描画時に数える。
 - **ユーザーの記録を壊さない。** 復習スケジュール・復習キュー・完了チェックは、問題の添字や範囲のキーで端末に保存されている。
