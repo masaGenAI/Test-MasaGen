@@ -80,7 +80,7 @@ function DoneCheck({ on, onToggle, size = 13, en }) {
     <span role="checkbox" aria-checked={!!on} tabIndex={0}
       onClick={(e) => onToggle(e)}
       title={en ? "Toggle done" : "完了にする / 解除"}
-      style={{ cursor: "pointer", fontSize: size, lineHeight: 1, userSelect: "none", color: on ? "#16A34A" : "#94a3b8", marginRight: 5 }}>
+      style={{ cursor: "pointer", fontSize: size, lineHeight: 1, userSelect: "none", color: on ? "#16A34A" : "currentColor", opacity: on ? 1 : .75, marginRight: 5 }}>
       {on ? "☑" : "☐"}
     </span>
   );
@@ -1656,7 +1656,7 @@ function CertCompletion({ state, storeKey, figsKey, figsTotal, bankLen, lang, C 
     <div style={{ background: (C && C.light) || "#F2F7FB", border: `1px solid ${(C && C.mid) || "#cfe0ee"}`, borderRadius: 12, padding: "13px 16px", marginBottom: 14 }}>
       <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
         <span style={{ fontSize: 12.5, fontWeight: 800, color: ink }}>{en ? "Completion" : "学習完了度"}</span>
-        <span style={{ fontSize: 22, fontWeight: 800, color: compPct >= 100 ? "#158F6B" : col }}>{compPct}<span style={{ fontSize: 12 }}>%</span></span>
+        <span style={{ fontSize: 22, fontWeight: 800, color: compPct >= 100 ? "#158F6B" : nvInk(col, (C && C.light) || "#F2F7FB") }}>{compPct}<span style={{ fontSize: 12 }}>%</span></span>
         <span style={{ fontSize: 10.5, color: "#5f6974" }}>{en ? "quiz · mock exams · diagrams" : "クイズ・模試・図解の完了を計測"}</span>
       </div>
       {bar(en ? "Quiz coverage" : "クイズ消化", quizPct, `${Math.min(ta, bankLen)}/${bankLen}${en ? "" : "問"}`)}
@@ -1728,7 +1728,7 @@ function StarButton({ id, text, scope, size }) {
   return (
     <button onClick={(e) => { e.stopPropagation(); StarStore.toggle(id, { t: (text || "").slice(0, 160), s: scope || "" }); }}
       title={starred ? "★を外す" : "あとで振り返る（★）"}
-      style={{ background: "transparent", border: "none", cursor: "pointer", fontSize: size || 17, lineHeight: 1, color: starred ? "#E8A03D" : "#b9c3cd", padding: "2px 4px", flexShrink: 0 }}>
+      style={{ background: "transparent", border: "none", cursor: "pointer", fontSize: size || 17, lineHeight: 1, color: starred ? "#B7791F" : "#7f8b98", padding: "2px 4px", flexShrink: 0 }}>
       {starred ? "★" : "☆"}
     </button>
   );
@@ -2513,7 +2513,7 @@ function CmpOne({ c, C, en }) {
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14, marginBottom: 14 }}>
       <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
         <div style={{ fontSize: 14, fontWeight: 700, color: C.deep }}>{en ? c.titleEn : c.title}</div>
-        <span style={{ fontSize: 10.5, color: "#94a3b8" }}>{en ? "click a header to sort ・ hover to highlight ・ click a row to pin" : "見出しクリックで並替 ・ ホバーで強調 ・ 行クリックで固定"}</span>
+        <span style={{ fontSize: 10.5, color: "#64748b" }}>{en ? "click a header to sort ・ hover to highlight ・ click a row to pin" : "見出しクリックで並替 ・ ホバーで強調 ・ 行クリックで固定"}</span>
         {(sortBy != null || pin != null) ? <button onClick={() => { setSortBy(null); setDir(1); setPin(null); }} style={{ fontSize: 10, border: `1px solid ${C.mid}`, background: "#fff", color: C.deep, borderRadius: 6, padding: "2px 7px", cursor: "pointer" }}>{en ? "reset" : "解除"}</button> : null}
       </div>
       <div style={{ overflowX: "auto" }}>
@@ -2587,7 +2587,7 @@ function GlossaryView({ GLOSSARY, GLOSSARY_CATS, DOM_HUE, C, lang, t }) {
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14, alignItems: "center" }}>
         {(GLOSSARY_CATS || []).map((k) => (
           <button key={k} onClick={() => setCat(k)}
-            style={{ padding: "5px 11px", borderRadius: 16, fontSize: 12, cursor: "pointer", border: `1px solid ${cat === k ? C.primary : C.mid}`, background: cat === k ? C.primary : "#fff", color: cat === k ? C.deep : C.ink, fontWeight: 600 }}>
+            style={{ padding: "5px 11px", borderRadius: 16, fontSize: 12, cursor: "pointer", border: `1px solid ${cat === k ? C.primary : C.mid}`, background: cat === k ? C.primary : "#fff", color: cat === k ? nvInk(C.deep, C.primary) : C.ink, fontWeight: 600 }}>
             {k === "すべて" ? t.allFields : k}
           </button>
         ))}
@@ -2598,7 +2598,7 @@ function GlossaryView({ GLOSSARY, GLOSSARY_CATS, DOM_HUE, C, lang, t }) {
       {list.map((g, i) => (
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 9 }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
-            <span style={{ background: DOM_HUE[g[0]], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{g[0]}</span>
+            <span style={{ background: DOM_HUE[g[0]], color: nvInk("#ffffff", DOM_HUE[g[0]]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{g[0]}</span>
             <span style={{ fontWeight: 700, fontSize: 14, color: C.deep }}>{g[1]}</span>
             {g[2] !== "-" && <span style={{ fontSize: 11.5, color: "#7b6d62" }}>{g[2]}</span>}
           </div>
@@ -3188,7 +3188,7 @@ function Stat({ label, value, color }) {
   return (
     <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 12, padding: "16px 18px" }}>
       <div style={{ fontSize: 12, color: C.slateLight, marginBottom: 6 }}>{label}</div>
-      <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
+      <div style={{ fontSize: 26, fontWeight: 800, color: color ? nvInk(color, "#ffffff", 3) : undefined }}>{value}</div>
     </div>
   );
 }
@@ -173841,14 +173841,14 @@ function MSExamShell({ sets, setKeys, domainSets, domains, lang, C, PASS, dName,
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{T.modeHint}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", T.practice], ["real", T.real]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? nvInk(C.deep, "#ffffff") : nvInk("#53757f", C.light), boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
         {domainSets && (
           <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
             {[["normal", T.fullSet], ["domain", T.byDomain]].map(([kk, label]) => (
-              <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? "#fff" : C.ink }}>{label}</button>
+              <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff") }}>{label}</button>
             ))}
           </div>
         )}
@@ -173858,13 +173858,13 @@ function MSExamShell({ sets, setKeys, domainSets, domains, lang, C, PASS, dName,
               <span style={{ background: d.hue || C.primary, color: nvInk("#ffffff", d.hue || C.primary), borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
               <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep }}>{en ? (d.nameEn || d.name) : d.name}</span>
             </span>
-            <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary }}>{T.start}</span>
+            <span style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff") }}>{T.start}</span>
           </button>
         ))}
         {kind === "normal" && setKeys.map(n => (
           <button key={n} onClick={() => start(n)} style={{ width: "100%", textAlign: "left", padding: "15px 16px", marginBottom: 10, borderRadius: 11, border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontWeight: 700, fontSize: 15, color: C.deep }}><DoneCheck on={mockDone.has("s"+n)} onToggle={(e) => mockDone.toggle("s"+n, e)} />{T.setW} {n}</span>
-            <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary }}>{mode === "practice" ? T.practice : T.real}</span>
+            <span style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff") }}>{mode === "practice" ? T.practice : T.real}</span>
           </button>
         ))}
       </div>
@@ -173891,7 +173891,7 @@ function MSExamShell({ sets, setKeys, domainSets, domains, lang, C, PASS, dName,
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
-          <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Set select" : "セット選択"}</button>
+          <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Set select" : "セット選択"}</button>
         </div>
       </div>
     );
@@ -173938,10 +173938,10 @@ function MSExamShell({ sets, setKeys, domainSets, domains, lang, C, PASS, dName,
                 </div>
                 <div style={{ padding: 16, fontSize: 13.5, color: "#1b2a33", lineHeight: 1.7 }}>
                   {tool === "detail" && (<div>{en ? "Domain" : "領域"}：<b>{Q.d} {domLabel(Q.d)}</b><br />{en ? "Question" : "問題番号"}：{pos + 1} / {qs.length}</div>)}
-                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? "#fff" : "#1b2a33" }}>{i + 1}</button>))}</div>)}
+                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? nvInk("#ffffff", C.primary) : nvInk("#1b2a33", "#ffffff") }}>{i + 1}</button>))}</div>)}
                   {tool === "break" && (<div>{en ? "The exam timer keeps running during a break." : "休憩中も試験タイマーは継続します。"}</div>)}
                   {tool === "help" && (<div>{en ? "Choose your answer(s), use Reset to clear, flag for later review, and navigate with Back/Next." : "選択肢で解答し、解答のリセットで取り消し、あとで見直すでフラグ、戻る／次へで移動します。"}</div>)}
-                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? "#fff" : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
+                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? nvInk("#ffffff", "#12324a") : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
                 </div>
                 <div style={{ padding: "10px 16px", borderTop: "1px solid #e3e9ed", textAlign: "right" }}><button onClick={() => setTool(null)} style={{ padding: "8px 18px", borderRadius: 6, border: "none", background: "#12324a", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{en ? "Close" : "閉じる"}</button></div>
               </div>
@@ -173988,7 +173988,7 @@ function MSExamShell({ sets, setKeys, domainSets, domains, lang, C, PASS, dName,
         <span>{Q.d} {domLabel(Q.d)}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginTop: 12 }}>
-        {pMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${pNeed} answers. (${submitted ? selSet.length : mSel.length}/${pNeed})` : `正しい回答を${pNeed}つ選択してください。（${submitted ? selSet.length : mSel.length}/${pNeed} 選択中）`}</div>}
+        {pMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${pNeed} answers. (${submitted ? selSet.length : mSel.length}/${pNeed})` : `正しい回答を${pNeed}つ選択してください。（${submitted ? selSet.length : mSel.length}/${pNeed} 選択中）`}</div>}
         <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{L2(Q, "q")}</div>
         {opts.map((opt, i) => {
           if (pMulti) { const chosen = submitted ? selSet.includes(i) : mSel.includes(i); const isC = Q.a.includes(i); let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (isC) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (chosen) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } } else if (chosen) { bg = C.light; bd = C.primary; col = C.deep; }
@@ -174002,7 +174002,7 @@ function MSExamShell({ sets, setKeys, domainSets, domains, lang, C, PASS, dName,
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
         <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : C.primary, cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
         <span style={{ fontSize: 13, color: "#5a7780", fontWeight: 600 }}>{pos + 1} / {qs.length}</span>
-        <button onClick={next} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{en ? "Next →" : "次の問題へ →"}</button>
+        <button onClick={next} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), cursor: "pointer" }}>{en ? "Next →" : "次の問題へ →"}</button>
       </div>
     </div>
   );
@@ -175972,7 +175972,7 @@ function App() {
       <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ fontSize: 19, fontWeight: 700 }}>
-            <span style={{ color: nvInk(C.primary, "#ffffff") }}>aws</span> {t.appTitle}
+            <span style={{ color: C.primary }}>aws</span> {t.appTitle}
           </div>
           <div style={{ fontSize: 12, marginTop: 2 }}>{t.appSub}</div>
         </div>
@@ -175980,7 +175980,7 @@ function App() {
           {["ja", "en"].map(l => (
             <button key={l} onClick={() => setLang(l)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "5px 12px", fontSize: 12, fontWeight: 700,
-                background: lang === l ? "#fff" : "transparent", color: lang === l ? C.deep : "#fff" }}>
+                background: lang === l ? "#fff" : "transparent", color: lang === l ? nvInk(C.deep, "#ffffff") : "#fff" }}>
               {l === "ja" ? "日本語" : "English"}
             </button>
           ))}
@@ -175990,7 +175990,7 @@ function App() {
         {TABS.map(([k, label]) => (
           <button key={k} onClick={() => setTab(k)}
             style={{ flex: "1 1 auto", padding: "11px 8px", border: "none", cursor: "pointer",
-              background: tab === k ? "#fff" : "transparent", color: tab === k ? C.deep : C.ink,
+              background: tab === k ? "#fff" : "transparent", color: tab === k ? nvInk(C.deep, "#ffffff") : C.ink,
               fontWeight: tab === k ? 700 : 500, fontSize: 13, borderBottom: tab === k ? `3px solid ${C.primary}` : "3px solid transparent" }}>
             {label}
           </button>
@@ -176081,7 +176081,7 @@ function Stat({ label, value, sub, color }) {
   return (
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#6b5d52" }}>{label}</div>
-      <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
+      <div style={{ fontSize: 26, fontWeight: 800, color: color ? nvInk(color, "#ffffff", 3) : undefined }}>{value}</div>
       <div style={{ fontSize: 11, color: "#7b6d62" }}>{sub}</div>
     </div>
   );
@@ -176125,7 +176125,7 @@ function Quiz({ onAnswer, lang, t }) {
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
-        <button onClick={() => slot.save({ filter, shuf, seed, pos }, filter === "ALL" ? (en ? "All" : "全分野") : filter)} style={{ padding: "6px 14px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{slot.meta ? (en ? "💾 Saved" : "💾 保存済") : (en ? "💾 Save" : "💾 セーブ")}</button>
+        <button onClick={() => slot.save({ filter, shuf, seed, pos }, filter === "ALL" ? (en ? "All" : "全分野") : filter)} style={{ padding: "6px 14px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{slot.meta ? (en ? "💾 Saved" : "💾 保存済") : (en ? "💾 Save" : "💾 セーブ")}</button>
         {slot.meta && (<>
           <button onClick={async () => { const d = await slot.read(); if (!d) return; resumeRef.current = { pos: d.pos || 0 }; setFilter(d.filter || "ALL"); setShuf(!!d.shuf); setSeed(d.seed || 0); setPos(d.pos || 0); setSel(null); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
           <span style={{ fontSize: 11, color: "#5a7288" }}>{saveStamp(slot.meta.t)}</span>
@@ -176138,7 +176138,7 @@ function Quiz({ onAnswer, lang, t }) {
           {[[false, en ? "Fixed order" : "固定順"], [true, en ? "Random" : "ランダム"]].map(([val, label]) => (
             <button key={String(val)} onClick={() => { setShuf(val); setSeed(x => x + 1); }}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "6px 16px", fontSize: 12.5, fontWeight: 700,
-                background: shuf === val ? "#fff" : "transparent", color: shuf === val ? C.deep : "#7b6d62",
+                background: shuf === val ? "#fff" : "transparent", color: shuf === val ? nvInk(C.deep, "#ffffff") : nvInk("#7b6d62", C.light),
                 boxShadow: shuf === val ? "0 1px 3px rgba(0,0,0,.12)" : "none" }}>
               {label}
             </button>
@@ -176149,7 +176149,7 @@ function Quiz({ onAnswer, lang, t }) {
         {["ALL", ...DOMAINS.map(d => d.id)].map(k => (
           <button key={k} onClick={() => setFilter(k)}
             style={{ display: "inline-flex", alignItems: "center", padding: "6px 14px", borderRadius: 18, fontSize: 13, cursor: "pointer",
-              border: `1.5px solid ${filter === k ? C.primary : C.mid}`, background: filter === k ? C.primary : "#fff", color: filter === k ? C.deep : C.ink, fontWeight: 700 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
+              border: `1.5px solid ${filter === k ? C.primary : C.mid}`, background: filter === k ? C.primary : "#fff", color: filter === k ? C.deep : nvInk(C.ink, "#ffffff"), fontWeight: 700 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
         ))}
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 18 }}>
@@ -176189,7 +176189,7 @@ function Quiz({ onAnswer, lang, t }) {
           ← {en ? "Prev" : "前の問題"}
         </button>
         <span style={{ fontSize: 13.5, color: "#7b6d62", fontWeight: 600 }}>{pos + 1} / {pool.length}</span>
-        <button onClick={() => go(1)} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 700, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
+        <button onClick={() => go(1)} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 700, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), cursor: "pointer" }}>{t.nextQ}</button>
       </div>
     </div>
   );
@@ -176375,7 +176375,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
     return (
       <div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-          <button onClick={onBack} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
+          <button onClick={onBack} style={{ border: "none", background: "none", color: nvInk(C.primary, "#ffffff"), cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
         </div>
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 4 }}>{lang === "ja" ? "本試験形式ケース" : "Exam-style cases"}</div>
         <div style={{ fontSize: 12, color: "#5d6c83", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
@@ -176411,13 +176411,13 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
         cursor: enabled ? "pointer" : "default",
         border: primary ? "none" : `1.5px solid ${enabled ? C.primary : C.mid}`,
         background: primary ? (enabled ? C.primary : C.mid) : "#fff",
-        color: primary ? "#fff" : (enabled ? C.primary : "#b9c4d6") }}>{label}</button>
+        color: primary ? nvInk("#ffffff", enabled ? C.primary : C.mid) : (enabled ? nvInk(C.primary, "#ffffff") : nvInk("#b9c4d6", "#ffffff", 3)) }}>{label}</button>
   );
 
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-        <button onClick={backToList} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
+        <button onClick={backToList} style={{ border: "none", background: "none", color: nvInk(C.primary, "#ffffff"), cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
         {!finished && <span style={{ fontSize: 12, color: "#5d6c83" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
       </div>
 
@@ -176447,7 +176447,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
-            <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
+            <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
             <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
           </div>
         </div>
@@ -176567,7 +176567,7 @@ function Exam({ onAnswer, onWrong, lang, t }) {
             {examModeBtns.map(([k, label]) => (
               <button key={k} onClick={() => setExamMode(k)}
                 style={{ border: "none", cursor: "pointer", borderRadius: 18, padding: "9px 22px", fontSize: 13, fontWeight: 700,
-                  background: examMode === k ? "#fff" : "transparent", color: examMode === k ? C.deep : "#7b6d62",
+                  background: examMode === k ? "#fff" : "transparent", color: examMode === k ? nvInk(C.deep, "#ffffff") : nvInk("#7b6d62", C.light),
                   boxShadow: examMode === k ? "0 1px 4px rgba(0,0,0,.12)" : "none" }}>
                 {label}
               </button>
@@ -176582,7 +176582,7 @@ function Exam({ onAnswer, onWrong, lang, t }) {
           {modeBtns.map(([k, label]) => (
             <button key={k} onClick={() => setMode(k)}
               style={{ flex: "1 1 45%", padding: "10px 8px", borderRadius: 10, cursor: "pointer", fontSize: 12.5, fontWeight: 700,
-                border: `1.5px solid ${mode === k ? C.primary : C.mid}`, background: mode === k ? C.primary : "#fff", color: mode === k ? C.deep : C.ink }}>
+                border: `1.5px solid ${mode === k ? C.primary : C.mid}`, background: mode === k ? C.primary : "#fff", color: mode === k ? C.deep : nvInk(C.ink, "#ffffff") }}>
               {label}
             </button>
           ))}
@@ -176676,7 +176676,7 @@ function Exam({ onAnswer, onWrong, lang, t }) {
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, background: timeWarn ? "#FBEAE8" : C.deep, color: timeWarn ? C.ng : "#fff", borderRadius: 9, padding: "9px 14px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, background: timeWarn ? "#FBEAE8" : C.deep, color: timeWarn ? C.ng : nvInk("#ffffff", C.deep), borderRadius: 9, padding: "9px 14px" }}>
         <span style={{ fontSize: 13, fontWeight: 600 }}>
           {title} · {t.questionNo(pos + 1, qs.length)}
           <span style={{ marginLeft: 8, fontSize: 11 }}>{isPractice ? t.examModePractice : t.examModeReal}</span>
@@ -176688,7 +176688,7 @@ function Exam({ onAnswer, onWrong, lang, t }) {
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#7b6d62", marginBottom: 6 }}>
         <span>{en ? "Answered" : "回答済"} {answeredCount}/{qs.length}</span>
         <button onClick={() => setFlags(f => ({ ...f, [pos]: !f[pos] }))}
-          style={{ border: "none", background: "none", cursor: "pointer", fontSize: 12, fontWeight: 700, color: flags[pos] ? C.primary : "#7b6d62" }}>
+          style={{ border: "none", background: "none", cursor: "pointer", fontSize: 12, fontWeight: 700, color: flags[pos] ? nvInk(C.primary, "#ffffff") : "#7b6d62" }}>
           {flags[pos] ? (en ? "★ Flagged" : "★ フラグ") : (en ? "☆ Flag" : "☆ フラグ")}
         </button>
       </div>
@@ -176731,7 +176731,7 @@ function Exam({ onAnswer, onWrong, lang, t }) {
           </button>
           {!isLastQ && (
             <button onClick={() => setPos(p => p + 1)}
-              style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>
+              style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>
               {en ? "Skip →" : "次へ →"}
             </button>
           )}
@@ -176812,7 +176812,7 @@ function Diagrams({ lang, t }) {
         {CATS.map(([k, label]) => (
           <button key={k} onClick={() => setCat(k)}
             style={{ padding: "6px 13px", borderRadius: 18, fontSize: 12.5, cursor: "pointer", fontWeight: 700,
-              border: `1.5px solid ${cat === k ? C.primary : C.mid}`, background: cat === k ? C.primary : "#fff", color: cat === k ? C.deep : C.ink }}>
+              border: `1.5px solid ${cat === k ? C.primary : C.mid}`, background: cat === k ? C.primary : "#fff", color: cat === k ? C.deep : nvInk(C.ink, "#ffffff") }}>
             {label}
           </button>
         ))}
@@ -176883,7 +176883,7 @@ function DecisionWidget({ lang, steps, leaves, startKey = "start" }) {
   return (
     <div>
       <div style={{ marginBottom: 10, fontSize: 12, color: "#7b6d62" }}>
-        {path.length > 0 && <button onClick={() => setPath(p => p.slice(0, -1))} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, padding: 0 }}>{en ? "← Back" : "← 戻る"}</button>}
+        {path.length > 0 && <button onClick={() => setPath(p => p.slice(0, -1))} style={{ border: "none", background: "none", color: nvInk(C.primary, "#ffffff"), cursor: "pointer", fontWeight: 700, padding: 0 }}>{en ? "← Back" : "← 戻る"}</button>}
       </div>
       {!leaf && steps[cur] && (
         <div>
@@ -177750,7 +177750,7 @@ function IamEvaluator({ lang }) {
   else if (allow) { result = en ? "ALLOWED" : "許可"; hue = C.ok; reason = en ? "Explicit Allow with no Deny → allowed." : "明示的許可があり拒否がない → 許可。"; }
   else { result = en ? "DENIED (implicit)" : "拒否（暗黙）"; hue = C.ng; reason = en ? "No explicit Allow → implicitly denied (least privilege)." : "明示的許可がない → 暗黙的に拒否（最小権限）。"; }
   const Toggle = ({ label, val, set, color }) => (
-    <button onClick={() => set(!val)} style={{ flex: 1, padding: "12px 10px", borderRadius: 10, border: `2px solid ${val ? color : C.mid}`, background: val ? color : "#fff", color: val ? "#fff" : C.ink, fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
+    <button onClick={() => set(!val)} style={{ flex: 1, padding: "12px 10px", borderRadius: 10, border: `2px solid ${val ? color : C.mid}`, background: val ? color : "#fff", color: val ? nvInk("#ffffff", color) : nvInk(C.ink, "#ffffff"), fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
       {label}: {val ? "ON" : "OFF"}
     </button>
   );
@@ -179860,7 +179860,7 @@ function App() {
           {["ja", "en"].map(l => (
             <button key={l} onClick={() => setLang(l)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "5px 12px", fontSize: 12, fontWeight: 700,
-                background: lang === l ? "#fff" : "transparent", color: lang === l ? C.deep : "#fff" }}>
+                background: lang === l ? "#fff" : "transparent", color: lang === l ? nvInk(C.deep, "#ffffff") : "#fff" }}>
               {l === "ja" ? "日本語" : "English"}
             </button>
           ))}
@@ -179870,7 +179870,7 @@ function App() {
         {TABS.map(([k, label]) => (
           <button key={k} onClick={() => setTab(k)}
             style={{ flex: "1 1 auto", padding: "11px 8px", border: "none", cursor: "pointer",
-              background: tab === k ? "#fff" : "transparent", color: tab === k ? C.deep : C.ink,
+              background: tab === k ? "#fff" : "transparent", color: tab === k ? nvInk(C.deep, "#ffffff") : C.ink,
               fontWeight: tab === k ? 700 : 500, fontSize: 13,
               borderBottom: tab === k ? `3px solid ${C.primary}` : "3px solid transparent" }}>
             {label}
@@ -179960,7 +179960,7 @@ function Stat({ label, value, sub, color }) {
   return (
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#6b5d52" }}>{label}</div>
-      <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
+      <div style={{ fontSize: 26, fontWeight: 800, color: color ? nvInk(color, "#ffffff", 3) : undefined }}>{value}</div>
       <div style={{ fontSize: 11, color: "#7b6d62" }}>{sub}</div>
     </div>
   );
@@ -180018,7 +180018,7 @@ function Quiz({ onAnswer, lang, t }) {
       <div>
         <div style={{ background: passed ? "#E8F5EE" : "#FFF6F1", border: `2px solid ${passed ? C.ok : C.primary}`, borderRadius: 12, padding: 22, textAlign: "center", marginBottom: 16 }}>
           <div style={{ fontSize: 15, fontWeight: 700, color: C.deep, marginBottom: 6 }}>{t.quizDone}</div>
-          <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : C.primary }}>{rate}%</div>
+          <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : nvInk(C.primary, "#ffffff") }}>{rate}%</div>
           <div style={{ fontSize: 13, color: "#6b5d52", marginTop: 4 }}>{t.quizDoneSub(stats.c, stats.a)}</div>
         </div>
         <button onClick={restart}
@@ -180030,7 +180030,7 @@ function Quiz({ onAnswer, lang, t }) {
             <button key={k} onClick={() => setFilter(k)}
             style={{ display: "inline-flex", alignItems: "center", padding: "5px 11px", borderRadius: 16, fontSize: 12, cursor: "pointer",
                 border: `1px solid ${filter === k ? C.primary : C.mid}`,
-                background: filter === k ? C.primary : "#fff", color: filter === k ? "#fff" : C.ink, fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
+                background: filter === k ? C.primary : "#fff", color: filter === k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
           ))}
         </div>
       </div>
@@ -180064,7 +180064,7 @@ function Quiz({ onAnswer, lang, t }) {
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
-        <button onClick={() => slot.save({ filter, order, session, pos, sel, answers, stats, done }, filter === "ALL" ? (lang === "en" ? "All" : "全分野") : filter)} style={{ padding: "6px 14px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{slot.meta ? (lang === "en" ? "💾 Saved" : "💾 保存済") : (lang === "en" ? "💾 Save" : "💾 セーブ")}</button>
+        <button onClick={() => slot.save({ filter, order, session, pos, sel, answers, stats, done }, filter === "ALL" ? (lang === "en" ? "All" : "全分野") : filter)} style={{ padding: "6px 14px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{slot.meta ? (lang === "en" ? "💾 Saved" : "💾 保存済") : (lang === "en" ? "💾 Save" : "💾 セーブ")}</button>
         {slot.meta && (<>
           <button onClick={async () => { const d = await slot.read(); if (!d) return; resumeRef.current = { session: d.session, pos: d.pos, sel: d.sel, answers: d.answers, stats: d.stats, done: d.done }; setFilter(d.filter || "ALL"); setOrder(d.order || "fixed"); setSession(d.session || []); setPos(d.pos || 0); setSel(d.sel == null ? null : d.sel); setAnswers(d.answers || []); setStats(d.stats || { c: 0, a: 0 }); setDone(!!d.done); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
           <span style={{ fontSize: 11, color: "#5a7288" }}>{saveStamp(slot.meta.t)}</span>
@@ -180078,7 +180078,7 @@ function Quiz({ onAnswer, lang, t }) {
             {[["fixed", t.orderFixed], ["random", t.orderRandom]].map(([k, label]) => (
               <button key={k} onClick={() => setOrder(k)}
                 style={{ border: "none", cursor: "pointer", borderRadius: 14, padding: "4px 12px", fontSize: 12, fontWeight: 700,
-                  background: order === k ? "#fff" : "transparent", color: order === k ? C.deep : "#7b6d62",
+                  background: order === k ? "#fff" : "transparent", color: order === k ? nvInk(C.deep, "#ffffff") : nvInk("#7b6d62", C.light),
                   boxShadow: order === k ? "0 1px 2px rgba(0,0,0,.12)" : "none" }}>
                 {label}
               </button>
@@ -180092,7 +180092,7 @@ function Quiz({ onAnswer, lang, t }) {
           <button key={k} onClick={() => setFilter(k)}
             style={{ display: "inline-flex", alignItems: "center", padding: "5px 11px", borderRadius: 16, fontSize: 12, cursor: "pointer",
               border: `1px solid ${filter === k ? C.primary : C.mid}`,
-              background: filter === k ? C.primary : "#fff", color: filter === k ? "#fff" : C.ink, fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
+              background: filter === k ? C.primary : "#fff", color: filter === k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
         ))}
       </div>
       {stats.a > 0 && (
@@ -180153,7 +180153,7 @@ function Quiz({ onAnswer, lang, t }) {
         </button>
         <button onClick={next}
           style={{ padding: "10px 30px", borderRadius: 8, fontSize: 13.5, fontWeight: 700, cursor: "pointer",
-            border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary }}>
+            border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff") }}>
           {pos + 1 >= total ? t.seeResult : t.nextQ}
         </button>
       </div>
@@ -180197,7 +180197,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               {[["practice", t.modePractice], ["real", t.modeReal]].map(([k, label]) => (
                 <button key={k} onClick={() => setMode(k)}
                   style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "7px 16px", fontSize: 13, fontWeight: 700,
-                    background: mode === k ? "#fff" : "transparent", color: mode === k ? C.deep : "#7b6d62",
+                    background: mode === k ? "#fff" : "transparent", color: mode === k ? nvInk(C.deep, "#ffffff") : nvInk("#7b6d62", C.light),
                     boxShadow: mode === k ? "0 1px 3px rgba(0,0,0,.12)" : "none" }}>
                   {label}
                 </button>
@@ -180213,7 +180213,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <button key={k} onClick={() => setKind(k)}
               style={{ flex: 1, padding: "13px 8px", borderRadius: 11, fontSize: 14, fontWeight: 700, cursor: "pointer",
                 border: `1.5px solid ${kind === k ? C.primary : C.mid}`,
-                background: kind === k ? C.primary : "#fff", color: kind === k ? "#fff" : C.ink }}>
+                background: kind === k ? C.primary : "#fff", color: kind === k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff") }}>
               {label}
             </button>
           ))}
@@ -180233,7 +180233,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
                   <span style={{ fontWeight: 700, fontSize: 15, color: SET_READY[n] ? C.deep : "#7b6d62" }}>{t.setLabel} {n}</span>
                   <span style={{ fontSize: 12, color: "#7b6d62", marginLeft: 10 }}>100{t.questionsUnit}</span>
                 </span>
-                <span style={{ fontSize: 12.5, fontWeight: 700, color: SET_READY[n] ? C.primary : "#bcae9f" }}>
+                <span style={{ fontSize: 12.5, fontWeight: 700, color: SET_READY[n] ? nvInk(C.primary, "#ffffff") : "#bcae9f" }}>
                   {SET_READY[n] ? t.start : t.preparing}
                 </span>
               </button>
@@ -180319,7 +180319,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         </Card>
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.retrySet}</button>
-          <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.toSetSelect}</button>
+          <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.toSetSelect}</button>
         </div>
       </div>
     );
@@ -180348,7 +180348,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         </button>
         <button onClick={next}
           style={{ padding: "6px 12px", borderRadius: 8, fontSize: 12.5, fontWeight: 700, cursor: "pointer",
-            border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary }}>
+            border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff") }}>
           {pos + 1 >= qs0.length ? t.seeResult : t.nextQ}
         </button>
       </div>
@@ -180440,7 +180440,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
     return (
       <div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-          <button onClick={onBack} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
+          <button onClick={onBack} style={{ border: "none", background: "none", color: nvInk(C.primary, "#ffffff"), cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
         </div>
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 4 }}>{lang === "ja" ? "本試験形式ケース" : "Exam-style cases"}</div>
         <div style={{ fontSize: 12, color: "#5d6c83", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
@@ -180482,7 +180482,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-        <button onClick={backToList} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
+        <button onClick={backToList} style={{ border: "none", background: "none", color: nvInk(C.primary, "#ffffff"), cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
         {!finished && <span style={{ fontSize: 12, color: "#5d6c83" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
       </div>
 
@@ -180512,7 +180512,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
-            <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
+            <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
             <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
           </div>
         </div>
@@ -180599,10 +180599,10 @@ function Scenario({ onAnswer, lang, t }) {
     const passed = rate >= PASS;
     return (
       <div>
-        <button onClick={() => setSetNo(null)} style={{ background: "none", border: "none", color: C.primary, cursor: "pointer", fontSize: 13, fontWeight: 700, marginBottom: 12 }}>{t.scenToSelect}</button>
+        <button onClick={() => setSetNo(null)} style={{ background: "none", border: "none", color: nvInk(C.primary, "#ffffff"), cursor: "pointer", fontSize: 13, fontWeight: 700, marginBottom: 12 }}>{t.scenToSelect}</button>
         <div style={{ background: passed ? "#E8F5EE" : "#FFF6F1", border: `2px solid ${passed ? C.ok : C.primary}`, borderRadius: 12, padding: 22, textAlign: "center", marginBottom: 16 }}>
           <div style={{ fontSize: 15, fontWeight: 700, color: C.deep, marginBottom: 6 }}>{t.scenResult}</div>
-          <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : C.primary }}>{rate}%</div>
+          <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : nvInk(C.primary, "#ffffff") }}>{rate}%</div>
           <div style={{ fontSize: 13, color: "#6b5d52", marginTop: 4 }}>{t.correctOf(stats.c, stats.a)}</div>
         </div>
         <button onClick={reset} style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{t.scenRetry}</button>
@@ -180639,14 +180639,14 @@ function Scenario({ onAnswer, lang, t }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <button onClick={() => setSetNo(null)} style={{ background: "none", border: "none", color: C.primary, cursor: "pointer", fontSize: 13, fontWeight: 700 }}>{t.scenToSelect}</button>
+          <button onClick={() => setSetNo(null)} style={{ background: "none", border: "none", color: nvInk(C.primary, "#ffffff"), cursor: "pointer", fontSize: 13, fontWeight: 700 }}>{t.scenToSelect}</button>
           <button onClick={prev} disabled={pos === 0}
             style={{ padding: "5px 11px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: pos === 0 ? "default" : "pointer",
               border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? nvInk("#bcae9f", "#ffffff", 3) : C.primary }}>
             {t.prevQ}
           </button>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}><span style={{ fontSize: 12, color: "#7b6d62" }}>{t.scenQNo(pos + 1, total)}</span><button onClick={next} style={{ padding: "5px 11px", borderRadius: 8, fontSize: 12, fontWeight: 700, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{pos + 1 >= total ? t.seeResult : t.nextQ}</button></div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}><span style={{ fontSize: 12, color: "#7b6d62" }}>{t.scenQNo(pos + 1, total)}</span><button onClick={next} style={{ padding: "5px 11px", borderRadius: 8, fontSize: 12, fontWeight: 700, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), cursor: "pointer" }}>{pos + 1 >= total ? t.seeResult : t.nextQ}</button></div>
       </div>
       <div style={{ marginBottom: 10 }}><Bar pct={Math.round((pos / total) * 100)} color={C.primary} /></div>
       <div style={{ background: C.light, border: `1px solid ${C.mid}`, borderRadius: 10, padding: 12, marginBottom: 12 }}>
@@ -180710,7 +180710,7 @@ function Review({ wrong, onRemove, onClear, lang, t }) {
             <button key={k} onClick={() => setFilter(k)}
             style={{ display: "inline-flex", alignItems: "center", padding: "5px 11px", borderRadius: 16, fontSize: 12, cursor: "pointer",
                 border: `1px solid ${filter === k ? C.primary : C.mid}`,
-                background: filter === k ? C.primary : "#fff", color: filter === k ? "#fff" : C.ink, fontWeight: 600 }}>
+                background: filter === k ? C.primary : "#fff", color: filter === k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight: 600 }}>
               {k === "ALL" ? t.allFields : k}{cnt > 0 ? ` ${cnt}` : ""}
             </button>
           );
@@ -180786,7 +180786,7 @@ function TreeNode({ node, depth, defaultOpen }) {
   return (
     <div style={{ marginLeft: depth === 0 ? 0 : 14 }}>
       <div onClick={() => hasKids && setOpen(o => !o)}
-        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? "#fff" : C.ink, marginBottom: 3 }}>
+        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? nvInk("#ffffff", C.deep) : C.ink, marginBottom: 3 }}>
         {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : nvInk(C.primary, "#ffffff") }}>{open ? "▼" : "▶"}</span>}
         {!hasKids && <span style={{ color: nvInk(C.mid, "#ffffff", 3) }}>•</span>}
         <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{node.label}</span>
@@ -183070,7 +183070,7 @@ function App() {
           {[["ja", "日本語"], ["en", "English"]].map(([k, lbl]) => (
             <button key={k} onClick={() => setLang(k)}
               style={{ border: "none", cursor: "pointer", borderRadius: 999, padding: "6px 16px", fontSize: 13, fontWeight: 700,
-                background: lang === k ? "#fff" : "transparent", color: lang === k ? C.deep : "rgba(255,255,255,0.85)" }}>
+                background: lang === k ? "#fff" : "transparent", color: lang === k ? nvInk(C.deep, "#ffffff") : "rgba(255,255,255,0.85)" }}>
               {lbl}
             </button>
           ))}
@@ -183080,7 +183080,7 @@ function App() {
         {TABS.map(([k, label]) => (
           <button key={k} onClick={() => setTab(k)}
             style={{ flex: "1 1 auto", padding: "11px 8px", border: "none", cursor: "pointer",
-              background: tab === k ? "#fff" : "transparent", color: tab === k ? C.deep : C.ink,
+              background: tab === k ? "#fff" : "transparent", color: tab === k ? nvInk(C.deep, "#ffffff") : C.ink,
               fontWeight: tab === k ? 700 : 500, fontSize: 13,
               borderBottom: tab === k ? `3px solid ${C.primary}` : "3px solid transparent" }}>
             {label}
@@ -183120,7 +183120,7 @@ function Stat({ label, value, sub, color }) {
   return (
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5a6a85" }}>{label}</div>
-      <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
+      <div style={{ fontSize: 26, fontWeight: 800, color: color ? nvInk(color, "#ffffff", 3) : undefined }}>{value}</div>
       <div style={{ fontSize: 11, color: "#5d6c83" }}>{sub}</div>
     </div>
   );
@@ -183324,7 +183324,7 @@ function Quiz({ onAnswer, lang }) {
           {[["fixed", t.fixed], ["random", t.random]].map(([k, lbl]) => (
             <button key={k} onClick={() => setMode(k)}
               style={{ border: "none", cursor: "pointer", borderRadius: 999, padding: "6px 16px", fontSize: 12.5, fontWeight: 700,
-                background: mode === k ? "#fff" : "transparent", color: mode === k ? C.deep : "#8a8275",
+                background: mode === k ? "#fff" : "transparent", color: mode === k ? nvInk(C.deep, "#ffffff") : nvInk("#8a8275", C.light),
                 boxShadow: mode === k ? "0 1px 2px rgba(0,0,0,0.08)" : "none" }}>
               {lbl}
             </button>
@@ -183336,7 +183336,7 @@ function Quiz({ onAnswer, lang }) {
           <button key={k} onClick={() => setFilter(k)}
             style={{ padding: "5px 11px", borderRadius: 16, fontSize: 12, cursor: "pointer",
               border: `1px solid ${filter === k ? C.primary : C.mid}`,
-              background: filter === k ? C.primary : "#fff", color: filter === k ? "#fff" : C.ink, fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allDomains : k}</span></button>
+              background: filter === k ? C.primary : "#fff", color: filter === k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allDomains : k}</span></button>
         ))}
       </div>
       {stats.a > 0 && (
@@ -183404,7 +183404,7 @@ function Exam({ onAnswer, lang }) {
               {[["practice", t.practiceMode], ["real", t.realMode]].map(([k, lbl]) => (
                 <button key={k} onClick={() => setExamMode(k)}
                   style={{ border: "none", cursor: "pointer", borderRadius: 999, padding: "8px 22px", fontSize: 13.5, fontWeight: 700,
-                    background: examMode === k ? "#fff" : "transparent", color: examMode === k ? C.deep : "#8a8275",
+                    background: examMode === k ? "#fff" : "transparent", color: examMode === k ? nvInk(C.deep, "#ffffff") : nvInk("#8a8275", C.light),
                     boxShadow: examMode === k ? "0 1px 2px rgba(0,0,0,0.08)" : "none" }}>
                   {lbl}
                 </button>
@@ -183416,7 +183416,7 @@ function Exam({ onAnswer, lang }) {
               {[["fixed", t.fixed], ["random", t.random]].map(([k, lbl]) => (
                 <button key={k} onClick={() => setOrderMode(k)}
                   style={{ border: "none", cursor: "pointer", borderRadius: 999, padding: "6px 18px", fontSize: 12.5, fontWeight: 700,
-                    background: orderMode === k ? "#fff" : "transparent", color: orderMode === k ? C.deep : "#8a8275",
+                    background: orderMode === k ? "#fff" : "transparent", color: orderMode === k ? nvInk(C.deep, "#ffffff") : nvInk("#8a8275", C.light),
                     boxShadow: orderMode === k ? "0 1px 2px rgba(0,0,0,0.08)" : "none" }}>
                   {lbl}
                 </button>
@@ -183520,7 +183520,7 @@ function Exam({ onAnswer, lang }) {
               <button key={i} onClick={() => chooseReal(i)}
                 style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px",
                   borderRadius: 9, border: `1.5px solid ${active ? C.primary : C.mid}`,
-                  background: active ? C.light : "#fff", color: active ? C.deep : C.ink,
+                  background: active ? C.light : "#fff", color: active ? C.deep : nvInk(C.ink, "#ffffff"),
                   cursor: "pointer", fontSize: 13.5, lineHeight: 1.4, fontWeight: active ? 700 : 500 }}>
                 <span style={{ fontWeight: 700, marginRight: 8 }}>{"ABCD"[i]}</span>{opt}
               </button>
@@ -183726,7 +183726,7 @@ function CaseStudy({ onAnswer, lang }) {
               {[["fixed", t.fixed], ["random", t.random]].map(([k, lbl]) => (
                 <button key={k} onClick={() => setOrderMode(k)}
                   style={{ border: "none", cursor: "pointer", borderRadius: 999, padding: "6px 18px", fontSize: 12.5, fontWeight: 700,
-                    background: orderMode === k ? "#fff" : "transparent", color: orderMode === k ? C.deep : "#8a8275",
+                    background: orderMode === k ? "#fff" : "transparent", color: orderMode === k ? nvInk(C.deep, "#ffffff") : nvInk("#8a8275", C.light),
                     boxShadow: orderMode === k ? "0 1px 2px rgba(0,0,0,0.08)" : "none" }}>
                   {lbl}
                 </button>
@@ -183848,7 +183848,7 @@ function Review({ state, onAnswer, clearReview, removeReview, lang }) {
           <button key={k} onClick={() => setDomFilter(k)}
             style={{ padding: "5px 11px", borderRadius: 16, fontSize: 12, cursor: "pointer",
               border: `1px solid ${domFilter === k ? C.primary : C.mid}`,
-              background: domFilter === k ? C.primary : "#fff", color: domFilter === k ? "#fff" : C.ink, fontWeight: 600 }}>
+              background: domFilter === k ? C.primary : "#fff", color: domFilter === k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight: 600 }}>
             {lbl}
           </button>
         ))}
@@ -183970,7 +183970,7 @@ function Glossary({ lang }) {
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
         {cats.map(k => (
           <button key={k} onClick={() => setCat(k)}
-            style={{ padding: "5px 11px", borderRadius: 16, fontSize: 12, cursor: "pointer", border: `1px solid ${cat === k ? C.primary : C.mid}`, background: cat === k ? C.primary : "#fff", color: cat === k ? "#fff" : C.ink, fontWeight: 600 }}>
+            style={{ padding: "5px 11px", borderRadius: 16, fontSize: 12, cursor: "pointer", border: `1px solid ${cat === k ? C.primary : C.mid}`, background: cat === k ? C.primary : "#fff", color: cat === k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight: 600 }}>
             {k === "ALL" ? t.allDomains : k}
           </button>
         ))}
@@ -184070,7 +184070,7 @@ function AicxGateBoard({ lang }) {
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
         {WS_5D.map((x, k) => (
           <button key={x.id} onClick={() => setI(k)}
-            style={{ background: i === k ? x.hue : "#fff", border: `1px solid ${i === k ? x.hue : C.mid}`, color: i === k ? "#fff" : C.ink, borderRadius: 999, padding: "5px 12px", fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>
+            style={{ background: i === k ? x.hue : "#fff", border: `1px solid ${i === k ? x.hue : C.mid}`, color: i === k ? nvInk("#ffffff", x.hue) : nvInk(C.ink, "#ffffff"), borderRadius: 999, padding: "5px 12px", fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>
             {k + 1}. {x.t[en ? 1 : 0]}
           </button>
         ))}
@@ -185039,7 +185039,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
     return (
       <div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-          <button onClick={onBack} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
+          <button onClick={onBack} style={{ border: "none", background: "none", color: nvInk(C.primary, "#ffffff"), cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
         </div>
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 4 }}>{lang === "ja" ? "本試験形式ケース" : "Exam-style cases"}</div>
         <div style={{ fontSize: 12, color: "#5d6c83", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
@@ -185081,7 +185081,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-        <button onClick={backToList} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
+        <button onClick={backToList} style={{ border: "none", background: "none", color: nvInk(C.primary, "#ffffff"), cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
         {!finished && <span style={{ fontSize: 12, color: "#5d6c83" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
       </div>
 
@@ -185094,7 +185094,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
               {data.sections.map((sc, si) => (
                 <button key={si} onClick={() => setSec(si)}
                   style={{ padding: "6px 12px", borderRadius: 16, fontSize: 12, fontWeight: 700, cursor: "pointer",
-                    border: `1.5px solid ${sec === si ? C.primary : C.mid}`, background: sec === si ? C.primary : "#fff", color: sec === si ? "#fff" : C.deep }}>{g(sc.title)}</button>
+                    border: `1.5px solid ${sec === si ? C.primary : C.mid}`, background: sec === si ? C.primary : "#fff", color: sec === si ? nvInk("#ffffff", C.primary) : nvInk(C.deep, "#ffffff") }}>{g(sc.title)}</button>
               ))}
             </div>
             {(() => { const scur = data.sections[Math.min(sec, data.sections.length - 1)]; return (<div>
@@ -185140,7 +185140,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
-            <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
+            <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
             <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
           </div>
         </div>
@@ -185237,11 +185237,11 @@ function App() {
           <div style={{ fontSize: 19, fontWeight: 700 }}>{t.appTitle}</div>
           <div style={{ fontSize: 12, marginTop: 2 }}>{t.appSub}</div>
         </div>
-        <div role="group" aria-label={t.langGroup} style={{ display: "flex", background: "rgba(255,255,255,.15)", borderRadius: 20, padding: 3, flexShrink: 0 }}>
+        <div role="group" aria-label={t.langGroup} style={{ display: "flex", background: "rgba(0,0,0,.12)", borderRadius: 20, padding: 3, flexShrink: 0 }}>
           {["ja", "en"].map(l => (
             <button key={l} onClick={() => setLang(l)} aria-pressed={lang === l}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "5px 12px", fontSize: 12, fontWeight: 700,
-                background: lang === l ? "#fff" : "transparent", color: lang === l ? C.deep : "#fff" }}>
+                background: lang === l ? "#fff" : "transparent", color: lang === l ? nvInk(C.deep, "#ffffff") : "#fff" }}>
               {l === "ja" ? "日本語" : "English"}
             </button>
           ))}
@@ -185253,7 +185253,7 @@ function App() {
             style={{
               flex: "1 1 auto", padding: "11px 8px", border: "none", cursor: "pointer",
               background: tab === k ? "#fff" : "transparent",
-              color: tab === k ? C.deep : C.ink, fontWeight: tab === k ? 700 : 500,
+              color: tab === k ? nvInk(C.deep, "#ffffff") : C.ink, fontWeight: tab === k ? 700 : 500,
               fontSize: 13, borderBottom: tab === k ? `3px solid ${C.primary}` : "3px solid transparent",
             }}>
             {label}
@@ -185359,7 +185359,7 @@ function Stat({ label, value, sub, color }) {
   return (
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5a7780" }}>{label}</div>
-      <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
+      <div style={{ fontSize: 26, fontWeight: 800, color: color ? nvInk(color, "#ffffff", 3) : undefined }}>{value}</div>
       <div style={{ fontSize: 11, color: "#53757f" }}>{sub}</div>
     </div>
   );
@@ -185422,7 +185422,7 @@ function Quiz({ onAnswer, t, questions }) {
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
-        <button onClick={() => slot.save({ filter, orderMode, shufKey, pos, history, stats }, filter === "ALL" ? "全分野" : filter)} style={{ padding: "6px 14px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{slot.meta ? t.slotSaved : t.slotSave}</button>
+        <button onClick={() => slot.save({ filter, orderMode, shufKey, pos, history, stats }, filter === "ALL" ? "全分野" : filter)} style={{ padding: "6px 14px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{slot.meta ? t.slotSaved : t.slotSave}</button>
         {slot.meta && (<>
           <button onClick={async () => { const d = await slot.read(); if (!d) return; resumeRef.current = { pos: d.pos, history: d.history, stats: d.stats }; setFilter(d.filter || "ALL"); setOrderMode(d.orderMode || "fixed"); setShufKey(d.shufKey || 0); setPos(d.pos || 0); setHistory(d.history || {}); setStats(d.stats || { c: 0, a: 0 }); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{t.slotResume}</button>
           <span style={{ fontSize: 11, color: "#5a7288" }}>{saveStamp(slot.meta.t)}</span>
@@ -185435,7 +185435,7 @@ function Quiz({ onAnswer, t, questions }) {
           {[["fixed", t.orderFixed], ["random", t.orderRandom]].map(([k, label]) => (
             <button key={k} onClick={() => { setOrderMode(k); if (k === "random") setShufKey(x => x + 1); }}
               style={{ padding: "4px 10px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 700,
-                background: orderMode === k ? "#fff" : "transparent", color: orderMode === k ? "#0B6E8F" : "#8a8275",
+                background: orderMode === k ? "#fff" : "transparent", color: orderMode === k ? nvInk("#0B6E8F", "#ffffff") : nvInk("#8a8275", C.light),
                 boxShadow: orderMode === k ? "0 1px 2px rgba(0,0,0,0.08)" : "none" }}>{label}</button>
           ))}
         </div>
@@ -185446,7 +185446,7 @@ function Quiz({ onAnswer, t, questions }) {
             style={{ display: "inline-flex", alignItems: "center",
               padding: "5px 11px", borderRadius: 16, fontSize: 12, cursor: "pointer",
               border: `1px solid ${filter === k ? C.primary : C.mid}`,
-              background: filter === k ? C.primary : "#fff", color: filter === k ? "#fff" : C.ink, fontWeight: 600,
+              background: filter === k ? C.primary : "#fff", color: filter === k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight: 600,
             }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} en={XL.v === "en"} /><span>{k === "ALL" ? t.allFields : k}</span></button>
         ))}
       </div>
@@ -185505,7 +185505,7 @@ function Quiz({ onAnswer, t, questions }) {
           {t.prevQ}
         </button>
         <span style={{ fontSize: 13, color: "#5a7780", fontWeight: 600 }}>{pos + 1} / {total}</span>
-        <button onClick={next} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
+        <button onClick={next} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), cursor: "pointer" }}>{t.nextQ}</button>
       </div>
     </div>
   );
@@ -185550,7 +185550,7 @@ function ReviewTab({ state, onClearOne, onClearAll, t }) {
             <button onClick={() => onClearOne(idx)} style={{ flexShrink: 0, padding: "4px 9px", borderRadius: 7, border: `1px solid ${C.mid}`, background: "#fff", color: "#53757f", fontSize: 11.5, cursor: "pointer" }}>{t.reviewClear}</button>
           </div>
           {(q.o || []).map((o, i) => (
-            <div key={i} style={{ padding: "7px 11px", marginBottom: 6, borderRadius: 8, border: `1.5px solid ${i === q.a ? C.ok : C.mid}`, background: i === q.a ? "#E6F4EF" : "#fff", color: i === q.a ? C.ok : C.ink, fontSize: 13, lineHeight: 1.5, fontWeight: i === q.a ? 700 : 500 }}>
+            <div key={i} style={{ padding: "7px 11px", marginBottom: 6, borderRadius: 8, border: `1.5px solid ${i === q.a ? C.ok : C.mid}`, background: i === q.a ? "#E6F4EF" : "#fff", color: i === q.a ? C.ok : nvInk(C.ink, "#ffffff"), fontSize: 13, lineHeight: 1.5, fontWeight: i === q.a ? 700 : 500 }}>
               <span style={{ fontWeight: 700, marginRight: 8 }}>{i === q.a ? "✓" : "ABCDE"[i]}</span>{rvO(q, o)}
             </div>
           ))}
@@ -185785,7 +185785,7 @@ function Exam({ onAnswer, t, onWrong }) {
             )}
             {c.type === "checkbox" && (
               <button onClick={() => !submitted && setCtrl(c.id, !cur)} disabled={submitted}
-                style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 16, border: `1.5px solid ${cur ? C.primary : C.mid}`, background: cur ? C.light : "#fff", color: cur ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{cur ? t.onMark : t.off}</button>
+                style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 16, border: `1.5px solid ${cur ? C.primary : C.mid}`, background: cur ? C.light : "#fff", color: cur ? C.deep : nvInk("#5d6c83", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{cur ? t.onMark : t.off}</button>
             )}
             {c.type === "spin" && (
               <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
@@ -185858,7 +185858,7 @@ function Exam({ onAnswer, t, onWrong }) {
                   flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px",
                   fontSize: 13.5, fontWeight: 700,
                   background: mode === m ? "#fff" : "transparent",
-                  color: mode === m ? C.deep : "#53757f",
+                  color: mode === m ? nvInk(C.deep, "#ffffff") : nvInk("#53757f", C.light),
                   boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none",
                   transition: "all .2s",
                 }}>
@@ -185873,7 +185873,7 @@ function Exam({ onAnswer, t, onWrong }) {
             <button key={kk} onClick={() => setKind(kk)}
               style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer",
                 border: `1.5px solid ${kind === kk ? C.primary : C.mid}`,
-                background: kind === kk ? C.primary : "#fff", color: kind === kk ? "#fff" : C.ink }}>
+                background: kind === kk ? C.primary : "#fff", color: kind === kk ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff") }}>
               {label}
             </button>
           ))}
@@ -185905,7 +185905,7 @@ function Exam({ onAnswer, t, onWrong }) {
               <span style={{ fontWeight: 700, fontSize: 15, color: SET_READY[n] ? C.deep : "#53757f" }}>{t.setLabel} {n}</span>
               <span style={{ fontSize: 12, color: "#53757f", marginLeft: 10 }}>50{t.questionsUnit}</span>
             </span>
-            <span style={{ fontSize: 12.5, fontWeight: 700, color: SET_READY[n] ? C.primary : "#a8c2cc" }}>
+            <span style={{ fontSize: 12.5, fontWeight: 700, color: SET_READY[n] ? nvInk(C.primary, "#ffffff") : nvInk("#a8c2cc", "#ffffff", 3) }}>
               {SET_READY[n] ? t.startIn(mode === "practice" ? t.modePractice : t.modeReal) : t.preparing}
             </span>
           </button>
@@ -185977,7 +185977,7 @@ function Exam({ onAnswer, t, onWrong }) {
 
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.retrySet}</button>
-          <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.toSetSelect}</button>
+          <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.toSetSelect}</button>
         </div>
       </div>
     );
@@ -185992,7 +185992,7 @@ function Exam({ onAnswer, t, onWrong }) {
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
           {exhibits.map((e, i) => (
             <button key={e.id} onClick={() => setExTab(i)}
-              style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{Lx(e, "tab")}</button>
+              style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? nvInk(C.deep, "#ffffff") : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{Lx(e, "tab")}</button>
           ))}
         </div>
         <div style={{ padding: 12 }}>
@@ -186029,7 +186029,7 @@ function Exam({ onAnswer, t, onWrong }) {
                 {[["yes", t.yes], ["no", t.no]].map(([v, label]) => {
                   const on = chosen === v;
                   return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted}
-                    style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? "#fff" : "#5a7780", fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>);
+                    style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>);
                 })}
                 {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}{t.mxCorrect(Q.correct[s.id] === "yes" ? t.yes : t.no)}</span>}
               </div>
@@ -186129,7 +186129,7 @@ function Exam({ onAnswer, t, onWrong }) {
                       <div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>
                         {qs.map((_, i) => (
                           <button key={i} onClick={() => { setPos(i); setTool(null); }}
-                            style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", position: "relative", background: picks[i] !== undefined ? "#2f6f8f" : "#fff", color: picks[i] !== undefined ? "#fff" : "#1b2a33" }}>
+                            style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", position: "relative", background: picks[i] !== undefined ? "#2f6f8f" : "#fff", color: picks[i] !== undefined ? nvInk("#ffffff", "#2f6f8f") : nvInk("#1b2a33", "#ffffff") }}>
                             {i + 1}{flags[i] ? <span style={{ position: "absolute", top: -3, right: -3, width: 8, height: 8, borderRadius: "50%", background: "#E8A33D" }} /> : null}
                           </button>
                         ))}
@@ -186144,7 +186144,7 @@ function Exam({ onAnswer, t, onWrong }) {
                       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>
                         {["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(b => (
                           <button key={b} onClick={() => { if (b === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("エラー"); } } else setCalcExpr(e => (e === "エラー" ? "" : e) + b); }}
-                            style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: b === "=" ? "#12324a" : /[/*\-+]/.test(b) ? "#eef2f5" : "#fff", color: b === "=" ? "#fff" : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{b}</button>
+                            style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: b === "=" ? "#12324a" : /[/*\-+]/.test(b) ? "#eef2f5" : "#fff", color: b === "=" ? nvInk("#ffffff", "#12324a") : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{b}</button>
                         ))}
                         <button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{t.calcClear}</button>
                       </div>
@@ -186396,7 +186396,7 @@ function Exam({ onAnswer, t, onWrong }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
         <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : C.primary, cursor: pos === 0 ? "not-allowed" : "pointer" }}>{t.prevQ}</button>
         <span style={{ fontSize: 13, color: "#5a7780", fontWeight: 600 }}>{pos + 1} / {qs.length}</span>
-        <button onClick={next} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
+        <button onClick={next} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), cursor: "pointer" }}>{t.nextQ}</button>
       </div>
     </div>
   );
@@ -186499,7 +186499,7 @@ function AppDecision() {
   return (
     <div>
       <div style={{ marginBottom: 10, fontSize: 12, color: "#53757f" }}>
-        {path.length > 0 && <button onClick={() => setPath(p => p.slice(0, -1))} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, padding: 0 }}>{TX().decBack}</button>}
+        {path.length > 0 && <button onClick={() => setPath(p => p.slice(0, -1))} style={{ border: "none", background: "none", color: nvInk(C.primary, "#ffffff"), cursor: "pointer", fontWeight: 700, padding: 0 }}>{TX().decBack}</button>}
       </div>
       {!leaf && steps[cur] && (
         <div>
@@ -186659,7 +186659,7 @@ function TreeNode({ node, depth, defaultOpen }) {
   return (
     <div style={{ marginLeft: depth === 0 ? 0 : 14 }}>
       <div onClick={() => hasKids && setOpen(o => !o)}
-        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? "#fff" : C.ink, marginBottom: 3 }}>
+        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? nvInk("#ffffff", C.deep) : C.ink, marginBottom: 3 }}>
         {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : nvInk(C.primary, "#ffffff") }}>{open ? "▼" : "▶"}</span>}
         {!hasKids && <span style={{ color: nvInk(C.mid, "#ffffff", 3) }}>•</span>}
         <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{Lx(node, "label")}</span>
@@ -186781,7 +186781,7 @@ function Scenario({ t }) {
               style={{
                 padding: "5px 11px", borderRadius: 16, fontSize: 12, cursor: "pointer",
                 border: `1px solid ${filter === k ? C.primary : C.mid}`,
-                background: filter === k ? C.primary : "#fff", color: filter === k ? "#fff" : C.ink, fontWeight: 600,
+                background: filter === k ? C.primary : "#fff", color: filter === k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight: 600,
               }}>
               {label}
             </button>
@@ -186802,7 +186802,7 @@ function Scenario({ t }) {
                 <div style={{ fontSize: 14, fontWeight: 600, lineHeight: 1.55, marginBottom: 10 }}>{Lx(s, "q")}</div>
                 {!isOpen ? (
                   <button onClick={() => setOpen(o => ({ ...o, [s.id]: true }))}
-                    style={{ padding: "8px 16px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
+                    style={{ padding: "8px 16px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
                     {t.showAnswer}
                   </button>
                 ) : (
@@ -186871,7 +186871,7 @@ function Compare({ t }) {
             style={{
               padding: "6px 11px", borderRadius: 16, fontSize: 11.5, cursor: "pointer",
               border: `1px solid ${idx === i ? C.primary : C.mid}`,
-              background: idx === i ? C.primary : "#fff", color: idx === i ? "#fff" : C.ink, fontWeight: 600,
+              background: idx === i ? C.primary : "#fff", color: idx === i ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight: 600,
             }}>
             {Lx(c, "title")}
           </button>
@@ -186882,7 +186882,7 @@ function Compare({ t }) {
 
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12 }}>
         <button onClick={() => setIdx(i => (i - 1 + COMPARE.length) % COMPARE.length)}
-          style={{ padding: "9px 16px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
+          style={{ padding: "9px 16px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
           {t.prevShort}
         </button>
         <span style={{ fontSize: 12, color: "#53757f", alignSelf: "center" }}>{idx + 1} / {COMPARE.length}</span>
@@ -187042,7 +187042,7 @@ function Glossary({ t }) {
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
         {GLOSSARY_CATS.map(k => (
           <button key={k} onClick={() => setCat(k)}
-            style={{ padding: "5px 11px", borderRadius: 16, fontSize: 12, cursor: "pointer", border: `1px solid ${cat === k ? C.primary : C.mid}`, background: cat === k ? C.primary : "#fff", color: cat === k ? "#fff" : C.ink, fontWeight: 600 }}>
+            style={{ padding: "5px 11px", borderRadius: 16, fontSize: 12, cursor: "pointer", border: `1px solid ${cat === k ? C.primary : C.mid}`, background: cat === k ? C.primary : "#fff", color: cat === k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight: 600 }}>
             {k === "すべて" ? t.allFields : k}
           </button>
         ))}
@@ -187611,7 +187611,7 @@ function App() {
           {["ja", "en"].map(l => (
             <button key={l} onClick={() => setLang(l)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "5px 12px", fontSize: 12, fontWeight: 700,
-                background: lang === l ? "#fff" : "transparent", color: lang === l ? C.deep : "#fff" }}>
+                background: lang === l ? "#fff" : "transparent", color: lang === l ? nvInk(C.deep, "#ffffff") : "#fff" }}>
               {l === "ja" ? "日本語" : "English"}
             </button>
           ))}
@@ -187621,7 +187621,7 @@ function App() {
         {TABS.map(([k, label]) => (
           <button key={k} onClick={() => setTab(k)}
             style={{ flex: "1 1 auto", padding: "11px 8px", border: "none", cursor: "pointer",
-              background: tab === k ? "#fff" : "transparent", color: tab === k ? C.deep : C.ink,
+              background: tab === k ? "#fff" : "transparent", color: tab === k ? nvInk(C.deep, "#ffffff") : C.ink,
               fontWeight: tab === k ? 700 : 500, fontSize: 13,
               borderBottom: tab === k ? `3px solid ${C.primary}` : "3px solid transparent" }}>
             {label}
@@ -187714,7 +187714,7 @@ function Stat({ label, value, sub, color }) {
   return (
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
-      <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
+      <div style={{ fontSize: 26, fontWeight: 800, color: color ? nvInk(color, "#ffffff", 3) : undefined }}>{value}</div>
       <div style={{ fontSize: 11, color: "#5a7288" }}>{sub}</div>
     </div>
   );
@@ -187821,7 +187821,7 @@ function Quiz({ onAnswer, lang, t }) {
             <button key={k} onClick={() => setOrderMode(k)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "6px 18px", fontSize: 13, fontWeight: 700,
                 background: orderMode === k ? "#fff" : "transparent",
-                color: orderMode === k ? C.deep : "#7d93a8",
+                color: orderMode === k ? nvInk(C.deep, "#ffffff") : nvInk("#7d93a8", C.light),
                 boxShadow: orderMode === k ? "0 1px 3px rgba(0,0,0,.12)" : "none" }}>
               {label}
             </button>
@@ -187834,7 +187834,7 @@ function Quiz({ onAnswer, lang, t }) {
           <button key={k} onClick={() => setFilter(k)}
             style={{ display: "inline-flex", alignItems: "center", padding: "7px 16px", borderRadius: 20, fontSize: 13, cursor: "pointer",
               border: `1.5px solid ${filter === k ? C.primary : C.mid}`,
-              background: filter === k ? C.primary : "#fff", color: filter === k ? "#fff" : C.ink, fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
+              background: filter === k ? C.primary : "#fff", color: filter === k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
         ))}
       </div>
 
@@ -187872,7 +187872,7 @@ function Quiz({ onAnswer, lang, t }) {
         <button onClick={goPrev} disabled={pos === 0}
           style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600,
             border: `1.5px solid ${C.mid}`, background: pos === 0 ? C.light : "#fff",
-            color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
+            color: pos === 0 ? "#a9bccf" : nvInk(C.ink, "#ffffff"), cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {lang === "en" ? "← Previous" : "← 前の問題"}
         </button>
         <span style={{ fontSize: 13, color: "#5a7288" }}>{pos + 1} / {poolCount}</span>
@@ -188049,13 +188049,13 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{en ? "Practice = instant explanations. Real = timed, official exam UI, scored at the end." : "演習モード＝即時解説。本番モード＝時間制・公式試験UI・終了後に採点。"}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", en ? "Practice" : "演習モード"], ["real", en ? "Real (exam UI)" : "本番モード"]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? nvInk(C.deep, "#ffffff") : nvInk("#53757f", C.light), boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
           {[["normal", en ? "Full set" : "通常セット"], ["domain", en ? "By domain" : "分野別"]].map(([kk, label]) => (
-            <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? "#fff" : C.ink }}>{label}</button>
+            <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff") }}>{label}</button>
           ))}
         </div>
         {kind === "domain" && DOMAINS.map(d => (
@@ -188148,7 +188148,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
-          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
+          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? nvInk(C.deep, "#ffffff") : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
@@ -188167,7 +188167,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
       <div key={s.id} style={{ marginBottom: 8, padding: "10px 11px", borderRadius: 8, border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
         <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{L(s, "text", lang)}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? "#fff" : "#5a7780", fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
+          {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
           {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
         </div>
       </div>); })}</div>);
@@ -188227,10 +188227,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
                 </div>
                 <div style={{ padding: 16, fontSize: 13.5, color: "#1b2a33", lineHeight: 1.7 }}>
                   {tool === "detail" && (<div>{en ? "Domain" : "領域"}：<b>{Q.d} {domName(Q.d, lang)}</b><br />{en ? "Question" : "問題番号"}：{pos + 1} / {qs.length}</div>)}
-                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? "#fff" : "#1b2a33" }}>{i + 1}</button>))}</div>)}
+                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? nvInk("#ffffff", C.primary) : nvInk("#1b2a33", "#ffffff") }}>{i + 1}</button>))}</div>)}
                   {tool === "break" && (<div>{en ? "The exam timer keeps running during a break." : "休憩中も試験タイマーは継続します。"}</div>)}
                   {tool === "help" && (<div>{en ? "Choose answers, use Reset to clear this question, flag for later review, and navigate with Back/Next." : "選択肢で解答し、解答のリセットで取り消し、あとで見直すでフラグ、戻る／次へで移動します。"}</div>)}
-                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? "#fff" : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
+                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? nvInk("#ffffff", "#12324a") : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
                 </div>
                 <div style={{ padding: "10px 16px", borderTop: "1px solid #e3e9ed", textAlign: "right" }}><button onClick={() => setTool(null)} style={{ padding: "8px 18px", borderRadius: 6, border: "none", background: "#12324a", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{en ? "Close" : "閉じる"}</button></div>
               </div>
@@ -188851,7 +188851,7 @@ function TreeNode({ node, depth, defaultOpen }) {
   return (
     <div style={{ marginLeft: depth === 0 ? 0 : 14 }}>
       <div onClick={() => hasKids && setOpen(o => !o)}
-        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? "#fff" : C.ink, marginBottom: 3 }}>
+        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? nvInk("#ffffff", C.deep) : C.ink, marginBottom: 3 }}>
         {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : nvInk(C.primary, "#ffffff") }}>{open ? "▼" : "▶"}</span>}
         {!hasKids && <span style={{ color: nvInk(C.mid, "#ffffff", 3) }}>•</span>}
         <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{node.label}</span>
@@ -189832,7 +189832,7 @@ function App() {
           {["ja", "en"].map(l => (
             <button key={l} onClick={() => setLang(l)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "5px 12px", fontSize: 12, fontWeight: 700,
-                background: lang === l ? "#fff" : "transparent", color: lang === l ? C.deep : "#fff" }}>
+                background: lang === l ? "#fff" : "transparent", color: lang === l ? nvInk(C.deep, "#ffffff") : "#fff" }}>
               {l === "ja" ? "日本語" : "English"}
             </button>
           ))}
@@ -189842,7 +189842,7 @@ function App() {
         {TABS.map(([k, label]) => (
           <button key={k} onClick={() => setTab(k)}
             style={{ flex: "1 1 auto", padding: "11px 8px", border: "none", cursor: "pointer",
-              background: tab === k ? "#fff" : "transparent", color: tab === k ? C.deep : C.ink,
+              background: tab === k ? "#fff" : "transparent", color: tab === k ? nvInk(C.deep, "#ffffff") : C.ink,
               fontWeight: tab === k ? 700 : 500, fontSize: 13,
               borderBottom: tab === k ? `3px solid ${C.primary}` : "3px solid transparent" }}>
             {label}
@@ -189935,7 +189935,7 @@ function Stat({ label, value, sub, color }) {
   return (
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
-      <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
+      <div style={{ fontSize: 26, fontWeight: 800, color: color ? nvInk(color, "#ffffff", 3) : undefined }}>{value}</div>
       <div style={{ fontSize: 11, color: "#5a7288" }}>{sub}</div>
     </div>
   );
@@ -190042,7 +190042,7 @@ function Quiz({ onAnswer, lang, t }) {
             <button key={k} onClick={() => setOrderMode(k)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "6px 18px", fontSize: 13, fontWeight: 700,
                 background: orderMode === k ? "#fff" : "transparent",
-                color: orderMode === k ? C.deep : "#7d93a8",
+                color: orderMode === k ? nvInk(C.deep, "#ffffff") : nvInk("#7d93a8", C.light),
                 boxShadow: orderMode === k ? "0 1px 3px rgba(0,0,0,.12)" : "none" }}>
               {label}
             </button>
@@ -190055,7 +190055,7 @@ function Quiz({ onAnswer, lang, t }) {
           <button key={k} onClick={() => setFilter(k)}
             style={{ display: "inline-flex", alignItems: "center", padding: "7px 16px", borderRadius: 20, fontSize: 13, cursor: "pointer",
               border: `1.5px solid ${filter === k ? C.primary : C.mid}`,
-              background: filter === k ? C.primary : "#fff", color: filter === k ? "#fff" : C.ink, fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
+              background: filter === k ? C.primary : "#fff", color: filter === k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
         ))}
       </div>
 
@@ -190093,7 +190093,7 @@ function Quiz({ onAnswer, lang, t }) {
         <button onClick={goPrev} disabled={pos === 0}
           style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600,
             border: `1.5px solid ${C.mid}`, background: pos === 0 ? C.light : "#fff",
-            color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
+            color: pos === 0 ? "#a9bccf" : nvInk(C.ink, "#ffffff"), cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {lang === "en" ? "← Previous" : "← 前の問題"}
         </button>
         <span style={{ fontSize: 13, color: "#5a7288" }}>{pos + 1} / {poolCount}</span>
@@ -190270,13 +190270,13 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{en ? "Practice = instant explanations. Real = timed, official exam UI, scored at the end." : "演習モード＝即時解説。本番モード＝時間制・公式試験UI・終了後に採点。"}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", en ? "Practice" : "演習モード"], ["real", en ? "Real (exam UI)" : "本番モード"]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? nvInk(C.deep, "#ffffff") : nvInk("#53757f", C.light), boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
           {[["normal", en ? "Full set" : "通常セット"], ["domain", en ? "By domain" : "分野別"]].map(([kk, label]) => (
-            <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? "#fff" : C.ink }}>{label}</button>
+            <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff") }}>{label}</button>
           ))}
         </div>
         {kind === "domain" && DOMAINS.map(d => (
@@ -190369,7 +190369,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
-          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
+          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? nvInk(C.deep, "#ffffff") : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
@@ -190388,7 +190388,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
       <div key={s.id} style={{ marginBottom: 8, padding: "10px 11px", borderRadius: 8, border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
         <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{L(s, "text", lang)}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? "#fff" : "#5a7780", fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
+          {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
           {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
         </div>
       </div>); })}</div>);
@@ -190448,10 +190448,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
                 </div>
                 <div style={{ padding: 16, fontSize: 13.5, color: "#1b2a33", lineHeight: 1.7 }}>
                   {tool === "detail" && (<div>{en ? "Domain" : "領域"}：<b>{Q.d} {domName(Q.d, lang)}</b><br />{en ? "Question" : "問題番号"}：{pos + 1} / {qs.length}</div>)}
-                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? "#fff" : "#1b2a33" }}>{i + 1}</button>))}</div>)}
+                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? nvInk("#ffffff", C.primary) : nvInk("#1b2a33", "#ffffff") }}>{i + 1}</button>))}</div>)}
                   {tool === "break" && (<div>{en ? "The exam timer keeps running during a break." : "休憩中も試験タイマーは継続します。"}</div>)}
                   {tool === "help" && (<div>{en ? "Choose answers, use Reset to clear this question, flag for later review, and navigate with Back/Next." : "選択肢で解答し、解答のリセットで取り消し、あとで見直すでフラグ、戻る／次へで移動します。"}</div>)}
-                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? "#fff" : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
+                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? nvInk("#ffffff", "#12324a") : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
                 </div>
                 <div style={{ padding: "10px 16px", borderTop: "1px solid #e3e9ed", textAlign: "right" }}><button onClick={() => setTool(null)} style={{ padding: "8px 18px", borderRadius: 6, border: "none", background: "#12324a", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{en ? "Close" : "閉じる"}</button></div>
               </div>
@@ -191137,7 +191137,7 @@ function TreeNode({ node, depth, defaultOpen }) {
   return (
     <div style={{ marginLeft: depth === 0 ? 0 : 14 }}>
       <div onClick={() => hasKids && setOpen(o => !o)}
-        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? "#fff" : C.ink, marginBottom: 3 }}>
+        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? nvInk("#ffffff", C.deep) : C.ink, marginBottom: 3 }}>
         {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : nvInk(C.primary, "#ffffff") }}>{open ? "▼" : "▶"}</span>}
         {!hasKids && <span style={{ color: nvInk(C.mid, "#ffffff", 3) }}>•</span>}
         <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{node.label}</span>
@@ -191584,7 +191584,7 @@ function App() {
           {["ja", "en"].map(l => (
             <button key={l} onClick={() => setLang(l)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "5px 12px", fontSize: 12, fontWeight: 700,
-                background: lang === l ? "#fff" : "transparent", color: lang === l ? C.deep : "#fff" }}>
+                background: lang === l ? "#fff" : "transparent", color: lang === l ? nvInk(C.deep, "#ffffff") : "#fff" }}>
               {l === "ja" ? "日本語" : "English"}
             </button>
           ))}
@@ -191594,7 +191594,7 @@ function App() {
         {TABS.map(([k, label]) => (
           <button key={k} onClick={() => setTab(k)}
             style={{ flex: "1 1 auto", padding: "11px 8px", border: "none", cursor: "pointer",
-              background: tab === k ? "#fff" : "transparent", color: tab === k ? C.deep : C.ink,
+              background: tab === k ? "#fff" : "transparent", color: tab === k ? nvInk(C.deep, "#ffffff") : C.ink,
               fontWeight: tab === k ? 700 : 500, fontSize: 13,
               borderBottom: tab === k ? `3px solid ${C.primary}` : "3px solid transparent" }}>
             {label}
@@ -191687,7 +191687,7 @@ function Stat({ label, value, sub, color }) {
   return (
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
-      <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
+      <div style={{ fontSize: 26, fontWeight: 800, color: color ? nvInk(color, "#ffffff", 3) : undefined }}>{value}</div>
       <div style={{ fontSize: 11, color: "#5a7288" }}>{sub}</div>
     </div>
   );
@@ -191794,7 +191794,7 @@ function Quiz({ onAnswer, lang, t }) {
             <button key={k} onClick={() => setOrderMode(k)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "6px 18px", fontSize: 13, fontWeight: 700,
                 background: orderMode === k ? "#fff" : "transparent",
-                color: orderMode === k ? C.deep : "#7d93a8",
+                color: orderMode === k ? nvInk(C.deep, "#ffffff") : nvInk("#7d93a8", C.light),
                 boxShadow: orderMode === k ? "0 1px 3px rgba(0,0,0,.12)" : "none" }}>
               {label}
             </button>
@@ -191807,7 +191807,7 @@ function Quiz({ onAnswer, lang, t }) {
           <button key={k} onClick={() => setFilter(k)}
             style={{ display: "inline-flex", alignItems: "center", padding: "7px 16px", borderRadius: 20, fontSize: 13, cursor: "pointer",
               border: `1.5px solid ${filter === k ? C.primary : C.mid}`,
-              background: filter === k ? C.primary : "#fff", color: filter === k ? "#fff" : C.ink, fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
+              background: filter === k ? C.primary : "#fff", color: filter === k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
         ))}
       </div>
 
@@ -191845,7 +191845,7 @@ function Quiz({ onAnswer, lang, t }) {
         <button onClick={goPrev} disabled={pos === 0}
           style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600,
             border: `1.5px solid ${C.mid}`, background: pos === 0 ? C.light : "#fff",
-            color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
+            color: pos === 0 ? "#a9bccf" : nvInk(C.ink, "#ffffff"), cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {lang === "en" ? "← Previous" : "← 前の問題"}
         </button>
         <span style={{ fontSize: 13, color: "#5a7288" }}>{pos + 1} / {poolCount}</span>
@@ -192022,13 +192022,13 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{en ? "Practice = instant explanations. Real = timed, official exam UI, scored at the end." : "演習モード＝即時解説。本番モード＝時間制・公式試験UI・終了後に採点。"}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", en ? "Practice" : "演習モード"], ["real", en ? "Real (exam UI)" : "本番モード"]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? nvInk(C.deep, "#ffffff") : nvInk("#53757f", C.light), boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
           {[["normal", en ? "Full set" : "通常セット"], ["domain", en ? "By domain" : "分野別"]].map(([kk, label]) => (
-            <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? "#fff" : C.ink }}>{label}</button>
+            <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff") }}>{label}</button>
           ))}
         </div>
         {kind === "domain" && DOMAINS.map(d => (
@@ -192122,7 +192122,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
-          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
+          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? nvInk(C.deep, "#ffffff") : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
@@ -192141,7 +192141,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
       <div key={s.id} style={{ marginBottom: 8, padding: "10px 11px", borderRadius: 8, border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
         <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{L(s, "text", lang)}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? "#fff" : "#5a7780", fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
+          {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
           {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
         </div>
       </div>); })}</div>);
@@ -192201,10 +192201,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
                 </div>
                 <div style={{ padding: 16, fontSize: 13.5, color: "#1b2a33", lineHeight: 1.7 }}>
                   {tool === "detail" && (<div>{en ? "Domain" : "領域"}：<b>{Q.d} {domName(Q.d, lang)}</b><br />{en ? "Question" : "問題番号"}：{pos + 1} / {qs.length}</div>)}
-                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? "#fff" : "#1b2a33" }}>{i + 1}</button>))}</div>)}
+                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? nvInk("#ffffff", C.primary) : nvInk("#1b2a33", "#ffffff") }}>{i + 1}</button>))}</div>)}
                   {tool === "break" && (<div>{en ? "The exam timer keeps running during a break." : "休憩中も試験タイマーは継続します。"}</div>)}
                   {tool === "help" && (<div>{en ? "Choose answers, use Reset to clear this question, flag for later review, and navigate with Back/Next." : "選択肢で解答し、解答のリセットで取り消し、あとで見直すでフラグ、戻る／次へで移動します。"}</div>)}
-                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? "#fff" : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
+                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? nvInk("#ffffff", "#12324a") : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
                 </div>
                 <div style={{ padding: "10px 16px", borderTop: "1px solid #e3e9ed", textAlign: "right" }}><button onClick={() => setTool(null)} style={{ padding: "8px 18px", borderRadius: 6, border: "none", background: "#12324a", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{en ? "Close" : "閉じる"}</button></div>
               </div>
@@ -192863,7 +192863,7 @@ function TreeNode({ node, depth, defaultOpen }) {
   return (
     <div style={{ marginLeft: depth === 0 ? 0 : 14 }}>
       <div onClick={() => hasKids && setOpen(o => !o)}
-        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? "#fff" : C.ink, marginBottom: 3 }}>
+        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? nvInk("#ffffff", C.deep) : C.ink, marginBottom: 3 }}>
         {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : nvInk(C.primary, "#ffffff") }}>{open ? "▼" : "▶"}</span>}
         {!hasKids && <span style={{ color: nvInk(C.mid, "#ffffff", 3) }}>•</span>}
         <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{node.label}</span>
@@ -193310,7 +193310,7 @@ function App() {
           {["ja", "en"].map(l => (
             <button key={l} onClick={() => setLang(l)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "5px 12px", fontSize: 12, fontWeight: 700,
-                background: lang === l ? "#fff" : "transparent", color: lang === l ? C.deep : "#fff" }}>
+                background: lang === l ? "#fff" : "transparent", color: lang === l ? nvInk(C.deep, "#ffffff") : "#fff" }}>
               {l === "ja" ? "日本語" : "English"}
             </button>
           ))}
@@ -193320,7 +193320,7 @@ function App() {
         {TABS.map(([k, label]) => (
           <button key={k} onClick={() => setTab(k)}
             style={{ flex: "1 1 auto", padding: "11px 8px", border: "none", cursor: "pointer",
-              background: tab === k ? "#fff" : "transparent", color: tab === k ? C.deep : C.ink,
+              background: tab === k ? "#fff" : "transparent", color: tab === k ? nvInk(C.deep, "#ffffff") : C.ink,
               fontWeight: tab === k ? 700 : 500, fontSize: 13,
               borderBottom: tab === k ? `3px solid ${C.primary}` : "3px solid transparent" }}>
             {label}
@@ -193413,7 +193413,7 @@ function Stat({ label, value, sub, color }) {
   return (
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
-      <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
+      <div style={{ fontSize: 26, fontWeight: 800, color: color ? nvInk(color, "#ffffff", 3) : undefined }}>{value}</div>
       <div style={{ fontSize: 11, color: "#5a7288" }}>{sub}</div>
     </div>
   );
@@ -193520,7 +193520,7 @@ function Quiz({ onAnswer, lang, t }) {
             <button key={k} onClick={() => setOrderMode(k)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "6px 18px", fontSize: 13, fontWeight: 700,
                 background: orderMode === k ? "#fff" : "transparent",
-                color: orderMode === k ? C.deep : "#7d93a8",
+                color: orderMode === k ? nvInk(C.deep, "#ffffff") : nvInk("#7d93a8", C.light),
                 boxShadow: orderMode === k ? "0 1px 3px rgba(0,0,0,.12)" : "none" }}>
               {label}
             </button>
@@ -193533,7 +193533,7 @@ function Quiz({ onAnswer, lang, t }) {
           <button key={k} onClick={() => setFilter(k)}
             style={{ display: "inline-flex", alignItems: "center", padding: "7px 16px", borderRadius: 20, fontSize: 13, cursor: "pointer",
               border: `1.5px solid ${filter === k ? C.primary : C.mid}`,
-              background: filter === k ? C.primary : "#fff", color: filter === k ? "#fff" : C.ink, fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
+              background: filter === k ? C.primary : "#fff", color: filter === k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
         ))}
       </div>
 
@@ -193571,7 +193571,7 @@ function Quiz({ onAnswer, lang, t }) {
         <button onClick={goPrev} disabled={pos === 0}
           style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600,
             border: `1.5px solid ${C.mid}`, background: pos === 0 ? C.light : "#fff",
-            color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
+            color: pos === 0 ? "#a9bccf" : nvInk(C.ink, "#ffffff"), cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {lang === "en" ? "← Previous" : "← 前の問題"}
         </button>
         <span style={{ fontSize: 13, color: "#5a7288" }}>{pos + 1} / {poolCount}</span>
@@ -193748,13 +193748,13 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{en ? "Practice = instant explanations. Real = timed, official exam UI, scored at the end." : "演習モード＝即時解説。本番モード＝時間制・公式試験UI・終了後に採点。"}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", en ? "Practice" : "演習モード"], ["real", en ? "Real (exam UI)" : "本番モード"]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? nvInk(C.deep, "#ffffff") : nvInk("#53757f", C.light), boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
           {[["normal", en ? "Full set" : "通常セット"], ["domain", en ? "By domain" : "分野別"]].map(([kk, label]) => (
-            <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? "#fff" : C.ink }}>{label}</button>
+            <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff") }}>{label}</button>
           ))}
         </div>
         {kind === "domain" && DOMAINS.map(d => (
@@ -193848,7 +193848,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
-          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
+          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? nvInk(C.deep, "#ffffff") : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
@@ -193867,7 +193867,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
       <div key={s.id} style={{ marginBottom: 8, padding: "10px 11px", borderRadius: 8, border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
         <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{L(s, "text", lang)}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? "#fff" : "#5a7780", fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
+          {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
           {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
         </div>
       </div>); })}</div>);
@@ -193927,10 +193927,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
                 </div>
                 <div style={{ padding: 16, fontSize: 13.5, color: "#1b2a33", lineHeight: 1.7 }}>
                   {tool === "detail" && (<div>{en ? "Domain" : "領域"}：<b>{Q.d} {domName(Q.d, lang)}</b><br />{en ? "Question" : "問題番号"}：{pos + 1} / {qs.length}</div>)}
-                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? "#fff" : "#1b2a33" }}>{i + 1}</button>))}</div>)}
+                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? nvInk("#ffffff", C.primary) : nvInk("#1b2a33", "#ffffff") }}>{i + 1}</button>))}</div>)}
                   {tool === "break" && (<div>{en ? "The exam timer keeps running during a break." : "休憩中も試験タイマーは継続します。"}</div>)}
                   {tool === "help" && (<div>{en ? "Choose answers, use Reset to clear this question, flag for later review, and navigate with Back/Next." : "選択肢で解答し、解答のリセットで取り消し、あとで見直すでフラグ、戻る／次へで移動します。"}</div>)}
-                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? "#fff" : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
+                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? nvInk("#ffffff", "#12324a") : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
                 </div>
                 <div style={{ padding: "10px 16px", borderTop: "1px solid #e3e9ed", textAlign: "right" }}><button onClick={() => setTool(null)} style={{ padding: "8px 18px", borderRadius: 6, border: "none", background: "#12324a", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{en ? "Close" : "閉じる"}</button></div>
               </div>
@@ -194589,7 +194589,7 @@ function TreeNode({ node, depth, defaultOpen }) {
   return (
     <div style={{ marginLeft: depth === 0 ? 0 : 14 }}>
       <div onClick={() => hasKids && setOpen(o => !o)}
-        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? "#fff" : C.ink, marginBottom: 3 }}>
+        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? nvInk("#ffffff", C.deep) : C.ink, marginBottom: 3 }}>
         {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : nvInk(C.primary, "#ffffff") }}>{open ? "▼" : "▶"}</span>}
         {!hasKids && <span style={{ color: nvInk(C.mid, "#ffffff", 3) }}>•</span>}
         <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{node.label}</span>
@@ -195028,7 +195028,7 @@ function App() {
           {["ja", "en"].map(l => (
             <button key={l} onClick={() => setLang(l)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "5px 12px", fontSize: 12, fontWeight: 700,
-                background: lang === l ? "#fff" : "transparent", color: lang === l ? C.deep : "#fff" }}>
+                background: lang === l ? "#fff" : "transparent", color: lang === l ? nvInk(C.deep, "#ffffff") : "#fff" }}>
               {l === "ja" ? "日本語" : "English"}
             </button>
           ))}
@@ -195038,7 +195038,7 @@ function App() {
         {TABS.map(([k, label]) => (
           <button key={k} onClick={() => setTab(k)}
             style={{ flex: "1 1 auto", padding: "11px 8px", border: "none", cursor: "pointer",
-              background: tab === k ? "#fff" : "transparent", color: tab === k ? C.deep : C.ink,
+              background: tab === k ? "#fff" : "transparent", color: tab === k ? nvInk(C.deep, "#ffffff") : C.ink,
               fontWeight: tab === k ? 700 : 500, fontSize: 13,
               borderBottom: tab === k ? `3px solid ${C.primary}` : "3px solid transparent" }}>
             {label}
@@ -195131,7 +195131,7 @@ function Stat({ label, value, sub, color }) {
   return (
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
-      <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
+      <div style={{ fontSize: 26, fontWeight: 800, color: color ? nvInk(color, "#ffffff", 3) : undefined }}>{value}</div>
       <div style={{ fontSize: 11, color: "#5a7288" }}>{sub}</div>
     </div>
   );
@@ -195238,7 +195238,7 @@ function Quiz({ onAnswer, lang, t }) {
             <button key={k} onClick={() => setOrderMode(k)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "6px 18px", fontSize: 13, fontWeight: 700,
                 background: orderMode === k ? "#fff" : "transparent",
-                color: orderMode === k ? C.deep : "#7d93a8",
+                color: orderMode === k ? nvInk(C.deep, "#ffffff") : nvInk("#7d93a8", C.light),
                 boxShadow: orderMode === k ? "0 1px 3px rgba(0,0,0,.12)" : "none" }}>
               {label}
             </button>
@@ -195251,7 +195251,7 @@ function Quiz({ onAnswer, lang, t }) {
           <button key={k} onClick={() => setFilter(k)}
             style={{ display: "inline-flex", alignItems: "center", padding: "7px 16px", borderRadius: 20, fontSize: 13, cursor: "pointer",
               border: `1.5px solid ${filter === k ? C.primary : C.mid}`,
-              background: filter === k ? C.primary : "#fff", color: filter === k ? "#fff" : C.ink, fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
+              background: filter === k ? C.primary : "#fff", color: filter === k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
         ))}
       </div>
 
@@ -195289,7 +195289,7 @@ function Quiz({ onAnswer, lang, t }) {
         <button onClick={goPrev} disabled={pos === 0}
           style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600,
             border: `1.5px solid ${C.mid}`, background: pos === 0 ? C.light : "#fff",
-            color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
+            color: pos === 0 ? "#a9bccf" : nvInk(C.ink, "#ffffff"), cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {lang === "en" ? "← Previous" : "← 前の問題"}
         </button>
         <span style={{ fontSize: 13, color: "#5a7288" }}>{pos + 1} / {poolCount}</span>
@@ -195466,13 +195466,13 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{en ? "Practice = instant explanations. Real = timed, official exam UI, scored at the end." : "演習モード＝即時解説。本番モード＝時間制・公式試験UI・終了後に採点。"}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", en ? "Practice" : "演習モード"], ["real", en ? "Real (exam UI)" : "本番モード"]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? nvInk(C.deep, "#ffffff") : nvInk("#53757f", C.light), boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
           {[["normal", en ? "Full set" : "通常セット"], ["domain", en ? "By domain" : "分野別"]].map(([kk, label]) => (
-            <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? "#fff" : C.ink }}>{label}</button>
+            <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff") }}>{label}</button>
           ))}
         </div>
         {kind === "domain" && DOMAINS.map(d => (
@@ -195566,7 +195566,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
-          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
+          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? nvInk(C.deep, "#ffffff") : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
@@ -195585,7 +195585,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
       <div key={s.id} style={{ marginBottom: 8, padding: "10px 11px", borderRadius: 8, border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
         <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{L(s, "text", lang)}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? "#fff" : "#5a7780", fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
+          {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
           {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
         </div>
       </div>); })}</div>);
@@ -195645,10 +195645,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
                 </div>
                 <div style={{ padding: 16, fontSize: 13.5, color: "#1b2a33", lineHeight: 1.7 }}>
                   {tool === "detail" && (<div>{en ? "Domain" : "領域"}：<b>{Q.d} {domName(Q.d, lang)}</b><br />{en ? "Question" : "問題番号"}：{pos + 1} / {qs.length}</div>)}
-                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? "#fff" : "#1b2a33" }}>{i + 1}</button>))}</div>)}
+                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? nvInk("#ffffff", C.primary) : nvInk("#1b2a33", "#ffffff") }}>{i + 1}</button>))}</div>)}
                   {tool === "break" && (<div>{en ? "The exam timer keeps running during a break." : "休憩中も試験タイマーは継続します。"}</div>)}
                   {tool === "help" && (<div>{en ? "Choose answers, use Reset to clear this question, flag for later review, and navigate with Back/Next." : "選択肢で解答し、解答のリセットで取り消し、あとで見直すでフラグ、戻る／次へで移動します。"}</div>)}
-                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? "#fff" : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
+                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? nvInk("#ffffff", "#12324a") : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
                 </div>
                 <div style={{ padding: "10px 16px", borderTop: "1px solid #e3e9ed", textAlign: "right" }}><button onClick={() => setTool(null)} style={{ padding: "8px 18px", borderRadius: 6, border: "none", background: "#12324a", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{en ? "Close" : "閉じる"}</button></div>
               </div>
@@ -196328,7 +196328,7 @@ function App() {
           {["ja", "en"].map(l => (
             <button key={l} onClick={() => setLang(l)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "5px 12px", fontSize: 12, fontWeight: 700,
-                background: lang === l ? "#fff" : "transparent", color: lang === l ? C.deep : "#fff" }}>
+                background: lang === l ? "#fff" : "transparent", color: lang === l ? nvInk(C.deep, "#ffffff") : "#fff" }}>
               {l === "ja" ? "日本語" : "English"}
             </button>
           ))}
@@ -196338,7 +196338,7 @@ function App() {
         {TABS.map(([k, label]) => (
           <button key={k} onClick={() => setTab(k)}
             style={{ flex: "1 1 auto", padding: "11px 8px", border: "none", cursor: "pointer",
-              background: tab === k ? "#fff" : "transparent", color: tab === k ? C.deep : C.ink,
+              background: tab === k ? "#fff" : "transparent", color: tab === k ? nvInk(C.deep, "#ffffff") : C.ink,
               fontWeight: tab === k ? 700 : 500, fontSize: 13,
               borderBottom: tab === k ? `3px solid ${C.primary}` : "3px solid transparent" }}>
             {label}
@@ -196431,7 +196431,7 @@ function Stat({ label, value, sub, color }) {
   return (
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
-      <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
+      <div style={{ fontSize: 26, fontWeight: 800, color: color ? nvInk(color, "#ffffff", 3) : undefined }}>{value}</div>
       <div style={{ fontSize: 11, color: "#5a7288" }}>{sub}</div>
     </div>
   );
@@ -196538,7 +196538,7 @@ function Quiz({ onAnswer, lang, t }) {
             <button key={k} onClick={() => setOrderMode(k)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "6px 18px", fontSize: 13, fontWeight: 700,
                 background: orderMode === k ? "#fff" : "transparent",
-                color: orderMode === k ? C.deep : "#7d93a8",
+                color: orderMode === k ? nvInk(C.deep, "#ffffff") : nvInk("#7d93a8", C.light),
                 boxShadow: orderMode === k ? "0 1px 3px rgba(0,0,0,.12)" : "none" }}>
               {label}
             </button>
@@ -196551,7 +196551,7 @@ function Quiz({ onAnswer, lang, t }) {
           <button key={k} onClick={() => setFilter(k)}
             style={{ display: "inline-flex", alignItems: "center", padding: "7px 16px", borderRadius: 20, fontSize: 13, cursor: "pointer",
               border: `1.5px solid ${filter === k ? C.primary : C.mid}`,
-              background: filter === k ? C.primary : "#fff", color: filter === k ? "#fff" : C.ink, fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
+              background: filter === k ? C.primary : "#fff", color: filter === k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
         ))}
       </div>
 
@@ -196589,7 +196589,7 @@ function Quiz({ onAnswer, lang, t }) {
         <button onClick={goPrev} disabled={pos === 0}
           style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600,
             border: `1.5px solid ${C.mid}`, background: pos === 0 ? C.light : "#fff",
-            color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
+            color: pos === 0 ? "#a9bccf" : nvInk(C.ink, "#ffffff"), cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {lang === "en" ? "← Previous" : "← 前の問題"}
         </button>
         <span style={{ fontSize: 13, color: "#5a7288" }}>{pos + 1} / {poolCount}</span>
@@ -196766,13 +196766,13 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{en ? "Practice = instant explanations. Real = timed, official exam UI, scored at the end." : "演習モード＝即時解説。本番モード＝時間制・公式試験UI・終了後に採点。"}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", en ? "Practice" : "演習モード"], ["real", en ? "Real (exam UI)" : "本番モード"]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? nvInk(C.deep, "#ffffff") : nvInk("#53757f", C.light), boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
           {[["normal", en ? "Full set" : "通常セット"], ["domain", en ? "By domain" : "分野別"]].map(([kk, label]) => (
-            <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? "#fff" : C.ink }}>{label}</button>
+            <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff") }}>{label}</button>
           ))}
         </div>
         {kind === "domain" && DOMAINS.map(d => (
@@ -196866,7 +196866,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
-          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
+          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? nvInk(C.deep, "#ffffff") : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
@@ -196885,7 +196885,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
       <div key={s.id} style={{ marginBottom: 8, padding: "10px 11px", borderRadius: 8, border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
         <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{L(s, "text", lang)}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? "#fff" : "#5a7780", fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
+          {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
           {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
         </div>
       </div>); })}</div>);
@@ -196945,10 +196945,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
                 </div>
                 <div style={{ padding: 16, fontSize: 13.5, color: "#1b2a33", lineHeight: 1.7 }}>
                   {tool === "detail" && (<div>{en ? "Domain" : "領域"}：<b>{Q.d} {domName(Q.d, lang)}</b><br />{en ? "Question" : "問題番号"}：{pos + 1} / {qs.length}</div>)}
-                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? "#fff" : "#1b2a33" }}>{i + 1}</button>))}</div>)}
+                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? nvInk("#ffffff", C.primary) : nvInk("#1b2a33", "#ffffff") }}>{i + 1}</button>))}</div>)}
                   {tool === "break" && (<div>{en ? "The exam timer keeps running during a break." : "休憩中も試験タイマーは継続します。"}</div>)}
                   {tool === "help" && (<div>{en ? "Choose answers, use Reset to clear this question, flag for later review, and navigate with Back/Next." : "選択肢で解答し、解答のリセットで取り消し、あとで見直すでフラグ、戻る／次へで移動します。"}</div>)}
-                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? "#fff" : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
+                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? nvInk("#ffffff", "#12324a") : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
                 </div>
                 <div style={{ padding: "10px 16px", borderTop: "1px solid #e3e9ed", textAlign: "right" }}><button onClick={() => setTool(null)} style={{ padding: "8px 18px", borderRadius: 6, border: "none", background: "#12324a", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{en ? "Close" : "閉じる"}</button></div>
               </div>
@@ -197626,7 +197626,7 @@ function App() {
           {["ja", "en"].map(l => (
             <button key={l} onClick={() => setLang(l)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "5px 12px", fontSize: 12, fontWeight: 700,
-                background: lang === l ? "#fff" : "transparent", color: lang === l ? C.deep : "#fff" }}>
+                background: lang === l ? "#fff" : "transparent", color: lang === l ? nvInk(C.deep, "#ffffff") : "#fff" }}>
               {l === "ja" ? "日本語" : "English"}
             </button>
           ))}
@@ -197636,7 +197636,7 @@ function App() {
         {TABS.map(([k, label]) => (
           <button key={k} onClick={() => setTab(k)}
             style={{ flex: "1 1 auto", padding: "11px 8px", border: "none", cursor: "pointer",
-              background: tab === k ? "#fff" : "transparent", color: tab === k ? C.deep : C.ink,
+              background: tab === k ? "#fff" : "transparent", color: tab === k ? nvInk(C.deep, "#ffffff") : C.ink,
               fontWeight: tab === k ? 700 : 500, fontSize: 13,
               borderBottom: tab === k ? `3px solid ${C.primary}` : "3px solid transparent" }}>
             {label}
@@ -197729,7 +197729,7 @@ function Stat({ label, value, sub, color }) {
   return (
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
-      <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
+      <div style={{ fontSize: 26, fontWeight: 800, color: color ? nvInk(color, "#ffffff", 3) : undefined }}>{value}</div>
       <div style={{ fontSize: 11, color: "#5a7288" }}>{sub}</div>
     </div>
   );
@@ -197836,7 +197836,7 @@ function Quiz({ onAnswer, lang, t }) {
             <button key={k} onClick={() => setOrderMode(k)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "6px 18px", fontSize: 13, fontWeight: 700,
                 background: orderMode === k ? "#fff" : "transparent",
-                color: orderMode === k ? C.deep : "#7d93a8",
+                color: orderMode === k ? nvInk(C.deep, "#ffffff") : nvInk("#7d93a8", C.light),
                 boxShadow: orderMode === k ? "0 1px 3px rgba(0,0,0,.12)" : "none" }}>
               {label}
             </button>
@@ -197849,7 +197849,7 @@ function Quiz({ onAnswer, lang, t }) {
           <button key={k} onClick={() => setFilter(k)}
             style={{ display: "inline-flex", alignItems: "center", padding: "7px 16px", borderRadius: 20, fontSize: 13, cursor: "pointer",
               border: `1.5px solid ${filter === k ? C.primary : C.mid}`,
-              background: filter === k ? C.primary : "#fff", color: filter === k ? "#fff" : C.ink, fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
+              background: filter === k ? C.primary : "#fff", color: filter === k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
         ))}
       </div>
 
@@ -197887,7 +197887,7 @@ function Quiz({ onAnswer, lang, t }) {
         <button onClick={goPrev} disabled={pos === 0}
           style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600,
             border: `1.5px solid ${C.mid}`, background: pos === 0 ? C.light : "#fff",
-            color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
+            color: pos === 0 ? "#a9bccf" : nvInk(C.ink, "#ffffff"), cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {lang === "en" ? "← Previous" : "← 前の問題"}
         </button>
         <span style={{ fontSize: 13, color: "#5a7288" }}>{pos + 1} / {poolCount}</span>
@@ -198064,13 +198064,13 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{en ? "Practice = instant explanations. Real = timed, official exam UI, scored at the end." : "演習モード＝即時解説。本番モード＝時間制・公式試験UI・終了後に採点。"}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", en ? "Practice" : "演習モード"], ["real", en ? "Real (exam UI)" : "本番モード"]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? nvInk(C.deep, "#ffffff") : nvInk("#53757f", C.light), boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
           {[["normal", en ? "Full set" : "通常セット"], ["domain", en ? "By domain" : "分野別"]].map(([kk, label]) => (
-            <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? "#fff" : C.ink }}>{label}</button>
+            <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff") }}>{label}</button>
           ))}
         </div>
         {kind === "domain" && DOMAINS.map(d => (
@@ -198164,7 +198164,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
-          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
+          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? nvInk(C.deep, "#ffffff") : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
@@ -198183,7 +198183,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
       <div key={s.id} style={{ marginBottom: 8, padding: "10px 11px", borderRadius: 8, border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
         <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{L(s, "text", lang)}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? "#fff" : "#5a7780", fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
+          {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
           {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
         </div>
       </div>); })}</div>);
@@ -198243,10 +198243,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
                 </div>
                 <div style={{ padding: 16, fontSize: 13.5, color: "#1b2a33", lineHeight: 1.7 }}>
                   {tool === "detail" && (<div>{en ? "Domain" : "領域"}：<b>{Q.d} {domName(Q.d, lang)}</b><br />{en ? "Question" : "問題番号"}：{pos + 1} / {qs.length}</div>)}
-                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? "#fff" : "#1b2a33" }}>{i + 1}</button>))}</div>)}
+                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? nvInk("#ffffff", C.primary) : nvInk("#1b2a33", "#ffffff") }}>{i + 1}</button>))}</div>)}
                   {tool === "break" && (<div>{en ? "The exam timer keeps running during a break." : "休憩中も試験タイマーは継続します。"}</div>)}
                   {tool === "help" && (<div>{en ? "Choose answers, use Reset to clear this question, flag for later review, and navigate with Back/Next." : "選択肢で解答し、解答のリセットで取り消し、あとで見直すでフラグ、戻る／次へで移動します。"}</div>)}
-                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? "#fff" : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
+                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? nvInk("#ffffff", "#12324a") : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
                 </div>
                 <div style={{ padding: "10px 16px", borderTop: "1px solid #e3e9ed", textAlign: "right" }}><button onClick={() => setTool(null)} style={{ padding: "8px 18px", borderRadius: 6, border: "none", background: "#12324a", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{en ? "Close" : "閉じる"}</button></div>
               </div>
@@ -198924,7 +198924,7 @@ function App() {
           {["ja", "en"].map(l => (
             <button key={l} onClick={() => setLang(l)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "5px 12px", fontSize: 12, fontWeight: 700,
-                background: lang === l ? "#fff" : "transparent", color: lang === l ? C.deep : "#fff" }}>
+                background: lang === l ? "#fff" : "transparent", color: lang === l ? nvInk(C.deep, "#ffffff") : "#fff" }}>
               {l === "ja" ? "日本語" : "English"}
             </button>
           ))}
@@ -198934,7 +198934,7 @@ function App() {
         {TABS.map(([k, label]) => (
           <button key={k} onClick={() => setTab(k)}
             style={{ flex: "1 1 auto", padding: "11px 8px", border: "none", cursor: "pointer",
-              background: tab === k ? "#fff" : "transparent", color: tab === k ? C.deep : C.ink,
+              background: tab === k ? "#fff" : "transparent", color: tab === k ? nvInk(C.deep, "#ffffff") : C.ink,
               fontWeight: tab === k ? 700 : 500, fontSize: 13,
               borderBottom: tab === k ? `3px solid ${C.primary}` : "3px solid transparent" }}>
             {label}
@@ -199027,7 +199027,7 @@ function Stat({ label, value, sub, color }) {
   return (
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
-      <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
+      <div style={{ fontSize: 26, fontWeight: 800, color: color ? nvInk(color, "#ffffff", 3) : undefined }}>{value}</div>
       <div style={{ fontSize: 11, color: "#5a7288" }}>{sub}</div>
     </div>
   );
@@ -199134,7 +199134,7 @@ function Quiz({ onAnswer, lang, t }) {
             <button key={k} onClick={() => setOrderMode(k)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "6px 18px", fontSize: 13, fontWeight: 700,
                 background: orderMode === k ? "#fff" : "transparent",
-                color: orderMode === k ? C.deep : "#7d93a8",
+                color: orderMode === k ? nvInk(C.deep, "#ffffff") : nvInk("#7d93a8", C.light),
                 boxShadow: orderMode === k ? "0 1px 3px rgba(0,0,0,.12)" : "none" }}>
               {label}
             </button>
@@ -199147,7 +199147,7 @@ function Quiz({ onAnswer, lang, t }) {
           <button key={k} onClick={() => setFilter(k)}
             style={{ display: "inline-flex", alignItems: "center", padding: "7px 16px", borderRadius: 20, fontSize: 13, cursor: "pointer",
               border: `1.5px solid ${filter === k ? C.primary : C.mid}`,
-              background: filter === k ? C.primary : "#fff", color: filter === k ? "#fff" : C.ink, fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
+              background: filter === k ? C.primary : "#fff", color: filter === k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
         ))}
       </div>
 
@@ -199185,7 +199185,7 @@ function Quiz({ onAnswer, lang, t }) {
         <button onClick={goPrev} disabled={pos === 0}
           style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600,
             border: `1.5px solid ${C.mid}`, background: pos === 0 ? C.light : "#fff",
-            color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
+            color: pos === 0 ? "#a9bccf" : nvInk(C.ink, "#ffffff"), cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {lang === "en" ? "← Previous" : "← 前の問題"}
         </button>
         <span style={{ fontSize: 13, color: "#5a7288" }}>{pos + 1} / {poolCount}</span>
@@ -199362,13 +199362,13 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{en ? "Practice = instant explanations. Real = timed, official exam UI, scored at the end." : "演習モード＝即時解説。本番モード＝時間制・公式試験UI・終了後に採点。"}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", en ? "Practice" : "演習モード"], ["real", en ? "Real (exam UI)" : "本番モード"]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? nvInk(C.deep, "#ffffff") : nvInk("#53757f", C.light), boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
           {[["normal", en ? "Full set" : "通常セット"], ["domain", en ? "By domain" : "分野別"]].map(([kk, label]) => (
-            <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? "#fff" : C.ink }}>{label}</button>
+            <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff") }}>{label}</button>
           ))}
         </div>
         {kind === "domain" && DOMAINS.map(d => (
@@ -199462,7 +199462,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
-          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
+          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? nvInk(C.deep, "#ffffff") : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
@@ -199481,7 +199481,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
       <div key={s.id} style={{ marginBottom: 8, padding: "10px 11px", borderRadius: 8, border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
         <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{L(s, "text", lang)}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? "#fff" : "#5a7780", fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
+          {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
           {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
         </div>
       </div>); })}</div>);
@@ -199541,10 +199541,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
                 </div>
                 <div style={{ padding: 16, fontSize: 13.5, color: "#1b2a33", lineHeight: 1.7 }}>
                   {tool === "detail" && (<div>{en ? "Domain" : "領域"}：<b>{Q.d} {domName(Q.d, lang)}</b><br />{en ? "Question" : "問題番号"}：{pos + 1} / {qs.length}</div>)}
-                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? "#fff" : "#1b2a33" }}>{i + 1}</button>))}</div>)}
+                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? nvInk("#ffffff", C.primary) : nvInk("#1b2a33", "#ffffff") }}>{i + 1}</button>))}</div>)}
                   {tool === "break" && (<div>{en ? "The exam timer keeps running during a break." : "休憩中も試験タイマーは継続します。"}</div>)}
                   {tool === "help" && (<div>{en ? "Choose answers, use Reset to clear this question, flag for later review, and navigate with Back/Next." : "選択肢で解答し、解答のリセットで取り消し、あとで見直すでフラグ、戻る／次へで移動します。"}</div>)}
-                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? "#fff" : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
+                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? nvInk("#ffffff", "#12324a") : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
                 </div>
                 <div style={{ padding: "10px 16px", borderTop: "1px solid #e3e9ed", textAlign: "right" }}><button onClick={() => setTool(null)} style={{ padding: "8px 18px", borderRadius: 6, border: "none", background: "#12324a", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{en ? "Close" : "閉じる"}</button></div>
               </div>
@@ -200208,7 +200208,7 @@ function App() {
           {["ja", "en"].map(l => (
             <button key={l} onClick={() => setLang(l)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "5px 12px", fontSize: 12, fontWeight: 700,
-                background: lang === l ? "#fff" : "transparent", color: lang === l ? C.deep : "#fff" }}>
+                background: lang === l ? "#fff" : "transparent", color: lang === l ? nvInk(C.deep, "#ffffff") : "#fff" }}>
               {l === "ja" ? "日本語" : "English"}
             </button>
           ))}
@@ -200218,7 +200218,7 @@ function App() {
         {TABS.map(([k, label]) => (
           <button key={k} onClick={() => setTab(k)}
             style={{ flex: "1 1 auto", padding: "11px 8px", border: "none", cursor: "pointer",
-              background: tab === k ? "#fff" : "transparent", color: tab === k ? C.deep : C.ink,
+              background: tab === k ? "#fff" : "transparent", color: tab === k ? nvInk(C.deep, "#ffffff") : C.ink,
               fontWeight: tab === k ? 700 : 500, fontSize: 13,
               borderBottom: tab === k ? `3px solid ${C.primary}` : "3px solid transparent" }}>
             {label}
@@ -200311,7 +200311,7 @@ function Stat({ label, value, sub, color }) {
   return (
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
-      <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
+      <div style={{ fontSize: 26, fontWeight: 800, color: color ? nvInk(color, "#ffffff", 3) : undefined }}>{value}</div>
       <div style={{ fontSize: 11, color: "#5a7288" }}>{sub}</div>
     </div>
   );
@@ -200418,7 +200418,7 @@ function Quiz({ onAnswer, lang, t }) {
             <button key={k} onClick={() => setOrderMode(k)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "6px 18px", fontSize: 13, fontWeight: 700,
                 background: orderMode === k ? "#fff" : "transparent",
-                color: orderMode === k ? C.deep : "#7d93a8",
+                color: orderMode === k ? nvInk(C.deep, "#ffffff") : nvInk("#7d93a8", C.light),
                 boxShadow: orderMode === k ? "0 1px 3px rgba(0,0,0,.12)" : "none" }}>
               {label}
             </button>
@@ -200431,7 +200431,7 @@ function Quiz({ onAnswer, lang, t }) {
           <button key={k} onClick={() => setFilter(k)}
             style={{ display: "inline-flex", alignItems: "center", padding: "7px 16px", borderRadius: 20, fontSize: 13, cursor: "pointer",
               border: `1.5px solid ${filter === k ? C.primary : C.mid}`,
-              background: filter === k ? C.primary : "#fff", color: filter === k ? "#fff" : C.ink, fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
+              background: filter === k ? C.primary : "#fff", color: filter === k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
         ))}
       </div>
 
@@ -200469,7 +200469,7 @@ function Quiz({ onAnswer, lang, t }) {
         <button onClick={goPrev} disabled={pos === 0}
           style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600,
             border: `1.5px solid ${C.mid}`, background: pos === 0 ? C.light : "#fff",
-            color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
+            color: pos === 0 ? "#a9bccf" : nvInk(C.ink, "#ffffff"), cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {lang === "en" ? "← Previous" : "← 前の問題"}
         </button>
         <span style={{ fontSize: 13, color: "#5a7288" }}>{pos + 1} / {poolCount}</span>
@@ -200645,13 +200645,13 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{en ? "Practice = instant explanations. Real = timed, official exam UI, scored at the end." : "演習モード＝即時解説。本番モード＝時間制・公式試験UI・終了後に採点。"}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", en ? "Practice" : "演習モード"], ["real", en ? "Real (exam UI)" : "本番モード"]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? nvInk(C.deep, "#ffffff") : nvInk("#53757f", C.light), boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
           {[["normal", en ? "Full set" : "通常セット"], ["domain", en ? "By domain" : "分野別"]].map(([kk, label]) => (
-            <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? "#fff" : C.ink }}>{label}</button>
+            <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff") }}>{label}</button>
           ))}
         </div>
         {kind === "domain" && DOMAINS.map(d => (
@@ -200744,7 +200744,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
-          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
+          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? nvInk(C.deep, "#ffffff") : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
@@ -200763,7 +200763,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
       <div key={s.id} style={{ marginBottom: 8, padding: "10px 11px", borderRadius: 8, border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
         <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{L(s, "text", lang)}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? "#fff" : "#5a7780", fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
+          {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
           {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
         </div>
       </div>); })}</div>);
@@ -200823,10 +200823,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
                 </div>
                 <div style={{ padding: 16, fontSize: 13.5, color: "#1b2a33", lineHeight: 1.7 }}>
                   {tool === "detail" && (<div>{en ? "Domain" : "領域"}：<b>{Q.d} {domName(Q.d, lang)}</b><br />{en ? "Question" : "問題番号"}：{pos + 1} / {qs.length}</div>)}
-                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? "#fff" : "#1b2a33" }}>{i + 1}</button>))}</div>)}
+                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? nvInk("#ffffff", C.primary) : nvInk("#1b2a33", "#ffffff") }}>{i + 1}</button>))}</div>)}
                   {tool === "break" && (<div>{en ? "The exam timer keeps running during a break." : "休憩中も試験タイマーは継続します。"}</div>)}
                   {tool === "help" && (<div>{en ? "Choose answers, use Reset to clear this question, flag for later review, and navigate with Back/Next." : "選択肢で解答し、解答のリセットで取り消し、あとで見直すでフラグ、戻る／次へで移動します。"}</div>)}
-                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? "#fff" : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
+                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? nvInk("#ffffff", "#12324a") : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
                 </div>
                 <div style={{ padding: "10px 16px", borderTop: "1px solid #e3e9ed", textAlign: "right" }}><button onClick={() => setTool(null)} style={{ padding: "8px 18px", borderRadius: 6, border: "none", background: "#12324a", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{en ? "Close" : "閉じる"}</button></div>
               </div>
@@ -201216,7 +201216,7 @@ function TreeNode({ node, depth, defaultOpen }) {
   return (
     <div style={{ marginLeft: depth === 0 ? 0 : 14 }}>
       <div onClick={() => hasKids && setOpen(o => !o)}
-        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? "#fff" : C.ink, marginBottom: 3 }}>
+        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? nvInk("#ffffff", C.deep) : C.ink, marginBottom: 3 }}>
         {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : nvInk(C.primary, "#ffffff") }}>{open ? "▼" : "▶"}</span>}
         {!hasKids && <span style={{ color: nvInk(C.mid, "#ffffff", 3) }}>•</span>}
         <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{node.label}</span>
@@ -201483,7 +201483,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
     return (
       <div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-          <button onClick={onBack} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
+          <button onClick={onBack} style={{ border: "none", background: "none", color: nvInk(C.primary, "#ffffff"), cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{lang === "ja" ? "← 戻る" : "← Back"}</button>
         </div>
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 4 }}>{lang === "ja" ? "本試験形式ケース" : "Exam-style cases"}</div>
         <div style={{ fontSize: 12, color: "#5d6c83", marginBottom: 12 }}>{lang === "ja" ? "資料表つき・僅差4択・全選択肢に根拠解説" : "Data tables, 4 close options, rationale for each"}</div>
@@ -201525,7 +201525,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-        <button onClick={backToList} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
+        <button onClick={backToList} style={{ border: "none", background: "none", color: nvInk(C.primary, "#ffffff"), cursor: "pointer", fontWeight: 700, fontSize: 12.5, padding: 0 }}>{clist.length > 1 ? (lang === "ja" ? "← ケース一覧" : "← Case list") : (lang === "ja" ? "← 戻る" : "← Back")}</button>
         {!finished && <span style={{ fontSize: 12, color: "#5d6c83" }}>{lang === "ja" ? `問 ${qi + 1} / ${qs.length}` : `Q ${qi + 1} / ${qs.length}`}</span>}
       </div>
 
@@ -201555,7 +201555,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           </div>
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
-            <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
+            <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
             <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
           </div>
         </div>
@@ -201640,7 +201640,7 @@ function App() {
           {["ja", "en"].map(l => (
             <button key={l} onClick={() => setLang(l)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "5px 12px", fontSize: 12, fontWeight: 700,
-                background: lang === l ? "#fff" : "transparent", color: lang === l ? C.deep : "#fff" }}>
+                background: lang === l ? "#fff" : "transparent", color: lang === l ? nvInk(C.deep, "#ffffff") : "#fff" }}>
               {l === "ja" ? "日本語" : "English"}
             </button>
           ))}
@@ -201650,7 +201650,7 @@ function App() {
         {TABS.map(([k, label]) => (
           <button key={k} onClick={() => setTab(k)}
             style={{ flex: "1 1 auto", padding: "11px 8px", border: "none", cursor: "pointer",
-              background: tab === k ? "#fff" : "transparent", color: tab === k ? C.deep : C.ink,
+              background: tab === k ? "#fff" : "transparent", color: tab === k ? nvInk(C.deep, "#ffffff") : C.ink,
               fontWeight: tab === k ? 700 : 500, fontSize: 13,
               borderBottom: tab === k ? `3px solid ${C.primary}` : "3px solid transparent" }}>
             {label}
@@ -201743,7 +201743,7 @@ function Stat({ label, value, sub, color }) {
   return (
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
-      <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
+      <div style={{ fontSize: 26, fontWeight: 800, color: color ? nvInk(color, "#ffffff", 3) : undefined }}>{value}</div>
       <div style={{ fontSize: 11, color: "#5a7288" }}>{sub}</div>
     </div>
   );
@@ -201832,7 +201832,7 @@ function Quiz({ onAnswer, lang, t }) {
     <div>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
         <button onClick={async () => { await slot.save({ filter, orderMode, order, pos, sel, answeredMap }, filter === "ALL" ? t.allFields : filter); }}
-          style={{ padding: "6px 14px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>
+          style={{ padding: "6px 14px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>
           {slot.meta ? (lang === "en" ? "💾 Saved" : "💾 保存済") : (lang === "en" ? "💾 Save" : "💾 セーブ")}
         </button>
         {slot.meta && (
@@ -201850,7 +201850,7 @@ function Quiz({ onAnswer, lang, t }) {
             <button key={k} onClick={() => setOrderMode(k)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "6px 18px", fontSize: 13, fontWeight: 700,
                 background: orderMode === k ? "#fff" : "transparent",
-                color: orderMode === k ? C.deep : "#7d93a8",
+                color: orderMode === k ? nvInk(C.deep, "#ffffff") : nvInk("#7d93a8", C.light),
                 boxShadow: orderMode === k ? "0 1px 3px rgba(0,0,0,.12)" : "none" }}>
               {label}
             </button>
@@ -201863,7 +201863,7 @@ function Quiz({ onAnswer, lang, t }) {
           <button key={k} onClick={() => setFilter(k)}
             style={{ display: "inline-flex", alignItems: "center", padding: "7px 16px", borderRadius: 20, fontSize: 13, cursor: "pointer",
               border: `1.5px solid ${filter === k ? C.primary : C.mid}`,
-              background: filter === k ? C.primary : "#fff", color: filter === k ? "#fff" : C.ink, fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
+              background: filter === k ? C.primary : "#fff", color: filter === k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
         ))}
       </div>
 
@@ -201901,11 +201901,11 @@ function Quiz({ onAnswer, lang, t }) {
         <button onClick={goPrev} disabled={pos === 0}
           style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600,
             border: `1.5px solid ${C.mid}`, background: pos === 0 ? C.light : "#fff",
-            color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
+            color: pos === 0 ? "#a9bccf" : nvInk(C.ink, "#ffffff"), cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {lang === "en" ? "← Previous" : "← 前の問題"}
         </button>
         <span style={{ fontSize: 13, color: "#5a7288" }}>{pos + 1} / {poolCount}</span>
-        <button onClick={goNext} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
+        <button onClick={goNext} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), cursor: "pointer" }}>{t.nextQ}</button>
       </div>
       </div>
     </div>
@@ -202077,13 +202077,13 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{en ? "Practice = instant explanations. Real = timed, official exam UI, scored at the end." : "演習モード＝即時解説。本番モード＝時間制・公式試験UI・終了後に採点。"}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", en ? "Practice" : "演習モード"], ["real", en ? "Real (exam UI)" : "本番モード"]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? nvInk(C.deep, "#ffffff") : nvInk("#53757f", C.light), boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
           {[["normal", en ? "Full set" : "通常セット"], ["domain", en ? "By domain" : "分野別"]].map(([kk, label]) => (
-            <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? "#fff" : C.ink }}>{label}</button>
+            <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff") }}>{label}</button>
           ))}
         </div>
         {kind === "domain" && DOMAINS.map(d => (
@@ -202127,7 +202127,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
-          <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Set select" : "セット選択"}</button>
+          <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Set select" : "セット選択"}</button>
         </div>
       </div>
     );
@@ -202176,7 +202176,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
-          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
+          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? nvInk(C.deep, "#ffffff") : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
@@ -202195,7 +202195,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
       <div key={s.id} style={{ marginBottom: 8, padding: "10px 11px", borderRadius: 8, border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
         <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{L(s, "text", lang)}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? "#fff" : "#5a7780", fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
+          {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
           {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
         </div>
       </div>); })}</div>);
@@ -202255,10 +202255,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
                 </div>
                 <div style={{ padding: 16, fontSize: 13.5, color: "#1b2a33", lineHeight: 1.7 }}>
                   {tool === "detail" && (<div>{en ? "Domain" : "領域"}：<b>{Q.d} {domName(Q.d, lang)}</b><br />{en ? "Question" : "問題番号"}：{pos + 1} / {qs.length}</div>)}
-                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? "#fff" : "#1b2a33" }}>{i + 1}</button>))}</div>)}
+                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? nvInk("#ffffff", C.primary) : nvInk("#1b2a33", "#ffffff") }}>{i + 1}</button>))}</div>)}
                   {tool === "break" && (<div>{en ? "The exam timer keeps running during a break." : "休憩中も試験タイマーは継続します。"}</div>)}
                   {tool === "help" && (<div>{en ? "Choose answers, use Reset to clear this question, flag for later review, and navigate with Back/Next." : "選択肢で解答し、解答のリセットで取り消し、あとで見直すでフラグ、戻る／次へで移動します。"}</div>)}
-                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? "#fff" : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
+                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? nvInk("#ffffff", "#12324a") : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
                 </div>
                 <div style={{ padding: "10px 16px", borderTop: "1px solid #e3e9ed", textAlign: "right" }}><button onClick={() => setTool(null)} style={{ padding: "8px 18px", borderRadius: 6, border: "none", background: "#12324a", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{en ? "Close" : "閉じる"}</button></div>
               </div>
@@ -202360,7 +202360,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
         <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : C.primary, cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
         <span style={{ fontSize: 13, color: "#5a7780", fontWeight: 600 }}>{pos + 1} / {qs.length}</span>
-        <button onClick={next} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
+        <button onClick={next} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), cursor: "pointer" }}>{t.nextQ}</button>
       </div>
     </div>
   );
@@ -202442,7 +202442,7 @@ function Review({ lang, t, onAnswer }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
         <button onClick={() => { setPhase("list"); setSel(null); }}
-          style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", fontWeight: 700, fontSize: 13, padding: 0 }}>
+          style={{ border: "none", background: "none", color: nvInk(C.primary, "#ffffff"), cursor: "pointer", fontWeight: 700, fontSize: 13, padding: 0 }}>
           {lang === "en" ? "← Back to list" : "← 一覧へ戻る"}
         </button>
         <span style={{ fontSize: 12, color: "#5b6b7d" }}>{lang === "en" ? "Left" : "残り"} {remaining}{t.questionsUnit}</span>
@@ -202635,7 +202635,7 @@ function TreeNode({ node, depth, defaultOpen }) {
   return (
     <div style={{ marginLeft: depth === 0 ? 0 : 14 }}>
       <div onClick={() => hasKids && setOpen(o => !o)}
-        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? "#fff" : C.ink, marginBottom: 3 }}>
+        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? nvInk("#ffffff", C.deep) : C.ink, marginBottom: 3 }}>
         {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : nvInk(C.primary, "#ffffff") }}>{open ? "▼" : "▶"}</span>}
         {!hasKids && <span style={{ color: nvInk(C.mid, "#ffffff", 3) }}>•</span>}
         <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{node.label}</span>
@@ -203237,7 +203237,7 @@ function App() {
           {["ja", "en"].map(l => (
             <button key={l} onClick={() => setLang(l)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "5px 12px", fontSize: 12, fontWeight: 700,
-                background: lang === l ? "#fff" : "transparent", color: lang === l ? C.deep : "#fff" }}>
+                background: lang === l ? "#fff" : "transparent", color: lang === l ? nvInk(C.deep, "#ffffff") : "#fff" }}>
               {l === "ja" ? "日本語" : "English"}
             </button>
           ))}
@@ -203247,7 +203247,7 @@ function App() {
         {TABS.map(([k, label]) => (
           <button key={k} onClick={() => setTab(k)}
             style={{ flex: "1 1 auto", padding: "11px 8px", border: "none", cursor: "pointer",
-              background: tab === k ? "#fff" : "transparent", color: tab === k ? C.deep : C.ink,
+              background: tab === k ? "#fff" : "transparent", color: tab === k ? nvInk(C.deep, "#ffffff") : C.ink,
               fontWeight: tab === k ? 700 : 500, fontSize: 13,
               borderBottom: tab === k ? `3px solid ${C.primary}` : "3px solid transparent" }}>
             {label}
@@ -203340,7 +203340,7 @@ function Stat({ label, value, sub, color }) {
   return (
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
-      <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
+      <div style={{ fontSize: 26, fontWeight: 800, color: color ? nvInk(color, "#ffffff", 3) : undefined }}>{value}</div>
       <div style={{ fontSize: 11, color: "#5a7288" }}>{sub}</div>
     </div>
   );
@@ -203447,7 +203447,7 @@ function Quiz({ onAnswer, lang, t }) {
             <button key={k} onClick={() => setOrderMode(k)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "6px 18px", fontSize: 13, fontWeight: 700,
                 background: orderMode === k ? "#fff" : "transparent",
-                color: orderMode === k ? C.deep : "#7d93a8",
+                color: orderMode === k ? nvInk(C.deep, "#ffffff") : nvInk("#7d93a8", C.light),
                 boxShadow: orderMode === k ? "0 1px 3px rgba(0,0,0,.12)" : "none" }}>
               {label}
             </button>
@@ -203460,7 +203460,7 @@ function Quiz({ onAnswer, lang, t }) {
           <button key={k} onClick={() => setFilter(k)}
             style={{ display: "inline-flex", alignItems: "center", padding: "7px 16px", borderRadius: 20, fontSize: 13, cursor: "pointer",
               border: `1.5px solid ${filter === k ? C.primary : C.mid}`,
-              background: filter === k ? C.primary : "#fff", color: filter === k ? "#fff" : C.ink, fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
+              background: filter === k ? C.primary : "#fff", color: filter === k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
         ))}
       </div>
 
@@ -203498,7 +203498,7 @@ function Quiz({ onAnswer, lang, t }) {
         <button onClick={goPrev} disabled={pos === 0}
           style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600,
             border: `1.5px solid ${C.mid}`, background: pos === 0 ? C.light : "#fff",
-            color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
+            color: pos === 0 ? "#a9bccf" : nvInk(C.ink, "#ffffff"), cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {lang === "en" ? "← Previous" : "← 前の問題"}
         </button>
         <span style={{ fontSize: 13, color: "#5a7288" }}>{pos + 1} / {poolCount}</span>
@@ -203674,13 +203674,13 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{en ? "Practice = instant explanations. Real = timed, official exam UI, scored at the end." : "演習モード＝即時解説。本番モード＝時間制・公式試験UI・終了後に採点。"}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", en ? "Practice" : "演習モード"], ["real", en ? "Real (exam UI)" : "本番モード"]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? nvInk(C.deep, "#ffffff") : nvInk("#53757f", C.light), boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
           {[["normal", en ? "Full set" : "通常セット"], ["domain", en ? "By domain" : "分野別"]].map(([kk, label]) => (
-            <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? "#fff" : C.ink }}>{label}</button>
+            <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff") }}>{label}</button>
           ))}
         </div>
         {kind === "domain" && DOMAINS.map(d => (
@@ -203773,7 +203773,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
-          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
+          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? nvInk(C.deep, "#ffffff") : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
@@ -203792,7 +203792,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
       <div key={s.id} style={{ marginBottom: 8, padding: "10px 11px", borderRadius: 8, border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
         <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{L(s, "text", lang)}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? "#fff" : "#5a7780", fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
+          {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
           {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
         </div>
       </div>); })}</div>);
@@ -203852,10 +203852,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
                 </div>
                 <div style={{ padding: 16, fontSize: 13.5, color: "#1b2a33", lineHeight: 1.7 }}>
                   {tool === "detail" && (<div>{en ? "Domain" : "領域"}：<b>{Q.d} {domName(Q.d, lang)}</b><br />{en ? "Question" : "問題番号"}：{pos + 1} / {qs.length}</div>)}
-                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? "#fff" : "#1b2a33" }}>{i + 1}</button>))}</div>)}
+                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? nvInk("#ffffff", C.primary) : nvInk("#1b2a33", "#ffffff") }}>{i + 1}</button>))}</div>)}
                   {tool === "break" && (<div>{en ? "The exam timer keeps running during a break." : "休憩中も試験タイマーは継続します。"}</div>)}
                   {tool === "help" && (<div>{en ? "Choose answers, use Reset to clear this question, flag for later review, and navigate with Back/Next." : "選択肢で解答し、解答のリセットで取り消し、あとで見直すでフラグ、戻る／次へで移動します。"}</div>)}
-                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? "#fff" : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
+                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? nvInk("#ffffff", "#12324a") : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
                 </div>
                 <div style={{ padding: "10px 16px", borderTop: "1px solid #e3e9ed", textAlign: "right" }}><button onClick={() => setTool(null)} style={{ padding: "8px 18px", borderRadius: 6, border: "none", background: "#12324a", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{en ? "Close" : "閉じる"}</button></div>
               </div>
@@ -204257,7 +204257,7 @@ function TreeNode({ node, depth, defaultOpen }) {
   return (
     <div style={{ marginLeft: depth === 0 ? 0 : 14 }}>
       <div onClick={() => hasKids && setOpen(o => !o)}
-        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? "#fff" : C.ink, marginBottom: 3 }}>
+        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? nvInk("#ffffff", C.deep) : C.ink, marginBottom: 3 }}>
         {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : nvInk(C.primary, "#ffffff") }}>{open ? "▼" : "▶"}</span>}
         {!hasKids && <span style={{ color: nvInk(C.mid, "#ffffff", 3) }}>•</span>}
         <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{node.label}</span>
@@ -204858,7 +204858,7 @@ function App() {
           {["ja", "en"].map(l => (
             <button key={l} onClick={() => setLang(l)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "5px 12px", fontSize: 12, fontWeight: 700,
-                background: lang === l ? "#fff" : "transparent", color: lang === l ? C.deep : "#fff" }}>
+                background: lang === l ? "#fff" : "transparent", color: lang === l ? nvInk(C.deep, "#ffffff") : "#fff" }}>
               {l === "ja" ? "日本語" : "English"}
             </button>
           ))}
@@ -204868,7 +204868,7 @@ function App() {
         {TABS.map(([k, label]) => (
           <button key={k} onClick={() => setTab(k)}
             style={{ flex: "1 1 auto", padding: "11px 8px", border: "none", cursor: "pointer",
-              background: tab === k ? "#fff" : "transparent", color: tab === k ? C.deep : C.ink,
+              background: tab === k ? "#fff" : "transparent", color: tab === k ? nvInk(C.deep, "#ffffff") : C.ink,
               fontWeight: tab === k ? 700 : 500, fontSize: 13,
               borderBottom: tab === k ? `3px solid ${C.primary}` : "3px solid transparent" }}>
             {label}
@@ -204961,7 +204961,7 @@ function Stat({ label, value, sub, color }) {
   return (
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5b6b7d" }}>{label}</div>
-      <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
+      <div style={{ fontSize: 26, fontWeight: 800, color: color ? nvInk(color, "#ffffff", 3) : undefined }}>{value}</div>
       <div style={{ fontSize: 11, color: "#5a7288" }}>{sub}</div>
     </div>
   );
@@ -205068,7 +205068,7 @@ function Quiz({ onAnswer, lang, t }) {
             <button key={k} onClick={() => setOrderMode(k)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "6px 18px", fontSize: 13, fontWeight: 700,
                 background: orderMode === k ? "#fff" : "transparent",
-                color: orderMode === k ? C.deep : "#7d93a8",
+                color: orderMode === k ? nvInk(C.deep, "#ffffff") : nvInk("#7d93a8", C.light),
                 boxShadow: orderMode === k ? "0 1px 3px rgba(0,0,0,.12)" : "none" }}>
               {label}
             </button>
@@ -205081,7 +205081,7 @@ function Quiz({ onAnswer, lang, t }) {
           <button key={k} onClick={() => setFilter(k)}
             style={{ display: "inline-flex", alignItems: "center", padding: "7px 16px", borderRadius: 20, fontSize: 13, cursor: "pointer",
               border: `1.5px solid ${filter === k ? C.primary : C.mid}`,
-              background: filter === k ? C.primary : "#fff", color: filter === k ? "#fff" : C.ink, fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
+              background: filter === k ? C.primary : "#fff", color: filter === k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
         ))}
       </div>
 
@@ -205119,7 +205119,7 @@ function Quiz({ onAnswer, lang, t }) {
         <button onClick={goPrev} disabled={pos === 0}
           style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600,
             border: `1.5px solid ${C.mid}`, background: pos === 0 ? C.light : "#fff",
-            color: pos === 0 ? "#a9bccf" : C.ink, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
+            color: pos === 0 ? "#a9bccf" : nvInk(C.ink, "#ffffff"), cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {lang === "en" ? "← Previous" : "← 前の問題"}
         </button>
         <span style={{ fontSize: 13, color: "#5a7288" }}>{pos + 1} / {poolCount}</span>
@@ -205295,13 +205295,13 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "#476770", marginBottom: 12 }}>{en ? "Practice = instant explanations. Real = timed, official exam UI, scored at the end." : "演習モード＝即時解説。本番モード＝時間制・公式試験UI・終了後に採点。"}</div>
           <div style={{ display: "flex", background: C.light, borderRadius: 24, padding: 4 }}>
             {[["practice", en ? "Practice" : "演習モード"], ["real", en ? "Real (exam UI)" : "本番モード"]].map(([m, label]) => (
-              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? C.deep : "#53757f", boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 20, padding: "10px 8px", fontSize: 13.5, fontWeight: 700, background: mode === m ? "#fff" : "transparent", color: mode === m ? nvInk(C.deep, "#ffffff") : nvInk("#53757f", C.light), boxShadow: mode === m ? "0 1px 4px rgba(11,110,143,.18)" : "none" }}>{label}</button>
             ))}
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
           {[["normal", en ? "Full set" : "通常セット"], ["domain", en ? "By domain" : "分野別"]].map(([kk, label]) => (
-            <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? "#fff" : C.ink }}>{label}</button>
+            <button key={kk} onClick={() => setKind(kk)} style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff") }}>{label}</button>
           ))}
         </div>
         {kind === "domain" && DOMAINS.map(d => (
@@ -205394,7 +205394,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", flexWrap: "wrap", borderBottom: `1px solid ${C.mid}`, background: C.light }}>
-          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? C.deep : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
+          {exhibits.map((e, i) => (<button key={e.id} onClick={() => setExTab(i)} style={{ padding: "8px 13px", border: "none", borderBottom: `2px solid ${exTab === i ? C.primary : "transparent"}`, background: exTab === i ? "#fff" : "transparent", color: exTab === i ? nvInk(C.deep, "#ffffff") : "#5d6c83", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>{tab(e)}</button>))}
         </div>
         <div style={{ padding: 12 }}>
           {ex.kind === "table" && ex.table ? (
@@ -205413,7 +205413,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
       <div key={s.id} style={{ marginBottom: 8, padding: "10px 11px", borderRadius: 8, border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
         <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{L(s, "text", lang)}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? "#fff" : "#5a7780", fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
+          {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
           {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
         </div>
       </div>); })}</div>);
@@ -205473,10 +205473,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
                 </div>
                 <div style={{ padding: 16, fontSize: 13.5, color: "#1b2a33", lineHeight: 1.7 }}>
                   {tool === "detail" && (<div>{en ? "Domain" : "領域"}：<b>{Q.d} {domName(Q.d, lang)}</b><br />{en ? "Question" : "問題番号"}：{pos + 1} / {qs.length}</div>)}
-                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? "#fff" : "#1b2a33" }}>{i + 1}</button>))}</div>)}
+                  {tool === "progress" && (<div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6 }}>{qs.map((_, i) => (<button key={i} onClick={() => { setPos(i); setTool(null); }} style={{ padding: "7px 0", borderRadius: 5, border: `1px solid ${i === pos ? "#12324a" : "#cbd5db"}`, fontSize: 12, fontWeight: 700, cursor: "pointer", background: picks[i] !== undefined ? C.primary : "#fff", color: picks[i] !== undefined ? nvInk("#ffffff", C.primary) : nvInk("#1b2a33", "#ffffff") }}>{i + 1}</button>))}</div>)}
                   {tool === "break" && (<div>{en ? "The exam timer keeps running during a break." : "休憩中も試験タイマーは継続します。"}</div>)}
                   {tool === "help" && (<div>{en ? "Choose answers, use Reset to clear this question, flag for later review, and navigate with Back/Next." : "選択肢で解答し、解答のリセットで取り消し、あとで見直すでフラグ、戻る／次へで移動します。"}</div>)}
-                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? "#fff" : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
+                  {tool === "calc" && (<div><input readOnly value={calcExpr} style={{ width: "100%", boxSizing: "border-box", textAlign: "right", fontSize: 20, padding: "10px 12px", border: "1px solid #cbd5db", borderRadius: 6, marginBottom: 8 }} /><div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>{["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map(bn => (<button key={bn} onClick={() => { if (bn === "=") { try { const r = Function('"use strict";return (' + calcExpr.replace(/[^0-9+\-*/.() ]/g, "") + ")")(); setCalcExpr(String(r)); } catch { setCalcExpr("ERR"); } } else setCalcExpr(e => (e === "ERR" ? "" : e) + bn); }} style={{ padding: "12px 0", borderRadius: 6, border: "1px solid #cbd5db", background: bn === "=" ? "#12324a" : /[/*\-+]/.test(bn) ? "#eef2f5" : "#fff", color: bn === "=" ? nvInk("#ffffff", "#12324a") : "#1b2a33", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>{bn}</button>))}<button onClick={() => setCalcExpr("")} style={{ gridColumn: "span 4", padding: "10px 0", borderRadius: 6, border: "1px solid #cbd5db", background: "#f5f7f8", color: "#c0392b", fontWeight: 700, cursor: "pointer" }}>{en ? "Clear" : "クリア"}</button></div></div>)}
                 </div>
                 <div style={{ padding: "10px 16px", borderTop: "1px solid #e3e9ed", textAlign: "right" }}><button onClick={() => setTool(null)} style={{ padding: "8px 18px", borderRadius: 6, border: "none", background: "#12324a", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{en ? "Close" : "閉じる"}</button></div>
               </div>
@@ -205867,7 +205867,7 @@ function TreeNode({ node, depth, defaultOpen }) {
   return (
     <div style={{ marginLeft: depth === 0 ? 0 : 14 }}>
       <div onClick={() => hasKids && setOpen(o => !o)}
-        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? "#fff" : C.ink, marginBottom: 3 }}>
+        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? nvInk("#ffffff", C.deep) : C.ink, marginBottom: 3 }}>
         {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : nvInk(C.primary, "#ffffff") }}>{open ? "▼" : "▶"}</span>}
         {!hasKids && <span style={{ color: nvInk(C.mid, "#ffffff", 3) }}>•</span>}
         <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{node.label}</span>
@@ -206748,7 +206748,7 @@ function App() {
           {["ja", "en"].map(l => (
             <button key={l} onClick={() => setLang(l)}
               style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "5px 12px", fontSize: 12, fontWeight: 700,
-                background: lang === l ? "#fff" : "transparent", color: lang === l ? C.deep : "#fff" }}>
+                background: lang === l ? "#fff" : "transparent", color: lang === l ? nvInk(C.deep, "#ffffff") : "#fff" }}>
               {l === "ja" ? "日本語" : "English"}
             </button>
           ))}
@@ -206758,7 +206758,7 @@ function App() {
         {TABS.map(([k, label]) => (
           <button key={k} onClick={() => setTab(k)}
             style={{ flex: "1 1 auto", padding: "11px 6px", border: "none", cursor: "pointer",
-              background: tab === k ? "#fff" : "transparent", color: tab === k ? C.deep : C.ink,
+              background: tab === k ? "#fff" : "transparent", color: tab === k ? nvInk(C.deep, "#ffffff") : C.ink,
               fontWeight: tab === k ? 700 : 500, fontSize: 12.5, position: "relative",
               borderBottom: tab === k ? `3px solid ${C.primary}` : "3px solid transparent" }}>
             {label}
@@ -206870,7 +206870,7 @@ function Stat({ label, value, sub, color }) {
   return (
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: "#5f6368" }}>{label}</div>
-      <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
+      <div style={{ fontSize: 26, fontWeight: 800, color: color ? nvInk(color, "#ffffff", 3) : undefined }}>{value}</div>
       <div style={{ fontSize: 11, color: "#6b7076" }}>{sub}</div>
     </div>
   );
@@ -206976,7 +206976,7 @@ function Quiz({ onAnswer, lang, t }) {
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
         {["ALL", ...DOMAINS.map(d => d.id)].map(k => (
           <button key={k} onClick={() => setFilter(k)}
-            style={{ display: "inline-flex", alignItems: "center", padding: "5px 11px", borderRadius: 16, fontSize: 12, cursor: "pointer", border: `1px solid ${filter === k ? C.primary : C.mid}`, background: filter === k ? C.primary : "#fff", color: filter === k ? "#fff" : C.ink, fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
+            style={{ display: "inline-flex", alignItems: "center", padding: "5px 11px", borderRadius: 16, fontSize: 12, cursor: "pointer", border: `1px solid ${filter === k ? C.primary : C.mid}`, background: filter === k ? C.primary : "#fff", color: filter === k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight: 600 }}><DoneCheck on={domDone.has(k)} onToggle={(e) => domDone.toggle(k, e)} /><span>{k === "ALL" ? t.allFields : k}</span></button>
         ))}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, fontSize: 12, color: "#5f6368" }}>
@@ -206985,7 +206985,7 @@ function Quiz({ onAnswer, lang, t }) {
           {[["fixed", t.orderFixed], ["random", t.orderRandom]].map(([k, label]) => (
             <button key={k} onClick={() => setMode(k)}
               style={{ border: "none", cursor: "pointer", borderRadius: 15, padding: "5px 14px", fontSize: 12, fontWeight: 700,
-                background: orderMode === k ? "#fff" : "transparent", color: orderMode === k ? C.deep : "#5f6368",
+                background: orderMode === k ? "#fff" : "transparent", color: orderMode === k ? nvInk(C.deep, "#ffffff") : nvInk("#5f6368", C.light),
                 boxShadow: orderMode === k ? "0 1px 3px rgba(0,0,0,.12)" : "none" }}>
               {label}
             </button>
@@ -207071,7 +207071,7 @@ function Exam({ onAnswer, lang, t, addToReview }) {
           {[["normal", t.kindNormal], ["domain", t.kindDomain]].map(([kk, label]) => (
             <button key={kk} onClick={() => setKind(kk)}
               style={{ flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, cursor: "pointer",
-                border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? "#fff" : C.ink }}>
+                border: `1.5px solid ${kind === kk ? C.primary : C.mid}`, background: kind === kk ? C.primary : "#fff", color: kind === kk ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff") }}>
               {label}
             </button>
           ))}
@@ -207098,7 +207098,7 @@ function Exam({ onAnswer, lang, t, addToReview }) {
               <span style={{ fontWeight: 700, fontSize: 15, color: SET_READY[n] ? C.deep : "#6b7076" }}>{t.setLabel} {n}</span>
               <span style={{ fontSize: 12, color: "#6b7076", marginLeft: 10 }}>65{t.questionsUnit}</span>
             </span>
-            <span style={{ fontSize: 12.5, fontWeight: 700, color: SET_READY[n] ? C.primary : "#bdc1c6" }}>{SET_READY[n] ? `${mode === "practice" ? t.modePractice : t.modeExam} ${t.start}` : t.preparing}</span>
+            <span style={{ fontSize: 12.5, fontWeight: 700, color: SET_READY[n] ? nvInk(C.primary, "#ffffff") : "#bdc1c6" }}>{SET_READY[n] ? `${mode === "practice" ? t.modePractice : t.modeExam} ${t.start}` : t.preparing}</span>
           </button>
         ))}
       </div>
@@ -207569,7 +207569,7 @@ function TreeNode({ node, depth, defaultOpen }) {
   const hasKids = node.children && node.children.length > 0;
   return (
     <div style={{ marginLeft: depth === 0 ? 0 : 14 }}>
-      <div onClick={() => hasKids && setOpen(o => !o)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? "#fff" : C.ink, marginBottom: 3 }}>
+      <div onClick={() => hasKids && setOpen(o => !o)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? nvInk("#ffffff", C.deep) : C.ink, marginBottom: 3 }}>
         {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : nvInk(C.primary, "#ffffff") }}>{open ? "▼" : "▶"}</span>}
         {!hasKids && <span style={{ color: nvInk(C.mid, "#ffffff", 3) }}>•</span>}
         <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{node.label}</span>
@@ -207629,7 +207629,7 @@ function ParallelTools({ lang }) {
       <div style={{ fontSize: 12, color: "#5f6368", marginBottom: 10 }}>{en?"All four sit at the same layer (transform). Tap to compare.":"4つは同じ「変換」層に並列。タップで比較。"}</div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
         {tools.map((tl, i) => (
-          <div key={i} onClick={() => setSel(sel === i ? null : i)} style={{ background: sel === i ? C.deep : C.light, color: sel === i ? "#fff" : C.ink, borderRadius: 10, padding: 12, cursor: "pointer", border: `1.5px solid ${C.mid}` }}>
+          <div key={i} onClick={() => setSel(sel === i ? null : i)} style={{ background: sel === i ? C.deep : C.light, color: sel === i ? nvInk("#ffffff", C.deep) : C.ink, borderRadius: 10, padding: 12, cursor: "pointer", border: `1.5px solid ${C.mid}` }}>
             <div style={{ fontWeight: 800, fontSize: 13.5, color: sel === i ? "#fff" : C.deep }}>{tl[0]}</div>
             <div style={{ fontSize: 11.5, marginTop: 3 }}>{tl[1]}</div>
           </div>
@@ -208596,13 +208596,13 @@ function Quiz({ onAnswer, onWrong, lang }) {
         <span style={{ fontSize:12.5, color:"#5a7288" }}>{en?"All":"全問"} {poolCount}{en?"":"問"}</span>
         <div style={{ display:"inline-flex", background:C.light, borderRadius:20, padding:4 }}>
           {[["seq", en?"In order":"順番"],["random", en?"Random":"ランダム"]].map(([k, label]) => (
-            <button key={k} onClick={() => setOrderMode(k)} style={{ border:"none", cursor:"pointer", borderRadius:16, padding:"6px 18px", fontSize:13, fontWeight:700, background:orderMode===k?"#fff":"transparent", color:orderMode===k?C.deep:"#7d93a8", boxShadow:orderMode===k?"0 1px 3px rgba(0,0,0,.12)":"none" }}>{label}</button>
+            <button key={k} onClick={() => setOrderMode(k)} style={{ border:"none", cursor:"pointer", borderRadius:16, padding:"6px 18px", fontSize:13, fontWeight:700, background:orderMode===k?"#fff":"transparent", color:orderMode===k ? nvInk(C.deep, "#ffffff") : "#7d93a8", boxShadow:orderMode===k?"0 1px 3px rgba(0,0,0,.12)":"none" }}>{label}</button>
           ))}
         </div>
       </div>
       <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:12 }}>
         {["ALL", ...DOMAINS.map(d => d.id)].map(k => (
-          <button key={k} onClick={() => setFilter(k)} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"7px 14px", borderRadius:20, fontSize:13, cursor:"pointer", border:`1.5px solid ${filter===k?C.primary:C.mid}`, background:filter===k?C.primary:"#fff", color:filter===k?"#fff":C.ink, fontWeight:600 }}>
+          <button key={k} onClick={() => setFilter(k)} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"7px 14px", borderRadius:20, fontSize:13, cursor:"pointer", border:`1.5px solid ${filter===k?C.primary:C.mid}`, background:filter===k?C.primary:"#fff", color:filter===k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight:600 }}>
             <span role="checkbox" aria-checked={!!doneSet[k]} onClick={(e) => toggleDone(k, e)} style={{ cursor:"pointer", fontSize:14, lineHeight:1, userSelect:"none", color: doneSet[k] ? (filter===k?"#fff":"#16A34A") : (filter===k?"rgba(255,255,255,.7)":"#b8c2cf") }}>{doneSet[k]?"☑":"☐"}</span>
             <span>{filterLabel(k)}</span>
           </button>
@@ -208630,7 +208630,7 @@ function Quiz({ onAnswer, onWrong, lang }) {
           </div>
         )}
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:14 }}>
-          <button onClick={goPrev} disabled={pos === 0} style={{ padding:"10px 30px", borderRadius:9, fontSize:13.5, fontWeight:600, border:`1.5px solid ${C.mid}`, background:pos===0?C.light:"#fff", color:pos===0?"#a9bccf":C.ink, cursor:pos===0?"not-allowed":"pointer" }}>{en?"← Previous":"← 前の問題"}</button>
+          <button onClick={goPrev} disabled={pos === 0} style={{ padding:"10px 30px", borderRadius:9, fontSize:13.5, fontWeight:600, border:`1.5px solid ${C.mid}`, background:pos===0?C.light:"#fff", color:pos===0 ? "#a9bccf" : nvInk(C.ink, "#ffffff"), cursor:pos===0?"not-allowed":"pointer" }}>{en?"← Previous":"← 前の問題"}</button>
           <span style={{ fontSize:13, color:"#5a7288" }}>{pos + 1} / {poolCount}</span>
           <button onClick={goNext} style={{ padding:"10px 30px", borderRadius:9, fontSize:13.5, fontWeight:600, border:`1.5px solid ${C.primary}`, background:"#fff", color:C.primary, cursor:"pointer" }}>{en?"Next →":"次の問題 →"}</button>
         </div>
@@ -208895,11 +208895,11 @@ function App() {
           <div style={{ fontSize:12, opacity:0.85, marginTop:2 }}>{t.appSub}</div>
         </div>
         <div style={{ display:"flex", background:"rgba(255,255,255,.15)", borderRadius:20, padding:3 }}>
-          {["ja","en"].map(l => <button key={l} onClick={() => setLang(l)} style={{ border:"none", cursor:"pointer", borderRadius:16, padding:"5px 12px", fontSize:12, fontWeight:700, background:lang===l?C.primary:"transparent", color:lang===l?C.deep:"#fff" }}>{l==="ja"?"日本語":"English"}</button>)}
+          {["ja","en"].map(l => <button key={l} onClick={() => setLang(l)} style={{ border:"none", cursor:"pointer", borderRadius:16, padding:"5px 12px", fontSize:12, fontWeight:700, background:lang===l?C.primary:"transparent", color:lang===l?nvInk(C.deep, C.primary):"#fff" }}>{l==="ja"?"日本語":"English"}</button>)}
         </div>
       </div>
       <div style={{ display:"flex", flexWrap:"wrap", borderBottom:`2px solid ${C.mid}`, background:C.light }}>
-        {TABS.map(([k, label]) => <button key={k} onClick={() => setTab(k)} style={{ flex:"1 1 auto", padding:"11px 8px", border:"none", cursor:"pointer", background:tab===k?"#fff":"transparent", color:tab===k?C.deep:C.ink, fontWeight:tab===k?700:500, fontSize:13, borderBottom:tab===k?`3px solid ${C.primary}`:"3px solid transparent" }}>{label}</button>)}
+        {TABS.map(([k, label]) => <button key={k} onClick={() => setTab(k)} style={{ flex:"1 1 auto", padding:"11px 8px", border:"none", cursor:"pointer", background:tab===k?"#fff":"transparent", color:tab===k ? nvInk(C.deep, "#ffffff") : C.ink, fontWeight:tab===k?700:500, fontSize:13, borderBottom:tab===k?`3px solid ${C.primary}`:"3px solid transparent" }}>{label}</button>)}
       </div>
       {tabHist.length > 0 && (
         <button onClick={goBackTab} aria-label="Back"
@@ -209732,13 +209732,13 @@ function Quiz({ onAnswer, onWrong, lang }) {
         <span style={{ fontSize:12.5, color:"#537369" }}>{en?"All":"全問"} {poolCount}{en?"":"問"}</span>
         <div style={{ display:"inline-flex", background:C.light, borderRadius:20, padding:4 }}>
           {[["seq", en?"In order":"順番"],["random", en?"Random":"ランダム"]].map(([k, label]) => (
-            <button key={k} onClick={() => setOrderMode(k)} style={{ border:"none", cursor:"pointer", borderRadius:16, padding:"6px 18px", fontSize:13, fontWeight:700, background:orderMode===k?"#fff":"transparent", color:orderMode===k?C.deep:"#537369", boxShadow:orderMode===k?"0 1px 3px rgba(0,0,0,.12)":"none" }}>{label}</button>
+            <button key={k} onClick={() => setOrderMode(k)} style={{ border:"none", cursor:"pointer", borderRadius:16, padding:"6px 18px", fontSize:13, fontWeight:700, background:orderMode===k?"#fff":"transparent", color:orderMode===k ? nvInk(C.deep, "#ffffff") : "#537369", boxShadow:orderMode===k?"0 1px 3px rgba(0,0,0,.12)":"none" }}>{label}</button>
           ))}
         </div>
       </div>
       <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:12 }}>
         {["ALL", ...DOMAINS.map(d => d.id)].map(k => (
-          <button key={k} onClick={() => setFilter(k)} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"7px 14px", borderRadius:20, fontSize:13, cursor:"pointer", border:`1.5px solid ${filter===k?C.primary:C.mid}`, background:filter===k?C.primary:"#fff", color:filter===k?"#fff":C.ink, fontWeight:600 }}>
+          <button key={k} onClick={() => setFilter(k)} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"7px 14px", borderRadius:20, fontSize:13, cursor:"pointer", border:`1.5px solid ${filter===k?C.primary:C.mid}`, background:filter===k?C.primary:"#fff", color:filter===k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight:600 }}>
             <span role="checkbox" aria-checked={!!doneSet[k]} onClick={(e) => toggleDone(k, e)} style={{ cursor:"pointer", fontSize:14, lineHeight:1, userSelect:"none", color: doneSet[k] ? (filter===k?"#fff":"#16A34A") : (filter===k?"rgba(255,255,255,.7)":"#a7c5bb") }}>{doneSet[k]?"☑":"☐"}</span>
             <span>{filterLabel(k)}</span>
           </button>
@@ -209766,7 +209766,7 @@ function Quiz({ onAnswer, onWrong, lang }) {
           </div>
         )}
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:14 }}>
-          <button onClick={goPrev} disabled={pos === 0} style={{ padding:"10px 30px", borderRadius:9, fontSize:13.5, fontWeight:600, border:`1.5px solid ${C.mid}`, background:pos===0?C.light:"#fff", color:pos===0?"#9cc0b4":C.ink, cursor:pos===0?"not-allowed":"pointer" }}>{en?"← Previous":"← 前の問題"}</button>
+          <button onClick={goPrev} disabled={pos === 0} style={{ padding:"10px 30px", borderRadius:9, fontSize:13.5, fontWeight:600, border:`1.5px solid ${C.mid}`, background:pos===0?C.light:"#fff", color:pos===0 ? "#9cc0b4" : nvInk(C.ink, "#ffffff"), cursor:pos===0?"not-allowed":"pointer" }}>{en?"← Previous":"← 前の問題"}</button>
           <span style={{ fontSize:13, color:"#537369" }}>{pos + 1} / {poolCount}</span>
           <button onClick={goNext} style={{ padding:"10px 30px", borderRadius:9, fontSize:13.5, fontWeight:600, border:`1.5px solid ${C.primary}`, background:"#fff", color:C.primary, cursor:"pointer" }}>{en?"Next →":"次の問題 →"}</button>
         </div>
@@ -210039,11 +210039,11 @@ function App() {
           <div style={{ fontSize:12, opacity:0.85, marginTop:2 }}>{t.appSub}</div>
         </div>
         <div style={{ display:"flex", background:"rgba(255,255,255,.15)", borderRadius:20, padding:3 }}>
-          {["ja","en"].map(l => <button key={l} onClick={() => setLang(l)} style={{ border:"none", cursor:"pointer", borderRadius:16, padding:"5px 12px", fontSize:12, fontWeight:700, background:lang===l?C.primary:"transparent", color:lang===l?"#fff":"#fff" }}>{l==="ja"?"日本語":"English"}</button>)}
+          {["ja","en"].map(l => <button key={l} onClick={() => setLang(l)} style={{ border:"none", cursor:"pointer", borderRadius:16, padding:"5px 12px", fontSize:12, fontWeight:700, background:lang===l?C.primary:"transparent", color:lang===l ? nvInk("#ffffff", C.primary) : "#fff" }}>{l==="ja"?"日本語":"English"}</button>)}
         </div>
       </div>
       <div style={{ display:"flex", flexWrap:"wrap", borderBottom:`2px solid ${C.mid}`, background:C.light }}>
-        {TABS.map(([k, label]) => <button key={k} onClick={() => setTab(k)} style={{ flex:"1 1 auto", padding:"11px 8px", border:"none", cursor:"pointer", background:tab===k?"#fff":"transparent", color:tab===k?C.deep:C.ink, fontWeight:tab===k?700:500, fontSize:13, borderBottom:tab===k?`3px solid ${C.primary}`:"3px solid transparent" }}>{label}</button>)}
+        {TABS.map(([k, label]) => <button key={k} onClick={() => setTab(k)} style={{ flex:"1 1 auto", padding:"11px 8px", border:"none", cursor:"pointer", background:tab===k?"#fff":"transparent", color:tab===k ? nvInk(C.deep, "#ffffff") : C.ink, fontWeight:tab===k?700:500, fontSize:13, borderBottom:tab===k?`3px solid ${C.primary}`:"3px solid transparent" }}>{label}</button>)}
       </div>
       {tabHist.length > 0 && (
         <button onClick={goBackTab} aria-label="Back"
@@ -210123,7 +210123,7 @@ function makeSecGovStation(cfg){
         <div style={{ background:C.light, border:`1px solid ${C.mid}`, borderRadius:12, padding:"13px 16px", marginBottom:12 }}>
           <div style={{ display:"flex", alignItems:"baseline", gap:8, marginBottom:8 }}>
             <span style={{ fontSize:12.5, fontWeight:800, color:C.deep }}>{en?"Completion":"学習完了度"}</span>
-            <span style={{ fontSize:22, fontWeight:800, color: compPct>=100 ? "#158F6B" : C.primary }}>{compPct}<span style={{ fontSize:12 }}>%</span></span>
+            <span style={{ fontSize:22, fontWeight:800, color: compPct>=100 ? "#158F6B" : nvInk(C.primary, "#ffffff") }}>{compPct}<span style={{ fontSize:12 }}>%</span></span>
             <span style={{ fontSize:10.5, color:G }}>{en?"quiz · mock exams · diagrams":"クイズ・模試・図解の完了を計測"}</span>
           </div>
           {compBar(en?"Quiz coverage":"クイズ消化", quizPct, `${Math.min(ta, BANK.length)}/${BANK.length}${en?"":"問"}`)}
@@ -210185,13 +210185,13 @@ function makeSecGovStation(cfg){
           <span style={{ fontSize:12.5, color:G }}>{en?"All":"全問"} {poolCount}{en?"":"問"}</span>
           <div style={{ display:"inline-flex", background:C.light, borderRadius:20, padding:4 }}>
             {[["seq", en?"In order":"順番"],["random", en?"Random":"ランダム"]].map(([k,label])=>(
-              <button key={k} onClick={()=>setOrderMode(k)} style={{ border:"none", cursor:"pointer", borderRadius:16, padding:"6px 18px", fontSize:13, fontWeight:700, background:orderMode===k?"#fff":"transparent", color:orderMode===k?C.deep:G, boxShadow:orderMode===k?"0 1px 3px rgba(0,0,0,.12)":"none" }}>{label}</button>
+              <button key={k} onClick={()=>setOrderMode(k)} style={{ border:"none", cursor:"pointer", borderRadius:16, padding:"6px 18px", fontSize:13, fontWeight:700, background:orderMode===k?"#fff":"transparent", color:orderMode===k ? nvInk(C.deep, "#ffffff") : G, boxShadow:orderMode===k?"0 1px 3px rgba(0,0,0,.12)":"none" }}>{label}</button>
             ))}
           </div>
         </div>
         <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:12 }}>
           {["ALL", ...DOMAINS.map(d=>d.id)].map(k=>(
-            <button key={k} onClick={()=>setFilter(k)} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"7px 14px", borderRadius:20, fontSize:13, cursor:"pointer", border:`1.5px solid ${filter===k?C.primary:C.mid}`, background:filter===k?C.primary:"#fff", color:filter===k?"#fff":C.ink, fontWeight:600 }}>
+            <button key={k} onClick={()=>setFilter(k)} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"7px 14px", borderRadius:20, fontSize:13, cursor:"pointer", border:`1.5px solid ${filter===k?C.primary:C.mid}`, background:filter===k?C.primary:"#fff", color:filter===k ? nvInk("#ffffff", C.primary) : nvInk(C.ink, "#ffffff"), fontWeight:600 }}>
               <span role="checkbox" aria-checked={!!doneSet[k]} onClick={(e)=>toggleDone(k,e)} style={{ cursor:"pointer", fontSize:14, lineHeight:1, userSelect:"none", color: doneSet[k]?(filter===k?"#fff":"#16A34A"):(filter===k?"rgba(255,255,255,.7)":"#b8c2cf") }}>{doneSet[k]?"☑":"☐"}</span>
               <span>{filterLabel(k)}</span>
             </button>
@@ -210214,7 +210214,7 @@ function makeSecGovStation(cfg){
             </div>
           )}
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:14 }}>
-            <button onClick={goPrev} disabled={pos===0} style={{ padding:"10px 30px", borderRadius:9, fontSize:13.5, fontWeight:600, border:`1.5px solid ${C.mid}`, background:pos===0?C.light:"#fff", color:pos===0?"#9fb0be":C.ink, cursor:pos===0?"not-allowed":"pointer" }}>{en?"← Previous":"← 前の問題"}</button>
+            <button onClick={goPrev} disabled={pos===0} style={{ padding:"10px 30px", borderRadius:9, fontSize:13.5, fontWeight:600, border:`1.5px solid ${C.mid}`, background:pos===0?C.light:"#fff", color:pos===0 ? "#9fb0be" : nvInk(C.ink, "#ffffff"), cursor:pos===0?"not-allowed":"pointer" }}>{en?"← Previous":"← 前の問題"}</button>
             <span style={{ fontSize:13, color:G }}>{pos+1} / {poolCount}</span>
             <button onClick={goNext} style={{ padding:"10px 30px", borderRadius:9, fontSize:13.5, fontWeight:600, border:`1.5px solid ${C.primary}`, background:"#fff", color:C.primary, cursor:"pointer" }}>{en?"Next →":"次の問題 →"}</button>
           </div>
@@ -210354,7 +210354,7 @@ function makeSecGovStation(cfg){
           </div>
         </div>
         <div style={{ display:"flex", flexWrap:"wrap", borderBottom:`2px solid ${C.mid}`, background:C.light }}>
-          {TABS.map(([k,label])=><button key={k} onClick={()=>setTab(k)} style={{ flex:"1 1 auto", padding:"11px 8px", border:"none", cursor:"pointer", background:tab===k?"#fff":"transparent", color:tab===k?C.deep:C.ink, fontWeight:tab===k?700:500, fontSize:13, borderBottom:tab===k?`3px solid ${C.primary}`:"3px solid transparent" }}>{label}</button>)}
+          {TABS.map(([k,label])=><button key={k} onClick={()=>setTab(k)} style={{ flex:"1 1 auto", padding:"11px 8px", border:"none", cursor:"pointer", background:tab===k?"#fff":"transparent", color:tab===k ? nvInk(C.deep, "#ffffff") : C.ink, fontWeight:tab===k?700:500, fontSize:13, borderBottom:tab===k?`3px solid ${C.primary}`:"3px solid transparent" }}>{label}</button>)}
         </div>
         {tabHist.length>0 && <button onClick={goBackTab} aria-label="Back" style={{ position:"fixed", right:16, bottom:104, zIndex:45, border:`1.5px solid ${C.deep}`, cursor:"pointer", borderRadius:22, padding:"9px 15px", background:"#fff", color:C.deep, fontSize:12.5, fontWeight:700, boxShadow:"0 4px 14px rgba(0,0,0,.20)" }}>← {lang==="en"?"Back":"戻る"}</button>}
         {tab!=="home" && <button onClick={()=>{ setTab("home"); if(typeof window!=="undefined") window.scrollTo({top:0,behavior:"smooth"}); }} aria-label="Top" style={{ position:"fixed", right:16, bottom:60, zIndex:45, border:"none", cursor:"pointer", borderRadius:22, padding:"10px 15px", background:C.deep, color:nvInk("#ffffff", C.deep), fontSize:12.5, fontWeight:700, boxShadow:"0 4px 14px rgba(0,0,0,.28)" }}>↑ {lang==="en"?"Top":"トップへ"}</button>}
