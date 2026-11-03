@@ -219548,7 +219548,7 @@ const BookSummaryModule = (function () {
         if (!d || d.__bsh !== 1) return;
         try {
           let m = JSON.parse(window.localStorage.getItem(BSH_STORE_KEY) || "{}") || {};
-          if (d.op === "set") m[d.k] = d.v;
+          if (d.op === "set") { try { novaDailyOnWrite("bsh:" + d.k, m[d.k] === undefined ? null : m[d.k], d.v); } catch (e) {} m[d.k] = d.v; }
           else if (d.op === "rm") delete m[d.k];
           else if (d.op === "clr") m = {};
           window.localStorage.setItem(BSH_STORE_KEY, JSON.stringify(m));
@@ -219629,7 +219629,7 @@ const LearningTrackerModule = (function () {
         if (!d || d.__lt !== 1) return;
         try {
           let m = JSON.parse(window.localStorage.getItem(LT_STORE_KEY) || "{}") || {};
-          if (d.op === "set") m[d.k] = d.v;
+          if (d.op === "set") { try { novaDailyOnTracker(d.k, m[d.k] === undefined ? null : m[d.k], d.v); } catch (e) {} m[d.k] = d.v; }
           else if (d.op === "rm") delete m[d.k];
           else if (d.op === "clr") m = {};
           window.localStorage.setItem(LT_STORE_KEY, JSON.stringify(m));
@@ -231565,6 +231565,190 @@ function novaLogStudy() {
     ls.setItem(K, JSON.stringify(m));
   } catch (e) {}
 }
+// ---------- デイリー記録（Others） ----------
+// Cowork の「デイリータスク トラッカー」で手動記録になっている Others 9項目を、Nova で日々つけるための台帳。
+// Nova にすでにある記録（資格の回答・Language Hub・Book Summary・学習トラッカー）は、保存のたびに日付つきで自動計上し、
+// もう一度入力させない。Nova の外でやること（English (ELZA) など）はワンタップで記録する。
+// Nova（GitHub Pages）から Notion へは直接書き込めないので、Notion へは Cowork のチャットに貼る更新文で反映する。
+const NOVA_DAILY_KEY = "nova_daily_v1";
+// name は Notion「Scheduled task tracker」の行名（「<name> — Day N」）と同じ表記。並びは Cowork のトラッカーと同じ
+const NOVA_DAILY_CATS = [
+  { id: "E", name: "English (ELZA)" },
+  { id: "L", name: "Languages（ES/DE）", hub: "languagehub", src: ["Language Hub のスペイン語・ドイツ語（クイズ・聞き流し・単語）", "Language Hub Spanish/German (quiz, listening, vocab)"] },
+  { id: "R", name: "Reading", hub: "booksummary", src: ["Book Summary の既読チェック・書籍クイズ、学習トラッカーの書籍", "Book Summary read checks and quizzes; Learning Tracker books"] },
+  { id: "EL", name: "E-learning", hub: "tracker", src: ["学習トラッカーの講座・Udemy・Tools の更新", "Learning Tracker course, Udemy and tools updates"] },
+  { id: "CT", name: "Certification", hub: "certification", src: ["Certification Hub の問題・模試の回答", "Certification Hub question and mock-exam answers"] },
+  { id: "H", name: "Hand-skills" },
+  { id: "GF", name: "GFS" },
+  { id: "S", name: "Selfcare" },
+  { id: "J", name: "Journaling" },
+];
+// 自動計上の単位（表示用）[日本語, 英語]
+const NOVA_DAILY_UNIT = { q: ["問", " Q"], min: ["分", " min"], mat: ["教材", " items"], v: ["語", " words"], sum: ["件既読", " read"], item: ["件更新", " updated"] };
+// Notion の Others 行の「Day N」は 2026-06-01 を Day 1 として数えている（Day 119＝9/27、Day 156＝11/3 で確認）
+const NOVA_DAILY_DAY1 = Date.UTC(2026, 5, 1);
+function novaDailyDayNo(day) {
+  const p = String(day).split("-").map(Number);
+  return Math.round((Date.UTC(p[0], p[1] - 1, p[2]) - NOVA_DAILY_DAY1) / 86400000) + 1;
+}
+function novaDailyRead() {
+  try {
+    const o = JSON.parse(window.localStorage.getItem(NOVA_DAILY_KEY) || "null");
+    if (o && typeof o === "object" && o.days && typeof o.days === "object") { if (!o.sent || typeof o.sent !== "object") o.sent = {}; return o; }
+  } catch (e) {}
+  return { v: 1, days: {}, sent: {} };
+}
+function novaDailySave(o) {
+  try { window.localStorage.setItem(NOVA_DAILY_KEY, JSON.stringify(o)); } catch (e) {}
+  try { window.dispatchEvent(new Event("nova-daily")); } catch (e) {}
+}
+// 自動計上：今日のカテゴリに単位ごとの数を足す
+function novaDailyAdd(cat, units) {
+  const us = Object.keys(units || {}).filter((u) => units[u] > 0);
+  if (!us.length) return;
+  const o = novaDailyRead();
+  const day = novaLocalDay();
+  const d = o.days[day] || (o.days[day] = {});
+  const a = d.a || (d.a = {});
+  const c = a[cat] || (a[cat] = {});
+  us.forEach((u) => { c[u] = Math.round(((c[u] || 0) + units[u]) * 10) / 10; });
+  novaDailySave(o);
+}
+function novaDailyHasAuto(d, c) { const a = d && d.a && d.a[c]; return !!a && Object.keys(a).some((u) => a[u] > 0); }
+// 手動の記録（m: 1＝完了 / 0＝自動計上を取り消し）が自動計上より優先
+function novaDailyStatus(d, c) {
+  const m = (d && d.m) || {};
+  const auto = novaDailyHasAuto(d, c);
+  if (m[c] === 1) return "done";
+  if (m[c] === 0) return auto ? "off" : "none";
+  return auto ? "auto" : "none";
+}
+function novaDailyIsDone(d, c) { const s = novaDailyStatus(d, c); return s === "done" || s === "auto"; }
+function novaDailyAutoText(d, c, en) {
+  const a = d && d.a && d.a[c];
+  if (!a) return "";
+  return Object.keys(a).filter((u) => a[u] > 0).map((u) => {
+    const un = NOVA_DAILY_UNIT[u] || [u, " " + u];
+    const n = u === "min" ? Math.max(1, Math.round(a[u])) : a[u];
+    return n + un[en ? 1 : 0];
+  }).join(en ? ", " : "・");
+}
+function novaDailyDoneIds(d) { return NOVA_DAILY_CATS.filter((c) => novaDailyIsDone(d, c.id)).map((c) => c.id); }
+function novaDailyNotes(d) { const n = (d && d.n) || {}; const out = {}; Object.keys(n).forEach((k) => { const t = String(n[k] || "").trim(); if (t) out[k] = t; }); return out; }
+// Notion 用にコピーした時点の状態。これと違う日だけを次の更新文に入れる
+function novaDailySig(d) { return novaDailyDoneIds(d).join(",") + "|" + JSON.stringify(novaDailyNotes(d)); }
+function novaDailyPending(o, today, back) {
+  const out = [];
+  const t = new Date(today + "T00:00:00");
+  for (let i = (back || 31) - 1; i >= 0; i--) {
+    const dt = new Date(t); dt.setDate(t.getDate() - i);
+    const day = novaLocalDay(dt);
+    const sent = o.sent[day];
+    if (novaDailySig(o.days[day]) !== (sent ? sent.sig : "|{}")) out.push(day);
+  }
+  return out;
+}
+// Cowork のチャットに貼ると、Claude が Notion の行を更新できる文（Notion の値に合わせて日本語で作る）
+function novaDailyNotionText(o, days) {
+  const nm = (id) => (NOVA_DAILY_CATS.find((c) => c.id === id) || { name: id }).name;
+  const L = [
+    "Notion の「Scheduled task tracker」で、種別が「個人タスク」の行のステータスを次のとおり更新してください。",
+    "行名は「<タスク名> — Day N」です。日付の列で照合し、その日の行が無ければ同じ形式（種別＝個人タスク）で作成してください。",
+  ];
+  days.forEach((day) => {
+    const d = o.days[day] || {};
+    const done = novaDailyDoneIds(d);
+    const prev = (o.sent[day] && o.sent[day].ids) || [];
+    const undo = prev.filter((id) => done.indexOf(id) < 0);
+    const notes = novaDailyNotes(d);
+    L.push("", "■ " + day + "（Day " + novaDailyDayNo(day) + "）");
+    L.push("・完了：" + (done.length ? done.map((id) => nm(id) + (novaDailyStatus(d, id) === "auto" ? "（Nova の記録：" + novaDailyAutoText(d, id, false) + "）" : "")).join("、") : "なし"));
+    if (undo.length) L.push("・未着手に戻す：" + undo.map(nm).join("、"));
+    Object.keys(notes).forEach((id) => L.push("・" + nm(id) + " の本文に追記：" + notes[id]));
+  });
+  L.push("", "（Project Nova のデイリー記録から作成）");
+  return L.join("\n");
+}
+// ---- 自動計上：Nova の既存の保存を横から見て、増えた分だけを今日に足す ----
+// 資格ごとの保存キー（CERT_STORE と同じもの：clf_c02_dashboard_v1 と *_study_vN / *_hub_study_vN）
+const NOVA_DAILY_CERT_RE = /^(clf_c02_dashboard_v1|[a-z0-9_]+_study_v\d+)$/;
+const NOVA_DAILY_LH_KEYS = { "quiz-stats": 1, "listen-minutes": 1, "listen-done": 1, "vocab-known": 1 };
+function novaDailyCountTrue(v, re) { if (!v || typeof v !== "object") return 0; return Object.keys(v).filter((k) => v[k] && (!re || re.test(k))).length; }
+// 保存値から「累計の数」を測る。{ cat, m: { 単位: 数 } }
+function novaDailyMeasure(k, raw) {
+  let v = null;
+  try { v = raw == null ? null : (typeof raw === "string" ? JSON.parse(raw) : raw); } catch (e) { return null; }
+  if (NOVA_DAILY_CERT_RE.test(k)) {
+    let n = 0, hasProg = false;
+    if (v && v.progress && typeof v.progress === "object") Object.values(v.progress).forEach((p) => { if (p && typeof p === "object") { hasProg = true; n += Number(p.attempts != null ? p.attempts : p.a) || 0; } });
+    if (!hasProg && v && v.results && typeof v.results === "object") n = Object.keys(v.results).length;
+    return { cat: "CT", m: { q: n } };
+  }
+  const ES_DE = ["es", "de"];
+  if (k === "quiz-stats") return { cat: "L", m: { q: ES_DE.reduce((t, l) => t + (Number(v && v[l] && v[l].totalAttempts) || 0), 0) } };
+  if (k === "listen-minutes") return { cat: "L", m: { min: ES_DE.reduce((t, l) => t + (Number(v && v[l]) || 0), 0) } };
+  if (k === "listen-done") return { cat: "L", m: { mat: novaDailyCountTrue(v, /^(es|de)\|/) } };
+  if (k === "vocab-known") return { cat: "L", m: { v: novaDailyCountTrue(v, /^(es|de)_/) } };
+  if (k === "bsh:booksummaryhub:checked:v1") return { cat: "R", m: { sum: novaDailyCountTrue(v) } };
+  if (k === "bsh:booksummaryhub:quiz:v1") {
+    let n = 0; Object.values((v && v.q) || {}).forEach((r) => { n += Number(r && r.seen) || 0; });
+    return { cat: "R", m: { q: n } };
+  }
+  return null;
+}
+const NOVA_DAILY_LAST = {};
+// oldRaw：書き込み前の値（文字列）／null＝まだ無い／undefined＝読めない（このときは前回測った値と比べる）
+function novaDailyOnWrite(k, oldRaw, newRaw) {
+  const nw = novaDailyMeasure(k, newRaw);
+  if (!nw) return;
+  let old;
+  if (oldRaw === undefined) old = NOVA_DAILY_LAST[k];
+  else if (oldRaw === null) old = {};
+  else { const o = novaDailyMeasure(k, oldRaw); old = o ? o.m : {}; }
+  NOVA_DAILY_LAST[k] = nw.m;
+  if (!old) return;
+  const inc = {};
+  Object.keys(nw.m).forEach((u) => { const dlt = (nw.m[u] || 0) - (old[u] || 0); if (dlt > 0) inc[u] = dlt; });
+  novaDailyAdd(nw.cat, inc);
+}
+// 学習トラッカー（iframe）の保存：講座・Udemy・Tools の状態や項目が変わったら E-learning、書籍なら Reading
+function novaDailyOnTracker(k, oldRaw, newRaw) {
+  if (!/^learning_tracker_cache_v\d+$/.test(k) || oldRaw == null) return;
+  let a = null, b = null;
+  try { a = JSON.parse(oldRaw); b = JSON.parse(newRaw); } catch (e) { return; }
+  if (!a || !b || !Array.isArray(a.items) || !Array.isArray(b.items)) return;
+  const prev = {};
+  a.items.forEach((it) => { if (it) prev[it.key + "||" + it.name] = JSON.stringify([it.status, it.p || {}]); });
+  let el = 0, rd = 0;
+  b.items.forEach((it) => {
+    if (!it) return;
+    const was = prev[it.key + "||" + it.name];
+    if (was === undefined || was === JSON.stringify([it.status, it.p || {}])) return;
+    if (it.key === "book") rd++;
+    else if (it.key === "course" || it.key === "udemy" || it.key === "tools") el++;
+  });
+  if (el) novaDailyAdd("EL", { item: el });
+  if (rd) novaDailyAdd("R", { item: rd });
+}
+// window.storage.set（資格の各ページ・Language Hub が使う保存口）を一度だけ包み、書き込み前後の差を数える
+function novaDailyHook() {
+  try {
+    const st = typeof window !== "undefined" ? window.storage : null;
+    if (!st || st.__novaDaily || typeof st.set !== "function") return;
+    const orig = st.set;
+    st.set = function (k, v) {
+      try {
+        const key = String(k);
+        if (NOVA_DAILY_CERT_RE.test(key) || NOVA_DAILY_LH_KEYS[key]) {
+          let oldRaw; try { oldRaw = window.localStorage.getItem(key); } catch (e) { oldRaw = undefined; }
+          novaDailyOnWrite(key, oldRaw, v);
+        }
+      } catch (e) {}
+      return orig.apply(this, arguments);
+    };
+    st.__novaDaily = true;
+  } catch (e) {}
+}
 // 全クイズ横断の弱点集計レジストリ（各資格モジュールの state.progress をドメイン名に解決するための対応表。
 // DOMAINS は各モジュール定義から機械抽出。値は [日本語名, 英語名]）。
 const NOVA_DOM_REG = {"saa_c03_study_v1":{"cert":"SAA-C03","doms":{"D1":["セキュアなアーキテクチャの設計","Design Secure Architectures"],"D2":["弾力性に優れたアーキテクチャの設計","Design Resilient Architectures"],"D3":["高パフォーマンスなアーキテクチャの設計","Design High-Performing Architectures"],"D4":["コストを最適化したアーキテクチャの設計","Design Cost-Optimized Architectures"]}},"cca_f_study_v1":{"cert":"CCA-F","doms":{"D1":["エージェント アーキテクチャとオーケストレーション","Agentic Architecture & Orchestration"],"D2":["ツール設計とMCP統合","Tool Design & MCP Integration"],"D3":["Claude Code 設定とワークフロー","Claude Code Config & Workflows"],"D4":["プロンプト エンジニアリングと構造化出力","Prompt Engineering & Structured Output"],"D5":["コンテキスト管理と信頼性","Context Management & Reliability"]}},"aics_study_v2":{"cert":"AICS","doms":{"D1":["生成AIとAIエージェントの基礎","生成AIとAIエージェントの基礎"],"D2":["業務の基礎","業務の基礎"],"D3":["AIデータリテラシーとマネジメント","AIデータリテラシーとマネジメント"],"D4":["自動化レベルとワークフロー設計","自動化レベルとワークフロー設計"],"D5":["人と組織から考えるAI時代の組織設計","人と組織から考えるAI時代の組織設計"],"D6":["AIエージェントを実装する5Dモデル","AIエージェントを実装する5Dモデル"]}},"pl900_study_v2":{"cert":"PL-900","doms":{"D1":["Power Platform のビジネス価値","Power Platform のビジネス価値"],"D2":["Power Platform 環境の管理 / Dataverse","Power Platform 環境の管理 / Dataverse"],"D3":["Power Apps の機能","Power Apps の機能"],"D4":["Power Automate の機能","Power Automate の機能"],"D5":["Copilot Studio のエージェント","Agents in Copilot Studio"],"PP":["旧範囲（Power Pages など）","Former scope (Power Pages etc.)"]}},"ab620_study_v2":{"cert":"AB-620","doms":{"D1":["エージェント ソリューションの計画と構成","Plan & Configure Agent Solutions"],"D2":["エージェントの統合と拡張","Integrate & Extend Agents"],"D3":["エージェントのテストと管理","Test & Manage Agents"]}},"dp900_study_v1":{"cert":"DP-900","doms":{"D1":["データの中核概念","Core Data Concepts"],"D2":["Azure のリレーショナルデータ","Relational Data on Azure"],"D3":["Azure の非リレーショナルデータ","Non-relational Data on Azure"],"D4":["Azure の分析ワークロード","Analytics Workload on Azure"]}},"sc500_study_v1":{"cert":"SC-500","doms":{"D1":["ID・アクセス・ガバナンスの管理","Manage Identity, Access, and Governance"],"D2":["ストレージ・データベース・ネットワークの保護","Secure Storage, Databases, and Networking"],"D3":["コンピュートの保護（AIセキュリティ含む）","Secure Compute (including AI)"],"D4":["セキュリティ態勢の管理と監視","Manage and Monitor Security Posture"]}},"sc900_study_v1":{"cert":"SC-900","doms":{"D1":["セキュリティ・コンプライアンス・ID の概念","Concepts of Security, Compliance, and Identity"],"D2":["Microsoft Entra の機能","Capabilities of Microsoft Entra"],"D3":["Microsoft セキュリティ ソリューションの機能","Capabilities of Microsoft Security Solutions"],"D4":["Microsoft コンプライアンス ソリューションの機能","Capabilities of Microsoft Compliance Solutions"]}},"gh600_study_v2":{"cert":"GH-600","doms":{"D1":["エージェントアーキテクチャとSDLCの準備","Prepare Agent Architecture & SDLC"],"D2":["ツール使用と環境操作の実装","Implement Tool Use & Environment Interaction"],"D3":["メモリ・状態・実行の管理","Manage Memory, State & Execution"],"D4":["評価・エラー分析・チューニング","Evaluation, Error Analysis & Tuning"],"D5":["マルチエージェント連携のオーケストレーション","Orchestrate Multi-agent Coordination"],"D6":["ガードレールと説明責任の実装","Implement Guardrails & Accountability"]}},"ab100_study_v2":{"cert":"AB-100","doms":{"D1":["AIビジネスソリューションの計画","Plan AI-powered Business Solutions"],"D2":["AIビジネスソリューションの設計","Design AI-powered Business Solutions"],"D3":["AIビジネスソリューションの展開","Deploy AI-powered Business Solutions"]}},"ab410_study_v2":{"cert":"AB-410","doms":{"D1":["インテリジェントアプリの基盤構築","Create a Foundation for Intelligent Applications"],"D2":["インテリジェントアプリの作成","Create Intelligent Applications"],"D3":["ビジネスロジックと自動化の構築","Build Business Logic & Automation"]}},"ai300_study_v2":{"cert":"AI-300","doms":{"D1":["MLOps基盤の設計と実装","Design & Implement an MLOps Infrastructure"],"D2":["機械学習モデルのライフサイクルと運用","ML Model Lifecycle & Operations"],"D3":["GenAIOps基盤の設計と実装","Design & Implement a GenAIOps Infrastructure"],"D4":["生成AIの品質保証と可観測性","GenAI Quality Assurance & Observability"],"D5":["生成AIシステムとモデル性能の最適化","Optimize GenAI Systems & Model Performance"]}},"ai103_study_v1":{"cert":"AI-103","doms":{"D1":["Azure AI ソリューションの計画と管理","Plan & manage an Azure AI solution"],"D2":["生成AI・エージェントソリューションの実装","Implement generative AI & agentic solutions"],"D3":["コンピュータービジョンソリューションの実装","Implement computer vision solutions"],"D4":["テキスト分析ソリューションの実装","Implement text analysis solutions"],"D5":["情報抽出ソリューションの実装","Implement information extraction solutions"]}},"ai200_study_v1":{"cert":"AI-200","doms":{"D1":["コンテナー化ソリューションの開発","Develop containerized solutions on Azure"],"D2":["Azureデータ管理サービスでのAI開発","AI solutions with Azure data management services"],"D3":["Azureサービスへの接続と利用","Connect to & consume Azure services"],"D4":["セキュリティ・監視・トラブルシュート","Secure, monitor, troubleshoot"]}},"gh900_study_v1":{"cert":"GH-900","doms":{"D1":["Git と GitHub の基礎","Understand Git & GitHub basics"],"D2":["GitHubリポジトリの操作","Work with GitHub repositories"],"D3":["GitHubでのコラボレーション","Collaborate using GitHub"],"D4":["モダン開発プラクティス","Apply modern development practices"],"D5":["GitHubでのプロジェクト管理","Manage projects with GitHub"],"D6":["プライバシー・セキュリティ・管理","Privacy, security & administration"],"D7":["GitHubコミュニティ","Explore the GitHub community"]}},"gh300_study_v1":{"cert":"GH-300","doms":{"D1":["Copilot を責任を持って使う","Use GitHub Copilot responsibly"],"D2":["GitHub Copilot の機能を使う","Use GitHub Copilot features"],"D3":["Copilot のデータとアーキテクチャ","Copilot data & architecture"],"D4":["プロンプトエンジニアリング","Prompt engineering & context"],"D5":["開発生産性の向上","Improve developer productivity"],"D6":["プライバシー・除外・セーフガード","Privacy, exclusions & safeguards"]}},"adp_study_v3":{"cert":"ADP","doms":{"D1":["データの準備と取り込み","Data Preparation & Ingestion"],"D2":["データ分析とプレゼンテーション","Data Analysis & Presentation"],"D3":["データ パイプラインのオーケストレーション","Data Pipeline Orchestration"],"D4":["データ マネジメント","Data Management"]}}};
@@ -233216,6 +233400,215 @@ function PortalLibrary({ lang, onResume }) {
   );
 }
 
+// ポータルの「デイリー記録（Others）」。今日の9項目はいつも見えていて、タップで記録する。
+// 開くと日付の切り替え・メモ・月の一覧・Notion 用の更新文のコピーが出る。台帳は novaDailyRead/novaDailySave（nova_daily_v1）。
+function PortalDaily({ lang, onResume }) {
+  const en = lang === "en";
+  const [o, setO] = useState(() => novaDailyRead());
+  const [today, setToday] = useState(() => novaLocalDay());
+  const [sel, setSel] = useState(() => novaLocalDay());
+  const [open, setOpen] = useState(false);
+  const [noteFor, setNoteFor] = useState(null);
+  const [copyMsg, setCopyMsg] = useState("");
+  const [preview, setPreview] = useState(null);
+  useEffect(() => {
+    const re = () => {
+      setO(novaDailyRead());
+      const t = novaLocalDay();
+      setToday((p) => { if (p !== t) setSel((s) => (s === p ? t : s)); return t; });
+    };
+    const onVis = () => { if (document.visibilityState === "visible") re(); };
+    window.addEventListener("nova-daily", re);
+    window.addEventListener("storage", re);
+    window.addEventListener("focus", re);
+    document.addEventListener("visibilitychange", onVis);
+    const iv = setInterval(re, 60000);
+    return () => {
+      window.removeEventListener("nova-daily", re);
+      window.removeEventListener("storage", re);
+      window.removeEventListener("focus", re);
+      document.removeEventListener("visibilitychange", onVis);
+      clearInterval(iv);
+    };
+  }, []);
+  const update = (fn) => { const x = novaDailyRead(); fn(x); novaDailySave(x); setO(x); };
+  const rec = (day) => (o.days && o.days[day]) || {};
+  const tap = (day, c) => update((x) => {
+    const d = x.days[day] || (x.days[day] = {});
+    const m = d.m || (d.m = {});
+    const s = novaDailyStatus(d, c);
+    if (s === "none") m[c] = 1;
+    else if (s === "done") { if (novaDailyHasAuto(d, c)) m[c] = 0; else delete m[c]; }
+    else if (s === "auto") m[c] = 0;
+    else delete m[c];
+  });
+  const setNote = (day, c, t) => update((x) => {
+    const d = x.days[day] || (x.days[day] = {});
+    const n = d.n || (d.n = {});
+    if (String(t).trim()) n[c] = String(t).slice(0, 300); else delete n[c];
+  });
+  const shift = (k) => {
+    const dt = new Date(sel + "T00:00:00"); dt.setDate(dt.getDate() + k);
+    const nd = novaLocalDay(dt);
+    if (nd <= today) { setSel(nd); setNoteFor(null); }
+  };
+  const wd = (day) => { const w = new Date(day + "T00:00:00").getDay(); return en ? ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][w] : "日月火水木金土"[w]; };
+  const md = (day) => { const p = day.split("-"); return Number(p[1]) + "/" + Number(p[2]); };
+  const dToday = rec(today);
+  const doneToday = novaDailyDoneIds(dToday).length;
+  const dSel = rec(sel);
+  const pending = novaDailyPending(o, today, 31);
+  const lastSent = Object.keys(o.sent || {}).map((k) => o.sent[k].at || 0).reduce((a, b) => Math.max(a, b), 0);
+  const CHIP = {
+    done: { bg: NOVA.accent, fg: "#FFFFFF", bd: NOVA.accent },
+    auto: { bg: "#E3ECF8", fg: nvInk(NOVA.accent, "#E3ECF8"), bd: "#7FA3D3" },
+    off: { bg: "#FFFFFF", fg: NOVA.sub, bd: NOVA.line },
+    none: { bg: "#FFFFFF", fg: NOVA.ink, bd: NOVA.line },
+  };
+  const stLabel = (s) => ({ done: en ? "Done" : "完了", auto: en ? "Done (Nova)" : "完了（Nova）", off: en ? "Cancelled" : "取消", none: en ? "Not yet" : "未" })[s];
+  const chip = (day, c, big) => {
+    const d = rec(day);
+    const s = novaDailyStatus(d, c.id);
+    const k = CHIP[s];
+    const at = novaDailyAutoText(d, c.id, en);
+    return (
+      <button key={c.id} type="button" onClick={() => tap(day, c.id)} aria-pressed={s === "done" || s === "auto"}
+        title={(c.name + " — " + stLabel(s)) + (at ? " · Nova: " + at : "")}
+        style={{ display: "inline-flex", alignItems: "center", gap: 6, minHeight: big ? 38 : 34, padding: big ? "6px 12px" : "5px 10px", borderRadius: 999, border: "1px solid " + k.bd, background: k.bg, color: k.fg, fontSize: 12.5, fontWeight: 600, cursor: "pointer", fontFamily: NOVA_SANS, textDecoration: s === "off" ? "line-through" : "none" }}>
+        <span aria-hidden="true" style={{ fontSize: 12 }}>{s === "done" || s === "auto" ? "✓" : s === "off" ? "×" : "○"}</span>
+        <span>{c.name}</span>
+        {at && s !== "none" ? <span style={{ fontSize: 10.5, fontWeight: 500, opacity: s === "done" ? 0.92 : 1 }}>{(s === "done" ? "· " : "") + "Nova " + at}</span> : null}
+      </button>
+    );
+  };
+  // 月の一覧（選んだ日の月）
+  const ym = sel.slice(0, 7);
+  const pY = Number(ym.slice(0, 4)), pM = Number(ym.slice(5, 7));
+  const nDays = new Date(pY, pM, 0).getDate();
+  const daysOfMonth = Array.from({ length: nDays }, (_, i) => ym + "-" + String(i + 1).padStart(2, "0"));
+  const cellBg = (s) => (s === "done" ? NOVA.accent : s === "auto" ? "#5A88C6" : s === "off" ? "#FFFFFF" : NOVA.panelSoft);
+  const doCopy = async (days) => {
+    const text = novaDailyNotionText(o, days);
+    setPreview({ text, days });
+    let ok = false;
+    try { if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(text); ok = true; } } catch (e) {}
+    if (!ok) {
+      try { const ta = document.createElement("textarea"); ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); ok = document.execCommand("copy"); document.body.removeChild(ta); } catch (e) {}
+    }
+    if (ok) {
+      update((x) => { const at = Date.now(); days.forEach((day) => { x.sent[day] = { ids: novaDailyDoneIds(x.days[day]), sig: novaDailySig(x.days[day]), at }; }); });
+      setCopyMsg(en ? "Copied " + days.length + " day(s). Paste it into a Cowork chat." : days.length + "日分をコピーしました。Cowork のチャットに貼ってください。");
+    } else setCopyMsg(en ? "Could not copy automatically. Select the text below and copy it." : "自動でコピーできませんでした。下の文を選んでコピーしてください。");
+  };
+  const last7 = () => { const out = []; const t = new Date(today + "T00:00:00"); for (let i = 6; i >= 0; i--) { const dt = new Date(t); dt.setDate(t.getDate() - i); out.push(novaLocalDay(dt)); } return out; };
+  const small = { fontSize: 11, color: NOVA.sub };
+  const btn = { background: "#FFFFFF", border: "1px solid " + NOVA.line, color: NOVA.ink, borderRadius: 6, padding: "6px 11px", fontSize: 12, cursor: "pointer", fontFamily: NOVA_SANS, minHeight: 32 };
+  return (
+    <div style={{ margin: "22px 0 4px" }} data-nova-daily="">
+      <div role="button" tabIndex={0} aria-expanded={open} onClick={() => setOpen((v) => !v)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen((v) => !v); } }}
+        style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", padding: "2px 0" }}>
+        <span aria-hidden="true" style={{ color: NOVA.sub, fontSize: 10, width: 10, flexShrink: 0 }}>{open ? "▾" : "▸"}</span>
+        <span aria-hidden="true" style={{ width: 26, height: 26, borderRadius: 8, flexShrink: 0, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#fff", background: "linear-gradient(135deg,#1B4B8C,#3E8FD6)" }}>✓</span>
+        <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.2, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontFamily: NOVA_SERIF, fontSize: 15.5, fontWeight: 700, color: NOVA.ink, letterSpacing: 0.2 }}>Daily Others</span>
+            <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: 1.2, color: "#fff", background: NOVA.accent, borderRadius: 999, padding: "2px 8px" }}>{en ? "DAILY" : "日々の記録"}</span>
+          </div>
+          <span style={{ fontSize: 10.5, color: NOVA.sub, letterSpacing: 0.3 }}>{en ? "Others of the Cowork task tracker · Nova activity counts automatically" : "Cowork トラッカーの Others を記録・Nova での学習は自動で付く"}</span>
+        </div>
+        <span style={{ flex: 1 }} />
+        <span style={{ fontSize: 11.5, color: NOVA.sub, flexShrink: 0 }}>{en ? "Today" : "今日"} <b style={{ color: NOVA.accent }}>{doneToday}</b>/{NOVA_DAILY_CATS.length}</span>
+      </div>
+      <NovaRule margin="6px 0 10px" />
+      {!open ? (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>{NOVA_DAILY_CATS.map((c) => chip(today, c, false))}</div>
+      ) : (
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+            <button type="button" style={btn} onClick={() => shift(-1)} aria-label={en ? "Previous day" : "前の日"}>‹</button>
+            <span style={{ fontSize: 14, fontWeight: 700, color: NOVA.ink, minWidth: 120, textAlign: "center" }}>{md(sel)}（{wd(sel)}）<span style={{ ...small, fontWeight: 400, marginLeft: 6 }}>Day {novaDailyDayNo(sel)}</span></span>
+            <button type="button" style={{ ...btn, opacity: sel >= today ? 0.45 : 1, cursor: sel >= today ? "default" : "pointer" }} disabled={sel >= today} onClick={() => shift(1)} aria-label={en ? "Next day" : "次の日"}>›</button>
+            {sel !== today ? <button type="button" style={btn} onClick={() => { setSel(today); setNoteFor(null); }}>{en ? "Today" : "今日へ"}</button> : null}
+            <span style={{ flex: 1 }} />
+            <span style={small}>{novaDailyDoneIds(dSel).length}/{NOVA_DAILY_CATS.length} {en ? "done" : "完了"}</span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {NOVA_DAILY_CATS.map((c) => {
+              const s = novaDailyStatus(dSel, c.id);
+              const note = (dSel.n && dSel.n[c.id]) || "";
+              return (
+                <div key={c.id} style={{ border: "1px solid " + NOVA.line, borderRadius: 10, padding: "8px 10px", background: NOVA.bg }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                    {chip(sel, c, true)}
+                    <span style={{ flex: 1 }} />
+                    {c.hub ? <button type="button" style={{ ...btn, padding: "4px 9px", fontSize: 11.5 }} onClick={() => onResume && onResume(c.hub)}>{en ? "Open" : "開く"} →</button> : null}
+                    <button type="button" style={{ ...btn, padding: "4px 9px", fontSize: 11.5 }} aria-expanded={noteFor === c.id} onClick={() => setNoteFor((v) => (v === c.id ? null : c.id))}>✎ {note ? (en ? "Note" : "メモあり") : (en ? "Note" : "メモ")}</button>
+                  </div>
+                  <div style={{ ...small, marginTop: 5, lineHeight: 1.5 }}>
+                    {c.src ? ((en ? "Counted automatically from " : "自動：") + c.src[en ? 1 : 0] + (s === "off" ? (en ? " (cancelled for this day)" : "（この日は取消）") : "")) : (en ? "Outside Nova — tap to record." : "Nova の外でやること。タップで記録。")}
+                  </div>
+                  {noteFor === c.id ? (
+                    <textarea defaultValue={note} maxLength={300} rows={2} placeholder={en ? "Optional note (goes into the Notion page body)" : "任意のメモ（Notion の本文に追記されます）"}
+                      onBlur={(e) => setNote(sel, c.id, e.target.value)}
+                      style={{ display: "block", width: "100%", boxSizing: "border-box", marginTop: 6, border: "1px solid " + NOVA.line, borderRadius: 6, padding: "6px 8px", fontSize: 13, fontFamily: NOVA_SANS, color: NOVA.ink, background: "#FFFFFF" }} />
+                  ) : note ? <div style={{ fontSize: 12, color: NOVA.ink, marginTop: 4, whiteSpace: "pre-wrap" }}>✎ {note}</div> : null}
+                </div>
+              );
+            })}
+          </div>
+          {/* 月の一覧 */}
+          <div style={{ marginTop: 14 }}>
+            <div style={{ fontSize: 11, letterSpacing: 1.5, color: NOVA.sub, marginBottom: 6 }}>{en ? pY + "-" + String(pM).padStart(2, "0") : pY + "年" + pM + "月"}</div>
+            <div role="group" aria-label={en ? "Month overview" : "月の一覧"} style={{ display: "grid", gridTemplateColumns: "clamp(64px, 24%, 92px) repeat(" + nDays + ", minmax(0, 1fr))", gap: 2, alignItems: "center" }}>
+              <span />
+              {daysOfMonth.map((day, i) => <span key={day} style={{ fontSize: 8.5, color: NOVA.sub, textAlign: "center" }}>{(i + 1) % 5 === 0 || i === 0 ? i + 1 : ""}</span>)}
+              {NOVA_DAILY_CATS.map((c) => {
+                const cnt = daysOfMonth.filter((day) => novaDailyIsDone(rec(day), c.id)).length;
+                return (
+                  <React.Fragment key={c.id}>
+                    <span style={{ fontSize: 10.5, color: NOVA.ink, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} title={c.name}>{c.name.replace(/（.*）| \(.*\)/, "")} <span style={{ color: NOVA.sub }}>{cnt}</span></span>
+                    {daysOfMonth.map((day) => {
+                      const fut = day > today;
+                      const s = fut ? "none" : novaDailyStatus(rec(day), c.id);
+                      return (
+                        <span key={day} role="button" tabIndex={-1} onClick={() => { if (!fut) { setSel(day); setNoteFor(null); } }} title={c.name + " " + md(day) + " — " + stLabel(s)}
+                          style={{ height: 11, borderRadius: 2, background: fut ? "transparent" : cellBg(s), border: "1px solid " + (day === sel ? NOVA.ink : s === "off" ? NOVA.faint : "transparent"), boxSizing: "border-box", cursor: fut ? "default" : "pointer" }} />
+                      );
+                    })}
+                  </React.Fragment>
+                );
+              })}
+            </div>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 6, ...small }}>
+              {[["done", en ? "Done" : "完了"], ["auto", en ? "Done (Nova)" : "Nova で自動"], ["off", en ? "Cancelled" : "取消"], ["none", en ? "Not yet" : "未"]].map(([s, l]) => (
+                <span key={s} style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><span aria-hidden="true" style={{ width: 10, height: 10, borderRadius: 2, background: cellBg(s), border: "1px solid " + (s === "off" ? NOVA.faint : "transparent") }} />{l}</span>
+              ))}
+            </div>
+          </div>
+          {/* Notion への反映 */}
+          <div style={{ marginTop: 14, border: "1px solid " + NOVA.line, borderRadius: 10, padding: "10px 12px", background: NOVA.panel }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: NOVA.ink, marginBottom: 4 }}>{en ? "Reflect in Notion (Cowork tracker)" : "Notion（Cowork のトラッカー）に反映"}</div>
+            <div style={{ ...small, lineHeight: 1.6, marginBottom: 8 }}>
+              {en
+                ? "This page cannot write to Notion directly. Copy the update text and paste it into a Cowork chat; Claude there updates the rows of “Scheduled task tracker”, and the Cowork tracker shows them."
+                : "このページから Notion へは直接書き込めません。更新文をコピーして Cowork のチャットに貼ると、Claude が「Scheduled task tracker」の行を更新し、Cowork のトラッカーに反映されます。"}
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+              <button type="button" style={{ ...btn, background: NOVA.accent, color: "#FFFFFF", border: "1px solid " + NOVA.accent, fontWeight: 700 }} onClick={() => doCopy(pending.length ? pending : [today])}>
+                {pending.length ? (en ? "Copy update for " + pending.length + " day(s)" : "未反映の " + pending.length + " 日分をコピー") : (en ? "Copy today's update" : "今日の分をコピー")}
+              </button>
+              <button type="button" style={btn} onClick={() => doCopy(last7())}>{en ? "Recreate last 7 days" : "直近7日分を作り直す"}</button>
+              {lastSent ? <span style={small}>{en ? "Last copied: " : "前回コピー："}{new Date(lastSent).toLocaleString(en ? "en-US" : "ja-JP", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" })}</span> : null}
+            </div>
+            {copyMsg ? <div role="status" style={{ fontSize: 12, color: NOVA.ink, marginTop: 8 }}>{copyMsg}</div> : null}
+            {preview ? <textarea readOnly value={preview.text} rows={Math.min(14, preview.text.split("\n").length + 1)} onFocus={(e) => e.target.select()} style={{ display: "block", width: "100%", boxSizing: "border-box", marginTop: 8, border: "1px solid " + NOVA.line, borderRadius: 6, padding: "6px 8px", fontSize: 12, fontFamily: "ui-monospace, Menlo, monospace", color: NOVA.ink, background: "#FFFFFF" }} /> : null}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ポータルの学習進捗3ブロック(STUDY LOG / COMPLETED / WEAKNESS FOCUS)を1つのトグルにまとめ、既定は閉じる。
 function PortalProgress({ lang, onResume }) {
   const en = lang === "en";
@@ -233381,6 +233774,7 @@ function novaHashHub() {
   try { const h = (window.location.hash || "").replace(/^#\/?/, "").split(/[/?]/)[0]; return NOVA_HUBS.includes(h) ? h : null; } catch (e) { return null; }
 }
 function ProjectNova() {
+  novaDailyHook(); // デイリー記録（Others）の自動計上：資格・Language Hub の保存口を一度だけ包む（2回目以降は何もしない）
   const [lang, setLang] = useState("ja");
   // 最初の描画からハッシュのハブを使う（null で始めると、下の書き戻しが深い位置を消してしまう）
   const [active, setActive] = useState(() => novaHashHub());
@@ -233663,6 +234057,8 @@ function ProjectNova() {
           <NovaRule />
 
           <NovaSearch lang={lang} />
+
+          <PortalDaily lang={lang} onResume={(id) => setActive(id)} />
 
           <PortalBootcamp lang={lang} onResume={(id) => setActive(id)} />
 
