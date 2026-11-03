@@ -128,8 +128,8 @@
      "Set naming conventions for agents and solutions, a disclaimer template for the conversation start, and mandatory shared components."
     ],
     [
-     "ライセンスと予算：保有ライセンスを棚卸しし、プレミアム機能（Managed Environments 等）・プレミアムコネクタ・生成AIの費用、従量課金か容量ライセンスか、環境単位のメッセージ容量の割当を決める。",
-     "Licensing and budget: review current entitlements; plan costs of premium features (e.g., Managed Environments), premium connectors and generative AI; choose pay-as-you-go or capacity licensing; allocate message capacity per environment."
+     "ライセンスと予算：保有ライセンスを棚卸しし、プレミアム機能（Managed Environments 等）・プレミアムコネクタ・生成AIの費用、従量課金か容量ライセンスか、環境単位の Copilot クレジット容量の割当を決める（2025年9月1日に課金単位がメッセージから Copilot クレジットに変わった）。",
+     "Licensing and budget: review current entitlements; plan costs of premium features (e.g., Managed Environments), premium connectors and generative AI; choose pay-as-you-go or capacity licensing; allocate Copilot Credits capacity per environment (the billing unit changed from messages to Copilot Credits on 1 Sep 2025)."
     ]
    ],
    "src": {
