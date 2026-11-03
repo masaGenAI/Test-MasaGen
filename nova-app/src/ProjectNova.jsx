@@ -95,10 +95,10 @@ function AccordionCard({ n, h, b, accent, mid, deep, ink, defaultOpen, diagram, 
     <div style={{ background: "#fff", border: `1px solid ${mid}`, borderLeft: `5px solid ${accent}`, borderRadius: 12, marginBottom: 10, overflow: "hidden" }}>
       <button onClick={() => setOpen((o) => !o)}
         style={{ width: "100%", textAlign: "left", background: open ? "#f8fafc" : "#fff", border: "none", cursor: "pointer", padding: "13px 15px", display: "flex", alignItems: "center", gap: 10 }}>
-        <span style={{ flexShrink: 0, width: 26, height: 26, borderRadius: "50%", background: accent, color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 12 }}>{n}</span>
+        <span style={{ flexShrink: 0, width: 26, height: 26, borderRadius: "50%", background: accent, color: nvInk("#ffffff", accent), display: "inline-flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 12 }}>{n}</span>
         <span style={{ flex: 1, fontSize: 13.5, fontWeight: 800, color: deep }}>{h}</span>
-        {hasDiag ? <span style={{ fontSize: 10, color: accent, fontWeight: 700, marginRight: 4 }}>◨ {lang === "en" ? "diagram" : "図解"}</span> : null}
-        <span style={{ color: accent, fontSize: 16, fontWeight: 800, lineHeight: 1 }}>{open ? "−" : "+"}</span>
+        {hasDiag ? <span style={{ fontSize: 10.5, color: nvInk(accent, "#f8fafc"), fontWeight: 700, marginRight: 4 }}>◨ {lang === "en" ? "diagram" : "図解"}</span> : null}
+        <span style={{ color: nvInk(accent, "#f8fafc", 3), fontSize: 16, fontWeight: 800, lineHeight: 1 }}>{open ? "−" : "+"}</span>
       </button>
       {open ? (
         <div style={{ padding: "2px 16px 14px clamp(14px, 5vw, 51px)", fontSize: 13, lineHeight: 1.75, color: ink }}>
@@ -1020,7 +1020,7 @@ function DomainDrillPanel({ sets, domains, lang, size }) {
             const n = pool(d.id).length;
             return (
               <button key={d.id} onClick={() => begin(d.id)} disabled={!n} style={{ ...btn(false), opacity: n ? 1 : .35 }}>
-                {d.id} {label(d)}<span style={{ opacity: .65, marginLeft: 5 }}>{n}</span>
+                {d.id} {label(d)}<span style={{ opacity: .8, marginLeft: 5 }}>{n}</span>
               </button>
             );
           })}
@@ -1276,10 +1276,10 @@ function FigFrame({ children, id, lang, hint, terms, topic }) {
         <span style={{ flex: 1 }} />
         {hasSvg ? (<>
         <button onClick={() => setZoom(Math.max(1, Math.round((zoom - 0.25) * 100) / 100))} disabled={zoom <= 1}
-                title={en ? "Zoom out" : "縮小"} style={{ ...btn(false), opacity: zoom <= 1 ? .4 : 1 }}>−</button>
+                title={en ? "Zoom out" : "縮小"} style={{ ...btn(false), opacity: zoom <= 1 ? .6 : 1 }}>−</button>
         <span style={{ fontSize: 10.5, opacity: .7, minWidth: 34, textAlign: "center" }}>{Math.round(zoom * 100)}%</span>
         <button onClick={() => setZoom(Math.min(3, Math.round((zoom + 0.25) * 100) / 100))} disabled={zoom >= 3}
-                title={en ? "Zoom in" : "拡大"} style={{ ...btn(false), opacity: zoom >= 3 ? .4 : 1 }}>＋</button>
+                title={en ? "Zoom in" : "拡大"} style={{ ...btn(false), opacity: zoom >= 3 ? .6 : 1 }}>＋</button>
         </>) : null}
         {noteCount > 0 && (
           <button onClick={() => setShowNotes(!showNotes)} aria-pressed={showNotes} style={btn(showNotes)}>
@@ -173832,7 +173832,7 @@ function MSExamShell({ sets, setKeys, domainSets, domains, lang, C, PASS, dName,
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
             <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
-              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
+              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
         )}
@@ -173890,7 +173890,7 @@ function MSExamShell({ sets, setKeys, domainSets, domains, lang, C, PASS, dName,
           <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
+          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
           <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Set select" : "セット選択"}</button>
         </div>
       </div>
@@ -173968,8 +173968,8 @@ function MSExamShell({ sets, setKeys, domainSets, domains, lang, C, PASS, dName,
             <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 16, fontSize: 13.5, color: INK, cursor: "pointer" }}><input type="checkbox" checked={!!flags[pos]} onChange={e => setFlags(f => ({ ...f, [pos]: e.target.checked }))} style={{ width: 16, height: 16 }} /><span>{en ? "Mark this question for review" : "この問題をあとで見直す"}</span></label>
           </div>
           <div style={{ display: "flex", gap: 16, margin: "16px 0 30px" }}>
-            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
-            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
+            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: nvInk("#ffffff", pos === 0 ? "#9fb4bc" : NAVY, 3), fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
+            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: nvInk("#ffffff", NAVY, 3), fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
           </div>
         </div>
       </div>
@@ -173984,7 +173984,7 @@ function MSExamShell({ sets, setKeys, domainSets, domains, lang, C, PASS, dName,
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 12.5, color: "#5a7780" }}>
-        <span><span style={{ background: C.primary, color: "#fff", borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{T.practice}</span>{en ? `${T.setW} ${setNo} · Q ${pos + 1}/${qs.length}` : `${T.setW}${setNo}・問${pos + 1}/${qs.length}`}</span>
+        <span><span style={{ background: C.primary, color: nvInk("#ffffff", C.primary), borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{T.practice}</span>{en ? `${T.setW} ${setNo} · Q ${pos + 1}/${qs.length}` : `${T.setW}${setNo}・問${pos + 1}/${qs.length}`}</span>
         <span>{Q.d} {domLabel(Q.d)}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginTop: 12 }}>
@@ -173996,8 +173996,8 @@ function MSExamShell({ sets, setKeys, domainSets, domains, lang, C, PASS, dName,
           let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (i === Q.a) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (i === sel) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } }
           return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
         })}
-        {pMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== pNeed} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === pNeed ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: mSel.length === pNeed ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-        {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: (pMulti ? eq(selSet, Q.a) : sel === Q.a) ? C.ok : C.ng }}>{(pMulti ? eq(selSet, Q.a) : sel === Q.a) ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{en ? "Answer" : "正解"}：{(pMulti ? Q.a : [Q.a]).map(i => "ABCDE"[i]).join("・")}　{L2(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+        {pMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== pNeed} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === pNeed ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === pNeed ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === pNeed ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+        {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: (pMulti ? eq(selSet, Q.a) : sel === Q.a) ? C.ok : C.ng }}>{(pMulti ? eq(selSet, Q.a) : sel === Q.a) ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{en ? "Answer" : "正解"}：{(pMulti ? Q.a : [Q.a]).map(i => "ABCDE"[i]).join("・")}　{L2(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
         <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : C.primary, cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
@@ -175969,12 +175969,12 @@ function App() {
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", color: C.ink, background: "#FFFDF9", minHeight: "100vh" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ fontSize: 19, fontWeight: 700 }}>
-            <span style={{ color: C.primary }}>aws</span> {t.appTitle}
+            <span style={{ color: nvInk(C.primary, "#ffffff") }}>aws</span> {t.appTitle}
           </div>
-          <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>{t.appSub}</div>
+          <div style={{ fontSize: 12, marginTop: 2 }}>{t.appSub}</div>
         </div>
         <div style={{ display: "flex", background: "rgba(255,255,255,.15)", borderRadius: 20, padding: 3 }}>
           {["ja", "en"].map(l => (
@@ -176006,7 +176006,7 @@ function App() {
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
-          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: nvInk("#ffffff", C.deep), fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ {lang === "en" ? "Top" : "トップへ"}
         </button>
       )}
@@ -176127,7 +176127,7 @@ function Quiz({ onAnswer, lang, t }) {
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
         <button onClick={() => slot.save({ filter, shuf, seed, pos }, filter === "ALL" ? (en ? "All" : "全分野") : filter)} style={{ padding: "6px 14px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{slot.meta ? (en ? "💾 Saved" : "💾 保存済") : (en ? "💾 Save" : "💾 セーブ")}</button>
         {slot.meta && (<>
-          <button onClick={async () => { const d = await slot.read(); if (!d) return; resumeRef.current = { pos: d.pos || 0 }; setFilter(d.filter || "ALL"); setShuf(!!d.shuf); setSeed(d.seed || 0); setPos(d.pos || 0); setSel(null); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
+          <button onClick={async () => { const d = await slot.read(); if (!d) return; resumeRef.current = { pos: d.pos || 0 }; setFilter(d.filter || "ALL"); setShuf(!!d.shuf); setSeed(d.seed || 0); setPos(d.pos || 0); setSel(null); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
           <span style={{ fontSize: 11, color: "#5a7288" }}>{saveStamp(slot.meta.t)}</span>
           <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
         </>)}
@@ -176185,7 +176185,7 @@ function Quiz({ onAnswer, lang, t }) {
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
         <button onClick={() => go(-1)} disabled={pos === 0}
-          style={{ padding: "10px 30px", borderRadius: 9, border: `1.5px solid ${C.mid}`, background: "#fff", color: pos === 0 ? "#bcae9f" : C.ink, fontWeight: 700, fontSize: 13.5, cursor: pos === 0 ? "default" : "pointer" }}>
+          style={{ padding: "10px 30px", borderRadius: 9, border: `1.5px solid ${C.mid}`, background: "#fff", color: pos === 0 ? nvInk("#bcae9f", "#ffffff", 3) : C.ink, fontWeight: 700, fontSize: 13.5, cursor: pos === 0 ? "default" : "pointer" }}>
           ← {en ? "Prev" : "前の問題"}
         </button>
         <span style={{ fontSize: 13.5, color: "#7b6d62", fontWeight: 600 }}>{pos + 1} / {pool.length}</span>
@@ -176221,7 +176221,7 @@ function Confuse({ lang, t }) {
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 10 }}>
           <div style={{ fontWeight: 700, color: C.deep, fontSize: 13.5, marginBottom: 5 }}>{lang === "en" && c[3] ? c[3] : c[0]}</div>
           <div style={{ fontSize: 13, lineHeight: 1.5, marginBottom: 4 }}>{lang === "en" && c[4] ? c[4] : c[1]}</div>
-          <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{t.judgeAxis}：{lang === "en" && c[5] ? c[5] : c[2]}</div>
+          <div style={{ fontSize: 12, color: nvInk(C.primary, "#ffffff"), fontWeight: 600 }}>{t.judgeAxis}：{lang === "en" && c[5] ? c[5] : c[2]}</div>
         </div>
       ))}
       {list.length === 0 && <div style={{ textAlign: "center", color: "#7b6d62", padding: 20 }}>{t.noMatch}</div>}
@@ -176308,7 +176308,7 @@ function Review({ state, onAnswer, onResolve, onClear, lang, t }) {
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, background: C.deep, color: "#fff", borderRadius: 9, padding: "9px 14px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, background: C.deep, color: nvInk("#ffffff", C.deep), borderRadius: 9, padding: "9px 14px" }}>
         <span style={{ fontSize: 13, fontWeight: 700 }}>{t.reviewTitle}</span>
         <span style={{ fontSize: 13, fontWeight: 700 }}>{en ? "Remaining" : "残り"}: {remaining}</span>
       </div>
@@ -176343,7 +176343,7 @@ function Review({ state, onAnswer, onResolve, onClear, lang, t }) {
       <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
         <button onClick={() => setPhase("list")} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.mid}`, background: "#fff", color: C.ink, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.reviewBackList}</button>
         {!revealed ? (
-          <button onClick={check} disabled={pick.length === 0} style={{ flex: 2, padding: 12, borderRadius: 9, border: "none", background: pick.length === 0 ? C.mid : C.accent, color: "#fff", fontWeight: 700, fontSize: 14, cursor: pick.length === 0 ? "default" : "pointer" }}>{t.showAnswer}</button>
+          <button onClick={check} disabled={pick.length === 0} style={{ flex: 2, padding: 12, borderRadius: 9, border: "none", background: pick.length === 0 ? C.mid : C.accent, color: nvInk("#ffffff", pick.length === 0 ? C.mid : C.accent, 3), fontWeight: 700, fontSize: 14, cursor: pick.length === 0 ? "default" : "pointer" }}>{t.showAnswer}</button>
         ) : (
           <button onClick={next} style={{ flex: 2, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: C.deep, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.checkContinue}</button>
         )}
@@ -176423,7 +176423,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 12 }}>
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 10 }}>{g(data.title)}</div>
-        <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, marginBottom: 6 }}>{lang === "ja" ? "ケース本文（資料）" : "Case (materials)"}</div>
+        <div style={{ fontSize: 11, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 6 }}>{lang === "ja" ? "ケース本文（資料）" : "Case (materials)"}</div>
         {g(data.body).map((p, i) => (<div key={i} style={{ fontSize: 13, lineHeight: 1.7, marginBottom: 8, color: C.ink }}>{p}</div>))}
         {(data.tables || []).map((tb, ti) => (
           <div key={ti} style={{ marginTop: 12 }}>
@@ -176448,7 +176448,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
             <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
-            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
+            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
           </div>
         </div>
       ) : (
@@ -176597,14 +176597,14 @@ function Exam({ onAnswer, onWrong, lang, t }) {
                 <span style={{ fontWeight: 700, fontSize: 15, color: C.deep }}>{en ? "Exam-style case" : "本試験形式ケース"}</span>
                 <span style={{ fontSize: 12, color: "#7b6d62", marginLeft: 8 }}>{en ? "Design scenario with data tables & rationale" : "設計シナリオ・資料表つき・僅差4択・根拠解説"}</span>
               </span>
-              <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary }}>{en ? "Start →" : "挑戦 →"}</span>
+              <span style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff") }}>{en ? "Start →" : "挑戦 →"}</span>
             </button>
             {EXAM_SET_NOS.map(n => (
               <button key={n} onClick={() => startNormal(n)}
                 style={{ width: "100%", textAlign: "left", padding: "15px 16px", marginBottom: 10, borderRadius: 11,
                   border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{ fontWeight: 700, fontSize: 15, color: C.deep }}>{t.setLabel} {n}</span>
-                <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary }}>{t.start}</span>
+                <span style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff") }}>{t.start}</span>
               </button>
             ))}
           </>
@@ -176617,7 +176617,7 @@ function Exam({ onAnswer, onWrong, lang, t }) {
               <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "2px 7px", fontSize: 11, marginRight: 8, fontWeight: 700 }}>{d.id}</span>
               <span style={{ fontWeight: 700, fontSize: 14, color: C.deep }}>{domName(d.id, lang)}</span>
             </span>
-            <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary }}>{t.start}</span>
+            <span style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff") }}>{t.start}</span>
           </button>
         ))}
       </div>
@@ -176679,10 +176679,10 @@ function Exam({ onAnswer, onWrong, lang, t }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, background: timeWarn ? "#FBEAE8" : C.deep, color: timeWarn ? C.ng : "#fff", borderRadius: 9, padding: "9px 14px" }}>
         <span style={{ fontSize: 13, fontWeight: 600 }}>
           {title} · {t.questionNo(pos + 1, qs.length)}
-          <span style={{ marginLeft: 8, fontSize: 11, opacity: 0.8 }}>{isPractice ? t.examModePractice : t.examModeReal}</span>
+          <span style={{ marginLeft: 8, fontSize: 11 }}>{isPractice ? t.examModePractice : t.examModeReal}</span>
         </span>
         {isPractice
-          ? <span style={{ fontSize: 13, fontWeight: 700, opacity: 0.85 }}>{en ? "Answered" : "回答済"} {answeredCount}/{qs.length}</span>
+          ? <span style={{ fontSize: 13, fontWeight: 700 }}>{en ? "Answered" : "回答済"} {answeredCount}/{qs.length}</span>
           : <span style={{ fontSize: 17, fontWeight: 800 }}>{fmtTime(timeLeft)}</span>}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#7b6d62", marginBottom: 6 }}>
@@ -176726,7 +176726,7 @@ function Exam({ onAnswer, onWrong, lang, t }) {
       {isPractice ? (
         <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
           <button onClick={() => setPos(p => Math.max(0, p - 1))} disabled={pos === 0}
-            style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.mid}`, background: "#fff", color: pos === 0 ? "#bcae9f" : C.ink, fontWeight: 700, fontSize: 14, cursor: pos === 0 ? "default" : "pointer" }}>
+            style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.mid}`, background: "#fff", color: pos === 0 ? nvInk("#bcae9f", "#ffffff", 3) : C.ink, fontWeight: 700, fontSize: 14, cursor: pos === 0 ? "default" : "pointer" }}>
             ← {en ? "Prev" : "前へ"}
           </button>
           {!isLastQ && (
@@ -176737,11 +176737,11 @@ function Exam({ onAnswer, onWrong, lang, t }) {
           )}
           {!isRevealed ? (
             <button onClick={() => revealPractice(pos)} disabled={pick.length === 0}
-              style={{ flex: 2, padding: 12, borderRadius: 9, border: "none", background: pick.length === 0 ? C.mid : C.accent, color: "#fff", fontWeight: 700, fontSize: 14, cursor: pick.length === 0 ? "default" : "pointer" }}>
+              style={{ flex: 2, padding: 12, borderRadius: 9, border: "none", background: pick.length === 0 ? C.mid : C.accent, color: nvInk("#ffffff", pick.length === 0 ? C.mid : C.accent, 3), fontWeight: 700, fontSize: 14, cursor: pick.length === 0 ? "default" : "pointer" }}>
               {t.showAnswer}
             </button>
           ) : isLastQ ? (
-            <button onClick={score} style={{ flex: 2, padding: 12, borderRadius: 9, border: "none", background: C.ok, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.scoreBtn} ✓</button>
+            <button onClick={score} style={{ flex: 2, padding: 12, borderRadius: 9, border: "none", background: C.ok, color: nvInk("#ffffff", C.ok, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.scoreBtn} ✓</button>
           ) : (
             <button onClick={() => setPos(p => p + 1)} style={{ flex: 2, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: C.deep, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.checkContinue}</button>
           )}
@@ -176749,13 +176749,13 @@ function Exam({ onAnswer, onWrong, lang, t }) {
       ) : (
         <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
           <button onClick={() => setPos(p => Math.max(0, p - 1))} disabled={pos === 0}
-            style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.mid}`, background: "#fff", color: pos === 0 ? "#bcae9f" : C.ink, fontWeight: 700, fontSize: 14, cursor: pos === 0 ? "default" : "pointer" }}>
+            style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.mid}`, background: "#fff", color: pos === 0 ? nvInk("#bcae9f", "#ffffff", 3) : C.ink, fontWeight: 700, fontSize: 14, cursor: pos === 0 ? "default" : "pointer" }}>
             ← {en ? "Prev" : "前へ"}
           </button>
           {pos + 1 < qs.length ? (
             <button onClick={() => setPos(p => p + 1)} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: C.deep, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Next" : "次へ"} →</button>
           ) : (
-            <button onClick={score} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.ok, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.scoreBtn} ✓</button>
+            <button onClick={score} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.ok, color: nvInk("#ffffff", C.ok, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.scoreBtn} ✓</button>
           )}
         </div>
       )}
@@ -176993,9 +176993,9 @@ function OrgHierarchy({ lang }) {
   const Node = ({ label, sub, hue, indent }) => (
     <div style={{ marginLeft: indent * 22, marginBottom: 8, position: "relative" }}>
       {indent > 0 && <span style={{ position: "absolute", left: -14, top: 0, bottom: 0, width: 2, background: C.mid }} />}
-      <div style={{ background: hue, color: "#fff", borderRadius: 9, padding: "9px 13px", display: "inline-block", minWidth: 180 }}>
+      <div style={{ background: hue, color: nvInk("#ffffff", hue), borderRadius: 9, padding: "9px 13px", display: "inline-block", minWidth: 180 }}>
         <div style={{ fontWeight: 700, fontSize: 13 }}>{label}</div>
-        <div style={{ fontSize: 11, opacity: 0.9 }}>{sub}</div>
+        <div style={{ fontSize: 11 }}>{sub}</div>
       </div>
     </div>
   );
@@ -177029,7 +177029,7 @@ function IamScopeHierarchy({ lang }) {
       </div>
       {rings.map(([label, hue, desc], i) => (
         <div key={i} style={{ marginLeft: i * 16, marginBottom: 7, background: "#fff", border: `2px solid ${hue}`, borderRadius: 10, padding: "9px 12px" }}>
-          <span style={{ background: hue, color: "#fff", borderRadius: 5, padding: "2px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{i + 1}</span>
+          <span style={{ background: hue, color: nvInk("#ffffff", hue), borderRadius: 5, padding: "2px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{i + 1}</span>
           <strong style={{ fontSize: 13, color: C.deep }}>{label}</strong>
           <div style={{ fontSize: 12, color: "#6b5d52", marginTop: 3 }}>{desc}</div>
         </div>
@@ -177053,9 +177053,9 @@ function DefenseLayers({ lang }) {
       <div style={{ fontSize: 12, color: "#6b5d52", marginBottom: 10 }}>{en ? "Outer to inner: each layer backs up the others. Tap a layer." : "外側から内側へ、各層が互いを補完。層をタップ。"}</div>
       {layers.map(([label, hue, desc], i) => (
         <div key={i} onClick={() => setSel(sel === i ? null : i)}
-          style={{ marginBottom: 6, marginLeft: i * 14, marginRight: i * 14, background: hue, color: "#fff", borderRadius: 10, padding: "12px 14px", cursor: "pointer", textAlign: "center", boxShadow: sel === i ? "0 0 0 3px rgba(255,153,0,.4)" : "none" }}>
+          style={{ marginBottom: 6, marginLeft: i * 14, marginRight: i * 14, background: hue, color: nvInk("#ffffff", hue), borderRadius: 10, padding: "12px 14px", cursor: "pointer", textAlign: "center", boxShadow: sel === i ? "0 0 0 3px rgba(255,153,0,.4)" : "none" }}>
           <div style={{ fontWeight: 700, fontSize: 13 }}>{label}</div>
-          {sel === i && <div style={{ fontSize: 12, marginTop: 6, opacity: 0.95, lineHeight: 1.5 }}>{desc}</div>}
+          {sel === i && <div style={{ fontSize: 12, marginTop: 6, lineHeight: 1.5 }}>{desc}</div>}
         </div>
       ))}
       <div style={{ textAlign: "center", fontSize: 11, color: "#7b6d62", marginTop: 4 }}>↓ {en ? "deeper = closer to data" : "下ほどデータに近い"}</div>
@@ -177078,9 +177078,9 @@ function DrLadder({ lang }) {
         <span>← {en ? "lower cost" : "低コスト"}</span><span>{en ? "shorter RTO" : "短い RTO"} →</span>
       </div>
       {steps.map(([label, sub, hue], i) => (
-        <div key={i} style={{ marginBottom: 6, marginLeft: (3 - i) * 30, background: hue, color: "#fff", borderRadius: 9, padding: "10px 14px" }}>
+        <div key={i} style={{ marginBottom: 6, marginLeft: (3 - i) * 30, background: hue, color: nvInk("#ffffff", hue), borderRadius: 9, padding: "10px 14px" }}>
           <div style={{ fontWeight: 700, fontSize: 13 }}>{label}</div>
-          <div style={{ fontSize: 11.5, opacity: 0.9 }}>{sub}</div>
+          <div style={{ fontSize: 11.5 }}>{sub}</div>
         </div>
       ))}
       <div style={{ fontSize: 12, color: "#6b5d52", marginTop: 8 }}>{en ? "Higher steps = shorter RTO but higher cost. Pick by RTO/RPO requirement and budget." : "上の段ほど RTO が短いがコストも高い。RTO/RPO 要件と予算で選ぶ。"}</div>
@@ -177101,7 +177101,7 @@ function StorageParallel({ lang }) {
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
       {cards.map(([name, hue, items], i) => (
         <div key={i} style={{ border: `1.5px solid ${hue}`, borderRadius: 11, overflow: "hidden" }}>
-          <div style={{ background: hue, color: "#fff", padding: "8px 10px", fontWeight: 700, fontSize: 13 }}>{name}</div>
+          <div style={{ background: hue, color: nvInk("#ffffff", hue), padding: "8px 10px", fontWeight: 700, fontSize: 13 }}>{name}</div>
           <div style={{ padding: "8px 10px" }}>
             {items.map((it, j) => <div key={j} style={{ fontSize: 12, color: C.ink, padding: "3px 0", lineHeight: 1.4 }}>{en ? "• " : "・"}{it}</div>)}
           </div>
@@ -177123,8 +177123,8 @@ function MsgParallel({ lang }) {
     <div>
       {cards.map(([name, hue, kind, desc], i) => (
         <div key={i} style={{ display: "flex", alignItems: "stretch", marginBottom: 8, border: `1.5px solid ${hue}`, borderRadius: 11, overflow: "hidden" }}>
-          <div style={{ background: hue, color: "#fff", padding: "10px 12px", fontWeight: 700, fontSize: 14, minWidth: 110, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-            {name}<span style={{ fontSize: 11, opacity: 0.9, fontWeight: 500 }}>{kind}</span>
+          <div style={{ background: hue, color: nvInk("#ffffff", hue, 3), padding: "10px 12px", fontWeight: 700, fontSize: 14, minWidth: 110, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+            {name}<span style={{ fontSize: 11, fontWeight: 500, color: nvInk("#ffffff", hue) }}>{kind}</span>
           </div>
           <div style={{ padding: "10px 12px", fontSize: 12.5, color: C.ink, lineHeight: 1.5, display: "flex", alignItems: "center" }}>{desc}</div>
         </div>
@@ -177140,11 +177140,11 @@ function FlowChain({ nodes }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
       {nodes.map((n, i) => (
         <div key={i}>
-          <div style={{ background: n[1], color: "#fff", borderRadius: 9, padding: "10px 13px" }}>
+          <div style={{ background: n[1], color: nvInk("#ffffff", n[1]), borderRadius: 9, padding: "10px 13px" }}>
             <div style={{ fontWeight: 700, fontSize: 13 }}>{n[0]}</div>
-            {n[2] && <div style={{ fontSize: 11.5, opacity: 0.92, marginTop: 2 }}>{n[2]}</div>}
+            {n[2] && <div style={{ fontSize: 11.5, marginTop: 2 }}>{n[2]}</div>}
           </div>
-          {i < nodes.length - 1 && <div style={{ textAlign: "center", color: C.mid, fontSize: 18, lineHeight: "20px" }}>↓</div>}
+          {i < nodes.length - 1 && <div style={{ textAlign: "center", color: nvInk(C.mid, "#ffffff", 3), fontSize: 18, lineHeight: "20px" }}>↓</div>}
         </div>
       ))}
     </div>
@@ -177194,14 +177194,14 @@ function FailoverFlow({ lang }) {
   ];
   return (
     <div>
-      <div style={{ background: frames[step][2], color: "#fff", borderRadius: 11, padding: 16, marginBottom: 10, minHeight: 70 }}>
-        <div style={{ fontSize: 11, opacity: 0.85, fontWeight: 700 }}>STEP {step + 1} / 4</div>
+      <div style={{ background: frames[step][2], color: nvInk("#ffffff", frames[step][2]), borderRadius: 11, padding: 16, marginBottom: 10, minHeight: 70 }}>
+        <div style={{ fontSize: 11, fontWeight: 700 }}>STEP {step + 1} / 4</div>
         <div style={{ fontSize: 15, fontWeight: 800, margin: "4px 0" }}>{frames[step][0]}</div>
-        <div style={{ fontSize: 12.5, opacity: 0.95, lineHeight: 1.5 }}>{frames[step][1]}</div>
+        <div style={{ fontSize: 12.5, lineHeight: 1.5 }}>{frames[step][1]}</div>
       </div>
       <div style={{ display: "flex", gap: 8 }}>
         <button onClick={() => setStep(s => Math.max(0, s - 1))} disabled={step === 0}
-          style={{ flex: 1, padding: 10, borderRadius: 9, border: `1.5px solid ${C.mid}`, background: "#fff", color: step === 0 ? "#bcae9f" : C.ink, fontWeight: 700, fontSize: 13, cursor: step === 0 ? "default" : "pointer" }}>← {en ? "Prev" : "前へ"}</button>
+          style={{ flex: 1, padding: 10, borderRadius: 9, border: `1.5px solid ${C.mid}`, background: "#fff", color: step === 0 ? nvInk("#bcae9f", "#ffffff", 3) : C.ink, fontWeight: 700, fontSize: 13, cursor: step === 0 ? "default" : "pointer" }}>← {en ? "Prev" : "前へ"}</button>
         <button onClick={() => setStep(s => Math.min(3, s + 1))} disabled={step === 3}
           style={{ flex: 1, padding: 10, borderRadius: 9, border: "none", background: step === 3 ? C.mid : C.primary, color: C.deep, fontWeight: 700, fontSize: 13, cursor: step === 3 ? "default" : "pointer" }}>{en ? "Next" : "次へ"} →</button>
       </div>
@@ -177217,11 +177217,11 @@ function VpcConcept({ lang }) {
   const en = lang === "en";
   const Box = ({ label, sub, hue, children, dashed }) => (
     <div style={{ border: `${dashed ? "2px dashed" : "1.5px solid"} ${hue}`, borderRadius: 10, padding: 10, marginBottom: 8 }}>
-      <div style={{ fontWeight: 700, fontSize: 12.5, color: hue }}>{label}{sub && <span style={{ fontSize: 11, color: "#7b6d62", fontWeight: 500 }}> — {sub}</span>}</div>
+      <div style={{ fontWeight: 700, fontSize: 12.5, color: nvInk(hue, "#ffffff") }}>{label}{sub && <span style={{ fontSize: 11, color: "#7b6d62", fontWeight: 500 }}> — {sub}</span>}</div>
       {children && <div style={{ marginTop: 8 }}>{children}</div>}
     </div>
   );
-  const Chip = ({ t, hue }) => <span style={{ display: "inline-block", background: hue, color: "#fff", borderRadius: 6, padding: "4px 9px", fontSize: 11.5, fontWeight: 600, margin: "0 6px 6px 0" }}>{t}</span>;
+  const Chip = ({ t, hue }) => <span style={{ display: "inline-block", background: hue, color: nvInk("#ffffff", hue), borderRadius: 6, padding: "4px 9px", fontSize: 11.5, fontWeight: 600, margin: "0 6px 6px 0" }}>{t}</span>;
   return (
     <div>
       <Box label="VPC (10.0.0.0/16)" sub={en ? "isolated network" : "隔離ネットワーク"} hue={C.deep}>
@@ -177258,11 +177258,11 @@ function EdgeConcept({ lang }) {
     <div>
       {items.map((it, i) => (
         <div key={i}>
-          <div style={{ background: it[1], color: "#fff", borderRadius: 9, padding: "10px 13px", textAlign: "center" }}>
+          <div style={{ background: it[1], color: nvInk("#ffffff", it[1]), borderRadius: 9, padding: "10px 13px", textAlign: "center" }}>
             <div style={{ fontWeight: 700, fontSize: 13 }}>{it[0]}</div>
-            {it[2] && <div style={{ fontSize: 11.5, opacity: 0.92, marginTop: 2 }}>{it[2]}</div>}
+            {it[2] && <div style={{ fontSize: 11.5, marginTop: 2 }}>{it[2]}</div>}
           </div>
-          {i < items.length - 1 && <div style={{ textAlign: "center", color: C.mid, fontSize: 16 }}>↓</div>}
+          {i < items.length - 1 && <div style={{ textAlign: "center", color: nvInk(C.mid, "#ffffff", 3), fontSize: 16 }}>↓</div>}
         </div>
       ))}
       <div style={{ fontSize: 12, color: "#6b5d52", marginTop: 8 }}>{en ? "Layered edge: Shield (DDoS) → WAF (app attacks) → CloudFront (cache + OAC) protects the origin." : "層状のエッジ防御：Shield(DDoS)→WAF(アプリ攻撃)→CloudFront(キャッシュ＋OAC)でオリジンを守る。"}</div>
@@ -177311,7 +177311,7 @@ function RespHierarchy({ lang }) {
       <div style={{ fontSize: 12, color: "#6b5d52", marginBottom: 10 }}>{en ? "\"Security OF the cloud\" is AWS; \"security IN the cloud\" is the customer." : "「クラウド“の”セキュリティ」は AWS、「クラウド“内”のセキュリティ」は顧客。"}</div>
       {rows.map(([label, hue, items], i) => (
         <div key={i} style={{ marginBottom: 10, border: `1.5px solid ${hue}`, borderRadius: 11, overflow: "hidden" }}>
-          <div style={{ background: hue, color: "#fff", padding: "9px 12px", fontWeight: 700, fontSize: 13 }}>{label}</div>
+          <div style={{ background: hue, color: nvInk("#ffffff", hue), padding: "9px 12px", fontWeight: 700, fontSize: 13 }}>{label}</div>
           <div style={{ padding: "9px 12px", display: "flex", flexWrap: "wrap", gap: 6 }}>
             {items.map((it, j) => <span key={j} style={{ background: C.light, color: C.deep, borderRadius: 6, padding: "5px 10px", fontSize: 12, fontWeight: 600 }}>{it}</span>)}
           </div>
@@ -177337,9 +177337,9 @@ function S3ClassHierarchy({ lang }) {
         <span>{en ? "hotter / pricier ↑" : "高頻度・割高 ↑"}</span><span>{en ? "↓ colder / cheaper" : "↓ 低頻度・安価"}</span>
       </div>
       {tiers.map(([label, hue, sub], i) => (
-        <div key={i} style={{ marginBottom: 6, marginLeft: i * 14, background: hue, color: "#fff", borderRadius: 9, padding: "10px 13px" }}>
+        <div key={i} style={{ marginBottom: 6, marginLeft: i * 14, background: hue, color: nvInk("#ffffff", hue), borderRadius: 9, padding: "10px 13px" }}>
           <div style={{ fontWeight: 700, fontSize: 13 }}>{label}</div>
-          <div style={{ fontSize: 11.5, opacity: 0.9 }}>{sub}</div>
+          <div style={{ fontSize: 11.5 }}>{sub}</div>
         </div>
       ))}
       <div style={{ fontSize: 12, color: "#6b5d52", marginTop: 8 }}>{en ? "Use lifecycle policies (or Intelligent-Tiering) to move data down as it cools." : "ライフサイクル（または Intelligent-Tiering）でアクセスが減ったデータを下層へ移行。"}</div>
@@ -177362,9 +177362,9 @@ function CachingLayers({ lang }) {
       <div style={{ fontSize: 12, color: "#6b5d52", marginBottom: 10 }}>{en ? "Closer to the user = faster & cheaper to serve. Tap a layer." : "利用者に近いほど高速・低コスト。層をタップ。"}</div>
       {layers.map(([label, hue, desc], i) => (
         <div key={i} onClick={() => setSel(sel === i ? null : i)}
-          style={{ marginBottom: 6, marginLeft: i * 16, background: hue, color: "#fff", borderRadius: 10, padding: "11px 14px", cursor: "pointer", boxShadow: sel === i ? "0 0 0 3px rgba(255,153,0,.4)" : "none" }}>
+          style={{ marginBottom: 6, marginLeft: i * 16, background: hue, color: nvInk("#ffffff", hue), borderRadius: 10, padding: "11px 14px", cursor: "pointer", boxShadow: sel === i ? "0 0 0 3px rgba(255,153,0,.4)" : "none" }}>
           <div style={{ fontWeight: 700, fontSize: 13 }}>{label}</div>
-          {sel === i && <div style={{ fontSize: 12, marginTop: 5, opacity: 0.95, lineHeight: 1.5 }}>{desc}</div>}
+          {sel === i && <div style={{ fontSize: 12, marginTop: 5, lineHeight: 1.5 }}>{desc}</div>}
         </div>
       ))}
     </div>
@@ -177384,7 +177384,7 @@ function NetworkLayers({ lang }) {
     <div>
       {rows.map(([layer, svc, hue], i) => (
         <div key={i} style={{ display: "flex", marginBottom: 6, border: `1.5px solid ${hue}`, borderRadius: 10, overflow: "hidden" }}>
-          <div style={{ background: hue, color: "#fff", padding: "10px 12px", fontWeight: 700, fontSize: 12.5, minWidth: 120, display: "flex", alignItems: "center" }}>{layer}</div>
+          <div style={{ background: hue, color: nvInk("#ffffff", hue), padding: "10px 12px", fontWeight: 700, fontSize: 12.5, minWidth: 120, display: "flex", alignItems: "center" }}>{layer}</div>
           <div style={{ padding: "10px 12px", fontSize: 12.5, color: C.ink, display: "flex", alignItems: "center" }}>{svc}</div>
         </div>
       ))}
@@ -177406,7 +177406,7 @@ function PurchaseParallel({ lang }) {
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
       {cards.map(([name, hue, items], i) => (
         <div key={i} style={{ border: `1.5px solid ${hue}`, borderRadius: 11, overflow: "hidden" }}>
-          <div style={{ background: hue, color: "#fff", padding: "8px 10px", fontWeight: 700, fontSize: 13 }}>{name}</div>
+          <div style={{ background: hue, color: nvInk("#ffffff", hue), padding: "8px 10px", fontWeight: 700, fontSize: 13 }}>{name}</div>
           <div style={{ padding: "8px 10px" }}>
             {items.map((it, j) => <div key={j} style={{ fontSize: 12, color: C.ink, padding: "3px 0", lineHeight: 1.4 }}>{en ? "• " : "・"}{it}</div>)}
           </div>
@@ -177429,8 +177429,8 @@ function DbParallel({ lang }) {
     <div>
       {cards.map(([name, hue, kind, desc], i) => (
         <div key={i} style={{ display: "flex", marginBottom: 8, border: `1.5px solid ${hue}`, borderRadius: 11, overflow: "hidden" }}>
-          <div style={{ background: hue, color: "#fff", padding: "10px 12px", fontWeight: 700, fontSize: 13, minWidth: 130, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-            {name}<span style={{ fontSize: 11, opacity: 0.9, fontWeight: 500 }}>{kind}</span>
+          <div style={{ background: hue, color: nvInk("#ffffff", hue), padding: "10px 12px", fontWeight: 700, fontSize: 13, minWidth: 130, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+            {name}<span style={{ fontSize: 11, fontWeight: 500, color: nvInk("#ffffff", hue) }}>{kind}</span>
           </div>
           <div style={{ padding: "10px 12px", fontSize: 12.5, color: C.ink, lineHeight: 1.5, display: "flex", alignItems: "center" }}>{desc}</div>
         </div>
@@ -177446,17 +177446,17 @@ function FanoutFlow({ lang }) {
     <div>
       <div style={{ background: "#232F3E", color: "#fff", borderRadius: 9, padding: "10px 13px", textAlign: "center" }}>
         <div style={{ fontWeight: 700, fontSize: 13 }}>{en ? "Publisher" : "発行元"}</div>
-        <div style={{ fontSize: 11.5, opacity: 0.9 }}>{en ? "Publishes one message" : "1 件のメッセージを発行"}</div>
+        <div style={{ fontSize: 11.5 }}>{en ? "Publishes one message" : "1 件のメッセージを発行"}</div>
       </div>
-      <div style={{ textAlign: "center", color: C.mid, fontSize: 16 }}>↓</div>
+      <div style={{ textAlign: "center", color: nvInk(C.mid, "#ffffff", 3), fontSize: 16 }}>↓</div>
       <div style={{ background: "#146EB4", color: "#fff", borderRadius: 9, padding: "10px 13px", textAlign: "center" }}>
         <div style={{ fontWeight: 700, fontSize: 13 }}>SNS Topic</div>
-        <div style={{ fontSize: 11.5, opacity: 0.9 }}>{en ? "Fans out to all subscribers" : "全購読先へ同報"}</div>
+        <div style={{ fontSize: 11.5 }}>{en ? "Fans out to all subscribers" : "全購読先へ同報"}</div>
       </div>
-      <div style={{ textAlign: "center", color: C.mid, fontSize: 16 }}>↓</div>
+      <div style={{ textAlign: "center", color: nvInk(C.mid, "#ffffff", 3), fontSize: 16 }}>↓</div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
         {[[en ? "SQS → Worker A" : "SQS → ワーカー A", "#CC7000"], [en ? "SQS → Worker B" : "SQS → ワーカー B", "#CC7000"], [en ? "Lambda" : "Lambda", "#FF9900"]].map((n, i) => (
-          <div key={i} style={{ background: n[1], color: "#fff", borderRadius: 9, padding: "10px 8px", textAlign: "center", fontSize: 12, fontWeight: 700 }}>{n[0]}</div>
+          <div key={i} style={{ background: n[1], color: nvInk("#ffffff", n[1]), borderRadius: 9, padding: "10px 8px", textAlign: "center", fontSize: 12, fontWeight: 700 }}>{n[0]}</div>
         ))}
       </div>
       <div style={{ fontSize: 12, color: "#6b5d52", marginTop: 8 }}>{en ? "One event → many independent, separately-scaling consumers. Each SQS adds buffering and failure isolation." : "1 イベント → 独立してスケールする複数の消費者へ。各 SQS が緩衝と障害分離を加える。"}</div>
@@ -177476,14 +177476,14 @@ function BlueGreenFlow({ lang }) {
   ];
   return (
     <div>
-      <div style={{ background: frames[step][2], color: "#fff", borderRadius: 11, padding: 16, marginBottom: 10, minHeight: 70 }}>
-        <div style={{ fontSize: 11, opacity: 0.85, fontWeight: 700 }}>STEP {step + 1} / 4</div>
+      <div style={{ background: frames[step][2], color: nvInk("#ffffff", frames[step][2]), borderRadius: 11, padding: 16, marginBottom: 10, minHeight: 70 }}>
+        <div style={{ fontSize: 11, fontWeight: 700 }}>STEP {step + 1} / 4</div>
         <div style={{ fontSize: 15, fontWeight: 800, margin: "4px 0" }}>{frames[step][0]}</div>
-        <div style={{ fontSize: 12.5, opacity: 0.95, lineHeight: 1.5 }}>{frames[step][1]}</div>
+        <div style={{ fontSize: 12.5, lineHeight: 1.5 }}>{frames[step][1]}</div>
       </div>
       <div style={{ display: "flex", gap: 8 }}>
         <button onClick={() => setStep(s => Math.max(0, s - 1))} disabled={step === 0}
-          style={{ flex: 1, padding: 10, borderRadius: 9, border: `1.5px solid ${C.mid}`, background: "#fff", color: step === 0 ? "#bcae9f" : C.ink, fontWeight: 700, fontSize: 13, cursor: step === 0 ? "default" : "pointer" }}>← {en ? "Prev" : "前へ"}</button>
+          style={{ flex: 1, padding: 10, borderRadius: 9, border: `1.5px solid ${C.mid}`, background: "#fff", color: step === 0 ? nvInk("#bcae9f", "#ffffff", 3) : C.ink, fontWeight: 700, fontSize: 13, cursor: step === 0 ? "default" : "pointer" }}>← {en ? "Prev" : "前へ"}</button>
         <button onClick={() => setStep(s => Math.min(3, s + 1))} disabled={step === 3}
           style={{ flex: 1, padding: 10, borderRadius: 9, border: "none", background: step === 3 ? C.mid : C.primary, color: C.deep, fontWeight: 700, fontSize: 13, cursor: step === 3 ? "default" : "pointer" }}>{en ? "Next" : "次へ"} →</button>
       </div>
@@ -177499,11 +177499,11 @@ function EncryptionConcept({ lang }) {
   const en = lang === "en";
   const Box = ({ label, hue, children }) => (
     <div style={{ border: `1.5px solid ${hue}`, borderRadius: 10, padding: 10, marginBottom: 8 }}>
-      <div style={{ fontWeight: 700, fontSize: 12.5, color: hue, marginBottom: 6 }}>{label}</div>
+      <div style={{ fontWeight: 700, fontSize: 12.5, color: nvInk(hue, "#ffffff"), marginBottom: 6 }}>{label}</div>
       {children}
     </div>
   );
-  const Chip = ({ t, hue }) => <span style={{ display: "inline-block", background: hue, color: "#fff", borderRadius: 6, padding: "4px 9px", fontSize: 11.5, fontWeight: 600, margin: "0 6px 6px 0" }}>{t}</span>;
+  const Chip = ({ t, hue }) => <span style={{ display: "inline-block", background: hue, color: nvInk("#ffffff", hue), borderRadius: 6, padding: "4px 9px", fontSize: 11.5, fontWeight: 600, margin: "0 6px 6px 0" }}>{t}</span>;
   return (
     <div>
       <Box label={en ? "At rest (stored data)" : "保管時（保存データ）"} hue={C.deep}>
@@ -177530,7 +177530,7 @@ function GlobalConcept({ lang }) {
   const en = lang === "en";
   const Region = ({ name, hue }) => (
     <div style={{ flex: 1, border: `1.5px solid ${hue}`, borderRadius: 10, padding: 9 }}>
-      <div style={{ fontWeight: 700, fontSize: 12.5, color: hue, marginBottom: 6 }}>{name}</div>
+      <div style={{ fontWeight: 700, fontSize: 12.5, color: nvInk(hue, "#ffffff"), marginBottom: 6 }}>{name}</div>
       <div style={{ fontSize: 11, color: C.ink, lineHeight: 1.6 }}>
         {en ? "AZ-a / AZ-b" : "AZ-a / AZ-b"}<br />ALB + ASG<br />{en ? "Aurora (Global DB)" : "Aurora（グローバル DB）"}
       </div>
@@ -177539,7 +177539,7 @@ function GlobalConcept({ lang }) {
   return (
     <div>
       <div style={{ background: "#232F3E", color: "#fff", borderRadius: 9, padding: "9px 12px", textAlign: "center", marginBottom: 8, fontWeight: 700, fontSize: 13 }}>Route 53 ({en ? "latency + failover" : "レイテンシ＋フェイルオーバー"})</div>
-      <div style={{ textAlign: "center", color: C.mid, fontSize: 16 }}>↓</div>
+      <div style={{ textAlign: "center", color: nvInk(C.mid, "#ffffff", 3), fontSize: 16 }}>↓</div>
       <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
         <Region name={en ? "Region A (primary)" : "リージョン A（主）"} hue={C.accent} />
         <Region name={en ? "Region B (DR)" : "リージョン B（DR）"} hue="#CC7000" />
@@ -177580,12 +177580,12 @@ function ArchBuilder({ lang }) {
     <div>
       <div style={{ fontSize: 12, color: "#6b5d52", marginBottom: 10 }}>{en ? "Tap tiers in order to assemble a highly available stack." : "上から順にタップして高可用スタックを組み立てよう。"}</div>
       <div style={{ minHeight: 30, marginBottom: 10 }}>
-        {built.length === 0 ? <div style={{ fontSize: 12, color: "#bcae9f", textAlign: "center", padding: 12, border: `1.5px dashed ${C.mid}`, borderRadius: 10 }}>{en ? "(empty — start with Route 53)" : "（未構築 — Route 53 から）"}</div> :
+        {built.length === 0 ? <div style={{ fontSize: 12, color: nvInk("#bcae9f", "#ffffff"), textAlign: "center", padding: 12, border: `1.5px dashed ${C.mid}`, borderRadius: 10 }}>{en ? "(empty — start with Route 53)" : "（未構築 — Route 53 から）"}</div> :
           built.map((id, i) => {
             const tr = tiers.find(t => t.id === id);
             return <div key={id}>
               <div style={{ background: tr.hue, color: nvInk("#ffffff", tr.hue), borderRadius: 9, padding: "9px 13px", fontWeight: 700, fontSize: 13, textAlign: "center" }}>{tr.label}</div>
-              {i < built.length - 1 && <div style={{ textAlign: "center", color: C.mid, fontSize: 15 }}>↓</div>}
+              {i < built.length - 1 && <div style={{ textAlign: "center", color: nvInk(C.mid, "#ffffff", 3), fontSize: 15 }}>↓</div>}
             </div>;
           })}
       </div>
@@ -177594,7 +177594,7 @@ function ArchBuilder({ lang }) {
         {tiers.map(tr => (
           <button key={tr.id} onClick={() => add(tr)} disabled={built.includes(tr.id)}
             style={{ padding: "8px 12px", borderRadius: 18, fontSize: 12.5, fontWeight: 700, cursor: built.includes(tr.id) ? "default" : "pointer",
-              border: `1.5px solid ${tr.hue}`, background: built.includes(tr.id) ? C.light : "#fff", color: built.includes(tr.id) ? "#bcae9f" : tr.hue }}>
+              border: `1.5px solid ${tr.hue}`, background: built.includes(tr.id) ? C.light : "#fff", color: built.includes(tr.id) ? nvInk("#bcae9f", "#ffffff", 3) : nvInk(tr.hue, "#ffffff") }}>
             + {tr.label}
           </button>
         ))}
@@ -177628,7 +177628,7 @@ function CostSimulator({ lang }) {
         return (
           <div key={i} style={{ marginBottom: 9 }}>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
-              <span style={{ fontWeight: 700, color: hue }}>{name} <span style={{ color: "#7b6d62", fontWeight: 500, fontSize: 11 }}>{note}</span></span>
+              <span style={{ fontWeight: 700, color: nvInk(hue, "#ffffff") }}>{name} <span style={{ color: "#7b6d62", fontWeight: 500, fontSize: 11 }}>{note}</span></span>
               <strong style={{ color: C.deep }}>${cost}</strong>
             </div>
             <div style={{ background: C.light, borderRadius: 6, height: 14, overflow: "hidden" }}>
@@ -177666,7 +177666,7 @@ function DrSimulator({ lang }) {
           <span>RTO: <strong>{cur.rto}</strong></span>
           <span>{en ? "Cost" : "コスト"}: <strong>{cur.cost}</strong></span>
         </div>
-        <div style={{ fontSize: 12.5, opacity: 0.95, lineHeight: 1.5 }}>{cur.desc}</div>
+        <div style={{ fontSize: 12.5, lineHeight: 1.5 }}>{cur.desc}</div>
       </div>
     </div>
   );
@@ -177696,10 +177696,10 @@ function S3Chooser({ lang }) {
     <div>
       <Slider label={en ? "Access frequency" : "アクセス頻度"} val={freq} set={setFreq} lo={en ? "rare (archive)" : "稀(アーカイブ)"} hi={en ? "frequent" : "高頻度"} />
       {freq === 0 && <Slider label={en ? "Retrieval tolerance" : "取り出しの待てる度合い"} val={retr} set={setRetr} lo={en ? "need instant" : "即時必要"} hi={en ? "hours OK" : "数時間OK"} />}
-      <div style={{ background: hue, color: "#fff", borderRadius: 11, padding: 16, marginTop: 4 }}>
-        <div style={{ fontSize: 11, opacity: 0.85, fontWeight: 700 }}>{en ? "Recommended class" : "推奨クラス"}</div>
+      <div style={{ background: hue, color: nvInk("#ffffff", hue), borderRadius: 11, padding: 16, marginTop: 4 }}>
+        <div style={{ fontSize: 11, fontWeight: 700 }}>{en ? "Recommended class" : "推奨クラス"}</div>
         <div style={{ fontSize: 18, fontWeight: 800, margin: "3px 0" }}>{result}</div>
-        <div style={{ fontSize: 12.5, opacity: 0.95, lineHeight: 1.5 }}>{why}</div>
+        <div style={{ fontSize: 12.5, lineHeight: 1.5 }}>{why}</div>
       </div>
     </div>
   );
@@ -177722,7 +177722,7 @@ function ScaleSimulator({ lang }) {
       <div style={{ display: "flex", gap: 6, justifyContent: "center", flexWrap: "wrap", marginBottom: 12 }}>
         {Array.from({ length: max }).map((_, i) => {
           const on = i < instances;
-          return <div key={i} style={{ width: 38, height: 46, borderRadius: 8, border: `2px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? C.deep : "#bcae9f", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 800, transition: "all .2s" }}>{on ? "▣" : "·"}</div>;
+          return <div key={i} style={{ width: 38, height: 46, borderRadius: 8, border: `2px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk(C.deep, C.primary) : nvInk("#bcae9f", "#ffffff", 3), display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 800, transition: "all .2s" }}>{on ? "▣" : "·"}</div>;
         })}
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
@@ -177761,10 +177761,10 @@ function IamEvaluator({ lang }) {
         <Toggle label={en ? "Explicit Allow" : "明示的許可"} val={allow} set={setAllow} color={C.ok} />
         <Toggle label={en ? "Explicit Deny" : "明示的拒否"} val={deny} set={setDeny} color={C.ng} />
       </div>
-      <div style={{ background: hue, color: "#fff", borderRadius: 11, padding: 16, textAlign: "center" }}>
-        <div style={{ fontSize: 11, opacity: 0.85, fontWeight: 700 }}>{en ? "Result" : "評価結果"}</div>
+      <div style={{ background: hue, color: nvInk("#ffffff", hue), borderRadius: 11, padding: 16, textAlign: "center" }}>
+        <div style={{ fontSize: 11, fontWeight: 700 }}>{en ? "Result" : "評価結果"}</div>
         <div style={{ fontSize: 22, fontWeight: 800, margin: "3px 0" }}>{result}</div>
-        <div style={{ fontSize: 12.5, opacity: 0.95, lineHeight: 1.5 }}>{reason}</div>
+        <div style={{ fontSize: 12.5, lineHeight: 1.5 }}>{reason}</div>
       </div>
       <div style={{ fontSize: 11.5, color: "#7b6d62", marginTop: 8 }}>{en ? "Precedence: explicit Deny > explicit Allow > implicit Deny." : "優先順位：明示的拒否 ＞ 明示的許可 ＞ 暗黙的拒否。"}</div>
     </div>
@@ -178268,7 +178268,7 @@ const EXTRA = [
   {"d":"D2","q":"【応用】MCP（Model Context Protocol）サーバーのログ記録が運用に効く理由はどれか。","o":["画面のUI表示を見やすく改善できるから","API課金額を抑えられるから","全体の処理速度を高速化できるから","呼び出しと結果を追跡し失敗を診断できる"],"a":3,"e":"MCPサーバーのログがあれば、呼び出しと結果を追跡でき、失敗の原因を診断できる。観測可能性が確保される。ログを取っても、画面表示が見やすくなったり、API課金額や処理速度が改善したりはしない。", "qEn": "[Applied] Why does logging on an MCP (Model Context Protocol) server help operations?", "oEn": ["Because it can improve how the on-screen UI looks","Because it can reduce API billing","Because it can speed up overall processing","It traces calls and results so failures can be diagnosed"], "eEn": "Logs from an MCP server let you trace calls and their results and diagnose why something failed, which gives observability. Logging does not make the display easier to read, and it does not reduce API cost or speed up processing."},
   {"d":"D2","q":"【応用】tool_choice を auto のまま構造化JSONを必ず得たい。最も確実な変更はどれか。","o":["プロンプトで形式を強く指示して依頼する","生成のtemperatureを0に固定する","特定ツールを強制し、その入力スキーマで形式を縛る","直近の会話履歴を全て消去して文脈を一度リセットする"],"a":2,"e":"autoはテキストも返しうる。特定ツール強制ならスキーマ準拠の構造化出力が保証される。", "qEn": "[Applied] With tool_choice left at auto, you want to always get structured JSON. What is the most reliable change?", "oEn": ["Strongly instruct the format in the prompt","Fix the generation temperature at 0","Force a specific tool and constrain the format with its schema","Erase all of the recent conversation history and reset the context once"], "eEn": "auto may also return text. Forcing a specific tool guarantees schema-conformant structured output."},
   {"d":"D2","q":"【応用】複数の抽出スキーマがあり文書型が不明なとき、構造化出力を保証する設定はどれか。","o":["プロンプトで出力形式を強く指示して頼む","tool_choice: \"auto\" に設定する","tool_choice: \"any\" にする","生成のtemperatureを下げて安定させる"],"a":2,"e":"anyは必ずいずれかのツールを呼ばせるため、文書型不明でも構造化出力を保証できる。", "qEn": "[Applied] When there are multiple extraction schemas and the document type is unknown, which setting guarantees structured output?", "oEn": ["Strongly instruct the output format in the prompt","Set tool_choice: \"auto\"","Set tool_choice: \"any\"","Lower the generation temperature to stabilize"], "eEn": "any always makes the model call one of the tools, so structured output is guaranteed even when the document type is unknown."},
-  {"d":"D2","q":"【知識】stdio と HTTP（MCP（Model Context Protocol）トランスポート）の違いとして正しいのはどれか。","o":["stdioはリモート通信向けであり、HTTPはローカルの標準入出力のみを用いて通信する方式","stdioもHTTPも同じくローカル通信専用で認証は不要である","stdioもHTTPもどちらもリモート接続専用で認証が必須になる","stdioはローカル・標準入出力で攻撃面が狭い／HTTPはリモートで認証/認可が重要"],"a":3,"e":"stdioはローカル接続用で攻撃面が狭い。HTTP/SSEはリモート用で認証・認可が重要。", "qEn": "[Knowledge] Which correctly describes the difference between the stdio and HTTP MCP (Model Context Protocol) transports?", "oEn": ["stdio is the method for remote communication, and HTTP is the method that communicates using only local standard input/output","Both stdio and HTTP are local-only communication and require no authentication","Both stdio and HTTP are remote-only connections and require authentication","stdio is local standard I/O with a narrow attack surface / HTTP is remote, where authentication/authorization matters"], "eEn": "stdio is for local connections and has a narrow attack surface. HTTP/SSE is for remote use, where authentication and authorization are important."},
+  {"d":"D2","q":"【知識】stdio と HTTP（MCP（Model Context Protocol）トランスポート）の違いとして正しいのはどれか。","o":["stdioはリモート通信向けであり、HTTPはローカルの標準入出力のみを用いて通信する方式","stdioもHTTPも同じくローカル通信専用で認証は不要である","stdioもHTTPもどちらもリモート接続専用で認証が必須になる","stdioはローカル・標準入出力で攻撃面が狭い／HTTPはリモートで認証/認可が重要"],"a":3,"e":"stdioはローカル接続用で攻撃面が狭い。HTTPはリモート用で認証・認可が重要（旧来のSSEは非推奨。2026年11月時点）。", "qEn": "[Knowledge] Which correctly describes the difference between the stdio and HTTP MCP (Model Context Protocol) transports?", "oEn": ["stdio is the method for remote communication, and HTTP is the method that communicates using only local standard input/output","Both stdio and HTTP are local-only communication and require no authentication","Both stdio and HTTP are remote-only connections and require authentication","stdio is local standard I/O with a narrow attack surface / HTTP is remote, where authentication/authorization matters"], "eEn": "stdio is for local connections and has a narrow attack surface. HTTP/SSE is for remote use, where authentication and authorization are important."},
   {"d":"D2","q":"【知識】MCP（Model Context Protocol）の「リソース」の性質として正しいのはどれか。","o":["モデルが参照できる読み取り中心のデータ単位","副作用を伴う実行操作を表す単位である","接続に用いる認証情報を格納する単位である","定型の指示を持つプロンプトテンプレートである"],"a":0,"e":"MCPのリソースは、モデルが参照できる読み取り中心のデータ単位。副作用を伴う実行操作はツールの役割で、リソースではない。認証情報を格納する単位でも、定型の指示を持つプロンプトテンプレートでもない。", "qEn": "[Knowledge] Which correctly describes the nature of MCP (Model Context Protocol) \"resources\"?", "oEn": ["Read-oriented units of data the model can reference","Units representing executable operations with side effects","Units that store the credentials used for connections","Prompt templates holding standard instructions"], "eEn": "An MCP resource is a unit of data the model can reference, mainly for reading. Actions with side effects are the role of tools, not resources. A resource is also not a store for credentials or a prompt template holding fixed instructions."},
   {"d":"D2","q":"【応用】ツールの結果サイズ管理が必要な理由はどれか。","o":["画面のUI表示を見やすく整えられるから","巨大な結果が急速にコンテキストを消費するから","API利用の課金コストを確実に抑えられるから","実行全体の処理速度を高速化できるから"],"a":1,"e":"ツールの巨大な結果は急速にコンテキストを消費し、後の判断に使える余地を奪う。要約やページングで投入量を制御する必要がある。画面のUI表示を整えることや、課金の確実な削減、処理速度の向上が理由ではない。", "qEn": "[Applied] Why is managing the size of tool results necessary?", "oEn": ["Because it tidies up the on-screen UI display","Because huge results consume context rapidly","Because it reliably reduces API usage billing costs","Because it speeds up overall execution"], "eEn": "A very large tool result quickly consumes context and leaves less room for later reasoning, so the amount passed in must be controlled with summaries or paging. The reason is not to tidy the UI, guarantee lower cost or speed up execution."},
   {"d":"D2","q":"【応用】過剰なエラー抑制が招く問題はどれか。","o":["画面のUI表示が全体的に改善され見やすくなる","失敗が隠れ、モデルが誤った前提で処理を進める","処理が常に高速に完了するようになる","API利用時の課金額が確実に下がる"],"a":1,"e":"エラー抑制は失敗を隠し誤った前提を生む。透過的な構造化エラーが自己修正を可能にする。", "qEn": "[Applied] What problem does excessive error suppression cause?", "oEn": ["The on-screen UI display improves and becomes easier to read","Failures are hidden, and the model proceeds on incorrect assumptions","Processing always completes quickly","API billing is certain to go down"], "eEn": "Error suppression hides failures and creates incorrect assumptions. Transparent structured errors enable self-correction."},
@@ -178974,7 +178974,7 @@ const EN = {
   "D2|【応用】MCPサーバーのログ記録が運用に効く理由はどれか。":{q:"[Applied] Why is MCP (Model Context Protocol) server logging useful operationally?",o:["For speed","For the UI (issues tend to surface at scale)","It tracks calls and results, enabling failure diagnosis","For billing (sacrifices reproducibility and observability)"],e:"Logging tracks calls and results, providing observability and failure diagnosis."},
   "D2|【応用】tool_choice を auto のまま構造化JSONを必ず得たい。最も確実な変更はどれか。":{q:"[Applied] You must always get structured JSON while tool_choice stays auto. Most reliable change?",o:["Clear history (generally not recommended)","Ask firmly in the prompt (easy short-term but hurts maintainability)","Temperature 0","Force a specific tool and constrain format with its input schema"],e:"auto can return text; forcing a specific tool guarantees schema-compliant structured output."},
   "D2|【応用】複数の抽出スキーマがあり文書型が不明なとき、構造化出力を保証する設定はどれか。":{q:"[Applied] With multiple extraction schemas and unknown document type, what setting guarantees structured output?",o:["Set tool_choice: \"any\"","Ask in the prompt (often reduces reliability instead)","tool_choice: \"auto\"","Lower temperature (an anti-pattern per the official guide)"],e:"any forces a tool call, guaranteeing structured output even when the document type is unknown."},
-  "D2|【知識】stdio と HTTP（MCPトランスポート）の違いとして正しいのはどれか。":{q:"[Knowledge] Which correctly distinguishes stdio and HTTP MCP (Model Context Protocol) transports?",o:["stdio is remote; HTTP is local","Both local (issues tend to surface at scale)","Both remote (sacrifices reproducibility and observability)","stdio is local via standard I/O with a narrow attack surface; HTTP is remote where auth/authz matter"],e:"stdio is for local connections with a narrow attack surface; HTTP/SSE is for remote use where authentication and authorization matter."},
+  "D2|【知識】stdio と HTTP（MCPトランスポート）の違いとして正しいのはどれか。":{q:"[Knowledge] Which correctly distinguishes stdio and HTTP MCP (Model Context Protocol) transports?",o:["stdio is remote; HTTP is local","Both local (issues tend to surface at scale)","Both remote (sacrifices reproducibility and observability)","stdio is local via standard I/O with a narrow attack surface; HTTP is remote where auth/authz matter"],e:"stdio is for local connections with a narrow attack surface; HTTP is for remote use where authentication and authorization matter (the older SSE transport is deprecated, as of November 2026)."},
   "D2|【知識】MCPの「リソース」の性質として正しいのはどれか。":{q:"[Knowledge] Which correctly describes the nature of an MCP (Model Context Protocol) 'resource'?",o:["A fixed prompt template","An action with side effects (easy short-term but hurts maintainability)","A read-oriented data unit the model can reference","Credentials (generally not recommended)"],e:"Resources provide read-oriented data; actions (with side effects) are the role of tools."},
   "D2|【応用】ツールの結果サイズ管理が必要な理由はどれか。":{q:"[Applied] Why is managing tool-result size necessary?",o:["For speed","For billing (an anti-pattern per the official guide)","For the UI (often reduces reliability instead)","Because huge results rapidly consume context"],e:"Huge return values crowd context; control input volume via summarization and paging."},
   "D2|【応用】過剰なエラー抑制が招く問題はどれか。":{q:"[Applied] What problem does excessive error suppression cause?",o:["Failures are hidden and the model proceeds on false premises","Always faster (issues tend to surface at scale)","Better UI","Lower cost (sacrifices reproducibility and observability)"],e:"Suppressing errors hides failures and breeds false premises; transparent structured errors enable self-correction."},
@@ -179480,7 +179480,7 @@ const MCP_TREE = { label:"MCP（Model Context Protocol）", children:[
   ]},
   { label:"トランスポート", children:[
     { label:"stdio", note:"ローカル・標準入出力・攻撃面が狭い" },
-    { label:"HTTP/SSE", note:"リモート・認証/認可が重要" },
+    { label:"HTTP", note:"リモート・認証/認可が重要。旧来の SSE は非推奨（Claude Code ドキュメント、2026年11月時点）" },
   ]},
 ]};
 const CC_TREE = { label:"Claude Code", children:[
@@ -179506,7 +179506,7 @@ const MCP_TREE_EN = { label:"MCP (Model Context Protocol)", children:[
   ]},
   { label:"Transport", children:[
     { label:"stdio", note:"Local, standard input/output, small attack surface" },
-    { label:"HTTP/SSE", note:"Remote; authentication and authorization matter" },
+    { label:"HTTP", note:"Remote; authentication and authorization matter. The older SSE transport is deprecated (Claude Code docs, as of November 2026)" },
   ]},
 ]};
 const CC_TREE_EN = { label:"Claude Code", children:[
@@ -179851,10 +179851,10 @@ function App() {
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", color: C.ink, background: "#FFFDFB", minHeight: "100vh" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ fontSize: 19, fontWeight: 700 }}>{t.appTitle}</div>
-          <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>{t.appSub}</div>
+          <div style={{ fontSize: 12, marginTop: 2 }}>{t.appSub}</div>
         </div>
         <div style={{ display: "flex", background: "rgba(255,255,255,.15)", borderRadius: 20, padding: 3 }}>
           {["ja", "en"].map(l => (
@@ -179887,7 +179887,7 @@ function App() {
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
-          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: nvInk("#ffffff", C.deep), fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ {lang === "en" ? "Top" : "トップへ"}
         </button>
       )}
@@ -180022,7 +180022,7 @@ function Quiz({ onAnswer, lang, t }) {
           <div style={{ fontSize: 13, color: "#6b5d52", marginTop: 4 }}>{t.quizDoneSub(stats.c, stats.a)}</div>
         </div>
         <button onClick={restart}
-          style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+          style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
           {t.restartQuiz}
         </button>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 14, justifyContent: "center" }}>
@@ -180066,7 +180066,7 @@ function Quiz({ onAnswer, lang, t }) {
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
         <button onClick={() => slot.save({ filter, order, session, pos, sel, answers, stats, done }, filter === "ALL" ? (lang === "en" ? "All" : "全分野") : filter)} style={{ padding: "6px 14px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{slot.meta ? (lang === "en" ? "💾 Saved" : "💾 保存済") : (lang === "en" ? "💾 Save" : "💾 セーブ")}</button>
         {slot.meta && (<>
-          <button onClick={async () => { const d = await slot.read(); if (!d) return; resumeRef.current = { session: d.session, pos: d.pos, sel: d.sel, answers: d.answers, stats: d.stats, done: d.done }; setFilter(d.filter || "ALL"); setOrder(d.order || "fixed"); setSession(d.session || []); setPos(d.pos || 0); setSel(d.sel == null ? null : d.sel); setAnswers(d.answers || []); setStats(d.stats || { c: 0, a: 0 }); setDone(!!d.done); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
+          <button onClick={async () => { const d = await slot.read(); if (!d) return; resumeRef.current = { session: d.session, pos: d.pos, sel: d.sel, answers: d.answers, stats: d.stats, done: d.done }; setFilter(d.filter || "ALL"); setOrder(d.order || "fixed"); setSession(d.session || []); setPos(d.pos || 0); setSel(d.sel == null ? null : d.sel); setAnswers(d.answers || []); setStats(d.stats || { c: 0, a: 0 }); setDone(!!d.done); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
           <span style={{ fontSize: 11, color: "#5a7288" }}>{saveStamp(slot.meta.t)}</span>
           <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
         </>)}
@@ -180139,7 +180139,7 @@ function Quiz({ onAnswer, lang, t }) {
               ・{t.answerIs("ABCD"[Q.a])}{Q.e}
             </div>
             <button onClick={next}
-              style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+              style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
               {pos + 1 >= total ? t.seeResult : t.nextQ}
             </button>
           </div>
@@ -180148,7 +180148,7 @@ function Quiz({ onAnswer, lang, t }) {
       <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginTop: 14 }}>
         <button onClick={prev} disabled={pos === 0}
           style={{ padding: "10px 30px", borderRadius: 8, fontSize: 13.5, fontWeight: 700, cursor: pos === 0 ? "default" : "pointer",
-            border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#bcae9f" : C.primary }}>
+            border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? nvInk("#bcae9f", "#ffffff", 3) : C.primary }}>
           {t.prevQ}
         </button>
         <button onClick={next}
@@ -180259,7 +180259,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
                       <span style={{ fontSize: 12, color: "#7b6d62", marginLeft: 8 }}>{t.domainSetCount(cnt)}</span>
                     </span>
                   </span>
-                  <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, flexShrink: 0 }}>{t.start}</span>
+                  <span style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), flexShrink: 0 }}>{t.start}</span>
                 </button>
               );
             })}
@@ -180318,7 +180318,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           })}
         </Card>
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.retrySet}</button>
+          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.retrySet}</button>
           <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.toSetSelect}</button>
         </div>
       </div>
@@ -180343,7 +180343,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
       <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
         <button onClick={prev} disabled={pos === 0}
           style={{ padding: "6px 12px", borderRadius: 8, fontSize: 12.5, fontWeight: 700, cursor: pos === 0 ? "default" : "pointer",
-            border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#bcae9f" : C.primary }}>
+            border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? nvInk("#bcae9f", "#ffffff", 3) : C.primary }}>
           {t.prevQ}
         </button>
         <button onClick={next}
@@ -180379,13 +180379,13 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <strong style={{ color: shownSel === Q.a ? C.ok : C.ng }}>{shownSel === Q.a ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[Q.a])}{Q.e}
             </div>
-            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
               {pos + 1 >= qs0.length ? t.seeResult : t.nextQ}
             </button>
           </div>
         )}
         {mode === "real" && recorded && (
-          <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+          <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
             {pos + 1 >= qs0.length ? t.seeResult : t.nextQ}
           </button>
         )}
@@ -180488,7 +180488,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 12 }}>
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 10 }}>{g(data.title)}</div>
-        <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, marginBottom: 6 }}>{lang === "ja" ? "ケース本文（資料）" : "Case (materials)"}</div>
+        <div style={{ fontSize: 11, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 6 }}>{lang === "ja" ? "ケース本文（資料）" : "Case (materials)"}</div>
         {g(data.body).map((p, i) => (<div key={i} style={{ fontSize: 13, lineHeight: 1.7, marginBottom: 8, color: C.ink }}>{p}</div>))}
         {(data.tables || []).map((tb, ti) => (
           <div key={ti} style={{ marginTop: 12 }}>
@@ -180513,7 +180513,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
             <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
-            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
+            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
           </div>
         </div>
       ) : (
@@ -180605,7 +180605,7 @@ function Scenario({ onAnswer, lang, t }) {
           <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : C.primary }}>{rate}%</div>
           <div style={{ fontSize: 13, color: "#6b5d52", marginTop: 4 }}>{t.correctOf(stats.c, stats.a)}</div>
         </div>
-        <button onClick={reset} style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{t.scenRetry}</button>
+        <button onClick={reset} style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{t.scenRetry}</button>
       </div>
     );
   }
@@ -180642,7 +180642,7 @@ function Scenario({ onAnswer, lang, t }) {
           <button onClick={() => setSetNo(null)} style={{ background: "none", border: "none", color: C.primary, cursor: "pointer", fontSize: 13, fontWeight: 700 }}>{t.scenToSelect}</button>
           <button onClick={prev} disabled={pos === 0}
             style={{ padding: "5px 11px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: pos === 0 ? "default" : "pointer",
-              border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#bcae9f" : C.primary }}>
+              border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? nvInk("#bcae9f", "#ffffff", 3) : C.primary }}>
             {t.prevQ}
           </button>
         </div>
@@ -180650,7 +180650,7 @@ function Scenario({ onAnswer, lang, t }) {
       </div>
       <div style={{ marginBottom: 10 }}><Bar pct={Math.round((pos / total) * 100)} color={C.primary} /></div>
       <div style={{ background: C.light, border: `1px solid ${C.mid}`, borderRadius: 10, padding: 12, marginBottom: 12 }}>
-        <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, marginBottom: 4 }}>{t.scenContext}</div>
+        <div style={{ fontSize: 11, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 4 }}>{t.scenContext}</div>
         <div style={{ fontSize: 12.5, color: C.ink, lineHeight: 1.6 }}>{scenText}</div>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16 }}>
@@ -180671,7 +180671,7 @@ function Scenario({ onAnswer, lang, t }) {
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
               <strong style={{ color: sel === Q.a ? C.ok : C.ng }}>{sel === Q.a ? t.correct : t.incorrect}</strong>・{t.answerIs("ABCD"[Q.a])}{Q.e}
             </div>
-            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
               {pos + 1 >= total ? t.seeResult : t.nextQ}
             </button>
           </div>
@@ -180741,7 +180741,7 @@ function Review({ wrong, onRemove, onClear, lang, t }) {
               ))}
             </div>
             <div style={{ background: C.light, borderRadius: 8, padding: 10, fontSize: 12.5, lineHeight: 1.5, marginTop: 6 }}>{w.e}</div>
-            <div style={{ fontSize: 11, color: "#bcae9f", marginTop: 6 }}>{t.reviewFrom(w0.src)} · {t.reviewSavedAt} {new Date(w0.ts).toLocaleDateString(lang === "en" ? "en-US" : "ja-JP")}</div>
+            <div style={{ fontSize: 11, color: nvInk("#bcae9f", "#ffffff"), marginTop: 6 }}>{t.reviewFrom(w0.src)} · {t.reviewSavedAt} {new Date(w0.ts).toLocaleDateString(lang === "en" ? "en-US" : "ja-JP")}</div>
           </div>
         );
       })}
@@ -180761,7 +180761,7 @@ function Confuse({ lang, t }) {
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 10 }}>
           <div style={{ fontWeight: 700, color: C.deep, fontSize: 13.5, marginBottom: 5 }}>{lang === "en" && c[3] ? c[3] : c[0]}</div>
           <div style={{ fontSize: 13, lineHeight: 1.5, marginBottom: 4 }}>{lang === "en" && c[4] ? c[4] : c[1]}</div>
-          <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{t.judgeAxis}：{lang === "en" && c[5] ? c[5] : c[2]}</div>
+          <div style={{ fontSize: 12, color: nvInk(C.primary, "#ffffff"), fontWeight: 600 }}>{t.judgeAxis}：{lang === "en" && c[5] ? c[5] : c[2]}</div>
         </div>
       ))}
       {list.length === 0 && <div style={{ textAlign: "center", color: "#7b6d62", padding: 20 }}>{t.noMatch}</div>}
@@ -180787,8 +180787,8 @@ function TreeNode({ node, depth, defaultOpen }) {
     <div style={{ marginLeft: depth === 0 ? 0 : 14 }}>
       <div onClick={() => hasKids && setOpen(o => !o)}
         style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? "#fff" : C.ink, marginBottom: 3 }}>
-        {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : C.primary }}>{open ? "▼" : "▶"}</span>}
-        {!hasKids && <span style={{ color: C.mid }}>•</span>}
+        {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : nvInk(C.primary, "#ffffff") }}>{open ? "▼" : "▶"}</span>}
+        {!hasKids && <span style={{ color: nvInk(C.mid, "#ffffff", 3) }}>•</span>}
         <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{node.label}</span>
       </div>
       {node.note && (!hasKids || open) && (
@@ -180970,9 +180970,9 @@ function Versus({ lang }) {
   return (
     <div>
       <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-        <div style={{ flex: 1, textAlign: "center", background: C.deep, color: "#fff", borderRadius: 9, padding: "10px 6px", fontWeight: 800, fontSize: 14 }}>{left}</div>
-        <div style={{ width: 28, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: C.primary, fontWeight: 800, fontSize: 13 }}>vs</div>
-        <div style={{ flex: 1, textAlign: "center", background: C.primary, color: "#fff", borderRadius: 9, padding: "10px 6px", fontWeight: 800, fontSize: 14 }}>{right}</div>
+        <div style={{ flex: 1, textAlign: "center", background: C.deep, color: nvInk("#ffffff", C.deep, 3), borderRadius: 9, padding: "10px 6px", fontWeight: 800, fontSize: 14 }}>{left}</div>
+        <div style={{ width: 28, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: nvInk(C.primary, "#ffffff"), fontWeight: 800, fontSize: 13 }}>vs</div>
+        <div style={{ flex: 1, textAlign: "center", background: C.primary, color: nvInk("#ffffff", C.primary, 3), borderRadius: 9, padding: "10px 6px", fontWeight: 800, fontSize: 14 }}>{right}</div>
       </div>
       {rows.map((r, i) => (
         <div key={i} style={{ marginBottom: 6 }}>
@@ -180996,14 +180996,14 @@ function FlowDiagram({ lang, steps, caption }) {
         <div key={i}>
           <div onClick={() => setSel(sel === i ? null : i)}
             style={{ display: "flex", alignItems: "center", gap: 10, background: sel === i ? "#FFF6F1" : "#fff", border: `1.5px solid ${sel === i ? C.primary : C.mid}`, borderRadius: 10, padding: "10px 12px", cursor: "pointer" }}>
-            <span style={{ width: 24, height: 24, borderRadius: "50%", background: C.deep, color: "#fff", fontSize: 12, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{i + 1}</span>
+            <span style={{ width: 24, height: 24, borderRadius: "50%", background: C.deep, color: nvInk("#ffffff", C.deep), fontSize: 12, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{i + 1}</span>
             <div style={{ flex: 1 }}>
               <div style={{ fontWeight: 700, fontSize: 13.5, color: C.deep }}>{s[0]}</div>
               {sel === i && <div style={{ fontSize: 12.5, color: "#5a4d43", marginTop: 3, lineHeight: 1.5 }}>{s[1]}</div>}
             </div>
           </div>
           {i < steps.length - 1 && (
-            <div style={{ textAlign: "center", color: C.mid, fontSize: 16, lineHeight: "18px", margin: "2px 0" }}>↓</div>
+            <div style={{ textAlign: "center", color: nvInk(C.mid, "#ffffff", 3), fontSize: 16, lineHeight: "18px", margin: "2px 0" }}>↓</div>
           )}
         </div>
       ))}
@@ -181019,19 +181019,19 @@ function Matrix({ lang, xLabel, yLabel, quadrants, caption }) {
     <div>
       <div style={{ display: "flex", gap: 6 }}>
         <div style={{ width: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <span style={{ writingMode: "vertical-rl", transform: "rotate(180deg)", fontSize: 11, fontWeight: 700, color: C.primary }}>{yLabel}</span>
+          <span style={{ writingMode: "vertical-rl", transform: "rotate(180deg)", fontSize: 11, fontWeight: 700, color: nvInk(C.primary, "#ffffff") }}>{yLabel}</span>
         </div>
         <div style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
           {cells.map((q, i) => (
             <div key={i} onClick={() => setSel(sel === i ? null : i)}
-              style={{ background: q[2], color: "#fff", borderRadius: 10, padding: "12px 10px", minHeight: 70, cursor: "pointer", opacity: sel !== null && sel !== i ? 0.5 : 1, border: sel === i ? `3px solid ${C.ink}` : "3px solid transparent" }}>
+              style={{ background: q[2], color: nvInk("#ffffff", q[2]), borderRadius: 10, padding: "12px 10px", minHeight: 70, cursor: "pointer", opacity: sel !== null && sel !== i ? 0.5 : 1, border: sel === i ? `3px solid ${C.ink}` : "3px solid transparent" }}>
               <div style={{ fontWeight: 800, fontSize: 13, lineHeight: 1.3 }}>{q[0]}</div>
-              {sel === i && <div style={{ fontSize: 11.5, marginTop: 5, lineHeight: 1.45, opacity: 0.95 }}>{q[1]}</div>}
+              {sel === i && <div style={{ fontSize: 11.5, marginTop: 5, lineHeight: 1.45 }}>{q[1]}</div>}
             </div>
           ))}
         </div>
       </div>
-      <div style={{ textAlign: "center", fontSize: 11, fontWeight: 700, color: C.primary, marginTop: 6, marginLeft: 24 }}>{xLabel}</div>
+      <div style={{ textAlign: "center", fontSize: 11, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginTop: 6, marginLeft: 24 }}>{xLabel}</div>
       <div style={{ fontSize: 12, color: "#6b5d52", marginTop: 8 }}>{caption}</div>
     </div>
   );
@@ -181067,14 +181067,14 @@ function Spectrum({ lang }) {
             </g>
           );
         })}
-        <text x="352" y="20" fontSize="10" fill={C.primary} textAnchor="end">{lang==="en"?"↑ Predictability":"↑ 予測可能性"}</text>
-        <text x="352" y="232" fontSize="10" fill={C.primary} textAnchor="end">{lang==="en"?"↓ Flexibility":"↓ 柔軟性"}</text>
+        <text x="352" y="20" fontSize="11.5" fill={nvInk(C.primary, "#ffffff")} textAnchor="end">{lang==="en"?"↑ Predictability":"↑ 予測可能性"}</text>
+        <text x="352" y="232" fontSize="11.5" fill={nvInk(C.primary, "#ffffff")} textAnchor="end">{lang==="en"?"↓ Flexibility":"↓ 柔軟性"}</text>
       </svg>
       {sel !== null ? (
         <div style={{ background: C.light, borderRadius: 9, padding: 12, marginTop: 6 }}>
           <div style={{ fontWeight: 700, color: C.deep, fontSize: 14 }}>{steps[sel][0]}</div>
           <div style={{ fontSize: 13, marginTop: 4, lineHeight: 1.5 }}>{steps[sel][1]}</div>
-          <div style={{ fontSize: 12.5, marginTop: 4, color: C.primary, fontWeight: 600 }}>{steps[sel][2]}</div>
+          <div style={{ fontSize: 12.5, marginTop: 4, color: nvInk(C.primary, "#ffffff"), fontWeight: 600 }}>{steps[sel][2]}</div>
         </div>
       ) : (
         <div style={{ fontSize: 12.5, color: "#6b5d52" }}>{lang==="en"?"Tap each step. Start from minimal complexity.":"各段をタップ。下へ進むほど柔軟性が増し予測可能性が下がる。最小の複雑さから始める。"}</div>
@@ -181111,7 +181111,7 @@ function CacheSim({ lang }) {
           <div style={{ fontSize: 19, fontWeight: 800, color: C.ok }}>{fmt(withCache)}</div>
         </div>
       </div>
-      <div style={{ background: C.deep, color: "#fff", borderRadius: 9, padding: 13, textAlign: "center" }}>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), borderRadius: 9, padding: 13, textAlign: "center" }}>
         <span style={{ fontSize: 13 }}>{en?"Input token reduction":"入力トークン削減"}</span>
         <span style={{ fontSize: 26, fontWeight: 800, marginLeft: 10 }}>{en?`~${saved}%`:`約${saved}%`}</span>
       </div>
@@ -181139,7 +181139,7 @@ function CtxStack({ lang }) {
         {layers.map((l, i) => {
           const h = Math.max(34, Math.round(l[2] / WINDOW * 320));
           return (
-            <div key={i} style={{ background: l[1], color: i < 2 ? "#fff" : C.ink, padding: "0 12px", height: h, display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 12, fontWeight: 600, borderBottom: i < 3 ? "1px solid rgba(255,255,255,.3)" : "none", overflow: "hidden" }}>
+            <div key={i} style={{ background: l[1], color: i < 2 ? nvInk("#ffffff", l[1]) : C.ink, padding: "0 12px", height: h, display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 12, fontWeight: 600, borderBottom: i < 3 ? "1px solid rgba(255,255,255,.3)" : "none", overflow: "hidden" }}>
               <span>{l[0]}</span><span style={{ fontSize: 11 }}>{fmt(l[2])}</span>
             </div>
           );
@@ -183061,10 +183061,10 @@ function App() {
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", color: C.ink, background: "#FBFCFF", minHeight: "100vh" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
         <div>
           <div style={{ fontSize: 19, fontWeight: 700 }}>{t.appTitle}</div>
-          <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>{t.appSub}</div>
+          <div style={{ fontSize: 12, marginTop: 2 }}>{t.appSub}</div>
         </div>
         <div style={{ display: "inline-flex", background: "rgba(255,255,255,0.18)", borderRadius: 999, padding: 3, flexShrink: 0 }}>
           {[["ja", "日本語"], ["en", "English"]].map(([k, lbl]) => (
@@ -183097,7 +183097,7 @@ function App() {
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
-          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: nvInk("#ffffff", C.deep), fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ {lang === "en" ? "Top" : "トップへ"}
         </button>
       )}
@@ -183225,7 +183225,7 @@ function QuestionCard({ Q, sel, choose, next, lastBtn, lang }) {
             {t.answerIs("ABCD"[Q.a])}{Q.e}
           </div>
           <button onClick={next}
-            style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+            style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
             {lastBtn}
           </button>
         </div>
@@ -183289,7 +183289,7 @@ function Quiz({ onAnswer, lang }) {
         </div>
         <div style={{ marginBottom: 14 }}><Bar pct={frate} color={frate >= PASS ? C.ok : C.ng} /></div>
         <button onClick={() => { setPos(0); setHistory({}); setStats({ c: 0, a: 0 }); }}
-          style={{ width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", marginBottom: 16 }}>
+          style={{ width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer", marginBottom: 16 }}>
           {lang === "ja" ? "もう一度挑戦する" : "Try again"}
         </button>
         <div style={{ fontSize: 13, fontWeight: 700, color: C.ink, marginBottom: 8 }}>
@@ -183313,7 +183313,7 @@ function Quiz({ onAnswer, lang }) {
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
         <button onClick={() => slot.save({ filter, mode, order, pos, history, stats }, filter === "ALL" ? (lang === "en" ? "All" : "全分野") : filter)} style={{ padding: "6px 14px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{slot.meta ? (lang === "en" ? "💾 Saved" : "💾 保存済") : (lang === "en" ? "💾 Save" : "💾 セーブ")}</button>
         {slot.meta && (<>
-          <button onClick={async () => { const d = await slot.read(); if (!d) return; resumeRef.current = { order: d.order, pos: d.pos, history: d.history, stats: d.stats }; setFilter(d.filter || "ALL"); setMode(d.mode || "fixed"); setOrder(d.order || []); setPos(d.pos || 0); setHistory(d.history || {}); setStats(d.stats || { c: 0, a: 0 }); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
+          <button onClick={async () => { const d = await slot.read(); if (!d) return; resumeRef.current = { order: d.order, pos: d.pos, history: d.history, stats: d.stats }; setFilter(d.filter || "ALL"); setMode(d.mode || "fixed"); setOrder(d.order || []); setPos(d.pos || 0); setHistory(d.history || {}); setStats(d.stats || { c: 0, a: 0 }); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
           <span style={{ fontSize: 11, color: "#5a7288" }}>{saveStamp(slot.meta.t)}</span>
           <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
         </>)}
@@ -183490,7 +183490,7 @@ function Exam({ onAnswer, lang }) {
             ))}
         </Card>
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.retry}</button>
+          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.retry}</button>
           <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.toSetSelect}</button>
         </div>
       </div>
@@ -183533,7 +183533,7 @@ function Exam({ onAnswer, lang }) {
               {t.prev}
             </button>
             <button onClick={nextReal}
-              style={{ flex: 2, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+              style={{ flex: 2, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
               {pos + 1 >= qs.length ? t.grade : t.next}
             </button>
           </div>
@@ -183660,7 +183660,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
             <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
-            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
+            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
           </div>
         </div>
       ) : (
@@ -183816,7 +183816,7 @@ function CaseStudy({ onAnswer, lang }) {
               </div>
             </div>
             <button onClick={next}
-              style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+              style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
               {(idx % list.length) + 1 >= list.length ? t.firstCase : t.nextCase}
             </button>
           </div>
@@ -183860,7 +183860,7 @@ function Review({ state, onAnswer, clearReview, removeReview, lang }) {
           <div key={key} style={{ marginBottom: 22 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, paddingBottom: 6, borderBottom: `2px solid ${C.mid}` }}>
               <span style={{ fontSize: 15, fontWeight: 800, color: C.deep }}>{label}</span>
-              <span style={{ fontSize: 12, color: "#fff", background: C.primary, borderRadius: 12, padding: "1px 9px", fontWeight: 700 }}>{items.length}</span>
+              <span style={{ fontSize: 12, color: nvInk("#ffffff", C.primary), background: C.primary, borderRadius: 12, padding: "1px 9px", fontWeight: 700 }}>{items.length}</span>
             </div>
             {items.map(r => <ReviewCard key={r.key} rec={r} onAnswer={onAnswer} removeReview={removeReview} lang={lang} />)}
           </div>
@@ -183983,7 +183983,7 @@ function Glossary({ lang }) {
         return (
           <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 9 }}>
             <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
-              <span style={{ background: DOM_HUE[g[0]], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{g[0]}</span>
+              <span style={{ background: DOM_HUE[g[0]], color: nvInk("#ffffff", DOM_HUE[g[0]]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{g[0]}</span>
               <span style={{ fontWeight: 700, fontSize: 14, color: C.deep }}>{primary}</span>
               {secondary && <span style={{ fontSize: 11.5, color: "#5d6c83" }}>{secondary}</span>}
             </div>
@@ -184076,7 +184076,7 @@ function AicxGateBoard({ lang }) {
         ))}
       </div>
       <div style={{ borderLeft: `3px solid ${s.hue}`, background: C.light, borderRadius: 8, padding: "11px 13px", marginBottom: 10 }}>
-        <div style={{ fontSize: 13, fontWeight: 800, color: s.hue, marginBottom: 6 }}>{s.t[en ? 1 : 0]} — {s.j[en ? 1 : 0]}</div>
+        <div style={{ fontSize: 13, fontWeight: 800, color: nvInk(s.hue, "#ffffff"), marginBottom: 6 }}>{s.t[en ? 1 : 0]} — {s.j[en ? 1 : 0]}</div>
         {s.k.map((r, j) => (
           <div key={j} style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 5 }}>
             <span style={{ flexShrink: 0, fontSize: 11.5, fontWeight: 800, color: C.primary, minWidth: en ? 118 : 96 }}>{r[en ? 2 : 0]}</span>
@@ -185089,7 +185089,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 10 }}>{g(data.title)}</div>
         {Array.isArray(data.sections) && data.sections.length ? (
           <>
-            <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, marginBottom: 6 }}>{lang === "ja" ? "目次（資料セクション）" : "Contents (materials)"}</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 6 }}>{lang === "ja" ? "目次（資料セクション）" : "Contents (materials)"}</div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12, borderBottom: `1px solid ${C.mid}`, paddingBottom: 10 }}>
               {data.sections.map((sc, si) => (
                 <button key={si} onClick={() => setSec(si)}
@@ -185114,7 +185114,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           </>
         ) : (
           <>
-            <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, marginBottom: 6 }}>{lang === "ja" ? "ケース本文（資料）" : "Case (materials)"}</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 6 }}>{lang === "ja" ? "ケース本文（資料）" : "Case (materials)"}</div>
             {g(data.body).map((p, i) => (<div key={i} style={{ fontSize: 13, lineHeight: 1.7, marginBottom: 8, color: C.ink }}>{p}</div>))}
             {(data.tables || []).map((tb, ti) => (
               <div key={ti} style={{ marginTop: 12 }}>
@@ -185141,7 +185141,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
             <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
-            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
+            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
           </div>
         </div>
       ) : (
@@ -185232,10 +185232,10 @@ function App() {
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", color: C.ink, background: "#FAFEFF", minHeight: "100vh" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
         <div>
           <div style={{ fontSize: 19, fontWeight: 700 }}>{t.appTitle}</div>
-          <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>{t.appSub}</div>
+          <div style={{ fontSize: 12, marginTop: 2 }}>{t.appSub}</div>
         </div>
         <div role="group" aria-label={t.langGroup} style={{ display: "flex", background: "rgba(255,255,255,.15)", borderRadius: 20, padding: 3, flexShrink: 0 }}>
           {["ja", "en"].map(l => (
@@ -185270,7 +185270,7 @@ function App() {
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
-          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: nvInk("#ffffff", C.deep), fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ {t.topBtn}
         </button>
       )}
@@ -185424,7 +185424,7 @@ function Quiz({ onAnswer, t, questions }) {
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
         <button onClick={() => slot.save({ filter, orderMode, shufKey, pos, history, stats }, filter === "ALL" ? "全分野" : filter)} style={{ padding: "6px 14px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{slot.meta ? t.slotSaved : t.slotSave}</button>
         {slot.meta && (<>
-          <button onClick={async () => { const d = await slot.read(); if (!d) return; resumeRef.current = { pos: d.pos, history: d.history, stats: d.stats }; setFilter(d.filter || "ALL"); setOrderMode(d.orderMode || "fixed"); setShufKey(d.shufKey || 0); setPos(d.pos || 0); setHistory(d.history || {}); setStats(d.stats || { c: 0, a: 0 }); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{t.slotResume}</button>
+          <button onClick={async () => { const d = await slot.read(); if (!d) return; resumeRef.current = { pos: d.pos, history: d.history, stats: d.stats }; setFilter(d.filter || "ALL"); setOrderMode(d.orderMode || "fixed"); setShufKey(d.shufKey || 0); setPos(d.pos || 0); setHistory(d.history || {}); setStats(d.stats || { c: 0, a: 0 }); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{t.slotResume}</button>
           <span style={{ fontSize: 11, color: "#5a7288" }}>{saveStamp(slot.meta.t)}</span>
           <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{t.slotDelete}</button>
         </>)}
@@ -185491,7 +185491,7 @@ function Quiz({ onAnswer, t, questions }) {
             </div>
             {pos + 1 < total && (
               <button onClick={next}
-                style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+                style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
                 {t.nextQ}
               </button>
             )}
@@ -185844,7 +185844,7 @@ function Exam({ onAnswer, t, onWrong }) {
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{t.slotLabel(slot.meta.label)}{slot.meta.label ? t.labelSep : ""}{saveStamp(slot.meta.t)}</div>
             </div>
             <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
-              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{t.slotResume}</button>
+              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{t.slotResume}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{t.slotDelete}</button>
           </div>
         )}
@@ -185890,7 +185890,7 @@ function Exam({ onAnswer, t, onWrong }) {
                 <span style={{ fontSize: 12, color: "#53757f", marginLeft: 8 }}>{t.domainSetCount(DOMAIN_SETS[d.id].length)}</span>
               </span>
             </span>
-            <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, flexShrink: 0 }}>{t.start}</span>
+            <span style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), flexShrink: 0 }}>{t.start}</span>
           </button>
         ))}
         {kind === "normal" && [1, 2, 3, 4, 5].map(n => (
@@ -185976,7 +185976,7 @@ function Exam({ onAnswer, t, onWrong }) {
         </Card>
 
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.retrySet}</button>
+          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.retrySet}</button>
           <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.toSetSelect}</button>
         </div>
       </div>
@@ -186049,7 +186049,7 @@ function Exam({ onAnswer, t, onWrong }) {
     const need = Q.n || Q.correct.length;
     return (
       <div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, overflow: "hidden" }}>
-        <div style={{ background: C.deep, color: "#fff", padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {Lx(Q, "screen")}{need > 1 ? t.hotSelectN(need) : ""}</div>
+        <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {Lx(Q, "screen")}{need > 1 ? t.hotSelectN(need) : ""}</div>
         <div style={{ padding: 10, display: "flex", flexDirection: "column", gap: 6, background: "#f6f8f9" }}>
           {(Q.hotspots || []).map(h => {
             const on = chosen.includes(h.id);
@@ -186220,9 +186220,9 @@ function Exam({ onAnswer, t, onWrong }) {
 
           <div style={{ display: "flex", gap: 16, margin: "16px 0 30px" }}>
             <button onClick={prev} disabled={pos === 0}
-              style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>{t.backNav}</button>
+              style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: nvInk("#ffffff", pos === 0 ? "#9fb4bc" : NAVY, 3), fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>{t.backNav}</button>
             <button onClick={next}
-              style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? t.finish : t.nextNav}</button>
+              style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: nvInk("#ffffff", NAVY, 3), fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? t.finish : t.nextNav}</button>
           </div>
         </div>
       </div>
@@ -186233,7 +186233,7 @@ function Exam({ onAnswer, t, onWrong }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 12.5, color: "#5a7780" }}>
         <span>
-          <span style={{ background: mode === "practice" ? C.primary : C.deep, color: "#fff", borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>
+          <span style={{ background: mode === "practice" ? C.primary : C.deep, color: nvInk("#ffffff", mode === "practice" ? C.primary : C.deep), borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>
             {mode === "practice" ? t.modePractice : t.modeReal}
           </span>
           {t.setLabel}{setNo} · {t.questionNo(pos + 1, qs.length)}
@@ -186253,13 +186253,13 @@ function Exam({ onAnswer, t, onWrong }) {
             const mOk = mxRight(Q, picks[pos]);
             const done = mxComplete(Q, picks[pos]);
             return (<>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{t.mxInstr}</div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{t.mxInstr}</div>
               <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{Lx(Q, "scenario")}</div>
               {renderMxBody(Q, submitted)}
-              {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{t.submitAns}</button>)}
+              {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{t.submitAns}</button>)}
               {submitted && (<div style={{ marginTop: 12 }}>
                 <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mOk ? C.ok : C.ng }}>{mOk ? t.correct : t.incorrect}</strong>{t.sp}{Lx(Q, "e")}</div>
-                <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? t.seeResult : t.nextQ}</button>
+                <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? t.seeResult : t.nextQ}</button>
               </div>)}
             </>);
           }
@@ -186267,13 +186267,13 @@ function Exam({ onAnswer, t, onWrong }) {
             const hOk = hotRight(Q, picks[pos]);
             const done = hotComplete(Q, picks[pos]);
             return (<>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{t.hotInstr}</div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{t.hotInstr}</div>
               <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{Lx(Q, "q")}</div>
               {renderHotBody(Q, submitted)}
-              {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{t.submitAns}</button>)}
+              {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{t.submitAns}</button>)}
               {submitted && (<div style={{ marginTop: 12 }}>
                 <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hOk ? C.ok : C.ng }}>{hOk ? t.correct : t.incorrect}</strong>{t.sp}{t.answerLbl}{Q.correct.map(id => Lx((Q.hotspots.find(h => h.id === id)) || {}, "label")).join(t.listSep)}{t.sp}{Lx(Q, "e")}</div>
-                <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? t.seeResult : t.nextQ}</button>
+                <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? t.seeResult : t.nextQ}</button>
               </div>)}
             </>);
           }
@@ -186281,12 +186281,12 @@ function Exam({ onAnswer, t, onWrong }) {
             const dndOk = dndRight(Q, picks[pos]);
             const done = dndComplete(Q, picks[pos]);
             return (<>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{t.dndInstr}</div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{t.dndInstr}</div>
               <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{Lx(Q, "q")}</div>
               {renderDndBody(Q, submitted)}
               {!submitted && (
                 <button onClick={submitDndPractice} disabled={!done}
-                  style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{t.submitAns}</button>
+                  style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{t.submitAns}</button>
               )}
               {submitted && (
                 <div style={{ marginTop: 12 }}>
@@ -186294,7 +186294,7 @@ function Exam({ onAnswer, t, onWrong }) {
                     <strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? t.correct : t.incorrect}</strong>
                     {t.dot}{t.dndMap}{(Q.items || []).map(it => `${Lx(it, "text")}→${Lx(Q.targets.find(tg => tg.id === Q.correct[it.id]) || {}, "label")}`).join(" / ")}{t.sp}{Lx(Q, "e")}
                   </div>
-                  <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? t.seeResult : t.nextQ}</button>
+                  <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? t.seeResult : t.nextQ}</button>
                 </div>
               )}
             </>);
@@ -186303,12 +186303,12 @@ function Exam({ onAnswer, t, onWrong }) {
             const bOk = buildRight(Q, picks[pos]);
             const done = buildComplete(Q, picks[pos]);
             return (<>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{t.buildInstr(Q.answer.length)}</div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{t.buildInstr(Q.answer.length)}</div>
               <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{Lx(Q, "q")}</div>
               {renderBuildBody(Q, submitted)}
               {!submitted && (
                 <button onClick={submitBuildPractice} disabled={!done}
-                  style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{t.submitAns}</button>
+                  style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{t.submitAns}</button>
               )}
               {submitted && (
                 <div style={{ marginTop: 12 }}>
@@ -186316,7 +186316,7 @@ function Exam({ onAnswer, t, onWrong }) {
                     <strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? t.correct : t.incorrect}</strong>
                     {t.dot}{t.buildOrder}{Q.answer.map((id, i) => `${i + 1}.${Lx((Q.candidates.find(c => c.id === id)) || {}, "text")}`).join(" / ")}{t.sp}{Lx(Q, "e")}
                   </div>
-                  <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? t.seeResult : t.nextQ}</button>
+                  <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? t.seeResult : t.nextQ}</button>
                 </div>
               )}
             </>);
@@ -186325,12 +186325,12 @@ function Exam({ onAnswer, t, onWrong }) {
             const sOk = scrRight(Q, picks[pos]);
             const done = scrComplete(Q, picks[pos]);
             return (<>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{t.scrInstr}</div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{t.scrInstr}</div>
               <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{Lx(Q, "q")}</div>
               {renderScrBody(Q, submitted)}
               {!submitted && (
                 <button onClick={submitScrPractice} disabled={!done}
-                  style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{t.submitAns}</button>
+                  style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{t.submitAns}</button>
               )}
               {submitted && (
                 <div style={{ marginTop: 12 }}>
@@ -186338,7 +186338,7 @@ function Exam({ onAnswer, t, onWrong }) {
                     <strong style={{ color: sOk ? C.ok : C.ng }}>{sOk ? t.correct : t.incorrect}</strong>
                     {t.dot}{t.scrSettings}{(Q.controls || []).map(c => `${Lx(c, "label")}=${String(Q.correct[c.id] === true ? t.on : Q.correct[c.id] === false ? t.off : scrOptLabel(c, Q.correct[c.id]))}`).join(" / ")}{t.sp}{Lx(Q, "e")}
                   </div>
-                  <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? t.seeResult : t.nextQ}</button>
+                  <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? t.seeResult : t.nextQ}</button>
                 </div>
               )}
             </>);
@@ -186349,7 +186349,7 @@ function Exam({ onAnswer, t, onWrong }) {
           const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isRight = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
           return (<>
-            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{t.multiInstr(need, submitted ? selSet.length : mSel.length)}</div>}
+            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{t.multiInstr(need, submitted ? selSet.length : mSel.length)}</div>}
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{Lx(Q, "q")}</div>
             {opts.map((opt, i) => {
               if (isMulti) {
@@ -186377,7 +186377,7 @@ function Exam({ onAnswer, t, onWrong }) {
             })}
             {isMulti && !submitted && (
               <button onClick={submitMultiPractice} disabled={mSel.length !== need}
-                style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{t.submitAns}</button>
+                style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{t.submitAns}</button>
             )}
             {submitted && (
               <div style={{ marginTop: 12 }}>
@@ -186385,7 +186385,7 @@ function Exam({ onAnswer, t, onWrong }) {
                   <strong style={{ color: isRight ? C.ok : C.ng }}>{isRight ? t.correct : t.incorrect}</strong>
                   {t.dot}{isMulti ? `${t.answerLbl}${correctSet.map(i => "ABCDE"[i]).join(t.listSep)}${t.sp}` : t.answerIs("ABCDE"[Q.a])}{Lx(Q, "e")}<RefLink r={Q.ref} />
                 </div>
-                <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+                <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
                   {isLast ? t.seeResult : t.nextQ}
                 </button>
               </div>
@@ -186459,7 +186459,7 @@ function Overview() {
           <div key={i} onClick={() => setSel(sel === i ? null : i)}
             style={{ background: colors[i], color: nvInk("#ffffff", colors[i]), borderRadius: 9, padding: "12px 10px", cursor: "pointer", border: sel === i ? `3px solid ${C.ink}` : "3px solid transparent" }}>
             <div style={{ fontWeight: 700, fontSize: 13 }}>{it[0]}</div>
-            <div style={{ fontSize: 11, opacity: 0.9 }}>{it[1]}</div>
+            <div style={{ fontSize: 11 }}>{it[1]}</div>
           </div>
         ))}
       </div>
@@ -186517,7 +186517,7 @@ function AppDecision() {
           <div style={{ fontSize: 11, color: C.ok, fontWeight: 700 }}>{TX().decResult}</div>
           <div style={{ fontSize: 16, fontWeight: 800, color: C.deep, margin: "4px 0" }}>{leaf[0]}</div>
           <div style={{ fontSize: 13, lineHeight: 1.5 }}>{leaf[1]}</div>
-          <button onClick={() => setPath([])} style={{ marginTop: 12, padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>{TX().decRestart}</button>
+          <button onClick={() => setPath([])} style={{ marginTop: 12, padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 13, cursor: "pointer" }}>{TX().decRestart}</button>
         </div>
       )}
     </div>
@@ -186541,9 +186541,9 @@ function Triggers() {
     <div>
       {items.map((it, i) => (
         <div key={i} onClick={() => setSel(sel === i ? null : i)} style={{ display: "flex", alignItems: "center", marginBottom: 8, cursor: "pointer" }}>
-          <div style={{ flex: 1, background: colors[i], color: "#fff", borderRadius: 8, padding: "10px 13px", border: sel === i ? `2px solid ${C.ink}` : "2px solid transparent" }}>
+          <div style={{ flex: 1, background: colors[i], color: nvInk("#ffffff", colors[i]), borderRadius: 8, padding: "10px 13px", border: sel === i ? `2px solid ${C.ink}` : "2px solid transparent" }}>
             <span style={{ fontWeight: 700, fontSize: 13.5 }}>{it[0]}</span>
-            <span style={{ fontSize: 11.5, marginLeft: 8, opacity: 0.9 }}>{TX().trigStart}{it[1]}</span>
+            <span style={{ fontSize: 11.5, marginLeft: 8 }}>{TX().trigStart}{it[1]}</span>
           </div>
         </div>
       ))}
@@ -186576,9 +186576,9 @@ function SecurityLadder() {
       {items.map((it, i) => (
         <div key={i} onClick={() => setSel(sel === i ? null : i)} style={{ display: "flex", alignItems: "center", marginBottom: 8, cursor: "pointer" }}>
           <div style={{ width: 26, fontSize: 11, color: "#53757f" }}>{i + 1}</div>
-          <div style={{ flex: 1, background: colors[i], color: "#fff", borderRadius: 8, padding: "9px 12px", border: sel === i ? `2px solid ${C.ink}` : "2px solid transparent", display: "flex", flexWrap: "wrap", alignItems: "baseline", columnGap: 8, rowGap: 2 }}>
+          <div style={{ flex: 1, background: colors[i], color: nvInk("#ffffff", colors[i]), borderRadius: 8, padding: "9px 12px", border: sel === i ? `2px solid ${C.ink}` : "2px solid transparent", display: "flex", flexWrap: "wrap", alignItems: "baseline", columnGap: 8, rowGap: 2 }}>
             <span style={{ fontWeight: 700, fontSize: 13 }}>{it[0]}</span>
-            <span style={{ fontSize: 11.5, opacity: 0.9 }}>{it[1]}</span>
+            <span style={{ fontSize: 11.5 }}>{it[1]}</span>
           </div>
         </div>
       ))}
@@ -186610,11 +186610,11 @@ function RoiSim() {
       </div>
       <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
         <div style={{ flex: 1, background: C.light, borderRadius: 9, padding: 11, textAlign: "center" }}>
-          <div style={{ fontSize: 11, color: "#5a7780" }}>{TX().roiMonth}</div>
+          <div style={{ fontSize: 11, color: nvInk("#5a7780", C.light) }}>{TX().roiMonth}</div>
           <div style={{ fontSize: 19, fontWeight: 800, color: C.deep }}>{TX().roiMin(fmt(savedMin))}</div>
         </div>
         <div style={{ flex: 1, background: "#E4F6EC", borderRadius: 9, padding: 11, textAlign: "center" }}>
-          <div style={{ fontSize: 11, color: "#5a7780" }}>{TX().roiHours}</div>
+          <div style={{ fontSize: 11, color: nvInk("#5a7780", "#E4F6EC") }}>{TX().roiHours}</div>
           <div style={{ fontSize: 19, fontWeight: 800, color: C.ok }}>{TX().roiHr(savedHr)}</div>
         </div>
       </div>
@@ -186660,8 +186660,8 @@ function TreeNode({ node, depth, defaultOpen }) {
     <div style={{ marginLeft: depth === 0 ? 0 : 14 }}>
       <div onClick={() => hasKids && setOpen(o => !o)}
         style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? "#fff" : C.ink, marginBottom: 3 }}>
-        {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : C.primary }}>{open ? "▼" : "▶"}</span>}
-        {!hasKids && <span style={{ color: C.mid }}>•</span>}
+        {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : nvInk(C.primary, "#ffffff") }}>{open ? "▼" : "▶"}</span>}
+        {!hasKids && <span style={{ color: nvInk(C.mid, "#ffffff", 3) }}>•</span>}
         <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{Lx(node, "label")}</span>
       </div>
       {node.note && (!hasKids || open) && (
@@ -186760,8 +186760,8 @@ function Scenario({ t }) {
 
   const head = (s) => (
     <div style={{ display: "flex", gap: 6, alignItems: "center", marginBottom: 8, flexWrap: "wrap" }}>
-      <span style={{ background: C.deep, color: "#fff", borderRadius: 4, padding: "1px 7px", fontSize: 11, fontWeight: 700 }}>{s.id}</span>
-      <span style={{ background: s.type === "calc" ? "#3BB8D4" : DOM_HUE[s.d], color: "#fff", borderRadius: 4, padding: "1px 7px", fontSize: 10.5 }}>{typeLabel(s.type)}</span>
+      <span style={{ background: C.deep, color: nvInk("#ffffff", C.deep), borderRadius: 4, padding: "1px 7px", fontSize: 11, fontWeight: 700 }}>{s.id}</span>
+      <span style={{ background: s.type === "calc" ? "#3BB8D4" : DOM_HUE[s.d], color: nvInk("#ffffff", s.type === "calc" ? "#3BB8D4" : DOM_HUE[s.d]), borderRadius: 4, padding: "1px 7px", fontSize: 10.5 }}>{typeLabel(s.type)}</span>
       <span style={{ fontSize: 11, color: "#53757f" }}>{s.d} · {domName(s.d)}</span>
     </div>
   );
@@ -186850,7 +186850,7 @@ function Scenario({ t }) {
               <button onClick={() => setCur(c => Math.max(0, c - 1))} disabled={idx === 0}
                 style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.mid}`, background: "#fff", color: idx === 0 ? "#a8c2cc" : C.deep, fontSize: 14, fontWeight: 700, cursor: idx === 0 ? "default" : "pointer" }}>{t.prevQ}</button>
               <button onClick={() => setCur(c => Math.min(list.length - 1, c + 1))} disabled={idx >= list.length - 1}
-                style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: idx >= list.length - 1 ? C.mid : C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: idx >= list.length - 1 ? "default" : "pointer" }}>{t.nextQ}</button>
+                style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: idx >= list.length - 1 ? C.mid : C.primary, color: nvInk("#ffffff", idx >= list.length - 1 ? C.mid : C.primary, 3), fontSize: 14, fontWeight: 700, cursor: idx >= list.length - 1 ? "default" : "pointer" }}>{t.nextQ}</button>
             </div>
           </div>
         );
@@ -186887,7 +186887,7 @@ function Compare({ t }) {
         </button>
         <span style={{ fontSize: 12, color: "#53757f", alignSelf: "center" }}>{idx + 1} / {COMPARE.length}</span>
         <button onClick={() => setIdx(i => (i + 1) % COMPARE.length)}
-          style={{ padding: "9px 16px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
+          style={{ padding: "9px 16px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
           {t.nextShort}
         </button>
       </div>
@@ -186941,7 +186941,7 @@ function Confuse({ t }) {
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 10 }}>
           <div style={{ fontWeight: 700, color: C.deep, fontSize: 13.5, marginBottom: 5 }}>{ce(c)[0]}</div>
           <div style={{ fontSize: 13, lineHeight: 1.5, marginBottom: 4 }}>{ce(c)[1]}</div>
-          <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{t.judgeAxis}{t.colon}{ce(c)[2]}</div>
+          <div style={{ fontSize: 12, color: nvInk(C.primary, "#ffffff"), fontWeight: 600 }}>{t.judgeAxis}{t.colon}{ce(c)[2]}</div>
         </div>
       ))}
       {list.length === 0 && <div style={{ textAlign: "center", color: "#53757f", padding: 20 }}>{t.noMatch}</div>}
@@ -187050,7 +187050,7 @@ function Glossary({ t }) {
       {list.map((g, i) => (
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 9 }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
-            <span style={{ background: DOM_HUE[g[0]], color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{g[0]}</span>
+            <span style={{ background: DOM_HUE[g[0]], color: nvInk("#ffffff", DOM_HUE[g[0]]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5 }}>{g[0]}</span>
             <span style={{ fontWeight: 700, fontSize: 14, color: C.deep }}>{gl(g)[1]}</span>
             {gl(g)[2] !== "-" && <span style={{ fontSize: 11.5, color: "#53757f" }}>{gl(g)[2]}</span>}
           </div>
@@ -187527,7 +187527,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
             <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
-            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
+            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
           </div>
         </div>
       ) : (
@@ -187601,11 +187601,11 @@ function App() {
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", color: C.ink, background: "#F7FBFF", minHeight: "100vh" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ fontSize: 19, fontWeight: 700 }}>{t.appTitle}</div>
-          <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>{t.appSub}</div>
-          <div style={{ fontSize: 11, opacity: 0.8, marginTop: 4 }}>{t.bankCount(BANK.length)} ・ {t.examCount(Object.keys(EXAM_SETS).length)}</div>
+          <div style={{ fontSize: 12, marginTop: 2 }}>{t.appSub}</div>
+          <div style={{ fontSize: 11, marginTop: 4 }}>{t.bankCount(BANK.length)} ・ {t.examCount(Object.keys(EXAM_SETS).length)}</div>
         </div>
         <div style={{ display: "flex", background: "rgba(255,255,255,.15)", borderRadius: 20, padding: 3 }}>
           {["ja", "en"].map(l => (
@@ -187638,7 +187638,7 @@ function App() {
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
-          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: nvInk("#ffffff", C.deep), fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ {lang === "en" ? "Top" : "トップへ"}
         </button>
       )}
@@ -187808,7 +187808,7 @@ function Quiz({ onAnswer, lang, t }) {
         </button>
         {slot.meta && (
           <>
-            <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
+            <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
             <span style={{ fontSize: 11, color: "#5a7288" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
             <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
           </>
@@ -188040,7 +188040,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
             <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
-              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
+              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
         )}
@@ -188098,7 +188098,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
+          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
           <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Set select" : "セット選択"}</button>
         </div>
       </div>
@@ -188176,7 +188176,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const chosen = Array.isArray(picks[pos]) ? picks[pos] : [];
     const need = Q.n || Q.correct.length;
     return (<div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, overflow: "hidden" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {en ? (Q.screenEn || Q.screen) : Q.screen}{need > 1 ? (en ? ` (choose ${need})` : `（${need}箇所選択）`) : ""}</div>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {en ? (Q.screenEn || Q.screen) : Q.screen}{need > 1 ? (en ? ` (choose ${need})` : `（${need}箇所選択）`) : ""}</div>
       <div style={{ padding: 10, display: "flex", flexDirection: "column", gap: 6, background: "#f6f8f9" }}>
         {(Q.hotspots || []).map(h => { const on = chosen.includes(h.id); const isC = Q.correct.includes(h.id); let bd = "#b7c3cb", bg = "#fff", col = C.ink; if (submitted) { if (isC) { bd = C.ok; bg = "#E4F6EC"; col = C.ok; } else if (on) { bd = C.ng; bg = "#FBE9E7"; col = C.ng; } } else if (on) { bd = C.primary; bg = C.light; col = C.deep; } return (
           <button key={h.id} onClick={() => !submitted && toggleHot(h.id, need)} disabled={submitted} style={{ textAlign: "left", padding: "10px 12px", borderRadius: 6, border: `1.5px ${(on || (submitted && isC)) ? "solid" : "dashed"} ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13, fontWeight: on ? 700 : 500, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -188266,8 +188266,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 16, fontSize: 13.5, color: INK, cursor: "pointer" }}><input type="checkbox" checked={!!flags[pos]} onChange={e => setFlags(f => ({ ...f, [pos]: e.target.checked }))} style={{ width: 16, height: 16 }} /><span>{en ? "Mark this question for review" : "この問題をあとで見直す"}</span></label>
           </div>
           <div style={{ display: "flex", gap: 16, margin: "16px 0 30px" }}>
-            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
-            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
+            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: nvInk("#ffffff", pos === 0 ? "#9fb4bc" : NAVY, 3), fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
+            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: nvInk("#ffffff", NAVY, 3), fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
           </div>
         </div>
       </div>
@@ -188279,7 +188279,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 12.5, color: "#5a7780" }}>
-        <span><span style={{ background: C.primary, color: "#fff", borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{en ? "Practice" : "演習モード"}</span>{en ? `Set ${setNo} · Q ${pos + 1}/${qs.length}` : `セット${setNo}・問${pos + 1}/${qs.length}`}</span>
+        <span><span style={{ background: C.primary, color: nvInk("#ffffff", C.primary), borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{en ? "Practice" : "演習モード"}</span>{en ? `Set ${setNo} · Q ${pos + 1}/${qs.length}` : `セット${setNo}・問${pos + 1}/${qs.length}`}</span>
         <span>{Q.d} {domName(Q.d, lang)}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginTop: 12 }}>
@@ -188289,29 +188289,29 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderDndBody(Q, submitted)}
-            {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.build) { const bOk = buildRight(Q, picks[pos]); const done = buildComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderBuildBody(Q, submitted)}
-            {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.mx) { const mxOk = mxRight(Q, picks[pos]); const done = mxComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "scenario")}</div>
             {renderMxBody(Q, submitted)}
-            {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.hot) { const hotOk = hotRight(Q, picks[pos]); const done = hotComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderHotBody(Q, submitted)}
-            {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           const isMulti = !!Q.multi; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); const selSet = Array.isArray(sel) ? sel : []; const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isR = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
@@ -188324,8 +188324,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
               let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (i === Q.a) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (i === sel) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } }
               return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
             })}
-            {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>);
         })()}
       </div>
@@ -188365,7 +188365,7 @@ function Review({ lang, t, onAnswer }) {
         </div>
         {list.length > 0 && (
           <button onClick={() => { setOrder(keys); setPos(0); setSel(null); setSessionSalt(Math.floor(Math.random() * 100000)); setPhase("run"); }}
-            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
+            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
             {t.reviewStart}
           </button>
         )}
@@ -188444,7 +188444,7 @@ function Review({ lang, t, onAnswer }) {
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
             {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
-            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
               {pos + 1 >= order.length ? t.reviewToList : t.nextQ}
             </button>
           </div>
@@ -188566,10 +188566,10 @@ function ReqFlow({ lang }) {
         {steps.map((s, i) => (
           <div key={i}>
             <div onClick={() => setSel(sel === i ? null : i)}
-              style={{ background: s[2], color: "#fff", borderRadius: 9, padding: "11px 12px", cursor: "pointer",
+              style={{ background: s[2], color: nvInk("#ffffff", s[2]), borderRadius: 9, padding: "11px 12px", cursor: "pointer",
                 border: sel === i ? `3px solid ${C.ink}` : "3px solid transparent", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span style={{ fontWeight: 700, fontSize: 13 }}>{s[0]}</span>
-              <span style={{ fontSize: 11, opacity: .85 }}>{i + 1}</span>
+              <span style={{ fontSize: 11 }}>{i + 1}</span>
             </div>
             {i < steps.length - 1 && <div style={{ textAlign: "center", fontSize: 18, color: C.primary, lineHeight: 1 }}>↓</div>}
           </div>
@@ -188701,7 +188701,7 @@ function IntegrationTree({ lang }) {
           <div style={{ fontSize: 11, color: C.ok, fontWeight: 700 }}>{en?"Conclusion":"結論"}</div>
           <div style={{ fontSize: 16, fontWeight: 800, color: C.deep, margin: "4px 0" }}>{leaf[0]}</div>
           <div style={{ fontSize: 13, lineHeight: 1.5 }}>{leaf[1]}</div>
-          <button onClick={() => setPath([])} style={{ marginTop: 12, padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>{en?"Restart":"最初から"}</button>
+          <button onClick={() => setPath([])} style={{ marginTop: 12, padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 13, cursor: "pointer" }}>{en?"Restart":"最初から"}</button>
         </div>
       )}
     </div>
@@ -188726,7 +188726,7 @@ function ALMFlow({ lang }) {
         {stages.map((s, i) => (
           <div key={i} style={{ display: "flex", alignItems: "center", flex: 1 }}>
             <div onClick={() => setSel(sel === i ? null : i)}
-              style={{ flex: 1, background: s[2], color: "#fff", borderRadius: 9, padding: "14px 8px", textAlign: "center", cursor: "pointer", border: sel === i ? `3px solid ${C.ink}` : "3px solid transparent" }}>
+              style={{ flex: 1, background: s[2], color: nvInk("#ffffff", s[2]), borderRadius: 9, padding: "14px 8px", textAlign: "center", cursor: "pointer", border: sel === i ? `3px solid ${C.ink}` : "3px solid transparent" }}>
               <div style={{ fontSize: 13, fontWeight: 800 }}>{s[0]}</div>
             </div>
             {i < stages.length - 1 && <div style={{ fontSize: 18, color: C.primary, padding: "0 2px" }}>→</div>}
@@ -188760,16 +188760,16 @@ function MultiAgent({ lang }) {
       <svg viewBox="0 0 360 210" style={{ width: "100%" }}>
         <g style={{ cursor: "pointer" }} onClick={() => setSel(sel === "orch" ? null : "orch")}>
           <rect x="125" y="8" width="110" height="40" rx="9" fill={cN.orch} stroke={sel==="orch"?C.ink:"none"} strokeWidth="3" />
-          <text x="180" y="32" fontSize="11.5" fontWeight="700" fill="#fff" textAnchor="middle">{lbl.orch}</text>
+          <text x="180" y="32" fontSize="12.5" fontWeight="700" fill="#fff" textAnchor="middle">{lbl.orch}</text>
         </g>
         {[["cs", 20], ["foundry", 130], ["fabric", 240]].map(([k, x]) => (
           <g key={k} style={{ cursor: "pointer" }} onClick={() => setSel(sel === k ? null : k)}>
             <line x1="180" y1="48" x2={x + 50} y2="115" stroke={C.mid} strokeWidth="2" />
             <rect x={x} y="115" width="100" height="42" rx="9" fill={cN[k]} opacity={sel && sel !== k ? 0.45 : 0.92} stroke={sel===k?C.ink:"none"} strokeWidth="3" />
-            <text x={x + 50} y="141" fontSize="11" fontWeight="700" fill="#fff" textAnchor="middle">{lbl[k]}</text>
+            <text x={x + 50} y="141" fontSize="12" fontWeight="700" fill="#fff" textAnchor="middle">{lbl[k]}</text>
           </g>
         ))}
-        <text x="180" y="185" fontSize="10.5" fill={C.primary} textAnchor="middle">{en?"A2A protocol enables cross-agent collaboration":"A2Aプロトコルがエージェント横断連携を実現"}</text>
+        <text x="180" y="185" fontSize="11.5" fill={C.primary} textAnchor="middle">{en?"A2A protocol enables cross-agent collaboration":"A2Aプロトコルがエージェント横断連携を実現"}</text>
       </svg>
       {sel ? (
         <div style={{ background: C.light, borderRadius: 9, padding: 12 }}>
@@ -188852,8 +188852,8 @@ function TreeNode({ node, depth, defaultOpen }) {
     <div style={{ marginLeft: depth === 0 ? 0 : 14 }}>
       <div onClick={() => hasKids && setOpen(o => !o)}
         style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? "#fff" : C.ink, marginBottom: 3 }}>
-        {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : C.primary }}>{open ? "▼" : "▶"}</span>}
-        {!hasKids && <span style={{ color: C.mid }}>•</span>}
+        {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : nvInk(C.primary, "#ffffff") }}>{open ? "▼" : "▶"}</span>}
+        {!hasKids && <span style={{ color: nvInk(C.mid, "#ffffff", 3) }}>•</span>}
         <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{node.label}</span>
       </div>
       {node.note && (!hasKids || open) && (
@@ -189748,7 +189748,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
             <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
-            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
+            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
           </div>
         </div>
       ) : (
@@ -189822,11 +189822,11 @@ function App() {
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", color: C.ink, background: "#F7FBFF", minHeight: "100vh" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ fontSize: 19, fontWeight: 700 }}>{t.appTitle}</div>
-          <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>{t.appSub}</div>
-          <div style={{ fontSize: 11, opacity: 0.8, marginTop: 4 }}>{t.bankCount(BANK.length)} ・ {t.examCount(Object.keys(EXAM_SETS).length)}</div>
+          <div style={{ fontSize: 12, marginTop: 2 }}>{t.appSub}</div>
+          <div style={{ fontSize: 11, marginTop: 4 }}>{t.bankCount(BANK.length)} ・ {t.examCount(Object.keys(EXAM_SETS).length)}</div>
         </div>
         <div style={{ display: "flex", background: "rgba(255,255,255,.15)", borderRadius: 20, padding: 3 }}>
           {["ja", "en"].map(l => (
@@ -189859,7 +189859,7 @@ function App() {
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
-          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: nvInk("#ffffff", C.deep), fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ {lang === "en" ? "Top" : "トップへ"}
         </button>
       )}
@@ -190029,7 +190029,7 @@ function Quiz({ onAnswer, lang, t }) {
         </button>
         {slot.meta && (
           <>
-            <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
+            <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
             <span style={{ fontSize: 11, color: "#5a7288" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
             <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
           </>
@@ -190261,7 +190261,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
             <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
-              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
+              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
         )}
@@ -190319,7 +190319,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
+          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
           <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Set select" : "セット選択"}</button>
         </div>
       </div>
@@ -190397,7 +190397,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const chosen = Array.isArray(picks[pos]) ? picks[pos] : [];
     const need = Q.n || Q.correct.length;
     return (<div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, overflow: "hidden" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {en ? (Q.screenEn || Q.screen) : Q.screen}{need > 1 ? (en ? ` (choose ${need})` : `（${need}箇所選択）`) : ""}</div>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {en ? (Q.screenEn || Q.screen) : Q.screen}{need > 1 ? (en ? ` (choose ${need})` : `（${need}箇所選択）`) : ""}</div>
       <div style={{ padding: 10, display: "flex", flexDirection: "column", gap: 6, background: "#f6f8f9" }}>
         {(Q.hotspots || []).map(h => { const on = chosen.includes(h.id); const isC = Q.correct.includes(h.id); let bd = "#b7c3cb", bg = "#fff", col = C.ink; if (submitted) { if (isC) { bd = C.ok; bg = "#E4F6EC"; col = C.ok; } else if (on) { bd = C.ng; bg = "#FBE9E7"; col = C.ng; } } else if (on) { bd = C.primary; bg = C.light; col = C.deep; } return (
           <button key={h.id} onClick={() => !submitted && toggleHot(h.id, need)} disabled={submitted} style={{ textAlign: "left", padding: "10px 12px", borderRadius: 6, border: `1.5px ${(on || (submitted && isC)) ? "solid" : "dashed"} ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13, fontWeight: on ? 700 : 500, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -190487,8 +190487,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 16, fontSize: 13.5, color: INK, cursor: "pointer" }}><input type="checkbox" checked={!!flags[pos]} onChange={e => setFlags(f => ({ ...f, [pos]: e.target.checked }))} style={{ width: 16, height: 16 }} /><span>{en ? "Mark this question for review" : "この問題をあとで見直す"}</span></label>
           </div>
           <div style={{ display: "flex", gap: 16, margin: "16px 0 30px" }}>
-            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
-            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
+            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: nvInk("#ffffff", pos === 0 ? "#9fb4bc" : NAVY, 3), fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
+            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: nvInk("#ffffff", NAVY, 3), fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
           </div>
         </div>
       </div>
@@ -190500,7 +190500,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 12.5, color: "#5a7780" }}>
-        <span><span style={{ background: C.primary, color: "#fff", borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{en ? "Practice" : "演習モード"}</span>{en ? `Set ${setNo} · Q ${pos + 1}/${qs.length}` : `セット${setNo}・問${pos + 1}/${qs.length}`}</span>
+        <span><span style={{ background: C.primary, color: nvInk("#ffffff", C.primary), borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{en ? "Practice" : "演習モード"}</span>{en ? `Set ${setNo} · Q ${pos + 1}/${qs.length}` : `セット${setNo}・問${pos + 1}/${qs.length}`}</span>
         <span>{Q.d} {domName(Q.d, lang)}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginTop: 12 }}>
@@ -190510,29 +190510,29 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderDndBody(Q, submitted)}
-            {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.build) { const bOk = buildRight(Q, picks[pos]); const done = buildComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderBuildBody(Q, submitted)}
-            {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.mx) { const mxOk = mxRight(Q, picks[pos]); const done = mxComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "scenario")}</div>
             {renderMxBody(Q, submitted)}
-            {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.hot) { const hotOk = hotRight(Q, picks[pos]); const done = hotComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderHotBody(Q, submitted)}
-            {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           const isMulti = !!Q.multi; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); const selSet = Array.isArray(sel) ? sel : []; const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isR = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
@@ -190545,8 +190545,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
               let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (i === Q.a) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (i === sel) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } }
               return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
             })}
-            {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>);
         })()}
       </div>
@@ -190586,7 +190586,7 @@ function Review({ lang, t, onAnswer }) {
         </div>
         {list.length > 0 && (
           <button onClick={() => { setOrder(keys); setPos(0); setSel(null); setSessionSalt(Math.floor(Math.random() * 100000)); setPhase("run"); }}
-            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
+            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
             {t.reviewStart}
           </button>
         )}
@@ -190665,7 +190665,7 @@ function Review({ lang, t, onAnswer }) {
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
             {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
-            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
               {pos + 1 >= order.length ? t.reviewToList : t.nextQ}
             </button>
           </div>
@@ -190688,19 +190688,19 @@ function DiagFlow({ lang }) {
         {STEPS.map((s, i) => (
           <div key={i}>
             <div onClick={() => setSel(sel === i ? null : i)}
-              style={{ background: hues[i % hues.length], color: "#fff", borderRadius: 9, padding: "11px 12px", cursor: "pointer",
+              style={{ background: hues[i % hues.length], color: nvInk("#ffffff", hues[i % hues.length]), borderRadius: 9, padding: "11px 12px", cursor: "pointer",
                 border: sel === i ? ("3px solid " + C.ink) : "3px solid transparent", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span style={{ fontWeight: 700, fontSize: 13 }}>{s[0]}</span>
-              <span style={{ fontSize: 11, opacity: .85 }}>{i + 1}</span>
+              <span style={{ fontSize: 11 }}>{i + 1}</span>
             </div>
-            {i < STEPS.length - 1 && <div style={{ textAlign: "center", fontSize: 18, color: C.mid, lineHeight: 1 }}>{"\u2193"}</div>}
+            {i < STEPS.length - 1 && <div style={{ textAlign: "center", fontSize: 18, color: nvInk(C.mid, "#ffffff", 3), lineHeight: 1 }}>{"\u2193"}</div>}
           </div>
         ))}
       </div>
       {OUTS.length > 0 && (
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
           {OUTS.map((o, i) => (
-            <span key={i} style={{ background: toneC[o[1]] || C.primary, color: "#fff", borderRadius: 20, padding: "5px 12px", fontSize: 12, fontWeight: 700 }}>{o[0]}</span>
+            <span key={i} style={{ background: toneC[o[1]] || C.primary, color: nvInk("#ffffff", toneC[o[1]] || C.primary), borderRadius: 20, padding: "5px 12px", fontSize: 12, fontWeight: 700 }}>{o[0]}</span>
           ))}
         </div>
       )}
@@ -190724,8 +190724,8 @@ function DiagCompare({ lang }) {
     <div style={{ overflowX: "auto" }}>
       <div style={{ display: "grid", gridTemplateColumns: "auto 1fr 1fr", fontSize: 12.5, minWidth: 340 }}>
         <div style={{ padding: "8px", borderBottom: ("2px solid " + C.mid) }}></div>
-        <div style={{ padding: "8px", fontWeight: 700, color: "#fff", background: C.primary, borderRadius: "8px 0 0 0", textAlign: "center" }}>{L}</div>
-        <div style={{ padding: "8px", fontWeight: 700, color: "#fff", background: C.deep, borderRadius: "0 8px 0 0", textAlign: "center" }}>{R}</div>
+        <div style={{ padding: "8px", fontWeight: 700, color: nvInk("#ffffff", C.primary), background: C.primary, borderRadius: "8px 0 0 0", textAlign: "center" }}>{L}</div>
+        <div style={{ padding: "8px", fontWeight: 700, color: nvInk("#ffffff", C.deep), background: C.deep, borderRadius: "0 8px 0 0", textAlign: "center" }}>{R}</div>
         {ROWS.map((r, i) => (
           <React.Fragment key={i}>
             <div style={{ padding: "8px", fontWeight: 700, color: C.deep, background: C.light, borderBottom: ("1px solid " + C.mid) }}>{r[0]}</div>
@@ -190746,7 +190746,7 @@ function DiagGrid({ lang }) {
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
       {CARDS.map((c, i) => (
         <div key={i} style={{ border: ("1px solid " + C.mid), borderRadius: 10, overflow: "hidden" }}>
-          <div style={{ background: hues[i % hues.length], color: "#fff", padding: "7px 10px", fontWeight: 700, fontSize: 12.5 }}>{c.t}</div>
+          <div style={{ background: hues[i % hues.length], color: nvInk("#ffffff", hues[i % hues.length]), padding: "7px 10px", fontWeight: 700, fontSize: 12.5 }}>{c.t}</div>
           <div style={{ padding: "8px 10px" }}>
             {c.items.map((it, j) => (
               <div key={j} style={{ fontSize: 12, color: C.ink, padding: "2px 0", lineHeight: 1.5 }}>{"\u2022 "}{it}</div>
@@ -190908,10 +190908,10 @@ function ReqFlow({ lang }) {
         {steps.map((s, i) => (
           <div key={i}>
             <div onClick={() => setSel(sel === i ? null : i)}
-              style={{ background: s[2], color: "#fff", borderRadius: 9, padding: "11px 12px", cursor: "pointer",
+              style={{ background: s[2], color: nvInk("#ffffff", s[2]), borderRadius: 9, padding: "11px 12px", cursor: "pointer",
                 border: sel === i ? `3px solid ${C.ink}` : "3px solid transparent", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span style={{ fontWeight: 700, fontSize: 13 }}>{s[0]}</span>
-              <span style={{ fontSize: 11, opacity: .85 }}>{i + 1}</span>
+              <span style={{ fontSize: 11 }}>{i + 1}</span>
             </div>
             {i < steps.length - 1 && <div style={{ textAlign: "center", fontSize: 18, color: C.primary, lineHeight: 1 }}>↓</div>}
           </div>
@@ -191043,7 +191043,7 @@ function IntegrationTree({ lang }) {
           <div style={{ fontSize: 11, color: C.ok, fontWeight: 700 }}>{en?"Conclusion":"結論"}</div>
           <div style={{ fontSize: 16, fontWeight: 800, color: C.deep, margin: "4px 0" }}>{leaf[0]}</div>
           <div style={{ fontSize: 13, lineHeight: 1.5 }}>{leaf[1]}</div>
-          <button onClick={() => setPath([])} style={{ marginTop: 12, padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>{en?"Restart":"最初から"}</button>
+          <button onClick={() => setPath([])} style={{ marginTop: 12, padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 13, cursor: "pointer" }}>{en?"Restart":"最初から"}</button>
         </div>
       )}
     </div>
@@ -191068,7 +191068,7 @@ function ALMFlow({ lang }) {
         {stages.map((s, i) => (
           <div key={i} style={{ display: "flex", alignItems: "center", flex: 1 }}>
             <div onClick={() => setSel(sel === i ? null : i)}
-              style={{ flex: 1, background: s[2], color: "#fff", borderRadius: 9, padding: "14px 8px", textAlign: "center", cursor: "pointer", border: sel === i ? `3px solid ${C.ink}` : "3px solid transparent" }}>
+              style={{ flex: 1, background: s[2], color: nvInk("#ffffff", s[2]), borderRadius: 9, padding: "14px 8px", textAlign: "center", cursor: "pointer", border: sel === i ? `3px solid ${C.ink}` : "3px solid transparent" }}>
               <div style={{ fontSize: 13, fontWeight: 800 }}>{s[0]}</div>
             </div>
             {i < stages.length - 1 && <div style={{ fontSize: 18, color: C.primary, padding: "0 2px" }}>→</div>}
@@ -191102,16 +191102,16 @@ function MultiAgent({ lang }) {
       <svg viewBox="0 0 360 210" style={{ width: "100%" }}>
         <g style={{ cursor: "pointer" }} onClick={() => setSel(sel === "orch" ? null : "orch")}>
           <rect x="125" y="8" width="110" height="40" rx="9" fill={cN.orch} stroke={sel==="orch"?C.ink:"none"} strokeWidth="3" />
-          <text x="180" y="32" fontSize="11.5" fontWeight="700" fill="#fff" textAnchor="middle">{lbl.orch}</text>
+          <text x="180" y="32" fontSize="12.5" fontWeight="700" fill="#fff" textAnchor="middle">{lbl.orch}</text>
         </g>
         {[["cs", 20], ["foundry", 130], ["fabric", 240]].map(([k, x]) => (
           <g key={k} style={{ cursor: "pointer" }} onClick={() => setSel(sel === k ? null : k)}>
             <line x1="180" y1="48" x2={x + 50} y2="115" stroke={C.mid} strokeWidth="2" />
             <rect x={x} y="115" width="100" height="42" rx="9" fill={cN[k]} opacity={sel && sel !== k ? 0.45 : 0.92} stroke={sel===k?C.ink:"none"} strokeWidth="3" />
-            <text x={x + 50} y="141" fontSize="11" fontWeight="700" fill="#fff" textAnchor="middle">{lbl[k]}</text>
+            <text x={x + 50} y="141" fontSize="12" fontWeight="700" fill="#fff" textAnchor="middle">{lbl[k]}</text>
           </g>
         ))}
-        <text x="180" y="185" fontSize="10.5" fill={C.primary} textAnchor="middle">{en?"A2A protocol enables cross-agent collaboration":"A2Aプロトコルがエージェント横断連携を実現"}</text>
+        <text x="180" y="185" fontSize="11.5" fill={C.primary} textAnchor="middle">{en?"A2A protocol enables cross-agent collaboration":"A2Aプロトコルがエージェント横断連携を実現"}</text>
       </svg>
       {sel ? (
         <div style={{ background: C.light, borderRadius: 9, padding: 12 }}>
@@ -191138,8 +191138,8 @@ function TreeNode({ node, depth, defaultOpen }) {
     <div style={{ marginLeft: depth === 0 ? 0 : 14 }}>
       <div onClick={() => hasKids && setOpen(o => !o)}
         style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? "#fff" : C.ink, marginBottom: 3 }}>
-        {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : C.primary }}>{open ? "▼" : "▶"}</span>}
-        {!hasKids && <span style={{ color: C.mid }}>•</span>}
+        {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : nvInk(C.primary, "#ffffff") }}>{open ? "▼" : "▶"}</span>}
+        {!hasKids && <span style={{ color: nvInk(C.mid, "#ffffff", 3) }}>•</span>}
         <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{node.label}</span>
       </div>
       {node.note && (!hasKids || open) && (
@@ -191500,7 +191500,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
             <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
-            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
+            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
           </div>
         </div>
       ) : (
@@ -191574,11 +191574,11 @@ function App() {
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", color: C.ink, background: "#F7FBFF", minHeight: "100vh" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ fontSize: 19, fontWeight: 700 }}>{t.appTitle}</div>
-          <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>{t.appSub}</div>
-          <div style={{ fontSize: 11, opacity: 0.8, marginTop: 4 }}>{t.bankCount(QUIZ_COUNT)} ・ {t.examCount(Object.keys(EXAM_SETS).length)}</div>
+          <div style={{ fontSize: 12, marginTop: 2 }}>{t.appSub}</div>
+          <div style={{ fontSize: 11, marginTop: 4 }}>{t.bankCount(QUIZ_COUNT)} ・ {t.examCount(Object.keys(EXAM_SETS).length)}</div>
         </div>
         <div style={{ display: "flex", background: "rgba(255,255,255,.15)", borderRadius: 20, padding: 3 }}>
           {["ja", "en"].map(l => (
@@ -191611,7 +191611,7 @@ function App() {
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
-          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: nvInk("#ffffff", C.deep), fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ {lang === "en" ? "Top" : "トップへ"}
         </button>
       )}
@@ -191781,7 +191781,7 @@ function Quiz({ onAnswer, lang, t }) {
         </button>
         {slot.meta && (
           <>
-            <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
+            <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
             <span style={{ fontSize: 11, color: "#5a7288" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
             <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
           </>
@@ -192013,7 +192013,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
             <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
-              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
+              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
         )}
@@ -192072,7 +192072,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
+          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
           <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Set select" : "セット選択"}</button>
         </div>
       </div>
@@ -192150,7 +192150,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const chosen = Array.isArray(picks[pos]) ? picks[pos] : [];
     const need = Q.n || Q.correct.length;
     return (<div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, overflow: "hidden" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {en ? (Q.screenEn || Q.screen) : Q.screen}{need > 1 ? (en ? ` (choose ${need})` : `（${need}箇所選択）`) : ""}</div>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {en ? (Q.screenEn || Q.screen) : Q.screen}{need > 1 ? (en ? ` (choose ${need})` : `（${need}箇所選択）`) : ""}</div>
       <div style={{ padding: 10, display: "flex", flexDirection: "column", gap: 6, background: "#f6f8f9" }}>
         {(Q.hotspots || []).map(h => { const on = chosen.includes(h.id); const isC = Q.correct.includes(h.id); let bd = "#b7c3cb", bg = "#fff", col = C.ink; if (submitted) { if (isC) { bd = C.ok; bg = "#E4F6EC"; col = C.ok; } else if (on) { bd = C.ng; bg = "#FBE9E7"; col = C.ng; } } else if (on) { bd = C.primary; bg = C.light; col = C.deep; } return (
           <button key={h.id} onClick={() => !submitted && toggleHot(h.id, need)} disabled={submitted} style={{ textAlign: "left", padding: "10px 12px", borderRadius: 6, border: `1.5px ${(on || (submitted && isC)) ? "solid" : "dashed"} ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13, fontWeight: on ? 700 : 500, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -192240,8 +192240,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 16, fontSize: 13.5, color: INK, cursor: "pointer" }}><input type="checkbox" checked={!!flags[pos]} onChange={e => setFlags(f => ({ ...f, [pos]: e.target.checked }))} style={{ width: 16, height: 16 }} /><span>{en ? "Mark this question for review" : "この問題をあとで見直す"}</span></label>
           </div>
           <div style={{ display: "flex", gap: 16, margin: "16px 0 30px" }}>
-            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
-            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
+            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: nvInk("#ffffff", pos === 0 ? "#9fb4bc" : NAVY, 3), fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
+            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: nvInk("#ffffff", NAVY, 3), fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
           </div>
         </div>
       </div>
@@ -192253,7 +192253,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 12.5, color: "#5a7780" }}>
-        <span><span style={{ background: C.primary, color: "#fff", borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{en ? "Practice" : "演習モード"}</span>{en ? `Set ${setNo} · Q ${pos + 1}/${qs.length}` : `セット${setNo}・問${pos + 1}/${qs.length}`}</span>
+        <span><span style={{ background: C.primary, color: nvInk("#ffffff", C.primary), borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{en ? "Practice" : "演習モード"}</span>{en ? `Set ${setNo} · Q ${pos + 1}/${qs.length}` : `セット${setNo}・問${pos + 1}/${qs.length}`}</span>
         <span>{Q.d} {domName(Q.d, lang)}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginTop: 12 }}>
@@ -192263,29 +192263,29 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderDndBody(Q, submitted)}
-            {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.build) { const bOk = buildRight(Q, picks[pos]); const done = buildComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderBuildBody(Q, submitted)}
-            {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.mx) { const mxOk = mxRight(Q, picks[pos]); const done = mxComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "scenario")}</div>
             {renderMxBody(Q, submitted)}
-            {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.hot) { const hotOk = hotRight(Q, picks[pos]); const done = hotComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderHotBody(Q, submitted)}
-            {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           const isMulti = !!Q.multi; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); const selSet = Array.isArray(sel) ? sel : []; const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isR = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
@@ -192298,8 +192298,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
               let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (i === Q.a) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (i === sel) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } }
               return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
             })}
-            {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>);
         })()}
       </div>
@@ -192339,7 +192339,7 @@ function Review({ lang, t, onAnswer }) {
         </div>
         {list.length > 0 && (
           <button onClick={() => { setOrder(keys); setPos(0); setSel(null); setSessionSalt(Math.floor(Math.random() * 100000)); setPhase("run"); }}
-            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
+            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
             {t.reviewStart}
           </button>
         )}
@@ -192418,7 +192418,7 @@ function Review({ lang, t, onAnswer }) {
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
             {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
-            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
               {pos + 1 >= order.length ? t.reviewToList : t.nextQ}
             </button>
           </div>
@@ -192441,19 +192441,19 @@ function DiagFlow({ lang }) {
         {STEPS.map((s, i) => (
           <div key={i}>
             <div onClick={() => setSel(sel === i ? null : i)}
-              style={{ background: hues[i % hues.length], color: "#fff", borderRadius: 9, padding: "11px 12px", cursor: "pointer",
+              style={{ background: hues[i % hues.length], color: nvInk("#ffffff", hues[i % hues.length]), borderRadius: 9, padding: "11px 12px", cursor: "pointer",
                 border: sel === i ? ("3px solid " + C.ink) : "3px solid transparent", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span style={{ fontWeight: 700, fontSize: 13 }}>{s[0]}</span>
-              <span style={{ fontSize: 11, opacity: .85 }}>{i + 1}</span>
+              <span style={{ fontSize: 11 }}>{i + 1}</span>
             </div>
-            {i < STEPS.length - 1 && <div style={{ textAlign: "center", fontSize: 18, color: C.mid, lineHeight: 1 }}>{"\u2193"}</div>}
+            {i < STEPS.length - 1 && <div style={{ textAlign: "center", fontSize: 18, color: nvInk(C.mid, "#ffffff", 3), lineHeight: 1 }}>{"\u2193"}</div>}
           </div>
         ))}
       </div>
       {OUTS.length > 0 && (
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
           {OUTS.map((o, i) => (
-            <span key={i} style={{ background: toneC[o[1]] || C.primary, color: "#fff", borderRadius: 20, padding: "5px 12px", fontSize: 12, fontWeight: 700 }}>{o[0]}</span>
+            <span key={i} style={{ background: toneC[o[1]] || C.primary, color: nvInk("#ffffff", toneC[o[1]] || C.primary), borderRadius: 20, padding: "5px 12px", fontSize: 12, fontWeight: 700 }}>{o[0]}</span>
           ))}
         </div>
       )}
@@ -192477,8 +192477,8 @@ function DiagCompare({ lang }) {
     <div style={{ overflowX: "auto" }}>
       <div style={{ display: "grid", gridTemplateColumns: "auto 1fr 1fr", fontSize: 12.5, minWidth: 340 }}>
         <div style={{ padding: "8px", borderBottom: ("2px solid " + C.mid) }}></div>
-        <div style={{ padding: "8px", fontWeight: 700, color: "#fff", background: C.primary, borderRadius: "8px 0 0 0", textAlign: "center" }}>{L}</div>
-        <div style={{ padding: "8px", fontWeight: 700, color: "#fff", background: C.deep, borderRadius: "0 8px 0 0", textAlign: "center" }}>{R}</div>
+        <div style={{ padding: "8px", fontWeight: 700, color: nvInk("#ffffff", C.primary), background: C.primary, borderRadius: "8px 0 0 0", textAlign: "center" }}>{L}</div>
+        <div style={{ padding: "8px", fontWeight: 700, color: nvInk("#ffffff", C.deep), background: C.deep, borderRadius: "0 8px 0 0", textAlign: "center" }}>{R}</div>
         {ROWS.map((r, i) => (
           <React.Fragment key={i}>
             <div style={{ padding: "8px", fontWeight: 700, color: C.deep, background: C.light, borderBottom: ("1px solid " + C.mid) }}>{r[0]}</div>
@@ -192499,7 +192499,7 @@ function DiagGrid({ lang }) {
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
       {CARDS.map((c, i) => (
         <div key={i} style={{ border: ("1px solid " + C.mid), borderRadius: 10, overflow: "hidden" }}>
-          <div style={{ background: hues[i % hues.length], color: "#fff", padding: "7px 10px", fontWeight: 700, fontSize: 12.5 }}>{c.t}</div>
+          <div style={{ background: hues[i % hues.length], color: nvInk("#ffffff", hues[i % hues.length]), padding: "7px 10px", fontWeight: 700, fontSize: 12.5 }}>{c.t}</div>
           <div style={{ padding: "8px 10px" }}>
             {c.items.map((it, j) => (
               <div key={j} style={{ fontSize: 12, color: C.ink, padding: "2px 0", lineHeight: 1.5 }}>{"\u2022 "}{it}</div>
@@ -192634,10 +192634,10 @@ function ReqFlow({ lang }) {
         {steps.map((s, i) => (
           <div key={i}>
             <div onClick={() => setSel(sel === i ? null : i)}
-              style={{ background: s[2], color: "#fff", borderRadius: 9, padding: "11px 12px", cursor: "pointer",
+              style={{ background: s[2], color: nvInk("#ffffff", s[2]), borderRadius: 9, padding: "11px 12px", cursor: "pointer",
                 border: sel === i ? `3px solid ${C.ink}` : "3px solid transparent", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span style={{ fontWeight: 700, fontSize: 13 }}>{s[0]}</span>
-              <span style={{ fontSize: 11, opacity: .85 }}>{i + 1}</span>
+              <span style={{ fontSize: 11 }}>{i + 1}</span>
             </div>
             {i < steps.length - 1 && <div style={{ textAlign: "center", fontSize: 18, color: C.primary, lineHeight: 1 }}>↓</div>}
           </div>
@@ -192769,7 +192769,7 @@ function IntegrationTree({ lang }) {
           <div style={{ fontSize: 11, color: C.ok, fontWeight: 700 }}>{en?"Conclusion":"結論"}</div>
           <div style={{ fontSize: 16, fontWeight: 800, color: C.deep, margin: "4px 0" }}>{leaf[0]}</div>
           <div style={{ fontSize: 13, lineHeight: 1.5 }}>{leaf[1]}</div>
-          <button onClick={() => setPath([])} style={{ marginTop: 12, padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>{en?"Restart":"最初から"}</button>
+          <button onClick={() => setPath([])} style={{ marginTop: 12, padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 13, cursor: "pointer" }}>{en?"Restart":"最初から"}</button>
         </div>
       )}
     </div>
@@ -192794,7 +192794,7 @@ function ALMFlow({ lang }) {
         {stages.map((s, i) => (
           <div key={i} style={{ display: "flex", alignItems: "center", flex: 1 }}>
             <div onClick={() => setSel(sel === i ? null : i)}
-              style={{ flex: 1, background: s[2], color: "#fff", borderRadius: 9, padding: "14px 8px", textAlign: "center", cursor: "pointer", border: sel === i ? `3px solid ${C.ink}` : "3px solid transparent" }}>
+              style={{ flex: 1, background: s[2], color: nvInk("#ffffff", s[2]), borderRadius: 9, padding: "14px 8px", textAlign: "center", cursor: "pointer", border: sel === i ? `3px solid ${C.ink}` : "3px solid transparent" }}>
               <div style={{ fontSize: 13, fontWeight: 800 }}>{s[0]}</div>
             </div>
             {i < stages.length - 1 && <div style={{ fontSize: 18, color: C.primary, padding: "0 2px" }}>→</div>}
@@ -192828,16 +192828,16 @@ function MultiAgent({ lang }) {
       <svg viewBox="0 0 360 210" style={{ width: "100%" }}>
         <g style={{ cursor: "pointer" }} onClick={() => setSel(sel === "orch" ? null : "orch")}>
           <rect x="125" y="8" width="110" height="40" rx="9" fill={cN.orch} stroke={sel==="orch"?C.ink:"none"} strokeWidth="3" />
-          <text x="180" y="32" fontSize="11.5" fontWeight="700" fill="#fff" textAnchor="middle">{lbl.orch}</text>
+          <text x="180" y="32" fontSize="12.5" fontWeight="700" fill="#fff" textAnchor="middle">{lbl.orch}</text>
         </g>
         {[["cs", 20], ["foundry", 130], ["fabric", 240]].map(([k, x]) => (
           <g key={k} style={{ cursor: "pointer" }} onClick={() => setSel(sel === k ? null : k)}>
             <line x1="180" y1="48" x2={x + 50} y2="115" stroke={C.mid} strokeWidth="2" />
             <rect x={x} y="115" width="100" height="42" rx="9" fill={cN[k]} opacity={sel && sel !== k ? 0.45 : 0.92} stroke={sel===k?C.ink:"none"} strokeWidth="3" />
-            <text x={x + 50} y="141" fontSize="11" fontWeight="700" fill="#fff" textAnchor="middle">{lbl[k]}</text>
+            <text x={x + 50} y="141" fontSize="12" fontWeight="700" fill="#fff" textAnchor="middle">{lbl[k]}</text>
           </g>
         ))}
-        <text x="180" y="185" fontSize="10.5" fill={C.primary} textAnchor="middle">{en?"A2A protocol enables cross-agent collaboration":"A2Aプロトコルがエージェント横断連携を実現"}</text>
+        <text x="180" y="185" fontSize="11.5" fill={C.primary} textAnchor="middle">{en?"A2A protocol enables cross-agent collaboration":"A2Aプロトコルがエージェント横断連携を実現"}</text>
       </svg>
       {sel ? (
         <div style={{ background: C.light, borderRadius: 9, padding: 12 }}>
@@ -192864,8 +192864,8 @@ function TreeNode({ node, depth, defaultOpen }) {
     <div style={{ marginLeft: depth === 0 ? 0 : 14 }}>
       <div onClick={() => hasKids && setOpen(o => !o)}
         style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? "#fff" : C.ink, marginBottom: 3 }}>
-        {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : C.primary }}>{open ? "▼" : "▶"}</span>}
-        {!hasKids && <span style={{ color: C.mid }}>•</span>}
+        {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : nvInk(C.primary, "#ffffff") }}>{open ? "▼" : "▶"}</span>}
+        {!hasKids && <span style={{ color: nvInk(C.mid, "#ffffff", 3) }}>•</span>}
         <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{node.label}</span>
       </div>
       {node.note && (!hasKids || open) && (
@@ -193226,7 +193226,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
             <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
-            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
+            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
           </div>
         </div>
       ) : (
@@ -193300,11 +193300,11 @@ function App() {
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", color: C.ink, background: "#F7FBFF", minHeight: "100vh" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ fontSize: 19, fontWeight: 700 }}>{t.appTitle}</div>
-          <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>{t.appSub}</div>
-          <div style={{ fontSize: 11, opacity: 0.8, marginTop: 4 }}>{t.bankCount(QUIZ_COUNT)} ・ {t.examCount(Object.keys(EXAM_SETS).length)}</div>
+          <div style={{ fontSize: 12, marginTop: 2 }}>{t.appSub}</div>
+          <div style={{ fontSize: 11, marginTop: 4 }}>{t.bankCount(QUIZ_COUNT)} ・ {t.examCount(Object.keys(EXAM_SETS).length)}</div>
         </div>
         <div style={{ display: "flex", background: "rgba(255,255,255,.15)", borderRadius: 20, padding: 3 }}>
           {["ja", "en"].map(l => (
@@ -193337,7 +193337,7 @@ function App() {
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
-          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: nvInk("#ffffff", C.deep), fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ {lang === "en" ? "Top" : "トップへ"}
         </button>
       )}
@@ -193507,7 +193507,7 @@ function Quiz({ onAnswer, lang, t }) {
         </button>
         {slot.meta && (
           <>
-            <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
+            <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
             <span style={{ fontSize: 11, color: "#5a7288" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
             <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
           </>
@@ -193739,7 +193739,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
             <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
-              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
+              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
         )}
@@ -193798,7 +193798,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
+          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
           <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Set select" : "セット選択"}</button>
         </div>
       </div>
@@ -193876,7 +193876,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const chosen = Array.isArray(picks[pos]) ? picks[pos] : [];
     const need = Q.n || Q.correct.length;
     return (<div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, overflow: "hidden" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {en ? (Q.screenEn || Q.screen) : Q.screen}{need > 1 ? (en ? ` (choose ${need})` : `（${need}箇所選択）`) : ""}</div>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {en ? (Q.screenEn || Q.screen) : Q.screen}{need > 1 ? (en ? ` (choose ${need})` : `（${need}箇所選択）`) : ""}</div>
       <div style={{ padding: 10, display: "flex", flexDirection: "column", gap: 6, background: "#f6f8f9" }}>
         {(Q.hotspots || []).map(h => { const on = chosen.includes(h.id); const isC = Q.correct.includes(h.id); let bd = "#b7c3cb", bg = "#fff", col = C.ink; if (submitted) { if (isC) { bd = C.ok; bg = "#E4F6EC"; col = C.ok; } else if (on) { bd = C.ng; bg = "#FBE9E7"; col = C.ng; } } else if (on) { bd = C.primary; bg = C.light; col = C.deep; } return (
           <button key={h.id} onClick={() => !submitted && toggleHot(h.id, need)} disabled={submitted} style={{ textAlign: "left", padding: "10px 12px", borderRadius: 6, border: `1.5px ${(on || (submitted && isC)) ? "solid" : "dashed"} ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13, fontWeight: on ? 700 : 500, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -193966,8 +193966,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 16, fontSize: 13.5, color: INK, cursor: "pointer" }}><input type="checkbox" checked={!!flags[pos]} onChange={e => setFlags(f => ({ ...f, [pos]: e.target.checked }))} style={{ width: 16, height: 16 }} /><span>{en ? "Mark this question for review" : "この問題をあとで見直す"}</span></label>
           </div>
           <div style={{ display: "flex", gap: 16, margin: "16px 0 30px" }}>
-            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
-            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
+            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: nvInk("#ffffff", pos === 0 ? "#9fb4bc" : NAVY, 3), fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
+            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: nvInk("#ffffff", NAVY, 3), fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
           </div>
         </div>
       </div>
@@ -193979,7 +193979,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 12.5, color: "#5a7780" }}>
-        <span><span style={{ background: C.primary, color: "#fff", borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{en ? "Practice" : "演習モード"}</span>{en ? `Set ${setNo} · Q ${pos + 1}/${qs.length}` : `セット${setNo}・問${pos + 1}/${qs.length}`}</span>
+        <span><span style={{ background: C.primary, color: nvInk("#ffffff", C.primary), borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{en ? "Practice" : "演習モード"}</span>{en ? `Set ${setNo} · Q ${pos + 1}/${qs.length}` : `セット${setNo}・問${pos + 1}/${qs.length}`}</span>
         <span>{Q.d} {domName(Q.d, lang)}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginTop: 12 }}>
@@ -193989,29 +193989,29 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderDndBody(Q, submitted)}
-            {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.build) { const bOk = buildRight(Q, picks[pos]); const done = buildComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderBuildBody(Q, submitted)}
-            {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.mx) { const mxOk = mxRight(Q, picks[pos]); const done = mxComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "scenario")}</div>
             {renderMxBody(Q, submitted)}
-            {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.hot) { const hotOk = hotRight(Q, picks[pos]); const done = hotComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderHotBody(Q, submitted)}
-            {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           const isMulti = !!Q.multi; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); const selSet = Array.isArray(sel) ? sel : []; const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isR = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
@@ -194024,8 +194024,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
               let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (i === Q.a) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (i === sel) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } }
               return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
             })}
-            {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>);
         })()}
       </div>
@@ -194065,7 +194065,7 @@ function Review({ lang, t, onAnswer }) {
         </div>
         {list.length > 0 && (
           <button onClick={() => { setOrder(keys); setPos(0); setSel(null); setSessionSalt(Math.floor(Math.random() * 100000)); setPhase("run"); }}
-            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
+            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
             {t.reviewStart}
           </button>
         )}
@@ -194144,7 +194144,7 @@ function Review({ lang, t, onAnswer }) {
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
             {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
-            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
               {pos + 1 >= order.length ? t.reviewToList : t.nextQ}
             </button>
           </div>
@@ -194167,19 +194167,19 @@ function DiagFlow({ lang }) {
         {STEPS.map((s, i) => (
           <div key={i}>
             <div onClick={() => setSel(sel === i ? null : i)}
-              style={{ background: hues[i % hues.length], color: "#fff", borderRadius: 9, padding: "11px 12px", cursor: "pointer",
+              style={{ background: hues[i % hues.length], color: nvInk("#ffffff", hues[i % hues.length]), borderRadius: 9, padding: "11px 12px", cursor: "pointer",
                 border: sel === i ? ("3px solid " + C.ink) : "3px solid transparent", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span style={{ fontWeight: 700, fontSize: 13 }}>{s[0]}</span>
-              <span style={{ fontSize: 11, opacity: .85 }}>{i + 1}</span>
+              <span style={{ fontSize: 11 }}>{i + 1}</span>
             </div>
-            {i < STEPS.length - 1 && <div style={{ textAlign: "center", fontSize: 18, color: C.mid, lineHeight: 1 }}>{"\u2193"}</div>}
+            {i < STEPS.length - 1 && <div style={{ textAlign: "center", fontSize: 18, color: nvInk(C.mid, "#ffffff", 3), lineHeight: 1 }}>{"\u2193"}</div>}
           </div>
         ))}
       </div>
       {OUTS.length > 0 && (
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
           {OUTS.map((o, i) => (
-            <span key={i} style={{ background: toneC[o[1]] || C.primary, color: "#fff", borderRadius: 20, padding: "5px 12px", fontSize: 12, fontWeight: 700 }}>{o[0]}</span>
+            <span key={i} style={{ background: toneC[o[1]] || C.primary, color: nvInk("#ffffff", toneC[o[1]] || C.primary), borderRadius: 20, padding: "5px 12px", fontSize: 12, fontWeight: 700 }}>{o[0]}</span>
           ))}
         </div>
       )}
@@ -194203,8 +194203,8 @@ function DiagCompare({ lang }) {
     <div style={{ overflowX: "auto" }}>
       <div style={{ display: "grid", gridTemplateColumns: "auto 1fr 1fr", fontSize: 12.5, minWidth: 340 }}>
         <div style={{ padding: "8px", borderBottom: ("2px solid " + C.mid) }}></div>
-        <div style={{ padding: "8px", fontWeight: 700, color: "#fff", background: C.primary, borderRadius: "8px 0 0 0", textAlign: "center" }}>{L}</div>
-        <div style={{ padding: "8px", fontWeight: 700, color: "#fff", background: C.deep, borderRadius: "0 8px 0 0", textAlign: "center" }}>{R}</div>
+        <div style={{ padding: "8px", fontWeight: 700, color: nvInk("#ffffff", C.primary), background: C.primary, borderRadius: "8px 0 0 0", textAlign: "center" }}>{L}</div>
+        <div style={{ padding: "8px", fontWeight: 700, color: nvInk("#ffffff", C.deep), background: C.deep, borderRadius: "0 8px 0 0", textAlign: "center" }}>{R}</div>
         {ROWS.map((r, i) => (
           <React.Fragment key={i}>
             <div style={{ padding: "8px", fontWeight: 700, color: C.deep, background: C.light, borderBottom: ("1px solid " + C.mid) }}>{r[0]}</div>
@@ -194225,7 +194225,7 @@ function DiagGrid({ lang }) {
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
       {CARDS.map((c, i) => (
         <div key={i} style={{ border: ("1px solid " + C.mid), borderRadius: 10, overflow: "hidden" }}>
-          <div style={{ background: hues[i % hues.length], color: "#fff", padding: "7px 10px", fontWeight: 700, fontSize: 12.5 }}>{c.t}</div>
+          <div style={{ background: hues[i % hues.length], color: nvInk("#ffffff", hues[i % hues.length]), padding: "7px 10px", fontWeight: 700, fontSize: 12.5 }}>{c.t}</div>
           <div style={{ padding: "8px 10px" }}>
             {c.items.map((it, j) => (
               <div key={j} style={{ fontSize: 12, color: C.ink, padding: "2px 0", lineHeight: 1.5 }}>{"\u2022 "}{it}</div>
@@ -194360,10 +194360,10 @@ function ReqFlow({ lang }) {
         {steps.map((s, i) => (
           <div key={i}>
             <div onClick={() => setSel(sel === i ? null : i)}
-              style={{ background: s[2], color: "#fff", borderRadius: 9, padding: "11px 12px", cursor: "pointer",
+              style={{ background: s[2], color: nvInk("#ffffff", s[2]), borderRadius: 9, padding: "11px 12px", cursor: "pointer",
                 border: sel === i ? `3px solid ${C.ink}` : "3px solid transparent", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span style={{ fontWeight: 700, fontSize: 13 }}>{s[0]}</span>
-              <span style={{ fontSize: 11, opacity: .85 }}>{i + 1}</span>
+              <span style={{ fontSize: 11 }}>{i + 1}</span>
             </div>
             {i < steps.length - 1 && <div style={{ textAlign: "center", fontSize: 18, color: C.primary, lineHeight: 1 }}>↓</div>}
           </div>
@@ -194495,7 +194495,7 @@ function IntegrationTree({ lang }) {
           <div style={{ fontSize: 11, color: C.ok, fontWeight: 700 }}>{en?"Conclusion":"結論"}</div>
           <div style={{ fontSize: 16, fontWeight: 800, color: C.deep, margin: "4px 0" }}>{leaf[0]}</div>
           <div style={{ fontSize: 13, lineHeight: 1.5 }}>{leaf[1]}</div>
-          <button onClick={() => setPath([])} style={{ marginTop: 12, padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>{en?"Restart":"最初から"}</button>
+          <button onClick={() => setPath([])} style={{ marginTop: 12, padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 13, cursor: "pointer" }}>{en?"Restart":"最初から"}</button>
         </div>
       )}
     </div>
@@ -194520,7 +194520,7 @@ function ALMFlow({ lang }) {
         {stages.map((s, i) => (
           <div key={i} style={{ display: "flex", alignItems: "center", flex: 1 }}>
             <div onClick={() => setSel(sel === i ? null : i)}
-              style={{ flex: 1, background: s[2], color: "#fff", borderRadius: 9, padding: "14px 8px", textAlign: "center", cursor: "pointer", border: sel === i ? `3px solid ${C.ink}` : "3px solid transparent" }}>
+              style={{ flex: 1, background: s[2], color: nvInk("#ffffff", s[2]), borderRadius: 9, padding: "14px 8px", textAlign: "center", cursor: "pointer", border: sel === i ? `3px solid ${C.ink}` : "3px solid transparent" }}>
               <div style={{ fontSize: 13, fontWeight: 800 }}>{s[0]}</div>
             </div>
             {i < stages.length - 1 && <div style={{ fontSize: 18, color: C.primary, padding: "0 2px" }}>→</div>}
@@ -194554,16 +194554,16 @@ function MultiAgent({ lang }) {
       <svg viewBox="0 0 360 210" style={{ width: "100%" }}>
         <g style={{ cursor: "pointer" }} onClick={() => setSel(sel === "orch" ? null : "orch")}>
           <rect x="125" y="8" width="110" height="40" rx="9" fill={cN.orch} stroke={sel==="orch"?C.ink:"none"} strokeWidth="3" />
-          <text x="180" y="32" fontSize="11.5" fontWeight="700" fill="#fff" textAnchor="middle">{lbl.orch}</text>
+          <text x="180" y="32" fontSize="12.5" fontWeight="700" fill="#fff" textAnchor="middle">{lbl.orch}</text>
         </g>
         {[["cs", 20], ["foundry", 130], ["fabric", 240]].map(([k, x]) => (
           <g key={k} style={{ cursor: "pointer" }} onClick={() => setSel(sel === k ? null : k)}>
             <line x1="180" y1="48" x2={x + 50} y2="115" stroke={C.mid} strokeWidth="2" />
             <rect x={x} y="115" width="100" height="42" rx="9" fill={cN[k]} opacity={sel && sel !== k ? 0.45 : 0.92} stroke={sel===k?C.ink:"none"} strokeWidth="3" />
-            <text x={x + 50} y="141" fontSize="11" fontWeight="700" fill="#fff" textAnchor="middle">{lbl[k]}</text>
+            <text x={x + 50} y="141" fontSize="12" fontWeight="700" fill="#fff" textAnchor="middle">{lbl[k]}</text>
           </g>
         ))}
-        <text x="180" y="185" fontSize="10.5" fill={C.primary} textAnchor="middle">{en?"A2A protocol enables cross-agent collaboration":"A2Aプロトコルがエージェント横断連携を実現"}</text>
+        <text x="180" y="185" fontSize="11.5" fill={C.primary} textAnchor="middle">{en?"A2A protocol enables cross-agent collaboration":"A2Aプロトコルがエージェント横断連携を実現"}</text>
       </svg>
       {sel ? (
         <div style={{ background: C.light, borderRadius: 9, padding: 12 }}>
@@ -194590,8 +194590,8 @@ function TreeNode({ node, depth, defaultOpen }) {
     <div style={{ marginLeft: depth === 0 ? 0 : 14 }}>
       <div onClick={() => hasKids && setOpen(o => !o)}
         style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? "#fff" : C.ink, marginBottom: 3 }}>
-        {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : C.primary }}>{open ? "▼" : "▶"}</span>}
-        {!hasKids && <span style={{ color: C.mid }}>•</span>}
+        {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : nvInk(C.primary, "#ffffff") }}>{open ? "▼" : "▶"}</span>}
+        {!hasKids && <span style={{ color: nvInk(C.mid, "#ffffff", 3) }}>•</span>}
         <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{node.label}</span>
       </div>
       {node.note && (!hasKids || open) && (
@@ -194944,7 +194944,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
             <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
-            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
+            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
           </div>
         </div>
       ) : (
@@ -195018,11 +195018,11 @@ function App() {
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", color: C.ink, background: "#F7FBFF", minHeight: "100vh" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ fontSize: 19, fontWeight: 700 }}>{t.appTitle}</div>
-          <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>{t.appSub}</div>
-          <div style={{ fontSize: 11, opacity: 0.8, marginTop: 4 }}>{t.bankCount(QUIZ_COUNT)} ・ {t.examCount(Object.keys(EXAM_SETS).length)}</div>
+          <div style={{ fontSize: 12, marginTop: 2 }}>{t.appSub}</div>
+          <div style={{ fontSize: 11, marginTop: 4 }}>{t.bankCount(QUIZ_COUNT)} ・ {t.examCount(Object.keys(EXAM_SETS).length)}</div>
         </div>
         <div style={{ display: "flex", background: "rgba(255,255,255,.15)", borderRadius: 20, padding: 3 }}>
           {["ja", "en"].map(l => (
@@ -195055,7 +195055,7 @@ function App() {
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
-          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: nvInk("#ffffff", C.deep), fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ {lang === "en" ? "Top" : "トップへ"}
         </button>
       )}
@@ -195225,7 +195225,7 @@ function Quiz({ onAnswer, lang, t }) {
         </button>
         {slot.meta && (
           <>
-            <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
+            <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
             <span style={{ fontSize: 11, color: "#5a7288" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
             <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
           </>
@@ -195457,7 +195457,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
             <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
-              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
+              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
         )}
@@ -195516,7 +195516,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
+          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
           <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Set select" : "セット選択"}</button>
         </div>
       </div>
@@ -195594,7 +195594,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const chosen = Array.isArray(picks[pos]) ? picks[pos] : [];
     const need = Q.n || Q.correct.length;
     return (<div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, overflow: "hidden" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {en ? (Q.screenEn || Q.screen) : Q.screen}{need > 1 ? (en ? ` (choose ${need})` : `（${need}箇所選択）`) : ""}</div>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {en ? (Q.screenEn || Q.screen) : Q.screen}{need > 1 ? (en ? ` (choose ${need})` : `（${need}箇所選択）`) : ""}</div>
       <div style={{ padding: 10, display: "flex", flexDirection: "column", gap: 6, background: "#f6f8f9" }}>
         {(Q.hotspots || []).map(h => { const on = chosen.includes(h.id); const isC = Q.correct.includes(h.id); let bd = "#b7c3cb", bg = "#fff", col = C.ink; if (submitted) { if (isC) { bd = C.ok; bg = "#E4F6EC"; col = C.ok; } else if (on) { bd = C.ng; bg = "#FBE9E7"; col = C.ng; } } else if (on) { bd = C.primary; bg = C.light; col = C.deep; } return (
           <button key={h.id} onClick={() => !submitted && toggleHot(h.id, need)} disabled={submitted} style={{ textAlign: "left", padding: "10px 12px", borderRadius: 6, border: `1.5px ${(on || (submitted && isC)) ? "solid" : "dashed"} ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13, fontWeight: on ? 700 : 500, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -195684,8 +195684,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 16, fontSize: 13.5, color: INK, cursor: "pointer" }}><input type="checkbox" checked={!!flags[pos]} onChange={e => setFlags(f => ({ ...f, [pos]: e.target.checked }))} style={{ width: 16, height: 16 }} /><span>{en ? "Mark this question for review" : "この問題をあとで見直す"}</span></label>
           </div>
           <div style={{ display: "flex", gap: 16, margin: "16px 0 30px" }}>
-            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
-            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
+            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: nvInk("#ffffff", pos === 0 ? "#9fb4bc" : NAVY, 3), fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
+            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: nvInk("#ffffff", NAVY, 3), fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
           </div>
         </div>
       </div>
@@ -195697,7 +195697,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 12.5, color: "#5a7780" }}>
-        <span><span style={{ background: C.primary, color: "#fff", borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{en ? "Practice" : "演習モード"}</span>{en ? `Set ${setNo} · Q ${pos + 1}/${qs.length}` : `セット${setNo}・問${pos + 1}/${qs.length}`}</span>
+        <span><span style={{ background: C.primary, color: nvInk("#ffffff", C.primary), borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{en ? "Practice" : "演習モード"}</span>{en ? `Set ${setNo} · Q ${pos + 1}/${qs.length}` : `セット${setNo}・問${pos + 1}/${qs.length}`}</span>
         <span>{Q.d} {domName(Q.d, lang)}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginTop: 12 }}>
@@ -195707,29 +195707,29 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderDndBody(Q, submitted)}
-            {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.build) { const bOk = buildRight(Q, picks[pos]); const done = buildComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderBuildBody(Q, submitted)}
-            {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.mx) { const mxOk = mxRight(Q, picks[pos]); const done = mxComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "scenario")}</div>
             {renderMxBody(Q, submitted)}
-            {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.hot) { const hotOk = hotRight(Q, picks[pos]); const done = hotComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderHotBody(Q, submitted)}
-            {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           const isMulti = !!Q.multi; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); const selSet = Array.isArray(sel) ? sel : []; const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isR = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
@@ -195742,8 +195742,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
               let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (i === Q.a) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (i === sel) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } }
               return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
             })}
-            {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>);
         })()}
       </div>
@@ -195783,7 +195783,7 @@ function Review({ lang, t, onAnswer }) {
         </div>
         {list.length > 0 && (
           <button onClick={() => { setOrder(keys); setPos(0); setSel(null); setSessionSalt(Math.floor(Math.random() * 100000)); setPhase("run"); }}
-            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
+            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
             {t.reviewStart}
           </button>
         )}
@@ -195862,7 +195862,7 @@ function Review({ lang, t, onAnswer }) {
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
             {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
-            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
               {pos + 1 >= order.length ? t.reviewToList : t.nextQ}
             </button>
           </div>
@@ -196244,7 +196244,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
             <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
-            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
+            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
           </div>
         </div>
       ) : (
@@ -196318,11 +196318,11 @@ function App() {
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", color: C.ink, background: "#F7FBFF", minHeight: "100vh" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ fontSize: 19, fontWeight: 700 }}>{t.appTitle}</div>
-          <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>{t.appSub}</div>
-          <div style={{ fontSize: 11, opacity: 0.8, marginTop: 4 }}>{t.bankCount(QUIZ_COUNT)} ・ {t.examCount(Object.keys(EXAM_SETS).length)}</div>
+          <div style={{ fontSize: 12, marginTop: 2 }}>{t.appSub}</div>
+          <div style={{ fontSize: 11, marginTop: 4 }}>{t.bankCount(QUIZ_COUNT)} ・ {t.examCount(Object.keys(EXAM_SETS).length)}</div>
         </div>
         <div style={{ display: "flex", background: "rgba(255,255,255,.15)", borderRadius: 20, padding: 3 }}>
           {["ja", "en"].map(l => (
@@ -196355,7 +196355,7 @@ function App() {
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
-          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: nvInk("#ffffff", C.deep), fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ {lang === "en" ? "Top" : "トップへ"}
         </button>
       )}
@@ -196525,7 +196525,7 @@ function Quiz({ onAnswer, lang, t }) {
         </button>
         {slot.meta && (
           <>
-            <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
+            <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
             <span style={{ fontSize: 11, color: "#5a7288" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
             <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
           </>
@@ -196757,7 +196757,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
             <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
-              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
+              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
         )}
@@ -196816,7 +196816,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
+          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
           <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Set select" : "セット選択"}</button>
         </div>
       </div>
@@ -196894,7 +196894,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const chosen = Array.isArray(picks[pos]) ? picks[pos] : [];
     const need = Q.n || Q.correct.length;
     return (<div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, overflow: "hidden" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {en ? (Q.screenEn || Q.screen) : Q.screen}{need > 1 ? (en ? ` (choose ${need})` : `（${need}箇所選択）`) : ""}</div>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {en ? (Q.screenEn || Q.screen) : Q.screen}{need > 1 ? (en ? ` (choose ${need})` : `（${need}箇所選択）`) : ""}</div>
       <div style={{ padding: 10, display: "flex", flexDirection: "column", gap: 6, background: "#f6f8f9" }}>
         {(Q.hotspots || []).map(h => { const on = chosen.includes(h.id); const isC = Q.correct.includes(h.id); let bd = "#b7c3cb", bg = "#fff", col = C.ink; if (submitted) { if (isC) { bd = C.ok; bg = "#E4F6EC"; col = C.ok; } else if (on) { bd = C.ng; bg = "#FBE9E7"; col = C.ng; } } else if (on) { bd = C.primary; bg = C.light; col = C.deep; } return (
           <button key={h.id} onClick={() => !submitted && toggleHot(h.id, need)} disabled={submitted} style={{ textAlign: "left", padding: "10px 12px", borderRadius: 6, border: `1.5px ${(on || (submitted && isC)) ? "solid" : "dashed"} ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13, fontWeight: on ? 700 : 500, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -196984,8 +196984,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 16, fontSize: 13.5, color: INK, cursor: "pointer" }}><input type="checkbox" checked={!!flags[pos]} onChange={e => setFlags(f => ({ ...f, [pos]: e.target.checked }))} style={{ width: 16, height: 16 }} /><span>{en ? "Mark this question for review" : "この問題をあとで見直す"}</span></label>
           </div>
           <div style={{ display: "flex", gap: 16, margin: "16px 0 30px" }}>
-            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
-            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
+            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: nvInk("#ffffff", pos === 0 ? "#9fb4bc" : NAVY, 3), fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
+            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: nvInk("#ffffff", NAVY, 3), fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
           </div>
         </div>
       </div>
@@ -196997,7 +196997,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 12.5, color: "#5a7780" }}>
-        <span><span style={{ background: C.primary, color: "#fff", borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{en ? "Practice" : "演習モード"}</span>{en ? `Set ${setNo} · Q ${pos + 1}/${qs.length}` : `セット${setNo}・問${pos + 1}/${qs.length}`}</span>
+        <span><span style={{ background: C.primary, color: nvInk("#ffffff", C.primary), borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{en ? "Practice" : "演習モード"}</span>{en ? `Set ${setNo} · Q ${pos + 1}/${qs.length}` : `セット${setNo}・問${pos + 1}/${qs.length}`}</span>
         <span>{Q.d} {domName(Q.d, lang)}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginTop: 12 }}>
@@ -197007,29 +197007,29 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderDndBody(Q, submitted)}
-            {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.build) { const bOk = buildRight(Q, picks[pos]); const done = buildComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderBuildBody(Q, submitted)}
-            {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.mx) { const mxOk = mxRight(Q, picks[pos]); const done = mxComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "scenario")}</div>
             {renderMxBody(Q, submitted)}
-            {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.hot) { const hotOk = hotRight(Q, picks[pos]); const done = hotComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderHotBody(Q, submitted)}
-            {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           const isMulti = !!Q.multi; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); const selSet = Array.isArray(sel) ? sel : []; const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isR = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
@@ -197042,8 +197042,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
               let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (i === Q.a) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (i === sel) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } }
               return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
             })}
-            {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>);
         })()}
       </div>
@@ -197083,7 +197083,7 @@ function Review({ lang, t, onAnswer }) {
         </div>
         {list.length > 0 && (
           <button onClick={() => { setOrder(keys); setPos(0); setSel(null); setSessionSalt(Math.floor(Math.random() * 100000)); setPhase("run"); }}
-            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
+            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
             {t.reviewStart}
           </button>
         )}
@@ -197162,7 +197162,7 @@ function Review({ lang, t, onAnswer }) {
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
             {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
-            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
               {pos + 1 >= order.length ? t.reviewToList : t.nextQ}
             </button>
           </div>
@@ -197542,7 +197542,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
             <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
-            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
+            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
           </div>
         </div>
       ) : (
@@ -197616,11 +197616,11 @@ function App() {
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", color: C.ink, background: "#F7FBFF", minHeight: "100vh" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ fontSize: 19, fontWeight: 700 }}>{t.appTitle}</div>
-          <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>{t.appSub}</div>
-          <div style={{ fontSize: 11, opacity: 0.8, marginTop: 4 }}>{t.bankCount(QUIZ_COUNT)} ・ {t.examCount(Object.keys(EXAM_SETS).length)}</div>
+          <div style={{ fontSize: 12, marginTop: 2 }}>{t.appSub}</div>
+          <div style={{ fontSize: 11, marginTop: 4 }}>{t.bankCount(QUIZ_COUNT)} ・ {t.examCount(Object.keys(EXAM_SETS).length)}</div>
         </div>
         <div style={{ display: "flex", background: "rgba(255,255,255,.15)", borderRadius: 20, padding: 3 }}>
           {["ja", "en"].map(l => (
@@ -197653,7 +197653,7 @@ function App() {
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
-          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: nvInk("#ffffff", C.deep), fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ {lang === "en" ? "Top" : "トップへ"}
         </button>
       )}
@@ -197823,7 +197823,7 @@ function Quiz({ onAnswer, lang, t }) {
         </button>
         {slot.meta && (
           <>
-            <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
+            <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
             <span style={{ fontSize: 11, color: "#5a7288" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
             <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
           </>
@@ -198055,7 +198055,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
             <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
-              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
+              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
         )}
@@ -198114,7 +198114,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
+          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
           <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Set select" : "セット選択"}</button>
         </div>
       </div>
@@ -198192,7 +198192,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const chosen = Array.isArray(picks[pos]) ? picks[pos] : [];
     const need = Q.n || Q.correct.length;
     return (<div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, overflow: "hidden" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {en ? (Q.screenEn || Q.screen) : Q.screen}{need > 1 ? (en ? ` (choose ${need})` : `（${need}箇所選択）`) : ""}</div>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {en ? (Q.screenEn || Q.screen) : Q.screen}{need > 1 ? (en ? ` (choose ${need})` : `（${need}箇所選択）`) : ""}</div>
       <div style={{ padding: 10, display: "flex", flexDirection: "column", gap: 6, background: "#f6f8f9" }}>
         {(Q.hotspots || []).map(h => { const on = chosen.includes(h.id); const isC = Q.correct.includes(h.id); let bd = "#b7c3cb", bg = "#fff", col = C.ink; if (submitted) { if (isC) { bd = C.ok; bg = "#E4F6EC"; col = C.ok; } else if (on) { bd = C.ng; bg = "#FBE9E7"; col = C.ng; } } else if (on) { bd = C.primary; bg = C.light; col = C.deep; } return (
           <button key={h.id} onClick={() => !submitted && toggleHot(h.id, need)} disabled={submitted} style={{ textAlign: "left", padding: "10px 12px", borderRadius: 6, border: `1.5px ${(on || (submitted && isC)) ? "solid" : "dashed"} ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13, fontWeight: on ? 700 : 500, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -198282,8 +198282,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 16, fontSize: 13.5, color: INK, cursor: "pointer" }}><input type="checkbox" checked={!!flags[pos]} onChange={e => setFlags(f => ({ ...f, [pos]: e.target.checked }))} style={{ width: 16, height: 16 }} /><span>{en ? "Mark this question for review" : "この問題をあとで見直す"}</span></label>
           </div>
           <div style={{ display: "flex", gap: 16, margin: "16px 0 30px" }}>
-            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
-            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
+            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: nvInk("#ffffff", pos === 0 ? "#9fb4bc" : NAVY, 3), fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
+            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: nvInk("#ffffff", NAVY, 3), fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
           </div>
         </div>
       </div>
@@ -198295,7 +198295,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 12.5, color: "#5a7780" }}>
-        <span><span style={{ background: C.primary, color: "#fff", borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{en ? "Practice" : "演習モード"}</span>{en ? `Set ${setNo} · Q ${pos + 1}/${qs.length}` : `セット${setNo}・問${pos + 1}/${qs.length}`}</span>
+        <span><span style={{ background: C.primary, color: nvInk("#ffffff", C.primary), borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{en ? "Practice" : "演習モード"}</span>{en ? `Set ${setNo} · Q ${pos + 1}/${qs.length}` : `セット${setNo}・問${pos + 1}/${qs.length}`}</span>
         <span>{Q.d} {domName(Q.d, lang)}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginTop: 12 }}>
@@ -198305,29 +198305,29 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderDndBody(Q, submitted)}
-            {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.build) { const bOk = buildRight(Q, picks[pos]); const done = buildComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderBuildBody(Q, submitted)}
-            {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.mx) { const mxOk = mxRight(Q, picks[pos]); const done = mxComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "scenario")}</div>
             {renderMxBody(Q, submitted)}
-            {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.hot) { const hotOk = hotRight(Q, picks[pos]); const done = hotComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderHotBody(Q, submitted)}
-            {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           const isMulti = !!Q.multi; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); const selSet = Array.isArray(sel) ? sel : []; const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isR = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
@@ -198340,8 +198340,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
               let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (i === Q.a) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (i === sel) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } }
               return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
             })}
-            {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>);
         })()}
       </div>
@@ -198381,7 +198381,7 @@ function Review({ lang, t, onAnswer }) {
         </div>
         {list.length > 0 && (
           <button onClick={() => { setOrder(keys); setPos(0); setSel(null); setSessionSalt(Math.floor(Math.random() * 100000)); setPhase("run"); }}
-            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
+            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
             {t.reviewStart}
           </button>
         )}
@@ -198460,7 +198460,7 @@ function Review({ lang, t, onAnswer }) {
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
             {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
-            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
               {pos + 1 >= order.length ? t.reviewToList : t.nextQ}
             </button>
           </div>
@@ -198840,7 +198840,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
             <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
-            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
+            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
           </div>
         </div>
       ) : (
@@ -198914,11 +198914,11 @@ function App() {
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", color: C.ink, background: "#F7FBFF", minHeight: "100vh" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ fontSize: 19, fontWeight: 700 }}>{t.appTitle}</div>
-          <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>{t.appSub}</div>
-          <div style={{ fontSize: 11, opacity: 0.8, marginTop: 4 }}>{t.bankCount(QUIZ_COUNT)} ・ {t.examCount(Object.keys(EXAM_SETS).length)}</div>
+          <div style={{ fontSize: 12, marginTop: 2 }}>{t.appSub}</div>
+          <div style={{ fontSize: 11, marginTop: 4 }}>{t.bankCount(QUIZ_COUNT)} ・ {t.examCount(Object.keys(EXAM_SETS).length)}</div>
         </div>
         <div style={{ display: "flex", background: "rgba(255,255,255,.15)", borderRadius: 20, padding: 3 }}>
           {["ja", "en"].map(l => (
@@ -198951,7 +198951,7 @@ function App() {
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
-          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: nvInk("#ffffff", C.deep), fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ {lang === "en" ? "Top" : "トップへ"}
         </button>
       )}
@@ -199121,7 +199121,7 @@ function Quiz({ onAnswer, lang, t }) {
         </button>
         {slot.meta && (
           <>
-            <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
+            <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
             <span style={{ fontSize: 11, color: "#5a7288" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
             <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
           </>
@@ -199353,7 +199353,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
             <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
-              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
+              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
         )}
@@ -199412,7 +199412,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
+          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
           <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Set select" : "セット選択"}</button>
         </div>
       </div>
@@ -199490,7 +199490,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const chosen = Array.isArray(picks[pos]) ? picks[pos] : [];
     const need = Q.n || Q.correct.length;
     return (<div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, overflow: "hidden" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {en ? (Q.screenEn || Q.screen) : Q.screen}{need > 1 ? (en ? ` (choose ${need})` : `（${need}箇所選択）`) : ""}</div>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {en ? (Q.screenEn || Q.screen) : Q.screen}{need > 1 ? (en ? ` (choose ${need})` : `（${need}箇所選択）`) : ""}</div>
       <div style={{ padding: 10, display: "flex", flexDirection: "column", gap: 6, background: "#f6f8f9" }}>
         {(Q.hotspots || []).map(h => { const on = chosen.includes(h.id); const isC = Q.correct.includes(h.id); let bd = "#b7c3cb", bg = "#fff", col = C.ink; if (submitted) { if (isC) { bd = C.ok; bg = "#E4F6EC"; col = C.ok; } else if (on) { bd = C.ng; bg = "#FBE9E7"; col = C.ng; } } else if (on) { bd = C.primary; bg = C.light; col = C.deep; } return (
           <button key={h.id} onClick={() => !submitted && toggleHot(h.id, need)} disabled={submitted} style={{ textAlign: "left", padding: "10px 12px", borderRadius: 6, border: `1.5px ${(on || (submitted && isC)) ? "solid" : "dashed"} ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13, fontWeight: on ? 700 : 500, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -199580,8 +199580,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 16, fontSize: 13.5, color: INK, cursor: "pointer" }}><input type="checkbox" checked={!!flags[pos]} onChange={e => setFlags(f => ({ ...f, [pos]: e.target.checked }))} style={{ width: 16, height: 16 }} /><span>{en ? "Mark this question for review" : "この問題をあとで見直す"}</span></label>
           </div>
           <div style={{ display: "flex", gap: 16, margin: "16px 0 30px" }}>
-            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
-            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
+            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: nvInk("#ffffff", pos === 0 ? "#9fb4bc" : NAVY, 3), fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
+            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: nvInk("#ffffff", NAVY, 3), fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
           </div>
         </div>
       </div>
@@ -199593,7 +199593,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 12.5, color: "#5a7780" }}>
-        <span><span style={{ background: C.primary, color: "#fff", borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{en ? "Practice" : "演習モード"}</span>{en ? `Set ${setNo} · Q ${pos + 1}/${qs.length}` : `セット${setNo}・問${pos + 1}/${qs.length}`}</span>
+        <span><span style={{ background: C.primary, color: nvInk("#ffffff", C.primary), borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{en ? "Practice" : "演習モード"}</span>{en ? `Set ${setNo} · Q ${pos + 1}/${qs.length}` : `セット${setNo}・問${pos + 1}/${qs.length}`}</span>
         <span>{Q.d} {domName(Q.d, lang)}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginTop: 12 }}>
@@ -199603,29 +199603,29 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderDndBody(Q, submitted)}
-            {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.build) { const bOk = buildRight(Q, picks[pos]); const done = buildComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderBuildBody(Q, submitted)}
-            {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.mx) { const mxOk = mxRight(Q, picks[pos]); const done = mxComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "scenario")}</div>
             {renderMxBody(Q, submitted)}
-            {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.hot) { const hotOk = hotRight(Q, picks[pos]); const done = hotComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderHotBody(Q, submitted)}
-            {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           const isMulti = !!Q.multi; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); const selSet = Array.isArray(sel) ? sel : []; const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isR = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
@@ -199638,8 +199638,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
               let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (i === Q.a) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (i === sel) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } }
               return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
             })}
-            {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>);
         })()}
       </div>
@@ -199679,7 +199679,7 @@ function Review({ lang, t, onAnswer }) {
         </div>
         {list.length > 0 && (
           <button onClick={() => { setOrder(keys); setPos(0); setSel(null); setSessionSalt(Math.floor(Math.random() * 100000)); setPhase("run"); }}
-            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
+            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
             {t.reviewStart}
           </button>
         )}
@@ -199758,7 +199758,7 @@ function Review({ lang, t, onAnswer }) {
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
             {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
-            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
               {pos + 1 >= order.length ? t.reviewToList : t.nextQ}
             </button>
           </div>
@@ -200124,7 +200124,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
             <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
-            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
+            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
           </div>
         </div>
       ) : (
@@ -200198,11 +200198,11 @@ function App() {
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", color: C.ink, background: "#F7FBFF", minHeight: "100vh" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ fontSize: 19, fontWeight: 700 }}>{t.appTitle}</div>
-          <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>{t.appSub}</div>
-          <div style={{ fontSize: 11, opacity: 0.8, marginTop: 4 }}>{t.bankCount(BANK.length)} ・ {t.examCount(Object.keys(EXAM_SETS).length)}</div>
+          <div style={{ fontSize: 12, marginTop: 2 }}>{t.appSub}</div>
+          <div style={{ fontSize: 11, marginTop: 4 }}>{t.bankCount(BANK.length)} ・ {t.examCount(Object.keys(EXAM_SETS).length)}</div>
         </div>
         <div style={{ display: "flex", background: "rgba(255,255,255,.15)", borderRadius: 20, padding: 3 }}>
           {["ja", "en"].map(l => (
@@ -200235,7 +200235,7 @@ function App() {
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
-          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: nvInk("#ffffff", C.deep), fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ {lang === "en" ? "Top" : "トップへ"}
         </button>
       )}
@@ -200405,7 +200405,7 @@ function Quiz({ onAnswer, lang, t }) {
         </button>
         {slot.meta && (
           <>
-            <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
+            <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
             <span style={{ fontSize: 11, color: "#5a7288" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
             <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
           </>
@@ -200636,7 +200636,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
             <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
-              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
+              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
         )}
@@ -200694,7 +200694,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
+          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
           <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Set select" : "セット選択"}</button>
         </div>
       </div>
@@ -200772,7 +200772,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const chosen = Array.isArray(picks[pos]) ? picks[pos] : [];
     const need = Q.n || Q.correct.length;
     return (<div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, overflow: "hidden" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {en ? (Q.screenEn || Q.screen) : Q.screen}{need > 1 ? (en ? ` (choose ${need})` : `（${need}箇所選択）`) : ""}</div>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {en ? (Q.screenEn || Q.screen) : Q.screen}{need > 1 ? (en ? ` (choose ${need})` : `（${need}箇所選択）`) : ""}</div>
       <div style={{ padding: 10, display: "flex", flexDirection: "column", gap: 6, background: "#f6f8f9" }}>
         {(Q.hotspots || []).map(h => { const on = chosen.includes(h.id); const isC = Q.correct.includes(h.id); let bd = "#b7c3cb", bg = "#fff", col = C.ink; if (submitted) { if (isC) { bd = C.ok; bg = "#E4F6EC"; col = C.ok; } else if (on) { bd = C.ng; bg = "#FBE9E7"; col = C.ng; } } else if (on) { bd = C.primary; bg = C.light; col = C.deep; } return (
           <button key={h.id} onClick={() => !submitted && toggleHot(h.id, need)} disabled={submitted} style={{ textAlign: "left", padding: "10px 12px", borderRadius: 6, border: `1.5px ${(on || (submitted && isC)) ? "solid" : "dashed"} ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13, fontWeight: on ? 700 : 500, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -200862,8 +200862,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 16, fontSize: 13.5, color: INK, cursor: "pointer" }}><input type="checkbox" checked={!!flags[pos]} onChange={e => setFlags(f => ({ ...f, [pos]: e.target.checked }))} style={{ width: 16, height: 16 }} /><span>{en ? "Mark this question for review" : "この問題をあとで見直す"}</span></label>
           </div>
           <div style={{ display: "flex", gap: 16, margin: "16px 0 30px" }}>
-            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
-            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
+            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: nvInk("#ffffff", pos === 0 ? "#9fb4bc" : NAVY, 3), fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
+            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: nvInk("#ffffff", NAVY, 3), fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
           </div>
         </div>
       </div>
@@ -200875,7 +200875,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 12.5, color: "#5a7780" }}>
-        <span><span style={{ background: C.primary, color: "#fff", borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{en ? "Practice" : "演習モード"}</span>{en ? `Set ${setNo} · Q ${pos + 1}/${qs.length}` : `セット${setNo}・問${pos + 1}/${qs.length}`}</span>
+        <span><span style={{ background: C.primary, color: nvInk("#ffffff", C.primary), borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{en ? "Practice" : "演習モード"}</span>{en ? `Set ${setNo} · Q ${pos + 1}/${qs.length}` : `セット${setNo}・問${pos + 1}/${qs.length}`}</span>
         <span>{Q.d} {domName(Q.d, lang)}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginTop: 12 }}>
@@ -200885,29 +200885,29 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderDndBody(Q, submitted)}
-            {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.build) { const bOk = buildRight(Q, picks[pos]); const done = buildComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderBuildBody(Q, submitted)}
-            {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.mx) { const mxOk = mxRight(Q, picks[pos]); const done = mxComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "scenario")}</div>
             {renderMxBody(Q, submitted)}
-            {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.hot) { const hotOk = hotRight(Q, picks[pos]); const done = hotComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderHotBody(Q, submitted)}
-            {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           const isMulti = !!Q.multi; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); const selSet = Array.isArray(sel) ? sel : []; const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isR = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
@@ -200920,8 +200920,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
               let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (i === Q.a) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (i === sel) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } }
               return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
             })}
-            {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>);
         })()}
       </div>
@@ -200961,7 +200961,7 @@ function Review({ lang, t, onAnswer }) {
         </div>
         {list.length > 0 && (
           <button onClick={() => { setOrder(keys); setPos(0); setSel(null); setSessionSalt(Math.floor(Math.random() * 100000)); setPhase("run"); }}
-            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
+            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
             {t.reviewStart}
           </button>
         )}
@@ -201040,7 +201040,7 @@ function Review({ lang, t, onAnswer }) {
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
             {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
-            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
               {pos + 1 >= order.length ? t.reviewToList : t.nextQ}
             </button>
           </div>
@@ -201071,7 +201071,7 @@ function Diagrams({ lang, t }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       {steps.map((st, i) => (
         <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ minWidth: 26, height: 26, borderRadius: 13, background: C.primary, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
+          <div style={{ minWidth: 26, height: 26, borderRadius: 13, background: C.primary, color: nvInk("#ffffff", C.primary), display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
           <div style={{ flex: 1, background: C.light, borderRadius: 8, padding: "8px 11px", fontSize: 12.5, color: C.ink, lineHeight: 1.5 }}><strong>{st[0]}</strong>{st[1] ? " — " + st[1] : ""}</div>
         </div>
       ))}
@@ -201217,8 +201217,8 @@ function TreeNode({ node, depth, defaultOpen }) {
     <div style={{ marginLeft: depth === 0 ? 0 : 14 }}>
       <div onClick={() => hasKids && setOpen(o => !o)}
         style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? "#fff" : C.ink, marginBottom: 3 }}>
-        {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : C.primary }}>{open ? "▼" : "▶"}</span>}
-        {!hasKids && <span style={{ color: C.mid }}>•</span>}
+        {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : nvInk(C.primary, "#ffffff") }}>{open ? "▼" : "▶"}</span>}
+        {!hasKids && <span style={{ color: nvInk(C.mid, "#ffffff", 3) }}>•</span>}
         <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{node.label}</span>
       </div>
       {node.note && (!hasKids || open) && (
@@ -201531,7 +201531,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
 
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginBottom: 12 }}>
         <div style={{ fontSize: 15, fontWeight: 800, color: C.deep, marginBottom: 10 }}>{g(data.title)}</div>
-        <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, marginBottom: 6 }}>{lang === "ja" ? "ケース本文（資料）" : "Case (materials)"}</div>
+        <div style={{ fontSize: 11, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 6 }}>{lang === "ja" ? "ケース本文（資料）" : "Case (materials)"}</div>
         {g(data.body).map((p, i) => (<div key={i} style={{ fontSize: 13, lineHeight: 1.7, marginBottom: 8, color: C.ink }}>{p}</div>))}
         {(data.tables || []).map((tb, ti) => (
           <div key={ti} style={{ marginTop: 12 }}>
@@ -201556,7 +201556,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
             <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
-            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
+            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
           </div>
         </div>
       ) : (
@@ -201630,11 +201630,11 @@ function App() {
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", color: C.ink, background: "#F7FBFF", minHeight: "100vh" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ fontSize: 19, fontWeight: 700 }}>{t.appTitle}</div>
-          <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>{t.appSub}</div>
-          <div style={{ fontSize: 11, opacity: 0.8, marginTop: 4 }}>{t.bankCount(BANK.length)} ・ {t.examCount(Object.keys(EXAM_SETS).length)}</div>
+          <div style={{ fontSize: 12, marginTop: 2 }}>{t.appSub}</div>
+          <div style={{ fontSize: 11, marginTop: 4 }}>{t.bankCount(BANK.length)} ・ {t.examCount(Object.keys(EXAM_SETS).length)}</div>
         </div>
         <div style={{ display: "flex", background: "rgba(255,255,255,.15)", borderRadius: 20, padding: 3 }}>
           {["ja", "en"].map(l => (
@@ -201667,7 +201667,7 @@ function App() {
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
-          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: nvInk("#ffffff", C.deep), fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ {lang === "en" ? "Top" : "トップへ"}
         </button>
       )}
@@ -201837,7 +201837,7 @@ function Quiz({ onAnswer, lang, t }) {
         </button>
         {slot.meta && (
           <>
-            <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
+            <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
             <span style={{ fontSize: 11, color: "#5a7288" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
             <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
           </>
@@ -202068,7 +202068,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
             <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
-              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
+              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
         )}
@@ -202092,13 +202092,13 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 5, padding: "3px 8px", fontSize: 12, fontWeight: 800 }}>{d.id}</span>
               <span style={{ fontWeight: 700, fontSize: 13.5, color: C.deep }}>{en ? d.nameEn : d.name}</span>
             </span>
-            <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary }}>{en ? "Start" : "開始"}</span>
+            <span style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff") }}>{en ? "Start" : "開始"}</span>
           </button>
         ))}
         {kind === "normal" && [1, 2, 3, 4, 5].map(n => (
           <button key={n} onClick={() => start(n)} style={{ width: "100%", textAlign: "left", padding: "15px 16px", marginBottom: 10, borderRadius: 11, border: `1.5px solid ${C.primary}`, background: "#fff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontWeight: 700, fontSize: 15, color: C.deep }}><DoneCheck on={mockDone.has("s"+n)} onToggle={(e) => mockDone.toggle("s"+n, e)} />{en ? `Set ${n}` : `セット ${n}`}</span>
-            <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary }}>{mode === "practice" ? (en ? "Practice" : "演習") : (en ? "Real" : "本番")}</span>
+            <span style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff") }}>{mode === "practice" ? (en ? "Practice" : "演習") : (en ? "Real" : "本番")}</span>
           </button>
         ))}
       </div>
@@ -202126,7 +202126,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
+          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
           <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Set select" : "セット選択"}</button>
         </div>
       </div>
@@ -202204,7 +202204,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const chosen = Array.isArray(picks[pos]) ? picks[pos] : [];
     const need = Q.n || Q.correct.length;
     return (<div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, overflow: "hidden" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {en ? (Q.screenEn || Q.screen) : Q.screen}{need > 1 ? (en ? ` (choose ${need})` : `（${need}箇所選択）`) : ""}</div>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {en ? (Q.screenEn || Q.screen) : Q.screen}{need > 1 ? (en ? ` (choose ${need})` : `（${need}箇所選択）`) : ""}</div>
       <div style={{ padding: 10, display: "flex", flexDirection: "column", gap: 6, background: "#f6f8f9" }}>
         {(Q.hotspots || []).map(h => { const on = chosen.includes(h.id); const isC = Q.correct.includes(h.id); let bd = "#b7c3cb", bg = "#fff", col = C.ink; if (submitted) { if (isC) { bd = C.ok; bg = "#E4F6EC"; col = C.ok; } else if (on) { bd = C.ng; bg = "#FBE9E7"; col = C.ng; } } else if (on) { bd = C.primary; bg = C.light; col = C.deep; } return (
           <button key={h.id} onClick={() => !submitted && toggleHot(h.id, need)} disabled={submitted} style={{ textAlign: "left", padding: "10px 12px", borderRadius: 6, border: `1.5px ${(on || (submitted && isC)) ? "solid" : "dashed"} ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13, fontWeight: on ? 700 : 500, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -202294,8 +202294,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 16, fontSize: 13.5, color: INK, cursor: "pointer" }}><input type="checkbox" checked={!!flags[pos]} onChange={e => setFlags(f => ({ ...f, [pos]: e.target.checked }))} style={{ width: 16, height: 16 }} /><span>{en ? "Mark this question for review" : "この問題をあとで見直す"}</span></label>
           </div>
           <div style={{ display: "flex", gap: 16, margin: "16px 0 30px" }}>
-            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
-            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
+            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: nvInk("#ffffff", pos === 0 ? "#9fb4bc" : NAVY, 3), fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
+            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: nvInk("#ffffff", NAVY, 3), fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
           </div>
         </div>
       </div>
@@ -202307,44 +202307,44 @@ function Exam({ onAnswer, lang, t, backRef }) {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 12.5, color: "#5a7780" }}>
-        <span><span style={{ background: C.primary, color: "#fff", borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{en ? "Practice" : "演習モード"}</span>{en ? `Set ${setNo} · Q ${pos + 1}/${qs.length}` : `セット${setNo}・問${pos + 1}/${qs.length}`}</span>
+        <span><span style={{ background: C.primary, color: nvInk("#ffffff", C.primary), borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{en ? "Practice" : "演習モード"}</span>{en ? `Set ${setNo} · Q ${pos + 1}/${qs.length}` : `セット${setNo}・問${pos + 1}/${qs.length}`}</span>
         <span>{Q.d} {domName(Q.d, lang)}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginTop: 12 }}>
         {Array.isArray(Q.exhibits) && renderExhibits(Q.exhibits)}
         {(() => {
           if (Q.dnd) { const dndOk = dndRight(Q, picks[pos]); const done = dndComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderDndBody(Q, submitted)}
-            {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.build) { const bOk = buildRight(Q, picks[pos]); const done = buildComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderBuildBody(Q, submitted)}
-            {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.mx) { const mxOk = mxRight(Q, picks[pos]); const done = mxComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "scenario")}</div>
             {renderMxBody(Q, submitted)}
-            {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.hot) { const hotOk = hotRight(Q, picks[pos]); const done = hotComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderHotBody(Q, submitted)}
-            {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           const isMulti = !!Q.multi; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); const selSet = Array.isArray(sel) ? sel : []; const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isR = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
           return (<>
-            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${need} answers. (${submitted ? selSet.length : mSel.length}/${need})` : `正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
+            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${need} answers. (${submitted ? selSet.length : mSel.length}/${need})` : `正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {opts.map((opt, i) => {
               if (isMulti) { const chosen = submitted ? selSet.includes(i) : mSel.includes(i); const isC = correctSet.includes(i); let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (isC) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (chosen) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } } else if (chosen) { bg = C.light; bd = C.primary; col = C.deep; }
@@ -202352,8 +202352,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
               let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (i === Q.a) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (i === sel) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } }
               return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
             })}
-            {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>);
         })()}
       </div>
@@ -202393,7 +202393,7 @@ function Review({ lang, t, onAnswer }) {
         </div>
         {list.length > 0 && (
           <button onClick={() => { setOrder(keys); setPos(0); setSel(null); setSessionSalt(Math.floor(Math.random() * 100000)); setPhase("run"); }}
-            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
+            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
             {t.reviewStart}
           </button>
         )}
@@ -202472,7 +202472,7 @@ function Review({ lang, t, onAnswer }) {
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
             {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
-            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
               {pos + 1 >= order.length ? t.reviewToList : t.nextQ}
             </button>
           </div>
@@ -202503,7 +202503,7 @@ function Diagrams({ lang, t }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       {steps.map((st, i) => (
         <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ minWidth: 26, height: 26, borderRadius: 13, background: C.primary, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
+          <div style={{ minWidth: 26, height: 26, borderRadius: 13, background: C.primary, color: nvInk("#ffffff", C.primary), display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
           <div style={{ flex: 1, background: C.light, borderRadius: 8, padding: "8px 11px", fontSize: 12.5, color: C.ink, lineHeight: 1.5 }}><strong>{st[0]}</strong>{st[1] ? " — " + st[1] : ""}</div>
         </div>
       ))}
@@ -202636,8 +202636,8 @@ function TreeNode({ node, depth, defaultOpen }) {
     <div style={{ marginLeft: depth === 0 ? 0 : 14 }}>
       <div onClick={() => hasKids && setOpen(o => !o)}
         style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? "#fff" : C.ink, marginBottom: 3 }}>
-        {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : C.primary }}>{open ? "▼" : "▶"}</span>}
-        {!hasKids && <span style={{ color: C.mid }}>•</span>}
+        {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : nvInk(C.primary, "#ffffff") }}>{open ? "▼" : "▶"}</span>}
+        {!hasKids && <span style={{ color: nvInk(C.mid, "#ffffff", 3) }}>•</span>}
         <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{node.label}</span>
       </div>
       {node.note && (!hasKids || open) && (
@@ -202667,7 +202667,7 @@ function Confuse({ lang, t }) {
         <div key={i} style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 10, padding: 13, marginBottom: 10 }}>
           <div style={{ fontWeight: 700, color: C.deep, fontSize: 13.5, marginBottom: 5 }}>{lang === "en" && c[3] ? c[3] : c[0]}</div>
           <div style={{ fontSize: 13, lineHeight: 1.5, marginBottom: 4 }}>{lang === "en" && c[4] ? c[4] : c[1]}</div>
-          <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{t.judgeAxis}：{lang === "en" && c[5] ? c[5] : c[2]}</div>
+          <div style={{ fontSize: 12, color: nvInk(C.primary, "#ffffff"), fontWeight: 600 }}>{t.judgeAxis}：{lang === "en" && c[5] ? c[5] : c[2]}</div>
         </div>
       ))}
       {list.length === 0 && <div style={{ textAlign: "center", color: "#5a7288", padding: 20 }}>{t.noMatch}</div>}
@@ -203153,7 +203153,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
             <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
-            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
+            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
           </div>
         </div>
       ) : (
@@ -203227,11 +203227,11 @@ function App() {
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", color: C.ink, background: "#F7FBFF", minHeight: "100vh" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ fontSize: 19, fontWeight: 700 }}>{t.appTitle}</div>
-          <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>{t.appSub}</div>
-          <div style={{ fontSize: 11, opacity: 0.8, marginTop: 4 }}>{t.bankCount(BANK.length)} ・ {t.examCount(Object.keys(EXAM_SETS).length)}</div>
+          <div style={{ fontSize: 12, marginTop: 2 }}>{t.appSub}</div>
+          <div style={{ fontSize: 11, marginTop: 4 }}>{t.bankCount(BANK.length)} ・ {t.examCount(Object.keys(EXAM_SETS).length)}</div>
         </div>
         <div style={{ display: "flex", background: "rgba(255,255,255,.15)", borderRadius: 20, padding: 3 }}>
           {["ja", "en"].map(l => (
@@ -203264,7 +203264,7 @@ function App() {
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
-          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: nvInk("#ffffff", C.deep), fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ {lang === "en" ? "Top" : "トップへ"}
         </button>
       )}
@@ -203434,7 +203434,7 @@ function Quiz({ onAnswer, lang, t }) {
         </button>
         {slot.meta && (
           <>
-            <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
+            <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
             <span style={{ fontSize: 11, color: "#5a7288" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
             <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
           </>
@@ -203665,7 +203665,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
             <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
-              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
+              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
         )}
@@ -203723,7 +203723,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
+          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
           <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Set select" : "セット選択"}</button>
         </div>
       </div>
@@ -203801,7 +203801,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const chosen = Array.isArray(picks[pos]) ? picks[pos] : [];
     const need = Q.n || Q.correct.length;
     return (<div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, overflow: "hidden" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {en ? (Q.screenEn || Q.screen) : Q.screen}{need > 1 ? (en ? ` (choose ${need})` : `（${need}箇所選択）`) : ""}</div>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {en ? (Q.screenEn || Q.screen) : Q.screen}{need > 1 ? (en ? ` (choose ${need})` : `（${need}箇所選択）`) : ""}</div>
       <div style={{ padding: 10, display: "flex", flexDirection: "column", gap: 6, background: "#f6f8f9" }}>
         {(Q.hotspots || []).map(h => { const on = chosen.includes(h.id); const isC = Q.correct.includes(h.id); let bd = "#b7c3cb", bg = "#fff", col = C.ink; if (submitted) { if (isC) { bd = C.ok; bg = "#E4F6EC"; col = C.ok; } else if (on) { bd = C.ng; bg = "#FBE9E7"; col = C.ng; } } else if (on) { bd = C.primary; bg = C.light; col = C.deep; } return (
           <button key={h.id} onClick={() => !submitted && toggleHot(h.id, need)} disabled={submitted} style={{ textAlign: "left", padding: "10px 12px", borderRadius: 6, border: `1.5px ${(on || (submitted && isC)) ? "solid" : "dashed"} ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13, fontWeight: on ? 700 : 500, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -203891,8 +203891,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 16, fontSize: 13.5, color: INK, cursor: "pointer" }}><input type="checkbox" checked={!!flags[pos]} onChange={e => setFlags(f => ({ ...f, [pos]: e.target.checked }))} style={{ width: 16, height: 16 }} /><span>{en ? "Mark this question for review" : "この問題をあとで見直す"}</span></label>
           </div>
           <div style={{ display: "flex", gap: 16, margin: "16px 0 30px" }}>
-            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
-            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
+            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: nvInk("#ffffff", pos === 0 ? "#9fb4bc" : NAVY, 3), fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
+            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: nvInk("#ffffff", NAVY, 3), fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
           </div>
         </div>
       </div>
@@ -203904,7 +203904,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 12.5, color: "#5a7780" }}>
-        <span><span style={{ background: C.primary, color: "#fff", borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{en ? "Practice" : "演習モード"}</span>{en ? `Set ${setNo} · Q ${pos + 1}/${qs.length}` : `セット${setNo}・問${pos + 1}/${qs.length}`}</span>
+        <span><span style={{ background: C.primary, color: nvInk("#ffffff", C.primary), borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{en ? "Practice" : "演習モード"}</span>{en ? `Set ${setNo} · Q ${pos + 1}/${qs.length}` : `セット${setNo}・問${pos + 1}/${qs.length}`}</span>
         <span>{Q.d} {domName(Q.d, lang)}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginTop: 12 }}>
@@ -203914,29 +203914,29 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderDndBody(Q, submitted)}
-            {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.build) { const bOk = buildRight(Q, picks[pos]); const done = buildComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderBuildBody(Q, submitted)}
-            {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.mx) { const mxOk = mxRight(Q, picks[pos]); const done = mxComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "scenario")}</div>
             {renderMxBody(Q, submitted)}
-            {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.hot) { const hotOk = hotRight(Q, picks[pos]); const done = hotComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderHotBody(Q, submitted)}
-            {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           const isMulti = !!Q.multi; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); const selSet = Array.isArray(sel) ? sel : []; const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isR = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
@@ -203949,8 +203949,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
               let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (i === Q.a) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (i === sel) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } }
               return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
             })}
-            {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>);
         })()}
       </div>
@@ -203990,7 +203990,7 @@ function Review({ lang, t, onAnswer }) {
         </div>
         {list.length > 0 && (
           <button onClick={() => { setOrder(keys); setPos(0); setSel(null); setSessionSalt(Math.floor(Math.random() * 100000)); setPhase("run"); }}
-            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
+            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
             {t.reviewStart}
           </button>
         )}
@@ -204069,7 +204069,7 @@ function Review({ lang, t, onAnswer }) {
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
             {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
-            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
               {pos + 1 >= order.length ? t.reviewToList : t.nextQ}
             </button>
           </div>
@@ -204100,7 +204100,7 @@ function Diagrams({ lang, t }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       {steps.map((st, i) => (
         <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ minWidth: 26, height: 26, borderRadius: 13, background: C.primary, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
+          <div style={{ minWidth: 26, height: 26, borderRadius: 13, background: C.primary, color: nvInk("#ffffff", C.primary), display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
           <div style={{ flex: 1, background: C.light, borderRadius: 8, padding: "8px 11px", fontSize: 12.5, color: C.ink, lineHeight: 1.5 }}><strong>{st[0]}</strong>{st[1] ? " — " + st[1] : ""}</div>
         </div>
       ))}
@@ -204258,8 +204258,8 @@ function TreeNode({ node, depth, defaultOpen }) {
     <div style={{ marginLeft: depth === 0 ? 0 : 14 }}>
       <div onClick={() => hasKids && setOpen(o => !o)}
         style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? "#fff" : C.ink, marginBottom: 3 }}>
-        {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : C.primary }}>{open ? "▼" : "▶"}</span>}
-        {!hasKids && <span style={{ color: C.mid }}>•</span>}
+        {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : nvInk(C.primary, "#ffffff") }}>{open ? "▼" : "▶"}</span>}
+        {!hasKids && <span style={{ color: nvInk(C.mid, "#ffffff", 3) }}>•</span>}
         <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{node.label}</span>
       </div>
       {node.note && (!hasKids || open) && (
@@ -204774,7 +204774,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
             <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
-            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
+            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
           </div>
         </div>
       ) : (
@@ -204848,11 +204848,11 @@ function App() {
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", color: C.ink, background: "#F7FBFF", minHeight: "100vh" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ fontSize: 19, fontWeight: 700 }}>{t.appTitle}</div>
-          <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>{t.appSub}</div>
-          <div style={{ fontSize: 11, opacity: 0.8, marginTop: 4 }}>{t.bankCount(BANK.length)} ・ {t.examCount(Object.keys(EXAM_SETS).length)}</div>
+          <div style={{ fontSize: 12, marginTop: 2 }}>{t.appSub}</div>
+          <div style={{ fontSize: 11, marginTop: 4 }}>{t.bankCount(BANK.length)} ・ {t.examCount(Object.keys(EXAM_SETS).length)}</div>
         </div>
         <div style={{ display: "flex", background: "rgba(255,255,255,.15)", borderRadius: 20, padding: 3 }}>
           {["ja", "en"].map(l => (
@@ -204885,7 +204885,7 @@ function App() {
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
-          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: nvInk("#ffffff", C.deep), fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ {lang === "en" ? "Top" : "トップへ"}
         </button>
       )}
@@ -205055,7 +205055,7 @@ function Quiz({ onAnswer, lang, t }) {
         </button>
         {slot.meta && (
           <>
-            <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
+            <button onClick={doResume} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
             <span style={{ fontSize: 11, color: "#5a7288" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</span>
             <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
           </>
@@ -205286,7 +205286,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
             <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
-              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
+              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
         )}
@@ -205344,7 +205344,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
+          <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
           <button onClick={() => setPhase("select")} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Set select" : "セット選択"}</button>
         </div>
       </div>
@@ -205422,7 +205422,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const chosen = Array.isArray(picks[pos]) ? picks[pos] : [];
     const need = Q.n || Q.correct.length;
     return (<div style={{ border: `1px solid ${C.mid}`, borderRadius: 8, overflow: "hidden" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {en ? (Q.screenEn || Q.screen) : Q.screen}{need > 1 ? (en ? ` (choose ${need})` : `（${need}箇所選択）`) : ""}</div>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "8px 12px", fontSize: 12.5, fontWeight: 700 }}>🖥 {en ? (Q.screenEn || Q.screen) : Q.screen}{need > 1 ? (en ? ` (choose ${need})` : `（${need}箇所選択）`) : ""}</div>
       <div style={{ padding: 10, display: "flex", flexDirection: "column", gap: 6, background: "#f6f8f9" }}>
         {(Q.hotspots || []).map(h => { const on = chosen.includes(h.id); const isC = Q.correct.includes(h.id); let bd = "#b7c3cb", bg = "#fff", col = C.ink; if (submitted) { if (isC) { bd = C.ok; bg = "#E4F6EC"; col = C.ok; } else if (on) { bd = C.ng; bg = "#FBE9E7"; col = C.ng; } } else if (on) { bd = C.primary; bg = C.light; col = C.deep; } return (
           <button key={h.id} onClick={() => !submitted && toggleHot(h.id, need)} disabled={submitted} style={{ textAlign: "left", padding: "10px 12px", borderRadius: 6, border: `1.5px ${(on || (submitted && isC)) ? "solid" : "dashed"} ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13, fontWeight: on ? 700 : 500, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -205512,8 +205512,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 16, fontSize: 13.5, color: INK, cursor: "pointer" }}><input type="checkbox" checked={!!flags[pos]} onChange={e => setFlags(f => ({ ...f, [pos]: e.target.checked }))} style={{ width: 16, height: 16 }} /><span>{en ? "Mark this question for review" : "この問題をあとで見直す"}</span></label>
           </div>
           <div style={{ display: "flex", gap: 16, margin: "16px 0 30px" }}>
-            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
-            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
+            <button onClick={prev} disabled={pos === 0} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: pos === 0 ? "#9fb4bc" : NAVY, color: nvInk("#ffffff", pos === 0 ? "#9fb4bc" : NAVY, 3), fontWeight: 700, fontSize: 15, cursor: pos === 0 ? "default" : "pointer" }}>‹ {en ? "Back" : "戻る"}</button>
+            <button onClick={next} style={{ flex: 1, padding: 15, borderRadius: 4, border: "none", background: NAVY, color: nvInk("#ffffff", NAVY, 3), fontWeight: 700, fontSize: 15, cursor: "pointer" }}>{isLast ? (en ? "Finish" : "終了") : (en ? "Next ›" : "次へ ›")}</button>
           </div>
         </div>
       </div>
@@ -205525,7 +205525,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 12.5, color: "#5a7780" }}>
-        <span><span style={{ background: C.primary, color: "#fff", borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{en ? "Practice" : "演習モード"}</span>{en ? `Set ${setNo} · Q ${pos + 1}/${qs.length}` : `セット${setNo}・問${pos + 1}/${qs.length}`}</span>
+        <span><span style={{ background: C.primary, color: nvInk("#ffffff", C.primary), borderRadius: 4, padding: "1px 8px", fontSize: 11, fontWeight: 700, marginRight: 8 }}>{en ? "Practice" : "演習モード"}</span>{en ? `Set ${setNo} · Q ${pos + 1}/${qs.length}` : `セット${setNo}・問${pos + 1}/${qs.length}`}</span>
         <span>{Q.d} {domName(Q.d, lang)}</span>
       </div>
       <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, padding: 16, marginTop: 12 }}>
@@ -205535,29 +205535,29 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderDndBody(Q, submitted)}
-            {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.build) { const bOk = buildRight(Q, picks[pos]); const done = buildComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderBuildBody(Q, submitted)}
-            {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.mx) { const mxOk = mxRight(Q, picks[pos]); const done = mxComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "scenario")}</div>
             {renderMxBody(Q, submitted)}
-            {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.hot) { const hotOk = hotRight(Q, picks[pos]); const done = hotComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderHotBody(Q, submitted)}
-            {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           const isMulti = !!Q.multi; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); const selSet = Array.isArray(sel) ? sel : []; const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isR = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
@@ -205570,8 +205570,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
               let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (i === Q.a) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (i === sel) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } }
               return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
             })}
-            {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: "#fff", fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>);
         })()}
       </div>
@@ -205611,7 +205611,7 @@ function Review({ lang, t, onAnswer }) {
         </div>
         {list.length > 0 && (
           <button onClick={() => { setOrder(keys); setPos(0); setSel(null); setSessionSalt(Math.floor(Math.random() * 100000)); setPhase("run"); }}
-            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
+            style={{ width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 16 }}>
             {t.reviewStart}
           </button>
         )}
@@ -205690,7 +205690,7 @@ function Review({ lang, t, onAnswer }) {
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
             {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
-            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+            <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
               {pos + 1 >= order.length ? t.reviewToList : t.nextQ}
             </button>
           </div>
@@ -205721,7 +205721,7 @@ function Diagrams({ lang, t }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       {steps.map((st, i) => (
         <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ minWidth: 26, height: 26, borderRadius: 13, background: C.primary, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
+          <div style={{ minWidth: 26, height: 26, borderRadius: 13, background: C.primary, color: nvInk("#ffffff", C.primary), display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
           <div style={{ flex: 1, background: C.light, borderRadius: 8, padding: "8px 11px", fontSize: 12.5, color: C.ink, lineHeight: 1.5 }}><strong>{st[0]}</strong>{st[1] ? " — " + st[1] : ""}</div>
         </div>
       ))}
@@ -205868,8 +205868,8 @@ function TreeNode({ node, depth, defaultOpen }) {
     <div style={{ marginLeft: depth === 0 ? 0 : 14 }}>
       <div onClick={() => hasKids && setOpen(o => !o)}
         style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? "#fff" : C.ink, marginBottom: 3 }}>
-        {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : C.primary }}>{open ? "▼" : "▶"}</span>}
-        {!hasKids && <span style={{ color: C.mid }}>•</span>}
+        {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : nvInk(C.primary, "#ffffff") }}>{open ? "▼" : "▶"}</span>}
+        {!hasKids && <span style={{ color: nvInk(C.mid, "#ffffff", 3) }}>•</span>}
         <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{node.label}</span>
       </div>
       {node.note && (!hasKids || open) && (
@@ -206640,7 +206640,7 @@ function ExamCaseRunner({ cases, lang, onBack, backRef, ck }) {
           <Bar pct={rate} color={rate >= PASS ? C.ok : C.ng} />
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
             <button onClick={() => { setFinished(false); setQi(0); }} style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "解答を見直す" : "Review answers"}</button>
-            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
+            <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{lang === "ja" ? "もう一度" : "Retry"}</button>
           </div>
         </div>
       ) : (
@@ -206739,10 +206739,10 @@ function App() {
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", color: C.ink, background: "#FBFCFE", minHeight: "100vh", position: "relative" }}>
-      <div style={{ background: C.deep, color: "#fff", padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ background: C.deep, color: nvInk("#ffffff", C.deep), padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ fontSize: 19, fontWeight: 700 }}>{t.appTitle}</div>
-          <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>{t.appSub}</div>
+          <div style={{ fontSize: 12, marginTop: 2 }}>{t.appSub}</div>
         </div>
         <div style={{ display: "flex", background: "rgba(255,255,255,.15)", borderRadius: 20, padding: 3 }}>
           {["ja", "en"].map(l => (
@@ -206763,7 +206763,7 @@ function App() {
               borderBottom: tab === k ? `3px solid ${C.primary}` : "3px solid transparent" }}>
             {label}
             {k === "review" && review.length > 0 && (
-              <span style={{ position: "absolute", top: 4, right: 6, background: C.ng, color: "#fff", borderRadius: 9, fontSize: 9.5, fontWeight: 700, padding: "1px 5px" }}>{review.length}</span>
+              <span style={{ position: "absolute", top: 4, right: 6, background: C.ng, color: nvInk("#ffffff", C.ng), borderRadius: 9, fontSize: 9.5, fontWeight: 700, padding: "1px 5px" }}>{review.length}</span>
             )}
           </button>
         ))}
@@ -206778,7 +206778,7 @@ function App() {
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
-          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: C.deep, color: nvInk("#ffffff", C.deep), fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ {lang === "en" ? "Top" : "トップへ"}
         </button>
       )}
@@ -206794,7 +206794,7 @@ function App() {
         {tab === "examcase" && <ExamCaseRunner ck="ADP_EXAM_CASES" cases={ADP_EXAM_CASES} lang={lang} onBack={() => setTab("home")} backRef={backRef} />}
       </div>
       {toast && (
-        <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", background: C.ink, color: "#fff", padding: "10px 18px", borderRadius: 22, fontSize: 13, fontWeight: 600, boxShadow: "0 4px 16px rgba(0,0,0,.25)", zIndex: 50 }}>{toast}</div>
+        <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", background: C.ink, color: nvInk("#ffffff", C.ink), padding: "10px 18px", borderRadius: 22, fontSize: 13, fontWeight: 600, boxShadow: "0 4px 16px rgba(0,0,0,.25)", zIndex: 50 }}>{toast}</div>
       )}
       {confirmCfg && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 60 }} onClick={() => setConfirmCfg(null)}>
@@ -206802,7 +206802,7 @@ function App() {
             <div style={{ fontSize: 14.5, lineHeight: 1.6, marginBottom: 18, color: C.ink }}>{confirmCfg.msg}</div>
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={() => setConfirmCfg(null)} style={{ flex: 1, padding: 10, borderRadius: 9, border: `1.5px solid ${C.mid}`, background: "#fff", color: C.ink, fontWeight: 700, fontSize: 13.5, cursor: "pointer" }}>{t.cancel}</button>
-              <button onClick={() => { confirmCfg.onOk(); setConfirmCfg(null); }} style={{ flex: 1, padding: 10, borderRadius: 9, border: "none", background: C.ng, color: "#fff", fontWeight: 700, fontSize: 13.5, cursor: "pointer" }}>{t.ok}</button>
+              <button onClick={() => { confirmCfg.onOk(); setConfirmCfg(null); }} style={{ flex: 1, padding: 10, borderRadius: 9, border: "none", background: C.ng, color: nvInk("#ffffff", C.ng), fontWeight: 700, fontSize: 13.5, cursor: "pointer" }}>{t.ok}</button>
             </div>
           </div>
         </div>
@@ -206864,7 +206864,7 @@ function Home({ state, lang, t, reviewCount }) {
 }
 
 function Badge({ id, hue }) {
-  return <span style={{ background: hue, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{id}</span>;
+  return <span style={{ background: hue, color: nvInk("#ffffff", hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{id}</span>;
 }
 function Stat({ label, value, sub, color }) {
   return (
@@ -206968,7 +206968,7 @@ function Quiz({ onAnswer, lang, t }) {
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
         <button onClick={() => slot.save({ filter, orderMode, order, pos, picks, stats }, filter === "ALL" ? (lang === "en" ? "All" : "全分野") : filter)} style={{ padding: "6px 14px", borderRadius: 8, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{slot.meta ? (lang === "en" ? "💾 Saved" : "💾 保存済") : (lang === "en" ? "💾 Save" : "💾 セーブ")}</button>
         {slot.meta && (<>
-          <button onClick={async () => { const d = await slot.read(); if (!d) return; resumeRef.current = { order: d.order, pos: d.pos, picks: d.picks, stats: d.stats }; setFilter(d.filter || "ALL"); setOrderMode(d.orderMode || "fixed"); setOrder(d.order || []); setPos(d.pos || 0); setPicks(d.picks || {}); setStats(d.stats || { c: 0, a: 0 }); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
+          <button onClick={async () => { const d = await slot.read(); if (!d) return; resumeRef.current = { order: d.order, pos: d.pos, picks: d.picks, stats: d.stats }; setFilter(d.filter || "ALL"); setOrderMode(d.orderMode || "fixed"); setOrder(d.order || []); setPos(d.pos || 0); setPicks(d.picks || {}); setStats(d.stats || { c: 0, a: 0 }); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{lang === "en" ? "▶ Resume" : "▶ 続きから"}</button>
           <span style={{ fontSize: 11, color: "#5a7288" }}>{saveStamp(slot.meta.t)}</span>
           <button onClick={() => slot.remove()} style={{ marginLeft: "auto", padding: "6px 10px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{lang === "en" ? "Delete" : "削除"}</button>
         </>)}
@@ -207006,7 +207006,7 @@ function Quiz({ onAnswer, lang, t }) {
           ← {t.prevQ}
         </button>
         <button onClick={next} disabled={pos + 1 >= order.length}
-          style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: pos + 1 >= order.length ? C.mid : C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: pos + 1 >= order.length ? "not-allowed" : "pointer" }}>
+          style={{ flex: 1, padding: 12, borderRadius: 9, border: "none", background: pos + 1 >= order.length ? C.mid : C.primary, color: nvInk("#ffffff", pos + 1 >= order.length ? C.mid : C.primary, 3), fontSize: 14, fontWeight: 700, cursor: pos + 1 >= order.length ? "not-allowed" : "pointer" }}>
           {t.nextQ}
         </button>
       </div>
@@ -207126,7 +207126,7 @@ function Exam({ onAnswer, lang, t, addToReview }) {
         <QuestionCard Q={Q} sel={sel} onChoose={choose} lang={lang} reveal={reveal} t={t} />
       </div>
       {sel !== null && (
-        <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+        <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
           {isLast ? (reveal ? t.seeResult : t.submit) : t.nextQ}
         </button>
       )}
@@ -207180,7 +207180,7 @@ function ExamResult({ answers, setNo, onRetry, onBack, lang, t }) {
         })}
       </Card>
       <div style={{ display: "flex", gap: 10 }}>
-        <button onClick={onRetry} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.retrySet}</button>
+        <button onClick={onRetry} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.retrySet}</button>
         <button onClick={onBack} style={{ flex: 1, padding: 13, borderRadius: 9, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.toSetSelect}</button>
       </div>
     </div>
@@ -207213,7 +207213,7 @@ function Review({ review, onAnswer, removeFromReview, clearReview, askConfirm, l
                 if (!n) return null;
                 return <div key={d.id} style={{ fontSize: 12.5, padding: "4px 0" }}><Badge id={d.id} hue={d.hue} />{domName(d.id, lang)} — <strong>{n}{t.questionsUnit}</strong></div>;
               })}
-              <button onClick={start} style={{ marginTop: 12, width: "100%", padding: 13, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.reviewStart}</button>
+              <button onClick={start} style={{ marginTop: 12, width: "100%", padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.reviewStart}</button>
             </div>
           )}
         </Card>
@@ -207225,7 +207225,7 @@ function Review({ review, onAnswer, removeFromReview, clearReview, askConfirm, l
     return (
       <div style={{ textAlign: "center", padding: 20 }}>
         <div style={{ fontSize: 18, fontWeight: 800, color: C.ok, marginBottom: 10 }}>{t.reviewDone}</div>
-        <button onClick={() => setPhase("home")} style={{ padding: "10px 18px", borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.backToReview}</button>
+        <button onClick={() => setPhase("home")} style={{ padding: "10px 18px", borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{t.backToReview}</button>
       </div>
     );
   }
@@ -207249,7 +207249,7 @@ function Review({ review, onAnswer, removeFromReview, clearReview, askConfirm, l
         <QuestionCard Q={Q} sel={sel} onChoose={choose} lang={lang} reveal t={t} />
       </div>
       {sel !== null && (
-        <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{t.nextQ}</button>
+        <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{t.nextQ}</button>
       )}
     </div>
   );
@@ -207467,7 +207467,7 @@ function DiagramsInner({ lang, t }) {
   const Section = ({ id, title, badge, children }) => (
     <div style={{ background: "#fff", border: `1px solid ${C.mid}`, borderRadius: 12, marginBottom: 12, overflow: "hidden" }}>
       <button onClick={() => setOpen(open === id ? "" : id)} style={{ width: "100%", textAlign: "left", padding: "13px 15px", border: "none", background: open === id ? C.light : "#fff", color: C.deep, fontWeight: 700, fontSize: 13.5, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <span><span style={{ background: C.primary, color: "#fff", borderRadius: 5, fontSize: 10, padding: "2px 6px", marginRight: 8 }}>{badge}</span>{title}</span><span>{open === id ? "−" : "+"}</span>
+        <span><span style={{ background: C.primary, color: nvInk("#ffffff", C.primary), borderRadius: 5, fontSize: 10, padding: "2px 6px", marginRight: 8 }}>{badge}</span>{title}</span><span>{open === id ? "−" : "+"}</span>
       </button>
       {open === id && <div style={{ padding: 15, borderTop: `1px solid ${C.light}` }}><FigFrame id={"cert:" + id} lang={typeof lang === "undefined" ? "" : lang}
         terms={typeof GLOSSARY !== "undefined" ? GLOSSARY : null} topic={title}>{children}</FigFrame></div>}
@@ -207570,8 +207570,8 @@ function TreeNode({ node, depth, defaultOpen }) {
   return (
     <div style={{ marginLeft: depth === 0 ? 0 : 14 }}>
       <div onClick={() => hasKids && setOpen(o => !o)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, cursor: hasKids ? "pointer" : "default", background: depth === 0 ? C.deep : "transparent", color: depth === 0 ? "#fff" : C.ink, marginBottom: 3 }}>
-        {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : C.primary }}>{open ? "▼" : "▶"}</span>}
-        {!hasKids && <span style={{ color: C.mid }}>•</span>}
+        {hasKids && <span style={{ fontWeight: 700, fontSize: 12, color: depth === 0 ? "#fff" : nvInk(C.primary, "#ffffff") }}>{open ? "▼" : "▶"}</span>}
+        {!hasKids && <span style={{ color: nvInk(C.mid, "#ffffff", 3) }}>•</span>}
         <span style={{ fontWeight: depth === 0 ? 700 : 600 }}>{node.label}</span>
       </div>
       {node.note && (!hasKids || open) && <div style={{ fontSize: 12, color: "#5f6368", marginLeft: 22, marginBottom: 5, lineHeight: 1.4 }}>{node.note}</div>}
@@ -207599,9 +207599,9 @@ function StorageLadder({ lang }) {
       <div style={{ fontSize: 12, color: "#5f6368", marginBottom: 10 }}>{en?"Top = hotter/pricier storage, bottom = colder/cheaper. Tap each.":"上＝高頻度・保存高、下＝低頻度・保存安。各段をタップ。"}</div>
       {items.map((it, i) => (
         <div key={i} onClick={() => setSel(sel === i ? null : i)} style={{ display: "flex", alignItems: "center", marginBottom: 6, cursor: "pointer", marginLeft: i * 18 }}>
-          <div style={{ flex: 1, background: [C.primary, "#4285F4", "#5491F5", C.deep][i], color: "#fff", borderRadius: 9, padding: "10px 13px", border: sel === i ? `2px solid ${C.ink}` : "2px solid transparent" }}>
+          <div style={{ flex: 1, background: [C.primary, "#4285F4", "#5491F5", C.deep][i], color: nvInk("#ffffff", [C.primary, "#4285F4", "#5491F5", C.deep][i]), borderRadius: 9, padding: "10px 13px", border: sel === i ? `2px solid ${C.ink}` : "2px solid transparent" }}>
             <span style={{ fontWeight: 800, fontSize: 14 }}>{it[0]}</span>
-            <span style={{ fontSize: 11.5, marginLeft: 8, opacity: 0.9 }}>{it[1]}</span>
+            <span style={{ fontSize: 11.5, marginLeft: 8 }}>{it[1]}</span>
           </div>
         </div>
       ))}
@@ -207631,7 +207631,7 @@ function ParallelTools({ lang }) {
         {tools.map((tl, i) => (
           <div key={i} onClick={() => setSel(sel === i ? null : i)} style={{ background: sel === i ? C.deep : C.light, color: sel === i ? "#fff" : C.ink, borderRadius: 10, padding: 12, cursor: "pointer", border: `1.5px solid ${C.mid}` }}>
             <div style={{ fontWeight: 800, fontSize: 13.5, color: sel === i ? "#fff" : C.deep }}>{tl[0]}</div>
-            <div style={{ fontSize: 11.5, marginTop: 3, opacity: 0.9 }}>{tl[1]}</div>
+            <div style={{ fontSize: 11.5, marginTop: 3 }}>{tl[1]}</div>
           </div>
         ))}
       </div>
@@ -207656,7 +207656,7 @@ function LifecycleFlow({ lang }) {
     <div>
       {order.map((k, i) => (
         <div key={k}>
-          <button onClick={() => setSel(sel === k ? null : k)} style={{ width: "100%", textAlign: "left", padding: "11px 13px", borderRadius: 9, marginBottom: 4, border: sel === k ? `2px solid ${C.ink}` : `1.5px solid ${C.mid}`, background: k === "govern" ? C.deep : C.primary, color: "#fff", cursor: "pointer", fontWeight: 700, fontSize: 13.5, opacity: k === "govern" ? 0.92 : 1 - i * 0.04 }}>
+          <button onClick={() => setSel(sel === k ? null : k)} style={{ width: "100%", textAlign: "left", padding: "11px 13px", borderRadius: 9, marginBottom: 4, border: sel === k ? `2px solid ${C.ink}` : `1.5px solid ${C.mid}`, background: k === "govern" ? C.deep : C.primary, color: nvInk("#ffffff", k === "govern" ? C.deep : C.primary), cursor: "pointer", fontWeight: 700, fontSize: 13.5, opacity: 1 }}>
             {k === "govern" ? "★ " : `${i + 1}. `}{steps[k][0]}{k !== "govern" && i < 4 ? "  ↓" : ""}
           </button>
           {sel === k && <div style={{ background: C.light, borderRadius: 8, padding: 11, fontSize: 12.5, lineHeight: 1.5, marginBottom: 6 }}>{steps[k][1]}</div>}
@@ -207751,7 +207751,7 @@ function StorageTree({ lang }) {
           <div style={{ fontSize: 11, color: C.ok, fontWeight: 700 }}>{en?"Recommended":"推奨"}</div>
           <div style={{ fontSize: 16, fontWeight: 800, color: C.deep, margin: "4px 0" }}>{leaf[0]}</div>
           <div style={{ fontSize: 13, lineHeight: 1.5 }}>{leaf[1]}</div>
-          <button onClick={() => setPath([])} style={{ marginTop: 12, padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>{en?"Restart":"最初から"}</button>
+          <button onClick={() => setPath([])} style={{ marginTop: 12, padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 13, cursor: "pointer" }}>{en?"Restart":"最初から"}</button>
         </div>
       )}
     </div>
@@ -208681,7 +208681,7 @@ function Compare({ lang }) {
           <div style={{ fontSize:13.5, fontWeight:700, color:C.deep, marginBottom:8 }}>{en?c.titleEn:c.title}</div>
           <div style={{ overflowX:"auto" }}>
             <table style={{ borderCollapse:"collapse", width:"100%", fontSize:12 }}>
-              <thead><tr>{(en?c.colsEn:c.cols).map((h, i) => <th key={i} style={{ textAlign:"left", padding:"8px 10px", background:C.deep, color:"#fff", fontWeight:700, whiteSpace:"nowrap" }}>{h}</th>)}</tr></thead>
+              <thead><tr>{(en?c.colsEn:c.cols).map((h, i) => <th key={i} style={{ textAlign:"left", padding:"8px 10px", background:C.deep, color:nvInk("#ffffff", C.deep), fontWeight:700, whiteSpace:"nowrap" }}>{h}</th>)}</tr></thead>
               <tbody>{(en?c.rowsEn:c.rows).map((r, ri) => <tr key={ri} style={{ background: ri%2?C.light:"#fff" }}>{r.map((cell, i) => <td key={i} style={{ padding:"8px 10px", border:`1px solid ${C.mid}`, color:C.ink, fontWeight:i===0?700:400, lineHeight:1.5 }}>{cell}</td>)}</tr>)}</tbody>
             </table>
           </div>
@@ -208889,7 +208889,7 @@ function App() {
 
   return (
     <div style={{ fontFamily:"system-ui, sans-serif", color:C.ink, background:"#FBFBFE", minHeight:"100vh" }}>
-      <div style={{ background:C.deep, color:"#fff", padding:"16px 18px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+      <div style={{ background:C.deep, color:nvInk("#ffffff", C.deep), padding:"16px 18px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
         <div>
           <div style={{ fontSize:19, fontWeight:700 }}>{t.appTitle}</div>
           <div style={{ fontSize:12, opacity:0.85, marginTop:2 }}>{t.appSub}</div>
@@ -208909,7 +208909,7 @@ function App() {
       )}
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top:0, behavior:"smooth" }); }} aria-label="Top"
-          style={{ position:"fixed", right:16, bottom:60, zIndex:45, border:"none", cursor:"pointer", borderRadius:22, padding:"10px 15px", background:C.deep, color:"#fff", fontSize:12.5, fontWeight:700, boxShadow:"0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position:"fixed", right:16, bottom:60, zIndex:45, border:"none", cursor:"pointer", borderRadius:22, padding:"10px 15px", background:C.deep, color:nvInk("#ffffff", C.deep), fontSize:12.5, fontWeight:700, boxShadow:"0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ {lang === "en" ? "Top" : "トップへ"}
         </button>
       )}
@@ -209816,7 +209816,7 @@ function Compare({ lang }) {
           <div style={{ fontSize:13.5, fontWeight:700, color:C.deep, marginBottom:8 }}>{en?c.titleEn:c.title}</div>
           <div style={{ overflowX:"auto" }}>
             <table style={{ borderCollapse:"collapse", width:"100%", fontSize:12 }}>
-              <thead><tr>{(en?c.colsEn:c.cols).map((h, i) => <th key={i} style={{ textAlign:"left", padding:"8px 10px", background:C.deep, color:"#fff", fontWeight:700, whiteSpace:"nowrap" }}>{h}</th>)}</tr></thead>
+              <thead><tr>{(en?c.colsEn:c.cols).map((h, i) => <th key={i} style={{ textAlign:"left", padding:"8px 10px", background:C.deep, color:nvInk("#ffffff", C.deep), fontWeight:700, whiteSpace:"nowrap" }}>{h}</th>)}</tr></thead>
               <tbody>{(en?c.rowsEn:c.rows).map((r, ri) => <tr key={ri} style={{ background: ri%2?C.light:"#fff" }}>{r.map((cell, i) => <td key={i} style={{ padding:"8px 10px", border:`1px solid ${C.mid}`, color:C.ink, fontWeight:i===0?700:400, lineHeight:1.5 }}>{cell}</td>)}</tr>)}</tbody>
             </table>
           </div>
@@ -210033,7 +210033,7 @@ function App() {
   const TABS = [["home", t.tabHome],["quiz", t.tabQuiz],["exam", t.tabExam],["review", reviewCount>0?`${t.tabReview} (${reviewCount})`:t.tabReview],["diagram", t.tabDiagram],["compare", t.tabCompare],["confuse", t.tabConfuse],["glossary", t.tabGlossary]];
   return (
     <div style={{ fontFamily:"system-ui, sans-serif", color:C.ink, background:"#FBFEFC", minHeight:"100vh" }}>
-      <div style={{ background:C.deep, color:"#fff", padding:"16px 18px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+      <div style={{ background:C.deep, color:nvInk("#ffffff", C.deep), padding:"16px 18px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
         <div>
           <div style={{ fontSize:19, fontWeight:700 }}>{t.appTitle}</div>
           <div style={{ fontSize:12, opacity:0.85, marginTop:2 }}>{t.appSub}</div>
@@ -210053,7 +210053,7 @@ function App() {
       )}
       {tab !== "home" && (
         <button onClick={() => { setTab("home"); if (typeof window !== "undefined") window.scrollTo({ top:0, behavior:"smooth" }); }} aria-label="Top"
-          style={{ position:"fixed", right:16, bottom:60, zIndex:45, border:"none", cursor:"pointer", borderRadius:22, padding:"10px 15px", background:C.deep, color:"#fff", fontSize:12.5, fontWeight:700, boxShadow:"0 4px 14px rgba(0,0,0,.28)" }}>
+          style={{ position:"fixed", right:16, bottom:60, zIndex:45, border:"none", cursor:"pointer", borderRadius:22, padding:"10px 15px", background:C.deep, color:nvInk("#ffffff", C.deep), fontSize:12.5, fontWeight:700, boxShadow:"0 4px 14px rgba(0,0,0,.28)" }}>
           ↑ {lang === "en" ? "Top" : "トップへ"}
         </button>
       )}
@@ -210254,7 +210254,7 @@ function makeSecGovStation(cfg){
           <div style={{ fontSize:13.5, fontWeight:700, color:C.deep, marginBottom:8 }}>{en?c.titleEn:c.title}</div>
           <div style={{ overflowX:"auto" }}>
             <table style={{ borderCollapse:"collapse", width:"100%", fontSize:12 }}>
-              <thead><tr>{(en?c.colsEn:c.cols).map((h,i)=><th key={i} style={{ textAlign:"left", padding:"8px 10px", background:C.deep, color:"#fff", fontWeight:700, whiteSpace:"nowrap" }}>{h}</th>)}</tr></thead>
+              <thead><tr>{(en?c.colsEn:c.cols).map((h,i)=><th key={i} style={{ textAlign:"left", padding:"8px 10px", background:C.deep, color:nvInk("#ffffff", C.deep), fontWeight:700, whiteSpace:"nowrap" }}>{h}</th>)}</tr></thead>
               <tbody>{(en?c.rowsEn:c.rows).map((r,ri)=><tr key={ri} style={{ background: ri%2?C.light:"#fff" }}>{r.map((cell,i)=><td key={i} style={{ padding:"8px 10px", border:`1px solid ${C.mid}`, color:C.ink, fontWeight:i===0?700:400, lineHeight:1.5 }}>{cell}</td>)}</tr>)}</tbody>
             </table>
           </div>
@@ -210319,7 +210319,7 @@ function makeSecGovStation(cfg){
               ))}
             </div>
           ) : (
-            dg.items.map((it,i)=>(<div key={i} style={{ background:it.c||C.primary, color:"#fff", borderRadius:8, padding:"9px 12px", fontSize:12.5, fontWeight:700, marginBottom:6 }}>{en?it.en:it.ja}</div>))
+            dg.items.map((it,i)=>(<div key={i} style={{ background:it.c||C.primary, color:nvInk("#ffffff", it.c||C.primary), borderRadius:8, padding:"9px 12px", fontSize:12.5, fontWeight:700, marginBottom:6 }}>{en?it.en:it.ja}</div>))
           )}
           {dg.noteJa && <div style={{ fontSize:11, color:G, marginTop:6 }}>{en?(dg.noteEn||dg.noteJa):dg.noteJa}</div>}
         </Card>
@@ -210347,7 +210347,7 @@ function makeSecGovStation(cfg){
     const TABS = [["home",t.tabHome],["quiz",t.tabQuiz],["exam",t.tabExam],["review",reviewCount>0?`${t.tabReview} (${reviewCount})`:t.tabReview],["diagram",t.tabDiagram],["compare",t.tabCompare],["confuse",t.tabConfuse],["glossary",t.tabGlossary]];
     return (
       <div style={{ fontFamily:"system-ui, sans-serif", color:C.ink, background:"#FBFCFE", minHeight:"100vh" }}>
-        <div style={{ background:C.deep, color:"#fff", padding:"16px 18px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+        <div style={{ background:C.deep, color:nvInk("#ffffff", C.deep), padding:"16px 18px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
           <div><div style={{ fontSize:19, fontWeight:700 }}>{t.appTitle}</div><div style={{ fontSize:12, opacity:0.85, marginTop:2 }}>{t.appSub}</div></div>
           <div style={{ display:"flex", background:"rgba(255,255,255,.15)", borderRadius:20, padding:3 }}>
             {["ja","en"].map(l=><button key={l} onClick={()=>setLang(l)} style={{ border:"none", cursor:"pointer", borderRadius:16, padding:"5px 12px", fontSize:12, fontWeight:700, background:lang===l?C.primary:"transparent", color:"#fff" }}>{l==="ja"?"日本語":"English"}</button>)}
@@ -210357,7 +210357,7 @@ function makeSecGovStation(cfg){
           {TABS.map(([k,label])=><button key={k} onClick={()=>setTab(k)} style={{ flex:"1 1 auto", padding:"11px 8px", border:"none", cursor:"pointer", background:tab===k?"#fff":"transparent", color:tab===k?C.deep:C.ink, fontWeight:tab===k?700:500, fontSize:13, borderBottom:tab===k?`3px solid ${C.primary}`:"3px solid transparent" }}>{label}</button>)}
         </div>
         {tabHist.length>0 && <button onClick={goBackTab} aria-label="Back" style={{ position:"fixed", right:16, bottom:104, zIndex:45, border:`1.5px solid ${C.deep}`, cursor:"pointer", borderRadius:22, padding:"9px 15px", background:"#fff", color:C.deep, fontSize:12.5, fontWeight:700, boxShadow:"0 4px 14px rgba(0,0,0,.20)" }}>← {lang==="en"?"Back":"戻る"}</button>}
-        {tab!=="home" && <button onClick={()=>{ setTab("home"); if(typeof window!=="undefined") window.scrollTo({top:0,behavior:"smooth"}); }} aria-label="Top" style={{ position:"fixed", right:16, bottom:60, zIndex:45, border:"none", cursor:"pointer", borderRadius:22, padding:"10px 15px", background:C.deep, color:"#fff", fontSize:12.5, fontWeight:700, boxShadow:"0 4px 14px rgba(0,0,0,.28)" }}>↑ {lang==="en"?"Top":"トップへ"}</button>}
+        {tab!=="home" && <button onClick={()=>{ setTab("home"); if(typeof window!=="undefined") window.scrollTo({top:0,behavior:"smooth"}); }} aria-label="Top" style={{ position:"fixed", right:16, bottom:60, zIndex:45, border:"none", cursor:"pointer", borderRadius:22, padding:"10px 15px", background:C.deep, color:nvInk("#ffffff", C.deep), fontSize:12.5, fontWeight:700, boxShadow:"0 4px 14px rgba(0,0,0,.28)" }}>↑ {lang==="en"?"Top":"トップへ"}</button>}
         <div style={{ padding:16, maxWidth:820, margin:"0 auto" }}>
           {tab==="home" && <Home state={state} lang={lang} />}
           {tab==="quiz" && <Quiz onAnswer={record} onWrong={addReview} lang={lang} />}
@@ -216274,14 +216274,14 @@ function App(){
           </div>
           {rows.map((r) => (
             <div key={r.code} style={{ display: "flex", alignItems: "center", gap: 10, background: "#fff", border: `1px solid ${GC.mid}`, borderRadius: 10, padding: "9px 14px", marginBottom: 7 }}>
-              <span style={{ fontSize: 12.5, fontWeight: 800, color: r.hue || GC.deep, minWidth: 110 }}>{r.code}</span>
+              <span style={{ fontSize: 12.5, fontWeight: 800, color: nvInk(r.hue, "#ffffff") || GC.deep, minWidth: 110 }}>{r.code}</span>
               <div style={{ flex: 1, height: 8, background: GC.light, borderRadius: 4, overflow: "hidden" }}>
                 <div style={{ width: `${Math.round(r.acc * 100)}%`, height: "100%", background: r.hue || GC.primary }} />
               </div>
               <span style={{ fontSize: 12, color: "#4A6157", minWidth: 54, textAlign: "right" }}>{r.c}/{r.t}（{Math.round(r.acc * 100)}%）</span>
             </div>
           ))}
-          <button onClick={() => setSetNo(null)} style={{ marginTop: 12, background: GC.primary, color: "#fff", border: "none", borderRadius: 9, padding: "10px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+          <button onClick={() => setSetNo(null)} style={{ marginTop: 12, background: GC.primary, color: nvInk("#ffffff", GC.primary), border: "none", borderRadius: 9, padding: "10px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
             {en ? "Back to sets" : "セット選択へ戻る"}
           </button>
         </div>
@@ -216300,7 +216300,7 @@ function App(){
         <div style={{ display: "flex", gap: 10, alignItems: "baseline", marginBottom: 10, flexWrap: "wrap" }}>
           <span style={{ fontSize: 12, fontWeight: 800, color: GC.deep }}>{en ? `Set ${setNo}` : `セット${setNo}`} · {pos + 1} / {qs.length}</span>
           <span style={{ fontSize: 11.5, color: "#4A6157" }}>{sel === null ? (en ? "Source certificate hidden until you answer" : "出題元の資格は解答後に表示") : null}</span>
-          {sel !== null && <span style={{ fontSize: 11.5, fontWeight: 800, color: cur.hue || GC.primary, marginLeft: "auto" }}>{en ? "From: " : "出題元: "}{cur.src}</span>}
+          {sel !== null && <span style={{ fontSize: 11.5, fontWeight: 800, color: nvInk(cur.hue, "#ffffff") || GC.primary, marginLeft: "auto" }}>{en ? "From: " : "出題元: "}{cur.src}</span>}
         </div>
         <div style={{ ...card, marginBottom: 10 }}>
           <div style={{ fontSize: 13.5, fontWeight: 700, color: GC.ink, lineHeight: 1.7 }}>{qText}</div>
@@ -216326,7 +216326,7 @@ function App(){
             <div style={{ fontSize: 12.5, fontWeight: 800, color: sel === Q.a ? GC.deep : GC.ng, marginBottom: 3 }}>{sel === Q.a ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</div>
             <div style={{ fontSize: 12, color: "#33473E", lineHeight: 1.7 }}>{expl}</div>
             <button onClick={() => { setPos(pos + 1); setSel(null); }}
-              style={{ marginTop: 10, background: GC.primary, color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
+              style={{ marginTop: 10, background: GC.primary, color: nvInk("#ffffff", GC.primary), border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
               {pos + 1 >= qs.length ? (en ? "See results →" : "結果を見る →") : (en ? "Next →" : "次の問題 →")}
             </button>
           </div>
@@ -216919,7 +216919,7 @@ function CertOverlapMap({ lang }) {
           </div>
           <div style={{ background: HUB.bg, border: `1px solid ${OVM_CERTS[sel].c}`, borderLeft: `3px solid ${OVM_CERTS[sel].c}`, borderRadius: 10, padding: "12px 14px", marginBottom: 12 }}>
             <div style={{ fontSize: 13, fontWeight: 800, color: OVM_CERTS[sel].c, marginBottom: 4 }}>{cert.n}</div>
-            <div style={{ fontSize: 12, color: HUB.ink, opacity: 0.85, lineHeight: 1.7 }}>{cert.d[ja ? 0 : 1]}</div>
+            <div style={{ fontSize: 12, color: HUB.ink, lineHeight: 1.7 }}>{cert.d[ja ? 0 : 1]}</div>
           </div>
           <div style={{ fontSize: 12, color: HUB.sub, lineHeight: 1.75 }}>
             {ja ? "使い方：◎が同じトピックに並ぶ資格は教材と記憶を共有できるので、1つを深く→残りへ薄く広げるのが最短。順序の例 — ISO 42001 F → AIGP（CCSK を並行）→ CISM → AAISM／AAIR。監査側へ行くなら CISA → AAIA。②③列は実務経験・前提資格が要件なので、受験時期はそこから逆算する。" : "How to use it: certificates sharing a ◎ share material and memory, so go deep on one and spread thin to the rest. One sequence — ISO 42001 F, then AIGP (CCSK in parallel), then CISM, then AAISM or AAIR; for the audit line, CISA then AAIA. Columns two and three carry experience or prerequisite requirements, so schedule backwards from those."}
