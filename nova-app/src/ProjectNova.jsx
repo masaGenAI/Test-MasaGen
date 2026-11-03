@@ -173491,8 +173491,11 @@ var DOMAINS = [
   {id:"D4", name:"請求・料金・サポート", weight:12, color:"#ba7517", bg:"#faeeda", tx:"#633806"}
 ];
 function dom(id){ for(var i=0;i<DOMAINS.length;i++) if(DOMAINS[i].id===id) return DOMAINS[i]; }
+// 英語モード用の分野名（DOMAINS に nameEn が無いときだけ補う。WEAK_TABLE の [日本語, English] にも使われる）
+const DOM_EN = { D1: "Cloud Concepts", D2: "Security and Compliance", D3: "Cloud Technology and Services", D4: "Billing, Pricing, and Support" };
+DOMAINS.forEach((d) => { if (!d.nameEn && DOM_EN[d.id]) d.nameEn = DOM_EN[d.id]; });
 const CLF_C = { primary: "#EC7211", deep: "#232F3E", light: "#FCEEDA", mid: "#E4D5BE", ink: "#16202E", ok: "#1d9e75", ng: "#d93025" };
-const CLF_DOMS = DOMAINS.map(d => ({ id: d.id, name: d.name, hue: d.color }));
+const CLF_DOMS = DOMAINS.map(d => ({ id: d.id, name: d.name, nameEn: d.nameEn, hue: d.color }));
 
 /* ===== 選択肢シャッフル（シード付き決定論的）=====
    元データは正解が常に o[0]（a:0）。表示時にシードで並べ替え、
@@ -174043,6 +174046,241 @@ var ILLUSTS = [
 
 const STORE_KEY = "clf_c02_dashboard_v1";
 
+/* ===== 表示言語（日本語 / English）=====
+   言語は App が描画のたびに XL.v へ入れる。子ビューは Lx / tget() で読むので lang を props で回さない。
+   採点・シャッフル・保存キー・保存値はすべて日本語データのまま（表示だけ切り替える）。 */
+const LANG_KEY = STORE_KEY + "_lang";
+const XL = { v: "ja" };
+function Lx(o, k) {
+  if (!o) return "";
+  const v = XL.v === "en" ? o[k + "En"] : undefined;
+  return v != null && v !== "" ? v : o[k];
+}
+// 配列フィールド（TREES.lines / SERVICE_MAP.items[].r など）の英語版。無ければ日本語。
+function arrL(o, k) {
+  const v = XL.v === "en" && o ? o[k + "En"] : null;
+  return Array.isArray(v) && v.length ? v : (o ? o[k] : []);
+}
+function dn(d) { return d ? (XL.v === "en" ? (d.nameEn || DOM_EN[d.id] || d.name) : d.name) : ""; }
+// シャッフル済みの選択肢（日本語 sh.o）と同じ並びで表示用の文言を返す。正解位置・判定は sh のまま。
+function optsL(q, sh) {
+  const base = sh && sh.o ? sh.o : [];
+  if (XL.v !== "en" || !q || !Array.isArray(q.o) || !Array.isArray(q.oEn) || q.oEn.length !== q.o.length) return base;
+  const used = {};
+  return base.map((t) => {
+    for (let j = 0; j < q.o.length; j++) if (!used[j] && q.o[j] === t) { used[j] = true; return q.oEn[j] || t; }
+    return t;
+  });
+}
+// 復習リストの保存値（日本語）から元の設問を引き当てる（英語表示用。見つからなければ null）
+function wrongOrig(k, w) {
+  const p = String(k).split(":");
+  const bank = p[0] === "quiz" ? SETS[p[1]] : (p[0] === "mock" ? MOCK_SETS[p[1]] : null);
+  const q = bank ? bank[Number(p[2])] : null;
+  return q && w && q.q === w.q ? q : null;
+}
+function wL(w, oq, k) { return XL.v === "en" && oq && oq[k + "En"] ? oq[k + "En"] : w[k]; }
+function srcL(s) {
+  if (XL.v !== "en") return s;
+  return String(s || "").replace(/^クイズ セット(\d+)$/, "Quiz Set $1").replace(/^模試(\d+)$/, "Mock exam $1");
+}
+// 用語集：GLOSSARY["<分類>En"] は英語版の並行配列なので分類一覧からは外す
+function glCats() { return Object.keys(GLOSSARY).filter((k) => !(/En$/.test(k) && GLOSSARY[k.slice(0, -2)])); }
+function glItems(cat) {
+  const ja = GLOSSARY[cat] || [];
+  const en = XL.v === "en" ? GLOSSARY[cat + "En"] : null;
+  if (!Array.isArray(en)) return ja;
+  return ja.map((it, i) => (Array.isArray(en[i]) && en[i][0] ? en[i] : it));
+}
+const GL_CAT_EN = { "クラウドの概念": "Cloud Concepts", "セキュリティ": "Security", "テクノロジー": "Technology", "請求・サポート": "Billing & Support" };
+function glCatL(cat) { return XL.v === "en" ? (GL_CAT_EN[cat] || cat) : cat; }
+// 混同ポイントの英語版（CONFUSE の1列目＝日本語のペア名で引く。無ければ日本語のまま）
+const CONFUSE_EN = {
+  "リージョン / AZ": ["Region / AZ", "A Region is a geographic area / an AZ is an isolated facility within it", "The Region is the one that contains the other"],
+  "高可用性 / フォールトトレランス": ["High availability / Fault tolerance", "Stays running through redundancy / tolerates failures with no downtime", "Whether any downtime occurs"],
+  "弾力性 / スケーラビリティ": ["Elasticity / Scalability", "Scales out and in automatically / room to grow", "Short-term fluctuation or long-term growth"],
+  "垂直 / 水平スケール": ["Vertical / Horizontal scaling", "Upgrade one server / add more servers", "Whether there is an upper limit"],
+  "IaaS / PaaS": ["IaaS / PaaS", "You manage the OS and above / you manage only the application", "Whether you manage the OS"],
+  "PaaS / SaaS": ["PaaS / SaaS", "A platform for building apps / using a finished product", "Build it or just use it"],
+  "オンデマンド / リザーブド": ["On-Demand / Reserved Instances", "Pay as you go / discount in exchange for a commitment", "Whether there is a long-term commitment"],
+  "リザーブド / Savings Plans": ["Reserved Instances / Savings Plans", "Commit to a specific configuration / commit to an amount of usage spend", "How flexible the commitment is"],
+  "スポット / オンデマンド": ["Spot / On-Demand", "Very cheap but can be interrupted / standard price, never interrupted", "Whether the workload tolerates interruption"],
+  "S3 / EBS": ["Amazon S3 / Amazon EBS", "Shared object storage / block storage for a single EC2 instance", "Whether it can be shared"],
+  "EBS / EFS": ["Amazon EBS / Amazon EFS", "One instance at a time / mounted by many instances at once", "Whether it can be shared concurrently"],
+  "RDS / DynamoDB": ["Amazon RDS / Amazon DynamoDB", "Relational / NoSQL", "Schema and scaling characteristics"],
+  "RDS / Redshift": ["Amazon RDS / Amazon Redshift", "Business transactions / large-scale analytics", "OLTP or OLAP"],
+  "ALB / NLB": ["ALB / NLB", "Layer 7 routing / fast Layer 4 load balancing", "Layer and use case"],
+  "セキュリティグループ / NACL": ["Security group / Network ACL", "Instance level, stateful / subnet level, stateless", "Scope and whether state is tracked"],
+  "IGW / NATゲートウェイ": ["Internet gateway / NAT gateway", "Two-way internet connectivity / outbound only", "Whether inbound connections are allowed"],
+  "ルートユーザー / IAMユーザー": ["Root user / IAM user", "All permissions, for emergencies only / individual permissions for daily use", "Scope and purpose"],
+  "IAMユーザー / ロール": ["IAM user / IAM role", "Long-term credentials / temporary delegation", "Whether the credentials are permanent"],
+  "明示拒否 / 暗黙拒否": ["Explicit deny / Implicit deny", "An explicit deny always takes precedence / everything is denied by default", "Which deny takes precedence"],
+  "KMS / CloudHSM": ["AWS KMS / AWS CloudHSM", "Managed and shared / dedicated HSM", "Level of control"],
+  "Shield / WAF": ["AWS Shield / AWS WAF", "DDoS mitigation / blocks Layer 7 attacks", "Layer and type of threat"],
+  "GuardDuty / Inspector": ["Amazon GuardDuty / Amazon Inspector", "Threat detection / vulnerability assessment", "Detection or assessment"],
+  "Inspector / Macie": ["Amazon Inspector / Amazon Macie", "Vulnerability scanning / sensitive data discovery", "Whether the target is vulnerabilities or data"],
+  "CloudWatch / CloudTrail": ["Amazon CloudWatch / AWS CloudTrail", "Operational monitoring / auditing of actions", "Performance or activity history"],
+  "CloudTrail / Config": ["AWS CloudTrail / AWS Config", "Who did what / whether the configuration is correct", "Actions or configuration"],
+  "Organizations / Control Tower": ["AWS Organizations / AWS Control Tower", "Account consolidation and billing / standardized setup with built-in governance", "Whether governance is automated"],
+  "Cost Explorer / Budgets": ["AWS Cost Explorer / AWS Budgets", "Trend analysis / budget alerts", "Analysis after the fact or alerts in advance"],
+  "マルチAZ / マルチリージョン": ["Multi-AZ / Multi-Region", "Redundancy within one Region / protection against wide-area disasters", "How wide the failure is"]
+};
+function confL(c) { const e = XL.v === "en" ? CONFUSE_EN[c[0]] : null; return e || c; }
+// サービス一覧の英語版の予備（SERVICE_MAP.items[] に nEn / dEn が無いときだけ使う。サービス名 n で引く）
+const SVC_EN = {
+  "EC2": { d: "Virtual machines where you freely manage the OS and everything above it. Choose from a wide range of instance types. Auto Scaling and ELB provide availability." },
+  "Lambda": { d: "Runs code in response to events. No servers to manage; billed by execution time (memory × duration). No charge while idle." },
+  "Lightsail": { d: "Bundles server, storage, database and networking at a low price. For quickly building small websites." },
+  "Batch": { d: "Automatically schedules large numbers of batch computing jobs. Allocates resources optimally." },
+  "ECS": { d: "Deploys and manages Docker containers. Easy to learn and ideal for AWS-style operations." },
+  "EKS": { d: "Helps you run standard Kubernetes. Choose it when you need conformance with standard Kubernetes (K8s)." },
+  "Fargate": { d: "Runs containers with no clusters to manage. Usable as a launch type for ECS/EKS." },
+  "S3": { d: "Unlimited, highly durable object storage. The foundation for static content delivery, backups and data lakes. Tiers: Standard / IA / Intelligent-Tiering / Glacier." },
+  "EBS": { d: "Persistent volumes attached to EC2. For a single instance; used for the OS and databases. Snapshots are stored in S3." },
+  "EFS": { d: "Scalable, NFS-compatible shared file storage that many EC2 instances can mount at the same time." },
+  "Glacier": { d: "Low-cost long-term storage. Three classes: Instant (immediate retrieval) / Flexible / Deep Archive (cheapest; retrieval takes time)." },
+  "Storage Gateway": { d: "Connects on-premises environments with S3. Bridges existing environments and the cloud for gradual data migration." },
+  "RDS": { d: "Relational database with automated patching and backups. Supports multiple engines. Read replicas spread read traffic; Multi-AZ provides high availability." },
+  "Aurora": { d: "MySQL/PostgreSQL-compatible and optimized for the cloud. Managed distributed storage. The Serverless version adjusts capacity automatically." },
+  "DynamoDB": { d: "Fully managed NoSQL with millisecond response times. Key-value, scales automatically. Global tables replicate data across Regions." },
+  "Redshift": { d: "Petabyte-scale columnar analytics database. For large-scale analytics (OLAP). Redshift Spectrum queries S3 directly." },
+  "ElastiCache": { d: "Caches frequent queries to cut response times. Also used to keep session data outside the servers." },
+  "VPC": { d: "A logically isolated private network space. Designed with public and private subnets." },
+  "Route 53": { d: "DNS routing that resolves domain names to IP addresses. Failover driven by health checks." },
+  "CloudFront": { d: "Reduces latency by delivering content from edge locations. S3, ELB or your own servers can be the origin." },
+  "Direct Connect": { d: "Connects on-premises to AWS over a dedicated line. Stable bandwidth and low latency. A VPN is the cheaper encrypted tunnel." },
+  "API Gateway": { d: "Create, publish and manage APIs. Throttling and authorization. The entry point of serverless architectures." },
+  "ALB": { d: "Routes HTTP/HTTPS traffic by path or host. Smart load balancing for web apps." },
+  "NLB": { d: "Ultra-high-throughput, low-latency TCP/UDP load balancing. Layer 4 balancing built for speed." },
+  "Global Accelerator": { d: "Directs users to the nearest endpoint over the AWS network. Also improves availability." },
+  "SQS": { d: "A queue that holds messages until they are retrieved. Decouples components and smooths out load." },
+  "SNS": { d: "Publish/subscribe push to many destinations at once. Enables fan-out." },
+  "EventBridge": { d: "Routes events by rules to connect services automatically." },
+  "Step Functions": { d: "Coordinates and visualizes multi-step processes as state transitions." },
+  "Athena": { d: "Analyzes data in S3 directly with standard SQL. Serverless; billed according to the queries you run." },
+  "Glue": { d: "Automates extract, transform and load (ETL) serverlessly. Manages the Data Catalog." },
+  "EMR": { d: "Managed Hadoop/Spark distributed processing. Analysis of large data volumes." },
+  "Kinesis": { d: "Collects and processes streaming data in real time. Continuous ingestion." },
+  "QuickSight": { d: "A BI service that turns analysis results into dashboards." },
+  "SageMaker": { d: "Build, train and deploy machine learning models end to end, integrated through to operations." },
+  "Bedrock": { d: "Use multiple foundation models through an API. Build generative AI into your applications." },
+  "Rekognition": { d: "Detects objects and faces in images and video. Content analysis." },
+  "Comprehend": { d: "Extracts sentiment and key phrases from text. Semantic analysis." },
+  "その他": { n: "Others", d: "Polly (text-to-speech), Transcribe (speech-to-text), Translate (translation), Textract (OCR), Lex (conversational bots)." },
+  "IAM": { d: "Manages access to resources. Achieves least privilege with users, groups, roles and policies." },
+  "Shield / WAF": { d: "Shield (DDoS mitigation; Standard is free) and WAF (blocks Layer 7 web attacks). Combine them for layered protection." },
+  "GuardDuty / Inspector / Macie": { d: "GuardDuty (threat detection), Inspector (vulnerability assessment), Macie (sensitive data discovery in S3)." },
+  "KMS / Secrets Manager": { d: "KMS (central key management), CloudHSM (dedicated HSM), Secrets Manager (stores secrets with automatic rotation), ACM (certificates)." },
+  "Artifact": { d: "On-demand access to compliance reports such as SOC and ISO." },
+  "CloudWatch": { d: "Visualizes operational status with metrics, logs and alarms. Set threshold alarms." },
+  "CloudTrail": { d: "Records the history of API calls (who did what). The foundation for governance and investigations." },
+  "Config": { d: "Tracks changes to resource configurations and evaluates compliance." },
+  "Organizations": { d: "Central management of accounts and consolidated billing. SCPs set permission limits." },
+  "Systems Manager": { d: "Centralizes patching and parameter management. Session Manager provides secure connections without keys." },
+  "CloudFormation": { d: "Defines infrastructure in JSON/YAML templates and builds it automatically. Ensures reproducibility." },
+  "Code系": { n: "Code services", d: "CodeCommit (source) → CodeBuild (build) → CodeDeploy (deploy), tied together by CodePipeline." },
+  "DMS": { d: "Migrates databases to another engine or cloud with minimal downtime. SCT converts schemas." },
+  "Snowファミリー": { n: "Snow Family", d: "Moves large volumes of data on physical devices when network bandwidth is limited." }
+};
+function svcL(it, k) {
+  const v = Lx(it, k);
+  if (XL.v !== "en" || !it || v !== it[k]) return v;
+  const f = SVC_EN[it.n];
+  return (f && f[k]) || v;
+}
+
+const T = {
+  ja: {
+    en: false,
+    sub: "CLF-C02 学習ダッシュボード",
+    tabs: { progress: "進捗", quiz: "クイズ", exam: "模擬試験", review: "復習", diagram: "図解", compare: "比較", confuse: "混同ポイント", glossary: "用語集" },
+    back: "← 戻る", top: "↑ トップへ", langAria: "表示言語",
+    answered: "解答済み", accuracy: "正答率", correctN: "正解数", setsAvail: "利用可能セット",
+    progressNote: "分野別の進捗（クイズの解答実績・試験の重み付け順）",
+    weight: (w) => "（" + w + "%）",
+    domStat: (done, total, cr) => done + "/" + total + "問・正答" + cr + "%",
+    resetRecords: "記録をリセット",
+    setN: (n) => "セット" + n, preparing: "（準備中）", setPreparing: "このセットは準備中です。",
+    all: "すべて", noQ: "該当する問題なし",
+    saved: "💾 保存済", save: "💾 セーブ", resume: "▶ 続きから", del: "削除",
+    fixed: "固定順", random: "ランダム",
+    setAnswered: (s, n) => "セット" + s + "：" + n + "問 解答済み",
+    resetSet: "このセットの解答をリセット",
+    correct: "正解", incorrect: "不正解", prev: "前へ", next: "次へ",
+    practiceMode: "演習モード", realMode: "本番モード", practice: "演習", real: "本番",
+    examTitle: "模擬試験 — クイズとは別の専用問題",
+    examDesc1: "各模試65問・全分野ミックス（D1:15 / D2:20 / D3:22 / D4:8、試験配点に準拠）。5セットはすべて別問題。合格ラインは70%です。",
+    examDesc2: "演習モードは1問ごとに解説表示、本番モードは最後にまとめて採点。",
+    mockN: (n) => "模試 " + n, qCount: (n) => n + "問", notReady: "準備中", startArrow: (m) => m + " 開始 →",
+    runHead: (s, m) => "模試" + s + "（" + m + "）", gap: "　", answeredN: (n) => "解答済み " + n,
+    grade: "採点する", quit: "中断して戻る",
+    resultHead: (s, m) => "模試" + s + "（" + m + "モード）総合正答率",
+    sep: "・",
+    passReached: "合格ライン到達", passShort: (n) => "合格まであと" + n + "%", ofQ: (c, n) => "（" + c + "/" + n + "問）",
+    again: "もう一度", hideAns: "解答を閉じる", showAns: "解答を確認", toSets: "セット選択へ",
+    correctAns: "正解：", yourAns: "あなたの解答：", unanswered: "未回答",
+    reviewTitle: "間違えた問題（復習リスト）",
+    reviewEmpty: "まだ間違えた問題はありません。クイズや模擬試験で間違えると、ここに自動で貯まります。",
+    reviewCount: (n) => "全" + n + "問。正解できた問題はリストから自動的に消えます。",
+    domCount: (id, n) => id + " " + n + "問",
+    clearReview: "復習リストを空にする", srcLabel: "出題：",
+    closeBtn: "閉じる", showAnsExpl: "答えと解説を見る", gotIt: "理解した（削除）",
+    diagramIntro: "主要な概念を図で理解する。階層・並列処理・フロー・概念マップなど。図の文字をクリックすると意味とメモ欄が出ます。「ラベルを隠して思い出す」で暗記、＋で拡大もできます。",
+    svcList: "サービス一覧", treeTab: "樹形図",
+    svcIntro: "分野ごとの主要サービスを一覧で比較。カードをタップで説明と関連サービスが開く。",
+    related: "関連・併用",
+    treeIntro: "主要テーマの構造を樹形図で整理。タップで開閉。",
+    confuseIntro: (n) => "試験で混同しやすいペアと判断ポイント（全" + n + "組）。",
+    axis: "判断軸：",
+    glSearch: "用語を検索…", noTerm: "該当する用語なし",
+  },
+  en: {
+    en: true,
+    sub: "CLF-C02 Study Dashboard",
+    tabs: { progress: "Progress", quiz: "Quiz", exam: "Mock Exam", review: "Review", diagram: "Diagrams", compare: "Compare", confuse: "Confusing Pairs", glossary: "Glossary" },
+    back: "← Back", top: "↑ Top", langAria: "Display language",
+    answered: "Answered", accuracy: "Accuracy", correctN: "Correct", setsAvail: "Sets available",
+    progressNote: "Progress by domain (quiz results, in exam-weight order)",
+    weight: (w) => "(" + w + "%)",
+    domStat: (done, total, cr) => done + "/" + total + " Qs · " + cr + "% correct",
+    resetRecords: "Reset records",
+    setN: (n) => "Set " + n, preparing: " (coming soon)", setPreparing: "This set is not ready yet.",
+    all: "All", noQ: "No matching questions",
+    saved: "💾 Saved", save: "💾 Save", resume: "▶ Resume", del: "Delete",
+    fixed: "Fixed order", random: "Random",
+    setAnswered: (s, n) => "Set " + s + ": " + n + " answered",
+    resetSet: "Reset answers for this set",
+    correct: "Correct", incorrect: "Incorrect", prev: "Previous", next: "Next",
+    practiceMode: "Practice mode", realMode: "Real mode", practice: "Practice", real: "Real",
+    examTitle: "Mock exam — dedicated questions, separate from the quiz",
+    examDesc1: "65 questions per mock exam, mixing all domains (D1:15 / D2:20 / D3:22 / D4:8, following the exam weighting). All 5 sets have different questions. The passing line is 70%.",
+    examDesc2: "Practice mode shows the explanation after each question; real mode scores everything at the end.",
+    mockN: (n) => "Mock " + n, qCount: (n) => n + " questions", notReady: "Coming soon", startArrow: (m) => "Start " + m + " →",
+    runHead: (s, m) => "Mock " + s + " (" + m + ")", gap: "  ", answeredN: (n) => "Answered " + n,
+    grade: "Score", quit: "Quit and go back",
+    resultHead: (s, m) => "Mock " + s + " (" + m + " mode) — overall accuracy",
+    sep: " · ",
+    passReached: "Passing line reached", passShort: (n) => n + "% short of passing", ofQ: (c, n) => " (" + c + "/" + n + ")",
+    again: "Try again", hideAns: "Hide answers", showAns: "Review answers", toSets: "Back to set selection",
+    correctAns: "Correct answer: ", yourAns: "Your answer: ", unanswered: "Unanswered",
+    reviewTitle: "Missed questions (review list)",
+    reviewEmpty: "No missed questions yet. Questions you get wrong in quizzes or mock exams are collected here automatically.",
+    reviewCount: (n) => n + " questions in total. Questions you answer correctly are removed from the list automatically.",
+    domCount: (id, n) => id + " · " + n,
+    clearReview: "Clear review list", srcLabel: "Source: ",
+    closeBtn: "Close", showAnsExpl: "Show answer and explanation", gotIt: "Got it (remove)",
+    diagramIntro: "Understand key concepts through diagrams: hierarchies, parallel processing, flows, concept maps and more. Click any text in a diagram to see its meaning and a notes field. Use \u201cHide labels (recall)\u201d to memorize, and ＋ to zoom in.",
+    svcList: "Service list", treeTab: "Tree diagrams",
+    svcIntro: "Compare the main services by category. Tap a card to open its description and related services.",
+    related: "Related / used with",
+    treeIntro: "Key topics organized as tree diagrams. Tap to expand or collapse.",
+    confuseIntro: (n) => "Pairs that are easy to confuse on the exam, with the deciding point (" + n + " pairs).",
+    axis: "Deciding factor: ",
+    glSearch: "Search terms…", noTerm: "No matching terms",
+  },
+};
+function tget() { return T[XL.v] || T.ja; }
+
 const TABS = [
   { id: "progress", label: "進捗" },
   { id: "quiz", label: "クイズ" },
@@ -174092,17 +174330,18 @@ function ProgressView({ state, setState }) {
   DOMAINS.forEach((d) => { done += s[d.id].done; correct += s[d.id].correct; total += s[d.id].total; });
   const rate = done ? Math.round((correct / done) * 100) : 0;
   const readyN = allReadySets().length;
+  const tl = tget();
 
   return (
     <div>
       <div className="metrics">
-        <div className="metric"><p className="lbl">解答済み</p><p className="val">{done} / {total}</p></div>
-        <div className="metric"><p className="lbl">正答率</p><p className="val">{rate}%</p></div>
-        <div className="metric"><p className="lbl">正解数</p><p className="val">{correct}</p></div>
-        <div className="metric"><p className="lbl">利用可能セット</p><p className="val">{readyN} / 5</p></div>
+        <div className="metric"><p className="lbl">{tl.answered}</p><p className="val">{done} / {total}</p></div>
+        <div className="metric"><p className="lbl">{tl.accuracy}</p><p className="val">{rate}%</p></div>
+        <div className="metric"><p className="lbl">{tl.correctN}</p><p className="val">{correct}</p></div>
+        <div className="metric"><p className="lbl">{tl.setsAvail}</p><p className="val">{readyN} / 5</p></div>
       </div>
       <p style={{ fontSize: 13, color: "#666", margin: "0 0 12px" }}>
-        分野別の進捗（クイズの解答実績・試験の重み付け順）
+        {tl.progressNote}
       </p>
       {DOMAINS.map((d) => {
         const st = s[d.id];
@@ -174112,9 +174351,9 @@ function ProgressView({ state, setState }) {
           <div className="bar-row" key={d.id}>
             <div className="bar-head">
               <span style={{ fontSize: 14, fontWeight: 600 }}>
-                {d.id} {d.name} <span style={{ color: "#6f6f6f", fontWeight: 400, fontSize: 12 }}>（{d.weight}%）</span>
+                {d.id} {dn(d)} <span style={{ color: "#6f6f6f", fontWeight: 400, fontSize: 12 }}>{tl.weight(d.weight)}</span>
               </span>
-              <span style={{ fontSize: 12, color: "#666" }}>{st.done}/{st.total}問・正答{cr}%</span>
+              <span style={{ fontSize: 12, color: "#666" }}>{tl.domStat(st.done, st.total, cr)}</span>
             </div>
             <div className="bar-track"><div className="bar-fill" style={{ width: pct + "%", background: d.color }} /></div>
           </div>
@@ -174125,7 +174364,7 @@ function ProgressView({ state, setState }) {
         style={{ marginTop: 10 }}
         onClick={() => setState((prev) => ({ ...prev, results: {} }))}
       >
-        記録をリセット
+        {tl.resetRecords}
       </button>
     </div>
   );
@@ -174138,6 +174377,7 @@ function QuizView({ quizSet, setQuizSet, quizFilter, setQuizFilter, quizIdx, set
   const slot = useQuizSlot("clf_c02_dashboard_v1:quiz_resume");
   const domDone = useDoneSet("clf_c02_study_v1:quiz_resume:dc");
   const setDone = useDoneSet("clf_c02_study_v1:quiz_resume:setdc");
+  const tl = tget();
   const idxs = useMemo(() => {
     const base = [];
     SETS[quizSet].forEach((q, i) => { if (quizFilter === "all" || q.d === quizFilter) base.push(i); });
@@ -174157,16 +174397,16 @@ function QuizView({ quizSet, setQuizSet, quizFilter, setQuizFilter, quizIdx, set
               style={!SET_READY[n] ? { opacity: 0.4, cursor: "default" } : undefined}
               onClick={() => { if (SET_READY[n]) { setQuizSet(n); setQuizIdx(0); } }}
             >
-              {SET_READY[n] ? <DoneCheck on={setDone.has(n)} onToggle={(e) => setDone.toggle(n, e)} /> : null}セット{n}{SET_READY[n] ? "" : "（準備中）"}
+              {SET_READY[n] ? <DoneCheck on={setDone.has(n)} onToggle={(e) => setDone.toggle(n, e)} en={tl.en} /> : null}{tl.setN(n)}{SET_READY[n] ? "" : tl.preparing}
             </button>
           ))}
         </div>
-        <div className="card">このセットは準備中です。</div>
+        <div className="card">{tl.setPreparing}</div>
       </div>
     );
   }
 
-  const filters = [["all", "すべて"]].concat(DOMAINS.map((d) => [d.id, d.id]));
+  const filters = [["all", tl.all]].concat(DOMAINS.map((d) => [d.id, d.id]));
   let curIdx = quizIdx;
   if (curIdx >= idxs.length) curIdx = 0;
   const setAnswered = SETS[quizSet].filter((_, i) => state.results.hasOwnProperty(quizSet + ":" + i)).length;
@@ -174176,7 +174416,7 @@ function QuizView({ quizSet, setQuizSet, quizFilter, setQuizFilter, quizIdx, set
       <div>
         <div className="seg-btns">
           {Array.from({ length: SET_COUNT }, (_, i) => i + 1).map((n) => (
-            <button key={n} className={"subtab" + (quizSet === n ? " on" : "")} onClick={() => { setQuizSet(n); setQuizIdx(0); }}><DoneCheck on={setDone.has(n)} onToggle={(e) => setDone.toggle(n, e)} />セット{n}</button>
+            <button key={n} className={"subtab" + (quizSet === n ? " on" : "")} onClick={() => { setQuizSet(n); setQuizIdx(0); }}><DoneCheck on={setDone.has(n)} onToggle={(e) => setDone.toggle(n, e)} en={tl.en} />{tl.setN(n)}</button>
           ))}
         </div>
         <div className="seg-btns">
@@ -174184,7 +174424,7 @@ function QuizView({ quizSet, setQuizSet, quizFilter, setQuizFilter, quizIdx, set
             <button key={f[0]} className={"subtab" + (quizFilter === f[0] ? " on" : "")} onClick={() => { setQuizFilter(f[0]); setQuizIdx(0); }}>{f[1]}</button>
           ))}
         </div>
-        <div className="card">該当する問題なし</div>
+        <div className="card">{tl.noQ}</div>
       </div>
     );
   }
@@ -174193,46 +174433,47 @@ function QuizView({ quizSet, setQuizSet, quizFilter, setQuizFilter, quizIdx, set
   const q = SETS[quizSet][gi];
   const d = dom(q.d);
   const sh = shuffledQ(q, "quiz" + quizSet + ":");
+  const shL = optsL(q, sh);
   const key = quizSet + ":" + gi;
   const answered = state.results.hasOwnProperty(key);
 
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
-        <button className="btn" style={{ padding: "6px 14px", fontSize: 12.5 }} onClick={() => slot.save({ quizSet, quizFilter, orderMode, shufKey, quizIdx }, "セット" + quizSet)}>{slot.meta ? "💾 保存済" : "💾 セーブ"}</button>
+        <button className="btn" style={{ padding: "6px 14px", fontSize: 12.5 }} onClick={() => slot.save({ quizSet, quizFilter, orderMode, shufKey, quizIdx }, "セット" + quizSet)}>{slot.meta ? tl.saved : tl.save}</button>
         {slot.meta && (<>
-          <button className="btn" style={{ padding: "6px 14px", fontSize: 12.5 }} onClick={async () => { const d = await slot.read(); if (!d) return; setQuizSet(d.quizSet || 1); setQuizFilter(d.quizFilter || "all"); setOrderMode(d.orderMode || "fixed"); setShufKey(d.shufKey || 0); setQuizIdx(d.quizIdx || 0); }}>▶ 続きから</button>
+          <button className="btn" style={{ padding: "6px 14px", fontSize: 12.5 }} onClick={async () => { const d = await slot.read(); if (!d) return; setQuizSet(d.quizSet || 1); setQuizFilter(d.quizFilter || "all"); setOrderMode(d.orderMode || "fixed"); setShufKey(d.shufKey || 0); setQuizIdx(d.quizIdx || 0); }}>{tl.resume}</button>
           <span style={{ fontSize: 11, color: "#6f6f6f" }}>{saveStamp(slot.meta.t)}</span>
-          <button className="btn" style={{ padding: "6px 10px", fontSize: 11 }} onClick={() => slot.remove()}>削除</button>
+          <button className="btn" style={{ padding: "6px 10px", fontSize: 11 }} onClick={() => slot.remove()}>{tl.del}</button>
         </>)}
       </div>
       <div className="seg-btns">
         {Array.from({ length: SET_COUNT }, (_, i) => i + 1).map((n) => (
-          <button key={n} className={"subtab" + (quizSet === n ? " on" : "")} onClick={() => { setQuizSet(n); setQuizIdx(0); }}><DoneCheck on={setDone.has(n)} onToggle={(e) => setDone.toggle(n, e)} />セット{n}</button>
+          <button key={n} className={"subtab" + (quizSet === n ? " on" : "")} onClick={() => { setQuizSet(n); setQuizIdx(0); }}><DoneCheck on={setDone.has(n)} onToggle={(e) => setDone.toggle(n, e)} en={tl.en} />{tl.setN(n)}</button>
         ))}
       </div>
       <div className="seg-btns">
         {filters.map((f) => (
-          <button key={f[0]} className={"subtab" + (quizFilter === f[0] ? " on" : "")} onClick={() => { setQuizFilter(f[0]); setQuizIdx(0); }} style={{ display: "inline-flex", alignItems: "center", gap: 3 }}><DoneCheck on={domDone.has(f[0])} onToggle={(e) => domDone.toggle(f[0], e)} />{f[1]}</button>
+          <button key={f[0]} className={"subtab" + (quizFilter === f[0] ? " on" : "")} onClick={() => { setQuizFilter(f[0]); setQuizIdx(0); }} style={{ display: "inline-flex", alignItems: "center", gap: 3 }}><DoneCheck on={domDone.has(f[0])} onToggle={(e) => domDone.toggle(f[0], e)} en={tl.en} />{f[1]}</button>
         ))}
       </div>
       <div className="seg-btns">
-        {[["fixed", "固定順"], ["random", "ランダム"]].map(([k, label]) => (
+        {[["fixed", tl.fixed], ["random", tl.random]].map(([k, label]) => (
           <button key={k} className={"subtab" + (orderMode === k ? " on" : "")} onClick={() => { setOrderMode(k); if (k === "random") setShufKey(x => x + 1); setQuizIdx(0); }}>{label}</button>
         ))}
       </div>
       {setAnswered > 0 && (
         <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 10, marginBottom: 12 }}>
-          <span style={{ fontSize: 12, color: "#6f6f6f" }}>セット{quizSet}：{setAnswered}問 解答済み</span>
-          <button className="btn" style={{ padding: "6px 14px", fontSize: 13 }} onClick={() => resetSet(quizSet)}>このセットの解答をリセット</button>
+          <span style={{ fontSize: 12, color: "#6f6f6f" }}>{tl.setAnswered(quizSet, setAnswered)}</span>
+          <button className="btn" style={{ padding: "6px 14px", fontSize: 13 }} onClick={() => resetSet(quizSet)}>{tl.resetSet}</button>
         </div>
       )}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-        <span className="badge" style={{ background: d.color }}>{q.d} {d.name}</span>
+        <span className="badge" style={{ background: d.color }}>{q.d} {dn(d)}</span>
         <span style={{ fontSize: 12, color: "#666" }}>{curIdx + 1} / {idxs.length}</span>
       </div>
       <div className="card">
-        <div style={{ display:"flex", alignItems:"flex-start", gap:6, margin:"0 0 14px" }}><p style={{ fontSize: 15, fontWeight: 600, margin:0, lineHeight: 1.6, flex:1 }}>{q.q}</p><StarButton id={"q#"+novaQHash(q.q||"")} text={q.q} scope={"クイズ"} /></div>
+        <div style={{ display:"flex", alignItems:"flex-start", gap:6, margin:"0 0 14px" }}><p style={{ fontSize: 15, fontWeight: 600, margin:0, lineHeight: 1.6, flex:1 }}>{Lx(q, "q")}</p><StarButton id={"q#"+novaQHash(q.q||"")} text={q.q} scope={"クイズ"} /></div>
         {sh.o.map((opt, oi) => {
           let cls = "opt";
           if (answered) { if (oi === sh.a) cls += " correct"; else if (oi === state.results[key]) cls += " wrong"; }
@@ -174242,7 +174483,7 @@ function QuizView({ quizSet, setQuizSet, quizFilter, setQuizFilter, quizIdx, set
               className={cls}
               onClick={() => { if (!answered) answerQuiz(quizSet, gi, oi, sh); }}
             >
-              {opt}
+              {shL[oi]}
             </div>
           );
         })}
@@ -174250,14 +174491,14 @@ function QuizView({ quizSet, setQuizSet, quizFilter, setQuizFilter, quizIdx, set
           const ok = state.results[key] === sh.a;
           return (
             <div className="expl">
-              <span style={{ fontWeight: 600, color: ok ? "#1e8e3e" : "#d93025" }}>{ok ? "正解" : "不正解"}</span> — {q.e}
+              <span style={{ fontWeight: 600, color: ok ? "#1e8e3e" : "#d93025" }}>{ok ? tl.correct : tl.incorrect}</span> — {Lx(q, "e")}
             </div>
           );
         })()}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: 14 }}>
-        <button className="btn" style={{ padding: "10px 30px" }} disabled={curIdx === 0} onClick={() => setQuizIdx(Math.max(0, curIdx - 1))}>前へ</button>
-        <button className="btn" style={{ padding: "10px 30px" }} disabled={curIdx >= idxs.length - 1} onClick={() => setQuizIdx(Math.min(idxs.length - 1, curIdx + 1))}>次へ</button>
+        <button className="btn" style={{ padding: "10px 30px" }} disabled={curIdx === 0} onClick={() => setQuizIdx(Math.max(0, curIdx - 1))}>{tl.prev}</button>
+        <button className="btn" style={{ padding: "10px 30px" }} disabled={curIdx >= idxs.length - 1} onClick={() => setQuizIdx(Math.min(idxs.length - 1, curIdx + 1))}>{tl.next}</button>
       </div>
     </div>
   );
@@ -174266,21 +174507,22 @@ function QuizView({ quizSet, setQuizSet, quizFilter, setQuizFilter, quizIdx, set
 /* ---------------- 模擬試験 ---------------- */
 function ExamView({ examMode, setExamMode, exam, setExam, gradeAndSubmit }) {
   const mockDone = useDoneSet("clf_c02_study_v1:exam_resume:mockdc");
+  const tl = tget();
   if (exam) {
     if (exam.submitted) return <ExamResultView exam={exam} setExam={setExam} />;
     return <ExamRunningView exam={exam} setExam={setExam} gradeAndSubmit={gradeAndSubmit} />;
   }
-  const modeLabel = examMode === "practice" ? "演習モード" : "本番モード";
+  const modeLabel = examMode === "practice" ? tl.practiceMode : tl.realMode;
   return (
     <div>
       <div className="card" style={{ marginBottom: 16 }}>
-        <p style={{ fontSize: 15, fontWeight: 600, margin: "0 0 6px" }}>模擬試験 — クイズとは別の専用問題</p>
-        <p style={{ fontSize: 13, color: "#666", margin: "0 0 4px", lineHeight: 1.6 }}>各模試65問・全分野ミックス（D1:15 / D2:20 / D3:22 / D4:8、試験配点に準拠）。5セットはすべて別問題。合格ラインは70%です。</p>
-        <p style={{ fontSize: 13, color: "#666", margin: "0 0 14px", lineHeight: 1.6 }}>演習モードは1問ごとに解説表示、本番モードは最後にまとめて採点。</p>
+        <p style={{ fontSize: 15, fontWeight: 600, margin: "0 0 6px" }}>{tl.examTitle}</p>
+        <p style={{ fontSize: 13, color: "#666", margin: "0 0 4px", lineHeight: 1.6 }}>{tl.examDesc1}</p>
+        <p style={{ fontSize: 13, color: "#666", margin: "0 0 14px", lineHeight: 1.6 }}>{tl.examDesc2}</p>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <div style={{ display: "inline-flex", background: "#f1efe8", borderRadius: 999, padding: 4, gap: 2 }}>
-            <button className={"modebtn" + (examMode === "practice" ? " on" : "")} onClick={() => setExamMode("practice")}>演習モード</button>
-            <button className={"modebtn" + (examMode === "real" ? " on" : "")} onClick={() => setExamMode("real")}>本番モード</button>
+            <button className={"modebtn" + (examMode === "practice" ? " on" : "")} onClick={() => setExamMode("practice")}>{tl.practiceMode}</button>
+            <button className={"modebtn" + (examMode === "real" ? " on" : "")} onClick={() => setExamMode("real")}>{tl.realMode}</button>
           </div>
         </div>
       </div>
@@ -174293,8 +174535,8 @@ function ExamView({ examMode, setExamMode, exam, setExam, gradeAndSubmit }) {
             className={"setcard" + (ok ? "" : " off")}
             onClick={() => { if (ok) setExam({ set: n, mode: examMode, cur: 0, ans: {}, submitted: false, review: false, sh: buildExamShuffle(n) }); }}
           >
-            <div style={{ display: "flex", alignItems: "center" }}><DoneCheck on={mockDone.has("m" + n)} onToggle={(e) => mockDone.toggle("m" + n, e)} /><span style={{ fontSize: 15, fontWeight: 600 }}>模試 {n}</span> <span style={{ fontSize: 13, color: "#6f6f6f", marginLeft: 8 }}>{ok ? cnt + "問" : "準備中"}</span></div>
-            {ok && <div style={{ fontSize: 14, color: "#a8632a", fontWeight: 500, whiteSpace: "nowrap" }}>{modeLabel} 開始 →</div>}
+            <div style={{ display: "flex", alignItems: "center" }}><DoneCheck on={mockDone.has("m" + n)} onToggle={(e) => mockDone.toggle("m" + n, e)} en={tl.en} /><span style={{ fontSize: 15, fontWeight: 600 }}>{tl.mockN(n)}</span> <span style={{ fontSize: 13, color: "#6f6f6f", marginLeft: 8 }}>{ok ? tl.qCount(cnt) : tl.notReady}</span></div>
+            {ok && <div style={{ fontSize: 14, color: "#a8632a", fontWeight: 500, whiteSpace: "nowrap" }}>{tl.startArrow(modeLabel)}</div>}
           </div>
         );
       })}
@@ -174308,16 +174550,18 @@ function ExamRunningView({ exam, setExam, gradeAndSubmit }) {
   const doneCount = Object.keys(exam.ans).length;
   const practice = exam.mode === "practice";
   const answered = practice && sel != null;
+  const tl = tget();
+  const shL = optsL(q, sh);
 
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-        <span style={{ fontSize: 12, color: "#666" }}>模試{exam.set}（{practice ? "演習" : "本番"}）　{d.id}　{i + 1} / {Q.length}</span>
-        <span style={{ fontSize: 12, color: "#666" }}>解答済み {doneCount}</span>
+        <span style={{ fontSize: 12, color: "#666" }}>{tl.runHead(exam.set, practice ? tl.practice : tl.real)}{tl.gap}{d.id}{tl.gap}{i + 1} / {Q.length}</span>
+        <span style={{ fontSize: 12, color: "#666" }}>{tl.answeredN(doneCount)}</span>
       </div>
       <div className="progress-line"><div style={{ height: "100%", width: Math.round(((i + 1) / Q.length) * 100) + "%", background: "#4285f4" }} /></div>
       <div className="card">
-        <div style={{ display:"flex", alignItems:"flex-start", gap:6, margin:"0 0 14px" }}><p style={{ fontSize: 15, fontWeight: 600, margin:0, lineHeight: 1.6, flex:1 }}>{q.q}</p><StarButton id={"q#"+novaQHash(q.q||"")} text={q.q} scope={"模試"} /></div>
+        <div style={{ display:"flex", alignItems:"flex-start", gap:6, margin:"0 0 14px" }}><p style={{ fontSize: 15, fontWeight: 600, margin:0, lineHeight: 1.6, flex:1 }}>{Lx(q, "q")}</p><StarButton id={"q#"+novaQHash(q.q||"")} text={q.q} scope={"模試"} /></div>
         {sh.o.map((opt, oi) => {
           let cls = "opt";
           if (answered) { if (oi === sh.a) cls += " correct"; else if (oi === sel) cls += " wrong"; }
@@ -174331,25 +174575,25 @@ function ExamRunningView({ exam, setExam, gradeAndSubmit }) {
                 setExam((prev) => ({ ...prev, ans: { ...prev.ans, [i]: oi } }));
               }}
             >
-              {opt}
+              {shL[oi]}
             </div>
           );
         })}
         {answered && (() => {
           const ok = sel === sh.a;
-          return <div className="expl"><span style={{ fontWeight: 600, color: ok ? "#1e8e3e" : "#d93025" }}>{ok ? "正解" : "不正解"}</span> — {q.e}</div>;
+          return <div className="expl"><span style={{ fontWeight: 600, color: ok ? "#1e8e3e" : "#d93025" }}>{ok ? tl.correct : tl.incorrect}</span> — {Lx(q, "e")}</div>;
         })()}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: 14 }}>
-        <button className="btn" disabled={i === 0} onClick={() => setExam((prev) => ({ ...prev, cur: Math.max(0, prev.cur - 1) }))}>前へ</button>
+        <button className="btn" disabled={i === 0} onClick={() => setExam((prev) => ({ ...prev, cur: Math.max(0, prev.cur - 1) }))}>{tl.prev}</button>
         {i >= Q.length - 1 ? (
-          <button className="btn primary" onClick={gradeAndSubmit}>採点する</button>
+          <button className="btn primary" onClick={gradeAndSubmit}>{tl.grade}</button>
         ) : (
-          <button className="btn" onClick={() => setExam((prev) => ({ ...prev, cur: Math.min(Q.length - 1, prev.cur + 1) }))}>次へ</button>
+          <button className="btn" onClick={() => setExam((prev) => ({ ...prev, cur: Math.min(Q.length - 1, prev.cur + 1) }))}>{tl.next}</button>
         )}
       </div>
       <div style={{ textAlign: "center", marginTop: 12 }}>
-        <button className="btn" style={{ fontSize: 12, padding: "6px 14px", color: "#6f6f6f" }} onClick={() => setExam(null)}>中断して戻る</button>
+        <button className="btn" style={{ fontSize: 12, padding: "6px 14px", color: "#6f6f6f" }} onClick={() => setExam(null)}>{tl.quit}</button>
       </div>
     </div>
   );
@@ -174363,28 +174607,29 @@ function ExamResultView({ exam, setExam }) {
   Q.forEach((q, i) => { byd[q.d].t++; if (exam.ans[i] === exam.sh[i].a) { correct++; byd[q.d].c++; } });
   const rate = Math.round((correct / Q.length) * 100);
   const pass = rate >= 70;
+  const tl = tget();
 
   return (
     <div>
       <div className="card" style={{ textAlign: "center", background: "#f6f7f9", marginBottom: 18 }}>
-        <p style={{ fontSize: 13, color: "#666", margin: "0 0 4px" }}>模試{exam.set}（{exam.mode === "practice" ? "演習" : "本番"}モード）総合正答率</p>
+        <p style={{ fontSize: 13, color: "#666", margin: "0 0 4px" }}>{tl.resultHead(exam.set, exam.mode === "practice" ? tl.practice : tl.real)}</p>
         <p style={{ fontSize: 36, fontWeight: 700, margin: 0, color: pass ? "#1e8e3e" : "#d93025" }}>{rate}%</p>
-        <p style={{ fontSize: 13, margin: "6px 0 0", color: pass ? "#1e8e3e" : "#d93025" }}>{pass ? "合格ライン到達" : "合格まであと" + (70 - rate) + "%"}（{correct}/{Q.length}問）</p>
+        <p style={{ fontSize: 13, margin: "6px 0 0", color: pass ? "#1e8e3e" : "#d93025" }}>{pass ? tl.passReached : tl.passShort(70 - rate)}{tl.ofQ(correct, Q.length)}</p>
       </div>
       {DOMAINS.map((d) => {
         const b = byd[d.id];
         const pct = b.t ? Math.round((b.c / b.t) * 100) : 0;
         return (
           <div className="bar-row" key={d.id}>
-            <div className="bar-head"><span style={{ fontSize: 13 }}>{d.id} {d.name}</span><span style={{ fontSize: 12, color: "#666" }}>{b.c}/{b.t}・{pct}%</span></div>
+            <div className="bar-head"><span style={{ fontSize: 13 }}>{d.id} {dn(d)}</span><span style={{ fontSize: 12, color: "#666" }}>{b.c}/{b.t}{tl.sep}{pct}%</span></div>
             <div className="bar-track"><div className="bar-fill" style={{ width: pct + "%", background: d.color }} /></div>
           </div>
         );
       })}
       <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
-        <button className="btn" onClick={() => setExam((prev) => ({ set: prev.set, mode: prev.mode, cur: 0, ans: {}, submitted: false, review: false, sh: buildExamShuffle(prev.set) }))}>もう一度</button>
-        <button className="btn" onClick={() => setExam((prev) => ({ ...prev, review: !prev.review }))}>{exam.review ? "解答を閉じる" : "解答を確認"}</button>
-        <button className="btn" onClick={() => setExam(null)}>セット選択へ</button>
+        <button className="btn" onClick={() => setExam((prev) => ({ set: prev.set, mode: prev.mode, cur: 0, ans: {}, submitted: false, review: false, sh: buildExamShuffle(prev.set) }))}>{tl.again}</button>
+        <button className="btn" onClick={() => setExam((prev) => ({ ...prev, review: !prev.review }))}>{exam.review ? tl.hideAns : tl.showAns}</button>
+        <button className="btn" onClick={() => setExam(null)}>{tl.toSets}</button>
       </div>
       {exam.review && (
         <div style={{ marginTop: 16 }}>
@@ -174393,10 +174638,10 @@ function ExamResultView({ exam, setExam }) {
             const ok = exam.ans[i] === sh.a;
             return (
               <div className="card" style={{ marginBottom: 8, borderLeft: "3px solid " + (ok ? "#34a853" : "#ea4335") }} key={i}>
-                <p style={{ fontSize: 13, fontWeight: 600, margin: "0 0 6px" }}>{i + 1}. {q.q}</p>
-                <p style={{ fontSize: 12, margin: "0 0 3px", color: "#1e8e3e" }}>正解：{sh.o[sh.a]}</p>
-                {!ok && <p style={{ fontSize: 12, margin: "0 0 3px", color: "#d93025" }}>あなたの解答：{exam.ans[i] != null ? sh.o[exam.ans[i]] : "未回答"}</p>}
-                <p style={{ fontSize: 12, margin: "4px 0 0", color: "#666" }}>{q.e}</p>
+                <p style={{ fontSize: 13, fontWeight: 600, margin: "0 0 6px" }}>{i + 1}. {Lx(q, "q")}</p>
+                <p style={{ fontSize: 12, margin: "0 0 3px", color: "#1e8e3e" }}>{tl.correctAns}{optsL(q, sh)[sh.a]}</p>
+                {!ok && <p style={{ fontSize: 12, margin: "0 0 3px", color: "#d93025" }}>{tl.yourAns}{exam.ans[i] != null ? optsL(q, sh)[exam.ans[i]] : tl.unanswered}</p>}
+                <p style={{ fontSize: 12, margin: "4px 0 0", color: "#666" }}>{Lx(q, "e")}</p>
               </div>
             );
           })}
@@ -174409,12 +174654,13 @@ function ExamResultView({ exam, setExam }) {
 /* ---------------- 復習 ---------------- */
 function ReviewView({ state, setState, reviewShow, setReviewShow, removeWrong }) {
   const keys = Object.keys(state.wrong);
+  const tl = tget();
 
   if (keys.length === 0) {
     return (
       <div className="card" style={{ marginBottom: 16 }}>
-        <p style={{ fontSize: 15, fontWeight: 600, margin: "0 0 4px" }}>間違えた問題（復習リスト）</p>
-        <p style={{ fontSize: 13, color: "#666", margin: 0 }}>まだ間違えた問題はありません。クイズや模擬試験で間違えると、ここに自動で貯まります。</p>
+        <p style={{ fontSize: 15, fontWeight: 600, margin: "0 0 4px" }}>{tl.reviewTitle}</p>
+        <p style={{ fontSize: 13, color: "#666", margin: 0 }}>{tl.reviewEmpty}</p>
       </div>
     );
   }
@@ -174426,42 +174672,44 @@ function ReviewView({ state, setState, reviewShow, setReviewShow, removeWrong })
   return (
     <div>
       <div className="card" style={{ marginBottom: 16 }}>
-        <p style={{ fontSize: 15, fontWeight: 600, margin: "0 0 4px" }}>間違えた問題（復習リスト）</p>
-        <p style={{ fontSize: 13, color: "#666", margin: "0 0 8px" }}>全{keys.length}問。正解できた問題はリストから自動的に消えます。</p>
+        <p style={{ fontSize: 15, fontWeight: 600, margin: "0 0 4px" }}>{tl.reviewTitle}</p>
+        <p style={{ fontSize: 13, color: "#666", margin: "0 0 8px" }}>{tl.reviewCount(keys.length)}</p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-          {DOMAINS.map((d) => byd[d.id] > 0 && <span className="badge" style={{ background: d.color }} key={d.id}>{d.id} {byd[d.id]}問</span>)}
+          {DOMAINS.map((d) => byd[d.id] > 0 && <span className="badge" style={{ background: d.color }} key={d.id}>{tl.domCount(d.id, byd[d.id])}</span>)}
         </div>
       </div>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 10 }}>
-        <button className="btn" onClick={() => setState((prev) => ({ ...prev, wrong: {} }))}>復習リストを空にする</button>
+        <button className="btn" onClick={() => setState((prev) => ({ ...prev, wrong: {} }))}>{tl.clearReview}</button>
       </div>
       {keys.map((k) => {
         const w = state.wrong[k];
         const d = dom(w.d);
         const open = !!reviewShow[k];
+        const oq = wrongOrig(k, w);
+        const woL = optsL(oq, w);
         return (
           <div className="card" style={{ marginBottom: 10, borderLeft: "3px solid " + d.color }} key={k}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
-              <p style={{ fontSize: 14, fontWeight: 600, margin: 0, lineHeight: 1.5 }}>{w.q}</p>
+              <p style={{ fontSize: 14, fontWeight: 600, margin: 0, lineHeight: 1.5 }}>{wL(w, oq, "q")}</p>
               <span className="badge" style={{ background: d.color, flexShrink: 0 }}>{w.d}</span>
             </div>
-            <p style={{ fontSize: 11, color: "#6f6f6f", margin: "6px 0 0" }}>出題：{w.src}</p>
+            <p style={{ fontSize: 11, color: "#6f6f6f", margin: "6px 0 0" }}>{tl.srcLabel}{srcL(w.src)}</p>
             {open && (
               <div style={{ marginTop: 10 }}>
                 {w.o.map((opt, oi) => {
                   const isA = oi === w.a;
                   return (
                     <div className={"opt" + (isA ? " correct" : "")} style={{ cursor: "default" }} key={oi}>
-                      {opt}{isA && <span style={{ color: "#1e8e3e", float: "right" }}>正解</span>}
+                      {woL[oi]}{isA && <span style={{ color: "#1e8e3e", float: "right" }}>{tl.correct}</span>}
                     </div>
                   );
                 })}
-                <div className="expl">{w.e}</div>
+                <div className="expl">{wL(w, oq, "e")}</div>
               </div>
             )}
             <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
-              <button className="btn" style={{ padding: "6px 14px", fontSize: 13 }} onClick={() => setReviewShow((prev) => ({ ...prev, [k]: !prev[k] }))}>{open ? "閉じる" : "答えと解説を見る"}</button>
-              <button className="btn" style={{ padding: "6px 14px", fontSize: 13 }} onClick={() => removeWrong(k)}>理解した（削除）</button>
+              <button className="btn" style={{ padding: "6px 14px", fontSize: 13 }} onClick={() => setReviewShow((prev) => ({ ...prev, [k]: !prev[k] }))}>{open ? tl.closeBtn : tl.showAnsExpl}</button>
+              <button className="btn" style={{ padding: "6px 14px", fontSize: 13 }} onClick={() => removeWrong(k)}>{tl.gotIt}</button>
             </div>
           </div>
         );
@@ -174472,16 +174720,17 @@ function ReviewView({ state, setState, reviewShow, setReviewShow, removeWrong })
 
 /* ---------------- 図解 ---------------- */
 function DiagramView() {
+  const tl = tget();
   return (
     <div>
-      <p style={{ fontSize: 13, color: "#666", margin: "0 0 16px" }}>主要な概念を図で理解する。階層・並列処理・フロー・概念マップなど。図の文字をクリックすると意味とメモ欄が出ます。「ラベルを隠して思い出す」で暗記、＋で拡大もできます。</p>
+      <p style={{ fontSize: 13, color: "#666", margin: "0 0 16px" }}>{tl.diagramIntro}</p>
       {ILLUSTS.map((it) => (
         <div className="card" style={{ marginBottom: 16 }} key={it.id}>
-          <p style={{ fontSize: 15, fontWeight: 700, margin: "0 0 4px" }}>{it.t}</p>
-          <p style={{ fontSize: 12, color: "#666", margin: "0 0 12px", lineHeight: 1.6 }}>{it.desc}</p>
-          <FigFrame id={"cert:clf:" + it.id} topic={it.t}
+          <p style={{ fontSize: 15, fontWeight: 700, margin: "0 0 4px" }}>{Lx(it, "t")}</p>
+          <p style={{ fontSize: 12, color: "#666", margin: "0 0 12px", lineHeight: 1.6 }}>{Lx(it, "desc")}</p>
+          <FigFrame id={"cert:clf:" + it.id} topic={it.t} lang={XL.v}
                     terms={typeof Station_SAA !== "undefined" && Station_SAA.GLOSSARY ? Station_SAA.GLOSSARY : null}>
-            <div style={{ overflowX: "auto" }} dangerouslySetInnerHTML={{ __html: it.svg }} />
+            <div style={{ overflowX: "auto" }} dangerouslySetInnerHTML={{ __html: Lx(it, "svg") }} />
           </FigFrame>
         </div>
       ))}
@@ -174491,20 +174740,21 @@ function DiagramView() {
 
 /* ---------------- 比較（サービスマップ＋樹形図） ---------------- */
 function CompareView({ diaSub, setDiaSub, diaOpen, setDiaOpen }) {
+  const tl = tget();
   return (
     <div>
       <div className="seg-btns">
-        <button className={"subtab" + (diaSub === "service" ? " on" : "")} onClick={() => { setDiaSub("service"); setDiaOpen(null); }}>サービス一覧</button>
-        <button className={"subtab" + (diaSub === "tree" ? " on" : "")} onClick={() => { setDiaSub("tree"); setDiaOpen(null); }}>樹形図</button>
+        <button className={"subtab" + (diaSub === "service" ? " on" : "")} onClick={() => { setDiaSub("service"); setDiaOpen(null); }}>{tl.svcList}</button>
+        <button className={"subtab" + (diaSub === "tree" ? " on" : "")} onClick={() => { setDiaSub("tree"); setDiaOpen(null); }}>{tl.treeTab}</button>
       </div>
       {diaSub === "service" ? (
         <div>
-          <p style={{ fontSize: 13, color: "#666", margin: "0 0 14px" }}>分野ごとの主要サービスを一覧で比較。カードをタップで説明と関連サービスが開く。</p>
+          <p style={{ fontSize: 13, color: "#666", margin: "0 0 14px" }}>{tl.svcIntro}</p>
           {SERVICE_MAP.map((cat, ci) => (
             <div className="svc-cat" key={ci}>
               <div className="svc-cat-head">
                 <span style={{ width: 10, height: 10, borderRadius: 3, background: cat.color, display: "inline-block" }} />
-                <span className="svc-cat-name">{cat.cat}</span>
+                <span className="svc-cat-name">{Lx(cat, "cat")}</span>
               </div>
               <div className="svc-grid">
                 {cat.items.map((it, ii) => {
@@ -174512,8 +174762,8 @@ function CompareView({ diaSub, setDiaSub, diaOpen, setDiaOpen }) {
                   const isOpen = diaOpen === key;
                   return (
                     <div key={key} className={"svc-chip" + (isOpen ? " open" : "")} style={{ background: cat.bg }} onClick={() => setDiaOpen(isOpen ? null : key)}>
-                      <p className="nm" style={{ color: cat.tx }}>{it.n}</p>
-                      <p className="ss" style={{ color: cat.tx }}>{it.s}</p>
+                      <p className="nm" style={{ color: cat.tx }}>{svcL(it, "n")}</p>
+                      <p className="ss" style={{ color: cat.tx }}>{Lx(it, "s")}</p>
                     </div>
                   );
                 })}
@@ -174523,12 +174773,12 @@ function CompareView({ diaSub, setDiaSub, diaOpen, setDiaOpen }) {
                 if (diaOpen !== key) return null;
                 return (
                   <div className="svc-detail" key={key}>
-                    <p style={{ fontSize: 14, fontWeight: 700, margin: "0 0 6px", color: cat.tx }}>{it.n}</p>
-                    <p className="dd">{it.d}</p>
+                    <p style={{ fontSize: 14, fontWeight: 700, margin: "0 0 6px", color: cat.tx }}>{svcL(it, "n")}</p>
+                    <p className="dd">{svcL(it, "d")}</p>
                     {it.r && it.r.length > 0 && (
                       <>
-                        <p className="svc-rel-label">関連・併用</p>
-                        <div className="svc-rel">{it.r.map((rr) => <span key={rr}>{rr}</span>)}</div>
+                        <p className="svc-rel-label">{tl.related}</p>
+                        <div className="svc-rel">{arrL(it, "r").map((rr, ri) => <span key={ri}>{rr}</span>)}</div>
                       </>
                     )}
                   </div>
@@ -174539,11 +174789,11 @@ function CompareView({ diaSub, setDiaSub, diaOpen, setDiaOpen }) {
         </div>
       ) : (
         <div>
-          <p style={{ fontSize: 13, color: "#666", margin: "0 0 14px" }}>主要テーマの構造を樹形図で整理。タップで開閉。</p>
+          <p style={{ fontSize: 13, color: "#666", margin: "0 0 14px" }}>{tl.treeIntro}</p>
           {TREES.map((tr, i) => (
             <details className="dia" defaultOpen={i === 0} key={tr.t}>
-              <summary>{tr.t}</summary>
-              <pre className="tree">{tr.lines.join("\n")}</pre>
+              <summary>{Lx(tr, "t")}</summary>
+              <pre className="tree">{arrL(tr, "lines").join("\n")}</pre>
             </details>
           ))}
         </div>
@@ -174554,14 +174804,15 @@ function CompareView({ diaSub, setDiaSub, diaOpen, setDiaOpen }) {
 
 /* ---------------- 混同ポイント ---------------- */
 function ConfuseView() {
+  const tl = tget();
   return (
     <div>
-      <p style={{ fontSize: 13, color: "#666", margin: "0 0 14px" }}>試験で混同しやすいペアと判断ポイント（全{CONFUSE.length}組）。</p>
+      <p style={{ fontSize: 13, color: "#666", margin: "0 0 14px" }}>{tl.confuseIntro(CONFUSE.length)}</p>
       {CONFUSE.map((c, i) => (
         <div className="conf" key={i}>
-          <p className="pair">{c[0]}</p>
-          <p className="desc">{c[1]}</p>
-          <p className="axis">判断軸：{c[2]}</p>
+          <p className="pair">{confL(c)[0]}</p>
+          <p className="desc">{confL(c)[1]}</p>
+          <p className="axis">{tl.axis}{confL(c)[2]}</p>
         </div>
       ))}
     </div>
@@ -174570,14 +174821,18 @@ function ConfuseView() {
 
 /* ---------------- 用語集 ---------------- */
 function GlossaryView({ glCat, setGlCat, glSearch, setGlSearch }) {
+  const tl = tget();
   let items = [];
   if (glSearch) {
     const q = glSearch.toLowerCase();
-    Object.keys(GLOSSARY).forEach((cat) => {
-      GLOSSARY[cat].forEach((it) => { if (it[0].toLowerCase().indexOf(q) >= 0 || it[1].indexOf(glSearch) >= 0) items.push(it); });
+    // 英語表示中は英語の語と説明も検索対象（日本語でも引ける）
+    const hit = (it) => !!it && (it[0].toLowerCase().indexOf(q) >= 0 || it[1].indexOf(glSearch) >= 0 || (tl.en && String(it[1]).toLowerCase().indexOf(q) >= 0));
+    glCats().forEach((cat) => {
+      const ja = GLOSSARY[cat] || [];
+      glItems(cat).forEach((it, i) => { if (hit(it) || (it !== ja[i] && hit(ja[i]))) items.push(it); });
     });
   } else {
-    items = GLOSSARY[glCat] || [];
+    items = glItems(glCat);
   }
 
   return (
@@ -174585,22 +174840,22 @@ function GlossaryView({ glCat, setGlCat, glSearch, setGlSearch }) {
       <input
         type="text"
         className="gl-input"
-        aria-label="用語を検索…" placeholder="用語を検索…"
+        aria-label={tl.glSearch} placeholder={tl.glSearch}
         value={glSearch}
         onChange={(e) => setGlSearch(e.target.value)}
       />
       <div className="seg-btns">
-        {Object.keys(GLOSSARY).map((cat) => (
+        {glCats().map((cat) => (
           <button
             key={cat}
             className={"subtab" + (glCat === cat && !glSearch ? " on" : "")}
             onClick={() => { setGlCat(cat); setGlSearch(""); }}
           >
-            {cat}
+            {glCatL(cat)}
           </button>
         ))}
       </div>
-      {items.length === 0 && <p style={{ fontSize: 13, color: "#6f6f6f" }}>該当する用語なし</p>}
+      {items.length === 0 && <p style={{ fontSize: 13, color: "#6f6f6f" }}>{tl.noTerm}</p>}
       {items.map((it, i) => (
         <div className="gl-row" key={i}>
           <span className="gl-term">{it[0]}</span>
@@ -174624,10 +174879,14 @@ function App() {
   const [exam, setExam] = useState(null);
   const [diaSub, setDiaSub] = useState("service");
   const [diaOpen, setDiaOpen] = useState(null);
-  const [glCat, setGlCat] = useState(Object.keys(GLOSSARY)[0]);
+  const [glCat, setGlCat] = useState(glCats()[0]);
   const [glSearch, setGlSearch] = useState("");
   const [reviewShow, setReviewShow] = useState({});
   const [state, setState] = useState({ results: {}, wrong: {} });
+  const [lang, setLangRaw] = useState(() => { try { return localStorage.getItem(LANG_KEY) === "en" ? "en" : "ja"; } catch (e) { return "ja"; } });
+  const setLang = (l) => { setLangRaw(l); try { localStorage.setItem(LANG_KEY, l); } catch (e) { /* 保存できない環境では今回の表示だけ切り替える */ } };
+  XL.v = lang;
+  const tl = T[lang] || T.ja;
 
   useEffect(() => {
     let cancelled = false;
@@ -174701,23 +174960,33 @@ function App() {
         <button onClick={goBackActive}
           aria-label="Back"
           style={{ position: "fixed", right: 16, bottom: 104, zIndex: 45, border: "1.5px solid #1a3a5c", cursor: "pointer", borderRadius: 22, padding: "9px 15px", background: "#fff", color: "#1a3a5c", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.20)" }}>
-          ← 戻る
+          {tl.back}
         </button>
       )}
       {active !== "progress" && (
         <button onClick={() => { setActive("progress"); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
           aria-label="Back to top"
           style={{ position: "fixed", right: 16, bottom: 60, zIndex: 45, border: "none", cursor: "pointer", borderRadius: 22, padding: "10px 15px", background: "#1a3a5c", color: "#fff", fontSize: 12.5, fontWeight: 700, boxShadow: "0 4px 14px rgba(0,0,0,.28)" }}>
-          ↑ トップへ
+          {tl.top}
         </button>
       )}
       <div className="clf-app" id="app">
         <style>{CLF_CSS}</style>
-        <div className="hdr"><div className="logo">CLF</div><h1>AWS Certified Cloud Practitioner</h1></div>
-        <p className="sub">CLF-C02 学習ダッシュボード</p>
+        <div className="hdr"><div className="logo">CLF</div><h1>AWS Certified Cloud Practitioner</h1>
+          <div role="group" aria-label={tl.langAria} style={{ marginLeft: "auto", display: "flex", flexShrink: 0, background: CLF_C.deep, borderRadius: 20, padding: 3 }}>
+            {["ja", "en"].map((l) => (
+              <button key={l} onClick={() => setLang(l)} aria-pressed={lang === l}
+                style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "5px 12px", fontSize: 12, fontWeight: 700,
+                  background: lang === l ? "#fff" : "transparent", color: lang === l ? CLF_C.deep : "#fff" }}>
+                {l === "ja" ? "日本語" : "English"}
+              </button>
+            ))}
+          </div>
+        </div>
+        <p className="sub">{tl.sub}</p>
         <div className="tabs">
           {TABS.map((t) => (
-            <button key={t.id} className={"tab" + (active === t.id ? " on" : "")} onClick={() => setActive(t.id)}>{t.label}</button>
+            <button key={t.id} className={"tab" + (active === t.id ? " on" : "")} onClick={() => setActive(t.id)}>{tl.tabs[t.id] || t.label}</button>
           ))}
         </div>
         <div className="panel">
@@ -174731,7 +175000,7 @@ function App() {
             />
           )}
           {active === "exam" && (
-            <MSExamShell sets={MOCK_SETS} setKeys={[1, 2, 3, 4, 5]} domainSets={null} domains={CLF_DOMS} lang="ja" C={CLF_C} PASS={70} dName={(id) => (dom(id) || {}).name || id} onAnswer={() => {}} saveKey="clf_c02_dashboard_v1:msexam_resume" />
+            <MSExamShell sets={MOCK_SETS} setKeys={[1, 2, 3, 4, 5]} domainSets={null} domains={CLF_DOMS} lang={lang} C={CLF_C} PASS={70} dName={(id) => dn(dom(id)) || id} onAnswer={() => {}} saveKey="clf_c02_dashboard_v1:msexam_resume" />
           )}
           {active === "review" && (
             <ReviewView state={state} setState={setState} reviewShow={reviewShow} setReviewShow={setReviewShow} removeWrong={removeWrong} />
