@@ -217444,6 +217444,26 @@ const genreName = (key, ja) => tx(ja, GENRE_EN[key] || ja);
 const CMP_LABEL_EN = { pron:"Subject pronouns", ques:"Question words", num:"Numbers", days:"Days of the week", prep:"Basic prepositions", be:"Conjugating \"to be\"", have:"Conjugating \"to have\"", color:"Colors", greet:"Greetings & basic phrases", poss:"Possessive pronouns (mine, yours…)", neg:"Making negative sentences" };
 const PHASE_TITLE_EN = { p1:"Soak in the sound", p2:"Say it out loud", p3:"Put patterns into words", p4:"Write and share" };
 
+// ===== 読み上げの声の性別（"male" / "female"）=====
+// ヘッダーの切り替えで変わる。すべての読み上げ（単語カード・文法・比較表・クイズ）が pickVoice でこれを見る。
+const LH_GENDER_KEY = "langhub_voice_gender_v1";
+let LH_VOICE_GENDER = "male";
+try { const g0 = typeof window !== "undefined" && window.localStorage && window.localStorage.getItem(LH_GENDER_KEY); if (g0 === "male" || g0 === "female") LH_VOICE_GENDER = g0; } catch (e) { /* 保存できない環境では既定の男性 */ }
+// 声の名前から性別を推定する。Web Speech API は性別を返さないので、OS・ブラウザでよく使われる名前の一覧で判定する。
+// 名前の一部ではなく単語単位で照合する（"paul" が "Paulina" に当たらないように）。
+const LH_MALE_NAMES = new Set(["male","jorge","diego","pablo","carlos","enrique","juan","miguel","alvaro","raul","fernando","arnau","dario","elias","nil","saul","teo","cecilio","gerardo","liberto","luciano","pelayo","yago","tomas","stefan","markus","yannick","hans","klaus","werner","conrad","bernd","christoph","kasper","killian","ralf","martin","thomas","nicolas","daniel","paul","henri","antoine","alain","claude","jerome","maurice","yves","remy","david","james","alex","fred","mark","guy","george"]);
+const LH_FEMALE_NAMES = new Set(["female","monica","paulina","laura","helena","elvira","dalia","sabina","abril","estrella","irene","laia","lia","triana","vera","ximena","beatriz","candela","carlota","larissa","marina","nuria","renata","lucia","marisol","conchita","penelope","esperanza","valentina","isabel","isabela","elena","sofia","carmen","anna","katja","hedda","petra","amala","elke","gisela","klarissa","louisa","maja","tanja","vicki","marlene","sabine","amelie","audrey","aurelie","julie","hortense","denise","brigitte","celeste","coralie","eloise","jacqueline","josephine","yvette","vivienne","marie","celine","virginie","chantal","lea","samantha","karen","victoria","zira","susan","hazel","moira","tessa","fiona","aria","jenny"]);
+function lhVoiceSex(name) {
+  const words = String(name || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").split(/[^a-z]+/).filter(Boolean);
+  if (words.includes("female")) return "female";
+  if (words.includes("male")) return "male";
+  if (words.some((w) => LH_FEMALE_NAMES.has(w))) return "female";
+  if (words.some((w) => LH_MALE_NAMES.has(w))) return "male";
+  // Chrome 内蔵の Google 音声（Google español / Deutsch / français など）は女性の声
+  if (/^google\b/i.test(String(name || ""))) return "female";
+  return null;
+}
+
 // ===== 発音(Web Speech API): 単語→例文の順に読み上げる =====
 function useSpeech(){
   const [ok,setOk]=useState(false);
@@ -217461,24 +217481,6 @@ function useSpeech(){
   // 拡張機能などが後から音声を追加した場合に、手動で一覧を取り直す
   const refreshVoices=()=>loadVoices();
 
-  // 既知の男性ボイス名(OS/ブラウザのTTSエンジンでよく使われる名前)のヒント一覧
-  const MALE_NAME_HINTS = [
-    "male",
-    // スペイン語
-    "jorge","diego","pablo","carlos","enrique","juan","miguel","alvaro","raul","fernando",
-    // ドイツ語
-    "stefan","markus","yannick","hans","klaus","werner",
-    // フランス語
-    "thomas","nicolas","daniel","paul","henri","antoine",
-    // その他プラットフォーム共通の男性名
-    "david","james","alex","fred","google uk english male",
-  ];
-  const isLikelyMale=(name)=>{
-    const n=(name||"").toLowerCase();
-    if(n.includes("female")) return false;
-    return MALE_NAME_HINTS.some(hint=>n.includes(hint));
-  };
-
   // 指定言語で選べる音声の一覧(ドロップダウン表示用)
   const voicesForLang=(lang)=>{
     const exact = voices.filter(v=>v.lang===lang);
@@ -217486,15 +217488,21 @@ function useSpeech(){
     return exact.length? exact : prefix;
   };
 
+  // 声を選ぶ。手動で選んだ音声があればそのまま使う。自動のときは、選んだ性別の声を探し、
+  // 見つからなければほかの声のピッチで寄せる（男性→低く、女性→高く）
   const pickVoice=(lang,voiceURI)=>{
     const candidates = voicesForLang(lang);
     if(voiceURI){
       const chosen = candidates.find(v=>v.voiceURI===voiceURI) || voices.find(v=>v.voiceURI===voiceURI);
-      if(chosen) return { voice: chosen, matchedMale: isLikelyMale(chosen.name) };
+      if(chosen) return { voice: chosen, pitch: 1 };
     }
-    if(candidates.length===0) return {voice:undefined, matchedMale:false};
-    const maleMatch = candidates.find(v=>isLikelyMale(v.name));
-    return { voice: maleMatch || candidates[0], matchedMale: !!maleMatch };
+    const want = LH_VOICE_GENDER;
+    if(candidates.length===0) return { voice: undefined, pitch: want==="male" ? 0.6 : 1 };
+    const match = candidates.find(v=>lhVoiceSex(v.name)===want);
+    if(match) return { voice: match, pitch: 1 };
+    const v = candidates.find(c=>!lhVoiceSex(c.name)) || candidates[0];
+    const sex = lhVoiceSex(v.name);
+    return { voice: v, pitch: want==="male" ? (sex==="male" ? 1 : 0.6) : (sex==="male" ? 1.35 : 1) };
   };
 
   // texts: 文字列の配列。順番に読み上げ、前の発話が終わってから次を話す
@@ -217508,10 +217516,9 @@ function useSpeech(){
       if(i>=queue.length) return;
       const u=new SpeechSynthesisUtterance(queue[i]);
       u.lang=lang; u.rate=rate;
-      const {voice,matchedMale}=pickVoice(lang,voiceURI);
+      const {voice,pitch}=pickVoice(lang,voiceURI);
       if(voice) u.voice=voice;
-      // 男性名の音声が見つからない場合、ピッチを下げて男性寄りの声質に近づける
-      u.pitch = matchedMale ? 1 : 0.6;
+      u.pitch = pitch;
       u.onend=()=>{ i++; speakNext(); };
       window.speechSynthesis.speak(u);
     };
@@ -217662,6 +217669,9 @@ function App(){
   const [lang,setLang]=useState("es");
   const [section,setSection]=useState("home"); // home | vocab | listen | compare | quiz
   const [dark,setDark]=useState(false);
+  // 読み上げの声の性別（ヘッダーで切り替え、端末に保存）
+  const [voiceGender,setVoiceGenderState]=useState(LH_VOICE_GENDER);
+  const setVoiceGender=(gd)=>{ LH_VOICE_GENDER=gd; setVoiceGenderState(gd); try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); window.storage.set(LH_GENDER_KEY, gd); }catch(e){} };
   const t=LANGS[lang];
 
   const goto=(sec,lg)=>{ if(lg) setLang(lg); setSection(sec); };
@@ -217722,6 +217732,15 @@ function App(){
                 background:"#fff",color:"#555",fontWeight:700,fontSize:12.5,whiteSpace:"nowrap",boxShadow:"0 1px 3px rgba(0,0,0,.08)"}}>
               {ui==="ja"? "EN":"日本語"}
             </button>
+            <div role="group" aria-label={tx("読み上げの声","Reading voice")} style={{display:"flex",height:36,borderRadius:10,overflow:"hidden",boxShadow:"0 1px 3px rgba(0,0,0,.08)",background:"#fff"}}>
+              {[["male",tx("男性の声","Male voice"),"♂"],["female",tx("女性の声","Female voice"),"♀"]].map(([gd,lbl,ic])=>(
+                <button key={gd} onClick={()=>setVoiceGender(gd)} aria-pressed={voiceGender===gd} title={lbl}
+                  style={{padding:"0 10px",border:"none",cursor:"pointer",fontSize:12.5,fontWeight:700,whiteSpace:"nowrap",
+                    background: voiceGender===gd ? t.primary : "#fff", color: voiceGender===gd ? "#fff" : "#555"}}>
+                  {ic} {lbl.replace(tx("の声"," voice"),"")}
+                </button>
+              ))}
+            </div>
             <button onClick={()=>setDark(v=>!v)} title={tx("ダークモード切替","Toggle dark mode")}
               style={{width:36,height:36,borderRadius:10,border:"none",cursor:"pointer",
                 background:"#fff",fontSize:16,boxShadow:"0 1px 3px rgba(0,0,0,.08)"}}>
@@ -218064,10 +218083,10 @@ function VocabPanel({lang,t,voiceURI,onVoiceChange}){
             {voiceOptions.length>0 ? (
               <select value={voiceURI||""} onChange={e=>onVoiceChange && onVoiceChange(e.target.value||null)}
                 style={{flex:1,maxWidth:260,padding:"6px 8px",borderRadius:8,border:"1px solid #ddd",background:"#fff",fontSize:12.5}}>
-                <option value="">{tx("自動選択（男性優先）","Auto (prefers male voices)")}</option>
-                {voiceOptions.map(v=>(
-                  <option key={v.voiceURI} value={v.voiceURI}>{v.name}</option>
-                ))}
+                <option value="">{LH_VOICE_GENDER==="male" ? tx("自動選択（男性の声を優先）","Auto (prefers a male voice)") : tx("自動選択（女性の声を優先）","Auto (prefers a female voice)")}</option>
+                {voiceOptions.map(v=>{ const sx=lhVoiceSex(v.name); return (
+                  <option key={v.voiceURI} value={v.voiceURI}>{v.name}{sx==="male" ? tx("（男性）"," (male)") : sx==="female" ? tx("（女性）"," (female)") : ""}</option>
+                ); })}
               </select>
             ) : (
               <span style={{opacity:.5,fontSize:11.5}}>{tx("音声が見つかりません","No voices found")}</span>
