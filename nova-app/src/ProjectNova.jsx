@@ -174987,6 +174987,12 @@ function App() {
   );
 }
 
+// 資格一覧と弱点レーダーが、この資格の分野別の解答数と正解数を読むための入口（domainStats をそのまま使う）
+App.WEAK_TABLE = (st) => {
+  if (!st || !st.results || typeof st.results !== "object") return [];
+  let s = null; try { s = domainStats(st); } catch (e) { return []; }
+  return DOMAINS.map((d) => ({ id: d.id, dom: [d.name, d.nameEn || d.name], a: (s[d.id] || {}).done || 0, c: (s[d.id] || {}).correct || 0 })).filter((r) => r.a > 0);
+};
 return App;
 })();
 
@@ -216132,6 +216138,18 @@ function CertCheckNote({ id, lang }) {
   return <div style={{ fontSize: 12, lineHeight: 1.6, color: sty[1], background: sty[0], padding: "6px 14px", borderBottom: `1px solid ${HUB.border}` }}>{head}{body}</div>;
 }
 
+// 資格ごとの学習記録（端末内）の保存キー。一覧のカードに解答数と正答率を出すために読む
+const CERT_STORE = { clf: "clf_c02_dashboard_v1", saa: "saa_c03_study_v1", ccaf: "cca_f_study_v1", aicx: "aics_study_v2", pl900: "pl900_study_v2", ab620: "ab620_study_v2", sc500: "sc500_study_v1", sc900: "sc900_study_v1", gh600: "gh600_study_v2", ab100: "ab100_study_v2", ab410: "ab410_study_v2", ai300: "ai300_study_v2", ai103: "ai103_study_v1", ai200: "ai200_study_v1", gh900: "gh900_study_v1", gh300: "gh300_study_v1", adp: "adp_study_v3", dp900: "dp900_study_v1", aigp: "aigp_hub_study_v1", iso42001f: "iso42001f_hub_study_v1", iso42001li: "iso42001li_hub_study_v1", ccsk: "ccsk_hub_study_v1", cism: "cism_hub_study_v1", cisa: "cisa_hub_study_v1", aaism: "aaism_hub_study_v1", aair: "aair_hub_study_v1", aaia: "aaia_hub_study_v1" };
+function certProgress(id) {
+  const key = CERT_STORE[id]; if (!key) return null;
+  let st = null; try { st = JSON.parse(window.localStorage.getItem(key) || "null"); } catch (e) { return null; }
+  if (!st || typeof st !== "object") return { att: 0, cor: 0 };
+  if (id === "clf") return (Station_CLF.WEAK_TABLE ? Station_CLF.WEAK_TABLE(st) : []).reduce((t, r) => ({ att: t.att + r.a, cor: t.cor + r.c }), { att: 0, cor: 0 });
+  let att = 0, cor = 0;
+  Object.values(st.progress || {}).forEach((p) => { if (p && typeof p === "object") { att += Number(p.attempts != null ? p.attempts : p.a) || 0; cor += Number(p.correct != null ? p.correct : p.c) || 0; } });
+  return { att, cor };
+}
+
 function HubApp() {
   const [active, setActive] = useState(null);
   // 開いている資格を URL に残す（#certification/<資格>）。「戻る」で資格一覧に戻る
@@ -216140,6 +216158,8 @@ function HubApp() {
   const t = HUB_L[lang];
   // 資格の「取得済み」チェック状態（端末内に自動保存）
   const [done, setDone] = useState({});
+  // 各資格の解答数と正答率（一覧に戻ったときに読み直す）
+  const certProg = useMemo(() => (active ? {} : Object.fromEntries(HUB_STATIONS.map((x) => [x.id, certProgress(x.id)]))), [active]);
   useEffect(() => {
     (async () => {
       try {
@@ -216381,6 +216401,13 @@ function HubApp() {
                         })()}
                       </div>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        {st.kind !== "kit" && certProg[st.id] ? (
+                          <span title={lang === "ja" ? "この端末での解答数と正答率" : "Answers and accuracy on this device"} style={{ fontSize: 10, fontWeight: 700, color: certProg[st.id].att ? HUB.ink : HUB.sub }}>
+                            {certProg[st.id].att
+                              ? (lang === "ja" ? `${certProg[st.id].att}問・正答率${Math.round((certProg[st.id].cor / certProg[st.id].att) * 100)}%` : `${certProg[st.id].att} answered · ${Math.round((certProg[st.id].cor / certProg[st.id].att) * 100)}%`)
+                              : (lang === "ja" ? "未着手" : "Not started")}
+                          </span>
+                        ) : null}
                         <span style={{ fontSize: 10, color: HUB.sub }}>{st.vendor}</span>
                         {st.kind !== "kit" && (
                           <span
@@ -216458,6 +216485,7 @@ function App() {
   return <HubApp />;
 }
   // ポータルの横断検索に出す資格
+  App.CLF_WEAK = (st) => (Station_CLF.WEAK_TABLE ? Station_CLF.WEAK_TABLE(st) : []);
   App.PORTAL_INDEX = (en) => HUB_STATIONS.filter((s) => s.Comp).map((s) => ({ label: s.code + "  " + (en ? s.en : s.ja), sub: (en ? "Certification · " : "資格・") + (s.vendor || ""), hash: "certification/" + s.id, extra: [s.ja, s.en, s.vendor].join(" ") }));
   return App;
 })();
@@ -230819,6 +230847,8 @@ const NOVA_REVIEW_KEYS = [
 // 形式が WEAK_SOURCES と違うハブ（Finance・Linguistics・Language・Liberal Arts・Book-Summary）。
 // keys() の値を読み、read() で [{ dom: [日本語, English], a: 解答数, c: 正解数 }] に直す。
 const NOVA_WEAK_EXTRA = [
+  { hub: ["AWS CLF-C02", "AWS CLF-C02"], keys: () => ["clf_c02_dashboard_v1"],
+    read: (vals) => (CertHubModule.CLF_WEAK ? CertHubModule.CLF_WEAK(vals["clf_c02_dashboard_v1"]) : []) },
   { hub: ["Finance Hub", "Finance Hub"], keys: () => (FinanceHubModule.WEAK_KEYS ? FinanceHubModule.WEAK_KEYS() : []).map((x) => x.key),
     read: (vals) => (FinanceHubModule.WEAK_KEYS ? FinanceHubModule.WEAK_KEYS() : []).map((x) => {
       const v = vals[x.key]; if (!v || typeof v !== "object") return null;
