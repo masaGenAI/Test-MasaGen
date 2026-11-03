@@ -115,6 +115,13 @@ function BackupBar() {
     try { return window.matchMedia("(max-width: 640px)").matches; } catch { return false; }
   });
   const [tucked, setTucked] = useState(false);
+  // 表示言語はポータルの設定に合わせる（ポータルが切り替えると "nova-lang" を送ってくる）
+  const [lang, setLang] = useState(() => (typeof window !== "undefined" && window.__novaLang) || "ja");
+  React.useEffect(() => {
+    const h = () => setLang(window.__novaLang || "ja");
+    window.addEventListener("nova-lang", h);
+    return () => window.removeEventListener("nova-lang", h);
+  }, []);
   React.useEffect(() => {
     let mq;
     try { mq = window.matchMedia("(max-width: 640px)"); } catch { return undefined; }
@@ -136,6 +143,7 @@ function BackupBar() {
     return () => window.removeEventListener("scroll", h);
   }, []);
   if (onLauncher) return null;
+  const en = lang === "en";
 
   const flash = (m) => {
     setMsg(m);
@@ -146,7 +154,7 @@ function BackupBar() {
     const data = collectProgress();
     const count = Object.keys(data).length;
     if (count === 0) {
-      flash("保存できる進捗がまだありません");
+      flash(en ? "No progress to save yet" : "保存できる進捗がまだありません");
       return;
     }
     const payload = JSON.stringify(
@@ -164,7 +172,7 @@ function BackupBar() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    flash(`進捗を保存しました（${count}件）`);
+    flash(en ? `Saved progress (${count} items)` : `進捗を保存しました（${count}件）`);
   };
 
   const importProgress = () => {
@@ -181,7 +189,7 @@ function BackupBar() {
           const data = parsed && parsed.data ? parsed.data : parsed;
           if (!data || typeof data !== "object") throw new Error("形式が不正です");
           const keys = Object.keys(data);
-          if (!window.confirm(`${keys.length}件の進捗を復元します。現在の進捗に上書きされます。よろしいですか？`))
+          if (!window.confirm(en ? `Restore ${keys.length} progress items? This overwrites your current progress.` : `${keys.length}件の進捗を復元します。現在の進捗に上書きされます。よろしいですか？`))
             return;
           keys.forEach((k) => {
             mem[k] = String(data[k]);
@@ -193,10 +201,10 @@ function BackupBar() {
               }
             }
           });
-          flash("復元しました。画面を更新します…");
+          flash(en ? "Restored. Reloading…" : "復元しました。画面を更新します…");
           window.setTimeout(() => window.location.reload(), 700);
         } catch (e) {
-          flash("復元に失敗しました（ファイルを確認してください）");
+          flash(en ? "Restore failed (check the file)" : "復元に失敗しました（ファイルを確認してください）");
         }
       };
       reader.readAsText(file);
@@ -269,17 +277,17 @@ function BackupBar() {
           }}
         >
           <div style={{ fontSize: 12, fontWeight: 600, color: LS_OK ? "#166534" : "#b45309", marginBottom: 4, lineHeight: 1.5 }}>
-            {LS_OK ? "✓ 進捗はこの端末に自動保存されています" : "⚠ このブラウザは自動保存オフ。バックアップ推奨"}
+            {LS_OK ? (en ? "✓ Progress is saved automatically on this device" : "✓ 進捗はこの端末に自動保存されています") : (en ? "⚠ Auto-save is off in this browser. Back up your progress" : "⚠ このブラウザは自動保存オフ。バックアップ推奨")}
           </div>
           <div style={{ fontSize: 11, color: "#64748b", marginBottom: 8, lineHeight: 1.5 }}>
-            別のPC・ブラウザへ移すには、書き出したファイルを相手側で読み込みます。
+            {en ? "To move to another PC or browser, export a file here and import it there." : "別のPC・ブラウザへ移すには、書き出したファイルを相手側で読み込みます。"}
           </div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            <button style={btn} onClick={exportProgress} title="学習の進捗をファイルに書き出します（別のPC/ブラウザへ移せます）">
-              ⬇ ファイルに書き出し
+            <button style={btn} onClick={exportProgress} title={en ? "Export your learning progress to a file (to move it to another PC/browser)" : "学習の進捗をファイルに書き出します（別のPC/ブラウザへ移せます）"}>
+              {en ? "⬇ Export to file" : "⬇ ファイルに書き出し"}
             </button>
-            <button style={btn} onClick={importProgress} title="書き出した進捗ファイルを読み込みます">
-              ⬆ 読み込み
+            <button style={btn} onClick={importProgress} title={en ? "Import an exported progress file" : "書き出した進捗ファイルを読み込みます"}>
+              {en ? "⬆ Import" : "⬆ 読み込み"}
             </button>
           </div>
         </div>
@@ -288,8 +296,8 @@ function BackupBar() {
       {/* 常時: 小さなボタンのみ（クリックでバックアップ操作を固定表示）。背景は不透明にして下の文字が透けないようにする */}
       <button
         onClick={() => setShowBackup((v) => !v)}
-        title={LS_OK ? "進捗は自動保存されています。別のPC/ブラウザへ移すにはここから書き出し/読み込み" : "自動保存オフ。ここからバックアップ"}
-        aria-label="進捗バックアップ"
+        title={LS_OK ? (en ? "Progress is saved automatically. Export/import here to move it to another PC/browser" : "進捗は自動保存されています。別のPC/ブラウザへ移すにはここから書き出し/読み込み") : (en ? "Auto-save is off. Back up here" : "自動保存オフ。ここからバックアップ")}
+        aria-label={en ? "Progress backup" : "進捗バックアップ"}
         aria-expanded={showBackup}
         style={{
           borderRadius: 999,
@@ -310,7 +318,7 @@ function BackupBar() {
           fontFamily: "'Inter',-apple-system,'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif",
         }}
       >
-        {narrow ? (LS_OK ? "💾" : "⚠") : LS_OK ? "💾 進捗バックアップ" : "⚠ 進捗バックアップ"}
+        {narrow ? (LS_OK ? "💾" : "⚠") : (LS_OK ? "💾 " : "⚠ ") + (en ? "Progress backup" : "進捗バックアップ")}
       </button>
     </div>
   );

@@ -232533,7 +232533,7 @@ function ProjectNova() {
     (async () => {
       try {
         const res = await window.storage.get("nova_lang_v1");
-        if (res && (res.value === "ja" || res.value === "en")) { setLang(res.value); window.__novaLang = res.value; }
+        if (res && (res.value === "ja" || res.value === "en")) { setLang(res.value); window.__novaLang = res.value; try { window.dispatchEvent(new Event("nova-lang")); } catch (e) {} }
       } catch (e) {}
     })();
   }, []);
@@ -232541,7 +232541,7 @@ function ProjectNova() {
   const toggleLang = () => {
     const next = lang === "ja" ? "en" : "ja";
     setLang(next);
-    window.__novaLang = next; // 英語がそろっているハブ（Finance・Consulting・Linguistics）はこれを初期値にして開く
+    window.__novaLang = next; try { window.dispatchEvent(new Event("nova-lang")); } catch (e) {} // 画面外のバックアップ欄にも知らせる // 英語がそろっているハブ（Finance・Consulting・Linguistics）はこれを初期値にして開く
     window.storage.set("nova_lang_v1", next).catch(() => {});
   };
 
