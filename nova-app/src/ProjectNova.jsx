@@ -141669,17 +141669,20 @@ function CloudDojo() {
     try { await window.storage.set(CLOUD_STORE_KEY, JSON.stringify({ progress: nextProgress, meta: nextMeta })); } catch (e) {}
   };
 
-  const recordAnswer = (cat, correct) => {
-    const cur = progress[cat] || { correct: 0, attempts: 0 };
-    const nextProgress = {
-      ...progress,
-      [cat]: { correct: cur.correct + (correct ? 1 : 0), attempts: cur.attempts + 1 },
-    };
+  // 複数の解答をまとめて記録する（模擬試験の採点で使う）。1問ずつ記録すると、同じ描画の progress を
+  // 元に上書きし合い、最後の1問しか残らなかった
+  const recordAnswers = (items) => {
+    if (!items || !items.length) return;
+    const nextProgress = { ...progress };
+    items.forEach(({ cat, correct }) => {
+      const cur = nextProgress[cat] || { correct: 0, attempts: 0 };
+      nextProgress[cat] = { correct: cur.correct + (correct ? 1 : 0), attempts: cur.attempts + 1 };
+    });
     // ストリーク & デイリー更新
     const t = todayStr();
     let { streak, lastDay, dailyDay, dailyCount } = meta;
     if (dailyDay !== t) { dailyDay = t; dailyCount = 0; }
-    dailyCount += 1;
+    dailyCount += items.length;
     if (lastDay !== t) {
       if (lastDay && dayDiff(lastDay, t) === 1) streak += 1;
       else streak = 1;
@@ -141687,6 +141690,7 @@ function CloudDojo() {
     }
     persist(nextProgress, { streak, lastDay, dailyDay, dailyCount });
   };
+  const recordAnswer = (cat, correct) => recordAnswers([{ cat, correct }]);
 
   const resetAll = () => persist({}, { streak: 0, lastDay: null, dailyDay: null, dailyCount: 0 });
 
@@ -141710,7 +141714,7 @@ function CloudDojo() {
       {!loaded && <p style={{ color: "var(--color-text-tertiary)", fontSize: 14 }}>{en ? "Loading…" : "読み込み中…"}</p>}
       {loaded && tab === "home" && <Home counts={counts} progress={progress} totals={totals} setTab={setTab} resetAll={resetAll} meta={meta} dailyToday={dailyToday} />}
       {loaded && tab === "quiz" && <Quiz counts={counts} progress={progress} recordAnswer={recordAnswer} />}
-      {loaded && tab === "exam" && <Exam recordAnswer={recordAnswer} />}
+      {loaded && tab === "exam" && <Exam recordAnswers={recordAnswers} />}
       {loaded && tab === "diagram" && <Diagrams />}
       {loaded && tab === "interactive" && <Interactive />}
       {loaded && tab === "glossary" && <Glossary />}
@@ -141895,7 +141899,7 @@ function Quiz({ counts, progress, recordAnswer }) {
     }
     const seed = Date.now() % 233280;
     let ord = pool.slice(); // 既定は固定順（収録順）
-    if (c === MIX) ord = ord.slice(0, 30); // ミックスは30問
+    if (c === MIX) ord = shuffle(pool, seed).slice(0, 30); // ミックスは全問から無作為に30問（以前は収録順の先頭30問になっていた）
     setCat(c); setOrder(ord); setIdx(0); setSel(null); setAnswered({});
     setReviewMode(false); setSessionCorrect(0); setSessionWrong(0);
   };
@@ -142063,7 +142067,7 @@ function Quiz({ counts, progress, recordAnswer }) {
 // ===== 模擬試験モード =====
 const EXAM_N = 30;
 
-function Exam({ recordAnswer }) {
+function Exam({ recordAnswers }) {
   const en = useCdEn();
   const [phase, setPhase] = useState("intro"); // intro / running / result
   const [order, setOrder] = useState([]);
@@ -142088,9 +142092,7 @@ function Exam({ recordAnswer }) {
 
   const finish = () => {
     // 採点を記録
-    order.forEach((gi) => {
-      if (answers[gi] !== undefined) recordAnswer(BANK[gi].d, answers[gi] === BANK[gi].a);
-    });
+    recordAnswers(order.filter((gi) => answers[gi] !== undefined).map((gi) => ({ cat: BANK[gi].d, correct: answers[gi] === BANK[gi].a })));
     setPhase("result");
   };
 
@@ -144353,8 +144355,10 @@ function DiagServices() {
   const colT = [RAMP.amberT, RAMP.blueT, RAMP.greenT, RAMP.redT];
   const rowH = 46, top = 50, x0 = 10, wc = 110, wd = 138, gap = 6;
   const H = top + rows.length * (rowH + gap) + 10;
+  // 横幅はセルの合計から出す（以前は 680 固定で、OCI の列の右端が切れていた）
+  const W = x0 + wc + gap + 4 * (wd + gap) - gap + x0;
   return (
-    <svg width="100%" viewBox={`0 0 680 ${H}`} role="img" style={{ display: "block" }}>
+    <svg width="100%" viewBox={`0 0 ${W} ${H}`} role="img" style={{ display: "block" }}>
       <title>{en ? "Key services of the four providers" : "4社の主要サービス対応表"}</title>
       <desc>{en ? "A table of each cloud's representative services across 10 domains" : "10分野について各クラウドの代表サービスを並べた表"}</desc>
       <Cell x={x0} y={10} w={wc} h={32} fill={RAMP.gray} stroke={RAMP.grayS} txt={en ? "Domain" : "分野"} color={RAMP.grayT} />
