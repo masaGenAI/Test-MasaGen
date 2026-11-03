@@ -217408,14 +217408,37 @@ const COMPARE = {
 };
 
 const LANGS = {
-  es: { name:"スペイン語", flag:"ES", primary:"#C23E2A", accent:"#F2A65A",
+  es: { name:"スペイン語", nameEn:"Spanish", flag:"ES", primary:"#C23E2A", accent:"#F2A65A",
         soft:"#FBEDE6", deep:"#9E3320", chip:"#F7D9C6", speechLang:"es-ES" },
-  de: { name:"ドイツ語", flag:"DE", primary:"#2E5C7E", accent:"#5FA8B5",
+  de: { name:"ドイツ語", nameEn:"German", flag:"DE", primary:"#2E5C7E", accent:"#5FA8B5",
         soft:"#E8F0F4", deep:"#1C3A52", chip:"#CFE2EC", speechLang:"de-DE" },
-  fr: { name:"フランス語", flag:"FR", primary:"#5B4B8A", accent:"#8E7BC7",
+  fr: { name:"フランス語", nameEn:"French", flag:"FR", primary:"#5B4B8A", accent:"#8E7BC7",
         soft:"#EFEBF7", deep:"#3B2F5E", chip:"#D9CFEE", speechLang:"fr-FR" },
 };
 const LANG_ORDER = ["es","de","fr"];
+
+// ===== 画面の言語（ポータルの言語で開き、ヘッダーの EN／日本語 で切り替える） =====
+// 訳すのは画面の部品（見出し・ボタン・案内）と短い決まった名前（言語名・ジャンル・比較表の分類・リスニングの期）だけ。
+// 単語の意味・例文の訳・文法の解説・教材の説明など、日本語話者向けの学習内容は訳さない。
+// ハブの根（App）が描画のたびに UI_EN を入れ直すので、部品と補助関数は tx(日本語, 英語) で今の言語の文言を選ぶ。
+let UI_EN = false;
+const tx = (ja, en) => (UI_EN ? en : ja);
+const langName = (k) => tx(LANGS[k].name, LANGS[k].nameEn);
+const useUiLang = () => {
+  const [ui, setUi] = useState(() => (typeof window !== "undefined" && window.__novaLang) || "ja"); // ポータルの言語で開く
+  useEffect(() => {
+    // ポータルが保存済みの言語を読み込んだとき・切り替えたとき（nova-lang）にも合わせる
+    const f = () => { const l = window.__novaLang; if (l === "ja" || l === "en") setUi(l); };
+    window.addEventListener("nova-lang", f);
+    return () => window.removeEventListener("nova-lang", f);
+  }, []);
+  return [ui, setUi];
+};
+// 単語カードのジャンル（キーごと）・比較表の分類・リスニングの期の英語名
+const GENRE_EN = { fn:"Function words", misc:"Other", noun:"Nouns", adv:"Adverbs", verb:"Verbs", num:"Numbers", adj:"Adjectives", color:"Colors", greet:"Greetings", time:"Time", ppl:"People & jobs", fam:"Family", body:"Body", food:"Food & drink", home:"Home & household", place:"Places & getting around", nat:"Nature & weather", abs:"Abstract ideas", conn:"Linking words", adv2:"Adverbs of place & direction", soc:"Society & work", emo:"Feelings", time2:"Adverbs of time", trav:"Travel", tech:"IT & modern life", adj2:"Adjectives (advanced)" };
+const genreName = (key, ja) => tx(ja, GENRE_EN[key] || ja);
+const CMP_LABEL_EN = { pron:"Subject pronouns", ques:"Question words", num:"Numbers", days:"Days of the week", prep:"Basic prepositions", be:"Conjugating \"to be\"", have:"Conjugating \"to have\"", color:"Colors", greet:"Greetings & basic phrases", poss:"Possessive pronouns (mine, yours…)", neg:"Making negative sentences" };
+const PHASE_TITLE_EN = { p1:"Soak in the sound", p2:"Say it out loud", p3:"Put patterns into words", p4:"Write and share" };
 
 // ===== 発音(Web Speech API): 単語→例文の順に読み上げる =====
 function useSpeech(){
@@ -217544,14 +217567,14 @@ function GrammarDrill({lang,t,topicId,onExit}){
   const [pick,setPick]=useState(null);
   const [score,setScore]=useState(0);
   const done=i>=pool.length;
-  if(!pool.length) return <div style={{fontSize:13,color:"#666"}}>このトピックの問題はまだありません。</div>;
+  if(!pool.length) return <div style={{fontSize:13,color:"#666"}}>{tx("このトピックの問題はまだありません。","No questions for this topic yet.")}</div>;
   if(done) return (
     <div style={{background:"#fff",borderRadius:14,padding:20,textAlign:"center",boxShadow:"0 2px 10px rgba(0,0,0,.05)"}}>
-      <div style={{fontSize:13,color:"#666"}}>正解数</div>
+      <div style={{fontSize:13,color:"#666"}}>{tx("正解数","Correct answers")}</div>
       <div style={{fontSize:34,fontWeight:800,color:t.primary}}>{score} <span style={{fontSize:18,color:"#999"}}>/ {pool.length}</span></div>
       <div style={{display:"flex",gap:8,justifyContent:"center",marginTop:12}}>
-        <button onClick={()=>{setI(0);setPick(null);setScore(0);}} style={{padding:"9px 16px",borderRadius:10,border:"none",cursor:"pointer",fontWeight:800,background:t.primary,color:"#fff"}}>もう一度</button>
-        <button onClick={onExit} style={{padding:"9px 16px",borderRadius:10,border:`1px solid ${t.primary}`,cursor:"pointer",fontWeight:800,background:"#fff",color:t.primary}}>表に戻る</button>
+        <button onClick={()=>{setI(0);setPick(null);setScore(0);}} style={{padding:"9px 16px",borderRadius:10,border:"none",cursor:"pointer",fontWeight:800,background:t.primary,color:"#fff"}}>{tx("もう一度","Try again")}</button>
+        <button onClick={onExit} style={{padding:"9px 16px",borderRadius:10,border:`1px solid ${t.primary}`,cursor:"pointer",fontWeight:800,background:"#fff",color:t.primary}}>{tx("表に戻る","Back to the lesson")}</button>
       </div>
     </div>
   );
@@ -217568,8 +217591,8 @@ function GrammarDrill({lang,t,topicId,onExit}){
       })}
       {pick!==null? (
         <div>
-          <div style={{fontSize:13,lineHeight:1.75,color:"#444",background:t.soft,borderRadius:10,padding:"10px 13px",margin:"6px 0 10px"}}>{pick===q.a?"✓ 正解。":"✗ 不正解。"}{q.e}</div>
-          <button onClick={()=>{setI(i+1);setPick(null);}} style={{padding:"9px 16px",borderRadius:10,border:"none",cursor:"pointer",fontWeight:800,background:t.primary,color:"#fff"}}>{i+1>=pool.length?"結果を見る":"次へ →"}</button>
+          <div style={{fontSize:13,lineHeight:1.75,color:"#444",background:t.soft,borderRadius:10,padding:"10px 13px",margin:"6px 0 10px"}}>{pick===q.a?tx("✓ 正解。","✓ Correct. "):tx("✗ 不正解。","✗ Incorrect. ")}{q.e}</div>
+          <button onClick={()=>{setI(i+1);setPick(null);}} style={{padding:"9px 16px",borderRadius:10,border:"none",cursor:"pointer",fontWeight:800,background:t.primary,color:"#fff"}}>{i+1>=pool.length?tx("結果を見る","See results"):tx("次へ →","Next →")}</button>
         </div>
       ):null}
     </div>
@@ -217581,13 +217604,13 @@ function GrammarPanel({lang,t,voiceURI}){
   const [sel,setSel]=useState(G.topics.length?G.topics[0].id:null);
   const [drill,setDrill]=useState(null); // null | "" (全範囲) | topic id
   useEffect(()=>{ setSel(G.topics.length?G.topics[0].id:null); setDrill(null); },[lang]);
-  if(!G.topics.length) return <div style={{fontSize:13,color:"#666"}}>準備中です。</div>;
+  if(!G.topics.length) return <div style={{fontSize:13,color:"#666"}}>{tx("準備中です。","Coming soon.")}</div>;
   const tp=G.topics.find(x=>x.id===sel)||G.topics[0];
   const nQ=(id)=>G.quiz.filter(q=>q.d===id).length;
   return (
     <div>
       <div style={{background:"#fff",borderRadius:14,padding:"14px 18px",marginBottom:14,boxShadow:"0 2px 10px rgba(0,0,0,.05)",fontSize:13,lineHeight:1.7,color:"#444"}}>
-        {t.name}の文法の要点を、活用や格の表と例文で確認し、トピックごとのドリル（全{G.quiz.length}問から10問ずつ）で定着させます。
+        {tx(`${t.name}の文法の要点を、活用や格の表と例文で確認し、トピックごとのドリル（全${G.quiz.length}問から10問ずつ）で定着させます。`, `Review the key points of ${t.nameEn} grammar with conjugation and case tables and example sentences, then lock them in with topic drills (10 at a time from ${G.quiz.length} questions). Explanations are in Japanese.`)}
       </div>
       <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:14}}>
         {G.topics.map(x=>(
@@ -217614,14 +217637,14 @@ function GrammarPanel({lang,t,voiceURI}){
           <div style={{display:"flex",flexDirection:"column",gap:6,margin:"8px 0 12px"}}>
             {tp.ex.map(([src,ja],i)=>(
               <div key={i} style={{display:"flex",gap:8,alignItems:"center",background:t.soft,borderRadius:10,padding:"8px 12px"}}>
-                {speech.ok? <button onClick={()=>speech.speak(src,t.speechLang,0.9,voiceURI)} title="発音" style={{border:"none",background:"transparent",cursor:"pointer",fontSize:15}}>🔊</button>:null}
+                {speech.ok? <button onClick={()=>speech.speak(src,t.speechLang,0.9,voiceURI)} title={tx("発音","Play")} style={{border:"none",background:"transparent",cursor:"pointer",fontSize:15}}>🔊</button>:null}
                 <div><div style={{fontSize:14,fontWeight:700,color:t.deep}}>{src}</div><div style={{fontSize:12.5,color:"#666"}}>{ja}</div></div>
               </div>
             ))}
           </div>
           <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-            <button onClick={()=>setDrill(tp.id)} style={{padding:"10px 16px",borderRadius:10,border:"none",cursor:"pointer",fontWeight:800,background:t.primary,color:"#fff"}}>🎯 このトピックのドリル（{nQ(tp.id)}問から）</button>
-            <button onClick={()=>setDrill("")} style={{padding:"10px 16px",borderRadius:10,border:`1px solid ${t.primary}`,cursor:"pointer",fontWeight:800,background:"#fff",color:t.primary}}>全トピックから10問</button>
+            <button onClick={()=>setDrill(tp.id)} style={{padding:"10px 16px",borderRadius:10,border:"none",cursor:"pointer",fontWeight:800,background:t.primary,color:"#fff"}}>{tx(`🎯 このトピックのドリル（${nQ(tp.id)}問から）`, `🎯 Drill this topic (from ${nQ(tp.id)} questions)`)}</button>
+            <button onClick={()=>setDrill("")} style={{padding:"10px 16px",borderRadius:10,border:`1px solid ${t.primary}`,cursor:"pointer",fontWeight:800,background:"#fff",color:t.primary}}>{tx("全トピックから10問","10 questions from all topics")}</button>
           </div>
         </div>
       )}
@@ -217630,6 +217653,8 @@ function GrammarPanel({lang,t,voiceURI}){
 }
 
 function App(){
+  const [ui,setUi]=useUiLang();
+  UI_EN = ui==="en";
   const [lang,setLang]=useState("es");
   const [section,setSection]=useState("home"); // home | vocab | listen | compare | quiz
   const [dark,setDark]=useState(false);
@@ -217674,7 +217699,7 @@ function App(){
               LANGUAGE LAB
             </div>
             <div style={{fontSize:23,fontWeight:800,letterSpacing:"-.5px",color:t.deep}}>
-              語学統合ハブ
+              {tx("語学統合ハブ","Language Hub")}
             </div>
           </div>
           <div style={{display:"flex",gap:6,alignItems:"center"}}>
@@ -217685,10 +217710,15 @@ function App(){
                   background: lang===k? LANGS[k].primary:"#fff",
                   color: lang===k? "#fff":"#555",
                   boxShadow: lang===k? "0 2px 8px rgba(0,0,0,.15)":"0 1px 3px rgba(0,0,0,.08)"}}>
-                {LANGS[k].flag} {LANGS[k].name}
+                {LANGS[k].flag} {langName(k)}
               </button>
             ))}
-            <button onClick={()=>setDark(v=>!v)} title="ダークモード切替"
+            <button onClick={()=>setUi(ui==="ja"?"en":"ja")} title={tx("English に切り替え","Switch to Japanese")}
+              style={{height:36,padding:"0 11px",borderRadius:10,border:"none",cursor:"pointer",
+                background:"#fff",color:"#555",fontWeight:700,fontSize:12.5,whiteSpace:"nowrap",boxShadow:"0 1px 3px rgba(0,0,0,.08)"}}>
+              {ui==="ja"? "EN":"日本語"}
+            </button>
+            <button onClick={()=>setDark(v=>!v)} title={tx("ダークモード切替","Toggle dark mode")}
               style={{width:36,height:36,borderRadius:10,border:"none",cursor:"pointer",
                 background:"#fff",fontSize:16,boxShadow:"0 1px 3px rgba(0,0,0,.08)"}}>
               {dark? "☀️":"🌙"}
@@ -217698,7 +217728,9 @@ function App(){
 
         {/* ===== セクション内サブナビ：ホーム / 単語カード / リスニング / 比較表 / クイズ ===== */}
         <div style={{display:"flex",gap:8,marginBottom:18,flexWrap:"wrap"}}>
-          {[["home","🏠 ホーム"],["vocab","📇 単語カード"],["listen","🎧 リスニング"],["grammar","📐 文法"],["compare","📊 比較表"],["quiz","🎯 クイズ"]].map(([k,lbl])=>(
+          {(UI_EN
+            ? [["home","🏠 Home"],["vocab","📇 Flashcards"],["listen","🎧 Listening"],["grammar","📐 Grammar"],["compare","📊 Compare"],["quiz","🎯 Quiz"]]
+            : [["home","🏠 ホーム"],["vocab","📇 単語カード"],["listen","🎧 リスニング"],["grammar","📐 文法"],["compare","📊 比較表"],["quiz","🎯 クイズ"]]).map(([k,lbl])=>(
             <button key={k} onClick={()=>setSection(k)}
               style={{flex:"1 1 100px",padding:"12px 8px",borderRadius:12,border:"none",cursor:"pointer",
                 fontWeight:800,fontSize:14,
@@ -217753,17 +217785,17 @@ function HomePanel({goto}){
   },[]);
 
   const fmtMinutes=(mins)=>{
-    if(!mins) return "0分";
-    if(mins<60) return `${Math.round(mins)}分`;
-    return `${Math.floor(mins/60)}時間${Math.round(mins%60)}分`;
+    if(!mins) return tx("0分","0 min");
+    if(mins<60) return tx(`${Math.round(mins)}分`,`${Math.round(mins)} min`);
+    return tx(`${Math.floor(mins/60)}時間${Math.round(mins%60)}分`,`${Math.floor(mins/60)} h ${Math.round(mins%60)} min`);
   };
 
   return (
     <div>
       <div style={{background:"#fff",borderRadius:16,padding:"18px 20px",marginBottom:16,boxShadow:"0 2px 12px rgba(0,0,0,.06)"}}>
-        <div style={{fontSize:15,fontWeight:800,color:"#2b2b2b",marginBottom:6}}>語学学習ダッシュボード</div>
+        <div style={{fontSize:15,fontWeight:800,color:"#2b2b2b",marginBottom:6}}>{tx("語学学習ダッシュボード","Language learning dashboard")}</div>
         <div style={{fontSize:12.5,color:"#666",lineHeight:1.6}}>
-          3言語×4セクションの進捗を一目で確認できます。カードをタップすると該当セクションへ移動します。
+          {tx("3言語×4セクションの進捗を一目で確認できます。カードをタップすると該当セクションへ移動します。","See your progress across the 3 languages at a glance. Tap a card to open that section.")}
         </div>
       </div>
 
@@ -217786,14 +217818,14 @@ function HomePanel({goto}){
           return (
             <div key={k} style={{background:"#fff",borderRadius:16,padding:"18px 20px",boxShadow:"0 2px 12px rgba(0,0,0,.06)"}}>
               <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
-                <span style={{fontSize:17,fontWeight:800,color:tk.deep}}>{tk.flag} {tk.name}</span>
+                <span style={{fontSize:17,fontWeight:800,color:tk.deep}}>{tk.flag} {langName(k)}</span>
               </div>
 
               <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10}}>
                 <button onClick={()=>goto("vocab",k)}
                   style={{textAlign:"left",padding:"12px 14px",borderRadius:12,border:"none",cursor:"pointer",
                     background:tk.soft}}>
-                  <div style={{fontSize:11,fontWeight:700,color:tk.deep,marginBottom:6}}>📇 単語カード</div>
+                  <div style={{fontSize:11,fontWeight:700,color:tk.deep,marginBottom:6}}>{tx("📇 単語カード","📇 Flashcards")}</div>
                   <div style={{fontSize:17,fontWeight:800,color:tk.deep}}>{knownCount}<span style={{fontSize:11,fontWeight:600,opacity:.9}}>/{vocabTotal}</span></div>
                   <div style={{height:5,background:"rgba(0,0,0,.08)",borderRadius:99,marginTop:6,overflow:"hidden"}}>
                     <div style={{height:"100%",width:`${vocabTotal?knownCount/vocabTotal*100:0}%`,background:tk.primary}}/>
@@ -217803,19 +217835,19 @@ function HomePanel({goto}){
                 <button onClick={()=>goto("listen",k)}
                   style={{textAlign:"left",padding:"12px 14px",borderRadius:12,border:"none",cursor:"pointer",
                     background:tk.soft}}>
-                  <div style={{fontSize:11,fontWeight:700,color:tk.deep,marginBottom:6}}>🎧 リスニング</div>
+                  <div style={{fontSize:11,fontWeight:700,color:tk.deep,marginBottom:6}}>{tx("🎧 リスニング","🎧 Listening")}</div>
                   <div style={{fontSize:17,fontWeight:800,color:tk.deep}}>{listenPct}<span style={{fontSize:11,fontWeight:600,opacity:.9}}>%</span></div>
-                  <div style={{fontSize:10.5,opacity:.6,marginTop:4}}>累計{fmtMinutes(listenMinutes[k]||0)}</div>
+                  <div style={{fontSize:10.5,opacity:.6,marginTop:4}}>{tx("累計","Total ")}{fmtMinutes(listenMinutes[k]||0)}</div>
                 </button>
 
                 <button onClick={()=>goto("quiz",k)}
                   style={{textAlign:"left",padding:"12px 14px",borderRadius:12,border:"none",cursor:"pointer",
                     background:tk.soft}}>
-                  <div style={{fontSize:11,fontWeight:700,color:tk.deep,marginBottom:6}}>🎯 クイズ</div>
+                  <div style={{fontSize:11,fontWeight:700,color:tk.deep,marginBottom:6}}>{tx("🎯 クイズ","🎯 Quiz")}</div>
                   <div style={{fontSize:17,fontWeight:800,color:tk.deep}}>
                     {qAcc!==null? `${qAcc}%` : "―"}
                   </div>
-                  <div style={{fontSize:10.5,opacity:.6,marginTop:4}}>🔥最長{qs.bestStreakEver} ・ {qs.roundsCompleted}R</div>
+                  <div style={{fontSize:10.5,opacity:.6,marginTop:4}}>{tx(`🔥最長${qs.bestStreakEver} ・ ${qs.roundsCompleted}R`,`🔥Best ${qs.bestStreakEver} · ${qs.roundsCompleted} rounds`)}</div>
                 </button>
               </div>
             </div>
@@ -217824,7 +217856,7 @@ function HomePanel({goto}){
       </div>
 
       {!loaded && (
-        <div style={{textAlign:"center",fontSize:12,opacity:.5,marginTop:16}}>読み込み中…</div>
+        <div style={{textAlign:"center",fontSize:12,opacity:.5,marginTop:16}}>{tx("読み込み中…","Loading…")}</div>
       )}
     </div>
   );
@@ -217956,14 +217988,14 @@ function VocabPanel({lang,t,voiceURI,onVoiceChange}){
     <div>
       {/* レベルタブ */}
       <div style={{display:"flex",gap:8,marginBottom:14}}>
-        {[["basic","基礎 500",totalBasic],["adv","応用 500",totalAdv]].map(([k,lbl,n])=>(
+        {[["basic",tx("基礎 500","Basic 500"),totalBasic],["adv",tx("応用 500","Advanced 500"),totalAdv]].map(([k,lbl,n])=>(
           <button key={k} onClick={()=>{setLevel(k);setGenre("ALL");setOrder(null);}}
             style={{flex:1,padding:"12px 8px",borderRadius:12,border:"none",cursor:"pointer",
               fontWeight:800,fontSize:15,
               background: level===k? t.primary:"#fff",
               color: level===k? "#fff":"#666",
               boxShadow: level===k? "0 3px 10px rgba(0,0,0,.15)":"0 1px 4px rgba(0,0,0,.06)"}}>
-            {lbl} <span style={{fontSize:12,opacity:.85,fontWeight:600}}>({n}語)</span>
+            {lbl} <span style={{fontSize:12,opacity:.85,fontWeight:600}}>{tx(`(${n}語)`,`(${n} words)`)}</span>
           </button>
         ))}
       </div>
@@ -217971,48 +218003,48 @@ function VocabPanel({lang,t,voiceURI,onVoiceChange}){
       {/* コントロール行 */}
       <div style={{display:"flex",gap:8,marginBottom:10,flexWrap:"wrap",alignItems:"center"}}>
         <input type="text" value={search} onChange={e=>setSearch(e.target.value)}
-          aria-label="単語・意味で検索" placeholder="単語・意味で検索"
+          aria-label={tx("単語・意味で検索","Search words or meanings")} placeholder={tx("単語・意味で検索","Search words or meanings")}
           style={{padding:"8px 10px",borderRadius:9,border:"1px solid #ddd",fontSize:13,background:"#fff",
             width:150,maxWidth:"100%"}}/>
 
         <select value={genre} onChange={e=>setGenre(e.target.value)}
           style={{padding:"8px 10px",borderRadius:9,border:"1px solid #ddd",fontSize:13,background:"#fff",maxWidth:220}}>
-          <option value="ALL">すべてのジャンル ({rows.length})</option>
+          <option value="ALL">{tx(`すべてのジャンル (${rows.length})`,`All genres (${rows.length})`)}</option>
           {genres.map(g=>{
             const cnt=rows.filter(r=>r[5]===g.key).length;
-            return <option key={g.key} value={g.key}>{g.label} ({cnt})</option>;
+            return <option key={g.key} value={g.key}>{genreName(g.key,g.label)} ({cnt})</option>;
           })}
         </select>
 
         <button onClick={()=>setMode(m=> m==="fw"?"rev": m==="rev"?"blank":"fw")}
           style={{padding:"8px 12px",borderRadius:9,border:"none",cursor:"pointer",fontSize:13,fontWeight:600,
             background:t.chip,color:t.deep}}>
-          {mode==="fw"? `${t.name}→日本語` : mode==="rev" ? `日本語→${t.name}` : "穴埋めモード"}
+          {mode==="fw"? tx(`${t.name}→日本語`,`${t.nameEn} → Japanese`) : mode==="rev" ? tx(`日本語→${t.name}`,`Japanese → ${t.nameEn}`) : tx("穴埋めモード","Fill in the blank")}
         </button>
 
         <button onClick={()=>setOrder(order?null:shuffle(cards.map((_,i)=>i)))}
           style={{padding:"8px 12px",borderRadius:9,border:"none",cursor:"pointer",fontSize:13,fontWeight:600,
             background: order? t.primary:"#fff",color: order?"#fff":"#666",
             boxShadow:"0 1px 3px rgba(0,0,0,.08)"}}>
-          {order? "シャッフル中":"シャッフル"}
+          {order? tx("シャッフル中","Shuffled"):tx("シャッフル","Shuffle")}
         </button>
 
         <label style={{display:"flex",alignItems:"center",gap:5,fontSize:12.5,cursor:"pointer",opacity:.85}}>
           <input type="checkbox" checked={unknownOnly} onChange={e=>setUnknownOnly(e.target.checked)} />
-          未知の単語だけ
+          {tx("未知の単語だけ","Unknown words only")}
         </label>
 
         {speech.ok && (
           <label style={{display:"flex",alignItems:"center",gap:5,fontSize:12.5,cursor:"pointer",opacity:.85}}>
             <input type="checkbox" checked={autoSpeak} onChange={e=>setAutoSpeak(e.target.checked)} />
-            自動発音（単語→例文）
+            {tx("自動発音（単語→例文）","Auto-play (word → example)")}
           </label>
         )}
       </div>
 
       {speech.ok && (
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12,fontSize:12.5}}>
-          <span style={{opacity:.7,whiteSpace:"nowrap"}}>発音速度</span>
+          <span style={{opacity:.7,whiteSpace:"nowrap"}}>{tx("発音速度","Speech rate")}</span>
           <input type="range" min="0.6" max="1.1" step="0.05" value={speedRate}
             onChange={e=>setSpeedRate(parseFloat(e.target.value))}
             style={{flex:1,maxWidth:180}}/>
@@ -218024,21 +218056,21 @@ function VocabPanel({lang,t,voiceURI,onVoiceChange}){
         const voiceOptions = speech.voicesForLang(t.speechLang);
         return (
           <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12,fontSize:12.5,flexWrap:"wrap"}}>
-            <span style={{opacity:.7,whiteSpace:"nowrap"}}>🎙 音声</span>
+            <span style={{opacity:.7,whiteSpace:"nowrap"}}>{tx("🎙 音声","🎙 Voice")}</span>
             {voiceOptions.length>0 ? (
               <select value={voiceURI||""} onChange={e=>onVoiceChange && onVoiceChange(e.target.value||null)}
                 style={{flex:1,maxWidth:260,padding:"6px 8px",borderRadius:8,border:"1px solid #ddd",background:"#fff",fontSize:12.5}}>
-                <option value="">自動選択（男性優先）</option>
+                <option value="">{tx("自動選択（男性優先）","Auto (prefers male voices)")}</option>
                 {voiceOptions.map(v=>(
                   <option key={v.voiceURI} value={v.voiceURI}>{v.name}</option>
                 ))}
               </select>
             ) : (
-              <span style={{opacity:.5,fontSize:11.5}}>音声が見つかりません</span>
+              <span style={{opacity:.5,fontSize:11.5}}>{tx("音声が見つかりません","No voices found")}</span>
             )}
             <button onClick={()=>speech.refreshVoices()}
               style={{padding:"5px 10px",borderRadius:8,border:"1px solid #ddd",background:"#fff",cursor:"pointer",fontSize:11.5,color:"#666"}}>
-              🔄 再取得
+              {tx("🔄 再取得","🔄 Reload voices")}
             </button>
           </div>
         );
@@ -218050,7 +218082,7 @@ function VocabPanel({lang,t,voiceURI,onVoiceChange}){
           <div style={{height:"100%",width:`${cards.length? (knownCount/cards.length*100):0}%`,
             background:t.primary,transition:"width .3s"}}/>
         </div>
-        <span style={{opacity:.7,whiteSpace:"nowrap"}}>既知 {knownCount}/{cards.length}</span>
+        <span style={{opacity:.7,whiteSpace:"nowrap"}}>{tx("既知","Known")} {knownCount}/{cards.length}</span>
       </div>
 
       {/* カード */}
@@ -218063,7 +218095,7 @@ function VocabPanel({lang,t,voiceURI,onVoiceChange}){
 
           <div style={{position:"absolute",top:14,left:16,fontSize:11,fontWeight:700,
             padding:"3px 9px",borderRadius:99,background:t.soft,color:t.deep}}>
-            {card[6]}
+            {genreName(card[5],card[6])}
           </div>
           <div style={{position:"absolute",top:12,right:14,fontSize:11,opacity:.5}}>
             {safeIdx+1} / {sequence.length}
@@ -218104,7 +218136,7 @@ function VocabPanel({lang,t,voiceURI,onVoiceChange}){
                 </>
               )}
               <div style={{marginTop:18,fontSize:11.5,opacity:.4}}>
-                タップで{mode==="fw"?"意味":mode==="rev"?"つづり":"空欄の単語"}を表示
+                {UI_EN ? `Tap to show the ${mode==="fw"?"meaning":mode==="rev"?"spelling":"missing word"}` : `タップで${mode==="fw"?"意味":mode==="rev"?"つづり":"空欄の単語"}を表示`}
               </div>
             </>
           )}
@@ -218145,25 +218177,25 @@ function VocabPanel({lang,t,voiceURI,onVoiceChange}){
         <button onClick={()=>go(-1)}
           style={{flex:1,padding:"14px",borderRadius:12,border:"none",cursor:"pointer",
             background:"#fff",color:"#555",fontWeight:700,fontSize:15,boxShadow:"0 1px 4px rgba(0,0,0,.08)"}}>
-          ← 前
+          {tx("← 前","← Prev")}
         </button>
         <button onClick={toggleKnown}
           style={{flex:1,padding:"14px",borderRadius:12,border:"none",cursor:"pointer",
             background: known[cardKey]? t.accent:"#fff",
             color: known[cardKey]? "#fff":"#555",fontWeight:700,fontSize:15,
             boxShadow:"0 1px 4px rgba(0,0,0,.08)"}}>
-          {known[cardKey]? "✓ 既知":"既知にする"}
+          {known[cardKey]? tx("✓ 既知","✓ Known"):tx("既知にする","Mark as known")}
         </button>
         <button onClick={()=>go(1)}
           style={{flex:1,padding:"14px",borderRadius:12,border:"none",cursor:"pointer",
             background:t.primary,color:"#fff",fontWeight:700,fontSize:15,boxShadow:"0 2px 8px rgba(0,0,0,.15)"}}>
-          次 →
+          {tx("次 →","Next →")}
         </button>
       </div>
 
       <div style={{marginTop:18,fontSize:11.5,opacity:.5,textAlign:"center",lineHeight:1.7}}>
-        スペース=めくる ／ ←→=移動 ／ K=既知 ／ P=発音（単語→例文）<br/>
-        {speech.ok? "発音はお使いのブラウザの音声合成を使用しています":"※このブラウザは音声合成に非対応です"}
+        {tx("スペース=めくる ／ ←→=移動 ／ K=既知 ／ P=発音（単語→例文）","Space = flip / ←→ = move / K = known / P = play (word → example)")}<br/>
+        {speech.ok? tx("発音はお使いのブラウザの音声合成を使用しています","Pronunciation uses your browser's speech synthesis"):tx("※このブラウザは音声合成に非対応です","※ This browser doesn't support speech synthesis")}
       </div>
     </div>
   );
@@ -218285,9 +218317,9 @@ function ListenPanel({lang,t}){
     return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
   };
   const fmtMinutes=(mins)=>{
-    if(!mins) return "0分";
-    if(mins<60) return `${Math.round(mins)}分`;
-    return `${Math.floor(mins/60)}時間${Math.round(mins%60)}分`;
+    if(!mins) return tx("0分","0 min");
+    if(mins<60) return tx(`${Math.round(mins)}分`,`${Math.round(mins)} min`);
+    return tx(`${Math.floor(mins/60)}時間${Math.round(mins%60)}分`,`${Math.floor(mins/60)} h ${Math.round(mins%60)} min`);
   };
 
   return (
@@ -218296,17 +218328,17 @@ function ListenPanel({lang,t}){
       <div style={{background:"#fff",borderRadius:14,padding:"14px 18px",marginBottom:14,
         boxShadow:"0 2px 10px rgba(0,0,0,.05)",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:10}}>
         <div style={{display:"flex",alignItems:"center",gap:12}}>
-          <span style={{fontSize:13,fontWeight:800,color:t.deep}}>⏱ 今日の学習時間</span>
+          <span style={{fontSize:13,fontWeight:800,color:t.deep}}>{tx("⏱ 今日の学習時間","⏱ Today's study time")}</span>
           {timerRunning && (
             <span style={{fontSize:16,fontWeight:800,color:"#C0392B",fontVariantNumeric:"tabular-nums"}}>{fmtTime(elapsedSec)}</span>
           )}
         </div>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <span style={{fontSize:12,opacity:.65}}>累計 {fmtMinutes(studyMinutes[lang]||0)}</span>
+          <span style={{fontSize:12,opacity:.65}}>{tx("累計","Total")} {fmtMinutes(studyMinutes[lang]||0)}</span>
           <button onClick={timerRunning? stopTimer : startTimer}
             style={{padding:"7px 16px",borderRadius:99,border:"none",cursor:"pointer",fontWeight:700,fontSize:12.5,
               background: timerRunning? "#C0392B":t.primary,color:"#fff"}}>
-            {timerRunning? "■ 終了して記録":"▶ 開始"}
+            {timerRunning? tx("■ 終了して記録","■ Stop and log"):tx("▶ 開始","▶ Start")}
           </button>
         </div>
       </div>
@@ -218314,7 +218346,7 @@ function ListenPanel({lang,t}){
       {/* 言語横断サマリー */}
       <div style={{background:t.deep,borderRadius:14,padding:"14px 18px",marginBottom:16}}>
         <div style={{fontSize:12,fontWeight:800,color:"#fff",opacity:.85,marginBottom:10,letterSpacing:"1px"}}>
-          3言語 教材消化率
+          {tx("3言語 教材消化率","Materials used, all 3 languages")}
         </div>
         <div style={{display:"flex",gap:16,flexWrap:"wrap"}}>
           {LANG_ORDER.map(k=>{
@@ -218325,8 +218357,8 @@ function ListenPanel({lang,t}){
             return (
               <div key={k} style={{flex:"1 1 140px",minWidth:120}}>
                 <div style={{display:"flex",justifyContent:"space-between",fontSize:11.5,color:"#fff",opacity:.9,marginBottom:4}}>
-                  <span>{LANGS[k].flag} {LANGS[k].name}</span>
-                  <span>{usedCount}/{total}　{fmtMinutes(studyMinutes[k]||0)}</span>
+                  <span>{LANGS[k].flag} {langName(k)}</span>
+                  <span>{usedCount}/{total}{tx("　"," · ")}{fmtMinutes(studyMinutes[k]||0)}</span>
                 </div>
                 <div style={{height:7,background:"rgba(255,255,255,.2)",borderRadius:99,overflow:"hidden"}}>
                   <div style={{height:"100%",width:`${pct}%`,background:LANGS[k].accent,transition:"width .3s"}}/>
@@ -218350,7 +218382,7 @@ function ListenPanel({lang,t}){
                 boxShadow: active? "0 3px 10px rgba(0,0,0,.15)":"0 1px 4px rgba(0,0,0,.06)",
                 textAlign:"left",transition:"all .2s"}}>
               <div style={{fontSize:11,fontWeight:700,opacity:.8,letterSpacing:"1px"}}>{PHASE_NUM[p]}</div>
-              <div style={{fontSize:13.5,fontWeight:800,marginTop:2,lineHeight:1.2}}>{pd.title}</div>
+              <div style={{fontSize:13.5,fontWeight:800,marginTop:2,lineHeight:1.2}}>{tx(pd.title,PHASE_TITLE_EN[p]||pd.title)}</div>
               <div style={{fontSize:10.5,opacity:.8,marginTop:3}}>{pd.weeks}</div>
             </button>
           );
@@ -218362,7 +218394,7 @@ function ListenPanel({lang,t}){
         boxShadow:"0 2px 12px rgba(0,0,0,.06)",borderLeft:`4px solid ${t.primary}`}}>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8,flexWrap:"wrap"}}>
           <span style={{fontSize:17,fontWeight:800,color:t.deep}}>
-            フェーズ{PHASE_NUM[phase]}「{ph.title}」
+            {tx(`フェーズ${PHASE_NUM[phase]}「${ph.title}」`,`Phase ${PHASE_NUM[phase]}: ${PHASE_TITLE_EN[phase]||ph.title}`)}
           </span>
           <span style={{fontSize:12,fontWeight:700,padding:"3px 10px",borderRadius:99,background:t.soft,color:t.deep}}>
             {ph.weeks}
@@ -218374,7 +218406,7 @@ function ListenPanel({lang,t}){
       {/* 聴き方プロトコル */}
       <div style={{marginBottom:20}}>
         <div style={{fontSize:13,fontWeight:800,color:t.deep,marginBottom:10,letterSpacing:".5px"}}>
-          ▸ この期の聴き方プロトコル
+          {tx("▸ この期の聴き方プロトコル","▸ How to listen in this phase")}
         </div>
         <div style={{display:"flex",flexDirection:"column",gap:8}}>
           {ph.protocol.map((step,i)=>(
@@ -218393,9 +218425,9 @@ function ListenPanel({lang,t}){
       {/* 教材リスト */}
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12,flexWrap:"wrap",gap:8}}>
         <div style={{fontSize:13,fontWeight:800,color:t.deep,letterSpacing:".5px"}}>
-          ▸ この期の教材（{phaseMaterials.length}）
+          {tx(`▸ この期の教材（${phaseMaterials.length}）`,`▸ Materials for this phase (${phaseMaterials.length})`)}
         </div>
-        <div style={{fontSize:12,opacity:.7}}>使った教材 {doneCount}/{phaseMaterials.length}</div>
+        <div style={{fontSize:12,opacity:.7}}>{tx("使った教材","Used")} {doneCount}/{phaseMaterials.length}</div>
       </div>
 
       <div style={{display:"flex",flexDirection:"column",gap:12}}>
@@ -218413,7 +218445,7 @@ function ListenPanel({lang,t}){
                   <span style={{fontSize:16.5,fontWeight:800,color:t.deep,lineHeight:1.25}}>{m.name}</span>
                   {m.core && (
                     <span style={{fontSize:10,fontWeight:800,padding:"2px 8px",borderRadius:99,
-                      background:t.accent,color:"#fff",letterSpacing:".5px"}}>軸</span>
+                      background:t.accent,color:"#fff",letterSpacing:".5px"}}>{tx("軸","Core")}</span>
                   )}
                 </div>
                 <button onClick={()=>setDone(d=>({...d,[k]:!d[k]}))}
@@ -218421,7 +218453,7 @@ function ListenPanel({lang,t}){
                     fontSize:12,fontWeight:700,
                     background: isDone? t.accent:t.soft,
                     color: isDone? "#fff":t.deep}}>
-                  {isDone? "✓ 使った":"未着手"}
+                  {isDone? tx("✓ 使った","✓ Used"):tx("未着手","Not started")}
                 </button>
               </div>
 
@@ -218436,14 +218468,14 @@ function ListenPanel({lang,t}){
                 </span>
               </div>
 
-              <Row label="何を" text={m.what} t={t}/>
-              <Row label="なぜ今" text={m.why} t={t}/>
-              <Row label="聴き方" text={m.how} t={t}/>
+              <Row label={tx("何を","What")} text={m.what} t={t}/>
+              <Row label={tx("なぜ今","Why now")} text={m.why} t={t}/>
+              <Row label={tx("聴き方","How")} text={m.how} t={t}/>
 
               <a href={m.url} target="_blank" rel="noopener noreferrer"
                 style={{display:"inline-flex",alignItems:"center",gap:6,marginTop:10,
                   fontSize:12.5,fontWeight:700,color:t.primary,textDecoration:"none"}}>
-                開く ↗
+                {tx("開く ↗","Open ↗")}
               </a>
             </div>
           );
@@ -218453,14 +218485,18 @@ function ListenPanel({lang,t}){
       {/* 全体の原則 */}
       <div style={{marginTop:26,background:t.deep,borderRadius:16,padding:"20px 22px",color:"#fff"}}>
         <div style={{fontSize:13,fontWeight:800,letterSpacing:"1px",opacity:.85,marginBottom:10}}>
-          通底する3原則
+          {tx("通底する3原則","3 underlying principles")}
         </div>
         <div style={{display:"flex",flexDirection:"column",gap:10}}>
-          {[
+          {(UI_EN ? [
+            ["Choose material you can follow","You improve fastest when you understand 60–70% or more. Below that, step back to something easier."],
+            ["Rack up the hours","Rather than looking up every word, build listening time and grow the part you understand."],
+            ["Let enjoyment fuel you","Mix in topics you care about. A routine you can keep up beats any other plan."]
+          ] : [
             ["分かる素材を選ぶ","60〜70%以上分かる難易度が最も伸びる。それ以下は易しいものへ戻る"],
             ["量を稼ぐ","単語を1つ調べるより、分かる部分を増やす感覚で接触時間を積む"],
             ["楽しさを燃料に","関心分野の素材を混ぜる。継続できる設計が最強の設計"]
-          ].map(([h,d],i)=>(
+          ]).map(([h,d],i)=>(
             <div key={i} style={{display:"flex",gap:12,alignItems:"flex-start"}}>
               <span style={{flexShrink:0,fontSize:13,fontWeight:800,color:t.accent,width:18}}>{i+1}</span>
               <div>
@@ -218473,8 +218509,8 @@ function ListenPanel({lang,t}){
       </div>
 
       <div style={{marginTop:18,fontSize:11,opacity:.5,textAlign:"center",lineHeight:1.7}}>
-        「軸」マークの教材を最優先に。各期の修了目安は聴き方プロトコルの達成度で判断。<br/>
-        リンク先の提供形態(無料/有料)・URLは変わることがあります。
+        {tx("「軸」マークの教材を最優先に。各期の修了目安は聴き方プロトコルの達成度で判断。","Put materials marked \"Core\" first. Judge when a phase is done by how well you meet its listening protocol.")}<br/>
+        {tx("リンク先の提供形態(無料/有料)・URLは変わることがあります。","Pricing (free/paid) and URLs of linked materials may change.")}
       </div>
     </div>
   );
@@ -218483,7 +218519,7 @@ function ListenPanel({lang,t}){
 function Row({label,text,t}){
   return (
     <div style={{display:"flex",gap:10,marginBottom:6,alignItems:"flex-start"}}>
-      <span style={{flexShrink:0,fontSize:11,fontWeight:800,color:t.primary,width:42,marginTop:2}}>{label}</span>
+      <span style={{flexShrink:0,fontSize:11,fontWeight:800,color:t.primary,width:UI_EN?54:42,marginTop:2}}>{label}</span>
       <span style={{fontSize:13,lineHeight:1.6,color:"#3a3a3a"}}>{text}</span>
     </div>
   );
@@ -218523,8 +218559,10 @@ function ComparePanel({lang,voicePrefs}){
     <div>
       <div style={{background:"#fff",borderRadius:14,padding:"14px 18px",marginBottom:16,
         boxShadow:"0 2px 10px rgba(0,0,0,.05)",fontSize:13,lineHeight:1.7,color:"#444"}}>
+        {UI_EN ? <>Compare Spanish, German and French side by side, grouped by part of speech and topic. Tap a heading to open or close it. Tap a word to hear it (the selected language, <b style={{color:LANGS[lang].primary}}>{LANGS[lang].nameEn}</b>, is highlighted). Meanings are given in Japanese.</> : <>
         品詞・種別ごとにスペイン語・ドイツ語・フランス語を横並びで比較できます。見出しをタップすると開閉します。
         単語の🔊で発音を確認できます（選択中の <b style={{color:LANGS[lang].primary}}>{LANGS[lang].name}</b> は強調表示）。
+        </>}
       </div>
 
       <button onClick={toggleQuizMode}
@@ -218533,7 +218571,7 @@ function ComparePanel({lang,voicePrefs}){
           background: quizMode? LANGS[lang].primary:"#fff",
           color: quizMode? "#fff":"#666",
           boxShadow: quizMode? "0 3px 10px rgba(0,0,0,.15)":"0 1px 4px rgba(0,0,0,.06)"}}>
-        {quizMode? "🧠 暗記モード ON（日本語だけ見て自分でテスト）":"🧠 暗記モードにする"}
+        {quizMode? tx("🧠 暗記モード ON（日本語だけ見て自分でテスト）","🧠 Memory mode ON (look at the Japanese only and test yourself)"):tx("🧠 暗記モードにする","🧠 Turn on memory mode")}
       </button>
 
       <div style={{display:"flex",flexDirection:"column",gap:12}}>
@@ -218544,9 +218582,9 @@ function ComparePanel({lang,voicePrefs}){
               <button onClick={()=>toggle(cat.key)}
                 style={{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",
                   padding:"16px 20px",border:"none",background:"transparent",cursor:"pointer",textAlign:"left"}}>
-                <span style={{fontSize:15.5,fontWeight:800,color:"#2b2b2b"}}>{cat.label}</span>
+                <span style={{fontSize:15.5,fontWeight:800,color:"#2b2b2b"}}>{tx(cat.label,CMP_LABEL_EN[cat.key]||cat.label)}</span>
                 <span style={{display:"flex",alignItems:"center",gap:10}}>
-                  <span style={{fontSize:11.5,opacity:.5}}>{cat.rows.length}項目</span>
+                  <span style={{fontSize:11.5,opacity:.5}}>{tx(`${cat.rows.length}項目`,`${cat.rows.length} items`)}</span>
                   <span style={{fontSize:14,opacity:.5,transform: isOpen? "rotate(90deg)":"none",transition:"transform .2s"}}>▸</span>
                 </span>
               </button>
@@ -218562,7 +218600,7 @@ function ComparePanel({lang,voicePrefs}){
                     {LANG_ORDER.map(k=>(
                       <div key={k} style={{fontSize:11.5,fontWeight:800,color: k===lang? LANGS[k].primary:"#888",
                         textAlign:"center",padding:"4px 0"}}>
-                        {LANGS[k].flag} {LANGS[k].name}
+                        {LANGS[k].flag} {langName(k)}
                       </div>
                     ))}
                   </div>
@@ -218601,7 +218639,7 @@ function ComparePanel({lang,voicePrefs}){
       </div>
 
       <div style={{marginTop:18,fontSize:11,opacity:.5,textAlign:"center",lineHeight:1.7}}>
-        {quizMode? "🔒をタップすると答えが表示されます（発音も流れます）。":"表内の単語をタップすると発音を確認できます（対応ブラウザのみ）。"}
+        {quizMode? tx("🔒をタップすると答えが表示されます（発音も流れます）。","Tap 🔒 to reveal the answer (and hear it)."):tx("表内の単語をタップすると発音を確認できます（対応ブラウザのみ）。","Tap a word in the table to hear it (supported browsers only).")}
       </div>
     </div>
   );
@@ -218875,7 +218913,7 @@ function QuizPanel({lang,t,voiceURI}){
     return (
       <div>
         <div style={{display:"flex",gap:8,marginBottom:10}}>
-          {[["sentence","📝 文章クイズ"],["vocab","🔤 単語クイズ"]].map(([k,lbl])=>(
+          {[["sentence",tx("📝 文章クイズ","📝 Sentence quiz")],["vocab",tx("🔤 単語クイズ","🔤 Word quiz")]].map(([k,lbl])=>(
             <button key={k} onClick={()=>setQuizType(k)}
               style={{flex:1,padding:"11px 8px",borderRadius:12,border:"none",cursor:"pointer",
                 fontWeight:800,fontSize:13.5,
@@ -218887,7 +218925,7 @@ function QuizPanel({lang,t,voiceURI}){
           ))}
         </div>
         <div style={{display:"flex",gap:8,marginBottom:10}}>
-          {[["basic","基礎",totalBasic],["adv","応用",totalAdv],["both","ミックス",totalBasic+totalAdv]].map(([k,lbl,n])=>(
+          {[["basic",tx("基礎","Basic"),totalBasic],["adv",tx("応用","Advanced"),totalAdv],["both",tx("ミックス","Mixed"),totalBasic+totalAdv]].map(([k,lbl,n])=>(
             <button key={k} onClick={()=>setLevel(k)}
               style={{flex:1,padding:"12px 8px",borderRadius:12,border:"none",cursor:"pointer",
                 fontWeight:800,fontSize:14,
@@ -218907,7 +218945,7 @@ function QuizPanel({lang,t,voiceURI}){
                 background: roundSize===n? t.accent:"#fff",
                 color: roundSize===n? "#fff":"#666",
                 boxShadow: roundSize===n? "0 3px 10px rgba(0,0,0,.15)":"0 1px 4px rgba(0,0,0,.06)"}}>
-              {n}問
+              {tx(`${n}問`,`${n} Qs`)}
             </button>
           ))}
         </div>
@@ -218919,7 +218957,7 @@ function QuizPanel({lang,t,voiceURI}){
               background: timeAttack? "#C0392B":"#fff",
               color: timeAttack? "#fff":"#666",
               boxShadow: timeAttack? "0 3px 10px rgba(0,0,0,.15)":"0 1px 4px rgba(0,0,0,.06)"}}>
-            ⏱ タイムアタック {timeAttack? "ON（並べ替え20秒/4択12秒）":"OFF"}
+            {tx("⏱ タイムアタック","⏱ Time attack")} {timeAttack? tx("ON（並べ替え20秒/4択12秒）","ON (ordering 20 s / multiple choice 12 s)"):"OFF"}
           </button>
         </div>
 
@@ -218927,40 +218965,40 @@ function QuizPanel({lang,t,voiceURI}){
           boxShadow:"0 8px 30px rgba(0,0,0,.08)"}}>
           <div style={{fontSize:40,marginBottom:10}}>{quizType==="vocab"?"🔤":"🎯"}</div>
           <div style={{fontSize:19,fontWeight:800,color:t.deep,marginBottom:8}}>
-            {quizType==="vocab"?"単語クイズ":"文章クイズ"}（{t.name}）
+            {UI_EN ? `${quizType==="vocab"?"Word quiz":"Sentence quiz"} (${t.nameEn})` : `${quizType==="vocab"?"単語クイズ":"文章クイズ"}（${t.name}）`}
           </div>
           <div style={{fontSize:13.5,color:"#555",lineHeight:1.7,marginBottom:22}}>
-            {quizType==="vocab" ? (<>単語と意味を4択で採点。「単語→意味」と「意味→単語」を<br/>ランダムに出題します。全語彙が対象。1ラウンド{Math.min(roundSize,activePool.length)}問です。</>) : (<>単語カードの例文から出題。「並べ替え」でタイルをタップして文を組み立てたり、<br/>「4択」で意味が一致する文を選んだり。1ラウンド{Math.min(roundSize,activePool.length)}問です。</>)}
+            {UI_EN ? (quizType==="vocab" ? (<>Multiple choice on words and meanings, mixing "word → meaning" and "meaning → word"<br/>at random. Covers the whole vocabulary. {Math.min(roundSize,activePool.length)} questions per round.</>) : (<>Questions come from the flashcard example sentences: tap tiles to build the sentence ("ordering"),<br/>or pick the sentence with the same meaning ("multiple choice"). {Math.min(roundSize,activePool.length)} questions per round.</>)) : quizType==="vocab" ? (<>単語と意味を4択で採点。「単語→意味」と「意味→単語」を<br/>ランダムに出題します。全語彙が対象。1ラウンド{Math.min(roundSize,activePool.length)}問です。</>) : (<>単語カードの例文から出題。「並べ替え」でタイルをタップして文を組み立てたり、<br/>「4択」で意味が一致する文を選んだり。1ラウンド{Math.min(roundSize,activePool.length)}問です。</>)}
           </div>
           <button onClick={startRound} disabled={activePool.length===0}
             style={{padding:"14px 40px",borderRadius:99,border:"none",cursor: activePool.length? "pointer":"not-allowed",
               background: activePool.length? t.primary : "#ccc",color:"#fff",fontWeight:800,fontSize:16,
               boxShadow:"0 4px 14px rgba(0,0,0,.18)"}}>
-            スタート ▶
+            {tx("スタート ▶","Start ▶")}
           </button>
           {activePool.length===0 && (
-            <div style={{marginTop:10,fontSize:12,color:"#c33"}}>この条件では出題できる問題がありません</div>
+            <div style={{marginTop:10,fontSize:12,color:"#c33"}}>{tx("この条件では出題できる問題がありません","No questions match these settings")}</div>
           )}
 
           {langStats.totalAttempts>0 && (
             <div style={{marginTop:24,paddingTop:20,borderTop:"1px solid #eee",
               display:"flex",justifyContent:"center",gap:22,flexWrap:"wrap"}}>
-              <StatBlock label="累計正解率" value={`${Math.round(langStats.totalCorrect/langStats.totalAttempts*100)}%`} t={t}/>
-              <StatBlock label="最長ストリーク" value={`🔥${langStats.bestStreakEver}`} t={t}/>
-              <StatBlock label="ラウンド完了数" value={`${langStats.roundsCompleted}`} t={t}/>
+              <StatBlock label={tx("累計正解率","Overall accuracy")} value={`${Math.round(langStats.totalCorrect/langStats.totalAttempts*100)}%`} t={t}/>
+              <StatBlock label={tx("最長ストリーク","Best streak")} value={`🔥${langStats.bestStreakEver}`} t={t}/>
+              <StatBlock label={tx("ラウンド完了数","Rounds completed")} value={`${langStats.roundsCompleted}`} t={t}/>
             </div>
           )}
 
           {(() => {
             const badges=[];
-            if(langStats.roundsCompleted>=1) badges.push("🎉 初ラウンド完了");
-            if(langStats.bestStreakEver>=7) badges.push("🔥 ストリーク7");
-            if(langStats.bestStreakEver>=15) badges.push("🔥🔥 ストリーク15");
-            if(langStats.bestStreakEver>=30) badges.push("🔥🔥🔥 ストリーク30");
-            if(langStats.totalCorrect>=100) badges.push("💯 100問正解");
-            if(langStats.totalCorrect>=500) badges.push("🏅 500問正解");
-            if(langStats.totalCorrect>=1000) badges.push("👑 1000問正解");
-            if(langStats.roundsCompleted>=10) badges.push("📅 10ラウンド完了");
+            if(langStats.roundsCompleted>=1) badges.push(tx("🎉 初ラウンド完了","🎉 First round done"));
+            if(langStats.bestStreakEver>=7) badges.push(tx("🔥 ストリーク7","🔥 Streak 7"));
+            if(langStats.bestStreakEver>=15) badges.push(tx("🔥🔥 ストリーク15","🔥🔥 Streak 15"));
+            if(langStats.bestStreakEver>=30) badges.push(tx("🔥🔥🔥 ストリーク30","🔥🔥🔥 Streak 30"));
+            if(langStats.totalCorrect>=100) badges.push(tx("💯 100問正解","💯 100 correct"));
+            if(langStats.totalCorrect>=500) badges.push(tx("🏅 500問正解","🏅 500 correct"));
+            if(langStats.totalCorrect>=1000) badges.push(tx("👑 1000問正解","👑 1000 correct"));
+            if(langStats.roundsCompleted>=10) badges.push(tx("📅 10ラウンド完了","📅 10 rounds done"));
             if(badges.length===0) return null;
             return (
               <div style={{marginTop:18,display:"flex",flexWrap:"wrap",gap:8,justifyContent:"center"}}>
@@ -218984,13 +219022,13 @@ function QuizPanel({lang,t,voiceURI}){
         boxShadow:"0 8px 30px rgba(0,0,0,.08)"}}>
         <div style={{fontSize:44,marginBottom:6}}>{pct>=80?"🏆":pct>=50?"👍":"💪"}</div>
         <div style={{fontSize:22,fontWeight:800,color:t.deep,marginBottom:4}}>
-          {score} / {questions.length} 正解
+          {tx(`${score} / ${questions.length} 正解`,`${score} / ${questions.length} correct`)}
         </div>
-        <div style={{fontSize:14,color:"#666",marginBottom:4}}>正答率 {pct}%　・　最長ストリーク 🔥{bestStreak}</div>
+        <div style={{fontSize:14,color:"#666",marginBottom:4}}>{tx(`正答率 ${pct}%　・　最長ストリーク 🔥${bestStreak}`,`Accuracy ${pct}% · Best streak 🔥${bestStreak}`)}</div>
 
         {mistakes.length>0 && (
           <div style={{marginTop:22,textAlign:"left"}}>
-            <div style={{fontSize:12.5,fontWeight:800,color:t.deep,marginBottom:8}}>{quizType==="vocab"?"間違えた単語（復習用）":"間違えた文（復習用）"}</div>
+            <div style={{fontSize:12.5,fontWeight:800,color:t.deep,marginBottom:8}}>{quizType==="vocab"?tx("間違えた単語（復習用）","Words you missed (for review)"):tx("間違えた文（復習用）","Sentences you missed (for review)")}</div>
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
               {mistakes.map((m,i)=>(
                 <div key={i} style={{background:t.soft,borderRadius:10,padding:"10px 12px"}}>
@@ -219005,13 +219043,13 @@ function QuizPanel({lang,t,voiceURI}){
         <button onClick={startRound}
           style={{marginTop:26,padding:"13px 36px",borderRadius:99,border:"none",cursor:"pointer",
             background:t.primary,color:"#fff",fontWeight:800,fontSize:15,boxShadow:"0 4px 14px rgba(0,0,0,.15)"}}>
-          もう一度 ↻
+          {tx("もう一度 ↻","Again ↻")}
         </button>
         {mistakes.length>0 && (
           <button onClick={()=>startReviewRound(mistakes.map(m=>m.card))}
             style={{marginTop:12,marginLeft:10,padding:"13px 30px",borderRadius:99,border:"none",cursor:"pointer",
               background:t.accent,color:"#fff",fontWeight:800,fontSize:15,boxShadow:"0 4px 14px rgba(0,0,0,.15)"}}>
-            苦手だけ復習（{mistakes.length}問）
+            {tx(`苦手だけ復習（${mistakes.length}問）`,`Review misses only (${mistakes.length})`)}
           </button>
         )}
       </div>
@@ -219039,7 +219077,7 @@ function QuizPanel({lang,t,voiceURI}){
         {current.type==="order" ? (
           <>
             <div style={{fontSize:12,fontWeight:700,color:t.primary,marginBottom:8,letterSpacing:".5px"}}>
-              並べ替えて文を作ろう
+              {tx("並べ替えて文を作ろう","Put the words in order")}
             </div>
             <div style={{fontSize:18,fontWeight:700,color:"#333",marginBottom:20,lineHeight:1.6}}>
               {current.card[4]}
@@ -219048,7 +219086,7 @@ function QuizPanel({lang,t,voiceURI}){
             {/* 組み立て中の答え */}
             <div style={{minHeight:52,display:"flex",flexWrap:"wrap",gap:8,marginBottom:16,
               padding:"10px",background:t.soft,borderRadius:12}}>
-              {answer.length===0 && <span style={{fontSize:12.5,opacity:.4}}>下のタイルをタップして文を組み立ててください</span>}
+              {answer.length===0 && <span style={{fontSize:12.5,opacity:.4}}>{tx("下のタイルをタップして文を組み立ててください","Tap the tiles below to build the sentence")}</span>}
               {answer.map(tile=>(
                 <button key={tile.id} onClick={()=>unpickTile(tile)}
                   disabled={!!checked}
@@ -219076,7 +219114,7 @@ function QuizPanel({lang,t,voiceURI}){
               <div style={{padding:"12px 14px",borderRadius:10,marginBottom:16,
                 background: checked==="correct"? "#E3F0E3":"#FBE9E7",
                 color: checked==="correct"? "#2E6B3E":"#B23A2E",fontWeight:700,fontSize:14}}>
-                {checked==="correct" ? "正解！ " : "正しい文: "}{current.card[3]}
+                {checked==="correct" ? tx("正解！ ","Correct! ") : tx("正しい文: ","Correct sentence: ")}{current.card[3]}
               </div>
             )}
 
@@ -219085,20 +219123,20 @@ function QuizPanel({lang,t,voiceURI}){
                 style={{width:"100%",padding:"14px",borderRadius:12,border:"none",
                   cursor: answer.length? "pointer":"not-allowed",
                   background: answer.length? t.primary:"#ddd",color:"#fff",fontWeight:800,fontSize:15}}>
-                答え合わせ
+                {tx("答え合わせ","Check")}
               </button>
             ) : (
               <button onClick={next}
                 style={{width:"100%",padding:"14px",borderRadius:12,border:"none",cursor:"pointer",
                   background:t.deep,color:"#fff",fontWeight:800,fontSize:15}}>
-                次へ →
+                {tx("次へ →","Next →")}
               </button>
             )}
           </>
         ) : current.type==="vocab" ? (
           <>
             <div style={{fontSize:12,fontWeight:700,color:t.primary,marginBottom:8,letterSpacing:".5px"}}>
-              {current.dir==="w2m" ? "単語の意味を選ぼう" : "意味に合う単語を選ぼう"}
+              {current.dir==="w2m" ? tx("単語の意味を選ぼう","Choose the meaning") : tx("意味に合う単語を選ぼう","Choose the word for this meaning")}
             </div>
             <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:20,flexWrap:"wrap"}}>
               <div style={{fontSize:24,fontWeight:800,color:t.deep,lineHeight:1.4}}>{current.dir==="w2m" ? current.card[0] : current.card[2]}</div>
@@ -219131,7 +219169,7 @@ function QuizPanel({lang,t,voiceURI}){
 
             {checked && (
               <div style={{marginTop:14,padding:"10px 14px",borderRadius:10,background:t.soft,fontSize:13,color:t.deep}}>
-                {current.card[0]}　—　{current.card[2]}{current.card[3] ? <span style={{opacity:.7}}>　例: {current.card[3]}</span> : null}
+                {current.card[0]}{tx("　—　"," — ")}{current.card[2]}{current.card[3] ? <span style={{opacity:.7}}>{tx("　例: ","  e.g. ")}{current.card[3]}</span> : null}
               </div>
             )}
 
@@ -219139,14 +219177,14 @@ function QuizPanel({lang,t,voiceURI}){
               <button onClick={next}
                 style={{width:"100%",padding:"14px",borderRadius:12,border:"none",cursor:"pointer",marginTop:14,
                   background:t.deep,color:"#fff",fontWeight:800,fontSize:15}}>
-                次へ →
+                {tx("次へ →","Next →")}
               </button>
             )}
           </>
         ) : (
           <>
             <div style={{fontSize:12,fontWeight:700,color:t.primary,marginBottom:8,letterSpacing:".5px"}}>
-              意味が一致する文を選ぼう
+              {tx("意味が一致する文を選ぼう","Choose the sentence with the same meaning")}
             </div>
             <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:20,flexWrap:"wrap"}}>
               <div style={{fontSize:20,fontWeight:800,color:t.deep,lineHeight:1.5}}>{current.card[3]}</div>
@@ -219178,7 +219216,7 @@ function QuizPanel({lang,t,voiceURI}){
               <button onClick={next}
                 style={{width:"100%",padding:"14px",borderRadius:12,border:"none",cursor:"pointer",marginTop:18,
                   background:t.deep,color:"#fff",fontWeight:800,fontSize:15}}>
-                次へ →
+                {tx("次へ →","Next →")}
               </button>
             )}
           </>
@@ -219186,13 +219224,13 @@ function QuizPanel({lang,t,voiceURI}){
       </div>
 
       <div style={{marginTop:14,fontSize:11,opacity:.5,textAlign:"center"}}>
-        スコア {score} 正解 ／ 現在 {qIdx+1}問目
+        {tx(`スコア ${score} 正解 ／ 現在 ${qIdx+1}問目`,`Score: ${score} correct / question ${qIdx+1}`)}
       </div>
     </div>
   );
 }
   // ポータルの横断検索に出す言語
-  App.PORTAL_INDEX = (en) => Object.entries(LANGS).map(([k, v]) => ({ label: v.name + (en ? " (" + v.flag + ")" : ""), sub: "Language Hub", hash: "languagehub/" + k + "/home", extra: v.flag }));
+  App.PORTAL_INDEX = (en) => Object.entries(LANGS).map(([k, v]) => ({ label: en ? v.nameEn + " (" + v.flag + ")" : v.name, sub: "Language Hub", hash: "languagehub/" + k + "/home", extra: v.flag }));
   return App;
 })();
 // ================= 別ファイルのハブ HTML の読み込み =================
@@ -219561,6 +219599,69 @@ const SideWorkHubModule = (function () {
   const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
   const SANS = 'Inter, -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif';
 
+  // ---------- 画面の言語（ポータルの言語で開き、メニューの EN／日本語 で切り替える） ----------
+  // 訳すのは画面の部品（見出し・ボタン・案内・凡例）と、データに入っている短い決まった名前（分類・地域・段階・役割・シリーズ名など）だけ。
+  // 調査データ・企画・台本・出典など、日本語で発信するための中身は訳さない。値そのもの（絞り込み・保存・CSS のキー）も日本語のまま。
+  // ハブの根（SideWorkHub）が描画のたびに UI_EN を入れ直すので、部品と補助関数は tx(日本語, 英語) で今の言語の文言を選ぶ。
+  let UI_EN = false;
+  const tx = (ja, en) => (UI_EN ? en : ja);
+  const useUiLang = () => {
+    const [ui, setUi] = useState(() => (typeof window !== "undefined" && window.__novaLang) || "ja"); // ポータルの言語で開く
+    useEffect(() => {
+      // ポータルが保存済みの言語を読み込んだとき・切り替えたとき（nova-lang）にも合わせる
+      const f = () => { const l = window.__novaLang; if (l === "ja" || l === "en") setUi(l); };
+      window.addEventListener("nova-lang", f);
+      return () => window.removeEventListener("nova-lang", f);
+    }, []);
+    return [ui, setUi];
+  };
+  const EN_LABEL = {
+    // 市場の分類・地域・題材
+    "主要市場": "Major markets", "学び・お金": "Learning & money", "悩み系": "Personal worries", "趣味・教養": "Hobbies & culture", "クリエイター・AI": "Creators & AI",
+    "世界": "World", "中国": "China", "米国": "US", "英国": "UK", "韓国": "South Korea", "日本": "Japan", "東アジア": "East Asia", "ワイン": "Wine", "歴史": "History",
+    // 海外の事例・媒体の段階と種類
+    "手本": "Role model", "反面教師": "Cautionary tale", "プラットフォームの動き": "Platform move", "AI量産": "AI mass production", "教養": "General knowledge",
+    "急成長": "Surging", "伸び始め": "Rising", "定着": "Established",
+    "コミュニティ": "Community", "テキスト・ニュースレター": "Text & newsletters", "画像・発見": "Images & discovery", "短尺動画": "Short video", "長尺・音声": "Long-form & audio",
+    // 参考アカウントの役割・テーマ
+    "ノウハウ": "Know-how", "協業候補": "Potential partner", "情報源": "Source",
+    "AI・制作": "AI & production", "SNS運用": "Social media ops", "お酒全般": "Drinks in general", "その他": "Other", "歴史・文化": "History & culture",
+    // ツールの分類・連携の工程と種類・自動化の度合い
+    "リサーチ・台本": "Research & scripts", "音声": "Audio", "画像": "Images", "動画生成": "Video generation", "編集・字幕": "Editing & captions", "アバター": "Avatars", "投稿の自動化": "Posting automation", "分析": "Analytics",
+    "調べる": "Research", "作る": "Make", "投稿": "Post", "管理": "Manage", "全体": "Overall",
+    "台本": "Script", "編集": "Editing", "調査": "Research", "収録・編集": "Recording & editing", "切り出し": "Clipping",
+    "コネクタ（MCP）": "Connector (MCP)", "プラグイン": "Plugin",
+    "自動": "Auto", "半自動": "Semi-auto", "人": "Human",
+    // 媒体とテーマの相性の段階
+    "非常に高い": "Very high", "高い": "High", "中〜高": "Medium–high", "中": "Medium", "低〜中": "Low–medium", "低": "Low",
+    // 発信プランの層
+    "ライト": "Casual", "ミドル": "Middle", "コア": "Core",
+    // 「その時」の型・時代
+    "決断の瞬間": "Moment of decision", "出来事の瞬間": "Moment of event", "解説型": "Explainer",
+    "古代": "Ancient", "中世": "Medieval", "近世": "Early modern", "近代": "Modern", "現代": "Contemporary",
+    // シリーズ
+    "ワイン：制度と格付け": "Wine: rules & classifications", "ワイン：人物とメゾン": "Wine: people & houses", "ワイン：事件・取引・戦争": "Wine: scandals, trade & war",
+    "ワイン：産地と世界遺産": "Wine: regions & World Heritage", "ワイン：技術と品種": "Wine: techniques & grapes", "ワイン：文化・作品・評論": "Wine: culture, works & criticism",
+    "世界：古代・中世": "World: ancient & medieval", "世界：近世": "World: early modern", "世界：近代": "World: modern", "世界：20世紀以降": "World: 20th century on",
+    "日本：古代〜戦国": "Japan: ancient to Sengoku", "日本：江戸": "Japan: Edo", "日本：近代": "Japan: modern", "日本：戦後": "Japan: postwar",
+    // 発信の型（名前と短い名前）
+    "二人の対談で深掘り": "Two-person deep-dive talk", "地図と図解で戦況を追う": "Following events on maps & diagrams", "ユーモアのあるアニメ解説": "Humorous animated explainer",
+    "超長尺の語りドキュメンタリー": "Very long narrated documentary", "図解インフォグラフィック": "Infographic explainer", "60秒の一問一答・逸話": "60-second Q&A or anecdote",
+    "今と過去をつなぐ連載ニュースレター": "Serial newsletter linking past & present", "現地とモノから語る": "Told through places & objects",
+    "対談": "Talk", "地図": "Maps", "アニメ": "Animation", "長尺語り": "Long narration", "図解": "Infographic", "ショート": "Short", "連載": "Serial", "現地": "On location",
+    // 第1か月の台本の形
+    "記念日ショート（60秒）": "Anniversary short (60 s)", "カルーセル5枚": "5-slide carousel", "長尺": "Long-form", "3分版": "3-minute version", "60秒「その時」版": "60-second \"moment\" version", "15〜30秒ショート": "15–30 s short",
+  };
+  const lbl = (s) => (UI_EN && EN_LABEL[s]) || s;
+  const MONTH_EN = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const DOW_EN = { "日": "Sun", "月": "Mon", "火": "Tue", "水": "Wed", "木": "Thu", "金": "Fri", "土": "Sat", "土・日": "Sat–Sun" };
+  const dowL = (d) => tx(d, DOW_EN[d] || d);
+  const LangToggle = ({ ui, setUi }) => (
+    <span className="sw-lang" role="group" aria-label="Language">
+      {[["ja", "日本語"], ["en", "EN"]].map(([k, l]) => <button key={k} type="button" className={ui === k ? "on" : ""} aria-pressed={ui === k} onClick={() => setUi(k)}>{l}</button>)}
+    </span>
+  );
+
   const CSS = `
 .sw{--bg:#F2F5FA;--panel:#fff;--ink:#0B1A33;--ink2:#22324D;--sub:#44526A;--faint:#526074;--line:#E2E8F1;--line2:#EEF2F7;
   --nav:#0A1730;--nav2:#10284D;--blue:#1D4ED8;--blue-d:#1D4ED8;--blue-dd:#1E3A8A;--blue-soft:#EAF1FE;--sky:#38BDF8;
@@ -219589,6 +219690,11 @@ const SideWorkHubModule = (function () {
 .sw-nav.on{background:linear-gradient(90deg,rgba(59,130,246,.95),rgba(37,99,235,.85));color:#fff;font-weight:700;box-shadow:0 4px 14px rgba(37,99,235,.35)}
 .sw-nav svg{flex-shrink:0;opacity:.85}
 .sw-mnav{display:none}
+.sw-lang{display:inline-flex;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:99px;padding:2px;gap:2px}
+.sw-lang button{border:0;background:none;color:#B8C6DE;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:99px;cursor:pointer;white-space:nowrap}
+.sw-lang button.on{background:#fff;color:var(--nav)}
+.sw-side .sw-lang{margin:0 8px 16px}
+.sw-mnav-top{display:flex;justify-content:flex-end;margin-bottom:6px}
 .sw-main{min-width:0;padding:26px 32px 80px;max-width:1320px;width:100%}
 .sw-top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
 .sw-kick{font-size:11px;letter-spacing:.16em;font-weight:800;color:var(--blue)}
@@ -219986,20 +220092,21 @@ const SideWorkHubModule = (function () {
   );
 
   const NAV = [
-    { n: "00", label: "ダッシュボード", short: "ホーム", items: [["home", "ダッシュボード", "dash"]] },
-    { n: "01", label: "調べる", short: "調べる", items: [["market", "市場", "market"], ["media", "媒体", "media"], ["accounts", "参考アカウント", "users"]] },
-    { n: "02", label: "企画する", short: "企画", items: [["planx", "発信プラン", "target"], ["plans", "企画帳", "plan"], ["neta", "ネタ帳", "bulb"]] },
-    { n: "03", label: "作る", short: "作る", items: [["m1", "第1か月の台本", "plan"], ["video", "AI動画の手順", "video"], ["pipeline", "自動化", "flow"], ["tools", "ツール比較", "tool"], ["connect", "MCP・連携", "plug"]] },
-    { n: "04", label: "確かめる", short: "確かめる", items: [["gate", "事実確認の関門", "shield"], ["quality", "品質レポート", "check"], ["sources", "情報源", "book"], ["rules", "規制・リスク", "scale"]] },
+    // 項目は [画面, 日本語, アイコン, 英語]
+    { n: "00", label: "ダッシュボード", short: "ホーム", en: "Dashboard", shortEn: "Home", items: [["home", "ダッシュボード", "dash", "Dashboard"]] },
+    { n: "01", label: "調べる", short: "調べる", en: "Research", shortEn: "Research", items: [["market", "市場", "market", "Markets"], ["media", "媒体", "media", "Platforms"], ["accounts", "参考アカウント", "users", "Reference accounts"]] },
+    { n: "02", label: "企画する", short: "企画", en: "Plan", shortEn: "Plan", items: [["planx", "発信プラン", "target", "Publishing plan"], ["plans", "企画帳", "plan", "Episode plans"], ["neta", "ネタ帳", "bulb", "Idea bank"]] },
+    { n: "03", label: "作る", short: "作る", en: "Make", shortEn: "Make", items: [["m1", "第1か月の台本", "plan", "Month 1 scripts"], ["video", "AI動画の手順", "video", "AI video steps"], ["pipeline", "自動化", "flow", "Automation"], ["tools", "ツール比較", "tool", "Tool comparison"], ["connect", "MCP・連携", "plug", "MCP & integrations"]] },
+    { n: "04", label: "確かめる", short: "確かめる", en: "Check", shortEn: "Check", items: [["gate", "事実確認の関門", "shield", "Fact-check gate"], ["quality", "品質レポート", "check", "Quality report"], ["sources", "情報源", "book", "Sources"], ["rules", "規制・リスク", "scale", "Rules & risks"]] },
   ];
   const groupOf = (pg) => NAV.find((g) => g.items.some(([k]) => k === pg)) || NAV[0];
 
   // ---------- 小さな部品 ----------
-  const Ext = ({ url, children }) => url ? <a href={url} target="_blank" rel="noopener noreferrer">{children || "出典"}</a> : null;
+  const Ext = ({ url, children }) => url ? <a href={url} target="_blank" rel="noopener noreferrer">{children || tx("出典", "Source")}</a> : null;
   const Badge = ({ v }) => (
-    <span className={"sw-badge " + (v ? "ok" : "no")} title={v ? "出典の本文または公式ページで確認した" : "検索結果の要約でのみ確認。使う前に原文で確かめる"}>{v ? "確認済み" : "要原文確認"}</span>
+    <span className={"sw-badge " + (v ? "ok" : "no")} title={v ? tx("出典の本文または公式ページで確認した", "Confirmed in the source text or on the official page") : tx("検索結果の要約でのみ確認。使う前に原文で確かめる", "Confirmed only from search-result summaries. Check the original before use")}>{v ? tx("確認済み", "Verified") : tx("要原文確認", "Check original")}</span>
   );
-  const Auto = ({ a }) => <span className={"sw-pill sw-auto-" + a}>{a === "人" ? "人が行う" : a}</span>;
+  const Auto = ({ a }) => <span className={"sw-pill sw-auto-" + a}>{a === "人" ? tx("人が行う", "By a person") : lbl(a)}</span>;
   const Seg = ({ value, onChange, options }) => (
     <div className="sw-seg" role="tablist">
       {options.map(([k, l]) => <button key={k} role="tab" aria-selected={value === k} className={value === k ? "on" : ""} onClick={() => onChange(k)}>{l}</button>)}
@@ -220043,9 +220150,9 @@ const SideWorkHubModule = (function () {
       </section>
     );
   }
-  const FoldAll = ({ onSet }) => <span className="sw-foldall"><button type="button" className="sw-btn" onClick={() => onSet(true)}>すべて開く</button><button type="button" className="sw-btn" onClick={() => onSet(false)}>すべて閉じる</button></span>;
+  const FoldAll = ({ onSet }) => <span className="sw-foldall"><button type="button" className="sw-btn" onClick={() => onSet(true)}>{tx("すべて開く", "Expand all")}</button><button type="button" className="sw-btn" onClick={() => onSet(false)}>{tx("すべて閉じる", "Collapse all")}</button></span>;
   const splitTitle = (t) => { const m = String(t || "").split(/：|――/); return [m[0], m.slice(1).join("――")]; };
-  const usd = (bn) => { const oku = bn * 10; if (oku >= 10000 && oku % 10000 === 0) return `${(oku / 10000).toLocaleString()}兆ドル`; return oku >= 100 ? `${Math.round(oku).toLocaleString()}億ドル` : `${(Math.round(oku * 10) / 10).toLocaleString()}億ドル`; };
+  const usd = (bn) => { if (UI_EN) return bn >= 1000 ? `$${+(bn / 1000).toFixed(2)}T` : bn >= 1 ? `$${+bn.toFixed(1)}B` : `$${Math.round(bn * 1000)}M`; const oku = bn * 10; if (oku >= 10000 && oku % 10000 === 0) return `${(oku / 10000).toLocaleString()}兆ドル`; return oku >= 100 ? `${Math.round(oku).toLocaleString()}億ドル` : `${(Math.round(oku * 10) / 10).toLocaleString()}億ドル`; };
   const useTip = () => {
     const [tip, setTip] = useState(null);
     const el = tip ? <div className="sw-tip" style={{ left: Math.max(8, Math.min(tip.x + 14, (typeof window !== "undefined" ? window.innerWidth : 1200) - 330)), top: tip.y + 14 }}>{tip.t}</div> : null;
@@ -220072,13 +220179,13 @@ const SideWorkHubModule = (function () {
     return (
       <div onMouseLeave={offTip}>
         {rows.map((r) => (
-          <div key={r.key} className="sw-hb" onMouseMove={(e) => onTip(e, `${r.name}（${r.region}）：${r.rows.map((x) => `${x.size}・${x.year}・${x.source}`).join(" ／ ")}`)}>
-            <span className="sw-hb-l" title={r.name}>{r.name}{r.region !== "世界" ? `（${r.region}）` : ""}</span>
+          <div key={r.key} className="sw-hb" onMouseMove={(e) => onTip(e, tx(`${r.name}（${r.region}）：${r.rows.map((x) => `${x.size}・${x.year}・${x.source}`).join(" ／ ")}`, `${r.name} (${lbl(r.region)}): ${r.rows.map((x) => `${x.size} · ${x.year} · ${x.source}`).join(" / ")}`))}>
+            <span className="sw-hb-l" title={r.name}>{r.name}{r.region !== "世界" ? tx(`（${r.region}）`, ` (${lbl(r.region)})`) : ""}</span>
             <span className="sw-hb-t">
               {r.hi > r.lo ? <i style={{ width: `${r.hi / top * 100}%`, background: color, opacity: .25 }} /> : null}
               <i style={{ width: `${Math.max(.8, r.lo / top * 100)}%`, background: color }} />
             </span>
-            <span className="sw-hb-v">{r.hi > r.lo ? `${usd(r.lo)}〜${usd(r.hi)}` : usd(r.lo)}</span>
+            <span className="sw-hb-v">{r.hi > r.lo ? `${usd(r.lo)}${tx("〜", "–")}${usd(r.hi)}` : usd(r.lo)}</span>
           </div>
         ))}
       </div>
@@ -220098,22 +220205,24 @@ const SideWorkHubModule = (function () {
   const FitBar = ({ v, color }) => <span className="sw-fit-b" aria-hidden="true">{[1, 2, 3, 4, 5].map((k) => <i key={k} style={k <= v ? { background: color } : null} />)}</span>;
   const Fit = ({ m }) => (
     <>
-      <div className="sw-fit"><span style={{ width: 40, flexShrink: 0 }}>ワイン</span><FitBar v={m.fit_wine_n} color="var(--wine)" /><span>{m.fit_wine_l}</span></div>
-      <div className="sw-fit"><span style={{ width: 40, flexShrink: 0 }}>歴史</span><FitBar v={m.fit_history_n} color="var(--hist)" /><span>{m.fit_history_l}</span></div>
+      <div className="sw-fit"><span style={{ width: UI_EN ? 50 : 40, flexShrink: 0 }}>{tx("ワイン", "Wine")}</span><FitBar v={m.fit_wine_n} color="var(--wine)" /><span>{lbl(m.fit_wine_l)}</span></div>
+      <div className="sw-fit"><span style={{ width: UI_EN ? 50 : 40, flexShrink: 0 }}>{tx("歴史", "History")}</span><FitBar v={m.fit_history_n} color="var(--hist)" /><span>{lbl(m.fit_history_l)}</span></div>
     </>
   );
 
   // ---------- 00 ダッシュボード ----------
+  // 工程は [画面, 日本語, 自動化の度合い, 英語]
   const FLOW = [
-    ["market", "市場を調べる", "半自動"], ["plans", "テーマと企画", "人"], ["sources", "一次情報を集める", "半自動"],
-    ["video", "台本・AI動画", "半自動"], ["gate", "事実確認の関門", "人"], ["media", "発信する", "半自動"], ["pipeline", "振り返る", "自動"],
+    ["market", "市場を調べる", "半自動", "Research markets"], ["plans", "テーマと企画", "人", "Themes & episodes"], ["sources", "一次情報を集める", "半自動", "Gather primary sources"],
+    ["video", "台本・AI動画", "半自動", "Script & AI video"], ["gate", "事実確認の関門", "人", "Fact-check gate"], ["media", "発信する", "半自動", "Publish"], ["pipeline", "振り返る", "自動", "Review results"],
   ];
+  // 約束は [日本語, 日本語の説明, 英語, 英語の説明]
   const VOWS = [
-    ["出典のない事実は出さない", "見つからない話は「諸説あり」と言うか、使わない"],
-    ["一次情報を優先する", "まとめ記事・SNS・AIの回答は出典にしない"],
-    ["AIの下書きは人が照合する", "関門を通るまで公開しない"],
-    ["AIで作ったことを隠さない", "各SNSの規約に沿ってAI生成を表示する"],
-    ["煽らない・誤認させない", "断定・誇張・ステマは法律と規約で禁じられている"],
+    ["出典のない事実は出さない", "見つからない話は「諸説あり」と言うか、使わない", "No fact without a source", "If you can't find support, say accounts differ or leave it out"],
+    ["一次情報を優先する", "まとめ記事・SNS・AIの回答は出典にしない", "Primary sources first", "Summary articles, social posts and AI answers are never sources"],
+    ["AIの下書きは人が照合する", "関門を通るまで公開しない", "A person checks every AI draft", "Nothing goes public until it passes the gate"],
+    ["AIで作ったことを隠さない", "各SNSの規約に沿ってAI生成を表示する", "Don't hide that AI made it", "Label AI-generated content as each platform's rules require"],
+    ["煽らない・誤認させない", "断定・誇張・ステマは法律と規約で禁じられている", "No hype, nothing misleading", "Overclaiming, exaggeration and stealth ads are banned by law and platform rules"],
   ];
   function Home({ go, done, checked, openEp }) {
     const W = (SW_DATA.wine || {}).episodes || [], H = (SW_DATA.history || {}).episodes || [];
@@ -220123,7 +220232,13 @@ const SideWorkHubModule = (function () {
     const kdone = (k) => FACTS.filter((f) => f.kind === k && (f.v || checked[f.key])).length;
     const ktot = (k) => FACTS.filter((f) => f.kind === k).length;
     const emRise = em.filter((m) => m.stage === "急成長" || m.stage === "伸び始め").sort((a, b) => (a.stage === "急成長" ? 0 : 1) - (b.stage === "急成長" ? 0 : 1));
-    const kpis = [
+    const kpis = UI_EN ? [
+      ["market", "market", (SW_DATA.markets || []).length + GM.length, "", "Market data", `Japan ${(SW_DATA.markets || []).length} · World ${GM.length}`],
+      ["media", "media", (SW_DATA.media || []).length + em.length, "", "Platforms compared", `Major ${(SW_DATA.media || []).length} · Rising ${em.length}`],
+      ["plans", "plan", W.length + H.length, "", "Episode plans", `Wine ${W.length} · History ${H.length} · Ideas ${NETA.length}`],
+      ["accounts", "users", acc, "", "Reference accounts", `${cs.length} overseas cases`],
+      ["plans", "shield", done, `/ ${FACTS.length}`, "Facts checked in the original", done ? `${FACTS.length - done} to go` : "None checked yet"],
+    ] : [
       ["market", "market", (SW_DATA.markets || []).length + GM.length, "件", "市場データ", `日本 ${(SW_DATA.markets || []).length}・世界 ${GM.length}`],
       ["media", "media", (SW_DATA.media || []).length + em.length, "媒体", "比較した媒体", `主要 ${(SW_DATA.media || []).length}・伸び始め ${em.length}`],
       ["plans", "plan", W.length + H.length, "本", "企画", `ワイン ${W.length}・歴史 ${H.length}・ネタ帳 ${NETA.length}`],
@@ -220132,12 +220247,12 @@ const SideWorkHubModule = (function () {
     ];
     return (
       <div>
-        <Head kick="DASHBOARD" title="嘘のない発信を、仕組みで回す" lede="ワインと歴史を題材に、調べる・企画する・作る・確かめるを、AIと人の役割を分けて回すための作業場です。" right={<span className="sw-stamp">調査時点　2026年10月</span>} />
+        <Head kick="DASHBOARD" title={tx("嘘のない発信を、仕組みで回す", "Honest posting, run as a system")} lede={tx("ワインと歴史を題材に、調べる・企画する・作る・確かめるを、AIと人の役割を分けて回すための作業場です。", "A workspace for researching, planning, making and checking posts about wine and history, with clear roles for AI and for people.")} right={<span className="sw-stamp">{tx("調査時点　2026年10月", "Researched October 2026")}</span>} />
         {(() => { const cm = new Date().getMonth() + 1; const rs = EPS.filter((e) => e.st && MD(e.st.date_greg) && MD(e.st.date_greg)[0] === cm).sort((a, b) => MD(a.st.date_greg)[1] - MD(b.st.date_greg)[1]); return rs.length ? (
           <div className="sw-card sw-sec">
-            <div className="sw-ch"><h2 className="sw-ct">今月の「その時」　{cm}月の記念日</h2><button className="sw-btn" onClick={() => go("plans")}>企画帳へ</button></div>
+            <div className="sw-ch"><h2 className="sw-ct">{tx(`今月の「その時」　${cm}月の記念日`, `This month's "moments": anniversaries in ${MONTH_EN[cm - 1]}`)}</h2><button className="sw-btn" onClick={() => go("plans")}>{tx("企画帳へ", "Episode plans")}</button></div>
             <div className="sw-cal" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(min(100%,320px),1fr))" }}>
-              {rs.slice(0, 6).map((e) => <button key={e.kind + e.id} className="sw-cal-r" style={{ border: "1px solid var(--line2)", borderRadius: 10 }} onClick={() => openEp(e)}><span className="sw-cal-d">{MD(e.st.date_greg)[1]}日</span><span style={{ minWidth: 0 }}><b style={{ fontSize: 14 }}>{splitTitle(e.title)[0]}</b><span className="sw-sm" style={{ display: "block" }}>{e.st.headline}</span></span></button>)}
+              {rs.slice(0, 6).map((e) => <button key={e.kind + e.id} className="sw-cal-r" style={{ border: "1px solid var(--line2)", borderRadius: 10 }} onClick={() => openEp(e)}><span className="sw-cal-d">{tx(`${MD(e.st.date_greg)[1]}日`, `${MD(e.st.date_greg)[1]}`)}</span><span style={{ minWidth: 0 }}><b style={{ fontSize: 14 }}>{splitTitle(e.title)[0]}</b><span className="sw-sm" style={{ display: "block" }}>{e.st.headline}</span></span></button>)}
             </div>
           </div>
         ) : null; })()}
@@ -220153,56 +220268,56 @@ const SideWorkHubModule = (function () {
         </div>
         <div className="sw-g sw-g-7-5">
           <div className="sw-card">
-            <div className="sw-ch"><h2 className="sw-ct">企画の4象限（話題性 × 根拠の固さ）</h2><button className="sw-btn" onClick={() => go("plans")}>企画帳へ</button></div>
+            <div className="sw-ch"><h2 className="sw-ct">{tx("企画の4象限（話題性 × 根拠の固さ）", "Episode quadrants (interest × evidence)")}</h2><button className="sw-btn" onClick={() => go("plans")}>{tx("企画帳へ", "Episode plans")}</button></div>
             <Matrix list={EPS} onOpen={openEp} compact />
-            <div className="sw-chips" style={{ marginTop: 8 }}>{QUADS.map(([q, n, , c]) => <span key={q} className="sw-chip" style={{ color: c, fontWeight: 800 }}>{n} {EPS.filter((e) => quadOf(SCORES[e.id]) === q).length}</span>)}</div>
+            <div className="sw-chips" style={{ marginTop: 8 }}>{quads().map(([q, n, , c]) => <span key={q} className="sw-chip" style={{ color: c, fontWeight: 800 }}>{n} {EPS.filter((e) => quadOf(SCORES[e.id]) === q).length}</span>)}</div>
           </div>
           <div className="sw-card">
-            <div className="sw-ch"><h2 className="sw-ct">事実の原文確認</h2><button className="sw-btn" onClick={() => go("plans")}>企画帳へ</button></div>
+            <div className="sw-ch"><h2 className="sw-ct">{tx("事実の原文確認", "Facts checked against originals")}</h2><button className="sw-btn" onClick={() => go("plans")}>{tx("企画帳へ", "Episode plans")}</button></div>
             <div className="sw-donut">
               <Donut done={done} total={FACTS.length} />
               <div style={{ flex: "1 1 160px", minWidth: 0 }}>
-                {[["wine", "ワイン", "var(--wine)"], ["history", "歴史", "var(--hist)"]].map(([k, l, c]) => (
+                {[["wine", tx("ワイン", "Wine"), "var(--wine)"], ["history", tx("歴史", "History"), "var(--hist)"]].map(([k, l, c]) => (
                   <div key={k} style={{ marginBottom: 10 }}>
                     <div className="sw-sm" style={{ display: "flex", justifyContent: "space-between" }}><span>{l}</span><b style={{ color: "var(--ink)" }}>{kdone(k)} / {ktot(k)}</b></div>
                     <div className="sw-bar"><i style={{ width: `${ktot(k) ? kdone(k) / ktot(k) * 100 : 0}%`, background: c }} /></div>
                   </div>
                 ))}
-                <p className="sw-sm" style={{ margin: 0 }}>調査では検索結果の要約しか読めていません。原文で確かめた事実だけが台本に入ります。</p>
+                <p className="sw-sm" style={{ margin: 0 }}>{tx("調査では検索結果の要約しか読めていません。原文で確かめた事実だけが台本に入ります。", "The research could only read search-result summaries. Only facts you check in the original go into scripts.")}</p>
               </div>
             </div>
           </div>
         </div>
         <div className="sw-g sw-g-7-5">
           <div className="sw-card">
-            <div className="sw-ch"><h2 className="sw-ct">世界の市場規模（米ドル建ての上位）</h2><button className="sw-btn" onClick={() => go("market")}>市場を見る</button></div>
-            {GM_BARS.length ? <RangeBars rows={GM_BARS.slice(0, 10)} onTip={onTip} offTip={offTip} /> : <p className="sw-sm">世界の市場データはまだありません。</p>}
-            <p className="sw-sm" style={{ margin: "10px 0 0" }}>出典が米ドルで示した数字だけを並べています（換算はしていません）。薄い部分は、調査会社によって推計に幅がある範囲です。年と範囲は市場ごとに違います。棒に触れると出典が出ます。</p>
+            <div className="sw-ch"><h2 className="sw-ct">{tx("世界の市場規模（米ドル建ての上位）", "Global market sizes (top, in US dollars)")}</h2><button className="sw-btn" onClick={() => go("market")}>{tx("市場を見る", "View markets")}</button></div>
+            {GM_BARS.length ? <RangeBars rows={GM_BARS.slice(0, 10)} onTip={onTip} offTip={offTip} /> : <p className="sw-sm">{tx("世界の市場データはまだありません。", "No global market data yet.")}</p>}
+            <p className="sw-sm" style={{ margin: "10px 0 0" }}>{tx("出典が米ドルで示した数字だけを並べています（換算はしていません）。薄い部分は、調査会社によって推計に幅がある範囲です。年と範囲は市場ごとに違います。棒に触れると出典が出ます。", "Only figures the sources gave in US dollars (nothing converted). The pale part is the spread between research firms' estimates. Years and scope differ by market. Hover a bar to see its sources.")}</p>
           </div>
           <div className="sw-card">
-            <div className="sw-ch"><h2 className="sw-ct">伸び始めの媒体</h2><button className="sw-btn" onClick={() => go("media")}>媒体を見る</button></div>
+            <div className="sw-ch"><h2 className="sw-ct">{tx("伸び始めの媒体", "Rising platforms")}</h2><button className="sw-btn" onClick={() => go("media")}>{tx("媒体を見る", "View platforms")}</button></div>
             {emRise.length ? (
               <div className="sw-em">
-                <div className="sw-em-r sw-em-h"><span>媒体</span><span>段階</span><span>相性（ワイン／歴史）</span></div>
+                <div className="sw-em-r sw-em-h"><span>{tx("媒体", "Platform")}</span><span>{tx("段階", "Stage")}</span><span>{tx("相性（ワイン／歴史）", "Fit (wine / history)")}</span></div>
                 {emRise.map((m) => (
                   <div key={m.name} className="sw-em-r" onMouseMove={(e) => onTip(e, `${m.name}：${m.users}`)} onMouseLeave={offTip}>
                     <span style={{ fontWeight: 700, minWidth: 0 }}>{m.name}<span className="sw-sm" style={{ display: "block", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{m.users}</span></span>
-                    <span><span className={"sw-pill sw-st-" + m.stage}>{m.stage}</span></span>
+                    <span><span className={"sw-pill sw-st-" + m.stage}>{lbl(m.stage)}</span></span>
                     <span style={{ display: "flex", gap: 8, alignItems: "center" }}><FitBar v={m.fit_wine_n} color="var(--wine)" /><FitBar v={m.fit_history_n} color="var(--hist)" /></span>
                   </div>
                 ))}
               </div>
-            ) : <p className="sw-sm">伸び始めの媒体のデータはまだありません。</p>}
-            <p className="sw-sm" style={{ margin: "10px 0 0" }}>利用者数は媒体ごとに定義（月間・日間・登録）と時点が違うので、横並びの比較はしていません。発信者が少ないことを直接示す統計は、どの媒体でも見つかっていません。</p>
+            ) : <p className="sw-sm">{tx("伸び始めの媒体のデータはまだありません。", "No data on rising platforms yet.")}</p>}
+            <p className="sw-sm" style={{ margin: "10px 0 0" }}>{tx("利用者数は媒体ごとに定義（月間・日間・登録）と時点が違うので、横並びの比較はしていません。発信者が少ないことを直接示す統計は、どの媒体でも見つかっていません。", "User counts differ in definition (monthly, daily, registered) and date by platform, so they aren't compared side by side. No statistic directly showing a lack of creators was found for any platform.")}</p>
           </div>
         </div>
         <div className="sw-card sw-sec">
-          <div className="sw-ch"><h2 className="sw-ct">7つの工程</h2><span className="sw-sm">テーマ選びと事実確認の関門は、自動化しても人が行います</span></div>
+          <div className="sw-ch"><h2 className="sw-ct">{tx("7つの工程", "7 steps")}</h2><span className="sw-sm">{tx("テーマ選びと事実確認の関門は、自動化しても人が行います", "Choosing themes and the fact-check gate stay with people, even when automated")}</span></div>
           <div className="sw-flow">
-            {FLOW.map(([k, t, a], i) => (
+            {FLOW.map(([k, t, a, te], i) => (
               <button key={i} className={"sw-node" + (k === "gate" ? " gate" : "")} onClick={() => go(k)}>
                 <div className="sw-node-n">{String(i + 1).padStart(2, "0")}</div>
-                <div className="sw-node-t">{t}</div>
+                <div className="sw-node-t">{tx(t, te)}</div>
                 <Auto a={a} />
               </button>
             ))}
@@ -220210,13 +220325,18 @@ const SideWorkHubModule = (function () {
         </div>
         <div className="sw-g sw-g2">
           <div className="sw-card">
-            <div className="sw-ch"><h2 className="sw-ct">次にやること</h2></div>
-            {[
+            <div className="sw-ch"><h2 className="sw-ct">{tx("次にやること", "Next steps")}</h2></div>
+            {(UI_EN ? [
+              ["Check episode facts against the originals", `${FACTS.length - done} still unchecked`, "plans", "Episode plans"],
+              ["Choose where to publish", "Compare usage rates and rising platforms", "media", "Platforms"],
+              ["Pass the gate before publishing", "Check numbers, names and dates", "gate", "Gate"],
+              ["Choose production and posting tools", "Compare budget stacks and MCP integrations", "tools", "Tools"],
+            ] : [
               ["企画帳の事実を原文で確かめる", `未確認があと${FACTS.length - done}件`, "plans", "企画帳へ"],
               ["発信する媒体を決める", "利用率と伸び始めの媒体を比べる", "media", "媒体へ"],
               ["公開前に関門を通す", "数字・固有名詞・年月日を照合する", "gate", "関門へ"],
               ["制作と投稿のツールを決める", "予算別の組み合わせと MCP・連携を比べる", "tools", "ツールへ"],
-            ].map(([t, d, k, b], i) => (
+            ]).map(([t, d, k, b], i) => (
               <div key={i} className="sw-todo">
                 <span className="sw-todo-n">{i + 1}</span>
                 <div style={{ minWidth: 0 }}><div style={{ fontWeight: 700, fontSize: 13 }}>{t}</div><div className="sw-sm">{d}</div></div>
@@ -220225,9 +220345,9 @@ const SideWorkHubModule = (function () {
             ))}
           </div>
           <div className="sw-card">
-          <div className="sw-ch"><h2 className="sw-ct">嘘をつかないための5つの約束</h2></div>
+          <div className="sw-ch"><h2 className="sw-ct">{tx("嘘をつかないための5つの約束", "5 promises for staying honest")}</h2></div>
           <div className="sw-vow" style={{ gridTemplateColumns: "1fr", gap: 8 }}>
-            {VOWS.map(([t, d], i) => <div key={i}><span style={{ color: "var(--ok)" }}><Icon n="check" /></span><b>{t}</b><span className="sw-sm">{d}</span></div>)}
+            {VOWS.map(([t, d, te, de], i) => <div key={i}><span style={{ color: "var(--ok)" }}><Icon n="check" /></span><b>{tx(t, te)}</b><span className="sw-sm">{tx(d, de)}</span></div>)}
           </div>
         </div>
         </div>
@@ -220237,7 +220357,8 @@ const SideWorkHubModule = (function () {
   }
 
   // ---------- 01 調べる：市場 ----------
-  const CRITERIA = [["当事者の数を数えられる", "公的統計や調査で人数・件数が分かる"], ["情報に偏りがある", "正しい情報が見つけにくく、整理するだけで価値が出る"], ["合法な稼ぎ方がある", "自分の商品、規制の範囲内の紹介・広告で稼げる"], ["一次情報で差がつく", "公的データや原典を比べて、独自の発信ができる"]];
+  // 採点の観点は [日本語, 日本語の説明, 英語, 英語の説明]
+  const CRITERIA = [["当事者の数を数えられる", "公的統計や調査で人数・件数が分かる", "The people affected can be counted", "Official statistics or surveys give numbers of people or cases"], ["情報に偏りがある", "正しい情報が見つけにくく、整理するだけで価値が出る", "Information is lopsided", "Good information is hard to find, so organizing it adds value"], ["合法な稼ぎ方がある", "自分の商品、規制の範囲内の紹介・広告で稼げる", "There's a legal way to earn", "Your own products, or referrals and ads within the rules"], ["一次情報で差がつく", "公的データや原典を比べて、独自の発信ができる", "Primary sources set you apart", "Comparing public data and original texts lets you say something new"]];
   function RowTable({ rows, head, cols, render, detail }) {
     const [open, setOpen] = useState(-1);
     return (
@@ -220252,7 +220373,7 @@ const SideWorkHubModule = (function () {
             {open === r.i ? <div className="sw-rowx"><dl className="sw-kv">{detail(r)}</dl></div> : null}
           </React.Fragment>
         ))}
-        {!rows.length ? <div className="sw-sm" style={{ padding: 16 }}>該当するものはありません。</div> : null}
+        {!rows.length ? <div className="sw-sm" style={{ padding: 16 }}>{tx("該当するものはありません。", "Nothing matches.")}</div> : null}
       </div>
     );
   }
@@ -220266,19 +220387,19 @@ const SideWorkHubModule = (function () {
     return (
       <>
         <div className="sw-tbar">
-          <Seg value={cat} onChange={setCat} options={[["all", `すべて ${rows.length}`], ...cats.map((c) => [c, `${c} ${rows.filter((r) => r.cat === c).length}`])]} />
-          <input className="sw-input" value={q} onChange={(e) => setQ(e.target.value)} placeholder="市場名・メモ・規制で絞り込む" aria-label="市場を絞り込む" />
-          <label className="sw-chk"><input type="checkbox" checked={only} onChange={() => setOnly(!only)} />出典があるものだけ</label>
+          <Seg value={cat} onChange={setCat} options={[["all", tx(`すべて ${rows.length}`, `All ${rows.length}`)], ...cats.map((c) => [c, `${lbl(c)} ${rows.filter((r) => r.cat === c).length}`])]} />
+          <input className="sw-input" value={q} onChange={(e) => setQ(e.target.value)} placeholder={tx("市場名・メモ・規制で絞り込む", "Filter by market, note or rule")} aria-label={tx("市場を絞り込む", "Filter markets")} />
+          <label className="sw-chk"><input type="checkbox" checked={only} onChange={() => setOnly(!only)} />{tx("出典があるものだけ", "Only with a source")}</label>
         </div>
-        <RowTable rows={list} head={["分類", "市場", "規模"]}
-          render={(r) => <><span><span className="sw-tag">{r.cat}</span></span><span style={{ fontWeight: 700 }}>{r.name}</span><span className={"sw-size" + (r.url ? "" : " muted")}>{r.url ? r.size : "出典が見つからないため使わない"}{r.url ? <Badge v={r.verified} /> : null}</span></>}
+        <RowTable rows={list} head={[tx("分類", "Category"), tx("市場", "Market"), tx("規模", "Size")]}
+          render={(r) => <><span><span className="sw-tag">{lbl(r.cat)}</span></span><span style={{ fontWeight: 700 }}>{r.name}</span><span className={"sw-size" + (r.url ? "" : " muted")}>{r.url ? r.size : tx("出典が見つからないため使わない", "No source found, not used")}{r.url ? <Badge v={r.verified} /> : null}</span></>}
           detail={(r) => <>
-            {!r.url ? <><dt>記録</dt><dd>{r.size}</dd></> : null}
-            {r.scope ? <><dt>範囲</dt><dd>{r.scope}</dd></> : null}
-            {r.growth ? <><dt>伸び</dt><dd>{r.growth}</dd></> : null}
-            <dt>出典</dt><dd>{r.source} <Ext url={r.url}>開く</Ext></dd>
-            {r.note ? <><dt>メモ</dt><dd>{r.note}</dd></> : null}
-            {r.regs ? <><dt>規制</dt><dd style={{ color: "var(--ng)" }}>{r.regs}</dd></> : null}
+            {!r.url ? <><dt>{tx("記録", "Record")}</dt><dd>{r.size}</dd></> : null}
+            {r.scope ? <><dt>{tx("範囲", "Scope")}</dt><dd>{r.scope}</dd></> : null}
+            {r.growth ? <><dt>{tx("伸び", "Growth")}</dt><dd>{r.growth}</dd></> : null}
+            <dt>{tx("出典", "Source")}</dt><dd>{r.source} <Ext url={r.url}>{tx("開く", "Open")}</Ext></dd>
+            {r.note ? <><dt>{tx("メモ", "Note")}</dt><dd>{r.note}</dd></> : null}
+            {r.regs ? <><dt>{tx("規制", "Rules")}</dt><dd style={{ color: "var(--ng)" }}>{r.regs}</dd></> : null}
           </>} />
       </>
     );
@@ -220294,25 +220415,25 @@ const SideWorkHubModule = (function () {
     return (
       <>
         <div className="sw-tbar">
-          <Seg value={cat} onChange={setCat} options={[["all", "すべての分類"], ...cats.map((c) => [c, c])]} />
-          <Seg value={reg} onChange={setReg} options={[["all", "全地域"], ...regions.map((c) => [c, c])]} />
+          <Seg value={cat} onChange={setCat} options={[["all", tx("すべての分類", "All categories")], ...cats.map((c) => [c, lbl(c)])]} />
+          <Seg value={reg} onChange={setReg} options={[["all", tx("全地域", "All regions")], ...regions.map((c) => [c, lbl(c)])]} />
         </div>
         <MarketQuad rows={list} />
         {bars.length ? (
           <div className="sw-card sw-sec">
-            <div className="sw-ch"><h2 className="sw-ct">市場規模の比較（米ドル建て）</h2><span className="sw-sm">{bars.length}市場</span></div>
+            <div className="sw-ch"><h2 className="sw-ct">{tx("市場規模の比較（米ドル建て）", "Market size comparison (US dollars)")}</h2><span className="sw-sm">{tx(`${bars.length}市場`, `${bars.length} markets`)}</span></div>
             <RangeBars rows={bars} onTip={onTip} offTip={offTip} />
-            <p className="sw-sm" style={{ margin: "10px 0 0" }}>出典が米ドルで示した数字のみ。薄い部分は推計者による幅。年・範囲・実績か予測かは市場ごとに違うので、下の表で確かめてください。</p>
+            <p className="sw-sm" style={{ margin: "10px 0 0" }}>{tx("出典が米ドルで示した数字のみ。薄い部分は推計者による幅。年・範囲・実績か予測かは市場ごとに違うので、下の表で確かめてください。", "US-dollar figures from the sources only. The pale part is the spread between estimators. Year, scope and actual vs. forecast vary by market, so check the table below.")}</p>
           </div>
         ) : null}
-        <RowTable rows={list} head={["地域", "市場", "規模"]} cols="92px minmax(0,1.2fr) minmax(0,1fr) 20px"
-          render={(r) => <><span><span className="sw-tag">{r.region}</span></span><span><b>{r.name}</b><span className="sw-sm" style={{ display: "block" }}>{r.cat}</span></span><span className={"sw-size" + (r.url ? "" : " muted")}>{r.url ? `${r.size}（${r.year}）` : "出典が見つからないため使わない"}{r.url ? <Badge v={r.verified} /> : null}</span></>}
+        <RowTable rows={list} head={[tx("地域", "Region"), tx("市場", "Market"), tx("規模", "Size")]} cols="92px minmax(0,1.2fr) minmax(0,1fr) 20px"
+          render={(r) => <><span><span className="sw-tag">{lbl(r.region)}</span></span><span><b>{r.name}</b><span className="sw-sm" style={{ display: "block" }}>{lbl(r.cat)}</span></span><span className={"sw-size" + (r.url ? "" : " muted")}>{r.url ? tx(`${r.size}（${r.year}）`, `${r.size} (${r.year})`) : tx("出典が見つからないため使わない", "No source found, not used")}{r.url ? <Badge v={r.verified} /> : null}</span></>}
           detail={(r) => <>
-            {!r.url ? <><dt>記録</dt><dd>{r.size}</dd></> : null}
-            {r.scope ? <><dt>範囲</dt><dd>{r.scope}</dd></> : null}
-            {r.growth ? <><dt>伸び</dt><dd>{r.growth}</dd></> : null}
-            <dt>出典</dt><dd>{r.source} <Ext url={r.url}>開く</Ext></dd>
-            {r.note ? <><dt>示唆</dt><dd>{r.note}</dd></> : null}
+            {!r.url ? <><dt>{tx("記録", "Record")}</dt><dd>{r.size}</dd></> : null}
+            {r.scope ? <><dt>{tx("範囲", "Scope")}</dt><dd>{r.scope}</dd></> : null}
+            {r.growth ? <><dt>{tx("伸び", "Growth")}</dt><dd>{r.growth}</dd></> : null}
+            <dt>{tx("出典", "Source")}</dt><dd>{r.source} <Ext url={r.url}>{tx("開く", "Open")}</Ext></dd>
+            {r.note ? <><dt>{tx("示唆", "Takeaway")}</dt><dd>{r.note}</dd></> : null}
           </>} />
         {tipEl}
       </>
@@ -220329,22 +220450,22 @@ const SideWorkHubModule = (function () {
     return (
       <>
         <div className="sw-tbar">
-          <Seg value={kind} onChange={setKind} options={[["all", `すべて ${rows.length}`], ...kinds.map((k) => [k, `${k} ${rows.filter((r) => r.kind === k).length}`])]} />
-          <Seg value={niche} onChange={setNiche} options={[["all", "全ジャンル"], ...niches.map((k) => [k, k])]} />
+          <Seg value={kind} onChange={setKind} options={[["all", tx(`すべて ${rows.length}`, `All ${rows.length}`)], ...kinds.map((k) => [k, `${lbl(k)} ${rows.filter((r) => r.kind === k).length}`])]} />
+          <Seg value={niche} onChange={setNiche} options={[["all", tx("全ジャンル", "All genres")], ...niches.map((k) => [k, lbl(k)])]} />
         </div>
         <div className="sw-g sw-g3">
           {list.map((r, i) => (
             <div key={i} className="sw-card sw-case" style={{ borderTop: `3px solid ${KIND_C[r.kind] || "#E2E8F1"}` }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "baseline" }}>
                 <b style={{ fontSize: 14 }}>{r.name}</b>
-                <span className="sw-pill" style={{ background: "var(--line2)", color: KIND_C[r.kind] || "var(--sub)" }}>{r.kind}</span>
+                <span className="sw-pill" style={{ background: "var(--line2)", color: KIND_C[r.kind] || "var(--sub)" }}>{lbl(r.kind)}</span>
               </div>
-              <div className="sw-sm">{[r.country, r.niche, r.platform].filter(Boolean).join("・")}</div>
+              <div className="sw-sm">{[r.country, lbl(r.niche), r.platform].filter(Boolean).join(tx("・", " · "))}</div>
               {r.scale ? <div style={{ fontWeight: 800, fontSize: 13, fontVariantNumeric: "tabular-nums" }}>{r.scale}</div> : null}
               <p style={{ margin: 0, fontSize: 13, color: "var(--ink2)" }}>{r.what}</p>
-              {r.model ? <div className="sw-sm"><b style={{ color: "var(--ink2)" }}>収益の形</b>　{r.model}</div> : null}
-              {r.lesson ? <div className="sw-note info" style={{ padding: "8px 12px" }}><b>学び　</b>{r.lesson}</div> : null}
-              <div className="sw-sm" style={{ marginTop: "auto" }}>{r.source} <Ext url={r.url}>開く</Ext><Badge v={r.verified} /></div>
+              {r.model ? <div className="sw-sm"><b style={{ color: "var(--ink2)" }}>{tx("収益の形", "Revenue model")}</b>{tx("　", " ")}{r.model}</div> : null}
+              {r.lesson ? <div className="sw-note info" style={{ padding: "8px 12px" }}><b>{tx("学び　", "Lesson: ")}</b>{r.lesson}</div> : null}
+              <div className="sw-sm" style={{ marginTop: "auto" }}>{r.source} <Ext url={r.url}>{tx("開く", "Open")}</Ext><Badge v={r.verified} /></div>
             </div>
           ))}
         </div>
@@ -220360,31 +220481,31 @@ const SideWorkHubModule = (function () {
     return (
       <div className="sw-g sw-g2">
         <div className="sw-card">
-          <div className="sw-ch"><h2 className="sw-ct">金額がない市場を見積もる</h2></div>
-          <p className="sw-sm" style={{ margin: "0 0 8px" }}>当事者の数 × お金を払う割合 × 1人あたりの支払額。人数は公的統計から取り、割合と単価は自分の仮定として明記します。</p>
-          {[["当事者の数（人・件／年）", n, setN, 1000], ["お金を払う割合（％）", rate, setRate, 0.5], ["1人あたりの支払額（円）", price, setPrice, 100]].map(([l, v, set, st], i) => (
+          <div className="sw-ch"><h2 className="sw-ct">{tx("金額がない市場を見積もる", "Estimate a market with no published size")}</h2></div>
+          <p className="sw-sm" style={{ margin: "0 0 8px" }}>{tx("当事者の数 × お金を払う割合 × 1人あたりの支払額。人数は公的統計から取り、割合と単価は自分の仮定として明記します。", "People affected × share who pay × spend per person. Take the head count from official statistics, and state the share and price as your own assumptions.")}</p>
+          {[[tx("当事者の数（人・件／年）", "People affected (people or cases / year)"), n, setN, 1000], [tx("お金を払う割合（％）", "Share who pay (%)"), rate, setRate, 0.5], [tx("1人あたりの支払額（円）", "Spend per person (yen)"), price, setPrice, 100]].map(([l, v, set, st], i) => (
             <label key={i} className="sw-field"><span>{l}</span><input type="number" value={v} step={st} min={0} onChange={(e) => set(Number(e.target.value) || 0)} /></label>
           ))}
           <div style={{ borderTop: "1px solid var(--line2)", paddingTop: 12 }}>
-            <div className="sw-sm">推計（年）</div>
-            <div className="sw-big">{est.toLocaleString()}<span style={{ fontSize: 14, marginLeft: 4 }}>円</span></div>
-            <div className="sw-sm" style={{ marginTop: 6 }}>初期値は自己破産（個人）の2024年の件数76,309件（司法統計）。割合と単価は仮の値なので、2〜3通り出して幅で示します。</div>
+            <div className="sw-sm">{tx("推計（年）", "Estimate (per year)")}</div>
+            <div className="sw-big">{est.toLocaleString()}<span style={{ fontSize: 14, marginLeft: 4 }}>{tx("円", "yen")}</span></div>
+            <div className="sw-sm" style={{ marginTop: 6 }}>{tx("初期値は自己破産（個人）の2024年の件数76,309件（司法統計）。割合と単価は仮の値なので、2〜3通り出して幅で示します。", "The default is the 76,309 personal bankruptcy cases of 2024 (Japan's judicial statistics). The share and price are placeholders, so try 2–3 scenarios and present a range.")}</div>
           </div>
         </div>
         <div className="sw-card">
-          <div className="sw-ch"><h2 className="sw-ct">テーマを採点する</h2></div>
-          <p className="sw-sm" style={{ margin: "0 0 8px" }}>各1〜5点。どれか1つでも1点なら、そのテーマは選びません。</p>
-          {CRITERIA.map(([t, d], i) => (
+          <div className="sw-ch"><h2 className="sw-ct">{tx("テーマを採点する", "Score a theme")}</h2></div>
+          <p className="sw-sm" style={{ margin: "0 0 8px" }}>{tx("各1〜5点。どれか1つでも1点なら、そのテーマは選びません。", "1–5 points each. If any item scores 1, drop the theme.")}</p>
+          {CRITERIA.map(([t, d, te, de], i) => (
             <div key={i} className="sw-field" style={{ alignItems: "flex-start" }}>
-              <div><div style={{ fontWeight: 700 }}>{t}</div><div className="sw-sm">{d}</div></div>
-              <div className="sw-dots" role="radiogroup" aria-label={t}>
+              <div><div style={{ fontWeight: 700 }}>{tx(t, te)}</div><div className="sw-sm">{tx(d, de)}</div></div>
+              <div className="sw-dots" role="radiogroup" aria-label={tx(t, te)}>
                 {[1, 2, 3, 4, 5].map((v) => <button key={v} role="radio" aria-checked={score[i] === v} className={score[i] >= v ? "on" : ""} onClick={() => { const s = score.slice(); s[i] = v; setScore(s); }}>{v}</button>)}
               </div>
             </div>
           ))}
           <div style={{ borderTop: "1px solid var(--line2)", paddingTop: 12, display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
             <div className="sw-big" style={{ color: low ? "var(--ng)" : "var(--blue-dd)" }}>{total}<span style={{ fontSize: 14, color: "var(--faint)" }}> / 20</span></div>
-            <span className="sw-sm">{low ? "1点の項目があるので選ばない" : total >= 15 ? "有力な候補" : total >= 11 ? "条件つきで検討" : "見送り"}</span>
+            <span className="sw-sm">{low ? tx("1点の項目があるので選ばない", "An item scored 1, so don't pick it") : total >= 15 ? tx("有力な候補", "Strong candidate") : total >= 11 ? tx("条件つきで検討", "Consider with conditions") : tx("見送り", "Pass")}</span>
           </div>
         </div>
       </div>
@@ -220394,8 +220515,8 @@ const SideWorkHubModule = (function () {
     const [t, setT] = useState("global");
     return (
       <div>
-        <Head kick="01 調べる" title="市場" lede="業界の売上は、そのまま副業の取り分にはなりません。見るのは「その悩みや関心の情報にお金を払う人の数」と、海外で先に起きていることです。出典が見つからない数字は使いません。" />
-        <Tabs value={t} onChange={setT} options={[["global", "世界", GM.length], ["japan", "日本", (SW_DATA.markets || []).length], ["cases", "海外の事例", (SW_DATA.global_cases || []).length], ["tools", "見積もりと採点", null]]} />
+        <Head kick={tx("01 調べる", "01 RESEARCH")} title={tx("市場", "Markets")} lede={tx("業界の売上は、そのまま副業の取り分にはなりません。見るのは「その悩みや関心の情報にお金を払う人の数」と、海外で先に起きていることです。出典が見つからない数字は使いません。", "An industry's revenue isn't what a side project can earn. What matters is how many people pay for information on that worry or interest, and what has already happened overseas. Figures without a source are not used.")} />
+        <Tabs value={t} onChange={setT} options={[["global", tx("世界", "World"), GM.length], ["japan", tx("日本", "Japan"), (SW_DATA.markets || []).length], ["cases", tx("海外の事例", "Overseas cases"), (SW_DATA.global_cases || []).length], ["tools", tx("見積もりと採点", "Estimate & score"), null]]} />
         {t === "global" && <MarketGlobal />}
         {t === "japan" && <MarketJapan />}
         {t === "cases" && <Cases />}
@@ -220434,28 +220555,28 @@ const SideWorkHubModule = (function () {
     const tl = (v) => usd(v);
     return (
       <div className="sw-card sw-sec" onMouseLeave={offTip}>
-        <div className="sw-ch"><h2 className="sw-ct">規模 × 伸び率（4象限）</h2><span className="sw-sm">{Object.keys(groups).length}市場・{pts.length}推計</span></div>
-        <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="市場規模と年平均成長率の4象限" style={{ display: "block" }}>
+        <div className="sw-ch"><h2 className="sw-ct">{tx("規模 × 伸び率（4象限）", "Size × growth (quadrants)")}</h2><span className="sw-sm">{tx(`${Object.keys(groups).length}市場・${pts.length}推計`, `${Object.keys(groups).length} markets · ${pts.length} estimates`)}</span></div>
+        <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={tx("市場規模と年平均成長率の4象限", "Quadrants of market size and annual growth rate")} style={{ display: "block" }}>
           <rect x={L} y={T} width={mx - L} height={my - T} fill="#EFF6FF" />
           <rect x={mx} y={T} width={W - R - mx} height={my - T} fill="#ECFDF5" />
           <rect x={mx} y={my} width={W - R - mx} height={H - B - my} fill="#F8FAFC" />
           <rect x={L} y={my} width={mx - L} height={H - B - my} fill="#FCFCFD" />
           <line x1={mx} x2={mx} y1={T} y2={H - B} stroke="#CBD5E1" strokeDasharray="4 4" />
           <line x1={L} x2={W - R} y1={my} y2={my} stroke="#CBD5E1" strokeDasharray="4 4" />
-          {[["小さいが急伸", L + 8, T + 16, "start", "#1D4ED8"], ["大きく伸びる", W - R - 8, T + 16, "end", "#047857"], ["大きく安定", W - R - 8, H - B - 8, "end", "#5A6880"], ["小さく緩やか", L + 8, H - B - 8, "start", "#566479"]].map(([n, x, y, a, c]) => <text key={n} x={x} y={y} textAnchor={a} fontSize="12.5" fontWeight="800" fill={c} fontFamily="Inter, sans-serif">{n}</text>)}
+          {[[tx("小さいが急伸", "Small but surging"), L + 8, T + 16, "start", "#1D4ED8"], [tx("大きく伸びる", "Big and growing"), W - R - 8, T + 16, "end", "#047857"], [tx("大きく安定", "Big and steady"), W - R - 8, H - B - 8, "end", "#5A6880"], [tx("小さく緩やか", "Small and slow"), L + 8, H - B - 8, "start", "#566479"]].map(([n, x, y, a, c]) => <text key={n} x={x} y={y} textAnchor={a} fontSize="12.5" fontWeight="800" fill={c} fontFamily="Inter, sans-serif">{n}</text>)}
           {ticks.map((v) => <g key={v}><line x1={sx(v)} x2={sx(v)} y1={H - B} y2={H - B + 4} stroke="#566479" /><text x={sx(v)} y={H - B + 16} textAnchor="middle" fontSize="10.5" fill="#5A6880" fontFamily="Inter, sans-serif">{tl(v)}</text></g>)}
           {[0, 10, 20, 30, 40].filter((v) => v <= y1).map((v) => <g key={v}><text x={L - 6} y={sy(v) + 4} textAnchor="end" fontSize="10.5" fill="#5A6880" fontFamily="Inter, sans-serif">{v}%</text></g>)}
-          <text x={(L + W - R) / 2} y={H - 6} textAnchor="middle" fontSize="11.5" fill="#5A6880" fontFamily="Inter, sans-serif">市場規模（米ドル、対数目盛り）→</text>
-          <text x={12} y={(T + H - B) / 2} textAnchor="middle" fontSize="11.5" fill="#5A6880" fontFamily="Inter, sans-serif" transform={`rotate(-90 12 ${(T + H - B) / 2})`}>年平均成長率 →</text>
+          <text x={(L + W - R) / 2} y={H - 6} textAnchor="middle" fontSize="11.5" fill="#5A6880" fontFamily="Inter, sans-serif">{tx("市場規模（米ドル、対数目盛り）→", "Market size (US$, log scale) →")}</text>
+          <text x={12} y={(T + H - B) / 2} textAnchor="middle" fontSize="11.5" fill="#5A6880" fontFamily="Inter, sans-serif" transform={`rotate(-90 12 ${(T + H - B) / 2})`}>{tx("年平均成長率 →", "Annual growth rate →")}</text>
           {Object.entries(groups).map(([k, rs]) => (
             <g key={k}>
               {rs.length > 1 ? <polyline points={rs.map((r) => `${sx(r.usd_bn)},${sy(r.cagr)}`).join(" ")} fill="none" stroke="#93C5FD" strokeWidth="1.5" strokeDasharray="3 3" /> : null}
-              {rs.map((r, i) => <circle key={i} cx={sx(r.usd_bn)} cy={sy(r.cagr)} r="7" fill="#1D4ED8" fillOpacity=".85" stroke="#fff" strokeWidth="2" onMouseMove={(ev) => onTip(ev, `${r.name}：${r.size}・年平均${r.cagr}%（${r.year}、${r.source}）`)} />)}
+              {rs.map((r, i) => <circle key={i} cx={sx(r.usd_bn)} cy={sy(r.cagr)} r="7" fill="#1D4ED8" fillOpacity=".85" stroke="#fff" strokeWidth="2" onMouseMove={(ev) => onTip(ev, tx(`${r.name}：${r.size}・年平均${r.cagr}%（${r.year}、${r.source}）`, `${r.name}: ${r.size} · ${r.cagr}%/yr (${r.year}, ${r.source})`))} />)}
             </g>
           ))}
           {labels.map((lb) => <text key={lb.k} x={lb.x} y={lb.y} textAnchor={lb.a} fontSize="11" fontWeight="700" fill="#22324D" fontFamily="Inter, sans-serif" style={{ pointerEvents: "none" }}>{lb.k}</text>)}
         </svg>
-        <p className="sw-sm" style={{ margin: "8px 0 0" }}>出典が米ドルの規模と年平均成長率の両方を示した市場だけを置いています。成長率は予測で、期間・定義は推計者ごとに違います。点線は同じ市場の別の推計です。境目は規模100億ドル・成長率10%に置いた目安です。</p>
+        <p className="sw-sm" style={{ margin: "8px 0 0" }}>{tx("出典が米ドルの規模と年平均成長率の両方を示した市場だけを置いています。成長率は予測で、期間・定義は推計者ごとに違います。点線は同じ市場の別の推計です。境目は規模100億ドル・成長率10%に置いた目安です。", "Only markets whose sources give both a US-dollar size and an annual growth rate are plotted. Growth rates are forecasts, and periods and definitions differ by estimator. Dotted lines join different estimates of the same market. The dividers at $10B and 10% growth are a rough guide.")}</p>
         {tipEl}
       </div>
     );
@@ -220466,12 +220587,12 @@ const SideWorkHubModule = (function () {
     const all = [...(SW_DATA.media || []).map((m) => ({ ...m, stage: "定着", major: true })), ...(SW_DATA.emerging_media || [])];
     const fitAvg = (m) => ((m.fit_wine_n || 0) + (m.fit_history_n || 0)) / 2;
     const col = (m) => fitAvg(m) >= 3.75 ? 2 : fitAvg(m) >= 2.75 ? 1 : 0;
-    const ROWS = [["急成長", "急成長"], ["伸び始め", "伸び始め"], ["定着", "定着（主要媒体を含む）"]];
-    const COLS = ["相性 低", "相性 中", "相性 高"];
-    const tone = (r, c) => c === 2 && r < 2 ? ["攻めどころ", "#ECFDF5", "#047857"] : c === 2 ? ["主戦場", "#EFF6FF", "#1D4ED8"] : c === 1 && r < 2 ? ["試す価値あり", "#FFFBEB", "#92400E"] : [null, "#F8FAFC", "#566479"];
+    const ROWS = [["急成長", tx("急成長", "Surging")], ["伸び始め", tx("伸び始め", "Rising")], ["定着", tx("定着（主要媒体を含む）", "Established (incl. major platforms)")]];
+    const COLS = [tx("相性 低", "Low fit"), tx("相性 中", "Medium fit"), tx("相性 高", "High fit")];
+    const tone = (r, c) => c === 2 && r < 2 ? [tx("攻めどころ", "Opportunity"), "#ECFDF5", "#047857"] : c === 2 ? [tx("主戦場", "Main arena"), "#EFF6FF", "#1D4ED8"] : c === 1 && r < 2 ? [tx("試す価値あり", "Worth a try"), "#FFFBEB", "#92400E"] : [null, "#F8FAFC", "#566479"];
     return (
       <div className="sw-card sw-sec">
-        <div className="sw-ch"><h2 className="sw-ct">伸び × テーマとの相性</h2><span className="sw-sm">主要{(SW_DATA.media || []).length}＋伸び始め{(SW_DATA.emerging_media || []).length}媒体</span></div>
+        <div className="sw-ch"><h2 className="sw-ct">{tx("伸び × テーマとの相性", "Growth × theme fit")}</h2><span className="sw-sm">{tx(`主要${(SW_DATA.media || []).length}＋伸び始め${(SW_DATA.emerging_media || []).length}媒体`, `${(SW_DATA.media || []).length} major + ${(SW_DATA.emerging_media || []).length} rising platforms`)}</span></div>
         <div className="sw-mx">
           <div className="sw-mx-h" />
           {COLS.map((c) => <div key={c} className="sw-mx-h">{c}</div>)}
@@ -220491,13 +220612,14 @@ const SideWorkHubModule = (function () {
             </React.Fragment>
           ))}
         </div>
-        <p className="sw-sm" style={{ margin: "8px 0 0" }}>相性は、ワインと歴史それぞれの相性（5段階、調査時の評価）の平均です。白い枠は主要媒体です。段階と相性は目安で、日本で使えるかどうかは各媒体の説明で確かめてください。</p>
+        <p className="sw-sm" style={{ margin: "8px 0 0" }}>{tx("相性は、ワインと歴史それぞれの相性（5段階、調査時の評価）の平均です。白い枠は主要媒体です。段階と相性は目安で、日本で使えるかどうかは各媒体の説明で確かめてください。", "Fit is the average of the wine and history fit (5-point scale, rated during research). White boxes are major platforms. Stage and fit are rough guides; check each platform's notes to see whether it works in Japan.")}</p>
       </div>
     );
   }
 
   // ---------- 01 調べる：媒体 ----------
   const AGES = ["全年代", "10代", "20代", "30代", "40代", "50代", "60代", "70代"];
+  const ageLabel = (a) => tx(a, a === "全年代" ? "All ages" : a === "10代" ? "Teens" : a.replace("代", "s"));
   const RAMP = [[239, 246, 255], [147, 197, 253], [37, 99, 235], [23, 37, 84]];
   const heat = (v) => {
     const t = Math.max(0, Math.min(1, v / 100)) * (RAMP.length - 1);
@@ -220514,44 +220636,44 @@ const SideWorkHubModule = (function () {
     return (
       <>
         <div className="sw-card sw-sec">
-          <div className="sw-ch"><h2 className="sw-ct">年代別の利用率（日本）</h2><span className="sw-sm">{src.users_src} <Ext url={src.users_url}>報告書</Ext><Badge v={!!src.users_verified} /></span></div>
+          <div className="sw-ch"><h2 className="sw-ct">{tx("年代別の利用率（日本）", "Usage by age group (Japan)")}</h2><span className="sw-sm">{src.users_src} <Ext url={src.users_url}>{tx("報告書", "Report")}</Ext><Badge v={!!src.users_verified} /></span></div>
           <div style={{ overflowX: "auto" }}>
             <table className="sw-heat" onMouseLeave={offTip}>
-              <caption style={{ textAlign: "left", fontSize: 12, color: "var(--sub)", paddingBottom: 6 }}>利用している人の割合（％）。令和7年度調査、N=1,800</caption>
-              <thead><tr><th className="r">媒体</th>{AGES.map((a) => <th key={a} scope="col">{a}</th>)}</tr></thead>
+              <caption style={{ textAlign: "left", fontSize: 12, color: "var(--sub)", paddingBottom: 6 }}>{tx("利用している人の割合（％）。令和7年度調査、N=1,800", "Share of people who use each platform (%). FY2025 survey, N=1,800")}</caption>
+              <thead><tr><th className="r">{tx("媒体", "Platform")}</th>{AGES.map((a) => <th key={a} scope="col">{ageLabel(a)}</th>)}</tr></thead>
               <tbody>
                 {rated.map((m) => (
                   <tr key={m.name}>
                     <th className="r" scope="row">{m.short || m.name}</th>
                     {AGES.map((a) => {
                       const v = m.ages[a];
-                      return <td key={a} className={a === "全年代" ? "all" : ""} style={v == null ? null : heat(v)} onMouseMove={(e) => onTip(e, `${m.short || m.name}・${a}：${v}%`)}>{v == null ? "—" : v.toFixed(1)}</td>;
+                      return <td key={a} className={a === "全年代" ? "all" : ""} style={v == null ? null : heat(v)} onMouseMove={(e) => onTip(e, tx(`${m.short || m.name}・${a}：${v}%`, `${m.short || m.name} · ${ageLabel(a)}: ${v}%`))}>{v == null ? "—" : v.toFixed(1)}</td>;
                     })}
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <div className="sw-legend"><span>0%</span><i /><span>100%</span><span style={{ marginLeft: 8 }}>太枠は全年代</span></div>
+          <div className="sw-legend"><span>0%</span><i /><span>100%</span><span style={{ marginLeft: 8 }}>{tx("太枠は全年代", "Bold column = all ages")}</span></div>
         </div>
         <div className="sw-g sw-g2">
           {rows.map((m, i) => (
             <div key={i} className="sw-card sw-mcard">
               <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline" }}>
                 <h3 className="sw-ct" style={{ fontSize: 15.5 }}>{m.name}</h3>
-                {m.ages && m.ages["全年代"] != null ? <div style={{ textAlign: "right", flexShrink: 0 }}><div className="sw-mrate">{m.ages["全年代"]}<span style={{ fontSize: 12 }}>%</span></div><div className="sw-sm" style={{ fontSize: 11 }}>全年代の利用率</div></div> : <span className="sw-sm" style={{ flexShrink: 0 }}>利用率の統計なし</span>}
+                {m.ages && m.ages["全年代"] != null ? <div style={{ textAlign: "right", flexShrink: 0 }}><div className="sw-mrate">{m.ages["全年代"]}<span style={{ fontSize: 12 }}>%</span></div><div className="sw-sm" style={{ fontSize: 11 }}>{tx("全年代の利用率", "Usage, all ages")}</div></div> : <span className="sw-sm" style={{ flexShrink: 0 }}>{tx("利用率の統計なし", "No usage statistics")}</span>}
               </div>
               <Fit m={m} />
               <p style={{ margin: 0, fontSize: 13, color: "var(--ink2)" }}>{m.formats}</p>
-              <div><button className="sw-btn" onClick={() => setOpen({ ...open, [i]: !open[i] })} aria-expanded={!!open[i]}>{open[i] ? "閉じる" : "収益化・AI表示・酒類のルール"}</button></div>
+              <div><button className="sw-btn" onClick={() => setOpen({ ...open, [i]: !open[i] })} aria-expanded={!!open[i]}>{open[i] ? tx("閉じる", "Close") : tx("収益化・AI表示・酒類のルール", "Monetization, AI labels & alcohol rules")}</button></div>
               {open[i] ? (
                 <div className="sw-det">
-                  <div className="sw-sm">ここから下のルール<Badge v={m.verified} /></div>
-                  <div><h4>ワイン発信では</h4><p>{m.fit_wine}</p></div>
-                  <div><h4>歴史発信では</h4><p>{m.fit_history}</p></div>
-                  <div><h4>収益化</h4><ul>{(m.monetize || []).map((x, j) => <li key={j}>{x}</li>)}</ul>{m.monetize_url ? <Ext url={m.monetize_url}>参照ページ</Ext> : null}</div>
-                  <div><h4>AI生成の表示</h4><p>{m.ai_policy} <Ext url={m.ai_policy_url}>規約</Ext></p></div>
-                  <div><h4>酒類</h4><p>{m.alcohol} <Ext url={m.alcohol_url}>規約</Ext></p></div>
+                  <div className="sw-sm">{tx("ここから下のルール", "Rules below")}<Badge v={m.verified} /></div>
+                  <div><h4>{tx("ワイン発信では", "For wine content")}</h4><p>{m.fit_wine}</p></div>
+                  <div><h4>{tx("歴史発信では", "For history content")}</h4><p>{m.fit_history}</p></div>
+                  <div><h4>{tx("収益化", "Monetization")}</h4><ul>{(m.monetize || []).map((x, j) => <li key={j}>{x}</li>)}</ul>{m.monetize_url ? <Ext url={m.monetize_url}>{tx("参照ページ", "Reference page")}</Ext> : null}</div>
+                  <div><h4>{tx("AI生成の表示", "AI-generated labels")}</h4><p>{m.ai_policy} <Ext url={m.ai_policy_url}>{tx("規約", "Terms")}</Ext></p></div>
+                  <div><h4>{tx("酒類", "Alcohol")}</h4><p>{m.alcohol} <Ext url={m.alcohol_url}>{tx("規約", "Terms")}</Ext></p></div>
                 </div>
               ) : null}
             </div>
@@ -220570,32 +220692,32 @@ const SideWorkHubModule = (function () {
     const list = rows.map((r, i) => ({ ...r, i })).filter((r) => kind === "all" || r.kind === kind).sort((a, b) => ((order[a.stage] ?? 3) - (order[b.stage] ?? 3)) || ((b.users_m || 0) - (a.users_m || 0)));
     return (
       <>
-        <div className="sw-note info sw-sec">「ブルーオーシャン」とは言い切れません。ここでは、利用者が伸びていることを示す数字と、発信者がまだ少ないと考える根拠を、出典とあわせて並べています。日本で使えるかどうかは媒体ごとに違います。</div>
-        <div className="sw-tbar"><Seg value={kind} onChange={setKind} options={[["all", `すべて ${rows.length}`], ...kinds.map((k) => [k, k])]} /></div>
+        <div className="sw-note info sw-sec">{tx("「ブルーオーシャン」とは言い切れません。ここでは、利用者が伸びていることを示す数字と、発信者がまだ少ないと考える根拠を、出典とあわせて並べています。日本で使えるかどうかは媒体ごとに違います。", "We can't call these \"blue oceans\". This lists figures showing user growth and reasons to think there are still few creators, with sources. Whether each works in Japan varies by platform.")}</div>
+        <div className="sw-tbar"><Seg value={kind} onChange={setKind} options={[["all", tx(`すべて ${rows.length}`, `All ${rows.length}`)], ...kinds.map((k) => [k, lbl(k)])]} /></div>
         <div className="sw-g sw-g2">
           {list.map((m) => (
             <div key={m.i} className="sw-card sw-mcard">
               <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline" }}>
-                <div style={{ minWidth: 0 }}><h3 className="sw-ct" style={{ fontSize: 15.5 }}>{m.name}</h3><span className="sw-sm">{m.kind}</span></div>
-                <span className={"sw-pill sw-st-" + m.stage}>{m.stage}</span>
+                <div style={{ minWidth: 0 }}><h3 className="sw-ct" style={{ fontSize: 15.5 }}>{m.name}</h3><span className="sw-sm">{lbl(m.kind)}</span></div>
+                <span className={"sw-pill sw-st-" + m.stage}>{lbl(m.stage)}</span>
               </div>
               <div style={{ fontWeight: 800, fontSize: 13.5, fontVariantNumeric: "tabular-nums" }}>{m.users}</div>
-              {m.growth ? <div className="sw-sm"><b style={{ color: "var(--ink2)" }}>伸び</b>　{m.growth}</div> : null}
-              <div className="sw-sm"><b style={{ color: "var(--ink2)" }}>日本</b>　{m.japan}</div>
+              {m.growth ? <div className="sw-sm"><b style={{ color: "var(--ink2)" }}>{tx("伸び", "Growth")}</b>{tx("　", " ")}{m.growth}</div> : null}
+              <div className="sw-sm"><b style={{ color: "var(--ink2)" }}>{tx("日本", "Japan")}</b>{tx("　", " ")}{m.japan}</div>
               <Fit m={m} />
-              <div className="sw-note info" style={{ padding: "8px 12px" }}><b>発信者が少ないと考える根拠　</b>{m.why_blue}</div>
+              <div className="sw-note info" style={{ padding: "8px 12px" }}><b>{tx("発信者が少ないと考える根拠　", "Why we think creators are few: ")}</b>{m.why_blue}</div>
               <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-                <button className="sw-btn" onClick={() => setOpen({ ...open, [m.i]: !open[m.i] })} aria-expanded={!!open[m.i]}>{open[m.i] ? "閉じる" : "収益化・規約・注意"}</button>
-                <span className="sw-sm">{m.source} <Ext url={m.url}>開く</Ext><Badge v={m.verified} /></span>
+                <button className="sw-btn" onClick={() => setOpen({ ...open, [m.i]: !open[m.i] })} aria-expanded={!!open[m.i]}>{open[m.i] ? tx("閉じる", "Close") : tx("収益化・規約・注意", "Monetization, terms & cautions")}</button>
+                <span className="sw-sm">{m.source} <Ext url={m.url}>{tx("開く", "Open")}</Ext><Badge v={m.verified} /></span>
               </div>
               {open[m.i] ? (
                 <div className="sw-det">
-                  <div><h4>ワイン発信では</h4><p>{m.fit_wine}</p></div>
-                  <div><h4>歴史発信では</h4><p>{m.fit_history}</p></div>
-                  <div><h4>収益化</h4><ul>{(m.monetize || []).map((x, j) => <li key={j}>{x}</li>)}</ul></div>
-                  <div><h4>AI生成の表示</h4><p>{m.ai_policy}</p></div>
-                  <div><h4>酒類</h4><p>{m.alcohol}</p></div>
-                  {m.risk ? <div className="sw-note warn"><b>始める前に　</b>{m.risk}</div> : null}
+                  <div><h4>{tx("ワイン発信では", "For wine content")}</h4><p>{m.fit_wine}</p></div>
+                  <div><h4>{tx("歴史発信では", "For history content")}</h4><p>{m.fit_history}</p></div>
+                  <div><h4>{tx("収益化", "Monetization")}</h4><ul>{(m.monetize || []).map((x, j) => <li key={j}>{x}</li>)}</ul></div>
+                  <div><h4>{tx("AI生成の表示", "AI-generated labels")}</h4><p>{m.ai_policy}</p></div>
+                  <div><h4>{tx("酒類", "Alcohol")}</h4><p>{m.alcohol}</p></div>
+                  {m.risk ? <div className="sw-note warn"><b>{tx("始める前に　", "Before you start: ")}</b>{m.risk}</div> : null}
                 </div>
               ) : null}
             </div>
@@ -220608,21 +220730,29 @@ const SideWorkHubModule = (function () {
     const [t, setT] = useState("major");
     return (
       <div>
-        <Head kick="01 調べる" title="媒体" lede="誰に届くかは利用率で、まだ空いているかは伸びと発信者の少なさで見ます。収益化・AI生成の表示・酒類の制限は媒体ごとに違い、よく変わるので、始める前に公式ヘルプで確かめてください。" />
+        <Head kick={tx("01 調べる", "01 RESEARCH")} title={tx("媒体", "Platforms")} lede={tx("誰に届くかは利用率で、まだ空いているかは伸びと発信者の少なさで見ます。収益化・AI生成の表示・酒類の制限は媒体ごとに違い、よく変わるので、始める前に公式ヘルプで確かめてください。", "Usage rates show who you'll reach; growth and a shortage of creators show where there's still room. Monetization, AI labeling and alcohol limits differ by platform and change often, so check the official help before you start.")} />
         <MediaMatrix />
-        <Tabs value={t} onChange={setT} options={[["major", "主要媒体", (SW_DATA.media || []).length], ["emerging", "伸び始めの媒体", (SW_DATA.emerging_media || []).length]]} />
+        <Tabs value={t} onChange={setT} options={[["major", tx("主要媒体", "Major platforms"), (SW_DATA.media || []).length], ["emerging", tx("伸び始めの媒体", "Rising platforms"), (SW_DATA.emerging_media || []).length]]} />
         {t === "major" ? <MediaMajor /> : <MediaEmerging />}
       </div>
     );
   }
 
   // ---------- 01 調べる：参考アカウント ----------
+  // 役割は [日本語の説明, 色, 英語の説明]
   const ROLES = {
-    "手本": ["企画・見せ方・つかみの参考にする", "#1D4ED8"],
-    "情報源": ["一次情報・公式素材の出どころ。素材の利用は許諾を取る", "#047857"],
-    "ノウハウ": ["AI動画・SNS運用・自動化の具体的な手順を学ぶ", "#7C3AED"],
-    "協業候補": ["将来の取材・タイアップの相手。PR表示と年齢制限が必要", "#9D174D"],
+    "手本": ["企画・見せ方・つかみの参考にする", "#1D4ED8", "For ideas, presentation and hooks"],
+    "情報源": ["一次情報・公式素材の出どころ。素材の利用は許諾を取る", "#047857", "Where primary information and official material come from. Get permission to use material"],
+    "ノウハウ": ["AI動画・SNS運用・自動化の具体的な手順を学ぶ", "#7C3AED", "Learn concrete steps for AI video, social media and automation"],
+    "協業候補": ["将来の取材・タイアップの相手。PR表示と年齢制限が必要", "#9D174D", "Future interview or tie-up partners. Needs ad disclosure and age limits"],
   };
+  const RED_FLAGS_EN = [
+    "Income claims with no period, breakdown or conditions (\"8 figures a month\", \"¥X00 million in sales\", \"¥400k a month in 30 min a day\")",
+    "Claims that anyone can repeat it: \"anyone\", \"zero skills\", \"guaranteed\"",
+    "Posts with no substance that just funnel you via comments or LINE sign-up perks into courses or calls",
+    "Student counts, total sales or \"No. 1\" claims with no evidence",
+    "Pressure to decide fast: \"closing soon\", \"only a few spots left\"",
+  ];
   const RED_FLAGS = [
     "期間・内訳・条件のない収入額（「月8桁」「年商◯億」「1日30分で月40万」）",
     "「誰でも」「スキルゼロで」「確実に」と、再現できると断定する",
@@ -220639,19 +220769,19 @@ const SideWorkHubModule = (function () {
     const list = rows.filter((r) => (role === "all" || r.role === role) && (theme === "all" || r.theme === theme)).sort((a, b) => b.score - a.score);
     return (
       <div>
-        <Head kick="01 調べる" title="参考アカウント" lede={`フォロー中の${A.total || ""}件の候補を、このハブの計画との相性で5段階に採点し、3以上の${rows.length}件を載せています。プロフィールと投稿の読み取りによる推定で、実績や数字が本当かどうかは確かめていません。`} />
+        <Head kick={tx("01 調べる", "01 RESEARCH")} title={tx("参考アカウント", "Reference accounts")} lede={tx(`フォロー中の${A.total || ""}件の候補を、このハブの計画との相性で5段階に採点し、3以上の${rows.length}件を載せています。プロフィールと投稿の読み取りによる推定で、実績や数字が本当かどうかは確かめていません。`, `${A.total || ""} followed accounts were scored 1–5 for fit with this hub's plan, and the ${rows.length} scoring 3 or more are listed. Scores are estimates from profiles and posts; claimed results and numbers have not been verified.`)} />
         <div className="sw-g sw-g4">
-          {Object.entries(ROLES).map(([k, [d, c]]) => (
+          {Object.entries(ROLES).map(([k, [d, c, de]]) => (
             <button key={k} onClick={() => setRole(role === k ? "all" : k)} aria-pressed={role === k} className="sw-card sw-kpi" style={{ boxShadow: role === k ? `0 0 0 2px ${c}` : undefined }}>
-              <span style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", width: "100%" }}><b style={{ color: c }}>{k}</b><span className="sw-kpi-n" style={{ fontSize: 22 }}>{rows.filter((r) => r.role === k).length}</span></span>
-              <span className="sw-sm">{d}</span>
+              <span style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", width: "100%" }}><b style={{ color: c }}>{lbl(k)}</b><span className="sw-kpi-n" style={{ fontSize: 22 }}>{rows.filter((r) => r.role === k).length}</span></span>
+              <span className="sw-sm">{tx(d, de)}</span>
             </button>
           ))}
         </div>
         <div className="sw-tbar">
-          <Seg value={theme} onChange={setTheme} options={[["all", "すべてのテーマ"], ...themes.map((t) => [t, t])]} />
-          {role !== "all" ? <button className="sw-btn" onClick={() => setRole("all")}>役割の絞り込みを外す</button> : null}
-          <span className="sw-sm" style={{ marginLeft: "auto" }}>{list.length}件</span>
+          <Seg value={theme} onChange={setTheme} options={[["all", tx("すべてのテーマ", "All themes")], ...themes.map((t) => [t, lbl(t)])]} />
+          {role !== "all" ? <button className="sw-btn" onClick={() => setRole("all")}>{tx("役割の絞り込みを外す", "Clear role filter")}</button> : null}
+          <span className="sw-sm" style={{ marginLeft: "auto" }}>{tx(`${list.length}件`, `${list.length} accounts`)}</span>
         </div>
         <div className="sw-g sw-g3">
           {list.map((r) => {
@@ -220660,22 +220790,22 @@ const SideWorkHubModule = (function () {
               <div key={r.u} className="sw-acc" style={{ "--c": c }}>
                 <div className="sw-acc-h">
                   <a className="sw-acc-u" href={`https://www.instagram.com/${r.u}/`} target="_blank" rel="noopener noreferrer">@{r.u}</a>
-                  <span className="sw-score" title={`相性 ${r.score} / 5`} aria-label={`相性 ${r.score} / 5`}>{[1, 2, 3, 4, 5].map((k) => <i key={k} className={k <= r.score ? "on" : ""} />)}</span>
+                  <span className="sw-score" title={tx(`相性 ${r.score} / 5`, `Fit ${r.score} / 5`)} aria-label={tx(`相性 ${r.score} / 5`, `Fit ${r.score} / 5`)}>{[1, 2, 3, 4, 5].map((k) => <i key={k} className={k <= r.score ? "on" : ""} />)}</span>
                 </div>
                 <div className="sw-sm" style={{ color: "var(--ink)" }}>{r.name}</div>
                 <div className="sw-sm">{r.reason}</div>
-                <div className="sw-sm" style={{ marginTop: "auto", display: "flex", gap: 8 }}><span className="sw-role">{r.role}</span><span>{r.theme}</span><span style={{ marginLeft: "auto" }}>{r.followers}</span></div>
+                <div className="sw-sm" style={{ marginTop: "auto", display: "flex", gap: 8 }}><span className="sw-role">{lbl(r.role)}</span><span>{lbl(r.theme)}</span><span style={{ marginLeft: "auto" }}>{r.followers}</span></div>
               </div>
             );
           })}
         </div>
         <div className="sw-g sw-g2">
           <div className="sw-card">
-            <div className="sw-ch"><h2 className="sw-ct">距離を置くべき発信の見分け方</h2></div>
-            <p className="sw-sm" style={{ margin: "0 0 6px" }}>フォロー中にも、次の特徴を持つ副業系の発信が数十件ありました（アカウント名は載せません）。</p>
-            {RED_FLAGS.map((t, i) => <div key={i} className="sw-fact" style={{ cursor: "default" }}><span style={{ color: "var(--ng)", fontWeight: 800 }}>×</span><span>{t}</span></div>)}
+            <div className="sw-ch"><h2 className="sw-ct">{tx("距離を置くべき発信の見分け方", "How to spot accounts to keep at a distance")}</h2></div>
+            <p className="sw-sm" style={{ margin: "0 0 6px" }}>{tx("フォロー中にも、次の特徴を持つ副業系の発信が数十件ありました（アカウント名は載せません）。", "Dozens of the followed side-hustle accounts showed these signs (names not listed).")}</p>
+            {tx(RED_FLAGS, RED_FLAGS_EN).map((t, i) => <div key={i} className="sw-fact" style={{ cursor: "default" }}><span style={{ color: "var(--ng)", fontWeight: 800 }}>×</span><span>{t}</span></div>)}
           </div>
-          {A.gaps ? <div className="sw-card"><div className="sw-ch"><h2 className="sw-ct">フォロー先に足りないもの</h2></div><p style={{ margin: 0, fontSize: 13.5 }}>{A.gaps}</p></div> : null}
+          {A.gaps ? <div className="sw-card"><div className="sw-ch"><h2 className="sw-ct">{tx("フォロー先に足りないもの", "What the followed accounts lack")}</h2></div><p style={{ margin: 0, fontSize: 13.5 }}>{A.gaps}</p></div> : null}
         </div>
       </div>
     );
@@ -220692,26 +220822,29 @@ const SideWorkHubModule = (function () {
   const SCORES = SW_DATA.scores || {};
   const SERIES = SW_DATA.series || [];
   const PLAN = SW_DATA.plan || null;
-  const LYR = ({ k, n }) => n ? <span className={"sw-lyr " + k} title={k === "l" ? `ライト層への向き度 ${n} / 5` : `コア層への向き度 ${n} / 5`}>{k === "l" ? "ライト" : "コア"} {"★".repeat(n)}</span> : null;
+  const LYR = ({ k, n }) => n ? <span className={"sw-lyr " + k} title={k === "l" ? tx(`ライト層への向き度 ${n} / 5`, `Fit for casual viewers ${n} / 5`) : tx(`コア層への向き度 ${n} / 5`, `Fit for core fans ${n} / 5`)}>{k === "l" ? tx("ライト", "Casual") : tx("コア", "Core")} {"★".repeat(n)}</span> : null;
   const AUD_OK = (e, lay) => { const a = e.aud; if (!a) return false; return lay === "l" ? a.l_fit >= 4 : lay === "c" ? a.c_fit >= 4 : lay === "lc" ? a.l_fit >= 4 && a.c_fit >= 4 : true; };
   const EP_PLAN = (() => { const m = {}; if (!PLAN) return m; (PLAN.arcs || []).forEach((a) => a.eps.forEach((id, i) => { m[id] = { arc: a, i: i + 1, n: a.eps.length }; })); (PLAN.weeks || []).forEach((w) => ["wine", "history"].forEach((k) => { if (w[k] && m[w[k].ep]) { m[w[k].ep].week = w.n; m[w[k].ep].start = w.start; } })); return m; })();
   const ST_TYPE = { "決断": "決断の瞬間", "瞬間": "出来事の瞬間", "解説": "解説型" };
-  const Stars = ({ n }) => n ? <span className="sw-stars" title={`その時度 ${n} / 5`} aria-label={`その時度 ${n} / 5`}>{"★".repeat(n)}<span style={{ color: "#CBD5E1" }}>{"★".repeat(5 - n)}</span></span> : null;
+  const Stars = ({ n }) => n ? <span className="sw-stars" title={tx(`その時度 ${n} / 5`, `"Moment" score ${n} / 5`)} aria-label={tx(`その時度 ${n} / 5`, `"Moment" score ${n} / 5`)}>{"★".repeat(n)}<span style={{ color: "#CBD5E1" }}>{"★".repeat(5 - n)}</span></span> : null;
   const stFit = (e) => (e.st && e.st.fit) || 0;
   const MD = (d) => { const m = /^-?\d+-(\d{2})-(\d{2})$/.exec(String(d || "")); return m ? [Number(m[1]), Number(m[2])] : null; };
   const SER = Object.fromEntries(SERIES.map((x) => [x.id, x]));
   const NETA = SW_DATA.neta || [];
   const NETA_KEY = "sw:neta:v1";
   const TIER_INFO = { S: ["公的・学術", "#047857"], A: ["事典・専門機関", "#1D4ED8"], B: ["報道・業界誌", "#0EA5E9"], C: ["Wikipedia・辞書", "#566479"], D: ["個人・まとめ・不明", "#92400E"] };
+  const TIER_EN = { S: "Official & academic", A: "Encyclopedias & expert bodies", B: "News & trade press", C: "Wikipedia & dictionaries", D: "Personal, aggregator or unknown" };
+  const tierName = (t) => tx(TIER_INFO[t][0], TIER_EN[t]);
   const VCLS = { "一致": "ok", "一部一致": "part", "不一致": "ng", "原文なし": "ng", "開けない": "part" };
   const VLAB = { "一致": "原文で一致", "一部一致": "原文で一部のみ一致", "不一致": "原文と食い違い", "原文なし": "原文に記述なし", "開けない": "原文を開けず" };
-  const VTag = ({ v }) => v && v.verdict ? <span className={"sw-vtag " + (VCLS[v.verdict] || "part")} title={[v.note, v.date ? `確認日 ${v.date}` : ""].filter(Boolean).join("　")}>{VLAB[v.verdict] || v.verdict}{v.date ? `（${v.date.slice(5).replace("-", "/")}）` : ""}</span> : null;
-  const TierTag = ({ t }) => t ? <span className="sw-tier-s" style={{ background: TIER_INFO[t][1] }} title={`出典の段階 ${t}：${TIER_INFO[t][0]}`}>{t}</span> : null;
+  const VLAB_EN = { "一致": "Matches original", "一部一致": "Partly matches original", "不一致": "Conflicts with original", "原文なし": "Not in original", "開けない": "Couldn't open original" };
+  const VTag = ({ v }) => v && v.verdict ? <span className={"sw-vtag " + (VCLS[v.verdict] || "part")} title={[v.note, v.date ? tx(`確認日 ${v.date}`, `Checked ${v.date}`) : ""].filter(Boolean).join("　")}>{(UI_EN ? VLAB_EN : VLAB)[v.verdict] || v.verdict}{v.date ? tx(`（${v.date.slice(5).replace("-", "/")}）`, ` (${v.date.slice(5).replace("-", "/")})`) : ""}</span> : null;
+  const TierTag = ({ t }) => t ? <span className="sw-tier-s" style={{ background: TIER_INFO[t][1] }} title={tx(`出典の段階 ${t}：${TIER_INFO[t][0]}`, `Source tier ${t}: ${TIER_EN[t]}`)}>{t}</span> : null;
   const sabShare = (e) => { const fs = e.facts || []; return fs.length ? Math.round(fs.filter((f) => "SAB".includes(f.tier || "D")).length / fs.length * 100) : 0; };
   const SRC_BY_NAME = { wine: Object.fromEntries(((SW_DATA.wine || {}).sources || []).map((x) => [x.name, x])), history: Object.fromEntries(((SW_DATA.history || {}).sources || []).map((x) => [x.name, x])) };
   const epArea = (e) => e.kind === "wine" ? "ワイン" : (e.area || "世界");
   const epYear = (e) => typeof e.year === "number" ? e.year : (e.kind === "history" && /^-?\d+$/.test(String(e.era || "")) ? Number(e.era) : null);
-  const yearLabel = (y) => y == null ? "—" : y < 0 ? `前${-y}` : String(y);
+  const yearLabel = (y) => y == null ? "—" : y < 0 ? tx(`前${-y}`, `${-y} BC`) : String(y);
   const hashJ = (s, k) => { let h = 2166136261; for (const ch of s + k) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return ((h >>> 0) % 1000) / 1000 - 0.5; };
   const QUADS = [
     ["now", "今すぐ作る", "話題性が高く、根拠も固い", "#047857"],
@@ -220719,6 +220852,13 @@ const SideWorkHubModule = (function () {
     ["base", "シリーズの土台", "地味だが根拠が固く、積み上げに向く", "#1D4ED8"],
     ["later", "後回し", "話題性も根拠も弱め", "#566479"],
   ];
+  const QUADS_EN = [
+    ["now", "Make now", "High interest and solid evidence", "#047857"],
+    ["check", "Verify first", "High interest, but the evidence is shaky", "#92400E"],
+    ["base", "Series backbone", "Low-key but well sourced; good for building up", "#1D4ED8"],
+    ["later", "Later", "Weaker on both interest and evidence", "#566479"],
+  ];
+  const quads = () => (UI_EN ? QUADS_EN : QUADS);
   const quadOf = (s) => !s ? null : s.appeal >= 5.5 ? (s.evidence >= 5.5 ? "now" : "check") : (s.evidence >= 5.5 ? "base" : "later");
 
   function EpChip({ e, onOpen }) {
@@ -220729,13 +220869,13 @@ const SideWorkHubModule = (function () {
   function Matrix({ list, onOpen, compact }) {
     const [tipEl, onTip, offTip] = useTip();
     const pts = list.filter((e) => SCORES[e.id]);
-    if (!pts.length) return <p className="sw-sm">採点データがまだありません。</p>;
+    if (!pts.length) return <p className="sw-sm">{tx("採点データがまだありません。", "No scores yet.")}</p>;
     const W = 640, H = compact ? 300 : 420, L = 44, R = 14, T = 14, B = 40;
     const sx = (v) => L + (v - 0.5) / 10 * (W - L - R), sy = (v) => H - B - (v - 0.5) / 10 * (H - T - B);
     const mx = sx(5.5), my = sy(5.5);
     return (
       <div onMouseLeave={offTip}>
-        <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="企画の4象限（横：根拠の固さ、縦：話題性）" style={{ display: "block" }}>
+        <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={tx("企画の4象限（横：根拠の固さ、縦：話題性）", "Episode quadrants (x: evidence, y: interest)")} style={{ display: "block" }}>
           <rect x={mx} y={T} width={W - R - mx} height={my - T} fill="#ECFDF5" />
           <rect x={L} y={T} width={mx - L} height={my - T} fill="#FFFBEB" />
           <rect x={mx} y={my} width={W - R - mx} height={H - B - my} fill="#EFF6FF" />
@@ -220743,23 +220883,23 @@ const SideWorkHubModule = (function () {
           <line x1={mx} x2={mx} y1={T} y2={H - B} stroke="#CBD5E1" strokeDasharray="4 4" />
           <line x1={L} x2={W - R} y1={my} y2={my} stroke="#CBD5E1" strokeDasharray="4 4" />
           {[["now", W - R - 8, T + 18, "end"], ["check", L + 8, T + 18, "start"], ["base", W - R - 8, H - B - 10, "end"], ["later", L + 8, H - B - 10, "start"]].map(([q, x, y, a]) => {
-            const Q = QUADS.find((z) => z[0] === q);
+            const Q = quads().find((z) => z[0] === q);
             return <text key={q} x={x} y={y} textAnchor={a} fontSize={compact ? 12 : 13} fontWeight="800" fill={Q[3]} fontFamily="Inter, sans-serif">{Q[1]}</text>;
           })}
-          <text x={(L + W - R) / 2} y={H - 8} textAnchor="middle" fontSize="11.5" fill="#5A6880" fontFamily="Inter, sans-serif">根拠の固さ →（一次資料で裏が取りやすい）</text>
-          <text x={14} y={(T + H - B) / 2} textAnchor="middle" fontSize="11.5" fill="#5A6880" fontFamily="Inter, sans-serif" transform={`rotate(-90 14 ${(T + H - B) / 2})`}>話題性 →</text>
+          <text x={(L + W - R) / 2} y={H - 8} textAnchor="middle" fontSize="11.5" fill="#5A6880" fontFamily="Inter, sans-serif">{tx("根拠の固さ →（一次資料で裏が取りやすい）", "Evidence → (easier to back with primary sources)")}</text>
+          <text x={14} y={(T + H - B) / 2} textAnchor="middle" fontSize="11.5" fill="#5A6880" fontFamily="Inter, sans-serif" transform={`rotate(-90 14 ${(T + H - B) / 2})`}>{tx("話題性 →", "Interest →")}</text>
           {pts.map((e) => {
             const s = SCORES[e.id];
             const x = sx(Math.max(1, Math.min(10, s.evidence + hashJ(e.id, "x") * 0.7))), y = sy(Math.max(1, Math.min(10, s.appeal + hashJ(e.id, "y") * 0.7)));
             return (
               <circle key={e.id} cx={x} cy={y} r={compact ? 5.5 : 7} fill={KIND_INFO[e.kind][1]} fillOpacity=".85" stroke="#fff" strokeWidth="2" style={{ cursor: "pointer" }}
-                onMouseMove={(ev) => onTip(ev, `${splitTitle(e.title)[0]}（話題性 ${s.appeal}・根拠 ${s.evidence}）`)} onClick={() => onOpen(e)} />
+                onMouseMove={(ev) => onTip(ev, tx(`${splitTitle(e.title)[0]}（話題性 ${s.appeal}・根拠 ${s.evidence}）`, `${splitTitle(e.title)[0]} (interest ${s.appeal} · evidence ${s.evidence})`))} onClick={() => onOpen(e)} />
             );
           })}
         </svg>
         <div className="sw-legend" style={{ marginTop: 4 }}>
-          <span><span style={{ color: KIND_INFO.wine[1] }}>●</span> ワイン</span><span><span style={{ color: KIND_INFO.history[1] }}>●</span> 歴史</span>
-          <span>点に触れると題名、押すと企画が開きます</span>
+          <span><span style={{ color: KIND_INFO.wine[1] }}>●</span> {tx("ワイン", "Wine")}</span><span><span style={{ color: KIND_INFO.history[1] }}>●</span> {tx("歴史", "History")}</span>
+          <span>{tx("点に触れると題名、押すと企画が開きます", "Hover a dot for its title; click to open the episode")}</span>
         </div>
         {tipEl}
       </div>
@@ -220778,26 +220918,26 @@ const SideWorkHubModule = (function () {
     return (
       <div onMouseLeave={offTip}>
         <div style={{ overflowX: "auto" }}>
-          <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ minWidth: 560, display: "block" }} role="img" aria-label="企画の年表">
+          <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ minWidth: 560, display: "block" }} role="img" aria-label={tx("企画の年表", "Episode timeline")}>
             {BANDS.map(([a, b, n], i) => (
               <g key={n}>
                 <rect x={L + i * bw} y={T - 22} width={bw} height={H - T + 22} fill={i % 2 ? "#F7F9FD" : "#fff"} />
-                <text x={L + i * bw + bw / 2} y={T - 8} textAnchor="middle" fontSize="12" fontWeight="800" fill="#5A6880" fontFamily="Inter, sans-serif">{n}<tspan fontWeight="400" fill="#566479">（{yearLabel(a)}〜{i === BANDS.length - 1 ? "" : yearLabel(b)}）</tspan></text>
+                <text x={L + i * bw + bw / 2} y={T - 8} textAnchor="middle" fontSize="12" fontWeight="800" fill="#5A6880" fontFamily="Inter, sans-serif">{lbl(n)}<tspan fontWeight="400" fill="#566479">{tx("（", " (")}{yearLabel(a)}{tx("〜", "–")}{i === BANDS.length - 1 ? "" : yearLabel(b)}{tx("）", ")")}</tspan></text>
               </g>
             ))}
             {LANES.map((ln, i) => (
               <g key={ln}>
                 <line x1={L} x2={W - R} y1={T + LH * i + LH / 2} y2={T + LH * i + LH / 2} stroke="#E2E8F1" />
-                <text x={8} y={T + LH * i + LH / 2 + 4} fontSize="12" fontWeight="700" fill="#22324D" fontFamily="Inter, sans-serif">{ln}</text>
+                <text x={8} y={T + LH * i + LH / 2 + 4} fontSize="12" fontWeight="700" fill="#22324D" fontFamily="Inter, sans-serif">{lbl(ln)}</text>
               </g>
             ))}
             {pts.map(({ e, y, lane }) => (
               <circle key={e.id} cx={xOf(y)} cy={T + LH * lane + LH / 2 + hashJ(e.id, "t") * 26} r="6" fill={KIND_INFO[e.kind][1]} fillOpacity=".85" stroke="#fff" strokeWidth="2" style={{ cursor: "pointer" }}
-                onMouseMove={(ev) => onTip(ev, `${yearLabel(y)}　${splitTitle(e.title)[0]}`)} onClick={() => onOpen(e)} />
+                onMouseMove={(ev) => onTip(ev, `${yearLabel(y)}${tx("　", "  ")}${splitTitle(e.title)[0]}`)} onClick={() => onOpen(e)} />
             ))}
           </svg>
         </div>
-        <p className="sw-sm" style={{ margin: "8px 0 0" }}>時代ごとに同じ幅で並べています（年の間隔は時代によって違います）。点に触れると年と題名、押すと企画が開きます。{noYear.length ? `年が定まらない${noYear.length}本は省いています。` : ""}</p>
+        <p className="sw-sm" style={{ margin: "8px 0 0" }}>{tx("時代ごとに同じ幅で並べています（年の間隔は時代によって違います）。点に触れると年と題名、押すと企画が開きます。", "Each era gets the same width (so the year scale differs by era). Hover a dot for its year and title; click to open the episode.")}{noYear.length ? tx(`年が定まらない${noYear.length}本は省いています。`, ` ${noYear.length} episodes without a definite year are left out.`) : ""}</p>
         {tipEl}
       </div>
     );
@@ -220811,16 +220951,16 @@ const SideWorkHubModule = (function () {
           return (
             <div key={f.id} className="sw-card sw-mcard">
               <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline" }}>
-                <h3 className="sw-ct" style={{ fontSize: 15.5 }}><span className="sw-fmt-id">{f.id}</span>{f.name}</h3>
-                <span className="sw-sm" style={{ flexShrink: 0 }}>{eps.length}本</span>
+                <h3 className="sw-ct" style={{ fontSize: 15.5 }}><span className="sw-fmt-id">{f.id}</span>{lbl(f.name)}</h3>
+                <span className="sw-sm" style={{ flexShrink: 0 }}>{tx(`${eps.length}本`, `${eps.length} episodes`)}</span>
               </div>
               <div className="sw-chips"><span className="sw-chip">{f.length}</span><span className="sw-chip">{f.media}</span></div>
               <p style={{ margin: 0, fontSize: 13, color: "var(--ink2)" }}>{f.desc}</p>
-              <div className="sw-note warn" style={{ padding: "8px 12px" }}><b>AIで作るときは　</b>{f.ai}</div>
+              <div className="sw-note warn" style={{ padding: "8px 12px" }}><b>{tx("AIで作るときは　", "When making it with AI: ")}</b>{f.ai}</div>
               <div>
-                <div className="sw-sm" style={{ fontWeight: 800, color: "var(--ink2)", marginBottom: 4 }}>海外・国内の手本</div>
+                <div className="sw-sm" style={{ fontWeight: 800, color: "var(--ink2)", marginBottom: 4 }}>{tx("海外・国内の手本", "Models abroad and in Japan")}</div>
                 {(f.cases || []).map((n) => { const c = CASE_BY_NAME[n]; return c ? (
-                  <div key={n} className="sw-casemini"><b>{c.name}</b><span className="sw-sm">{c.lesson}</span><span className="sw-sm">{c.source} <Ext url={c.url}>開く</Ext><Badge v={c.verified} /></span></div>
+                  <div key={n} className="sw-casemini"><b>{c.name}</b><span className="sw-sm">{c.lesson}</span><span className="sw-sm">{c.source} <Ext url={c.url}>{tx("開く", "Open")}</Ext><Badge v={c.verified} /></span></div>
                 ) : null; })}
               </div>
               {eps.length ? <div className="sw-chips">{eps.map((e) => <EpChip key={e.kind + e.id} e={e} onOpen={onOpen} />)}</div> : null}
@@ -220838,18 +220978,18 @@ const SideWorkHubModule = (function () {
     const ms = months || [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
     return (
       <>
-        <p className="sw-sm" style={{ margin: "0 0 10px" }}>グレゴリオ暦の年月日が事実で分かる「その時」{rows.length}本を、月日の順に並べました。旧暦・ユリウス暦の日付しか分からないものは載せていません。記念日に合わせて出すと、その日に検索・話題になりやすくなります。</p>
+        <p className="sw-sm" style={{ margin: "0 0 10px" }}>{tx(`グレゴリオ暦の年月日が事実で分かる「その時」${rows.length}本を、月日の順に並べました。旧暦・ユリウス暦の日付しか分からないものは載せていません。記念日に合わせて出すと、その日に検索・話題になりやすくなります。`, `${rows.length} "moments" with a known Gregorian date, in calendar order. Ones known only by lunisolar or Julian dates are left out. Posting on the anniversary helps them get searched and talked about that day.`)}</p>
         <div className="sw-cal">
           {ms.map((m) => { const rs = rows.filter(([, mm]) => mm === m).sort((a, b) => a[2] - b[2]); return (
             <div key={m} className={"sw-cal-m" + (m === cm ? " now" : "")}>
-              <div className="sw-cal-h"><span>{m}月{m === cm ? "（今月）" : ""}</span><span className="sw-sm">{rs.length}本</span></div>
+              <div className="sw-cal-h"><span>{tx(`${m}月${m === cm ? "（今月）" : ""}`, `${MONTH_EN[m - 1]}${m === cm ? " (this month)" : ""}`)}</span><span className="sw-sm">{tx(`${rs.length}本`, `${rs.length} episodes`)}</span></div>
               {rs.map(([e, , d]) => (
                 <button key={e.kind + e.id} className={"sw-cal-r" + (m === cm && d === cd ? " today" : "")} onClick={() => onOpen(e)}>
-                  <span className="sw-cal-d">{d}日</span>
-                  <span style={{ minWidth: 0 }}><b style={{ fontSize: 14 }}>{splitTitle(e.title)[0]}</b><span className="sw-sm" style={{ display: "block" }}>{/^\d/.test(e.st.headline) ? "" : `${String(e.st.date_greg).slice(0, 4).replace(/^0+/, "")}年・`}{e.st.headline}</span></span>
+                  <span className="sw-cal-d">{tx(`${d}日`, `${d}`)}</span>
+                  <span style={{ minWidth: 0 }}><b style={{ fontSize: 14 }}>{splitTitle(e.title)[0]}</b><span className="sw-sm" style={{ display: "block" }}>{/^\d/.test(e.st.headline) ? "" : tx(`${String(e.st.date_greg).slice(0, 4).replace(/^0+/, "")}年・`, `${String(e.st.date_greg).slice(0, 4).replace(/^0+/, "")} · `)}{e.st.headline}</span></span>
                 </button>
               ))}
-              {!rs.length ? <div className="sw-sm" style={{ padding: "8px 14px" }}>この月の「その時」はまだありません。</div> : null}
+              {!rs.length ? <div className="sw-sm" style={{ padding: "8px 14px" }}>{tx("この月の「その時」はまだありません。", "No \"moments\" in this month yet.")}</div> : null}
             </div>
           ); })}
         </div>
@@ -220869,8 +221009,8 @@ const SideWorkHubModule = (function () {
       <div className={"sw-grpl" + (open ? " open" : "")}>
         <button type="button" className="sw-grpl-h" style={{ "--gk": gk }} onClick={() => { setOpen(!open); remember(id, !open); }} aria-expanded={open} title={g.desc || ""}>
           <span className="sw-fold-c" aria-hidden="true" />
-          <span className="sw-grpl-t">{g.name}</span>
-          <span className="sw-grpl-m">{es.length}本{now ? `・今すぐ作る ${now}` : ""}</span>
+          <span className="sw-grpl-t">{lbl(g.name)}</span>
+          <span className="sw-grpl-m">{tx(`${es.length}本${now ? `・今すぐ作る ${now}` : ""}`, `${es.length} episodes${now ? ` · make now ${now}` : ""}`)}</span>
         </button>
         {open ? es.map(item) : null}
       </div>
@@ -220910,48 +221050,52 @@ const SideWorkHubModule = (function () {
           <span style={{ minWidth: 0 }}>
             <span className="sw-ep-t">{t}</span>
             {e.st && e.st.headline ? <span className="sw-ep-h">{e.st.headline}</span> : null}
-            <span className="sw-ep-p"><Stars n={stFit(e)} />{stFit(e) ? "　" : ""}{e.aud ? `ライト${e.aud.l_fit}・コア${e.aud.c_fit}・` : ""}{grouped ? "" : `${epArea(e)}・`}事実 {ok}/{all}・出典 {sabShare(e)}%{q ? `・${QUADS.find((z) => z[0] === q)[1]}` : ""}</span>
+            <span className="sw-ep-p"><Stars n={stFit(e)} />{stFit(e) ? tx("　", "  ") : ""}{UI_EN
+              ? `${e.aud ? `Casual ${e.aud.l_fit} · core ${e.aud.c_fit} · ` : ""}${grouped ? "" : `${lbl(epArea(e))} · `}facts ${ok}/${all} · sources ${sabShare(e)}%${q ? ` · ${QUADS_EN.find((z) => z[0] === q)[1]}` : ""}`
+              : `${e.aud ? `ライト${e.aud.l_fit}・コア${e.aud.c_fit}・` : ""}${grouped ? "" : `${epArea(e)}・`}事実 ${ok}/${all}・出典 ${sabShare(e)}%${q ? `・${QUADS.find((z) => z[0] === q)[1]}` : ""}`}</span>
           </span>
         </button>
       );
     };
     return (
       <div>
-        <Head kick="02 企画する" title="企画帳" lede={`ワインと歴史の企画${EPS.length}本。つかみ・事実・台本の骨組み・タイトル案・素材案に加え、海外の発信者の型と、その手本から得た学びを付けています。事実はまだ検索の要約でしか確かめていません。出典の原文と照らし合わせ、合っていたらチェックを付けてください。チェックした事実だけが台本に入ります。`} />
-        <Tabs value={view} onChange={(v) => { setView(v); if (v !== "list") setSel(null); }} options={[["list", "一覧と詳細", list.length], ["cal", "記念日カレンダー", EPS.filter((e) => e.st && MD(e.st.date_greg)).length], ["matrix", "4象限", null], ["timeline", "年表", null], ["formats", "型で探す", FORMATS.length]]} />
+        <Head kick={tx("02 企画する", "02 PLAN")} title={tx("企画帳", "Episode plans")} lede={tx(`ワインと歴史の企画${EPS.length}本。つかみ・事実・台本の骨組み・タイトル案・素材案に加え、海外の発信者の型と、その手本から得た学びを付けています。事実はまだ検索の要約でしか確かめていません。出典の原文と照らし合わせ、合っていたらチェックを付けてください。チェックした事実だけが台本に入ります。`, `${EPS.length} episode plans on wine and history, each with a hook, facts, a script outline, title ideas and visual ideas, plus formats from overseas creators and lessons from those models. Facts have only been checked against search summaries so far. Compare them with the original sources and tick the ones that match; only ticked facts go into scripts.`)} />
+        <Tabs value={view} onChange={(v) => { setView(v); if (v !== "list") setSel(null); }} options={[["list", tx("一覧と詳細", "List & details"), list.length], ["cal", tx("記念日カレンダー", "Anniversary calendar"), EPS.filter((e) => e.st && MD(e.st.date_greg)).length], ["matrix", tx("4象限", "Quadrants"), null], ["timeline", tx("年表", "Timeline"), null], ["formats", tx("型で探す", "By format"), FORMATS.length]]} />
         <div className="sw-tbar">
-          <Seg value={kind} onChange={(v) => { setKind(v); setSel(null); if (v === "wine") setArea("all"); }} options={[["all", `すべて ${EPS.length}`], ["wine", `ワイン ${EPS.filter((e) => e.kind === "wine").length}`], ["history", `歴史 ${EPS.filter((e) => e.kind === "history").length}`]]} />
-          <select className="sw-select" value={lay} onChange={(e) => { setLay(e.target.value); setSel(null); }} aria-label="対象の層で絞り込む">
-            <option value="all">対象の層：すべて</option>
-            <option value="l">ライト層向き（★4以上）</option>
-            <option value="c">コア層向き（★4以上）</option>
-            <option value="lc">両方に向く（★4以上）</option>
+          <Seg value={kind} onChange={(v) => { setKind(v); setSel(null); if (v === "wine") setArea("all"); }} options={[["all", tx(`すべて ${EPS.length}`, `All ${EPS.length}`)], ["wine", tx(`ワイン ${EPS.filter((e) => e.kind === "wine").length}`, `Wine ${EPS.filter((e) => e.kind === "wine").length}`)], ["history", tx(`歴史 ${EPS.filter((e) => e.kind === "history").length}`, `History ${EPS.filter((e) => e.kind === "history").length}`)]]} />
+          <select className="sw-select" value={lay} onChange={(e) => { setLay(e.target.value); setSel(null); }} aria-label={tx("対象の層で絞り込む", "Filter by audience")}>
+            <option value="all">{tx("対象の層：すべて", "Audience: all")}</option>
+            <option value="l">{tx("ライト層向き（★4以上）", "For casual viewers (★4+)")}</option>
+            <option value="c">{tx("コア層向き（★4以上）", "For core fans (★4+)")}</option>
+            <option value="lc">{tx("両方に向く（★4以上）", "For both (★4+)")}</option>
           </select>
-          <select className="sw-select" value={stt} onChange={(e) => { setStt(e.target.value); setSel(null); }} aria-label="その時の型で絞り込む">
-            <option value="all">その時の型：すべて</option>
-            {Object.entries(ST_TYPE).map(([k, l]) => <option key={k} value={k}>{l}（{EPS.filter((e) => e.st && e.st.type === k).length}）</option>)}
+          <select className="sw-select" value={stt} onChange={(e) => { setStt(e.target.value); setSel(null); }} aria-label={tx("その時の型で絞り込む", "Filter by moment type")}>
+            <option value="all">{tx("その時の型：すべて", "Moment type: all")}</option>
+            {Object.entries(ST_TYPE).map(([k, l]) => <option key={k} value={k}>{tx(`${l}（${EPS.filter((e) => e.st && e.st.type === k).length}）`, `${lbl(l)} (${EPS.filter((e) => e.st && e.st.type === k).length})`)}</option>)}
           </select>
-          <select className="sw-select" value={ser} onChange={(e) => { setSer(e.target.value); setSel(null); }} aria-label="シリーズで絞り込む">
-            <option value="all">すべてのシリーズ</option>
-            {SERIES.filter((x) => kind === "all" || x.kind === kind).map((x) => <option key={x.id} value={x.id}>{x.name}（{EPS.filter((e) => e.series === x.id).length}）</option>)}
+          <select className="sw-select" value={ser} onChange={(e) => { setSer(e.target.value); setSel(null); }} aria-label={tx("シリーズで絞り込む", "Filter by series")}>
+            <option value="all">{tx("すべてのシリーズ", "All series")}</option>
+            {SERIES.filter((x) => kind === "all" || x.kind === kind).map((x) => <option key={x.id} value={x.id}>{tx(`${x.name}（${EPS.filter((e) => e.series === x.id).length}）`, `${lbl(x.name)} (${EPS.filter((e) => e.series === x.id).length})`)}</option>)}
           </select>
-          {kind !== "wine" ? <Seg value={area} onChange={(v) => { setArea(v); setSel(null); }} options={[["all", "全地域"], ...areas.filter((a) => kind === "all" || a !== "ワイン").map((a) => [a, a])]} /> : null}
-          <select className="sw-select" value={sort} onChange={(e) => setSort(e.target.value)} aria-label="並べ替え">
-            <option value="series">シリーズ別にまとめる</option><option value="fit">その時度が高い順</option><option value="id">番号順</option><option value="quality">出典の質が高い順</option><option value="appeal">話題性が高い順</option><option value="year">年代順</option>
+          {kind !== "wine" ? <Seg value={area} onChange={(v) => { setArea(v); setSel(null); }} options={[["all", tx("全地域", "All regions")], ...areas.filter((a) => kind === "all" || a !== "ワイン").map((a) => [a, lbl(a)])]} /> : null}
+          <select className="sw-select" value={sort} onChange={(e) => setSort(e.target.value)} aria-label={tx("並べ替え", "Sort")}>
+            {UI_EN
+              ? <><option value="series">Group by series</option><option value="fit">Best "moment" first</option><option value="id">By number</option><option value="quality">Best sources first</option><option value="appeal">Most interest first</option><option value="year">By year</option></>
+              : <><option value="series">シリーズ別にまとめる</option><option value="fit">その時度が高い順</option><option value="id">番号順</option><option value="quality">出典の質が高い順</option><option value="appeal">話題性が高い順</option><option value="year">年代順</option></>}
           </select>
-          <select className="sw-select" value={fmt} onChange={(e) => { setFmt(e.target.value); setSel(null); }} aria-label="発信の型で絞り込む">
-            <option value="all">発信の型：すべて</option>
-            {FORMATS.map((f) => <option key={f.id} value={f.id}>{f.id} {f.name}</option>)}
+          <select className="sw-select" value={fmt} onChange={(e) => { setFmt(e.target.value); setSel(null); }} aria-label={tx("発信の型で絞り込む", "Filter by format")}>
+            <option value="all">{tx("発信の型：すべて", "Format: all")}</option>
+            {FORMATS.map((f) => <option key={f.id} value={f.id}>{f.id} {lbl(f.name)}</option>)}
           </select>
         </div>
         {view === "list" ? (
           <div className={"sw-plans" + (sel ? " has-sel" : "")}>
             <div className="sw-eplist">
-              {grouped ? <div className="sw-eplist-bar"><span className="sw-sm">{groups.length}シリーズ・{list.length}本</span><FoldAll onSet={setGAll} /></div> : null}
+              {grouped ? <div className="sw-eplist-bar"><span className="sw-sm">{tx(`${groups.length}シリーズ・${list.length}本`, `${groups.length} series · ${list.length} episodes`)}</span><FoldAll onSet={setGAll} /></div> : null}
               <FoldSig.Provider value={gsig}>
                 {grouped ? groups.map(([g, es]) => <EpGroup key={g.id} g={g} es={es} item={item} hasCur={!!(cur && es.some((e) => e.kind + e.id === cur.kind + cur.id))} />) : list.map(item)}
               </FoldSig.Provider>
-              {!list.length ? <div className="sw-sm" style={{ padding: 16 }}>条件に合う企画はありません。</div> : null}
+              {!list.length ? <div className="sw-sm" style={{ padding: 16 }}>{tx("条件に合う企画はありません。", "No episodes match.")}</div> : null}
             </div>
             <div className="sw-epdetail">{cur ? <Episode key={cur.kind + cur.id} e={cur} checked={checked} toggle={toggle} onBack={() => setSel(null)} /> : null}</div>
           </div>
@@ -220959,12 +221103,12 @@ const SideWorkHubModule = (function () {
         {view === "matrix" ? (
           <>
             <div className="sw-card sw-sec">
-              <div className="sw-ch"><h2 className="sw-ct">話題性 × 根拠の固さ</h2><span className="sw-sm">{list.filter((e) => SCORES[e.id]).length}本・仮採点</span></div>
+              <div className="sw-ch"><h2 className="sw-ct">{tx("話題性 × 根拠の固さ", "Interest × evidence")}</h2><span className="sw-sm">{tx(`${list.filter((e) => SCORES[e.id]).length}本・仮採点`, `${list.filter((e) => SCORES[e.id]).length} episodes · provisional scores`)}</span></div>
               <Matrix list={list} onOpen={open} />
-              <p className="sw-sm" style={{ margin: "8px 0 0" }}>点数はAIによる仮採点で、目安です（各10点）。話題性＝知名度・意外性・検索されやすさ。根拠の固さ＝一次資料や定評ある資料で裏が取れる度合いと、学説の割れにくさ。詳細で採点の理由を確かめ、自分の判断で入れ替えてください。</p>
+              <p className="sw-sm" style={{ margin: "8px 0 0" }}>{tx("点数はAIによる仮採点で、目安です（各10点）。話題性＝知名度・意外性・検索されやすさ。根拠の固さ＝一次資料や定評ある資料で裏が取れる度合いと、学説の割れにくさ。詳細で採点の理由を確かめ、自分の判断で入れ替えてください。", "Scores are provisional AI ratings out of 10, as a rough guide. Interest = fame, surprise and searchability. Evidence = how well primary or respected sources back it up, and how settled the scholarship is. Check the reasons in each episode and re-rank with your own judgment.")}</p>
             </div>
             <div className="sw-g sw-g4">
-              {QUADS.map(([q, n, d, c]) => (
+              {quads().map(([q, n, d, c]) => (
                 <div key={q} className="sw-card" style={{ borderTop: `3px solid ${c}` }}>
                   <div className="sw-ch" style={{ marginBottom: 4 }}><h3 className="sw-ct" style={{ color: c }}>{n}</h3><span className="sw-kpi-n" style={{ fontSize: 20 }}>{qCount(q)}</span></div>
                   <p className="sw-sm" style={{ margin: "0 0 8px" }}>{d}</p>
@@ -220975,10 +221119,10 @@ const SideWorkHubModule = (function () {
           </>
         ) : null}
         {view === "cal" ? <StCalendar list={list} onOpen={open} /> : null}
-        {view === "timeline" ? <div className="sw-card"><div className="sw-ch"><h2 className="sw-ct">企画の年表</h2><span className="sw-sm">{list.length}本</span></div><Timeline list={list} onOpen={open} /></div> : null}
+        {view === "timeline" ? <div className="sw-card"><div className="sw-ch"><h2 className="sw-ct">{tx("企画の年表", "Episode timeline")}</h2><span className="sw-sm">{tx(`${list.length}本`, `${list.length} episodes`)}</span></div><Timeline list={list} onOpen={open} /></div> : null}
         {view === "formats" ? (
           <>
-            <div className="sw-note info sw-sec">海外の事例から、副業で再現しやすい発信の型を8つに整理しました。型ごとに、手本の事例・AIで作るときの注意・その型が生きる企画を並べています。</div>
+            <div className="sw-note info sw-sec">{tx("海外の事例から、副業で再現しやすい発信の型を8つに整理しました。型ごとに、手本の事例・AIで作るときの注意・その型が生きる企画を並べています。", "Eight formats drawn from overseas examples that are easy to reproduce as side work. Each lists model cases, cautions for making it with AI, and the episodes that suit it.")}</div>
             <FormatBoard list={list} onOpen={open} />
           </>
         ) : null}
@@ -220986,7 +221130,7 @@ const SideWorkHubModule = (function () {
     );
   }
 
-  const AXES = [["appeal", "話題性"], ["evidence", "根拠の固さ"], ["ease", "作りやすさ"], ["risk", "炎上・規制の注意度"]];
+  const AXES = [["appeal", "話題性", "Interest"], ["evidence", "根拠の固さ", "Evidence"], ["ease", "作りやすさ", "Ease of making"], ["risk", "炎上・規制の注意度", "Backlash & regulatory risk"]];
   function Episode({ e, checked, toggle, onBack }) {
     const kind = e.kind;
     const [, , kv, ks] = KIND_INFO[kind];
@@ -220998,81 +221142,81 @@ const SideWorkHubModule = (function () {
     const sc = e.script;
     const fmts = (e.formats || []).map((id) => FMT[id]).filter(Boolean);
     const story = [
-      ["0〜3秒 つかみ", e.hook],
-      ...(kind === "history" ? [["前提", e.before], ["転換点", e.moment], ["その後", e.after]] : [["展開", e.angle]]),
-      ["裏づけ", okFacts.length ? okFacts.map((f) => `${f.t}（${f.src}）`).join(" ／ ") : "まだありません。「事実と出典」を原文で確かめ、チェックを付けると入ります。"],
-      ["締め", kind === "history" ? "「もしこの瞬間が違っていたら？」と問いかけて終える" : "知るときに使える一言で終える"],
-      ["概要欄", "出典の一覧と、AIで作成した映像・音声であることの表示"],
+      [tx("0〜3秒 つかみ", "0–3 s hook"), e.hook],
+      ...(kind === "history" ? [[tx("前提", "Setup"), e.before], [tx("転換点", "Turning point"), e.moment], [tx("その後", "Aftermath"), e.after]] : [[tx("展開", "Development"), e.angle]]),
+      [tx("裏づけ", "Evidence"), okFacts.length ? okFacts.map((f) => `${f.t}（${f.src}）`).join(" ／ ") : tx("まだありません。「事実と出典」を原文で確かめ、チェックを付けると入ります。", "None yet. Check \"Facts & sources\" against the originals and tick them to add them here.")],
+      [tx("締め", "Close"), kind === "history" ? tx("「もしこの瞬間が違っていたら？」と問いかけて終える", "End by asking: what if this moment had gone differently?") : tx("知るときに使える一言で終える", "End with a line viewers can take away and use")],
+      [tx("概要欄", "Description"), tx("出典の一覧と、AIで作成した映像・音声であることの表示", "A list of sources and a note that the video and audio were made with AI")],
     ];
     const [sig, setAll] = useFoldSig();
     const st = e.st;
     const [ver, setVer] = useState(st ? "st60" : "s60");
     const [lyr, setLyr] = useState("l");
     const q = quadOf(s);
-    const qd = q ? QUADS.find((z) => z[0] === q) : null;
+    const qd = q ? quads().find((z) => z[0] === q) : null;
     const sr = SER[e.series];
     const refs = (ns) => (ns || []).map((n) => facts[n] ? <span key={n} className={"sw-fref" + (facts[n].ok ? " ok" : "")} title={facts[n].t}>{n + 1}</span> : null);
-    const aud = (l) => l.audited ? <span className="sw-aud" title={l.why || "台本の監査で直した行"}>監査で修正</span> : null;
+    const aud = (l) => l.audited ? <span className="sw-aud" title={l.why || tx("台本の監査で直した行", "Line fixed in the script audit")}>{tx("監査で修正", "Fixed in audit")}</span> : null;
     const chars = (st ? st.script60 : sc ? sc.script60 : []).reduce((a, l) => a + String(l.line || "").length, 0);
     const sref = (k) => refs((st && st.refs && st.refs[k]) || []);
     let k = 0;
     return (
       <article className="sw-card sw-epd" style={{ "--k": kv, "--k-soft": ks }}>
-        <button className="sw-btn sw-back" onClick={onBack}>← 一覧へ</button>
-        <div className="sw-kick" style={{ color: "var(--k)" }}>{kind === "history" ? `${yearLabel(epYear(e))}・${e.region || ""}` : `ワインの物語${e.place ? "・" + e.place : ""}${epYear(e) != null ? "・" + yearLabel(epYear(e)) : ""}`}</div>
+        <button className="sw-btn sw-back" onClick={onBack}>{tx("← 一覧へ", "← Back to list")}</button>
+        <div className="sw-kick" style={{ color: "var(--k)" }}>{kind === "history" ? `${yearLabel(epYear(e))}${tx("・", " · ")}${e.region || ""}` : `${tx("ワインの物語", "Wine story")}${e.place ? tx("・", " · ") + e.place : ""}${epYear(e) != null ? tx("・", " · ") + yearLabel(epYear(e)) : ""}`}</div>
         <h2 className="sw-h1" style={{ fontSize: 24, margin: "4px 0 2px" }}>{t}</h2>
         {sub ? <div className="sw-lede">{sub}</div> : null}
         <div className="sw-epsum">
-          {sr ? <span className="sw-epsum-i"><small>シリーズ</small><b>{sr.name}</b></span> : null}
-          {qd ? <span className="sw-epsum-i"><small>判定（仮）</small><b><i className="sw-dot" style={{ background: qd[3] }} />{qd[1]}</b></span> : null}
-          <span className="sw-epsum-i"><small>出典の質</small><b>S〜B {sabShare(e)}%</b></span>
-          <span className="sw-epsum-i"><small>原文で確認</small><b>{okFacts.length} / {facts.length}</b></span>
-          {e.aud ? <span className="sw-epsum-i"><small>対象の層</small><b style={{ display: "flex", gap: 4, flexWrap: "wrap" }}><LYR k="l" n={e.aud.l_fit} /><LYR k="c" n={e.aud.c_fit} /></b></span> : null}
-          {EP_PLAN[e.id] ? <span className="sw-epsum-i"><small>発信プラン</small><b>{EP_PLAN[e.id].arc.title}　{EP_PLAN[e.id].i}/{EP_PLAN[e.id].n}本目{EP_PLAN[e.id].week ? `・第${EP_PLAN[e.id].week}週` : ""}</b></span> : null}
+          {sr ? <span className="sw-epsum-i"><small>{tx("シリーズ", "Series")}</small><b>{lbl(sr.name)}</b></span> : null}
+          {qd ? <span className="sw-epsum-i"><small>{tx("判定（仮）", "Verdict (provisional)")}</small><b><i className="sw-dot" style={{ background: qd[3] }} />{qd[1]}</b></span> : null}
+          <span className="sw-epsum-i"><small>{tx("出典の質", "Source quality")}</small><b>{tx("S〜B", "S–B")} {sabShare(e)}%</b></span>
+          <span className="sw-epsum-i"><small>{tx("原文で確認", "Checked in original")}</small><b>{okFacts.length} / {facts.length}</b></span>
+          {e.aud ? <span className="sw-epsum-i"><small>{tx("対象の層", "Audience")}</small><b style={{ display: "flex", gap: 4, flexWrap: "wrap" }}><LYR k="l" n={e.aud.l_fit} /><LYR k="c" n={e.aud.c_fit} /></b></span> : null}
+          {EP_PLAN[e.id] ? <span className="sw-epsum-i"><small>{tx("発信プラン", "Publishing plan")}</small><b>{EP_PLAN[e.id].arc.title}{tx(`　${EP_PLAN[e.id].i}/${EP_PLAN[e.id].n}本目${EP_PLAN[e.id].week ? `・第${EP_PLAN[e.id].week}週` : ""}`, `  ${EP_PLAN[e.id].i}/${EP_PLAN[e.id].n}${EP_PLAN[e.id].week ? ` · week ${EP_PLAN[e.id].week}` : ""}`)}</b></span> : null}
         </div>
         {st ? (
           <div className="sw-st">
-            <div className="sw-st-top"><span className="sw-st-when">その時　{st.when}{st.where ? `　${st.where}` : ""}{st.date_note ? `（${st.date_note}）` : ""}</span><span className="sw-st-type">{ST_TYPE[st.type] || st.type}　<Stars n={st.fit} /></span></div>
+            <div className="sw-st-top"><span className="sw-st-when">{tx("その時　", "Moment: ")}{st.when}{st.where ? tx(`　${st.where}`, ` · ${st.where}`) : ""}{st.date_note ? tx(`（${st.date_note}）`, ` (${st.date_note})`) : ""}</span><span className="sw-st-type">{lbl(ST_TYPE[st.type] || st.type)}{tx("　", "  ")}<Stars n={st.fit} /></span></div>
             <div className="sw-st-hl">{st.headline}{sref("headline")}</div>
-            {st.who ? <div className="sw-st-who">主人公　<b>{st.who}</b>{sref("who")}</div> : null}
+            {st.who ? <div className="sw-st-who">{tx("主人公　", "Protagonist: ")}<b>{st.who}</b>{sref("who")}</div> : null}
             <div className="sw-st-flow">
-              <div><h5>懸かっていたもの</h5><p>{st.stakes}{sref("stakes")}</p></div>
-              <div><h5>迫られた選択</h5><p>{st.choice}{sref("choice")}</p></div>
-              <div className="m"><h5>その瞬間</h5><p>{st.turn}{sref("turn")}</p></div>
-              <div><h5>動いたもの</h5><p>{st.moved}{sref("moved")}</p></div>
+              <div><h5>{tx("懸かっていたもの", "What was at stake")}</h5><p>{st.stakes}{sref("stakes")}</p></div>
+              <div><h5>{tx("迫られた選択", "The choice")}</h5><p>{st.choice}{sref("choice")}</p></div>
+              <div className="m"><h5>{tx("その瞬間", "The moment")}</h5><p>{st.turn}{sref("turn")}</p></div>
+              <div><h5>{tx("動いたもの", "What changed")}</h5><p>{st.moved}{sref("moved")}</p></div>
             </div>
-            {st.ifnot ? <div className="sw-st-if">もしも　{st.ifnot}</div> : null}
+            {st.ifnot ? <div className="sw-st-if">{tx("もしも　", "What if: ")}{st.ifnot}</div> : null}
           </div>
         ) : <blockquote className="sw-hook">{e.hook}</blockquote>}
-        <div className="sw-epd-bar"><span className="sw-sm">見出しを押すと開閉できます</span><FoldAll onSet={setAll} /></div>
+        <div className="sw-epd-bar"><span className="sw-sm">{tx("見出しを押すと開閉できます", "Click a heading to open or close it")}</span><FoldAll onSet={setAll} /></div>
         <FoldSig.Provider value={sig}>
-          <Fold id="ep:core" n={++k} title="企画の芯" meta={kind === "history" ? "その前・転換点・その後" : "切り口"}>
+          <Fold id="ep:core" n={++k} title={tx("企画の芯", "Core of the episode")} meta={kind === "history" ? tx("その前・転換点・その後", "Before · turning point · after") : tx("切り口", "Angle")}>
             {kind === "history" ? (
               <div className="sw-tl">
-                <div><h5>その前</h5><p>{e.before}</p></div>
-                <div className="m"><h5>転換点</h5><p>{e.moment}</p></div>
-                <div><h5>その後</h5><p>{e.after}</p></div>
+                <div><h5>{tx("その前", "Before")}</h5><p>{e.before}</p></div>
+                <div className="m"><h5>{tx("転換点", "Turning point")}</h5><p>{e.moment}</p></div>
+                <div><h5>{tx("その後", "After")}</h5><p>{e.after}</p></div>
               </div>
             ) : <p style={{ fontSize: 14.5, margin: "0 0 12px", lineHeight: 1.8 }}>{e.angle}</p>}
-            {e.people && e.people.length ? <p className="sw-sm" style={{ margin: "0 0 10px" }}><b style={{ color: "var(--ink2)" }}>人物</b>　{e.people.join("、")}</p> : null}
-            {st && e.hook ? <p className="sw-sm" style={{ margin: "0 0 10px" }}><b style={{ color: "var(--ink2)" }}>解説型のつかみ</b>　{e.hook}</p> : null}
+            {e.people && e.people.length ? <p className="sw-sm" style={{ margin: "0 0 10px" }}><b style={{ color: "var(--ink2)" }}>{tx("人物", "People")}</b>{tx("　", " ")}{e.people.join("、")}</p> : null}
+            {st && e.hook ? <p className="sw-sm" style={{ margin: "0 0 10px" }}><b style={{ color: "var(--ink2)" }}>{tx("解説型のつかみ", "Explainer hook")}</b>{tx("　", " ")}{e.hook}</p> : null}
             <div className="sw-chips">
               {(e.media || []).map((m) => <span key={m} className="sw-chip">{m}</span>)}
-              {fmts.map((f) => <span key={f.id} className="sw-chip" style={{ background: "var(--blue-soft)", color: "var(--blue-d)", fontWeight: 700 }}>{f.id} {f.short}</span>)}
+              {fmts.map((f) => <span key={f.id} className="sw-chip" style={{ background: "var(--blue-soft)", color: "var(--blue-d)", fontWeight: 700 }}>{f.id} {lbl(f.short)}</span>)}
             </div>
           </Fold>
-          <Fold id="ep:facts" n={++k} title="事実と出典" meta={`原文で確認 ${okFacts.length} / ${facts.length}`}>
+          <Fold id="ep:facts" n={++k} title={tx("事実と出典", "Facts & sources")} meta={tx(`原文で確認 ${okFacts.length} / ${facts.length}`, `Checked ${okFacts.length} / ${facts.length}`)}>
             <div className="sw-bar" style={{ marginBottom: 4 }}><i style={{ width: `${facts.length ? okFacts.length / facts.length * 100 : 0}%` }} /></div>
             {facts.map((f) => (
               <label key={f.j} className="sw-fact" style={f.verified ? { cursor: "default" } : null}>
-                <input type="checkbox" checked={f.ok} disabled={f.verified} onChange={() => toggle(fk(f.j))} aria-label="原文で確認した" />
-                <span><b className="sw-fnum">{f.j + 1}</b><TierTag t={f.tier} />{f.t}<span className="sw-sm" style={{ display: "block" }}>{f.src} <Ext url={f.url}>開く</Ext><Badge v={f.ok} />{f.upgraded ? <span className="sw-up" title={(f.old_src ? `格上げ前：${f.old_src}。` : "") + (f.up_note || "")}>{f.corrected ? "出典を格上げし文面を修正" : "出典を格上げ"}</span> : null}{f.url_est ? <span className="sw-up warn" title="検索結果から出典ページを推定した。開いて該当の記述があるか確かめる">ページ要確認</span> : null}{f.partial ? <span className="sw-up warn" title={`新しい出典で確かめられたのは文の一部だけ。${f.up_note || ""}`}>一部のみ裏づけ</span> : null}{f.tier === "D" ? <span className="sw-up warn">出典が弱い</span> : null}{f.added_for_moment ? <span className="sw-up" style={{ background: "var(--blue-soft)", color: "var(--blue-d)" }} title="「その時」を描くために、あとから調べて足した事実">その時のために追加</span> : null}{!f.url ? <span className="sw-up warn">出典ページ未特定</span> : null}<VTag v={f.v} />{f.t_old ? <span className="sw-up" title={`直す前：${f.t_old}`}>原文に合わせて修正</span> : null}</span>{f.v && f.v.note ? <span className="sw-sm" style={{ display: "block", color: "var(--ink2)" }}>{f.v.note}</span> : null}{f.v && (f.v.quote || []).length ? <span className="sw-vq" style={{ display: "block" }}>原文：{f.v.quote[0]}</span> : null}</span>
+                <input type="checkbox" checked={f.ok} disabled={f.verified} onChange={() => toggle(fk(f.j))} aria-label={tx("原文で確認した", "Checked in the original")} />
+                <span><b className="sw-fnum">{f.j + 1}</b><TierTag t={f.tier} />{f.t}<span className="sw-sm" style={{ display: "block" }}>{f.src} <Ext url={f.url}>{tx("開く", "Open")}</Ext><Badge v={f.ok} />{f.upgraded ? <span className="sw-up" title={(f.old_src ? tx(`格上げ前：${f.old_src}。`, `Before upgrade: ${f.old_src}. `) : "") + (f.up_note || "")}>{f.corrected ? tx("出典を格上げし文面を修正", "Source upgraded, wording fixed") : tx("出典を格上げ", "Source upgraded")}</span> : null}{f.url_est ? <span className="sw-up warn" title={tx("検索結果から出典ページを推定した。開いて該当の記述があるか確かめる", "Source page inferred from search results. Open it and confirm the passage is there")}>{tx("ページ要確認", "Check page")}</span> : null}{f.partial ? <span className="sw-up warn" title={tx(`新しい出典で確かめられたのは文の一部だけ。${f.up_note || ""}`, `The new source confirms only part of the sentence. ${f.up_note || ""}`)}>{tx("一部のみ裏づけ", "Partly supported")}</span> : null}{f.tier === "D" ? <span className="sw-up warn">{tx("出典が弱い", "Weak source")}</span> : null}{f.added_for_moment ? <span className="sw-up" style={{ background: "var(--blue-soft)", color: "var(--blue-d)" }} title={tx("「その時」を描くために、あとから調べて足した事実", "Fact researched later to portray the \"moment\"")}>{tx("その時のために追加", "Added for the moment")}</span> : null}{!f.url ? <span className="sw-up warn">{tx("出典ページ未特定", "Source page not identified")}</span> : null}<VTag v={f.v} />{f.t_old ? <span className="sw-up" title={tx(`直す前：${f.t_old}`, `Before: ${f.t_old}`)}>{tx("原文に合わせて修正", "Fixed to match the original")}</span> : null}</span>{f.v && f.v.note ? <span className="sw-sm" style={{ display: "block", color: "var(--ink2)" }}>{f.v.note}</span> : null}{f.v && (f.v.quote || []).length ? <span className="sw-vq" style={{ display: "block" }}>{tx("原文：", "Original: ")}{f.v.quote[0]}</span> : null}</span>
               </label>
             ))}
-            {(e.caution || e.debate) ? <div className="sw-note warn" style={{ marginTop: 12 }}><b>{kind === "history" ? "学説が分かれる点・俗説　" : "俗説と事実の違い・注意　"}</b>{e.caution || e.debate}</div> : null}
+            {(e.caution || e.debate) ? <div className="sw-note warn" style={{ marginTop: 12 }}><b>{kind === "history" ? tx("学説が分かれる点・俗説　", "Disputed points & popular myths: ") : tx("俗説と事実の違い・注意　", "Myths vs. facts & cautions: ")}</b>{e.caution || e.debate}</div> : null}
           </Fold>
-          <Fold id="ep:script" n={++k} title="台本" meta={st ? `その時版 60秒 ${chars}字・3分 ${(st.beats3 || []).length}拍` : sc ? `60秒 ${chars}字・3分 ${(sc.beats3 || []).length}拍` : "骨組み"}>
-            {sc || st ? <div style={{ marginBottom: 10 }}><Seg value={ver} onChange={setVer} options={[...(st ? [["st60", "その時版 60秒"], ["st3", "その時版 3分"]] : []), ...(sc ? [["s60", st ? "解説版 60秒" : "60秒台本"], ["b3", st ? "解説版 3分" : "3分版の構成"]] : []), ["bone", "骨組み"]]} /></div> : null}
+          <Fold id="ep:script" n={++k} title={tx("台本", "Script")} meta={st ? tx(`その時版 60秒 ${chars}字・3分 ${(st.beats3 || []).length}拍`, `Moment version: 60 s ${chars} chars · 3 min ${(st.beats3 || []).length} beats`) : sc ? tx(`60秒 ${chars}字・3分 ${(sc.beats3 || []).length}拍`, `60 s ${chars} chars · 3 min ${(sc.beats3 || []).length} beats`) : tx("骨組み", "Outline")}>
+            {sc || st ? <div style={{ marginBottom: 10 }}><Seg value={ver} onChange={setVer} options={[...(st ? [["st60", tx("その時版 60秒", "Moment 60 s")], ["st3", tx("その時版 3分", "Moment 3 min")]] : []), ...(sc ? [["s60", st ? tx("解説版 60秒", "Explainer 60 s") : tx("60秒台本", "60 s script")], ["b3", st ? tx("解説版 3分", "Explainer 3 min") : tx("3分版の構成", "3 min structure")]] : []), ["bone", tx("骨組み", "Outline")]]} /></div> : null}
             {st && ver === "st60" ? (
               <div className="sw-script">
                 {(st.script60 || []).map((l, j) => <div key={j}><span className="sw-script-t">{l.t}</span><span>{l.line}{refs(l.facts)}{aud(l)}</span></div>)}
@@ -221086,78 +221230,80 @@ const SideWorkHubModule = (function () {
             ) : null}
             {sc && ver === "b3" ? <div className="sw-story">{(sc.beats3 || []).map((b, j) => <div key={j}><span>{b.t}　{b.beat}</span><span>{b.line}{refs(b.facts)}{aud(b)}</span></div>)}</div> : null}
             {(!sc && !st) || ver === "bone" ? <div className="sw-story">{story.map(([a, b], j) => b ? <div key={j}><span>{a}</span><span>{b}</span></div> : null)}</div> : null}
-            {st && (ver === "st60" || ver === "st3") ? <p className="sw-sm" style={{ margin: "8px 0 0" }}>その時版は、冒頭で「その瞬間」に立ち会い、背景 → 迫られた選択 → 山場 → 動いたもの の順に進みます。事実にない場面・心情は描かず、分からないことは問いにしています。</p> : null}
-            {(sc || st) && ver !== "bone" ? <p className="sw-sm" style={{ margin: "8px 0 0" }}>番号は、その行が頼る事実（「事実と出典」の番号）。<span className="sw-fref">1</span> 原文で未確認　<span className="sw-fref ok">1</span> 確認済み。未確認の番号が残る行は、そのまま公開しないでください。</p> : null}
+            {st && (ver === "st60" || ver === "st3") ? <p className="sw-sm" style={{ margin: "8px 0 0" }}>{tx("その時版は、冒頭で「その瞬間」に立ち会い、背景 → 迫られた選択 → 山場 → 動いたもの の順に進みます。事実にない場面・心情は描かず、分からないことは問いにしています。", "The moment version opens at the moment itself, then goes background → the choice → climax → what changed. It doesn't invent scenes or feelings beyond the facts; unknowns are posed as questions.")}</p> : null}
+            {(sc || st) && ver !== "bone" ? <p className="sw-sm" style={{ margin: "8px 0 0" }}>{UI_EN
+              ? <>Numbers show the facts each line relies on (numbered as in "Facts & sources"). <span className="sw-fref">1</span> not yet checked  <span className="sw-fref ok">1</span> checked. Don't publish lines that still carry unchecked numbers.</>
+              : <>番号は、その行が頼る事実（「事実と出典」の番号）。<span className="sw-fref">1</span> 原文で未確認　<span className="sw-fref ok">1</span> 確認済み。未確認の番号が残る行は、そのまま公開しないでください。</>}</p> : null}
           </Fold>
           {e.aud ? (
-            <Fold id="ep:aud" n={++k} title="層別の作り方（ライト層・コア層）" meta={`ライト★${e.aud.l_fit}・コア★${e.aud.c_fit}`}>
-              <div style={{ marginBottom: 10 }}><Seg value={lyr} onChange={setLyr} options={[["l", "ライト層向け（入口）"], ["c", "コア層向け（深掘り）"]]} /></div>
+            <Fold id="ep:aud" n={++k} title={tx("層別の作り方（ライト層・コア層）", "Versions by audience (casual · core)")} meta={tx(`ライト★${e.aud.l_fit}・コア★${e.aud.c_fit}`, `Casual ★${e.aud.l_fit} · core ★${e.aud.c_fit}`)}>
+              <div style={{ marginBottom: 10 }}><Seg value={lyr} onChange={setLyr} options={[["l", tx("ライト層向け（入口）", "For casual viewers (entry)")], ["c", tx("コア層向け（深掘り）", "For core fans (deep dive)")]]} /></div>
               {lyr === "l" ? (
                 <>
                   <div className="sw-bighook">{e.aud.l_hook}</div>
-                  <p className="sw-one">持ち帰る一言：{e.aud.l_one}</p>
-                  <div className="sw-sub-h">15〜30秒ショート</div>
+                  <p className="sw-one">{tx("持ち帰る一言：", "Takeaway: ")}{e.aud.l_one}</p>
+                  <div className="sw-sub-h">{tx("15〜30秒ショート", "15–30 s short")}</div>
                   <div className="sw-script">{(e.aud.l_short || []).map((l, j) => <div key={j}><span className="sw-script-t">{j + 1}</span><span>{l.line}{refs(l.facts)}{aud(l)}</span></div>)}</div>
-                  <div className="sw-sub-h">カルーセル（5枚）</div>
-                  <div className="sw-slides">{(e.aud.l_carousel || []).map((x, j) => <div key={j} className="sw-slide"><small>{j + 1}枚目</small><b>{x.h}</b><span>{x.b}{refs(x.facts)}</span></div>)}</div>
-                  {(e.aud.l_words || []).length ? <><div className="sw-sub-h">言葉のやさしい言い換え</div>{e.aud.l_words.map((w, j) => <div key={j} className="sw-sm" style={{ color: "var(--ink2)" }}>・<b>{w.term}</b>：{w.plain}</div>)}</> : null}
+                  <div className="sw-sub-h">{tx("カルーセル（5枚）", "Carousel (5 slides)")}</div>
+                  <div className="sw-slides">{(e.aud.l_carousel || []).map((x, j) => <div key={j} className="sw-slide"><small>{tx(`${j + 1}枚目`, `Slide ${j + 1}`)}</small><b>{x.h}</b><span>{x.b}{refs(x.facts)}</span></div>)}</div>
+                  {(e.aud.l_words || []).length ? <><div className="sw-sub-h">{tx("言葉のやさしい言い換え", "Plain-language rewordings")}</div>{e.aud.l_words.map((w, j) => <div key={j} className="sw-sm" style={{ color: "var(--ink2)" }}>・<b>{w.term}</b>：{w.plain}</div>)}</> : null}
                 </>
               ) : (
                 <>
-                  <div className="sw-note info" style={{ marginBottom: 10 }}><b>論点の問い　</b>{e.aud.c_q}</div>
-                  <div className="sw-sub-h">長尺の章立て（8〜12分）</div>
+                  <div className="sw-note info" style={{ marginBottom: 10 }}><b>{tx("論点の問い　", "Key question: ")}</b>{e.aud.c_q}</div>
+                  <div className="sw-sub-h">{tx("長尺の章立て（8〜12分）", "Long-form chapters (8–12 min)")}</div>
                   <div className="sw-outl">{(e.aud.c_outline || []).map((x, j) => <div key={j}><span className="sw-outl-t">{x.t}</span><div><b>{x.ch}</b>{refs(x.facts)}{aud(x)}<ul>{(x.pts || []).map((p, q) => <li key={q}>{p}</li>)}</ul></div></div>)}</div>
-                  <div className="sw-sub-h">画面に出す資料</div>
+                  <div className="sw-sub-h">{tx("画面に出す資料", "Documents to show on screen")}</div>
                   <div className="sw-chips">{(e.aud.c_sources || []).map((x) => <span key={x} className="sw-chip">{x}</span>)}</div>
-                  <div className="sw-sub-h">論点</div>
+                  <div className="sw-sub-h">{tx("論点", "Points of debate")}</div>
                   {(e.aud.c_debate || []).map((x, j) => <div key={j} className="sw-sm" style={{ color: "var(--ink2)" }}>・{x}</div>)}
-                  <div className="sw-sub-h">note 記事の見出し</div>
+                  <div className="sw-sub-h">{tx("note 記事の見出し", "note article headings")}</div>
                   {(e.aud.c_note || []).map((x, j) => <div key={j} style={{ fontSize: 14, fontWeight: 700 }}>{j + 1}. {x}</div>)}
                 </>
               )}
-              {e.aud.audit ? <div className="sw-note info" style={{ marginTop: 10 }}><b>層別パックの監査　</b>{e.aud.audit}</div> : null}
+              {e.aud.audit ? <div className="sw-note info" style={{ marginTop: 10 }}><b>{tx("層別パックの監査　", "Audience pack audit: ")}</b>{e.aud.audit}</div> : null}
             </Fold>
           ) : null}
           {sc ? (
-            <Fold id="ep:check" n={++k} title="公開前チェック" meta={`最優先で照合 ${(sc.check_first || []).length}件`} def={false}>
-              <div className="sw-sub-h">最優先で照合する事実</div>
+            <Fold id="ep:check" n={++k} title={tx("公開前チェック", "Pre-publish check")} meta={tx(`最優先で照合 ${(sc.check_first || []).length}件`, `${(sc.check_first || []).length} top-priority checks`)} def={false}>
+              <div className="sw-sub-h">{tx("最優先で照合する事実", "Facts to check first")}</div>
               <div className="sw-note warn">{(sc.check_first || []).map((n) => facts[n] ? <div key={n}>・{n + 1}. {facts[n].t}</div> : null)}</div>
-              <div className="sw-sub-h">確かめ先</div>
-              <div className="sw-note info">{(sc.verify_at || []).length ? sc.verify_at.map((nm) => { const src = SRC_BY_NAME[kind][nm]; return <div key={nm}>・{src && src.url ? <Ext url={src.url}>{nm}</Ext> : nm}{src ? `（${src.tier}）` : ""}</div>; }) : <div>情報源の一覧に合うものがありません。事実ごとの出典から当たってください。</div>}</div>
-              {sc.disclosure ? <><div className="sw-sub-h">概要欄の文案</div><div className="sw-fmtbox"><div style={{ fontSize: 14, whiteSpace: "pre-wrap" }}>{[].concat(sc.disclosure).join("\n")}</div>{kind === "wine" ? <div className="sw-sm" style={{ marginTop: 6, color: "#7A3E06" }}>＋ 酒類の注意表示を必ず添える（例：「20歳未満の飲酒は法律で禁止されています。」）。各SNSで年齢制限の設定も行う。</div> : null}</div></> : null}
+              <div className="sw-sub-h">{tx("確かめ先", "Where to check")}</div>
+              <div className="sw-note info">{(sc.verify_at || []).length ? sc.verify_at.map((nm) => { const src = SRC_BY_NAME[kind][nm]; return <div key={nm}>・{src && src.url ? <Ext url={src.url}>{nm}</Ext> : nm}{src ? `（${src.tier}）` : ""}</div>; }) : <div>{tx("情報源の一覧に合うものがありません。事実ごとの出典から当たってください。", "Nothing matches the source list; work from each fact's own source.")}</div>}</div>
+              {sc.disclosure ? <><div className="sw-sub-h">{tx("概要欄の文案", "Draft description")}</div><div className="sw-fmtbox"><div style={{ fontSize: 14, whiteSpace: "pre-wrap" }}>{[].concat(sc.disclosure).join("\n")}</div>{kind === "wine" ? <div className="sw-sm" style={{ marginTop: 6, color: "#7A3E06" }}>{tx("＋ 酒類の注意表示を必ず添える（例：「20歳未満の飲酒は法律で禁止されています。」）。各SNSで年齢制限の設定も行う。", "+ Always add the alcohol notice (e.g. 「20歳未満の飲酒は法律で禁止されています。」), and set age restrictions on each platform.")}</div> : null}</div></> : null}
             </Fold>
           ) : null}
-          <Fold id="ep:titles" n={++k} title="タイトル案と素材" meta={`タイトル ${(e.titles || []).length + ((st && st.titles) || []).length}・素材 ${(e.visuals || []).length}`} def={false}>
-            {st && (st.titles || []).length ? <><div className="sw-sub-h">その時型のタイトル案</div>{st.titles.map((x, j) => <div key={j} className="sw-fact" style={{ cursor: "default", gridTemplateColumns: "24px 1fr" }}><span className="sw-todo-n" style={{ width: 22, height: 22, fontSize: 11.5 }}>{j + 1}</span><span style={{ fontWeight: 700 }}>{x}</span></div>)}</> : null}
-            {st && (st.staging || []).length ? <><div className="sw-sub-h">演出メモ（台本ではありません）</div>{st.staging.map((x, j) => <div key={j} className="sw-sm" style={{ color: "var(--ink2)" }}>・{x}</div>)}</> : null}
-            {(e.titles || []).length ? <><div className="sw-sub-h">{st ? "解説型のタイトル案" : "タイトル案"}</div>{e.titles.map((x, j) => <div key={j} className="sw-fact" style={{ cursor: "default", gridTemplateColumns: "24px 1fr" }}><span className="sw-todo-n" style={{ width: 22, height: 22, fontSize: 11.5 }}>{j + 1}</span><span style={{ fontWeight: 700 }}>{x}</span></div>)}</> : null}
-            {(e.visuals || []).length ? <><div className="sw-sub-h">映像・画像の素材案</div>{e.visuals.map((v, j) => <div key={j} className="sw-tool"><span><b>{v.what}</b></span><span className="sw-sm" style={{ color: "var(--ink2)" }}>{v.source_hint}</span></div>)}</> : null}
+          <Fold id="ep:titles" n={++k} title={tx("タイトル案と素材", "Title ideas & visuals")} meta={tx(`タイトル ${(e.titles || []).length + ((st && st.titles) || []).length}・素材 ${(e.visuals || []).length}`, `Titles ${(e.titles || []).length + ((st && st.titles) || []).length} · visuals ${(e.visuals || []).length}`)} def={false}>
+            {st && (st.titles || []).length ? <><div className="sw-sub-h">{tx("その時型のタイトル案", "Moment-style title ideas")}</div>{st.titles.map((x, j) => <div key={j} className="sw-fact" style={{ cursor: "default", gridTemplateColumns: "24px 1fr" }}><span className="sw-todo-n" style={{ width: 22, height: 22, fontSize: 11.5 }}>{j + 1}</span><span style={{ fontWeight: 700 }}>{x}</span></div>)}</> : null}
+            {st && (st.staging || []).length ? <><div className="sw-sub-h">{tx("演出メモ（台本ではありません）", "Staging notes (not part of the script)")}</div>{st.staging.map((x, j) => <div key={j} className="sw-sm" style={{ color: "var(--ink2)" }}>・{x}</div>)}</> : null}
+            {(e.titles || []).length ? <><div className="sw-sub-h">{st ? tx("解説型のタイトル案", "Explainer title ideas") : tx("タイトル案", "Title ideas")}</div>{e.titles.map((x, j) => <div key={j} className="sw-fact" style={{ cursor: "default", gridTemplateColumns: "24px 1fr" }}><span className="sw-todo-n" style={{ width: 22, height: 22, fontSize: 11.5 }}>{j + 1}</span><span style={{ fontWeight: 700 }}>{x}</span></div>)}</> : null}
+            {(e.visuals || []).length ? <><div className="sw-sub-h">{tx("映像・画像の素材案", "Footage & image ideas")}</div>{e.visuals.map((v, j) => <div key={j} className="sw-tool"><span><b>{v.what}</b></span><span className="sw-sm" style={{ color: "var(--ink2)" }}>{v.source_hint}</span></div>)}</> : null}
           </Fold>
           {fmts.length ? (
-            <Fold id="ep:fmt" n={++k} title="発信の型と海外の手本" meta={fmts.map((f) => f.id).join("・")} def={false}>
+            <Fold id="ep:fmt" n={++k} title={tx("発信の型と海外の手本", "Formats & overseas models")} meta={fmts.map((f) => f.id).join(tx("・", " · "))} def={false}>
               {e.format_note ? <p className="sw-sm" style={{ margin: "0 0 8px" }}>{e.format_note}</p> : null}
               {fmts.map((f) => (
                 <div key={f.id} className="sw-fmtbox">
-                  <div><b>{f.id} {f.name}</b><span className="sw-sm">　{f.length}・{f.media}</span></div>
-                  {(f.cases || []).map((n) => { const c = CASE_BY_NAME[n]; return c ? <div key={n} className="sw-sm" style={{ marginTop: 4 }}><b style={{ color: "var(--ink2)" }}>{c.name}</b>：{c.lesson} <Ext url={c.url}>出典</Ext></div> : null; })}
-                  <div className="sw-sm" style={{ marginTop: 4, color: "#7A3E06" }}>AIで作るときは：{f.ai}</div>
+                  <div><b>{f.id} {lbl(f.name)}</b><span className="sw-sm">{tx(`　${f.length}・${f.media}`, `  ${f.length} · ${f.media}`)}</span></div>
+                  {(f.cases || []).map((n) => { const c = CASE_BY_NAME[n]; return c ? <div key={n} className="sw-sm" style={{ marginTop: 4 }}><b style={{ color: "var(--ink2)" }}>{c.name}</b>{tx("：", ": ")}{c.lesson} <Ext url={c.url}>{tx("出典", "Source")}</Ext></div> : null; })}
+                  <div className="sw-sm" style={{ marginTop: 4, color: "#7A3E06" }}>{tx("AIで作るときは：", "When making it with AI: ")}{f.ai}</div>
                 </div>
               ))}
             </Fold>
           ) : null}
           {s ? (
-            <Fold id="ep:score" n={++k} title="採点（仮）" meta={`話題性 ${s.appeal}・根拠 ${s.evidence}・作りやすさ ${s.ease}・注意 ${s.risk}`} def={false}>
+            <Fold id="ep:score" n={++k} title={tx("採点（仮）", "Scores (provisional)")} meta={tx(`話題性 ${s.appeal}・根拠 ${s.evidence}・作りやすさ ${s.ease}・注意 ${s.risk}`, `Interest ${s.appeal} · evidence ${s.evidence} · ease ${s.ease} · caution ${s.risk}`)} def={false}>
               <div className="sw-scores">
-                {AXES.map(([key, l]) => <div key={key}><span className="sw-sm">{l}</span><span className="sw-bar"><i style={{ width: `${(s[key] || 0) * 10}%`, background: key === "risk" ? "var(--warn)" : "var(--blue)" }} /></span><b>{s[key]}</b></div>)}
-                {s.why ? <p className="sw-sm" style={{ margin: "4px 0 0", gridColumn: "1/-1" }}>採点の理由（仮）：{s.why}</p> : null}
+                {AXES.map(([key, l, le]) => <div key={key}><span className="sw-sm">{tx(l, le)}</span><span className="sw-bar"><i style={{ width: `${(s[key] || 0) * 10}%`, background: key === "risk" ? "var(--warn)" : "var(--blue)" }} /></span><b>{s[key]}</b></div>)}
+                {s.why ? <p className="sw-sm" style={{ margin: "4px 0 0", gridColumn: "1/-1" }}>{tx("採点の理由（仮）：", "Reasoning (provisional): ")}{s.why}</p> : null}
               </div>
             </Fold>
           ) : null}
-          <Fold id="ep:log" n={++k} title="見直しと監査の記録" meta={`直した点 ${(e.review || []).length}件${sc && sc.audit_n ? `・台本 ${sc.audit_n}行` : ""}`} def={false}>
-            {(e.review || []).length ? <div className="sw-note ng"><b>見直しで直した点</b>{e.review.map((r, j) => <div key={j}>・{r}</div>)}</div> : <p className="sw-sm" style={{ margin: 0 }}>見直しで直した点はありません。</p>}
-            {sc && sc.audit ? <div className="sw-note info" style={{ marginTop: 10 }}><b>台本の監査　</b>{sc.audit}</div> : null}
-            {st && st.audit ? <div className="sw-note info" style={{ marginTop: 10 }}><b>その時版の監査　</b>{st.audit}</div> : null}
-            {st && (st.needs || []).length ? <div className="sw-note warn" style={{ marginTop: 10 }}><b>「その時」を強めるために調べたいこと</b>{st.needs.map((x, j) => <div key={j}>・{x}</div>)}</div> : null}
+          <Fold id="ep:log" n={++k} title={tx("見直しと監査の記録", "Review & audit log")} meta={tx(`直した点 ${(e.review || []).length}件${sc && sc.audit_n ? `・台本 ${sc.audit_n}行` : ""}`, `${(e.review || []).length} fixes${sc && sc.audit_n ? ` · ${sc.audit_n} script lines` : ""}`)} def={false}>
+            {(e.review || []).length ? <div className="sw-note ng"><b>{tx("見直しで直した点", "Fixed in review")}</b>{e.review.map((r, j) => <div key={j}>・{r}</div>)}</div> : <p className="sw-sm" style={{ margin: 0 }}>{tx("見直しで直した点はありません。", "No fixes from review.")}</p>}
+            {sc && sc.audit ? <div className="sw-note info" style={{ marginTop: 10 }}><b>{tx("台本の監査　", "Script audit: ")}</b>{sc.audit}</div> : null}
+            {st && st.audit ? <div className="sw-note info" style={{ marginTop: 10 }}><b>{tx("その時版の監査　", "Moment version audit: ")}</b>{st.audit}</div> : null}
+            {st && (st.needs || []).length ? <div className="sw-note warn" style={{ marginTop: 10 }}><b>{tx("「その時」を強めるために調べたいこと", "To research to strengthen the \"moment\"")}</b>{st.needs.map((x, j) => <div key={j}>・{x}</div>)}</div> : null}
           </Fold>
         </FoldSig.Provider>
       </article>
@@ -221169,11 +221315,11 @@ const SideWorkHubModule = (function () {
     const e = EPS.find((x) => x.id === id);
     if (!e) return null;
     const [, c] = KIND_INFO[e.kind];
-    return <button className="sw-epchip" style={{ "--c": c }} onClick={() => onOpen(e)} title={e.st ? e.st.headline : e.title}>{splitTitle(e.title)[0]}{e.aud ? <span style={{ fontWeight: 600, color: "var(--sub)" }}>　L{e.aud.l_fit}・C{e.aud.c_fit}</span> : null}</button>;
+    return <button className="sw-epchip" style={{ "--c": c }} onClick={() => onOpen(e)} title={e.st ? e.st.headline : e.title}>{splitTitle(e.title)[0]}{e.aud ? <span style={{ fontWeight: 600, color: "var(--sub)" }}>{tx(`　L${e.aud.l_fit}・C${e.aud.c_fit}`, `  L${e.aud.l_fit} · C${e.aud.c_fit}`)}</span> : null}</button>;
   }
   function PlanPage({ openEp, go }) {
     const [sig, setAll] = useFoldSig();
-    if (!PLAN) return <div><Head kick="02 企画する" title="発信プラン" lede="計画のデータがありません。" /></div>;
+    if (!PLAN) return <div><Head kick={tx("02 企画する", "02 PLAN")} title={tx("発信プラン", "Publishing plan")} lede={tx("計画のデータがありません。", "No plan data.")} /></div>;
     const P = PLAN;
     const arcT = Object.fromEntries(P.arcs.map((a) => [a.id, a]));
     const months = [];
@@ -221183,85 +221329,85 @@ const SideWorkHubModule = (function () {
     const nowM = new Date().toISOString().slice(0, 7);
     return (
       <div>
-        <Head kick="02 企画する" title="発信プラン" lede="誰に向けて、どの順番で、どの形で出すかの1年の計画です。層の定義・頻度・測る数字は仮説で、公開後の数字でフェーズごとに見直します。" />
-        <div className="sw-note info sw-sec"><b>骨組みは3つ　</b>①ライト層を短い動画とカルーセルで集め、コア層を長尺と note で深める。②1つの企画から6つの形を、いちばん詳しいコア版から作って切り出す。③物語の順番を決めたシリーズを、毎週ワイン1本・歴史1本ずつ進め、記念日には該当の回を差し込む。</div>
-        <div className="sw-epd-bar"><span className="sw-sm">見出しを押すと開閉できます</span><FoldAll onSet={setAll} /></div>
+        <Head kick={tx("02 企画する", "02 PLAN")} title={tx("発信プラン", "Publishing plan")} lede={tx("誰に向けて、どの順番で、どの形で出すかの1年の計画です。層の定義・頻度・測る数字は仮説で、公開後の数字でフェーズごとに見直します。", "A one-year plan for whom to reach, in what order and in which formats. Audience definitions, frequency and metrics are hypotheses, reviewed each phase against real numbers after launch.")} />
+        <div className="sw-note info sw-sec"><b>{tx("骨組みは3つ　", "Three pillars: ")}</b>{tx("①ライト層を短い動画とカルーセルで集め、コア層を長尺と note で深める。②1つの企画から6つの形を、いちばん詳しいコア版から作って切り出す。③物語の順番を決めたシリーズを、毎週ワイン1本・歴史1本ずつ進め、記念日には該当の回を差し込む。", "① Draw casual viewers with short videos and carousels, and deepen core fans with long-form and note. ② Make six formats from each episode, starting from the most detailed core version and cutting it down. ③ Run series in a set story order, one wine and one history episode a week, slotting in the matching episode on anniversaries.")}</div>
+        <div className="sw-epd-bar"><span className="sw-sm">{tx("見出しを押すと開閉できます", "Click a heading to open or close it")}</span><FoldAll onSet={setAll} /></div>
         <FoldSig.Provider value={sig}>
-          <Fold id="plan:who" n={1} title="狙う層" meta="ワイン・歴史 × ライト・コア">
+          <Fold id="plan:who" n={1} title={tx("狙う層", "Target audiences")} meta={tx("ワイン・歴史 × ライト・コア", "Wine · history × casual · core")}>
             <div className="sw-g sw-g2" style={{ marginBottom: 0 }}>
               {P.personas.map((p) => (
                 <div key={p.id} className="sw-persona" style={{ "--c": p.layer === "light" ? "#F59E0B" : "#4F46E5" }}>
-                  <h4><span className={"sw-lyr " + (p.layer === "light" ? "l" : "c")} style={{ marginRight: 8 }}>{p.layer === "light" ? "ライト" : "コア"}</span>{p.name}</h4>
+                  <h4><span className={"sw-lyr " + (p.layer === "light" ? "l" : "c")} style={{ marginRight: 8 }}>{p.layer === "light" ? tx("ライト", "Casual") : tx("コア", "Core")}</span>{p.name}</h4>
                   <div style={{ fontSize: 14 }}>{p.who}</div>
                   <dl className="sw-kv">
-                    <dt>求めるもの</dt><dd>{p.needs.join("／")}</dd>
-                    <dt>出す形</dt><dd>{p.formats.join("／")}</dd>
-                    <dt>語り口</dt><dd>{p.tone}</dd>
-                    <dt>避ける</dt><dd>{p.avoid.join("／")}</dd>
-                    <dt>確かめ方</dt><dd>{p.check}</dd>
+                    <dt>{tx("求めるもの", "Wants")}</dt><dd>{p.needs.join("／")}</dd>
+                    <dt>{tx("出す形", "Formats")}</dt><dd>{p.formats.join("／")}</dd>
+                    <dt>{tx("語り口", "Tone")}</dt><dd>{p.tone}</dd>
+                    <dt>{tx("避ける", "Avoid")}</dt><dd>{p.avoid.join("／")}</dd>
+                    <dt>{tx("確かめ方", "How to check")}</dt><dd>{p.check}</dd>
                   </dl>
                 </div>
               ))}
             </div>
           </Fold>
-          <Fold id="plan:produce" n={2} title="1つの企画から6つの形を作る順番" meta="深い方から浅い方へ">
+          <Fold id="plan:produce" n={2} title={tx("1つの企画から6つの形を作る順番", "Order for making six formats from one episode")} meta={tx("深い方から浅い方へ", "From deepest to lightest")}>
             {P.produce.map(([t, dsc, l], i) => <div key={i} className="sw-todo" style={{ gridTemplateColumns: "minmax(0,1fr) auto" }}><div><b style={{ fontSize: 14.5 }}>{t}</b><div className="sw-sm">{dsc}</div></div><span className="sw-chip">{l}</span></div>)}
           </Fold>
-          <Fold id="plan:funnel" n={3} title="公開の流れと頻度" meta="入口 → 橋渡し → 深掘り → 関係">
-            <div className="sw-funnel">{P.funnel.map((f, i) => <div key={i}><span className="sw-sm" style={{ fontWeight: 800 }}>{i + 1}. {f.layer}</span><b>{f.stage}</b><div style={{ fontSize: 13.5, margin: "4px 0" }}>{f.what}</div><div className="sw-sm">ねらい：{f.aim}</div><div className="sw-sm">測る：{f.measure}</div></div>)}</div>
+          <Fold id="plan:funnel" n={3} title={tx("公開の流れと頻度", "Publishing flow & frequency")} meta={tx("入口 → 橋渡し → 深掘り → 関係", "Entry → bridge → deep dive → relationship")}>
+            <div className="sw-funnel">{P.funnel.map((f, i) => <div key={i}><span className="sw-sm" style={{ fontWeight: 800 }}>{i + 1}. {lbl(f.layer)}</span><b>{f.stage}</b><div style={{ fontSize: 13.5, margin: "4px 0" }}>{f.what}</div><div className="sw-sm">{tx("ねらい：", "Aim: ")}{f.aim}</div><div className="sw-sm">{tx("測る：", "Measure: ")}{f.measure}</div></div>)}</div>
           </Fold>
-          <Fold id="plan:phase" n={4} title="進め方（フェーズ0〜4）" meta={`${P.phases[0].from.slice(0, 7)}〜${P.phases[P.phases.length - 1].to.slice(0, 7)}`}>
+          <Fold id="plan:phase" n={4} title={tx("進め方（フェーズ0〜4）", "Roadmap (phases 0–4)")} meta={`${P.phases[0].from.slice(0, 7)}${tx("〜", "–")}${P.phases[P.phases.length - 1].to.slice(0, 7)}`}>
             {P.phases.map((p) => (
               <div key={p.n} className="sw-ph">
-                <h4>フェーズ{p.n}　{p.name}<span className="sw-sm" style={{ marginLeft: 8, fontWeight: 600 }}>{p.from}〜{p.to}</span></h4>
-                <div style={{ fontSize: 14 }}>ねらい：{p.goal}</div>
+                <h4>{tx(`フェーズ${p.n}　${p.name}`, `Phase ${p.n}: ${p.name}`)}<span className="sw-sm" style={{ marginLeft: 8, fontWeight: 600 }}>{p.from}{tx("〜", "–")}{p.to}</span></h4>
+                <div style={{ fontSize: 14 }}>{tx("ねらい：", "Aim: ")}{p.goal}</div>
                 <ul>{p.do.map((x, i) => <li key={i}>{x}</li>)}</ul>
-                <div className="sw-sm"><b style={{ color: "var(--ink2)" }}>次へ進む目安</b>　{p.next}</div>
+                <div className="sw-sm"><b style={{ color: "var(--ink2)" }}>{tx("次へ進む目安", "When to move on")}</b>{tx("　", " ")}{p.next}</div>
               </div>
             ))}
           </Fold>
-          <Fold id="plan:arcs" n={5} title="シリーズの物語（並べる順番と理由）" meta={`${P.arcs.length}シリーズ・${P.arcs.reduce((a, x) => a + x.eps.length, 0)}本`}>
+          <Fold id="plan:arcs" n={5} title={tx("シリーズの物語（並べる順番と理由）", "Series storylines (order and why)")} meta={tx(`${P.arcs.length}シリーズ・${P.arcs.reduce((a, x) => a + x.eps.length, 0)}本`, `${P.arcs.length} series · ${P.arcs.reduce((a, x) => a + x.eps.length, 0)} episodes`)}>
             {["wine", "history"].map((kd) => (
               <div key={kd}>
-                <div className="sw-sub-h">{kd === "wine" ? "ワイン" : "歴史"}</div>
+                <div className="sw-sub-h">{kd === "wine" ? tx("ワイン", "Wine") : tx("歴史", "History")}</div>
                 {P.arcs.filter((a) => a.kind === kd).map((a) => (
                   <div key={a.id} className="sw-arc" style={{ "--c": KC[kd] }}>
-                    <b style={{ fontSize: 15.5 }}>{a.title}</b><span className="sw-sm">　{a.eps.length}本</span>
+                    <b style={{ fontSize: 15.5 }}>{a.title}</b><span className="sw-sm">{tx(`　${a.eps.length}本`, `  ${a.eps.length} episodes`)}</span>
                     <div className="sw-sm" style={{ color: "var(--ink2)", marginTop: 2 }}>{a.story}</div>
                     <div className="sw-arc-eps">{a.eps.map((id, i) => <React.Fragment key={id}>{i ? <i>→</i> : null}<EpLink id={id} onOpen={openEp} /></React.Fragment>)}</div>
                   </div>
                 ))}
               </div>
             ))}
-            <div className="sw-sub-h">ワイン×歴史の交差回</div>
+            <div className="sw-sub-h">{tx("ワイン×歴史の交差回", "Wine × history crossover episodes")}</div>
             {P.cross.map(([a, b, t], i) => <div key={i} className="sw-sm" style={{ color: "var(--ink2)", margin: "4px 0" }}>・{t}　<EpLink id={a} onOpen={openEp} /><EpLink id={b} onOpen={openEp} /></div>)}
           </Fold>
-          <Fold id="plan:weeks" n={6} title="週ごとの公開表" meta={`${P.weeks.length}週・特集はワイン1本＋歴史1本／週`} def={false}>
-            {M1 && go ? <div className="sw-note info" style={{ margin: "0 0 10px", display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}><span><b>第1〜{M1.weeks.length}週は台本があります　</b>ナレーション・画面の文字・映像・概要欄・公開前チェックまで</span><button className="sw-btn" onClick={() => go("m1")}>台本を開く</button></div> : null}
-            <p className="sw-sm" style={{ margin: "0 0 8px" }}>各週の特集企画から、ショート（15〜30秒と60秒）・カルーセル・3分版を作ります。長尺と note は、ワインと歴史を週ごとに入れ替えます（長尺はフェーズ1の第4週から、note はフェーズ2から）。記念日の欄は、その週に記念日がある企画で、ショートを1本差し込みます。</p>
+          <Fold id="plan:weeks" n={6} title={tx("週ごとの公開表", "Weekly schedule")} meta={tx(`${P.weeks.length}週・特集はワイン1本＋歴史1本／週`, `${P.weeks.length} weeks · features: 1 wine + 1 history a week`)} def={false}>
+            {M1 && go ? <div className="sw-note info" style={{ margin: "0 0 10px", display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}><span><b>{tx(`第1〜${M1.weeks.length}週は台本があります　`, `Weeks 1–${M1.weeks.length} have scripts: `)}</b>{tx("ナレーション・画面の文字・映像・概要欄・公開前チェックまで", "narration, on-screen text, footage, description and pre-publish checks")}</span><button className="sw-btn" onClick={() => go("m1")}>{tx("台本を開く", "Open scripts")}</button></div> : null}
+            <p className="sw-sm" style={{ margin: "0 0 8px" }}>{tx("各週の特集企画から、ショート（15〜30秒と60秒）・カルーセル・3分版を作ります。長尺と note は、ワインと歴史を週ごとに入れ替えます（長尺はフェーズ1の第4週から、note はフェーズ2から）。記念日の欄は、その週に記念日がある企画で、ショートを1本差し込みます。", "From each week's featured episodes, make shorts (15–30 s and 60 s), a carousel and a 3-minute version. Long-form and note alternate between wine and history each week (long-form from week 4 of phase 1, note from phase 2). The anniversary column adds one short for an episode whose anniversary falls that week.")}</p>
             {months.map(([m, ws], mi) => (
-              <Fold key={m} id={"plan:m:" + m} title={`${Number(m.slice(0, 4))}年${Number(m.slice(5, 7))}月`} meta={`${ws.length}週・フェーズ${[...new Set(ws.map((w) => w.phase))].join("・")}`} def={m === nowM || (mi === 0 && !months.some(([x]) => x === nowM))}>
+              <Fold key={m} id={"plan:m:" + m} title={tx(`${Number(m.slice(0, 4))}年${Number(m.slice(5, 7))}月`, `${MONTH_EN[Number(m.slice(5, 7)) - 1]} ${Number(m.slice(0, 4))}`)} meta={tx(`${ws.length}週・フェーズ${[...new Set(ws.map((w) => w.phase))].join("・")}`, `${ws.length} weeks · phase ${[...new Set(ws.map((w) => w.phase))].join(", ")}`)} def={m === nowM || (mi === 0 && !months.some(([x]) => x === nowM))}>
                 {ws.map((w) => (
                   <div key={w.n} className="sw-wk">
-                    <div><div style={{ fontWeight: 800 }}>第{w.n}週</div><div className="sw-wk-h">{md(w.start)}〜・フェーズ{w.phase}</div></div>
-                    <div><div className="sw-wk-h">歴史の特集{w.history ? `（${arcT[w.history.arc].title}）` : ""}</div>{w.history ? <EpLink id={w.history.ep} onOpen={openEp} /> : "—"}</div>
-                    <div><div className="sw-wk-h">ワインの特集{w.wine ? `（${arcT[w.wine.arc].title}）` : ""}</div>{w.wine ? <EpLink id={w.wine.ep} onOpen={openEp} /> : "—"}</div>
+                    <div><div style={{ fontWeight: 800 }}>{tx(`第${w.n}週`, `Week ${w.n}`)}</div><div className="sw-wk-h">{tx(`${md(w.start)}〜・フェーズ${w.phase}`, `From ${md(w.start)} · phase ${w.phase}`)}</div></div>
+                    <div><div className="sw-wk-h">{tx("歴史の特集", "History feature")}{w.history ? tx(`（${arcT[w.history.arc].title}）`, ` (${arcT[w.history.arc].title})`) : ""}</div>{w.history ? <EpLink id={w.history.ep} onOpen={openEp} /> : "—"}</div>
+                    <div><div className="sw-wk-h">{tx("ワインの特集", "Wine feature")}{w.wine ? tx(`（${arcT[w.wine.arc].title}）`, ` (${arcT[w.wine.arc].title})`) : ""}</div>{w.wine ? <EpLink id={w.wine.ep} onOpen={openEp} /> : "—"}</div>
                     <div>
-                      <div className="sw-wk-h">長尺：{w.long ? "" : "—"}{w.long ? <EpLink id={w.long} onOpen={openEp} /> : null}</div>
-                      <div className="sw-wk-h">note：{w.note ? "" : "—"}{w.note ? <EpLink id={w.note} onOpen={openEp} /> : null}</div>
-                      {w.anniv.length ? <div className="sw-wk-h">記念日：{w.anniv.map((a) => <span key={a.ep} style={{ display: "inline-block" }}>{md(a.date)} <EpLink id={a.ep} onOpen={openEp} /></span>)}</div> : null}
+                      <div className="sw-wk-h">{tx("長尺：", "Long-form: ")}{w.long ? "" : "—"}{w.long ? <EpLink id={w.long} onOpen={openEp} /> : null}</div>
+                      <div className="sw-wk-h">{tx("note：", "note: ")}{w.note ? "" : "—"}{w.note ? <EpLink id={w.note} onOpen={openEp} /> : null}</div>
+                      {w.anniv.length ? <div className="sw-wk-h">{tx("記念日：", "Anniversaries: ")}{w.anniv.map((a) => <span key={a.ep} style={{ display: "inline-block" }}>{md(a.date)} <EpLink id={a.ep} onOpen={openEp} /></span>)}</div> : null}
                     </div>
                   </div>
                 ))}
               </Fold>
             ))}
-            {(P.rest || []).length ? <p className="sw-sm" style={{ margin: "8px 0 0" }}>シリーズに入れていない{P.rest.length}本は、記念日の回や、反応を見て足す控えとして使います。</p> : null}
+            {(P.rest || []).length ? <p className="sw-sm" style={{ margin: "8px 0 0" }}>{tx(`シリーズに入れていない${P.rest.length}本は、記念日の回や、反応を見て足す控えとして使います。`, `The ${P.rest.length} episodes outside any series are kept in reserve for anniversaries or to add based on audience response.`)}</p> : null}
           </Fold>
-          <Fold id="plan:weekly" n={7} title="1週間の作業の流れ" def={false}>
-            {P.weekly.map(([d, t], i) => <div key={i} className="sw-todo" style={{ gridTemplateColumns: "52px 1fr" }}><span className="sw-todo-n" style={{ width: 44 }}>{d}</span><span style={{ fontSize: 14 }}>{t}</span></div>)}
+          <Fold id="plan:weekly" n={7} title={tx("1週間の作業の流れ", "Weekly workflow")} def={false}>
+            {P.weekly.map(([d, t], i) => <div key={i} className="sw-todo" style={{ gridTemplateColumns: "52px 1fr" }}><span className="sw-todo-n" style={{ width: 44 }}>{dowL(d)}</span><span style={{ fontSize: 14 }}>{t}</span></div>)}
           </Fold>
-          <Fold id="plan:measure" n={8} title="測り方と見直しのルール" def={false}>
-            {P.measure.map(([l, m, r], i) => <div key={i} className="sw-rule"><b>{l}</b><div className="sw-sm" style={{ color: "var(--ink2)" }}>測る：{m}</div><div className="sw-sm">見直し：{r}</div></div>)}
+          <Fold id="plan:measure" n={8} title={tx("測り方と見直しのルール", "Metrics & review rules")} def={false}>
+            {P.measure.map(([l, m, r], i) => <div key={i} className="sw-rule"><b>{l}</b><div className="sw-sm" style={{ color: "var(--ink2)" }}>{tx("測る：", "Measure: ")}{m}</div><div className="sw-sm">{tx("見直し：", "Review: ")}{r}</div></div>)}
           </Fold>
         </FoldSig.Provider>
         <p className="sw-sm" style={{ marginTop: 10 }}>{P.note}</p>
@@ -221275,7 +221421,7 @@ const SideWorkHubModule = (function () {
   function M1Copy({ text }) {
     const [ok, setOk] = useState(false);
     const go = () => { try { navigator.clipboard.writeText(text).then(() => { setOk(true); setTimeout(() => setOk(false), 1500); }, () => {}); } catch (e) {} };
-    return <button type="button" className="sw-btn" onClick={go}>{ok ? "コピーしました" : "コピー"}</button>;
+    return <button type="button" className="sw-btn" onClick={go}>{ok ? tx("コピーしました", "Copied") : tx("コピー", "Copy")}</button>;
   }
   function M1Piece({ p, openEp }) {
     const e = EPS.find((x) => x.id === p.ep);
@@ -221287,15 +221433,15 @@ const SideWorkHubModule = (function () {
     return (
       <div style={{ "--k": kc }}>
         <dl className="sw-kv" style={{ marginBottom: 10 }}>
-          <dt>題材</dt><dd><EpLink id={p.ep} onOpen={openEp} /></dd>
-          <dt>媒体</dt><dd>{p.platform}</dd>
-          <dt>長さ</dt><dd>{p.len}{p.form === "s3" || p.form === "long" ? "（5字/秒＋間で計算した目安）" : ""}</dd>
+          <dt>{tx("題材", "Topic")}</dt><dd><EpLink id={p.ep} onOpen={openEp} /></dd>
+          <dt>{tx("媒体", "Platform")}</dt><dd>{p.platform}</dd>
+          <dt>{tx("長さ", "Length")}</dt><dd>{p.len}{p.form === "s3" || p.form === "long" ? tx("（5字/秒＋間で計算した目安）", " (estimated at 5 chars/s plus pauses)") : ""}</dd>
         </dl>
         {p.form === "car" ? (
           <div className="sw-slides">{p.rows.map((r, i) => <div key={i} className="sw-slide"><small>{r.t}</small><b>{r.h}</b><span>{r.line}{refs(r.facts)}</span></div>)}</div>
         ) : (
           <div className="sw-m1-rows">
-            <div className="hd"><span>時間</span><span>ナレーション（数字は根拠の事実番号）</span><span>画面の文字</span><span>映像</span></div>
+            <div className="hd"><span>{tx("時間", "Time")}</span><span>{tx("ナレーション（数字は根拠の事実番号）", "Narration (numbers = supporting facts)")}</span><span>{tx("画面の文字", "On-screen text")}</span><span>{tx("映像", "Footage")}</span></div>
             {p.rows.map((r, i) => {
               const head = lab && r[lab] !== prev ? (prev = r[lab]) : null;
               return (
@@ -221305,14 +221451,14 @@ const SideWorkHubModule = (function () {
                     <span className="sw-m1-t">{r.t}</span>
                     <span>{r.line}{refs(r.facts)}</span>
                     <span>{r.telop ? <span className="sw-m1-tel">{r.telop}</span> : null}</span>
-                    <span className="sw-m1-vis">{r.visual}{r.hold ? <i>（間{r.hold}秒）</i> : null}</span>
+                    <span className="sw-m1-vis">{r.visual}{r.hold ? <i>{tx(`（間${r.hold}秒）`, ` (pause ${r.hold} s)`)}</i> : null}</span>
                   </div>
                 </React.Fragment>
               );
             })}
           </div>
         )}
-        <div className="sw-sub-h" style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 14 }}>{p.form === "car" ? "キャプション" : "概要欄・キャプション"}<M1Copy text={p.caption} /></div>
+        <div className="sw-sub-h" style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 14 }}>{p.form === "car" ? tx("キャプション", "Caption") : tx("概要欄・キャプション", "Description & caption")}<M1Copy text={p.caption} /></div>
         <pre className="sw-m1-cap">{p.caption}</pre>
       </div>
     );
@@ -221322,7 +221468,7 @@ const SideWorkHubModule = (function () {
     const [wn, setWn] = useState(() => { const t = new Date().toISOString().slice(0, 10); const w = M1 ? M1.weeks.find((x) => t >= x.start && t <= x.end) : null; return w ? w.n : 1; });
     const [done, setDone] = useState(() => load(M1_KEY));
     const flip = (k) => { const d = { ...done }; if (d[k]) delete d[k]; else d[k] = 1; setDone(d); save(M1_KEY, d); };
-    if (!M1) return <div><Head kick="03 作る" title="第1か月の台本" lede="台本のデータがありません。" /></div>;
+    if (!M1) return <div><Head kick={tx("03 作る", "03 MAKE")} title={tx("第1か月の台本", "Month 1 scripts")} lede={tx("台本のデータがありません。", "No script data.")} /></div>;
     const w = M1.weeks.find((x) => x.n === wn) || M1.weeks[0];
     const md = (iso) => `${Number(iso.slice(5, 7))}/${Number(iso.slice(8, 10))}`;
     const epT = (id) => { const e = EPS.find((x) => x.id === id); return e ? splitTitle(e.title)[0] : id; };
@@ -221331,57 +221477,57 @@ const SideWorkHubModule = (function () {
     const nChkDone = Object.entries(w.checks).reduce((a, [id, c]) => a + c.facts.filter((f) => f.verified || done[`chk:${id}:${f.n}`]).length + (c.audit || []).filter((x, j) => ((c.audit_v || [])[j] || {}).verdict === "一致" || done[`aud:${id}:${j}`]).length, 0);
     return (
       <div>
-        <Head kick="03 作る" title="第1か月の台本" lede={`発信プランの第1〜${M1.weeks.length}週（${md(M1.weeks[0].start)}〜${md(M1.weeks[M1.weeks.length - 1].end)}）に出す台本です。ナレーション・画面の文字・映像・概要欄まで、そのまま収録に使える形にしてあります。`} />
-        {M1.draft ? <div className="sw-note ng sw-sec"><b>下書きです　</b>監査前の台本です。公開に使わないでください。</div> : null}
-        <div className="sw-note warn sw-sec"><b>公開の前に必ず　</b>台本の事実は、出典を検索結果や解説で確かめた段階で、原文での確認はまだです。各週の「公開前チェック」の事実を原文で確かめ、違っていたら台本を直してから出してください。{M1.how.map((h, i) => <div key={i} className="sw-sm" style={{ marginTop: 4, color: "inherit" }}>・{h}</div>)}</div>
+        <Head kick={tx("03 作る", "03 MAKE")} title={tx("第1か月の台本", "Month 1 scripts")} lede={tx(`発信プランの第1〜${M1.weeks.length}週（${md(M1.weeks[0].start)}〜${md(M1.weeks[M1.weeks.length - 1].end)}）に出す台本です。ナレーション・画面の文字・映像・概要欄まで、そのまま収録に使える形にしてあります。`, `Scripts for weeks 1–${M1.weeks.length} of the publishing plan (${md(M1.weeks[0].start)}–${md(M1.weeks[M1.weeks.length - 1].end)}). Narration, on-screen text, footage and descriptions are ready to record as they are.`)} />
+        {M1.draft ? <div className="sw-note ng sw-sec"><b>{tx("下書きです　", "Draft: ")}</b>{tx("監査前の台本です。公開に使わないでください。", "These scripts haven't been audited yet. Don't publish them.")}</div> : null}
+        <div className="sw-note warn sw-sec"><b>{tx("公開の前に必ず　", "Before publishing: ")}</b>{tx("台本の事実は、出典を検索結果や解説で確かめた段階で、原文での確認はまだです。各週の「公開前チェック」の事実を原文で確かめ、違っていたら台本を直してから出してください。", "Script facts have been checked only against search results and commentary, not the originals. Check each week's \"Pre-publish check\" facts against the originals, and fix the script before posting if anything differs.")}{M1.how.map((h, i) => <div key={i} className="sw-sm" style={{ marginTop: 4, color: "inherit" }}>・{h}</div>)}</div>
         <div className="sw-tbar">
-          <Seg value={wn} onChange={setWn} options={M1.weeks.map((x) => [x.n, `第${x.n}週 ${md(x.start)}〜`])} />
+          <Seg value={wn} onChange={setWn} options={M1.weeks.map((x) => [x.n, tx(`第${x.n}週 ${md(x.start)}〜`, `Week ${x.n} from ${md(x.start)}`)])} />
           <FoldAll onSet={setAll} />
         </div>
         <div className="sw-m1-sum">
-          <div><div className="sw-wk-h">ワインの特集</div><EpLink id={w.wine} onOpen={openEp} /></div>
-          <div><div className="sw-wk-h">歴史の特集</div><EpLink id={w.history} onOpen={openEp} /></div>
-          <div><div className="sw-wk-h">進み具合</div><b>作った {nDone}/{w.pieces.length}本</b>　<span className="sw-sm">事実の確認 {nChkDone}/{nChk}</span>{w.long ? <div className="sw-wk-h" style={{ marginTop: 4 }}>長尺：<EpLink id={w.long} onOpen={openEp} /></div> : null}</div>
+          <div><div className="sw-wk-h">{tx("ワインの特集", "Wine feature")}</div><EpLink id={w.wine} onOpen={openEp} /></div>
+          <div><div className="sw-wk-h">{tx("歴史の特集", "History feature")}</div><EpLink id={w.history} onOpen={openEp} /></div>
+          <div><div className="sw-wk-h">{tx("進み具合", "Progress")}</div><b>{tx(`作った ${nDone}/${w.pieces.length}本`, `Made ${nDone}/${w.pieces.length}`)}</b>{tx("　", "  ")}<span className="sw-sm">{tx(`事実の確認 ${nChkDone}/${nChk}`, `Facts checked ${nChkDone}/${nChk}`)}</span>{w.long ? <div className="sw-wk-h" style={{ marginTop: 4 }}>{tx("長尺：", "Long-form: ")}<EpLink id={w.long} onOpen={openEp} /></div> : null}</div>
         </div>
         {w.note.map((n, i) => <div key={i} className="sw-note info" style={{ marginBottom: 10 }}>{n}</div>)}
         <FoldSig.Provider value={sig}>
-          <Fold id={`m1:${w.n}:sched`} n={1} title="公開の予定" meta={`${w.pieces.length}本・チェックは「作った」印`}>
+          <Fold id={`m1:${w.n}:sched`} n={1} title={tx("公開の予定", "Publishing schedule")} meta={tx(`${w.pieces.length}本・チェックは「作った」印`, `${w.pieces.length} pieces · tick = made`)}>
             <div className="sw-m1-sched">
               {w.pieces.map((p) => (
                 <div key={p.key} className={done[p.key] ? "o" : ""}>
-                  <span className="d">{md(p.date)}（{p.dow}）</span>
-                  <span className="f" style={{ "--k": KIND_INFO[p.kind][1], "--k-soft": KIND_INFO[p.kind][3] }}><span className="sw-m1-form">{p.form_label}{p.main ? "" : "・任意"}</span></span>
+                  <span className="d">{tx(`${md(p.date)}（${p.dow}）`, `${dowL(p.dow)} ${md(p.date)}`)}</span>
+                  <span className="f" style={{ "--k": KIND_INFO[p.kind][1], "--k-soft": KIND_INFO[p.kind][3] }}><span className="sw-m1-form">{lbl(p.form_label)}{p.main ? "" : tx("・任意", " · optional")}</span></span>
                   <span className="tt">{epT(p.ep)}</span>
-                  <input type="checkbox" checked={!!done[p.key]} onChange={() => flip(p.key)} aria-label={`${md(p.date)} ${p.form_label} を作った`} />
+                  <input type="checkbox" checked={!!done[p.key]} onChange={() => flip(p.key)} aria-label={tx(`${md(p.date)} ${p.form_label} を作った`, `Made: ${lbl(p.form_label)} for ${md(p.date)}`)} />
                 </div>
               ))}
             </div>
           </Fold>
           {w.pieces.map((p, i) => (
             <Fold key={p.key} id={`m1:${p.key}`} n={i + 2} tone={p.kind === "wine" ? "wine" : "hist"} def={false}
-              title={`${md(p.date)}（${p.dow}）${p.form_label}${p.main ? "" : "（任意）"}：${p.title}`} meta={`${p.len}${done[p.key] ? "・作った" : ""}`}>
+              title={tx(`${md(p.date)}（${p.dow}）${p.form_label}${p.main ? "" : "（任意）"}：${p.title}`, `${dowL(p.dow)} ${md(p.date)} ${lbl(p.form_label)}${p.main ? "" : " (optional)"}: ${p.title}`)} meta={`${p.len}${done[p.key] ? tx("・作った", " · made") : ""}`}>
               <M1Piece p={p} openEp={openEp} />
             </Fold>
           ))}
-          <Fold id={`m1:${w.n}:chk`} n={w.pieces.length + 2} title="公開前チェック（原文で確かめる事実）" meta={`${nChkDone}/${nChk}件`} def={false}>
+          <Fold id={`m1:${w.n}:chk`} n={w.pieces.length + 2} title={tx("公開前チェック（原文で確かめる事実）", "Pre-publish check (facts to confirm in the originals)")} meta={tx(`${nChkDone}/${nChk}件`, `${nChkDone}/${nChk}`)} def={false}>
             {Object.entries(w.checks).map(([id, c]) => (
               <div key={id} style={{ marginBottom: 14 }}>
                 <div className="sw-sub-h"><EpLink id={id} onOpen={openEp} /></div>
                 {c.facts.map((f) => (
                   <label key={f.n} className="sw-m1-chk">
                     <input type="checkbox" checked={!!(f.verified || done[`chk:${id}:${f.n}`])} disabled={!!f.verified} onChange={() => flip(`chk:${id}:${f.n}`)} />
-                    <span><b>事実{f.n + 1}</b>（{f.tier}）{f.t}<div className="sw-sm">{f.src}{f.url ? <>　<Ext url={f.url}>出典を開く</Ext></> : null}{f.v_url && f.v_url !== f.url ? <>　<Ext url={f.v_url}>照合したページ</Ext></> : null}</div>{f.verdict ? <VTag v={{ verdict: f.verdict, note: f.v_note }} /> : null}{f.verified ? null : f.why.map((x, j) => <span key={j} className="sw-m1-why">{x}</span>)}{f.v_note ? <div className="sw-sm" style={{ color: "var(--ink2)" }}>{f.v_note}</div> : null}{f.v_quote ? <div className="sw-vq">原文：{f.v_quote}</div> : null}{f.t_old ? <div className="sw-sm">原文に合わせて直した。直す前：{f.t_old}</div> : null}</span>
+                    <span><b>{tx(`事実${f.n + 1}`, `Fact ${f.n + 1}`)}</b>{tx(`（${f.tier}）`, ` (${f.tier}) `)}{f.t}<div className="sw-sm">{f.src}{f.url ? <>{tx("　", "  ")}<Ext url={f.url}>{tx("出典を開く", "Open source")}</Ext></> : null}{f.v_url && f.v_url !== f.url ? <>{tx("　", "  ")}<Ext url={f.v_url}>{tx("照合したページ", "Page checked")}</Ext></> : null}</div>{f.verdict ? <VTag v={{ verdict: f.verdict, note: f.v_note }} /> : null}{f.verified ? null : f.why.map((x, j) => <span key={j} className="sw-m1-why">{x}</span>)}{f.v_note ? <div className="sw-sm" style={{ color: "var(--ink2)" }}>{f.v_note}</div> : null}{f.v_quote ? <div className="sw-vq">{tx("原文：", "Original: ")}{f.v_quote}</div> : null}{f.t_old ? <div className="sw-sm">{tx("原文に合わせて直した。直す前：", "Fixed to match the original. Before: ")}{f.t_old}</div> : null}</span>
                   </label>
                 ))}
                 {(c.audit || []).map((a, j) => (
                   <label key={"a" + j} className="sw-m1-chk">
                     <input type="checkbox" checked={!!(((c.audit_v || [])[j] || {}).verdict === "一致" || done[`aud:${id}:${j}`])} disabled={((c.audit_v || [])[j] || {}).verdict === "一致"} onChange={() => flip(`aud:${id}:${j}`)} />
-                    <span><span className="sw-m1-why">監査の指摘</span>{a}{(c.audit_v || [])[j] ? <div><VTag v={c.audit_v[j]} />{c.audit_v[j].note ? <span className="sw-sm" style={{ color: "var(--ink2)" }}>{c.audit_v[j].note}</span> : null}{(c.audit_v[j].quote || [])[0] ? <div className="sw-vq">原文：{c.audit_v[j].quote[0]}</div> : null}</div> : null}</span>
+                    <span><span className="sw-m1-why">{tx("監査の指摘", "Audit note")}</span>{a}{(c.audit_v || [])[j] ? <div><VTag v={c.audit_v[j]} />{c.audit_v[j].note ? <span className="sw-sm" style={{ color: "var(--ink2)" }}>{c.audit_v[j].note}</span> : null}{(c.audit_v[j].quote || [])[0] ? <div className="sw-vq">{tx("原文：", "Original: ")}{c.audit_v[j].quote[0]}</div> : null}</div> : null}</span>
                   </label>
                 ))}
-                {c.where.length ? <div className="sw-sm" style={{ marginTop: 4 }}><b>確かめ先</b>　{c.where.join("、")}</div> : null}
+                {c.where.length ? <div className="sw-sm" style={{ marginTop: 4 }}><b>{tx("確かめ先", "Where to check")}</b>{tx("　", " ")}{c.where.join("、")}</div> : null}
                 <ul className="sw-sm" style={{ margin: "6px 0 0", paddingLeft: 18 }}>{c.std.map((x, j) => <li key={j}>{x}</li>)}</ul>
-                {c.not_in.length ? <div className="sw-sm" style={{ marginTop: 4 }}><b>未確認のため台本に入れていないこと</b>　{c.not_in.join("／")}</div> : null}
+                {c.not_in.length ? <div className="sw-sm" style={{ marginTop: 4 }}><b>{tx("未確認のため台本に入れていないこと", "Left out of the script as unconfirmed")}</b>{tx("　", " ")}{c.not_in.join("／")}</div> : null}
               </div>
             ))}
           </Fold>
@@ -221394,16 +221540,16 @@ const SideWorkHubModule = (function () {
   function NetaCard({ n, on, flip }) {
     return (
       <div className={"sw-neta" + (on ? " on" : "")}>
-        <div className="sw-neta-h"><span className="sw-neta-y">{yearLabel(n.year)}</span><b>{n.title}{n.fit ? <span style={{ marginLeft: 6 }}><Stars n={n.fit} /></span> : null}</b><button type="button" className={"sw-btn" + (on ? " pri" : "")} onClick={flip} aria-pressed={on}>{on ? "★ 選んだ" : "☆ 選ぶ"}</button></div>
-        {n.moment || n.who ? <div className="sw-neta-m">{n.who ? <><b>主人公</b>　{n.who}　</> : null}{n.moment ? <><b>その瞬間</b>　{n.moment}</> : null}</div> : null}
+        <div className="sw-neta-h"><span className="sw-neta-y">{yearLabel(n.year)}</span><b>{n.title}{n.fit ? <span style={{ marginLeft: 6 }}><Stars n={n.fit} /></span> : null}</b><button type="button" className={"sw-btn" + (on ? " pri" : "")} onClick={flip} aria-pressed={on}>{on ? tx("★ 選んだ", "★ Picked") : tx("☆ 選ぶ", "☆ Pick")}</button></div>
+        {n.moment || n.who ? <div className="sw-neta-m">{n.who ? <><b>{tx("主人公", "Protagonist")}</b>{tx("　", " ")}{n.who}{tx("　", "  ")}</> : null}{n.moment ? <><b>{tx("その瞬間", "The moment")}</b>{tx("　", " ")}{n.moment}</> : null}</div> : null}
         <div className="sw-neta-q">{n.q}</div>
         <p>{n.angle}</p>
         <dl className="sw-kv">
-          <dt>確かめる</dt><dd>{(n.check || []).join(" ／ ")}</dd>
-          <dt>確かめ先</dt><dd>{(n.where || []).join("、")}</dd>
-          {n.risk ? <><dt>注意</dt><dd>{n.risk}</dd></> : null}
+          <dt>{tx("確かめる", "To check")}</dt><dd>{(n.check || []).join(" ／ ")}</dd>
+          <dt>{tx("確かめ先", "Where")}</dt><dd>{(n.where || []).join("、")}</dd>
+          {n.risk ? <><dt>{tx("注意", "Caution")}</dt><dd>{n.risk}</dd></> : null}
         </dl>
-        <div className="sw-chips">{n.area ? <span className="sw-chip">{n.area}</span> : null}{(n.formats || []).map((f) => FMT[f] ? <span key={f} className="sw-chip" style={{ background: "var(--blue-soft)", color: "var(--blue-d)", fontWeight: 700 }}>{f} {FMT[f].short || FMT[f].name}</span> : null)}</div>
+        <div className="sw-chips">{n.area ? <span className="sw-chip">{lbl(n.area)}</span> : null}{(n.formats || []).map((f) => FMT[f] ? <span key={f} className="sw-chip" style={{ background: "var(--blue-soft)", color: "var(--blue-d)", fontWeight: 700 }}>{f} {lbl(FMT[f].short || FMT[f].name)}</span> : null)}</div>
       </div>
     );
   }
@@ -221417,29 +221563,31 @@ const SideWorkHubModule = (function () {
     const list = NETA.filter((n) => (kind === "all" || n.kind === kind) && (!only || pick[n.id]) && (!q || [n.title, n.q, n.angle].join(" ").includes(q)));
     const sers = SERIES.filter((x) => list.some((n) => n.series === x.id));
     const picked = NETA.filter((n) => pick[n.id]).length;
-    const kpis = [[NETA.length, "件", "候補"], [NETA.filter((n) => n.kind === "wine").length, "件", "ワイン"], [NETA.filter((n) => n.kind === "history").length, "件", "歴史"], [picked, "件", "選んだ候補"]];
+    const kpis = UI_EN
+      ? [[NETA.length, "", "Ideas"], [NETA.filter((n) => n.kind === "wine").length, "", "Wine"], [NETA.filter((n) => n.kind === "history").length, "", "History"], [picked, "", "Picked"]]
+      : [[NETA.length, "件", "候補"], [NETA.filter((n) => n.kind === "wine").length, "件", "ワイン"], [NETA.filter((n) => n.kind === "history").length, "件", "歴史"], [picked, "件", "選んだ候補"]];
     return (
       <div>
-        <Head kick="02 企画する" title="ネタ帳" lede={`次に調べて企画にする題材の候補${NETA.length}件です。まだ調べていない候補なので、つかみは問いの形にしてあります。良いものを選び、企画帳と同じ手順（出典を2つで確かめる → 見直し → 台本）で本編にしてください。`} />
+        <Head kick={tx("02 企画する", "02 PLAN")} title={tx("ネタ帳", "Idea bank")} lede={tx(`次に調べて企画にする題材の候補${NETA.length}件です。まだ調べていない候補なので、つかみは問いの形にしてあります。良いものを選び、企画帳と同じ手順（出典を2つで確かめる → 見直し → 台本）で本編にしてください。`, `${NETA.length} candidate topics to research next and turn into episodes. They haven't been researched yet, so hooks are written as questions. Pick the good ones and develop them with the same steps as the episode plans (confirm with 2 sources → review → script).`)} />
         <div className="sw-g sw-g4">
           {kpis.map(([v, u, l], i) => <div key={i} className="sw-card sw-kpi" style={{ cursor: "default" }}><span className="sw-kpi-n">{v}<small>{u}</small></span><span className="sw-kpi-l">{l}</span></div>)}
         </div>
-        <div className="sw-note warn sw-sec"><b>調査前の候補です　</b>年は題材を特定するための目安で、事実は確かめていません。数字・人物の発言・因果は、確かめるまで動画に入れないでください。</div>
+        <div className="sw-note warn sw-sec"><b>{tx("調査前の候補です　", "Not yet researched: ")}</b>{tx("年は題材を特定するための目安で、事実は確かめていません。数字・人物の発言・因果は、確かめるまで動画に入れないでください。", "Years only help identify the topic; no facts have been checked. Keep numbers, quotes and causal claims out of videos until they're confirmed.")}</div>
         <div className="sw-tbar">
-          <Seg value={kind} onChange={setKind} options={[["all", `すべて ${NETA.length}`], ["wine", "ワイン"], ["history", "歴史"]]} />
-          <input className="sw-input" value={q} onChange={(e) => setQ(e.target.value)} placeholder="題・つかみ・切り口で絞り込む" aria-label="ネタを絞り込む" />
-          <label className="sw-chk"><input type="checkbox" checked={only} onChange={() => setOnly(!only)} />選んだものだけ</label>
+          <Seg value={kind} onChange={setKind} options={[["all", tx(`すべて ${NETA.length}`, `All ${NETA.length}`)], ["wine", tx("ワイン", "Wine")], ["history", tx("歴史", "History")]]} />
+          <input className="sw-input" value={q} onChange={(e) => setQ(e.target.value)} placeholder={tx("題・つかみ・切り口で絞り込む", "Filter by title, hook or angle")} aria-label={tx("ネタを絞り込む", "Filter ideas")} />
+          <label className="sw-chk"><input type="checkbox" checked={only} onChange={() => setOnly(!only)} />{tx("選んだものだけ", "Picked only")}</label>
           <FoldAll onSet={setAll} />
         </div>
         <FoldSig.Provider value={sig}>
           {sers.map((x) => { const ns = list.filter((n) => n.series === x.id); return (
-            <Fold key={x.id} id={"neta:" + x.id} title={x.name} meta={`${ns.length}件${ns.some((n) => pick[n.id]) ? `・選んだ ${ns.filter((n) => pick[n.id]).length}` : ""}`} def={false} tone={x.kind === "wine" ? "wine" : "hist"}>
+            <Fold key={x.id} id={"neta:" + x.id} title={lbl(x.name)} meta={tx(`${ns.length}件${ns.some((n) => pick[n.id]) ? `・選んだ ${ns.filter((n) => pick[n.id]).length}` : ""}`, `${ns.length} ideas${ns.some((n) => pick[n.id]) ? ` · picked ${ns.filter((n) => pick[n.id]).length}` : ""}`)} def={false} tone={x.kind === "wine" ? "wine" : "hist"}>
               {x.desc ? <p className="sw-sm" style={{ margin: "0 0 10px" }}>{x.desc}</p> : null}
               <div className="sw-g sw-g2" style={{ marginBottom: 0 }}>{ns.map((n) => <NetaCard key={n.id} n={n} on={!!pick[n.id]} flip={() => flip(n.id)} />)}</div>
             </Fold>
           ); })}
         </FoldSig.Provider>
-        {!list.length ? <div className="sw-sm">条件に合う候補はありません。</div> : null}
+        {!list.length ? <div className="sw-sm">{tx("条件に合う候補はありません。", "No ideas match.")}</div> : null}
       </div>
     );
   }
@@ -221451,8 +221599,8 @@ const SideWorkHubModule = (function () {
     const [sig, setAll] = useFoldSig();
     return (
       <div>
-        <Head kick="03 作る" title="AI動画の手順" lede="縦型ショート（1〜3分）を想定した手順です。映像・音声の生成ツールは、プランによって商用利用の条件が違います。使う前に料金ページで確かめてください。" />
-        <div className="sw-epd-bar"><span className="sw-sm">{steps.length}工程。見出しを押すと開閉できます</span><FoldAll onSet={setAll} /></div>
+        <Head kick={tx("03 作る", "03 MAKE")} title={tx("AI動画の手順", "AI video steps")} lede={tx("縦型ショート（1〜3分）を想定した手順です。映像・音声の生成ツールは、プランによって商用利用の条件が違います。使う前に料金ページで確かめてください。", "Steps for vertical shorts (1–3 min). Commercial-use terms for video and audio generators vary by plan, so check the pricing page before use.")} />
+        <div className="sw-epd-bar"><span className="sw-sm">{tx(`${steps.length}工程。見出しを押すと開閉できます`, `${steps.length} steps. Click a heading to open or close it`)}</span><FoldAll onSet={setAll} /></div>
         <FoldSig.Provider value={sig}>
           <div className="sw-steps">
             {steps.map((st, i) => {
@@ -221461,10 +221609,10 @@ const SideWorkHubModule = (function () {
               return (
                 <div key={i} className="sw-step">
                   <span className={"sw-step-n" + (gate ? " gate" : "")} style={{ top: 9 }}>{i + 1}</span>
-                  <Fold id={"vid:" + i} title={title} meta={st.tools && st.tools.length ? `ツール ${st.tools.length}` : ""} tone={gate ? "gate" : ""} def={i === 0 || gate}>
+                  <Fold id={"vid:" + i} title={title} meta={st.tools && st.tools.length ? tx(`ツール ${st.tools.length}`, `${st.tools.length} tools`) : ""} tone={gate ? "gate" : ""} def={i === 0 || gate}>
                     <p style={{ margin: "0 0 8px", fontSize: 14.5, color: "var(--ink2)", lineHeight: 1.8 }}>{st.detail}</p>
                     {st.tools && st.tools.length ? <div className="sw-chips">{st.tools.map((x, j) => <span key={j} className="sw-chip">{x}</span>)}</div> : null}
-                    {st.caution ? <div className="sw-note ng" style={{ marginTop: 10 }}><b>注意　</b>{st.caution}</div> : null}
+                    {st.caution ? <div className="sw-note ng" style={{ marginTop: 10 }}><b>{tx("注意　", "Caution: ")}</b>{st.caution}</div> : null}
                   </Fold>
                 </div>
               );
@@ -221482,7 +221630,7 @@ const SideWorkHubModule = (function () {
     const setAll = (v) => setOp(v ? Object.fromEntries(st.map((_, i) => [i, true])) : {});
     return (
       <div>
-        <Head kick="03 作る" title="自動化の設計" lede="工程ごとに、AIに任せる範囲と人が見る点を決めます。緑は自動、黄は半自動（AIが下書きして人が直す）、赤は人が必ず行う工程です。" />
+        <Head kick={tx("03 作る", "03 MAKE")} title={tx("自動化の設計", "Automation design")} lede={tx("工程ごとに、AIに任せる範囲と人が見る点を決めます。緑は自動、黄は半自動（AIが下書きして人が直す）、赤は人が必ず行う工程です。", "For each step, decide what AI handles and what people review. Green is automatic, yellow is semi-automatic (AI drafts, a person edits), and red must always be done by a person.")} />
         <div className="sw-card sw-sec">
           <div className="sw-flow c4" style={{ "--cols": 4 }}>
             {st.map((x, i) => (
@@ -221493,18 +221641,18 @@ const SideWorkHubModule = (function () {
               </button>
             ))}
           </div>
-          <p className="sw-sm" style={{ margin: "8px 0 0" }}>工程を押すと、下の説明が開きます。</p>
+          <p className="sw-sm" style={{ margin: "8px 0 0" }}>{tx("工程を押すと、下の説明が開きます。", "Click a step to open its details below.")}</p>
         </div>
-        <div className="sw-epd-bar"><span className="sw-sm">{st.length}工程</span><FoldAll onSet={setAll} /></div>
+        <div className="sw-epd-bar"><span className="sw-sm">{tx(`${st.length}工程`, `${st.length} steps`)}</span><FoldAll onSet={setAll} /></div>
         {st.map((x, i) => (
           <div key={i} id={`sw-st-${i}`} style={{ scrollMarginTop: 80 }}>
-            <Fold n={i + 1} title={<>{x.name}　<Auto a={x.auto} /></>} meta={(x.tools || []).length ? `ツール ${(x.tools || []).length}` : ""} tone={x.auto === "人" ? "gate" : ""} open={!!op[i]} onToggle={(v) => setOp((o) => ({ ...o, [i]: v }))}>
+            <Fold n={i + 1} title={<>{x.name}{tx("　", "  ")}<Auto a={x.auto} /></>} meta={(x.tools || []).length ? tx(`ツール ${(x.tools || []).length}`, `${(x.tools || []).length} tools`) : ""} tone={x.auto === "人" ? "gate" : ""} open={!!op[i]} onToggle={(v) => setOp((o) => ({ ...o, [i]: v }))}>
               <p style={{ margin: "0 0 10px", fontSize: 14.5, color: "var(--ink2)" }}>{x.goal}</p>
               {(x.tools || []).map((tl, j) => (
-                <div key={j} className="sw-tool"><span><b>{tl.name}</b>{tl.url ? <> <Ext url={tl.url}>公式</Ext></> : null}<Badge v={tl.verified} /></span><span style={{ color: "var(--ink2)" }}>{tl.what}</span></div>
+                <div key={j} className="sw-tool"><span><b>{tl.name}</b>{tl.url ? <> <Ext url={tl.url}>{tx("公式", "Official")}</Ext></> : null}<Badge v={tl.verified} /></span><span style={{ color: "var(--ink2)" }}>{tl.what}</span></div>
               ))}
-              {x.human_check ? <div className="sw-note ng" style={{ marginTop: 10 }}><b>人が確認すること　</b>{x.human_check}</div> : null}
-              {x.output ? <div className="sw-sm" style={{ marginTop: 8 }}>できあがるもの：{x.output}</div> : null}
+              {x.human_check ? <div className="sw-note ng" style={{ marginTop: 10 }}><b>{tx("人が確認すること　", "Human check: ")}</b>{x.human_check}</div> : null}
+              {x.output ? <div className="sw-sm" style={{ marginTop: 8 }}>{tx("できあがるもの：", "Output: ")}{x.output}</div> : null}
             </Fold>
           </div>
         ))}
@@ -221526,29 +221674,29 @@ const SideWorkHubModule = (function () {
     const card = (r) => (
       <div key={r.i} className="sw-card sw-mcard">
         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline" }}>
-          <div style={{ minWidth: 0 }}><h3 className="sw-ct" style={{ fontSize: 16 }}>{r.name}</h3><span className="sw-tag">{r.cat}</span></div>
-          <span className="sw-sm" style={{ flexShrink: 0 }}><Ext url={r.url}>公式</Ext><Badge v={r.verified} /></span>
+          <div style={{ minWidth: 0 }}><h3 className="sw-ct" style={{ fontSize: 16 }}>{r.name}</h3><span className="sw-tag">{lbl(r.cat)}</span></div>
+          <span className="sw-sm" style={{ flexShrink: 0 }}><Ext url={r.url}>{tx("公式", "Official")}</Ext><Badge v={r.verified} /></span>
         </div>
         <p style={{ margin: 0, fontSize: 14, color: "var(--ink2)" }}>{r.what}</p>
-        {r.best_for ? <div className="sw-sm"><b style={{ color: "var(--ink2)" }}>向く工程</b>　{r.best_for}</div> : null}
+        {r.best_for ? <div className="sw-sm"><b style={{ color: "var(--ink2)" }}>{tx("向く工程", "Best for")}</b>{tx("　", " ")}{r.best_for}</div> : null}
         <dl className="sw-kv">
-          <dt>料金</dt><dd>{r.price}</dd>
-          <dt>商用</dt><dd>{r.commercial}</dd>
+          <dt>{tx("料金", "Price")}</dt><dd>{r.price}</dd>
+          <dt>{tx("商用", "Commercial use")}</dt><dd>{r.commercial}</dd>
         </dl>
-        <div><button className="sw-btn" onClick={() => setOpen({ ...open, [r.i]: !open[r.i] })} aria-expanded={!!open[r.i]}>{open[r.i] ? "閉じる" : "日本語・連携・AI表示・注意"}</button></div>
+        <div><button className="sw-btn" onClick={() => setOpen({ ...open, [r.i]: !open[r.i] })} aria-expanded={!!open[r.i]}>{open[r.i] ? tx("閉じる", "Close") : tx("日本語・連携・AI表示・注意", "Japanese, integrations, AI labels & cautions")}</button></div>
         {open[r.i] ? (
           <div className="sw-det">
-            <div><h4>日本語</h4><p>{r.japanese}</p></div>
-            <div><h4>APIと連携</h4><p>{r.api}</p></div>
-            <div><h4>AI生成の表示・透かし</h4><p>{r.ai_label}</p></div>
-            {r.caution ? <div className="sw-note warn"><b>注意　</b>{r.caution}</div> : null}
+            <div><h4>{tx("日本語", "Japanese support")}</h4><p>{r.japanese}</p></div>
+            <div><h4>{tx("APIと連携", "API & integrations")}</h4><p>{r.api}</p></div>
+            <div><h4>{tx("AI生成の表示・透かし", "AI labels & watermarks")}</h4><p>{r.ai_label}</p></div>
+            {r.caution ? <div className="sw-note warn"><b>{tx("注意　", "Caution: ")}</b>{r.caution}</div> : null}
           </div>
         ) : null}
       </div>
     );
     return (
       <div>
-        <Head kick="03 作る" title="ツール比較" lede={`台本・音声・画像・動画・編集・投稿・分析に使う、Claude 以外のツール${rows.length}件。料金と商用の条件は変わりやすいので、出典の時点を添えています。使う前に公式の料金・規約ページで確かめてください。`} />
+        <Head kick={tx("03 作る", "03 MAKE")} title={tx("ツール比較", "Tool comparison")} lede={tx(`台本・音声・画像・動画・編集・投稿・分析に使う、Claude 以外のツール${rows.length}件。料金と商用の条件は変わりやすいので、出典の時点を添えています。使う前に公式の料金・規約ページで確かめてください。`, `${rows.length} tools other than Claude for scripts, audio, images, video, editing, posting and analytics. Prices and commercial terms change often, so source dates are noted. Check the official pricing and terms pages before use.`)} />
         {stacks.length ? (
           <div className="sw-g sw-g3">
             {stacks.map((s, i) => (
@@ -221556,7 +221704,7 @@ const SideWorkHubModule = (function () {
                 <div className="sw-ch" style={{ marginBottom: 0 }}><h3 className="sw-ct">{s.name}</h3><span className="sw-sm">{s.cost}</span></div>
                 <p className="sw-sm" style={{ margin: 0 }}>{s.who}</p>
                 {s.steps.map(([st, tools], j) => (
-                  <div key={j} className="sw-stack-r"><span className="sw-sm" style={{ fontWeight: 800 }}>{st}</span><span className="sw-chips">{tools.map((t) => <span key={t} className="sw-chip">{t}</span>)}</span></div>
+                  <div key={j} className="sw-stack-r"><span className="sw-sm" style={{ fontWeight: 800 }}>{lbl(st)}</span><span className="sw-chips">{tools.map((t) => <span key={t} className="sw-chip">{t}</span>)}</span></div>
                 ))}
                 {s.note ? <div className="sw-note info" style={{ padding: "8px 12px" }}>{s.note}</div> : null}
               </div>
@@ -221564,15 +221712,15 @@ const SideWorkHubModule = (function () {
           </div>
         ) : null}
         <div className="sw-tbar">
-          <Seg value={cat} onChange={setCat} options={[["all", `すべて ${rows.length}`], ...cats.map((c) => [c, `${c} ${rows.filter((r) => r.cat === c).length}`])]} />
-          <input className="sw-input" value={q} onChange={(e) => setQ(e.target.value)} placeholder="ツール名・用途で絞り込む" aria-label="ツールを絞り込む" />
+          <Seg value={cat} onChange={setCat} options={[["all", tx(`すべて ${rows.length}`, `All ${rows.length}`)], ...cats.map((c) => [c, `${lbl(c)} ${rows.filter((r) => r.cat === c).length}`])]} />
+          <input className="sw-input" value={q} onChange={(e) => setQ(e.target.value)} placeholder={tx("ツール名・用途で絞り込む", "Filter by tool or use")} aria-label={tx("ツールを絞り込む", "Filter tools")} />
         </div>
         {cat === "all" && !q ? (
           <>
-            <div className="sw-epd-bar"><span className="sw-sm">{cats.length}分類・{rows.length}件</span><FoldAll onSet={setAll} /></div>
+            <div className="sw-epd-bar"><span className="sw-sm">{tx(`${cats.length}分類・${rows.length}件`, `${cats.length} categories · ${rows.length} tools`)}</span><FoldAll onSet={setAll} /></div>
             <FoldSig.Provider value={sig}>
               {cats.map((c, ci) => { const rs = list.filter((r) => r.cat === c); return (
-                <Fold key={c} id={"tool:" + c} n={ci + 1} title={c} meta={`${rs.length}件：${rs.map((r) => r.name).slice(0, 4).join("・")}${rs.length > 4 ? "ほか" : ""}`} def={false}>
+                <Fold key={c} id={"tool:" + c} n={ci + 1} title={lbl(c)} meta={tx(`${rs.length}件：${rs.map((r) => r.name).slice(0, 4).join("・")}${rs.length > 4 ? "ほか" : ""}`, `${rs.length}: ${rs.map((r) => r.name).slice(0, 4).join(", ")}${rs.length > 4 ? ", …" : ""}`)} def={false}>
                   <div className="sw-g sw-g2" style={{ marginBottom: 0 }}>{rs.map(card)}</div>
                 </Fold>
               ); })}
@@ -221595,32 +221743,32 @@ const SideWorkHubModule = (function () {
     const card = (r) => (
       <div key={r.name} className="sw-card sw-mcard">
               <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline" }}>
-                <div style={{ minWidth: 0 }}><h3 className="sw-ct" style={{ fontSize: 15 }}>{r.name}</h3><span className="sw-tag" style={r.kind === "プラグイン" ? { background: "#F3E8FF", color: "#6D28D9" } : null}>{r.kind}</span> <span className="sw-tag" style={{ background: "#EEF2F7", color: "#475569" }}>{r.stage}</span></div>
-                <span style={{ flexShrink: 0, textAlign: "right" }}><FitDots v={r.fit} /><div className="sw-sm" style={{ fontSize: 11 }}>この副業との相性</div></span>
+                <div style={{ minWidth: 0 }}><h3 className="sw-ct" style={{ fontSize: 15 }}>{r.name}</h3><span className="sw-tag" style={r.kind === "プラグイン" ? { background: "#F3E8FF", color: "#6D28D9" } : null}>{lbl(r.kind)}</span> <span className="sw-tag" style={{ background: "#EEF2F7", color: "#475569" }}>{lbl(r.stage)}</span></div>
+                <span style={{ flexShrink: 0, textAlign: "right" }}><FitDots v={r.fit} /><div className="sw-sm" style={{ fontSize: 11 }}>{tx("この副業との相性", "Fit with this side work")}</div></span>
               </div>
               <p style={{ margin: 0, fontSize: 13, color: "var(--ink2)" }}>{r.what}</p>
-              <div className="sw-sm"><b style={{ color: "var(--ink2)" }}>使い方</b>　{r.use}</div>
-              {r.publisher ? <div className="sw-sm"><b style={{ color: "var(--ink2)" }}>公開者</b>　{r.publisher}</div> : null}
+              <div className="sw-sm"><b style={{ color: "var(--ink2)" }}>{tx("使い方", "How to use")}</b>{tx("　", " ")}{r.use}</div>
+              {r.publisher ? <div className="sw-sm"><b style={{ color: "var(--ink2)" }}>{tx("公開者", "Publisher")}</b>{tx("　", " ")}{r.publisher}</div> : null}
               {r.tools && r.tools.length ? <div className="sw-chips">{r.tools.map((t) => <span key={t} className="sw-chip" style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace", fontSize: 11 }}>{t}</span>)}</div> : null}
-              <div className="sw-note warn" style={{ padding: "8px 12px" }}><b>注意　</b>{r.caution}</div>
+              <div className="sw-note warn" style={{ padding: "8px 12px" }}><b>{tx("注意　", "Caution: ")}</b>{r.caution}</div>
             </div>
     );
-    const FitDots = ({ v }) => <span className="sw-score" style={{ "--c": "#1D4ED8" }} aria-label={`相性 ${v} / 3`}>{[1, 2, 3].map((k) => <i key={k} className={k <= v ? "on" : ""} />)}</span>;
+    const FitDots = ({ v }) => <span className="sw-score" style={{ "--c": "#1D4ED8" }} aria-label={tx(`相性 ${v} / 3`, `Fit ${v} / 3`)}>{[1, 2, 3].map((k) => <i key={k} className={k <= v ? "on" : ""} />)}</span>;
     return (
       <div>
-        <Head kick="03 作る" title="MCP・コネクタ・プラグイン" lede={`Claude から外部サービスを動かすための連携を、この副業の工程に合わせて選びました（${C.checked || ""}に${C.source || "ディレクトリ"}で確認）。説明はディレクトリの記載にもとづき、実際に接続して動作を試したものではありません。`} />
+        <Head kick={tx("03 作る", "03 MAKE")} title={tx("MCP・コネクタ・プラグイン", "MCP, connectors & plugins")} lede={tx(`Claude から外部サービスを動かすための連携を、この副業の工程に合わせて選びました（${C.checked || ""}に${C.source || "ディレクトリ"}で確認）。説明はディレクトリの記載にもとづき、実際に接続して動作を試したものではありません。`, `Integrations for driving outside services from Claude, picked to fit this side work's steps (checked in ${C.source || "the directory"}, ${C.checked || ""}). Descriptions follow the directory listings; none have been connected and tested.`)} />
         <div className="sw-card sw-sec">
-          <div className="sw-ch"><h2 className="sw-ct">工程ごとの組み合わせ</h2><span className="sw-sm">相性の高いもの（●●●）だけを並べています</span></div>
+          <div className="sw-ch"><h2 className="sw-ct">{tx("工程ごとの組み合わせ", "Combinations by step")}</h2><span className="sw-sm">{tx("相性の高いもの（●●●）だけを並べています", "Only the best fits (●●●) are shown")}</span></div>
           <div className="sw-flow" style={{ "--cols": 4 }}>
             {["調べる", "作る", "投稿", "分析"].map((s, i) => (
               <div key={s} className="sw-node" style={{ cursor: "default" }}>
                 <div className="sw-node-n">{String(i + 1).padStart(2, "0")}</div>
-                <div className="sw-node-t">{s}</div>
+                <div className="sw-node-t">{lbl(s)}</div>
                 <div className="sw-chips">{items.filter((r) => r.stage === s && r.fit >= 3).map((r) => <span key={r.name} className="sw-chip">{r.name.replace(/ by .*| Social Media Management| - .*/, "")}</span>)}</div>
               </div>
             ))}
           </div>
-          <p className="sw-sm" style={{ margin: "8px 0 0" }}>管理（Notion など）は全工程の台帳として使います。事実確認の関門は、どの連携を使っても人が行います。</p>
+          <p className="sw-sm" style={{ margin: "8px 0 0" }}>{tx("管理（Notion など）は全工程の台帳として使います。事実確認の関門は、どの連携を使っても人が行います。", "Management tools (Notion, etc.) serve as the ledger for every step. Whatever the integration, the fact-check gate is done by a person.")}</p>
         </div>
         <div className="sw-g sw-g3">
           {(C.principles || []).map(([t, d], i) => (
@@ -221631,15 +221779,15 @@ const SideWorkHubModule = (function () {
           ))}
         </div>
         <div className="sw-tbar">
-          <Seg value={stage} onChange={setStage} options={[["all", `すべて ${items.length}`], ...stages.map((s) => [s, s])]} />
-          <Seg value={kind} onChange={setKind} options={[["all", "種類すべて"], ["コネクタ（MCP）", "コネクタ（MCP）"], ["プラグイン", "プラグイン"]]} />
+          <Seg value={stage} onChange={setStage} options={[["all", tx(`すべて ${items.length}`, `All ${items.length}`)], ...stages.map((s) => [s, lbl(s)])]} />
+          <Seg value={kind} onChange={setKind} options={[["all", tx("種類すべて", "All types")], ["コネクタ（MCP）", lbl("コネクタ（MCP）")], ["プラグイン", lbl("プラグイン")]]} />
         </div>
         {stage === "all" ? (
           <>
-            <div className="sw-epd-bar"><span className="sw-sm">{stages.length}工程・{list.length}件</span><FoldAll onSet={setAll} /></div>
+            <div className="sw-epd-bar"><span className="sw-sm">{tx(`${stages.length}工程・${list.length}件`, `${stages.length} steps · ${list.length} items`)}</span><FoldAll onSet={setAll} /></div>
             <FoldSig.Provider value={sig}>
               {stages.map((sg, si) => { const rs = list.filter((r) => r.stage === sg); return rs.length ? (
-                <Fold key={sg} id={"conn:" + sg} n={si + 1} title={sg} meta={`${rs.length}件：${rs.map((r) => r.name.replace(/ by .*| Social Media Management| - .*/, "")).slice(0, 3).join("・")}${rs.length > 3 ? "ほか" : ""}`} def={si === 0}>
+                <Fold key={sg} id={"conn:" + sg} n={si + 1} title={lbl(sg)} meta={tx(`${rs.length}件：${rs.map((r) => r.name.replace(/ by .*| Social Media Management| - .*/, "")).slice(0, 3).join("・")}${rs.length > 3 ? "ほか" : ""}`, `${rs.length}: ${rs.map((r) => r.name.replace(/ by .*| Social Media Management| - .*/, "")).slice(0, 3).join(", ")}${rs.length > 3 ? ", …" : ""}`)} def={si === 0}>
                   <div className="sw-g sw-g2" style={{ marginBottom: 0 }}>{rs.map(card)}</div>
                 </Fold>
               ) : null; })}
@@ -221648,7 +221796,7 @@ const SideWorkHubModule = (function () {
         ) : <div className="sw-g sw-g2">{list.map(card)}</div>}
         {(C.not_fit || []).length ? (
           <div className="sw-card">
-            <div className="sw-ch"><h2 className="sw-ct">今回は選ばなかったもの</h2></div>
+            <div className="sw-ch"><h2 className="sw-ct">{tx("今回は選ばなかったもの", "Not chosen this time")}</h2></div>
             {C.not_fit.map(([n, d], i) => <div key={i} className="sw-rule"><b>{n}</b><div className="sw-sm">{d}</div></div>)}
           </div>
         ) : null}
@@ -221662,14 +221810,23 @@ const SideWorkHubModule = (function () {
     const up = Q.upgrades || {};
     const allF = EPS.flatMap((e) => (e.facts || []).map((f) => ({ ...f, kind: e.kind })));
     const cnt = (fs) => { const c = { S: 0, A: 0, B: 0, C: 0, D: 0 }; fs.forEach((f) => { c[f.tier || "D"]++; }); return c; };
-    const rows = [["全体", allF], ["ワイン", allF.filter((f) => f.kind === "wine")], ["歴史", allF.filter((f) => f.kind === "history")]].map(([l, fs]) => [l, cnt(fs), fs.length]);
+    const rows = [[tx("全体", "All"), allF], [tx("ワイン", "Wine"), allF.filter((f) => f.kind === "wine")], [tx("歴史", "History"), allF.filter((f) => f.kind === "history")]].map(([l, fs]) => [l, cnt(fs), fs.length]);
     const reviewed = EPS.reduce((a, e) => a + (e.review || []).length, 0);
     const audited = EPS.reduce((a, e) => a + ((e.script || {}).audit_n || 0), 0);
     const auditedEps = EPS.filter((e) => (e.script || {}).audit).length;
     const weak = EPS.slice().sort((a, b) => sabShare(a) - sabShare(b)).slice(0, 12);
     const [tipEl, onTip, offTip] = useTip();
-    const kpis = [[EPS.length, "本", "企画"], [allF.length, "件", "事実"], [reviewed, "件", "見直しで直した点"], [(up.replaced || 0) + (up.corrected || 0), "件", "出典の格上げ"], [audited, "行", "台本の監査で直した行"], [done, `/ ${allF.length}`, "原文で確認した事実"]];
-    const STEPS = [
+    const kpis = UI_EN
+      ? [[EPS.length, "", "Episodes"], [allF.length, "", "Facts"], [reviewed, "", "Fixes from review"], [(up.replaced || 0) + (up.corrected || 0), "", "Source upgrades"], [audited, "", "Script lines fixed in audit"], [done, `/ ${allF.length}`, "Facts checked in the original"]]
+      : [[EPS.length, "本", "企画"], [allF.length, "件", "事実"], [reviewed, "件", "見直しで直した点"], [(up.replaced || 0) + (up.corrected || 0), "件", "出典の格上げ"], [audited, "行", "台本の監査で直した行"], [done, `/ ${allF.length}`, "原文で確認した事実"]];
+    const STEPS = UI_EN ? [
+      ["Standards for building episodes", "Episodes are built with instructions covering the 10 error types most often found in past reviews and the source-tier rules (no tier D; key numbers checked against 2 sources)."],
+      ["Independent review", `Another model (Opus) read every episode, flagged errors, overstatements, calendar mistakes and myths, and replaced them with safe wording (${reviewed}).`],
+      ["Source upgrades", `Facts with weak sources were switched to official, encyclopedia or news sources, with the wording fixed where the new source disagreed (${up.replaced || 0} replaced · ${up.corrected || 0} fixed · ${up.not_found || 0} not found). Replacements supported only in part (${allF.filter((f) => f.partial).length}) and those with an inferred source page (${allF.filter((f) => f.url_est).length}) are marked.`],
+      ["Script audit", `Each script line was checked against the facts it cites, and overstated or unsupported lines were fixed (${auditedEps} episodes · ${audited} lines).`],
+      ["Cross-checking episodes", `Mismatched years, numbers, names and calendars were found and fixed between episodes on the same events or systems, and within single episodes (${Q.consist || 0}).`],
+      ["Checking the originals (you)", "Finally, open the original sources, compare, and tick the facts that match. Only ticked facts go into scripts."],
+    ] : [
       ["企画づくりの基準", "過去の見直しで多かった誤り10種類と、出典の段階の基準（D は使わない、重要な数字は2つの出典で照合）を指示に入れて作る。"],
       ["独立した見直し", `別のモデル（Opus）が全企画を読み、誤り・言い過ぎ・暦の誤り・俗説を指摘し、安全な文面に置き換える（${reviewed}件）。`],
       ["出典の格上げ", `出典が弱い事実を、公的・事典・報道の出典に差し替える。差し替え先と食い違えば文面を直す（差し替え${up.replaced || 0}件・修正${up.corrected || 0}件・見つからず${up.not_found || 0}件）。差し替えのうち、文の一部だけ裏づけられたもの${allF.filter((f) => f.partial).length}件と、出典ページを推定したもの${allF.filter((f) => f.url_est).length}件には印を付けた。`],
@@ -221679,36 +221836,36 @@ const SideWorkHubModule = (function () {
     ];
     return (
       <div onMouseLeave={offTip}>
-        <Head kick="04 確かめる" title="品質レポート" lede="企画の事実がどこまで確かめられているかと、品質を上げるために通した工程です。調査の環境から出典サイトの本文を開けなかったため、原文での確認は最後にあなたが行う前提で、それ以外の点検を機械と別のモデルで通しています。" />
+        <Head kick={tx("04 確かめる", "04 CHECK")} title={tx("品質レポート", "Quality report")} lede={tx("企画の事実がどこまで確かめられているかと、品質を上げるために通した工程です。調査の環境から出典サイトの本文を開けなかったため、原文での確認は最後にあなたが行う前提で、それ以外の点検を機械と別のモデルで通しています。", "How far the episode facts have been verified, and the steps used to raise quality. The research environment couldn't open source pages, so checking the originals is left to you as the last step; every other check was run by script and by a second model.")} />
         <div className="sw-g" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,150px),1fr))" }}>
           {kpis.map(([n, u, l], i) => <div key={i} className="sw-card sw-kpi" style={{ cursor: "default" }}><span className="sw-kpi-n">{n}<small>{u}</small></span><span className="sw-kpi-l">{l}</span></div>)}
         </div>
         <div className="sw-card sw-sec">
-          <div className="sw-ch"><h2 className="sw-ct">出典の段階の内訳</h2><span className="sw-sm">URLのドメインから機械的に判定</span></div>
+          <div className="sw-ch"><h2 className="sw-ct">{tx("出典の段階の内訳", "Source tier breakdown")}</h2><span className="sw-sm">{tx("URLのドメインから機械的に判定", "Classified automatically from URL domains")}</span></div>
           {rows.map(([l, c, n]) => (
             <div key={l} className="sw-hb" style={{ gridTemplateColumns: "64px minmax(0,1fr) auto" }}>
               <span className="sw-hb-l">{l}</span>
-              <span className="sw-stack">{["S", "A", "B", "C", "D"].map((t) => c[t] ? <i key={t} style={{ width: `${c[t] / n * 100}%`, background: TIER_INFO[t][1] }} onMouseMove={(e) => onTip(e, `${l}・${t}（${TIER_INFO[t][0]}）：${c[t]}件（${Math.round(c[t] / n * 100)}%）`)} /> : null)}</span>
-              <span className="sw-hb-v">S〜B {n ? Math.round((c.S + c.A + c.B) / n * 100) : 0}%</span>
+              <span className="sw-stack">{["S", "A", "B", "C", "D"].map((t) => c[t] ? <i key={t} style={{ width: `${c[t] / n * 100}%`, background: TIER_INFO[t][1] }} onMouseMove={(e) => onTip(e, tx(`${l}・${t}（${TIER_INFO[t][0]}）：${c[t]}件（${Math.round(c[t] / n * 100)}%）`, `${l} · ${t} (${TIER_EN[t]}): ${c[t]} (${Math.round(c[t] / n * 100)}%)`))} /> : null)}</span>
+              <span className="sw-hb-v">{tx("S〜B", "S–B")} {n ? Math.round((c.S + c.A + c.B) / n * 100) : 0}%</span>
             </div>
           ))}
-          <div className="sw-legend">{["S", "A", "B", "C", "D"].map((t) => <span key={t} style={{ display: "inline-flex", alignItems: "center", gap: 2 }}><TierTag t={t} />{TIER_INFO[t][0]}</span>)}</div>
-          {Q.sab_before != null ? <p className="sw-sm" style={{ margin: "8px 0 0" }}>出典の格上げの前は S〜B が {Q.sab_before}% でした（同じ事実を格上げ前の出典で数えた値）。いまは {rows[0][2] ? Math.round((rows[0][1].S + rows[0][1].A + rows[0][1].B) / rows[0][2] * 100) : 0}% です。</p> : null}
+          <div className="sw-legend">{["S", "A", "B", "C", "D"].map((t) => <span key={t} style={{ display: "inline-flex", alignItems: "center", gap: 2 }}><TierTag t={t} />{tierName(t)}</span>)}</div>
+          {Q.sab_before != null ? <p className="sw-sm" style={{ margin: "8px 0 0" }}>{tx(`出典の格上げの前は S〜B が ${Q.sab_before}% でした（同じ事実を格上げ前の出典で数えた値）。いまは ${rows[0][2] ? Math.round((rows[0][1].S + rows[0][1].A + rows[0][1].B) / rows[0][2] * 100) : 0}% です。`, `Before the source upgrades, S–B was ${Q.sab_before}% (the same facts counted with their old sources). It's now ${rows[0][2] ? Math.round((rows[0][1].S + rows[0][1].A + rows[0][1].B) / rows[0][2] * 100) : 0}%.`)}</p> : null}
         </div>
         <div className="sw-g sw-g2">
           <div className="sw-card">
-            <div className="sw-ch"><h2 className="sw-ct">品質のために通した工程</h2></div>
+            <div className="sw-ch"><h2 className="sw-ct">{tx("品質のために通した工程", "Quality steps")}</h2></div>
             {STEPS.map(([t, d], i) => <div key={i} className="sw-todo" style={{ gridTemplateColumns: "26px 1fr" }}><span className="sw-todo-n">{i + 1}</span><div><div style={{ fontWeight: 700, fontSize: 13 }}>{t}</div><div className="sw-sm">{d}</div></div></div>)}
           </div>
           <div className="sw-card">
-            <div className="sw-ch"><h2 className="sw-ct">出典の質が低い企画</h2><span className="sw-sm">S〜B の割合が低い順</span></div>
+            <div className="sw-ch"><h2 className="sw-ct">{tx("出典の質が低い企画", "Episodes with weak sources")}</h2><span className="sw-sm">{tx("S〜B の割合が低い順", "Lowest S–B share first")}</span></div>
             {weak.map((e) => (
               <button key={e.kind + e.id} className="sw-row" style={{ "--tc": "minmax(0,1fr) 64px", padding: "8px 0" }} onClick={() => openEp(e)}>
-                <span><b style={{ fontSize: 13 }}>{splitTitle(e.title)[0]}</b><span className="sw-sm" style={{ display: "block" }}>{KIND_INFO[e.kind][0]}・{e.id}</span></span>
+                <span><b style={{ fontSize: 13 }}>{splitTitle(e.title)[0]}</b><span className="sw-sm" style={{ display: "block" }}>{lbl(KIND_INFO[e.kind][0])}{tx("・", " · ")}{e.id}</span></span>
                 <span className="sw-size" style={{ textAlign: "right", color: sabShare(e) < 40 ? "var(--warn)" : "var(--ink)" }}>{sabShare(e)}%</span>
               </button>
             ))}
-            <p className="sw-sm" style={{ margin: "8px 0 0" }}>これらの企画は、公開前に出典を差し替えるか、題材ごと見送ることを考えてください。</p>
+            <p className="sw-sm" style={{ margin: "8px 0 0" }}>{tx("これらの企画は、公開前に出典を差し替えるか、題材ごと見送ることを考えてください。", "Before publishing these, consider replacing their sources or dropping the topic.")}</p>
           </div>
         </div>
         {tipEl}
@@ -221728,14 +221885,14 @@ const SideWorkHubModule = (function () {
     const reset = () => { setChk({}); save(GATE_KEY, {}); };
     return (
       <div>
-        <Head kick="04 確かめる" title="事実確認の関門" lede="1本の動画を公開する前に、ここを全部通します。自動化しても、この工程だけは人が行います。" />
+        <Head kick={tx("04 確かめる", "04 CHECK")} title={tx("事実確認の関門", "Fact-check gate")} lede={tx("1本の動画を公開する前に、ここを全部通します。自動化しても、この工程だけは人が行います。", "Every video passes all of these checks before it goes public. Even with automation, this step is always done by a person.")} />
         <div className="sw-card">
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
               <Donut done={n} total={items.length} size={84} />
-              <div><div style={{ fontWeight: 800, color: all ? "var(--ok)" : "var(--warn)" }}>{all ? "公開してよい状態" : "公開前（未確認の項目あり）"}</div><div className="sw-sm">チェックはこの端末に残ります</div></div>
+              <div><div style={{ fontWeight: 800, color: all ? "var(--ok)" : "var(--warn)" }}>{all ? tx("公開してよい状態", "Ready to publish") : tx("公開前（未確認の項目あり）", "Not ready (unchecked items)")}</div><div className="sw-sm">{tx("チェックはこの端末に残ります", "Checks are saved on this device")}</div></div>
             </div>
-            <button className="sw-btn" onClick={reset}>次の動画のためにリセット</button>
+            <button className="sw-btn" onClick={reset}>{tx("次の動画のためにリセット", "Reset for the next video")}</button>
           </div>
           <div style={{ marginTop: 10 }}>
             {items.map((f, i) => (
@@ -221744,7 +221901,7 @@ const SideWorkHubModule = (function () {
                 <div>
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "flex-start" }}>
                     <b style={{ fontSize: 13.5, cursor: "pointer", textDecoration: chk[i] ? "line-through" : "none", color: chk[i] ? "var(--faint)" : "var(--ink)" }} onClick={() => flip(i)}>{f.item}</b>
-                    <button className="sw-btn" style={{ padding: "2px 10px", fontSize: 11.5 }} onClick={() => setOpen({ ...open, [i]: !open[i] })} aria-expanded={!!open[i]}>{open[i] ? "閉じる" : "やり方"}</button>
+                    <button className="sw-btn" style={{ padding: "2px 10px", fontSize: 11.5 }} onClick={() => setOpen({ ...open, [i]: !open[i] })} aria-expanded={!!open[i]}>{open[i] ? tx("閉じる", "Close") : tx("やり方", "How")}</button>
                   </div>
                   {open[i] ? <p className="sw-sm" style={{ margin: "6px 0 0", color: "var(--ink2)" }}>{f.how}</p> : null}
                 </div>
@@ -221755,27 +221912,28 @@ const SideWorkHubModule = (function () {
       </div>
     );
   }
-  const TIERS = [["S", "一次情報", "公的統計・公文書・公式発表・原典", "#047857"], ["A", "定評ある解説", "事典・学術書・専門機関の解説", "#1D4ED8"], ["B", "信頼できる報道", "報道・業界メディア。独立した2つ以上で一致を確かめる", "#526074"]];
+  // 段階は [記号, 日本語, 日本語の説明, 色, 英語, 英語の説明]
+  const TIERS = [["S", "一次情報", "公的統計・公文書・公式発表・原典", "#047857", "Primary sources", "Official statistics, public records, official announcements, original texts"], ["A", "定評ある解説", "事典・学術書・専門機関の解説", "#1D4ED8", "Respected references", "Encyclopedias, scholarly books, explanations from expert bodies"], ["B", "信頼できる報道", "報道・業界メディア。独立した2つ以上で一致を確かめる", "#526074", "Reliable reporting", "News and trade media. Confirm agreement in 2 or more independent outlets"]];
   function Sources() {
     const [kind, setKind] = useState("wine");
     const rows = ((SW_DATA[kind] || {}).sources) || [];
     return (
       <div>
-        <Head kick="04 確かめる" title="情報源" lede="出典は3段階で扱います。まとめ記事・SNS・AIの回答は出典にしません。" />
+        <Head kick={tx("04 確かめる", "04 CHECK")} title={tx("情報源", "Sources")} lede={tx("出典は3段階で扱います。まとめ記事・SNS・AIの回答は出典にしません。", "Sources are handled in three tiers. Summary articles, social posts and AI answers are never sources.")} />
         <div className="sw-g sw-g3">
-          {TIERS.map(([t, nm, d, c]) => (
+          {TIERS.map(([t, nm, d, c, nme, de]) => (
             <div key={t} className="sw-card" style={{ display: "flex", gap: 12 }}>
               <span className="sw-tier" style={{ background: c }}>{t}</span>
-              <div><b>{nm}</b><div className="sw-sm">{d}</div></div>
+              <div><b>{tx(nm, nme)}</b><div className="sw-sm">{tx(d, de)}</div></div>
             </div>
           ))}
         </div>
-        <Tabs value={kind} onChange={setKind} options={[["wine", "ワイン", ((SW_DATA.wine || {}).sources || []).length], ["history", "歴史", ((SW_DATA.history || {}).sources || []).length]]} />
-        {TIERS.map(([t, nm, , c]) => { const rs = rows.filter((x) => x.tier === t); return rs.length ? (
-          <Fold key={kind + t} id={"src:" + t} title={<><span className="sw-tier" style={{ background: c, width: 22, height: 22, fontSize: 11.5, marginRight: 8, verticalAlign: -4 }}>{t}</span>{nm}</>} meta={`${rs.length}件`}>
+        <Tabs value={kind} onChange={setKind} options={[["wine", tx("ワイン", "Wine"), ((SW_DATA.wine || {}).sources || []).length], ["history", tx("歴史", "History"), ((SW_DATA.history || {}).sources || []).length]]} />
+        {TIERS.map(([t, nm, , c, nme]) => { const rs = rows.filter((x) => x.tier === t); return rs.length ? (
+          <Fold key={kind + t} id={"src:" + t} title={<><span className="sw-tier" style={{ background: c, width: 22, height: 22, fontSize: 11.5, marginRight: 8, verticalAlign: -4 }}>{t}</span>{tx(nm, nme)}</>} meta={tx(`${rs.length}件`, `${rs.length}`)}>
             {rs.map((x, i) => (
               <div key={t + i} className="sw-src">
-                <div><b>{x.name}</b> {x.url ? <Ext url={x.url}>開く</Ext> : <span className="sw-sm">（URLなし）</span>}<div className="sw-sm">{x.why}</div></div>
+                <div><b>{x.name}</b> {x.url ? <Ext url={x.url}>{tx("開く", "Open")}</Ext> : <span className="sw-sm">{tx("（URLなし）", "(no URL)")}</span>}<div className="sw-sm">{x.why}</div></div>
               </div>
             ))}
           </Fold>
@@ -221786,26 +221944,28 @@ const SideWorkHubModule = (function () {
   function Rules() {
     const PL = SW_DATA.pipeline || {};
     const [g, setG] = useState("rights");
-    const groups = { rights: ["権利とAI表示", PL.rights || []], wine: ["酒類の発信", (SW_DATA.wine || {}).rules || []], history: ["歴史の発信", (SW_DATA.history || {}).rules || []] };
+    const groups = { rights: [tx("権利とAI表示", "Rights & AI labels"), PL.rights || []], wine: [tx("酒類の発信", "Alcohol content"), (SW_DATA.wine || {}).rules || []], history: [tx("歴史の発信", "History content"), (SW_DATA.history || {}).rules || []] };
     const rows = groups[g][1];
     return (
       <div>
-        <Head kick="04 確かめる" title="規制・リスク" lede="著作権・肖像と声・ステマ規制・酒類の基準・AI生成の表示など、発信の前に押さえる決まりです。個別の判断が要るときは専門家に相談してください。" />
+        <Head kick={tx("04 確かめる", "04 CHECK")} title={tx("規制・リスク", "Rules & risks")} lede={tx("著作権・肖像と声・ステマ規制・酒類の基準・AI生成の表示など、発信の前に押さえる決まりです。個別の判断が要るときは専門家に相談してください。", "Rules to know before posting: copyright, likeness and voice, stealth-marketing rules, alcohol standards, AI-generated labels and more. Consult a professional when a case needs individual judgment.")} />
         <Tabs value={g} onChange={setG} options={Object.entries(groups).map(([k, [l, r]]) => [k, l, r.length])} />
         <div className="sw-card sw-sec" style={{ padding: "6px 20px" }}>
           {rows.map((r, i) => (
             <div key={i} className="sw-rule">
-              <div style={{ fontWeight: 800 }}>{r.name}{r.verified !== undefined ? <Badge v={r.verified} /> : null} {r.url ? <Ext url={r.url}>開く</Ext> : null}</div>
+              <div style={{ fontWeight: 800 }}>{r.name}{r.verified !== undefined ? <Badge v={r.verified} /> : null} {r.url ? <Ext url={r.url}>{tx("開く", "Open")}</Ext> : null}</div>
               <div className="sw-sm" style={{ color: "var(--ink2)" }}>{r.summary}</div>
             </div>
           ))}
         </div>
-        <div className="sw-note warn"><b>悩み系のテーマで越えない線　</b>医療（美容・薄毛・ダイエット）は医療広告ガイドラインと薬機法、法律の悩み（離婚・借金・退職）は弁護士法72条（紹介料の禁止・非弁行為）、紹介報酬つきの発信は景品表示法のステマ規制（広告であることの表示）に従います。違法な手口や、特定の人を調べる方法は発信しません。</div>
+        <div className="sw-note warn"><b>{tx("悩み系のテーマで越えない線　", "Lines not to cross on personal-worry themes: ")}</b>{tx("医療（美容・薄毛・ダイエット）は医療広告ガイドラインと薬機法、法律の悩み（離婚・借金・退職）は弁護士法72条（紹介料の禁止・非弁行為）、紹介報酬つきの発信は景品表示法のステマ規制（広告であることの表示）に従います。違法な手口や、特定の人を調べる方法は発信しません。", "Medical topics (beauty, hair loss, diets) follow Japan's medical advertising guidelines and the Pharmaceuticals and Medical Devices Act; legal worries (divorce, debt, quitting a job) follow Article 72 of the Attorneys Act (no referral fees or unlicensed legal practice); posts with referral rewards follow the stealth-marketing rules of the Act against Unjustifiable Premiums and Misleading Representations (disclose that it's an ad). Never post illegal methods or ways to look into specific people.")}</div>
       </div>
     );
   }
 
   function SideWorkHub() {
+    const [ui, setUi] = useUiLang();
+    UI_EN = ui === "en";
     const [pg, setPg] = useState("home");
     const [focus, setFocus] = useState(null);
     // 開いている画面を URL に残す（#sidework/<画面>）
@@ -221820,26 +221980,28 @@ const SideWorkHubModule = (function () {
     return (
       <div className="sw">
         <style>{CSS}</style>
-        <aside className="sw-side" aria-label="Side Work Hub のメニュー">
+        <aside className="sw-side" aria-label={tx("Side Work Hub のメニュー", "Side Work Hub menu")}>
           <div className="sw-logo">
             <span className="sw-logo-m"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 6h16v12H4zM10 9l5 3-5 3z" /></svg></span>
-            <span><span className="sw-logo-s">SIDE WORK HUB</span><div className="sw-logo-t">SNS副業ダッシュボード</div></span>
+            <span><span className="sw-logo-s">SIDE WORK HUB</span><div className="sw-logo-t">{tx("SNS副業ダッシュボード", "Social media dashboard")}</div></span>
           </div>
+          <LangToggle ui={ui} setUi={setUi} />
           <div className="sw-meter">
-            <div className="sw-meter-l"><span>原文で確認した事実</span><b>{done} / {FACTS.length}</b></div>
+            <div className="sw-meter-l"><span>{tx("原文で確認した事実", "Facts checked in the original")}</span><b>{done} / {FACTS.length}</b></div>
             <div className="sw-bar"><i style={{ width: `${FACTS.length ? done / FACTS.length * 100 : 0}%` }} /></div>
           </div>
           {NAV.map((g) => (
             <div key={g.n} className="sw-grp">
-              <div className="sw-grp-h">{g.n}　{g.label}</div>
-              {g.items.map(([k, l, ic]) => <button key={k} className={"sw-nav" + (pg === k ? " on" : "")} aria-current={pg === k ? "page" : undefined} onClick={() => go(k)}><Icon n={ic} />{l}</button>)}
+              <div className="sw-grp-h">{g.n}{tx("　", " ")}{tx(g.label, g.en)}</div>
+              {g.items.map(([k, l, ic, le]) => <button key={k} className={"sw-nav" + (pg === k ? " on" : "")} aria-current={pg === k ? "page" : undefined} onClick={() => go(k)}><Icon n={ic} />{tx(l, le)}</button>)}
             </div>
           ))}
         </aside>
         <main className="sw-main" onClick={shutCard}>
-          <nav className="sw-mnav" aria-label="Side Work Hub のメニュー">
-            <div className="sw-mnav-s">{NAV.map((g) => <button key={g.n} className={grp.n === g.n ? "on" : ""} onClick={() => go(g.items[0][0])}>{g.short}</button>)}</div>
-            {grp.items.length > 1 ? <div className="sw-mnav-i">{grp.items.map(([k, l]) => <button key={k} className={pg === k ? "on" : ""} onClick={() => go(k)}>{l}</button>)}</div> : null}
+          <nav className="sw-mnav" aria-label={tx("Side Work Hub のメニュー", "Side Work Hub menu")}>
+            <div className="sw-mnav-top"><LangToggle ui={ui} setUi={setUi} /></div>
+            <div className="sw-mnav-s">{NAV.map((g) => <button key={g.n} className={grp.n === g.n ? "on" : ""} onClick={() => go(g.items[0][0])}>{tx(g.short, g.shortEn)}</button>)}</div>
+            {grp.items.length > 1 ? <div className="sw-mnav-i">{grp.items.map(([k, l, , le]) => <button key={k} className={pg === k ? "on" : ""} onClick={() => go(k)}>{tx(l, le)}</button>)}</div> : null}
           </nav>
           {pg === "home" && <Home go={go} done={done} checked={checked} openEp={(e) => { setFocus(e.kind + e.id); go("plans"); }} />}
           {pg === "market" && <Market />}
@@ -221857,7 +222019,7 @@ const SideWorkHubModule = (function () {
           {pg === "quality" && <Quality done={done} openEp={(e) => { setFocus(e.kind + e.id); go("plans"); }} />}
           {pg === "sources" && <Sources />}
           {pg === "rules" && <Rules />}
-          <footer className="sw-foot">調査：2026年10月。規約・料金・市場規模は変わるので、使う前に出典で最新を確かめてください。「要原文確認」は検索結果の要約でしか確かめていないものです。</footer>
+          <footer className="sw-foot">{tx("調査：2026年10月。規約・料金・市場規模は変わるので、使う前に出典で最新を確かめてください。「要原文確認」は検索結果の要約でしか確かめていないものです。", "Researched October 2026. Terms, prices and market sizes change, so check the latest at the source before use. \"Check original\" marks items confirmed only from search-result summaries.")}</footer>
         </main>
       </div>
     );
@@ -221929,6 +222091,22 @@ const LiberalArtsModule = (function () {
 // 会食で休んだ日や未実施の日、予定と違う Set をやった日があっても、次回は続きの Set から再開できる。
 const TrainingHubModule = (function () {
   const TR_KEY = "training_log_v1";
+  // ---- 画面の言語（ポータルの言語で開き、見出しの EN／日本語 で切り替える） ----
+  // 訳すのは画面の部品（見出し・ボタン・案内）と短い決まった名前（種目・食事の区分）だけ。記録した内容とメニューの重量・手順は訳さない。
+  // ハブの根（TrainingHub）が描画のたびに UI_EN を入れ直すので、部品と補助関数は tx(日本語, 英語) で今の言語の文言を選ぶ。
+  let UI_EN = false;
+  const tx = (ja, en) => (UI_EN ? en : ja);
+  const pl = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`; // 英語の複数形（1 day / 2 days）
+  const useUiLang = () => {
+    const [ui, setUi] = useState(() => (typeof window !== "undefined" && window.__novaLang) || "ja"); // ポータルの言語で開く
+    useEffect(() => {
+      // ポータルが保存済みの言語を読み込んだとき・切り替えたとき（nova-lang）にも合わせる
+      const f = () => { const l = window.__novaLang; if (l === "ja" || l === "en") setUi(l); };
+      window.addEventListener("nova-lang", f);
+      return () => window.removeEventListener("nova-lang", f);
+    }, []);
+    return [ui, setUi];
+  };
   // 配色。ポータルの NOVA はこのモジュールより後で宣言されるため、ここでは参照しない。
   const TC = {
     ink: "#0E1E38", sub: "#5B6B85", faint: "#A9B4C6", line: "#DEE5EF", panel: "#F4F7FB", bg: "#FFFFFF",
@@ -221940,6 +222118,8 @@ const TrainingHubModule = (function () {
 
   // ---- メニューの元データ（ユーザーのプランそのまま。Set調整で上書きした値はこれに重ねる） ----
   const EX_NAME = { squat: "スクワット", chest: "チェストプレス", lat: "ラットプルダウン", torso: "ロータリートルソー" };
+  const EX_NAME_EN = { squat: "Squat", chest: "Chest press", lat: "Lat pulldown", torso: "Rotary torso" };
+  const exName = (id) => tx(EX_NAME[id], EX_NAME_EN[id]);
   const AERO_WALK = [
     "最初5分：低い傾斜・楽な速度でウォーキング",
     "次の50分：傾斜8％・速度5.5km/h",
@@ -221976,7 +222156,10 @@ const TrainingHubModule = (function () {
   BASE.A = { id: "A", n: 0, label: "有酸素", kind: "aero", title: "有酸素のみ", items: [], aero: { total: 60, steps: AERO_WALK } };
   const SET_IDS = ["S1", "S2", "S3", "S4", "S5"];
   const PICK_IDS = [...SET_IDS, "A"];
-  const setName = (s) => (s ? (s.label || `Set${s.n}`) : "?");
+  const setName = (s) => (s ? (s.label ? tx(s.label, "Cardio") : `Set${s.n}`) : "?");
+  // Set の題名（4種類だけの決まった名前）の英語
+  const TITLE_EN = { "スクワット＋上半身＋ウォーキング": "Squats + upper body + walking", "上半身＋ランニング": "Upper body + running", "上半身＋ウォーキング": "Upper body + walking", "有酸素のみ": "Cardio only" };
+  const setTitle = (s) => tx(s.title, TITLE_EN[s.title] || s.title);
   // 1巡：Set1 → Set2 → 休養日 → Set3 → Set4 → Set5 → 休養日
   const CYCLE = ["S1", "S2", "R", "S3", "S4", "S5", "R"];
 
@@ -222009,6 +222192,35 @@ const TrainingHubModule = (function () {
     "まず2週間続け、体重・疲労・筋力を見て調整",
     "第一目標：88kg・26％ → 81kg前後・20％前後。筋肉を維持できた場合の概算",
   ];
+  const FLOW_RULES_EN = [
+    "Base cycle: Set1 → Set2 → rest day → Set3 → Set4 → Set5 → rest day",
+    "Monthly target: each Set 4 times, 20 sessions in total",
+    "Make a dining-out day a rest day and resume with the next Set",
+    "When the month changes, carry on from wherever you are in the cycle",
+    "Don't cram missed sessions into the end of the month",
+    "Leave at least 2–3 days between squat sessions",
+  ];
+  const LOAD_RULES_EN = [
+    "Do the strength work in the listed order, then cardio",
+    "Warm up squats with a light weight (20 kg) before the working sets",
+    "Pick weights that leave 2–3 reps in reserve",
+    "If plan changes put chest press or lat pulldown on back-to-back days, cut the volume (e.g. drop the heaviest set)",
+    "After a rest day, do the planned volume; reduce it if you're still tired",
+    "Rest between sets: 2–3 min for squat, chest press and lat pulldown; 1–2 min for rotary torso",
+    "Start running in Set2 only; add it to Set4 once you recover well",
+    "Run at a 0–1% incline and a comfortable pace at first; build up to the target 3% incline at 9–10 km/h",
+    "Incline walking is demanding too: lower the incline, speed or time to match your breathing and leg fatigue",
+  ];
+  const FOOD_RULES_EN = [
+    "Calories: start at 2,300–2,400 kcal/day",
+    "Protein: 160–180 g/day",
+    "Fat: about 60–70 g/day",
+    "Carbs: fill the remaining calories",
+    "Count the morning protein shake toward daily protein",
+    "Weigh yourself every morning under the same conditions and track the 7-day average",
+    "Keep this up for 2 weeks first, then adjust based on weight, fatigue and strength",
+    "First goal: 88 kg / 26% → about 81 kg / 20%. A rough estimate assuming you keep your muscle",
+  ];
   const GOAL = { fromKg: 88, fromBf: 26, kg: 81, bf: 20 };
   const MONTH_TARGET = 4; // 各Setの月間目安
 
@@ -222023,7 +222235,7 @@ const TrainingHubModule = (function () {
   const recSet = (rec, adj) => (rec && rec.set && BASE[rec.set]
     ? (rec.menu ? { ...BASE[rec.set], ...rec.menu } : effSet(adj, rec.set))
     : null);
-  const fmtItem = (it) => (it.plan ? it.plan : `${it.w != null ? `${it.w}kg目安・` : ""}${it.reps} × ${it.sets}セット`);
+  const fmtItem = (it) => (it.plan ? it.plan : tx(`${it.w != null ? `${it.w}kg目安・` : ""}${it.reps} × ${it.sets}セット`, `${it.w != null ? `~${it.w} kg · ` : ""}${it.reps} × ${it.sets} sets`));
   const baseItem = (setId, exId) => BASE[setId].items.find((x) => x.id === exId);
 
   // ---- 日付（端末の暦日で扱う。toISOString は UTC になり日本時間の朝に前日へずれる） ----
@@ -222034,7 +222246,10 @@ const TrainingHubModule = (function () {
   const dayNo = (k) => { const [y, m, d] = partsOf(k); return Date.UTC(y, m - 1, d) / 86400000; };
   const diffDays = (a, b) => dayNo(a) - dayNo(b);
   const DOW = ["日", "月", "火", "水", "木", "金", "土"];
-  const label = (k) => { const [y, m, d] = partsOf(k); return `${m}/${d}（${DOW[new Date(y, m - 1, d).getDay()]}）`; };
+  const DOW_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const MONTH_EN = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  // 日本語は「11/3（火）」、英語は「Tue 11/3」
+  const label = (k) => { const [y, m, d] = partsOf(k); const w = new Date(y, m - 1, d).getDay(); return UI_EN ? `${DOW_EN[w]} ${m}/${d}` : `${m}/${d}（${DOW[w]}）`; };
   const short = (k) => { const [, m, d] = partsOf(k); return `${m}/${d}`; };
 
   // ---- 順番の計算 ----
@@ -222081,17 +222296,17 @@ const TrainingHubModule = (function () {
       if (last) {
         const n = diffDays(k, last);
         out.push(n < 2
-          ? { warn: true, t: `スクワットは前回（${short(last)}）から${n}日しか空いていません。間隔は2〜3日以上が目安です。` }
-          : { t: `スクワットは前回（${short(last)}）から${n}日空いています。` });
+          ? { warn: true, t: tx(`スクワットは前回（${short(last)}）から${n}日しか空いていません。間隔は2〜3日以上が目安です。`, `Only ${pl(n, "day")} since your last squats (${short(last)}). Aim for a gap of 2–3 days or more.`) }
+          : { t: tx(`スクワットは前回（${short(last)}）から${n}日空いています。`, `${pl(n, "day")} since your last squats (${short(last)}).`) });
       }
     }
     // 2026-10 のメニュー変更で種目は重量の段（plan）だけになり、セット数で判定できなくなった。上半身の種目があるかで判定する
     const isUpper = (s0) => !!s0 && s0.items.some((it) => it.id === "chest" || it.id === "lat");
     const prevUpper = prev && prev.s === "done" && isUpper(BASE[prev.set]);
     if (isUpper(set) && prevUpper) {
-      out.push({ warn: true, t: "前日も上半身をしています（連日）。チェストプレスとラットプルダウンは最も重い段を省くなど、量を減らします。" });
+      out.push({ warn: true, t: tx("前日も上半身をしています（連日）。チェストプレスとラットプルダウンは最も重い段を省くなど、量を減らします。", "You did upper body yesterday too (back-to-back days). Cut chest press and lat pulldown volume, e.g. drop the heaviest set.") });
     } else if (isUpper(set) && prev && (prev.s === "rest" || prev.s === "dinner")) {
-      out.push({ t: "休養明けです。予定どおりの量を基本に、疲れが残っていれば減らします。" });
+      out.push({ t: tx("休養明けです。予定どおりの量を基本に、疲れが残っていれば減らします。", "First session after a rest day: do the planned volume, and cut back if you're still tired.") });
     }
     return out;
   };
@@ -222118,7 +222333,7 @@ const TrainingHubModule = (function () {
       <div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
           <span style={chip(KIND_COLOR[set.kind], "#fff")}>{setName(set)}</span>
-          <span style={{ fontSize: 14, fontWeight: 800, color: TC.ink }}>{set.title}</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: TC.ink }}>{setTitle(set)}</span>
         </div>
         <ol style={{ margin: 0, paddingLeft: 20, color: TC.ink, fontSize: 13, lineHeight: 1.8 }}>
           {set.items.map((it) => {
@@ -222126,16 +222341,16 @@ const TrainingHubModule = (function () {
             const changed = b && fmtItem(b) !== fmtItem(it);
             return (
               <li key={it.id}>
-                <b>{EX_NAME[it.id]}</b>：{fmtItem(it)}
-                {changed ? <span style={{ ...chip(TC.accentSoft, TC.accent), marginLeft: 6 }} title={`元のプラン：${fmtItem(b)}`}>調整済み</span> : null}
-                {changed ? <span style={{ fontSize: 11.5, color: TC.faint, marginLeft: 6 }}>元：{fmtItem(b)}</span> : null}
+                <b>{exName(it.id)}</b>{tx("：", ": ")}{fmtItem(it)}
+                {changed ? <span style={{ ...chip(TC.accentSoft, TC.accent), marginLeft: 6 }} title={tx(`元のプラン：${fmtItem(b)}`, `Original plan: ${fmtItem(b)}`)}>{tx("調整済み", "Adjusted")}</span> : null}
+                {changed ? <span style={{ fontSize: 11.5, color: TC.faint, marginLeft: 6 }}>{tx("元：", "Was: ")}{fmtItem(b)}</span> : null}
               </li>
             );
           })}
           <li>
-            <b>有酸素</b>：合計{set.aero.total}分
+            <b>{tx("有酸素", "Cardio")}</b>{tx(`：合計${set.aero.total}分`, `: ${set.aero.total} min total`)}
             {base && (base.aero.total !== set.aero.total || base.aero.steps.join("|") !== set.aero.steps.join("|"))
-              ? <span style={{ ...chip(TC.accentSoft, TC.accent), marginLeft: 6 }}>調整済み</span> : null}
+              ? <span style={{ ...chip(TC.accentSoft, TC.accent), marginLeft: 6 }}>{tx("調整済み", "Adjusted")}</span> : null}
             <ul style={{ margin: "2px 0 4px", paddingLeft: 18, color: TC.sub, fontSize: 12.5, lineHeight: 1.75 }}>
               {set.aero.steps.map((x, j) => <li key={j}>{x}</li>)}
             </ul>
@@ -222143,7 +222358,7 @@ const TrainingHubModule = (function () {
         </ol>
         {run ? (
           <div style={{ marginTop: 6, fontSize: 12.5, color: TC.ink, background: TC.accentSoft, borderRadius: 8, padding: "6px 10px" }}>
-            ランニング{run}分 → その後のウォーキングは{run === 5 ? 35 : 30}分
+            {tx(`ランニング${run}分 → その後のウォーキングは${run === 5 ? 35 : 30}分`, `Run ${run} min → then walk ${run === 5 ? 35 : 30} min`)}
           </div>
         ) : null}
       </div>
@@ -222173,7 +222388,7 @@ const TrainingHubModule = (function () {
           return (
             <button key={id} onClick={() => onPick(id)} aria-pressed={value === id} style={{ ...btn(value === id, KIND_COLOR[s.kind]), position: "relative" }}>
               {setName(s)}
-              {expected === id ? <span style={{ fontSize: 10, fontWeight: 700, marginLeft: 5, opacity: value === id ? 0.9 : 0.75 }}>予定</span> : null}
+              {expected === id ? <span style={{ fontSize: 10, fontWeight: 700, marginLeft: 5, opacity: value === id ? 0.9 : 0.75 }}>{tx("予定", "Planned")}</span> : null}
             </button>
           );
         })}
@@ -222184,11 +222399,11 @@ const TrainingHubModule = (function () {
   function RunPicker({ value, onPick }) {
     return (
       <div style={{ marginTop: 10 }}>
-        <div style={cap}>ランニング</div>
+        <div style={cap}>{tx("ランニング", "Running")}</div>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           {[0, 5, 10].map((m) => (
             <button key={m} onClick={() => onPick(m)} aria-pressed={(value || 0) === m} style={{ ...btn((value || 0) === m), ...small }}>
-              {m ? `${m}分` : "走らない（ウォーキングのみ）"}
+              {m ? tx(`${m}分`, `${m} min`) : tx("走らない（ウォーキングのみ）", "No run (walk only)")}
             </button>
           ))}
         </div>
@@ -222199,11 +222414,11 @@ const TrainingHubModule = (function () {
   // 記録の表示名
   const statusText = (r) => {
     if (!r || !r.s) return "";
-    if (r.s === "done") return `${setName(BASE[r.set])} 完了`;
-    if (r.s === "other") return `その他${r.other ? `：${r.other}` : ""}`;
-    return { skip: "未実施", skipset: "Skip", rest: "休養", dinner: "会食" }[r.s] || "";
+    if (r.s === "done") return tx(`${setName(BASE[r.set])} 完了`, `${setName(BASE[r.set])} done`);
+    if (r.s === "other") return tx(`その他${r.other ? `：${r.other}` : ""}`, `Other${r.other ? `: ${r.other}` : ""}`);
+    return (UI_EN ? { skip: "Not done", skipset: "Skip", rest: "Rest", dinner: "Dining out" } : { skip: "未実施", skipset: "Skip", rest: "休養", dinner: "会食" })[r.s] || "";
   };
-  const planText = (p) => (p === "R" ? "休養日" : p === "dinner" ? "会食" : setName(BASE[p]));
+  const planText = (p) => (p === "R" ? tx("休養日", "Rest day") : p === "dinner" ? tx("会食", "Dining out") : setName(BASE[p]));
 
   // ---- 今日のトレーニング（その場で記録する） ----
   function TodayCard({ days, adj, todayK, proj, onPut, openEditor }) {
@@ -222215,8 +222430,8 @@ const TrainingHubModule = (function () {
     const [other, setOther] = useState("");
     const head = (
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
-        <div style={{ ...h2, margin: 0 }}>今日のトレーニング <span style={{ fontWeight: 600, color: TC.sub, fontSize: 13 }}>{label(todayK)}</span></div>
-        <span style={{ fontSize: 12.5, color: TC.sub }}>予定：<b style={{ color: TC.ink }}>{planText(expected)}</b></span>
+        <div style={{ ...h2, margin: 0 }}>{tx("今日のトレーニング", "Today's training")} <span style={{ fontWeight: 600, color: TC.sub, fontSize: 13 }}>{label(todayK)}</span></div>
+        <span style={{ fontSize: 12.5, color: TC.sub }}>{tx("予定：", "Planned: ")}<b style={{ color: TC.ink }}>{planText(expected)}</b></span>
       </div>
     );
     if (rec && rec.s) {
@@ -222225,11 +222440,11 @@ const TrainingHubModule = (function () {
         <div style={{ ...card, borderColor: TC.ink }}>
           {head}
           <div style={{ fontSize: 15, fontWeight: 800, color: TC.accent, margin: "8px 0 10px" }}>
-            ✓ 記録済み：{statusText(rec)}{rec.run ? `（ランニング${rec.run}分）` : ""}
+            {tx("✓ 記録済み：", "✓ Logged: ")}{statusText(rec)}{rec.run ? tx(`（ランニング${rec.run}分）`, ` (ran ${rec.run} min)`) : ""}
           </div>
           {set ? <SetMenu set={set} run={rec.run} /> : null}
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
-            <button onClick={() => openEditor(todayK)} style={btn(false)}>記録を修正する</button>
+            <button onClick={() => openEditor(todayK)} style={btn(false)}>{tx("記録を修正する", "Edit this entry")}</button>
           </div>
         </div>
       );
@@ -222240,7 +222455,7 @@ const TrainingHubModule = (function () {
       else if (pick === "other") { if (other.trim()) onPut(todayK, { s: "other", other: other.trim() }); }
       else onPut(todayK, { s: "rest" });
     };
-    const primary = set ? `✓ ${setName(set)} 完了` : pick === "other" ? "✓ その他を記録" : "✓ 休養";
+    const primary = set ? tx(`✓ ${setName(set)} 完了`, `✓ ${setName(set)} done`) : pick === "other" ? tx("✓ その他を記録", "✓ Log other") : tx("✓ 休養", "✓ Rest");
     return (
       <div style={{ ...card, borderColor: TC.ink }}>
         {head}
@@ -222254,26 +222469,26 @@ const TrainingHubModule = (function () {
               <Hints list={hintsFor(days, todayK, set)} />
             </>
           ) : pick === "other" ? (
-            <label style={{ display: "block", ...cap }}>やった内容（自由記述）
+            <label style={{ display: "block", ...cap }}>{tx("やった内容（自由記述）", "What you did (free text)")}
               <textarea value={other} onChange={(e) => setOther(e.target.value)} rows={3} autoFocus
-                        aria-label="例：ゴルフ18ホール／ストレッチ30分／上半身だけ実施" placeholder="例：ゴルフ18ホール／ストレッチ30分／上半身だけ実施"
+                        aria-label={tx("例：ゴルフ18ホール／ストレッチ30分／上半身だけ実施", "e.g. 18 holes of golf / 30 min of stretching / upper body only")} placeholder={tx("例：ゴルフ18ホール／ストレッチ30分／上半身だけ実施", "e.g. 18 holes of golf / 30 min of stretching / upper body only")}
                         style={{ ...field, width: "100%", marginTop: 4, resize: "vertical", lineHeight: 1.6 }} />
             </label>
           ) : (
             <div style={{ fontSize: 13.5, color: TC.ink, background: TC.panel, borderRadius: 10, padding: "10px 12px" }}>
-              しっかり休んで、次回のSet{BASE[setAt(pos)].n}に備えましょう。
+              {tx(`しっかり休んで、次回のSet${BASE[setAt(pos)].n}に備えましょう。`, `Rest well and get ready for Set${BASE[setAt(pos)].n} next time.`)}
             </div>
           )}
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 14 }}>
           <button onClick={commit} disabled={pick === "other" && !other.trim()}
                   style={{ ...btn(true, pick === "other" ? TC.other : undefined), opacity: pick === "other" && !other.trim() ? 0.5 : 1 }}>{primary}</button>
-          {expected !== "R" ? <button onClick={() => onPut(todayK, { s: "skip" })} style={btn(false)}>未実施</button> : null}
-          <button onClick={() => onPut(todayK, { s: "skipset" })} style={btn(false)} title="予定を飛ばして、次回は次のSetから">Skip</button>
-          {expected !== "R" ? <button onClick={() => onPut(todayK, { s: "rest" })} style={btn(false)}>休養</button> : null}
-          <button onClick={() => onPut(todayK, { s: "dinner" })} style={btn(false)}>会食</button>
+          {expected !== "R" ? <button onClick={() => onPut(todayK, { s: "skip" })} style={btn(false)}>{tx("未実施", "Not done")}</button> : null}
+          <button onClick={() => onPut(todayK, { s: "skipset" })} style={btn(false)} title={tx("予定を飛ばして、次回は次のSetから", "Skip the planned session; next time moves on to the next Set")}>Skip</button>
+          {expected !== "R" ? <button onClick={() => onPut(todayK, { s: "rest" })} style={btn(false)}>{tx("休養", "Rest")}</button> : null}
+          <button onClick={() => onPut(todayK, { s: "dinner" })} style={btn(false)}>{tx("会食", "Dining out")}</button>
           <button onClick={() => setPick(pick === "other" ? (expected === "R" ? null : expected) : "other")} aria-pressed={pick === "other"}
-                  style={btn(pick === "other", TC.other)}>その他</button>
+                  style={btn(pick === "other", TC.other)}>{tx("その他", "Other")}</button>
         </div>
       </div>
     );
@@ -222293,46 +222508,46 @@ const TrainingHubModule = (function () {
     return (
       <div style={{ ...card, borderColor: TC.accent }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8, marginBottom: 10 }}>
-          <div style={{ ...h2, margin: 0 }}>{label(k)}の記録</div>
-          <button onClick={onClose} style={{ ...btn(false), ...small }}>閉じる</button>
+          <div style={{ ...h2, margin: 0 }}>{tx(`${label(k)}の記録`, `Log for ${label(k)}`)}</div>
+          <button onClick={onClose} style={{ ...btn(false), ...small }}>{tx("閉じる", "Close")}</button>
         </div>
         {isFuture ? (
           <div>
             <div style={{ fontSize: 12.5, color: TC.sub, marginBottom: 8, lineHeight: 1.7 }}>
-              先の日付には会食の予定だけ入れられます。入れた日は休養日になり、予定の Set は翌日以降に繰り下がります。
+              {tx("先の日付には会食の予定だけ入れられます。入れた日は休養日になり、予定の Set は翌日以降に繰り下がります。", "For future dates you can only add a dining-out plan. That day becomes a rest day, and the planned Set moves to the following days.")}
             </div>
             <button onClick={() => onPut({ s: r.s === "dinner" ? undefined : "dinner" })} style={btn(r.s === "dinner", TC.dinner)}>
-              {r.s === "dinner" ? "会食の予定を取り消す" : "会食の予定を入れる"}
+              {r.s === "dinner" ? tx("会食の予定を取り消す", "Cancel dining-out plan") : tx("会食の予定を入れる", "Add dining-out plan")}
             </button>
           </div>
         ) : (
           <div>
-            {expected ? <div style={cap}>この日の予定：<b style={{ color: TC.ink }}>{planText(expected)}</b></div> : null}
+            {expected ? <div style={cap}>{tx("この日の予定：", "Planned for this day: ")}<b style={{ color: TC.ink }}>{planText(expected)}</b></div> : null}
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-              <button onClick={() => { if (!worked) pickSet(nextSet || "S1"); }} style={btn(worked)}>完了</button>
-              <button onClick={() => onPut({ s: "skip" })} style={btn(r.s === "skip", TC.skip)}>未実施</button>
-              <button onClick={() => onPut({ s: "skipset" })} style={btn(r.s === "skipset", TC.skipset)} title="予定を飛ばして、次回は次のSetから">Skip</button>
-              <button onClick={() => onPut({ s: "rest" })} style={btn(r.s === "rest", TC.rest)}>休養</button>
-              <button onClick={() => onPut({ s: "dinner" })} style={btn(r.s === "dinner", TC.dinner)}>会食</button>
-              <button onClick={() => onPut({ s: "other" })} style={btn(r.s === "other", TC.other)}>その他</button>
+              <button onClick={() => { if (!worked) pickSet(nextSet || "S1"); }} style={btn(worked)}>{tx("完了", "Done")}</button>
+              <button onClick={() => onPut({ s: "skip" })} style={btn(r.s === "skip", TC.skip)}>{tx("未実施", "Not done")}</button>
+              <button onClick={() => onPut({ s: "skipset" })} style={btn(r.s === "skipset", TC.skipset)} title={tx("予定を飛ばして、次回は次のSetから", "Skip the planned session; next time moves on to the next Set")}>Skip</button>
+              <button onClick={() => onPut({ s: "rest" })} style={btn(r.s === "rest", TC.rest)}>{tx("休養", "Rest")}</button>
+              <button onClick={() => onPut({ s: "dinner" })} style={btn(r.s === "dinner", TC.dinner)}>{tx("会食", "Dining out")}</button>
+              <button onClick={() => onPut({ s: "other" })} style={btn(r.s === "other", TC.other)}>{tx("その他", "Other")}</button>
             </div>
             {worked ? (
               <div style={{ marginTop: 12 }}>
-                <div style={cap}>やった内容（予定と違えば選び直してください。次回はここから続きます）</div>
+                <div style={cap}>{tx("やった内容（予定と違えば選び直してください。次回はここから続きます）", "What you did (pick again if it differs from the plan; the next session continues from here)")}</div>
                 <MenuPicker value={r.set} expected={expected !== "R" ? expected : null} onPick={pickSet} />
                 {shown && shown.kind === "run" ? <RunPicker value={r.run} onPick={(m) => onPut({ run: m || undefined })} /> : null}
                 {shown ? (
                   <div style={{ marginTop: 12 }}>
-                    <div style={{ ...cap, marginBottom: 8 }}>{r.menu ? "記録した時点のメニュー" : "メニュー"}</div>
+                    <div style={{ ...cap, marginBottom: 8 }}>{r.menu ? tx("記録した時点のメニュー", "Menu as logged") : tx("メニュー", "Menu")}</div>
                     <SetMenu set={shown} run={r.run} />
                   </div>
                 ) : null}
               </div>
             ) : null}
             {r.s === "other" ? (
-              <label style={{ display: "block", ...cap, marginTop: 12 }}>やった内容（自由記述）
+              <label style={{ display: "block", ...cap, marginTop: 12 }}>{tx("やった内容（自由記述）", "What you did (free text)")}
                 <textarea value={other} onChange={(e) => setOther(e.target.value)} onBlur={() => onPut({ other: other.trim() || undefined })} rows={3} autoFocus
-                          aria-label="例：ゴルフ18ホール／ストレッチ30分／上半身だけ実施" placeholder="例：ゴルフ18ホール／ストレッチ30分／上半身だけ実施"
+                          aria-label={tx("例：ゴルフ18ホール／ストレッチ30分／上半身だけ実施", "e.g. 18 holes of golf / 30 min of stretching / upper body only")} placeholder={tx("例：ゴルフ18ホール／ストレッチ30分／上半身だけ実施", "e.g. 18 holes of golf / 30 min of stretching / upper body only")}
                           style={{ ...field, width: "100%", marginTop: 4, resize: "vertical", lineHeight: 1.6 }} />
               </label>
             ) : null}
@@ -222345,37 +222560,37 @@ const TrainingHubModule = (function () {
           return (
             <div style={{ marginTop: 14, padding: "10px 12px", background: TC.panel, borderRadius: 10, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
               <span style={{ fontSize: 12.5, color: TC.ink }}>
-                食事：{ms.length ? `${ms.length}件${t.kcal ? `・${t.kcal.toLocaleString()}kcal` : ""}${t.p ? `・タンパク質${Math.round(t.p)}g` : ""}` : "まだ記録がありません"}
+                {tx("食事：", "Meals: ")}{ms.length ? tx(`${ms.length}件${t.kcal ? `・${t.kcal.toLocaleString()}kcal` : ""}${t.p ? `・タンパク質${Math.round(t.p)}g` : ""}`, `${ms.length} logged${t.kcal ? ` · ${t.kcal.toLocaleString()} kcal` : ""}${t.p ? ` · protein ${Math.round(t.p)} g` : ""}`) : tx("まだ記録がありません", "none logged yet")}
               </span>
-              <button onClick={() => onOpenMeals(k)} style={{ ...btn(false), ...small }}>{ms.length ? "食事を見る" : "食事を記録する"}</button>
+              <button onClick={() => onOpenMeals(k)} style={{ ...btn(false), ...small }}>{ms.length ? tx("食事を見る", "View meals") : tx("食事を記録する", "Log a meal")}</button>
             </div>
           );
         })() : null}
         <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginTop: 14, alignItems: "flex-end" }}>
           {!isFuture ? (
             <>
-              <label style={cap}>体重（kg）<br />
+              <label style={cap}>{tx("体重（kg）", "Weight (kg)")}<br />
                 <input inputMode="decimal" value={kg} onChange={(e) => setKg(e.target.value)} onBlur={() => onPut({ kg: num1(kg) })} style={{ ...field, width: 90 }} aria-label="87.6" placeholder="87.6" />
               </label>
-              <label style={cap}>体脂肪率（％）<br />
+              <label style={cap}>{tx("体脂肪率（％）", "Body fat (%)")}<br />
                 <input inputMode="decimal" value={bf} onChange={(e) => setBf(e.target.value)} onBlur={() => onPut({ bf: num1(bf) })} style={{ ...field, width: 90 }} aria-label="25.8" placeholder="25.8" />
               </label>
             </>
           ) : null}
-          <label style={{ ...cap, flex: 1, minWidth: 180 }}>メモ（体調・使った重量など）<br />
+          <label style={{ ...cap, flex: 1, minWidth: 180 }}>{tx("メモ（体調・使った重量など）", "Notes (how you felt, weights used, etc.)")}<br />
             <input value={memo} onChange={(e) => setMemo(e.target.value)} onBlur={() => onPut({ memo: memo.trim() || undefined })}
-                   style={{ ...field, width: "100%" }} aria-label="例：脚に疲れが残りランは見送り" placeholder="例：脚に疲れが残りランは見送り" />
+                   style={{ ...field, width: "100%" }} aria-label={tx("例：脚に疲れが残りランは見送り", "e.g. Legs still tired, skipped the run")} placeholder={tx("例：脚に疲れが残りランは見送り", "e.g. Legs still tired, skipped the run")} />
           </label>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 12, gap: 8, flexWrap: "wrap" }}>
-          <span style={{ fontSize: 11, color: TC.faint }}>入力内容は自動で保存されます（文字・数値は入力欄から離れたとき）</span>
+          <span style={{ fontSize: 11, color: TC.faint }}>{tx("入力内容は自動で保存されます（文字・数値は入力欄から離れたとき）", "Changes save automatically (text and numbers when you leave the field)")}</span>
           {rec ? <button onClick={() => {
                            const ms = r.meals || [];
-                           if (!window.confirm(`${label(k)}の記録を削除しますか？${ms.length ? "食事の記録と写真も削除されます。" : ""}`)) return;
+                           if (!window.confirm(tx(`${label(k)}の記録を削除しますか？${ms.length ? "食事の記録と写真も削除されます。" : ""}`, `Delete the log for ${label(k)}?${ms.length ? " Its meals and photos will be deleted too." : ""}`))) return;
                            photoDel(ms.flatMap((m) => m.photos || []));
                            onPut(null);
                          }}
-                         style={{ ...btn(false), ...small, color: TC.skip }}>この日の記録を削除</button> : null}
+                         style={{ ...btn(false), ...small, color: TC.skip }}>{tx("この日の記録を削除", "Delete this day's log")}</button> : null}
         </div>
       </div>
     );
@@ -222396,7 +222611,7 @@ const TrainingHubModule = (function () {
     const pts = keys.map((k, i) => ({ k, i, kg: days[k] && days[k].kg != null ? days[k].kg : null, a: avg7(days, k) }));
     const vals = pts.flatMap((p) => [p.kg, p.a ? p.a.v : null]).filter((v) => v != null);
     if (!vals.length) {
-      return <div style={{ fontSize: 13, color: TC.sub, padding: "28px 0", textAlign: "center" }}>体重を記録すると、ここに推移と7日平均が表示されます。</div>;
+      return <div style={{ fontSize: 13, color: TC.sub, padding: "28px 0", textAlign: "center" }}>{tx("体重を記録すると、ここに推移と7日平均が表示されます。", "Log your weight to see the trend and 7-day average here.")}</div>;
     }
     let lo = Math.floor(Math.min(...vals) - 0.5), hi = Math.ceil(Math.max(...vals) + 0.5);
     if (hi - lo < 3) lo = hi - 3;
@@ -222422,14 +222637,14 @@ const TrainingHubModule = (function () {
     return (
       <div style={{ position: "relative" }}>
         <div style={{ display: "flex", gap: 14, fontSize: 12, color: TC.sub, marginBottom: 6, flexWrap: "wrap" }}>
-          <span><svg width="12" height="12" style={{ verticalAlign: "-1px" }}><circle cx="6" cy="6" r="4" fill={TC.dot} /></svg> 毎朝の体重</span>
-          <span><svg width="18" height="12" style={{ verticalAlign: "-1px" }}><line x1="1" y1="6" x2="17" y2="6" stroke={TC.accent} strokeWidth="2" strokeLinecap="round" /></svg> 7日平均</span>
+          <span><svg width="12" height="12" style={{ verticalAlign: "-1px" }}><circle cx="6" cy="6" r="4" fill={TC.dot} /></svg> {tx("毎朝の体重", "Morning weight")}</span>
+          <span><svg width="18" height="12" style={{ verticalAlign: "-1px" }}><line x1="1" y1="6" x2="17" y2="6" stroke={TC.accent} strokeWidth="2" strokeLinecap="round" /></svg> {tx("7日平均", "7-day average")}</span>
           {goalIn
-            ? <span><svg width="18" height="12" style={{ verticalAlign: "-1px" }}><line x1="1" y1="6" x2="17" y2="6" stroke={TC.sub} strokeWidth="1" /></svg> 目標 {GOAL.kg}kg</span>
-            : <span>目標の{GOAL.kg}kgは表示範囲の下（変化が見やすいよう、記録の範囲に合わせています）</span>}
+            ? <span><svg width="18" height="12" style={{ verticalAlign: "-1px" }}><line x1="1" y1="6" x2="17" y2="6" stroke={TC.sub} strokeWidth="1" /></svg> {tx(`目標 ${GOAL.kg}kg`, `Goal ${GOAL.kg} kg`)}</span>
+            : <span>{tx(`目標の${GOAL.kg}kgは表示範囲の下（変化が見やすいよう、記録の範囲に合わせています）`, `The ${GOAL.kg} kg goal is below the chart (the scale fits your entries so changes are easier to see)`)}</span>}
         </div>
         <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", display: "block", touchAction: "pan-y" }}
-             onPointerMove={onMove} onPointerLeave={() => setHover(null)} role="img" aria-label={`直近${span}日の体重と7日平均`}>
+             onPointerMove={onMove} onPointerLeave={() => setHover(null)} role="img" aria-label={tx(`直近${span}日の体重と7日平均`, `Weight and 7-day average over the last ${span} days`)}>
           {ticks.map((v) => (
             <g key={v}>
               <line x1={L} x2={W - R} y1={y(v)} y2={y(v)} stroke={TC.line} strokeWidth="1" />
@@ -222438,7 +222653,7 @@ const TrainingHubModule = (function () {
           ))}
           {xt.map((i) => <text key={i} x={x(i)} y={H - 6} textAnchor="middle" fontSize="11" fill={TC.sub}>{short(keys[i])}</text>)}
           {goalIn ? <line x1={L} x2={W - R} y1={y(GOAL.kg)} y2={y(GOAL.kg)} stroke={TC.sub} strokeWidth="1" /> : null}
-          {goalIn ? <text x={W - R + 6} y={y(GOAL.kg) + 4} fontSize="11" fill={TC.sub}>目標{GOAL.kg}</text> : null}
+          {goalIn ? <text x={W - R + 6} y={y(GOAL.kg) + 4} fontSize="11" fill={TC.sub}>{tx("目標", "Goal ")}{GOAL.kg}</text> : null}
           {segs.map((s, i) => <polyline key={i} points={s.join(" ")} fill="none" stroke={TC.accent} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />)}
           {pts.filter((p) => p.kg != null).map((p) => <circle key={p.k} cx={x(p.i)} cy={y(p.kg)} r="4" fill={TC.dot} stroke={TC.bg} strokeWidth="2" />)}
           {lastA ? <text x={x(lastA.i) + 8} y={y(lastA.a.v) + 4} fontSize="11.5" fontWeight="700" fill={TC.ink}>{lastA.a.v.toFixed(1)}</text> : null}
@@ -222450,8 +222665,8 @@ const TrainingHubModule = (function () {
                         background: TC.bg, border: `1px solid ${TC.line}`, borderRadius: 8, padding: "6px 9px", fontSize: 12, color: TC.ink,
                         boxShadow: "0 4px 14px rgba(14,30,56,.12)", whiteSpace: "nowrap" }}>
             <div style={{ fontWeight: 700 }}>{label(hp.k)}</div>
-            <div>体重：{hp.kg != null ? `${hp.kg.toFixed(1)}kg` : "記録なし"}</div>
-            <div>7日平均：{hp.a ? `${hp.a.v.toFixed(1)}kg（${hp.a.n}日分）` : "—"}</div>
+            <div>{tx("体重：", "Weight: ")}{hp.kg != null ? tx(`${hp.kg.toFixed(1)}kg`, `${hp.kg.toFixed(1)} kg`) : tx("記録なし", "no entry")}</div>
+            <div>{tx("7日平均：", "7-day avg: ")}{hp.a ? tx(`${hp.a.v.toFixed(1)}kg（${hp.a.n}日分）`, `${hp.a.v.toFixed(1)} kg (${pl(hp.a.n, "day")})`) : "—"}</div>
           </div>
         ) : null}
       </div>
@@ -222473,32 +222688,32 @@ const TrainingHubModule = (function () {
     return (
       <div>
         <div style={card}>
-          <div style={h2}>今朝の計測 <span style={{ fontWeight: 600, color: TC.sub, fontSize: 13 }}>{label(todayK)}</span></div>
+          <div style={h2}>{tx("今朝の計測", "This morning's weigh-in")} <span style={{ fontWeight: 600, color: TC.sub, fontSize: 13 }}>{label(todayK)}</span></div>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end" }}>
-            <label style={cap}>体重（kg）<br />
+            <label style={cap}>{tx("体重（kg）", "Weight (kg)")}<br />
               <input inputMode="decimal" value={kg} onChange={(e) => setKg(e.target.value)} style={{ ...field, width: 100, fontSize: 15 }} aria-label="87.6" placeholder="87.6" /></label>
-            <label style={cap}>体脂肪率（％）<br />
+            <label style={cap}>{tx("体脂肪率（％）", "Body fat (%)")}<br />
               <input inputMode="decimal" value={bf} onChange={(e) => setBf(e.target.value)} style={{ ...field, width: 100, fontSize: 15 }} aria-label="25.8" placeholder="25.8" /></label>
-            <button onClick={() => onPut(todayK, { kg: num1(kg), bf: num1(bf) })} style={{ ...btn(true), marginBottom: 6 }}>記録する</button>
+            <button onClick={() => onPut(todayK, { kg: num1(kg), bf: num1(bf) })} style={{ ...btn(true), marginBottom: 6 }}>{tx("記録する", "Log")}</button>
           </div>
-          <div style={{ fontSize: 11.5, color: TC.faint, marginTop: 4 }}>毎朝、同じ条件で測ります。過去の日の値は、記録タブのカレンダーから直せます。</div>
+          <div style={{ fontSize: 11.5, color: TC.faint, marginTop: 4 }}>{tx("毎朝、同じ条件で測ります。過去の日の値は、記録タブのカレンダーから直せます。", "Weigh in every morning under the same conditions. Fix past days from the calendar on the Log tab.")}</div>
         </div>
 
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 14 }}>
           <div style={tile}>
-            <div style={{ fontSize: 12, color: TC.sub }}>7日平均</div>
+            <div style={{ fontSize: 12, color: TC.sub }}>{tx("7日平均", "7-day average")}</div>
             <div style={{ fontSize: 26, fontWeight: 800, color: TC.ink }}>{a ? `${a.v.toFixed(1)}kg` : "—"}</div>
-            <div style={{ fontSize: 11.5, color: TC.sub }}>{a ? `直近7日のうち${a.n}日分の平均` : "直近7日に3回以上測ると表示されます"}</div>
+            <div style={{ fontSize: 11.5, color: TC.sub }}>{a ? tx(`直近7日のうち${a.n}日分の平均`, `Average of ${a.n} of the last 7 days`) : tx("直近7日に3回以上測ると表示されます", "Shown after 3+ weigh-ins in the last 7 days")}</div>
           </div>
           <div style={tile}>
-            <div style={{ fontSize: 12, color: TC.sub }}>先週比（7日平均）</div>
+            <div style={{ fontSize: 12, color: TC.sub }}>{tx("先週比（7日平均）", "vs last week (7-day avg)")}</div>
             <div style={{ fontSize: 26, fontWeight: 800, color: TC.ink }}>{a && aPrev ? `${a.v - aPrev.v > 0 ? "+" : ""}${(a.v - aPrev.v).toFixed(1)}kg` : "—"}</div>
-            <div style={{ fontSize: 11.5, color: TC.sub }}>{a && aPrev ? `${aPrev.v.toFixed(1)}kg → ${a.v.toFixed(1)}kg` : "2週間分そろうと表示されます"}</div>
+            <div style={{ fontSize: 11.5, color: TC.sub }}>{a && aPrev ? `${aPrev.v.toFixed(1)}kg → ${a.v.toFixed(1)}kg` : tx("2週間分そろうと表示されます", "Shown once you have 2 weeks of data")}</div>
           </div>
           <div style={tile}>
-            <div style={{ fontSize: 12, color: TC.sub }}>目標（{GOAL.kg}kg・{GOAL.bf}％）まで</div>
-            <div style={{ fontSize: 26, fontWeight: 800, color: TC.ink }}>{a ? `あと${Math.max(0, a.v - GOAL.kg).toFixed(1)}kg` : "—"}</div>
-            <div style={{ fontSize: 11.5, color: TC.sub }}>{b ? `体脂肪率（7日平均）${b.v.toFixed(1)}％` : `スタート：${GOAL.fromKg}kg・${GOAL.fromBf}％`}</div>
+            <div style={{ fontSize: 12, color: TC.sub }}>{tx(`目標（${GOAL.kg}kg・${GOAL.bf}％）まで`, `To goal (${GOAL.kg} kg · ${GOAL.bf}%)`)}</div>
+            <div style={{ fontSize: 26, fontWeight: 800, color: TC.ink }}>{a ? tx(`あと${Math.max(0, a.v - GOAL.kg).toFixed(1)}kg`, `${Math.max(0, a.v - GOAL.kg).toFixed(1)} kg to go`) : "—"}</div>
+            <div style={{ fontSize: 11.5, color: TC.sub }}>{b ? tx(`体脂肪率（7日平均）${b.v.toFixed(1)}％`, `Body fat (7-day avg) ${b.v.toFixed(1)}%`) : tx(`スタート：${GOAL.fromKg}kg・${GOAL.fromBf}％`, `Start: ${GOAL.fromKg} kg · ${GOAL.fromBf}%`)}</div>
           </div>
         </div>
 
@@ -222506,34 +222721,34 @@ const TrainingHubModule = (function () {
           <div style={{ ...card, background: elapsed >= 14 ? TC.warnBg : TC.panel, borderColor: elapsed >= 14 ? TC.dinner : TC.line }}>
             <div style={{ fontSize: 13, color: TC.ink, lineHeight: 1.7 }}>
               {elapsed >= 14
-                ? `計測を始めて${elapsed}日目です。プランの「まず2週間続け、体重・疲労・筋力を見て調整」にあたる時期です。摂取カロリー（2,300〜2,400kcal／日）と負荷を見直しましょう。重量・回数は「Set調整」で変えられます。`
-                : `計測を始めて${elapsed}日目です。2週間（あと${14 - elapsed}日）続けたら、体重・疲労・筋力を見て調整します。`}
+                ? tx(`計測を始めて${elapsed}日目です。プランの「まず2週間続け、体重・疲労・筋力を見て調整」にあたる時期です。摂取カロリー（2,300〜2,400kcal／日）と負荷を見直しましょう。重量・回数は「Set調整」で変えられます。`, `Day ${elapsed} of weigh-ins. Your plan says to keep going for 2 weeks and then adjust based on weight, fatigue and strength, so it's time to review your calories (2,300–2,400 kcal/day) and training load. Change weights and reps in "Adjust Sets".`)
+                : tx(`計測を始めて${elapsed}日目です。2週間（あと${14 - elapsed}日）続けたら、体重・疲労・筋力を見て調整します。`, `Day ${elapsed} of weigh-ins. After 2 weeks (${pl(14 - elapsed, "more day")}), adjust based on weight, fatigue and strength.`)}
             </div>
           </div>
         ) : null}
 
         <div style={card}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
-            <div style={{ ...h2, margin: 0 }}>体重の推移</div>
+            <div style={{ ...h2, margin: 0 }}>{tx("体重の推移", "Weight trend")}</div>
             <div style={{ display: "flex", gap: 6 }}>
-              {[30, 60, 90].map((n) => <button key={n} onClick={() => setSpan(n)} style={{ ...btn(span === n), ...small }}>{n}日</button>)}
+              {[30, 60, 90].map((n) => <button key={n} onClick={() => setSpan(n)} style={{ ...btn(span === n), ...small }}>{tx(`${n}日`, `${n} days`)}</button>)}
             </div>
           </div>
           <WeightChart days={days} todayK={todayK} span={span} />
-          <div style={{ fontSize: 11.5, color: TC.faint, marginTop: 6 }}>7日平均は、直近7日に3回以上の記録がある日だけ表示します。</div>
+          <div style={{ fontSize: 11.5, color: TC.faint, marginTop: 6 }}>{tx("7日平均は、直近7日に3回以上の記録がある日だけ表示します。", "The 7-day average is shown only on days with 3+ entries in the last 7 days.")}</div>
         </div>
 
         {entries.length ? (
           <div style={card}>
-            <div style={h2}>計測の記録（新しい順・最大30件）</div>
+            <div style={h2}>{tx("計測の記録（新しい順・最大30件）", "Weigh-in log (newest first, up to 30)")}</div>
             <div style={{ overflowX: "auto" }}>
               <table style={{ borderCollapse: "collapse", fontSize: 12.5, color: TC.ink, minWidth: 360, width: "100%" }}>
                 <thead>
                   <tr style={{ color: TC.sub, textAlign: "right" }}>
-                    <th style={{ textAlign: "left", padding: "4px 6px", fontWeight: 600 }}>日付</th>
-                    <th style={{ padding: "4px 6px", fontWeight: 600 }}>体重</th>
-                    <th style={{ padding: "4px 6px", fontWeight: 600 }}>7日平均</th>
-                    <th style={{ padding: "4px 6px", fontWeight: 600 }}>体脂肪率</th>
+                    <th style={{ textAlign: "left", padding: "4px 6px", fontWeight: 600 }}>{tx("日付", "Date")}</th>
+                    <th style={{ padding: "4px 6px", fontWeight: 600 }}>{tx("体重", "Weight")}</th>
+                    <th style={{ padding: "4px 6px", fontWeight: 600 }}>{tx("7日平均", "7-day avg")}</th>
+                    <th style={{ padding: "4px 6px", fontWeight: 600 }}>{tx("体脂肪率", "Body fat")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -222544,7 +222759,7 @@ const TrainingHubModule = (function () {
                         <td style={{ textAlign: "left", padding: "5px 6px" }}>{label(k)}</td>
                         <td style={{ padding: "5px 6px" }}>{r.kg != null ? r.kg.toFixed(1) : "—"}</td>
                         <td style={{ padding: "5px 6px" }}>{av ? av.v.toFixed(1) : "—"}</td>
-                        <td style={{ padding: "5px 6px" }}>{r.bf != null ? `${r.bf.toFixed(1)}％` : "—"}</td>
+                        <td style={{ padding: "5px 6px" }}>{r.bf != null ? tx(`${r.bf.toFixed(1)}％`, `${r.bf.toFixed(1)}%`) : "—"}</td>
                       </tr>
                     );
                   })}
@@ -222622,13 +222837,13 @@ const TrainingHubModule = (function () {
     const S = size || 72;
     return (
       <span style={{ position: "relative", display: "inline-block", width: S, height: S }}>
-        <button onClick={() => url && onOpen && onOpen(url)} aria-label="写真を大きく表示"
+        <button onClick={() => url && onOpen && onOpen(url)} aria-label={tx("写真を大きく表示", "View photo larger")}
                 style={{ width: S, height: S, padding: 0, border: `1px solid ${TC.line}`, borderRadius: 8, overflow: "hidden", cursor: url ? "zoom-in" : "default", background: TC.panel }}>
-          {url ? <img src={url} alt="食事の写真" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-               : <span style={{ fontSize: 10, color: TC.faint }}>{missing ? "写真なし" : "…"}</span>}
+          {url ? <img src={url} alt={tx("食事の写真", "Meal photo")} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+               : <span style={{ fontSize: 10, color: TC.faint }}>{missing ? tx("写真なし", "No photo") : "…"}</span>}
         </button>
         {onRemove ? (
-          <button onClick={onRemove} aria-label="この写真を外す"
+          <button onClick={onRemove} aria-label={tx("この写真を外す", "Remove this photo")}
                   style={{ position: "absolute", top: -6, right: -6, width: 22, height: 22, borderRadius: 11, border: `1px solid ${TC.line}`,
                            background: TC.bg, color: TC.skip, fontSize: 13, lineHeight: "18px", cursor: "pointer", padding: 0 }}>×</button>
         ) : null}
@@ -222639,14 +222854,14 @@ const TrainingHubModule = (function () {
   function PhotoViewer({ url, onClose }) {
     if (!url) return null;
     return (
-      <div onClick={onClose} role="dialog" aria-label="写真"
+      <div onClick={onClose} role="dialog" aria-label={tx("写真", "Photo")}
            style={{ position: "fixed", inset: 0, zIndex: 10050, background: "rgba(8,14,26,.86)", display: "flex", flexDirection: "column",
                     alignItems: "center", justifyContent: "center", padding: 16, gap: 12 }}>
-        <img src={url} alt="食事の写真" onClick={(e) => e.stopPropagation()}
+        <img src={url} alt={tx("食事の写真", "Meal photo")} onClick={(e) => e.stopPropagation()}
              style={{ maxWidth: "100%", maxHeight: "calc(100vh - 110px)", borderRadius: 10, objectFit: "contain" }} />
         <div style={{ display: "flex", gap: 8 }} onClick={(e) => e.stopPropagation()}>
-          <a href={url} download="meal.jpg" style={{ ...btn(false), textDecoration: "none" }}>端末に保存</a>
-          <button onClick={onClose} style={btn(true)}>閉じる</button>
+          <a href={url} download="meal.jpg" style={{ ...btn(false), textDecoration: "none" }}>{tx("端末に保存", "Save to device")}</a>
+          <button onClick={onClose} style={btn(true)}>{tx("閉じる", "Close")}</button>
         </div>
       </div>
     );
@@ -222654,6 +222869,9 @@ const TrainingHubModule = (function () {
 
   // ---- 食事 ----
   const MEAL_KINDS = ["朝食", "昼食", "夕食", "間食", "プロテイン"];
+  // 区分の値（記録に入る値）は日本語のまま。表示だけ英語にする
+  const MEAL_EN = { "朝食": "Breakfast", "昼食": "Lunch", "夕食": "Dinner", "間食": "Snack", "プロテイン": "Protein" };
+  const mealName = (k) => tx(k, MEAL_EN[k] || k);
   const NUT = { kcal: [2300, 2400], p: [160, 180], f: [60, 70] };
   // 炭水化物は「残りのカロリーで調整」。カロリーとP・Fの目安から幅を出す
   NUT.c = [Math.round((NUT.kcal[0] - NUT.p[1] * 4 - NUT.f[1] * 9) / 4), Math.round((NUT.kcal[1] - NUT.p[0] * 4 - NUT.f[0] * 9) / 4)];
@@ -222692,11 +222910,11 @@ const TrainingHubModule = (function () {
       setErr(""); setBusy(true);
       const ok = [], bad = [];
       for (const f of Array.from(files || [])) {
-        try { const b = await shrinkPhoto(f); const id = newId("p"); await photoPut(id, b); ok.push(id); } catch (e) { bad.push(f.name || "写真"); }
+        try { const b = await shrinkPhoto(f); const id = newId("p"); await photoPut(id, b); ok.push(id); } catch (e) { bad.push(f.name || tx("写真", "photo")); }
       }
       setPhotos((xs) => [...xs, ...ok]); setAdded((xs) => [...xs, ...ok]); setBusy(false);
-      if (bad.length) setErr(`読み込めない写真がありました（${bad.join("、")}）。HEIC形式などはJPEGに変換してから追加してください。`);
-      if (!photoPersist) setErr((e) => `${e ? e + " " : ""}この環境では写真を保存できないため、画面を閉じると写真は消えます。`);
+      if (bad.length) setErr(tx(`読み込めない写真がありました（${bad.join("、")}）。HEIC形式などはJPEGに変換してから追加してください。`, `Some photos couldn't be read (${bad.join(", ")}). Convert HEIC and similar formats to JPEG first.`));
+      if (!photoPersist) setErr((e) => `${e ? e + " " : ""}${tx("この環境では写真を保存できないため、画面を閉じると写真は消えます。", "Photos can't be stored here, so they'll be lost when you close this screen.")}`);
       if (fileRef.current) fileRef.current.value = "";
     };
     const removePhoto = (id) => {
@@ -222724,40 +222942,40 @@ const TrainingHubModule = (function () {
     );
     return (
       <div style={{ ...card, borderColor: TC.accent }}>
-        <div style={h2}>{meal ? "食事を編集" : "食事を追加"}</div>
+        <div style={h2}>{meal ? tx("食事を編集", "Edit meal") : tx("食事を追加", "Add meal")}</div>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
-          {MEAL_KINDS.map((k) => <button key={k} onClick={() => setKind(k)} aria-pressed={kind === k} style={{ ...btn(kind === k), ...small }}>{k}</button>)}
-          <input type="time" value={time} onChange={(e) => setTime(e.target.value)} aria-label="時刻" style={{ ...field, width: 112, padding: "4px 8px", fontSize: 13 }} />
+          {MEAL_KINDS.map((k) => <button key={k} onClick={() => setKind(k)} aria-pressed={kind === k} style={{ ...btn(kind === k), ...small }}>{mealName(k)}</button>)}
+          <input type="time" value={time} onChange={(e) => setTime(e.target.value)} aria-label={tx("時刻", "Time")} style={{ ...field, width: 112, padding: "4px 8px", fontSize: 13 }} />
         </div>
-        <label style={{ display: "block", ...cap }}>食べたもの
+        <label style={{ display: "block", ...cap }}>{tx("食べたもの", "What you ate")}
           <textarea value={text} onChange={(e) => setText(e.target.value)} rows={2}
-                    aria-label="例：鶏むね肉200g、玄米150g、サラダ、味噌汁" placeholder="例：鶏むね肉200g、玄米150g、サラダ、味噌汁"
+                    aria-label={tx("例：鶏むね肉200g、玄米150g、サラダ、味噌汁", "e.g. 200 g chicken breast, 150 g brown rice, salad, miso soup")} placeholder={tx("例：鶏むね肉200g、玄米150g、サラダ、味噌汁", "e.g. 200 g chicken breast, 150 g brown rice, salad, miso soup")}
                     style={{ ...field, width: "100%", marginTop: 4, resize: "vertical", lineHeight: 1.6 }} />
         </label>
-        <div style={{ ...cap, marginTop: 8 }}>栄養（分かる分だけで構いません）</div>
+        <div style={{ ...cap, marginTop: 8 }}>{tx("栄養（分かる分だけで構いません）", "Nutrition (fill in what you know)")}</div>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end" }}>
-          {numBox("kcal", "エネルギー", "kcal")}
-          {numBox("p", "タンパク質", "g")}
-          {numBox("f", "脂質", "g")}
-          {numBox("c", "炭水化物", "g")}
+          {numBox("kcal", tx("エネルギー", "Energy"), "kcal")}
+          {numBox("p", tx("タンパク質", "Protein"), "g")}
+          {numBox("f", tx("脂質", "Fat"), "g")}
+          {numBox("c", tx("炭水化物", "Carbs"), "g")}
         </div>
         {!hasNum(nums.kcal) && pfcKcal != null ? (
-          <div style={{ fontSize: 11.5, color: TC.sub, marginTop: 6 }}>エネルギーが空欄のため、P・F・Cから約{pfcKcal.toLocaleString()}kcalとして合計します。</div>
+          <div style={{ fontSize: 11.5, color: TC.sub, marginTop: 6 }}>{tx(`エネルギーが空欄のため、P・F・Cから約${pfcKcal.toLocaleString()}kcalとして合計します。`, `Energy is blank, so about ${pfcKcal.toLocaleString()} kcal from protein, fat and carbs is used in the total.`)}</div>
         ) : null}
-        <div style={{ ...cap, marginTop: 12 }}>写真</div>
+        <div style={{ ...cap, marginTop: 12 }}>{tx("写真", "Photos")}</div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
           {photos.map((id) => <PhotoThumb key={id} id={id} onOpen={setView} onRemove={() => removePhoto(id)} />)}
           <label style={{ ...btn(false), position: "relative", display: "inline-flex", alignItems: "center", gap: 6, opacity: busy ? 0.6 : 1 }}>
-            {busy ? "写真を処理中…" : "＋ 写真を追加"}
+            {busy ? tx("写真を処理中…", "Processing photos…") : tx("＋ 写真を追加", "+ Add photos")}
             <input ref={fileRef} type="file" accept="image/*" multiple disabled={busy} onChange={(e) => addFiles(e.target.files)}
                    style={{ position: "absolute", width: 1, height: 1, opacity: 0, overflow: "hidden" }} />
           </label>
         </div>
         {err ? <div style={{ fontSize: 12, color: TC.skip, marginTop: 6, lineHeight: 1.6 }}>{err}</div> : null}
-        <div style={{ fontSize: 11, color: TC.faint, marginTop: 6 }}>写真は縮小してこの端末のブラウザ内に保存します（進捗バックアップには含まれません）。</div>
+        <div style={{ fontSize: 11, color: TC.faint, marginTop: 6 }}>{tx("写真は縮小してこの端末のブラウザ内に保存します（進捗バックアップには含まれません）。", "Photos are resized and stored in this device's browser (not included in the progress backup).")}</div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 14 }}>
-          <button onClick={save} disabled={empty || busy} style={{ ...btn(true), opacity: empty || busy ? 0.5 : 1 }}>保存する</button>
-          <button onClick={cancel} style={btn(false)}>キャンセル</button>
+          <button onClick={save} disabled={empty || busy} style={{ ...btn(true), opacity: empty || busy ? 0.5 : 1 }}>{tx("保存する", "Save")}</button>
+          <button onClick={cancel} style={btn(false)}>{tx("キャンセル", "Cancel")}</button>
         </div>
         <PhotoViewer url={view} onClose={() => setView(null)} />
       </div>
@@ -222769,18 +222987,20 @@ const TrainingHubModule = (function () {
     if (none) {
       return (
         <div style={{ marginBottom: 10, display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", fontSize: 12.5 }}>
-          <span style={{ color: TC.ink }}><b>{name}</b> <span style={{ color: TC.faint }}>未入力</span></span>
-          <span style={{ color: TC.sub }}>目安 {lo.toLocaleString()}〜{hi.toLocaleString()}{unit}</span>
+          <span style={{ color: TC.ink }}><b>{name}</b> <span style={{ color: TC.faint }}>{tx("未入力", "not entered")}</span></span>
+          <span style={{ color: TC.sub }}>{tx("目安 ", "Target ")}{lo.toLocaleString()}{tx("〜", "–")}{hi.toLocaleString()}{tx("", " ")}{unit}</span>
         </div>
       );
     }
     const max = hi * 1.25;
-    const state = value < lo ? `あと${(lo - value).toLocaleString()}〜${(hi - value).toLocaleString()}${unit}` : value > hi ? `目安を${(value - hi).toLocaleString()}${unit}上回る` : "目安の範囲内";
+    const state = UI_EN
+      ? (value < lo ? `${(lo - value).toLocaleString()}–${(hi - value).toLocaleString()} ${unit} to go` : value > hi ? `${(value - hi).toLocaleString()} ${unit} over target` : "Within target")
+      : (value < lo ? `あと${(lo - value).toLocaleString()}〜${(hi - value).toLocaleString()}${unit}` : value > hi ? `目安を${(value - hi).toLocaleString()}${unit}上回る` : "目安の範囲内");
     return (
       <div style={{ marginBottom: 10 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8, flexWrap: "wrap", fontSize: 12.5 }}>
           <span style={{ color: TC.ink }}><b>{name}</b> {Math.round(value).toLocaleString()}{unit}</span>
-          <span style={{ color: TC.sub }}>目安 {lo.toLocaleString()}〜{hi.toLocaleString()}{unit}・{state}</span>
+          <span style={{ color: TC.sub }}>{tx("目安 ", "Target ")}{lo.toLocaleString()}{tx("〜", "–")}{hi.toLocaleString()}{tx("", " ")}{unit}{tx("・", " · ")}{state}</span>
         </div>
         <div style={{ position: "relative", height: 8, background: TC.line, borderRadius: 4, marginTop: 4, overflow: "hidden" }}>
           <div style={{ position: "absolute", left: `${(lo / max) * 100}%`, width: `${((hi - lo) / max) * 100}%`, top: 0, bottom: 0, background: "#C9E7E1" }} />
@@ -222807,7 +223027,7 @@ const TrainingHubModule = (function () {
       setEditing(null);
     };
     const delMeal = (m) => {
-      if (!window.confirm(`${m.kind}${m.time ? `（${m.time}）` : ""}の記録を削除しますか？写真も削除されます。`)) return;
+      if (!window.confirm(tx(`${m.kind}${m.time ? `（${m.time}）` : ""}の記録を削除しますか？写真も削除されます。`, `Delete ${mealName(m.kind)}${m.time ? ` (${m.time})` : ""}? Its photos will be deleted too.`))) return;
       photoDel(m.photos);
       const list = meals.filter((x) => x.id !== m.id);
       putDay(dk, { meals: list.length ? list : undefined });
@@ -222815,36 +223035,36 @@ const TrainingHubModule = (function () {
     return (
       <div>
         <div style={{ ...card, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "10px 14px" }}>
-          <button onClick={() => go(-1)} style={{ ...btn(false), padding: "5px 12px" }} aria-label="前の日">‹</button>
+          <button onClick={() => go(-1)} style={{ ...btn(false), padding: "5px 12px" }} aria-label={tx("前の日", "Previous day")}>‹</button>
           <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 16, fontWeight: 800, color: TC.ink }}>{dk === todayK ? "今日" : dk === addDays(todayK, -1) ? "昨日" : ""} {label(dk)}</div>
-            {rec.s ? <div style={{ fontSize: 11.5, color: TC.sub }}>この日のトレーニング：{statusText(rec)}</div> : null}
+            <div style={{ fontSize: 16, fontWeight: 800, color: TC.ink }}>{dk === todayK ? tx("今日", "Today") : dk === addDays(todayK, -1) ? tx("昨日", "Yesterday") : ""} {label(dk)}</div>
+            {rec.s ? <div style={{ fontSize: 11.5, color: TC.sub }}>{tx("この日のトレーニング：", "Training this day: ")}{statusText(rec)}</div> : null}
           </div>
           <div style={{ display: "flex", gap: 6 }}>
-            {dk !== todayK ? <button onClick={() => { setDk(todayK); setEditing(null); }} style={{ ...btn(false), ...small }}>今日</button> : null}
-            <button onClick={() => go(1)} disabled={dk >= todayK} style={{ ...btn(false), padding: "5px 12px", opacity: dk >= todayK ? 0.35 : 1 }} aria-label="次の日">›</button>
+            {dk !== todayK ? <button onClick={() => { setDk(todayK); setEditing(null); }} style={{ ...btn(false), ...small }}>{tx("今日", "Today")}</button> : null}
+            <button onClick={() => go(1)} disabled={dk >= todayK} style={{ ...btn(false), padding: "5px 12px", opacity: dk >= todayK ? 0.35 : 1 }} aria-label={tx("次の日", "Next day")}>›</button>
           </div>
         </div>
 
         <div style={card}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
-            <div style={{ ...h2, margin: 0 }}>この日の合計</div>
-            <span style={{ fontSize: 12, color: TC.sub }}>{meals.length}件の食事</span>
+            <div style={{ ...h2, margin: 0 }}>{tx("この日の合計", "Day total")}</div>
+            <span style={{ fontSize: 12, color: TC.sub }}>{tx(`${meals.length}件の食事`, pl(meals.length, "meal"))}</span>
           </div>
           {anyNum ? (
             <>
-              <NutBar name="エネルギー" unit="kcal" value={t.kcal} range={NUT.kcal} none={!t.n.kcal} />
-              <NutBar name="タンパク質" unit="g" value={t.p} range={NUT.p} none={!t.n.p} note="朝のプロテインも含めて数えます" />
-              <NutBar name="脂質" unit="g" value={t.f} range={NUT.f} none={!t.n.f} />
-              <NutBar name="炭水化物" unit="g" value={t.c} range={NUT.c} none={!t.n.c} note="炭水化物は残りのカロリーで調整（目安はカロリー・P・Fの目安から計算）" />
-              {t.blank ? <div style={{ fontSize: 11.5, color: TC.sub }}>数値が入っていない食事が{t.blank}件あります（エネルギーの合計には含まれていません）。</div> : null}
+              <NutBar name={tx("エネルギー", "Energy")} unit="kcal" value={t.kcal} range={NUT.kcal} none={!t.n.kcal} />
+              <NutBar name={tx("タンパク質", "Protein")} unit="g" value={t.p} range={NUT.p} none={!t.n.p} note={tx("朝のプロテインも含めて数えます", "Includes the morning protein shake")} />
+              <NutBar name={tx("脂質", "Fat")} unit="g" value={t.f} range={NUT.f} none={!t.n.f} />
+              <NutBar name={tx("炭水化物", "Carbs")} unit="g" value={t.c} range={NUT.c} none={!t.n.c} note={tx("炭水化物は残りのカロリーで調整（目安はカロリー・P・Fの目安から計算）", "Carbs fill the remaining calories (target derived from the calorie, protein and fat targets)")} />
+              {t.blank ? <div style={{ fontSize: 11.5, color: TC.sub }}>{tx(`数値が入っていない食事が${t.blank}件あります（エネルギーの合計には含まれていません）。`, `${t.blank === 1 ? "1 meal has" : `${t.blank} meals have`} no numbers (not included in the energy total).`)}</div> : null}
             </>
           ) : (
             <div style={{ fontSize: 12.5, color: TC.sub, lineHeight: 1.7 }}>
-              食事にカロリーやP・F・Cを入れると、プランの目安（{NUT.kcal[0].toLocaleString()}〜{NUT.kcal[1].toLocaleString()}kcal、タンパク質{NUT.p[0]}〜{NUT.p[1]}g、脂質{NUT.f[0]}〜{NUT.f[1]}g）と比べた合計が出ます。写真や内容だけの記録でも構いません。
+              {tx(`食事にカロリーやP・F・Cを入れると、プランの目安（${NUT.kcal[0].toLocaleString()}〜${NUT.kcal[1].toLocaleString()}kcal、タンパク質${NUT.p[0]}〜${NUT.p[1]}g、脂質${NUT.f[0]}〜${NUT.f[1]}g）と比べた合計が出ます。写真や内容だけの記録でも構いません。`, `Add calories or protein, fat and carbs to your meals to compare the total with your plan's targets (${NUT.kcal[0].toLocaleString()}–${NUT.kcal[1].toLocaleString()} kcal, protein ${NUT.p[0]}–${NUT.p[1]} g, fat ${NUT.f[0]}–${NUT.f[1]} g). Logging just photos or a description is fine too.`)}
             </div>
           )}
-          {rec.s === "dinner" ? <div style={{ fontSize: 12, color: TC.dinner, marginTop: 8 }}>会食の日です。分かる範囲で、写真だけでも残しておくと後で振り返れます。</div> : null}
+          {rec.s === "dinner" ? <div style={{ fontSize: 12, color: TC.dinner, marginTop: 8 }}>{tx("会食の日です。分かる範囲で、写真だけでも残しておくと後で振り返れます。", "Dining-out day. Log what you can; even just photos help when you look back.")}</div> : null}
         </div>
 
         {sorted.map((m) => (editing === m.id ? (
@@ -222852,17 +223072,17 @@ const TrainingHubModule = (function () {
         ) : (
           <div key={m.id} style={card}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
-              <div style={{ fontSize: 14, fontWeight: 800, color: TC.ink }}>{m.kind}{m.time ? <span style={{ fontWeight: 600, color: TC.sub, fontSize: 12.5, marginLeft: 6 }}>{m.time}</span> : null}</div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: TC.ink }}>{mealName(m.kind)}{m.time ? <span style={{ fontWeight: 600, color: TC.sub, fontSize: 12.5, marginLeft: 6 }}>{m.time}</span> : null}</div>
               <div style={{ display: "flex", gap: 6 }}>
-                <button onClick={() => setEditing(m.id)} style={{ ...btn(false), ...small }}>編集</button>
-                <button onClick={() => delMeal(m)} style={{ ...btn(false), ...small, color: TC.skip }}>削除</button>
+                <button onClick={() => setEditing(m.id)} style={{ ...btn(false), ...small }}>{tx("編集", "Edit")}</button>
+                <button onClick={() => delMeal(m)} style={{ ...btn(false), ...small, color: TC.skip }}>{tx("削除", "Delete")}</button>
               </div>
             </div>
             {m.text ? <div style={{ fontSize: 13, color: TC.ink, lineHeight: 1.7, marginTop: 6, whiteSpace: "pre-wrap" }}>{m.text}</div> : null}
             {mealKcal(m) != null || hasNum(m.p) || hasNum(m.f) || hasNum(m.c) ? (
               <div style={{ fontSize: 12, color: TC.sub, marginTop: 6, fontVariantNumeric: "tabular-nums" }}>
-                {[mealKcal(m) != null ? `${mealKcal(m).toLocaleString()}kcal${hasNum(m.kcal) ? "" : "（P・F・Cから計算）"}` : null,
-                  hasNum(m.p) ? `P ${m.p}g` : null, hasNum(m.f) ? `F ${m.f}g` : null, hasNum(m.c) ? `C ${m.c}g` : null].filter(Boolean).join("・")}
+                {[mealKcal(m) != null ? `${mealKcal(m).toLocaleString()}kcal${hasNum(m.kcal) ? "" : tx("（P・F・Cから計算）", " (from P/F/C)")}` : null,
+                  hasNum(m.p) ? `P ${m.p}g` : null, hasNum(m.f) ? `F ${m.f}g` : null, hasNum(m.c) ? `C ${m.c}g` : null].filter(Boolean).join(tx("・", " · "))}
               </div>
             ) : null}
             {m.photos && m.photos.length ? (
@@ -222876,7 +223096,7 @@ const TrainingHubModule = (function () {
         {editing === "new" ? (
           <MealForm isToday={dk === todayK} onSave={saveMeal} onCancel={() => setEditing(null)} />
         ) : (
-          <button onClick={() => setEditing("new")} style={{ ...btn(true), width: "100%", padding: "12px 14px", marginBottom: 14 }}>＋ 食事を記録する</button>
+          <button onClick={() => setEditing("new")} style={{ ...btn(true), width: "100%", padding: "12px 14px", marginBottom: 14 }}>{tx("＋ 食事を記録する", "+ Log a meal")}</button>
         )}
         <PhotoViewer url={view} onClose={() => setView(null)} />
       </div>
@@ -222895,33 +223115,33 @@ const TrainingHubModule = (function () {
       <div>
         <div style={{ ...card, background: TC.panel }}>
           <div style={{ fontSize: 13, color: TC.ink, lineHeight: 1.7 }}>
-            {anyAdj ? "Set調整で変えた内容を反映しています（「調整済み」の印がある種目）。" : "いまのプランの全体像です。"}
-            重量や回数を変えるときは <button onClick={goAdjust} style={{ ...btn(false), ...small, marginLeft: 4 }}>Set調整へ</button>
+            {anyAdj ? tx("Set調整で変えた内容を反映しています（「調整済み」の印がある種目）。", "Includes your changes from Adjust Sets (exercises marked \"Adjusted\").") : tx("いまのプランの全体像です。", "Your current plan at a glance.")}
+            {tx("重量や回数を変えるときは", "To change weights or reps:")} <button onClick={goAdjust} style={{ ...btn(false), ...small, marginLeft: 4 }}>{tx("Set調整へ", "Adjust Sets")}</button>
           </div>
         </div>
         <div style={card}>
-          <div style={h2}>月単位での進め方</div>
-          {list(FLOW_RULES)}
+          <div style={h2}>{tx("月単位での進め方", "How each month runs")}</div>
+          {list(tx(FLOW_RULES, FLOW_RULES_EN))}
         </div>
         {SET_IDS.map((id) => (
           <React.Fragment key={id}>
             <div style={card}><SetMenu set={effSet(adj, id)} base={BASE[id]} /></div>
             {CYCLE[CYCLE.indexOf(id) + 1] === "R" ? (
-              <div style={{ ...card, background: TC.panel, padding: "10px 16px", fontSize: 13.5, fontWeight: 700, color: TC.rest }}>休養日</div>
+              <div style={{ ...card, background: TC.panel, padding: "10px 16px", fontSize: 13.5, fontWeight: 700, color: TC.rest }}>{tx("休養日", "Rest day")}</div>
             ) : null}
           </React.Fragment>
         ))}
         <div style={card}>
           <SetMenu set={effSet(adj, "A")} base={BASE.A} />
-          <div style={{ ...cap, marginTop: 8, marginBottom: 0 }}>有酸素だけの日に選ぶメニューです。Set1〜5 の巡回には入らず、記録しても次の Set は進みません。</div>
+          <div style={{ ...cap, marginTop: 8, marginBottom: 0 }}>{tx("有酸素だけの日に選ぶメニューです。Set1〜5 の巡回には入らず、記録しても次の Set は進みません。", "Pick this on cardio-only days. It's outside the Set1–5 cycle, so logging it doesn't move the next Set forward.")}</div>
         </div>
         <div style={card}>
-          <div style={h2}>負荷・回復の調整</div>
-          {list(LOAD_RULES)}
+          <div style={h2}>{tx("負荷・回復の調整", "Load and recovery")}</div>
+          {list(tx(LOAD_RULES, LOAD_RULES_EN))}
         </div>
         <div style={card}>
-          <div style={h2}>食事・体重管理</div>
-          {list(FOOD_RULES)}
+          <div style={h2}>{tx("食事・体重管理", "Food and weight")}</div>
+          {list(tx(FOOD_RULES, FOOD_RULES_EN))}
         </div>
       </div>
     );
@@ -222981,8 +223201,7 @@ const TrainingHubModule = (function () {
       <div>
         <div style={{ ...card, background: TC.panel }}>
           <div style={{ fontSize: 13, color: TC.ink, lineHeight: 1.75 }}>
-            各Setの重量・回数・セット数と、有酸素の内容を変更できます。変更は自動で保存され、記録画面とプランにすぐ反映されます。
-            記録済みの日には、記録した時点のメニューがそのまま残ります。
+            {tx("各Setの重量・回数・セット数と、有酸素の内容を変更できます。変更は自動で保存され、記録画面とプランにすぐ反映されます。 記録済みの日には、記録した時点のメニューがそのまま残ります。", "Change each Set's weights, reps and sets, and its cardio. Changes save automatically and show up right away on the Log and Plan tabs. Days you've already logged keep the menu as it was when logged.")}
           </div>
         </div>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
@@ -222995,7 +223214,7 @@ const TrainingHubModule = (function () {
         <div style={card}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
             <span style={chip(KIND_COLOR[set.kind], "#fff")}>{setName(set)}</span>
-            <span style={{ fontSize: 14, fontWeight: 800, color: TC.ink }}>{set.title}</span>
+            <span style={{ fontSize: 14, fontWeight: 800, color: TC.ink }}>{setTitle(set)}</span>
           </div>
           {set.items.map((it) => {
             const b = baseItem(sid, it.id);
@@ -223004,26 +223223,26 @@ const TrainingHubModule = (function () {
             return (
               <div key={it.id} style={{ borderTop: `1px solid ${TC.line}`, padding: "12px 0" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
-                  <b style={{ fontSize: 13.5, color: TC.ink }}>{EX_NAME[it.id]}</b>
-                  {changed ? <span style={{ fontSize: 11.5, color: TC.sub }}>元のプラン：{fmtItem(b)}</span> : null}
+                  <b style={{ fontSize: 13.5, color: TC.ink }}>{exName(it.id)}</b>
+                  {changed ? <span style={{ fontSize: 11.5, color: TC.sub }}>{tx("元のプラン：", "Original plan: ")}{fmtItem(b)}</span> : null}
                 </div>
                 {b.plan ? (
                 <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center" }}>
-                  <label style={{ fontSize: 12, color: TC.sub }}>重量×回数&nbsp;
+                  <label style={{ fontSize: 12, color: TC.sub }}>{tx("重量×回数", "Weight × reps")}&nbsp;
                     <Field value={it.plan} width="min(100%, 480px)" placeholder={b.plan} onCommit={(v) => setItem(sid, it.id, { plan: String(v).trim() || b.plan })} />
                   </label>
                 </div>
                 ) : (
                 <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center" }}>
-                  <label style={{ fontSize: 12, color: TC.sub }}>重量&nbsp;
-                    <Field value={it.w} width={72} inputMode="decimal" placeholder="指定なし" suffix="kg"
+                  <label style={{ fontSize: 12, color: TC.sub }}>{tx("重量", "Weight")}&nbsp;
+                    <Field value={it.w} width={72} inputMode="decimal" placeholder={tx("指定なし", "Any")} suffix="kg"
                            onCommit={(v) => { const w = weight(v); if (w !== undefined) setItem(sid, it.id, { w }); }} />
                   </label>
-                  <label style={{ fontSize: 12, color: TC.sub }}>回数&nbsp;
+                  <label style={{ fontSize: 12, color: TC.sub }}>{tx("回数", "Reps")}&nbsp;
                     <Field value={it.reps} width={110} placeholder={b.reps} onCommit={(v) => setItem(sid, it.id, { reps: String(v).trim() || b.reps })} />
                   </label>
-                  <label style={{ fontSize: 12, color: TC.sub }}>セット数&nbsp;
-                    <Field value={it.sets} width={52} inputMode="numeric" suffix="セット"
+                  <label style={{ fontSize: 12, color: TC.sub }}>{tx("セット数", "Sets")}&nbsp;
+                    <Field value={it.sets} width={52} inputMode="numeric" suffix={tx("セット", "sets")}
                            onCommit={(v) => { const n = parseInt(v, 10); if (n >= 1 && n <= 10) setItem(sid, it.id, { sets: n }); }} />
                   </label>
                 </div>
@@ -223031,19 +223250,19 @@ const TrainingHubModule = (function () {
                 <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 }}>
                   {os.length ? (
                     <button onClick={() => os.forEach((id) => setItem(id, it.id, b.plan ? { plan: it.plan } : { w: it.w, reps: it.reps }))} style={{ ...btn(false), ...small }}>
-                      重量・回数を{os.map((id) => setName(BASE[id])).join("・")}にもそろえる
+                      {tx(`重量・回数を${os.map((id) => setName(BASE[id])).join("・")}にもそろえる`, `Apply these weights and reps to ${os.map((id) => setName(BASE[id])).join(", ")} too`)}
                     </button>
                   ) : null}
-                  {changed ? <button onClick={() => setItem(sid, it.id, b.plan ? { plan: b.plan } : { w: b.w, reps: b.reps, sets: b.sets })} style={{ ...btn(false), ...small }}>元に戻す</button> : null}
+                  {changed ? <button onClick={() => setItem(sid, it.id, b.plan ? { plan: b.plan } : { w: b.w, reps: b.reps, sets: b.sets })} style={{ ...btn(false), ...small }}>{tx("元に戻す", "Reset")}</button> : null}
                 </div>
               </div>
             );
           })}
           <div style={{ borderTop: `1px solid ${TC.line}`, padding: "12px 0 0" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
-              <b style={{ fontSize: 13.5, color: TC.ink }}>有酸素</b>
-              <label style={{ fontSize: 12, color: TC.sub }}>合計&nbsp;
-                <Field value={set.aero.total} width={60} inputMode="numeric" suffix="分"
+              <b style={{ fontSize: 13.5, color: TC.ink }}>{tx("有酸素", "Cardio")}</b>
+              <label style={{ fontSize: 12, color: TC.sub }}>{tx("合計", "Total")}&nbsp;
+                <Field value={set.aero.total} width={60} inputMode="numeric" suffix={tx("分", "min")}
                        onCommit={(v) => { const n = parseInt(v, 10); if (n >= 1 && n <= 240) setAero({ total: n }); }} />
               </label>
             </div>
@@ -223059,22 +223278,22 @@ const TrainingHubModule = (function () {
                       setAero({ steps: nx });
                     }} />
                   </div>
-                  <button onClick={() => { const nx = [...steps]; nx.splice(i, 1); setAero({ steps: nx }); }} aria-label={`${i + 1}行目を削除`}
-                          style={{ ...btn(false), ...small, color: TC.skip }}>削除</button>
+                  <button onClick={() => { const nx = [...steps]; nx.splice(i, 1); setAero({ steps: nx }); }} aria-label={tx(`${i + 1}行目を削除`, `Delete line ${i + 1}`)}
+                          style={{ ...btn(false), ...small, color: TC.skip }}>{tx("削除", "Delete")}</button>
                 </div>
               ))}
             </div>
-            <button onClick={() => setAero({ steps: [...steps, "新しい項目"] })} style={{ ...btn(false), ...small, marginTop: 8 }}>＋ 行を追加</button>
+            <button onClick={() => setAero({ steps: [...steps, tx("新しい項目", "New step")] })} style={{ ...btn(false), ...small, marginTop: 8 }}>{tx("＋ 行を追加", "+ Add line")}</button>
           </div>
         </div>
         {adj && adj[sid] ? (
           <div style={{ textAlign: "right", marginBottom: 14 }}>
-            <button onClick={() => { if (window.confirm(`${setName(set)}の調整をすべて元のプランに戻しますか？`)) putAdj((a) => { delete a[sid]; return a; }); }}
-                    style={{ ...btn(false), ...small, color: TC.skip }}>{setName(set)}をすべて元のプランに戻す</button>
+            <button onClick={() => { if (window.confirm(tx(`${setName(set)}の調整をすべて元のプランに戻しますか？`, `Reset all changes to ${setName(set)} back to the original plan?`))) putAdj((a) => { delete a[sid]; return a; }); }}
+                    style={{ ...btn(false), ...small, color: TC.skip }}>{tx(`${setName(set)}をすべて元のプランに戻す`, `Reset ${setName(set)} to the original plan`)}</button>
           </div>
         ) : null}
         <div style={card}>
-          <div style={{ ...cap, marginBottom: 8 }}>いまの{setName(set)}（記録画面に表示される内容）</div>
+          <div style={{ ...cap, marginBottom: 8 }}>{tx(`いまの${setName(set)}（記録画面に表示される内容）`, `Current ${setName(set)} (as shown on the Log tab)`)}</div>
           <SetMenu set={set} base={base} />
         </div>
       </div>
@@ -223096,33 +223315,33 @@ const TrainingHubModule = (function () {
       if (r && r.s) {
         if (r.s === "done") { const s = BASE[r.set]; return <span style={chip(s ? KIND_COLOR[s.kind] : TC.ink, "#fff")}>✓{setName(s)}</span>; }
         if (r.s === "skipset") return <span style={chip(TC.skipset, "#fff")}>Skip</span>;
-        if (r.s === "other") return <span style={chip(TC.other, "#fff")}>その他</span>;
-        if (r.s === "skip") return <span style={chip(TC.bg, TC.skip, `1.5px solid ${TC.skip}`)}>未実施</span>;
-        if (r.s === "rest") return <span style={chip(TC.rest, "#fff")}>休養</span>;
+        if (r.s === "other") return <span style={chip(TC.other, "#fff")}>{tx("その他", "Other")}</span>;
+        if (r.s === "skip") return <span style={chip(TC.bg, TC.skip, `1.5px solid ${TC.skip}`)}>{tx("未実施", "Not done")}</span>;
+        if (r.s === "rest") return <span style={chip(TC.rest, "#fff")}>{tx("休養", "Rest")}</span>;
         if (r.s === "dinner") return k > todayK
-          ? <span style={chip(TC.bg, TC.dinner, `1.5px dashed ${TC.dinner}`)}>会食</span>
-          : <span style={chip(TC.dinner, "#fff")}>会食</span>;
+          ? <span style={chip(TC.bg, TC.dinner, `1.5px dashed ${TC.dinner}`)}>{tx("会食", "Dining")}</span>
+          : <span style={chip(TC.dinner, "#fff")}>{tx("会食", "Dining")}</span>;
       }
       const p = proj[k];
       if (p && p !== "dinner") {
         const s = BASE[p];
-        return <span style={chip("transparent", TC.sub, `1px dashed ${s ? KIND_COLOR[s.kind] : TC.faint}`)}>{s ? `Set${s.n}` : "休"}</span>;
+        return <span style={chip("transparent", TC.sub, `1px dashed ${s ? KIND_COLOR[s.kind] : TC.faint}`)}>{s ? `Set${s.n}` : tx("休", "Rest")}</span>;
       }
       return null;
     };
     return (
       <div style={card}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10, gap: 8 }}>
-          <button onClick={() => move(-1)} style={{ ...btn(false), padding: "5px 12px" }} aria-label="前の月">‹</button>
-          <div style={{ fontSize: 16, fontWeight: 800, color: TC.ink }}>{y}年{m}月</div>
+          <button onClick={() => move(-1)} style={{ ...btn(false), padding: "5px 12px" }} aria-label={tx("前の月", "Previous month")}>‹</button>
+          <div style={{ fontSize: 16, fontWeight: 800, color: TC.ink }}>{tx(`${y}年${m}月`, `${MONTH_EN[m - 1]} ${y}`)}</div>
           <div style={{ display: "flex", gap: 6 }}>
-            <button onClick={() => { const [ty, tm] = partsOf(todayK); setYm([ty, tm]); setSel(todayK); }} style={{ ...btn(false), ...small }}>今日</button>
-            <button onClick={() => move(1)} style={{ ...btn(false), padding: "5px 12px" }} aria-label="次の月">›</button>
+            <button onClick={() => { const [ty, tm] = partsOf(todayK); setYm([ty, tm]); setSel(todayK); }} style={{ ...btn(false), ...small }}>{tx("今日", "Today")}</button>
+            <button onClick={() => move(1)} style={{ ...btn(false), padding: "5px 12px" }} aria-label={tx("次の月", "Next month")}>›</button>
           </div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(7, minmax(0, 1fr))", gap: 4 }}>
-          {DOW.map((d, i) => (
-            <div key={d} style={{ textAlign: "center", fontSize: 11, fontWeight: 700, color: i === 0 ? TC.skip : i === 6 ? TC.squat : TC.sub, paddingBottom: 2 }}>{d}</div>
+          {(UI_EN ? DOW_EN : DOW).map((d, i) => (
+            <div key={i} style={{ textAlign: "center", fontSize: 11, fontWeight: 700, color: i === 0 ? TC.skip : i === 6 ? TC.squat : TC.sub, paddingBottom: 2 }}>{d}</div>
           ))}
           {cells.map((k, i) => {
             if (!k) return <div key={"e" + i} />;
@@ -223130,7 +223349,7 @@ const TrainingHubModule = (function () {
             const r = days[k];
             return (
               <button key={k} onClick={() => setSel(isSel ? null : k)} aria-pressed={isSel}
-                      aria-label={`${label(k)} ${statusText(r) || (proj[k] ? `予定：${planText(proj[k])}` : "")}`}
+                      aria-label={`${label(k)} ${statusText(r) || (proj[k] ? `${tx("予定：", "planned: ")}${planText(proj[k])}` : "")}`}
                       title={r && (r.other || r.memo) ? [r.other, r.memo].filter(Boolean).join(" ／ ") : undefined}
                       style={{ minHeight: 56, padding: "4px 2px", borderRadius: 9, cursor: "pointer", fontFamily: "inherit",
                                display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
@@ -223149,18 +223368,18 @@ const TrainingHubModule = (function () {
           })}
         </div>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 10, fontSize: 11, color: TC.sub, alignItems: "center", lineHeight: 1.9 }}>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 5, whiteSpace: "nowrap" }}><span style={chip(TC.squat, "#fff")}>Set1・3</span><span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: 1.2, color: TC.ink, marginRight: 4 }}>LEG DAY</span></span>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 5, whiteSpace: "nowrap" }}><span style={chip(TC.run, "#fff")}>Set2・4</span><span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: 1.2, color: TC.ink, marginRight: 4 }}>RUN DAY</span></span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 5, whiteSpace: "nowrap" }}><span style={chip(TC.squat, "#fff")}>{tx("Set1・3", "Set1/3")}</span><span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: 1.2, color: TC.ink, marginRight: 4 }}>LEG DAY</span></span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 5, whiteSpace: "nowrap" }}><span style={chip(TC.run, "#fff")}>{tx("Set2・4", "Set2/4")}</span><span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: 1.2, color: TC.ink, marginRight: 4 }}>RUN DAY</span></span>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 5, whiteSpace: "nowrap" }}><span style={chip(TC.walk, "#fff")}>Set5</span><span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: 1.2, color: TC.ink, marginRight: 4 }}>WALK DAY</span></span>
-          <span style={chip(TC.other, "#fff")}>その他</span>
-          <span style={chip(TC.rest, "#fff")}>休養</span>
-          <span style={chip(TC.dinner, "#fff")}>会食</span>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 5, whiteSpace: "nowrap" }}><span style={chip(TC.aero, "#fff")}>有酸素</span><span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: 1.2, color: TC.ink, marginRight: 4 }}>CARDIO</span></span>
-          <span style={chip(TC.bg, TC.skip, `1.5px solid ${TC.skip}`)}>未実施</span>
+          <span style={chip(TC.other, "#fff")}>{tx("その他", "Other")}</span>
+          <span style={chip(TC.rest, "#fff")}>{tx("休養", "Rest")}</span>
+          <span style={chip(TC.dinner, "#fff")}>{tx("会食", "Dining")}</span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 5, whiteSpace: "nowrap" }}><span style={chip(TC.aero, "#fff")}>{tx("有酸素", "Cardio")}</span>{UI_EN ? null : <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: 1.2, color: TC.ink, marginRight: 4 }}>CARDIO</span>}</span>
+          <span style={chip(TC.bg, TC.skip, `1.5px solid ${TC.skip}`)}>{tx("未実施", "Not done")}</span>
           <span style={chip(TC.skipset, "#fff")}>Skip</span>
-          <span style={chip("transparent", TC.sub, `1px dashed ${TC.faint}`)}>点線</span><span>このまま進めた場合の予定</span>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><span style={{ width: 6, height: 6, borderRadius: 3, background: TC.dinner }} />食事の記録あり</span>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><span style={{ width: 6, height: 6, borderRadius: 3, background: TC.sub }} />メモあり</span>
+          <span style={chip("transparent", TC.sub, `1px dashed ${TC.faint}`)}>{tx("点線", "Dotted")}</span><span>{tx("このまま進めた場合の予定", "Projected plan if you carry on")}</span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><span style={{ width: 6, height: 6, borderRadius: 3, background: TC.dinner }} />{tx("食事の記録あり", "Meals logged")}</span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><span style={{ width: 6, height: 6, borderRadius: 3, background: TC.sub }} />{tx("メモあり", "Has notes")}</span>
         </div>
       </div>
     );
@@ -223175,14 +223394,14 @@ const TrainingHubModule = (function () {
     const per = SET_IDS.map((id) => ({ s: BASE[id], n: cnt((r) => r.s === "done" && r.set === id) }));
     const total = per.reduce((a, b) => a + b.n, 0);
     const others = [
-      ["その他", cnt((r) => r.s === "other")], ["休養", cnt((r) => r.s === "rest")],
-      ["会食", cnt((r) => r.s === "dinner")], ["未実施", cnt((r) => r.s === "skip")], ["Skip", cnt((r) => r.s === "skipset")], ["有酸素", cnt((r) => r.s === "done" && r.set === "A")],
+      [tx("その他", "Other"), cnt((r) => r.s === "other")], [tx("休養", "Rest"), cnt((r) => r.s === "rest")],
+      [tx("会食", "Dining out"), cnt((r) => r.s === "dinner")], [tx("未実施", "Not done"), cnt((r) => r.s === "skip")], ["Skip", cnt((r) => r.s === "skipset")], [tx("有酸素", "Cardio"), cnt((r) => r.s === "done" && r.set === "A")],
     ];
     return (
       <div style={card}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
-          <div style={{ ...h2, margin: 0 }}>{m}月の進み具合</div>
-          <div style={{ fontSize: 13, color: TC.ink }}><b style={{ fontSize: 20 }}>{total}</b> / {SET_IDS.length * MONTH_TARGET}回</div>
+          <div style={{ ...h2, margin: 0 }}>{tx(`${m}月の進み具合`, `${MONTH_EN[m - 1]} progress`)}</div>
+          <div style={{ fontSize: 13, color: TC.ink }}><b style={{ fontSize: 20 }}>{total}</b> / {tx(`${SET_IDS.length * MONTH_TARGET}回`, `${SET_IDS.length * MONTH_TARGET} sessions`)}</div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: 6, marginTop: 10 }}>
           {per.map(({ s, n }) => (
@@ -223196,13 +223415,17 @@ const TrainingHubModule = (function () {
           ))}
         </div>
         <div style={{ fontSize: 12, color: TC.sub, marginTop: 10, lineHeight: 1.7 }}>
-          {others.map(([nm, c]) => `${nm} ${c}日`).join("・")}{planned ? `（このあと会食の予定 ${planned}日）` : ""}
+          {UI_EN
+            ? `${others.map(([nm, c]) => `${nm} ${pl(c, "day")}`).join(" · ")}${planned ? ` (dining out planned on ${pl(planned, "more day")})` : ""}`
+            : `${others.map(([nm, c]) => `${nm} ${c}日`).join("・")}${planned ? `（このあと会食の予定 ${planned}日）` : ""}`}
         </div>
       </div>
     );
   }
 
   function TrainingHub() {
+    const [ui, setUi] = useUiLang();
+    UI_EN = ui === "en";
     const [data, setData] = useState(null);
     const [tab, setTab] = useState("log");
     // 開いているタブを URL に残す（#training/<タブ>）
@@ -223247,7 +223470,7 @@ const TrainingHubModule = (function () {
         return next;
       });
     };
-    if (!data) return <div style={{ padding: 40, color: TC.sub, fontSize: 14 }}>読み込み中…</div>;
+    if (!data) return <div style={{ padding: 40, color: TC.sub, fontSize: 14 }}>{tx("読み込み中…", "Loading…")}</div>;
     const days = data.days;
     const adj = data.adj || {};
     const [y, m] = ym;
@@ -223255,14 +223478,22 @@ const TrainingHubModule = (function () {
     const until = monthEnd > addDays(todayK, 30) ? monthEnd : addDays(todayK, 30);
     const proj = project(days, todayK, until);
     const selPos = sel && sel <= todayK ? posBefore(days, sel) : null;
-    const TABS = [["log", "記録"], ["meal", "食事"], ["weight", "体重"], ["plan", "プラン"], ["adjust", "Set調整"]];
+    const TABS = UI_EN
+      ? [["log", "Log"], ["meal", "Meals"], ["weight", "Weight"], ["plan", "Plan"], ["adjust", "Adjust Sets"]]
+      : [["log", "記録"], ["meal", "食事"], ["weight", "体重"], ["plan", "プラン"], ["adjust", "Set調整"]];
     const todayPos = posBefore(days, todayK);
     return (
       <div style={{ background: "#F7F9FC", minHeight: "calc(100vh - 46px)", fontFamily: '"Inter", -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif' }}>
         <div style={{ maxWidth: 820, margin: "0 auto", padding: "18px 16px 60px" }}>
-          <div style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 11, letterSpacing: 2, color: TC.accent, fontWeight: 700 }}>TRAINING HUB</div>
-            <div style={{ fontSize: 22, fontWeight: 800, color: TC.ink, margin: "2px 0 4px" }}>Progress Log</div>
+          <div style={{ marginBottom: 14, display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
+            <div>
+              <div style={{ fontSize: 11, letterSpacing: 2, color: TC.accent, fontWeight: 700 }}>TRAINING HUB</div>
+              <div style={{ fontSize: 22, fontWeight: 800, color: TC.ink, margin: "2px 0 4px" }}>Progress Log</div>
+            </div>
+            <button onClick={() => setUi(ui === "ja" ? "en" : "ja")} title={tx("English に切り替え", "Switch to Japanese")}
+                    style={{ ...btn(false), ...small, borderRadius: 999, marginTop: 2, whiteSpace: "nowrap" }}>
+              {ui === "ja" ? "EN" : "日本語"}
+            </button>
           </div>
           <div style={{ display: "flex", gap: 2, marginBottom: 14, borderBottom: `1px solid ${TC.line}`, overflowX: "auto" }}>
             {TABS.map(([id, nm]) => (
@@ -233127,13 +233358,13 @@ function ProjectNova() {
   else if (active === "linguisticshub") rawHub = <LinguisticsHubModule />;
   // 英語モードで開いても中身が日本語のままのハブ（翻訳していないことを先に知らせる）
   const NOVA_JA_ONLY = {
-    languagehub: "This hub's interface and explanations are in Japanese only (it teaches Spanish, German and French to Japanese speakers).",
-    training: "This hub is available in Japanese only.",
+    languagehub: "Lessons, word meanings and grammar explanations are in Japanese (this hub teaches Spanish, German and French to Japanese speakers); the interface is in English.",
+    training: "Workout menus and your logged entries are shown as written, in Japanese; the rest of the interface is in English.",
     booksummary: "Book Summary is available in Japanese only: the summaries, quizzes and interface have not been translated.",
     liberalarts: "Liberal Arts is available in Japanese only (English names are shown for people where available).",
     tracker: "The Learning Tracker is available in Japanese only.",
     anythingmemo: "Anything Memo is available in Japanese only.",
-    sidework: "The Side Work Hub is available in Japanese only.",
+    sidework: "Research data, episode plans, scripts and sources are in Japanese (this hub produces Japanese-language posts); the interface is in English.",
   };
   const hubEl = rawHub ? (
     <HubErrorBoundary key={active} lang={lang} onHome={() => setActive(null)}>{rawHub}</HubErrorBoundary>
