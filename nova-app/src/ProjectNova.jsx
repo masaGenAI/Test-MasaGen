@@ -216207,13 +216207,19 @@ function SectionTitle({ no, title, C }) {
 const Station_GovMix = (function(){
 const GC = { primary:"#0E7A5F", deep:"#0A5645", light:"#E9F6F1", mid:"#BFE3D6", ink:"#142821", ng:"#C0392B" };
 const PER_CERT = 5;
+const GM_SETS = 3;
+// 選択肢を「選択肢A」「(B)」のように記号で参照している問題は、並べ替えると解説と食い違うので動かさない
+const GM_LETTER_REF = /(?:選択肢|肢)\s*[A-DＡ-Ｄ]|（[A-D]）|\([A-D]\)|\b(?:option|choice) [A-D]\b/i;
 function gmBuildSet(setNo){
   const out = [];
   SECGOV_REG.forEach((st) => {
     const bank = st.bank || [];
     if (!bank.length) return;
+    // 各資格の 15 問（5 問 × 3 セット）をバンク全体から均等に取る。以前は先頭 15 問を使っていたため、
+    // 分野が D1 に偏り、正解の位置も偏っていた（バンクは塊ごとに作られている）。セット n は 15 区画の n, n+3, n+6… 番目
     for (let i = 0; i < PER_CERT; i++) {
-      const q = bank[((setNo - 1) * PER_CERT + i) % bank.length];
+      const slot = i * GM_SETS + (setNo - 1);
+      const q = bank[Math.min(bank.length - 1, Math.floor((slot + 0.5) * bank.length / (PER_CERT * GM_SETS)))];
       if (q && Array.isArray(q.o)) out.push({ src: st.code, hue: st.hue, q });
     }
   });
@@ -216223,7 +216229,21 @@ function gmBuildSet(setNo){
     const item = out[c * PER_CERT + i];
     if (item) inter.push(item);
   }
-  return inter;
+  // 正解の位置をならす：A〜D を同じ数ずつ並べた列をセットごとの固定の種で混ぜ、その位置に正解が来るよう選択肢を巡回させる
+  // （ほかの選択肢の並び順は保つ。A→B→C→D の決まった順にすると、それ自体が手がかりになる）
+  let seed = setNo * 7919 + 17;
+  const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+  const targets = inter.map((_, j) => j % 4);
+  for (let i = targets.length - 1; i > 0; i--) { const k = Math.floor(rnd() * (i + 1)); const t = targets[i]; targets[i] = targets[k]; targets[k] = t; }
+  return inter.map((it, j) => {
+    const q = it.q, n = q.o.length;
+    if (n < 2 || typeof q.a !== "number" || [q.e, q.eEn, ...(q.o || []), ...(q.oEn || [])].some((t) => GM_LETTER_REF.test(String(t || "")))) return it;
+    const target = targets[j] % n, shift = (target - q.a + n) % n;
+    if (!shift) return it;
+    const rot = (arr) => (Array.isArray(arr) && arr.length === n ? arr.map((_, k) => arr[(k - shift + n) % n]) : arr);
+    if (Array.isArray(q.oEn) && q.oEn.length !== n) return it;
+    return { ...it, q: { ...q, o: rot(q.o), oEn: rot(q.oEn), a: target } };
+  });
 }
 function App(){
   const [lang, setLang] = useState(certInitLang);
