@@ -101,7 +101,7 @@ function AccordionCard({ n, h, b, accent, mid, deep, ink, defaultOpen, diagram, 
         <span style={{ color: accent, fontSize: 16, fontWeight: 800, lineHeight: 1 }}>{open ? "−" : "+"}</span>
       </button>
       {open ? (
-        <div style={{ padding: "2px 16px 14px 51px", fontSize: 13, lineHeight: 1.75, color: ink }}>
+        <div style={{ padding: "2px 16px 14px clamp(14px, 5vw, 51px)", fontSize: 13, lineHeight: 1.75, color: ink }}>
           {hasDiag ? <FlowDiagram graph={diagram} lang={lang} terms={terms} /> : null}
           {b}
           {terms ? <TermStrip text={typeof b === "string" ? b : ""} terms={terms} lang={lang} /> : null}
@@ -1176,8 +1176,23 @@ function FigFrame({ children, id, lang, hint, terms, topic }) {
   const [notes, setNotes] = useState({});
   const [showNotes, setShowNotes] = useState(false);
   const [labels, setLabels] = useState(0);
+  const [hasSvg, setHasSvg] = useState(false); // 拡大ボタンは SVG の図にだけ効く（HTML の図は幅が広がるだけなので出さない）
   const [figTerms, setFigTerms] = useState([]);
   const sigRef = useRef("");
+  // 狭い画面で SVG の図が縮みすぎて文字が読めないとき（9px 未満）は、最初から読める大きさまで拡大して横スクロールにする
+  const [autoZoom, setAutoZoom] = useState(false);
+  React.useLayoutEffect(() => {
+    const root = box.current; if (!root) return;
+    let minPx = Infinity;
+    root.querySelectorAll("svg").forEach((svg) => {
+      if (svg.parentElement && svg.parentElement.closest("svg")) return;
+      const vb = svg.viewBox && svg.viewBox.baseVal; if (!vb || !vb.width) return;
+      const w = svg.getBoundingClientRect().width; if (!w) return;
+      const k = w / vb.width;
+      svg.querySelectorAll("text").forEach((t) => { const fs = parseFloat(getComputedStyle(t).fontSize) || 0; if (fs && (t.textContent || "").trim()) minPx = Math.min(minPx, fs * k); });
+    });
+    if (minPx < 9) { setZoom(Math.min(3, Math.ceil((10 / minPx) * 4) / 4)); setAutoZoom(true); }
+  }, []);
   const en = String(lang || "").startsWith("en");
   const KEY = "fig_notes_v1";
 
@@ -1199,6 +1214,8 @@ function FigFrame({ children, id, lang, hint, terms, topic }) {
     if (!root) return;
     const els = Array.from(root.querySelectorAll("svg text"));
     if (els.length !== labels) setLabels(els.length);
+    const sv = Array.from(root.querySelectorAll("svg")).some((g) => !g.closest("[data-fd]") && g.getBoundingClientRect().width > 60);
+    if (sv !== hasSvg) setHasSvg(sv);
     const bound = [];
     els.forEach((el, i) => {
       const term = (el.textContent || "").trim() || "#" + i;
@@ -1257,11 +1274,13 @@ function FigFrame({ children, id, lang, hint, terms, topic }) {
         )}
         {mask && <span style={{ fontSize: 10.5, opacity: .7 }}>{en ? `${shown.size}/${labels} revealed` : `${labels}個中 ${shown.size}個を開いた`}</span>}
         <span style={{ flex: 1 }} />
+        {hasSvg ? (<>
         <button onClick={() => setZoom(Math.max(1, Math.round((zoom - 0.25) * 100) / 100))} disabled={zoom <= 1}
                 title={en ? "Zoom out" : "縮小"} style={{ ...btn(false), opacity: zoom <= 1 ? .4 : 1 }}>−</button>
         <span style={{ fontSize: 10.5, opacity: .7, minWidth: 34, textAlign: "center" }}>{Math.round(zoom * 100)}%</span>
         <button onClick={() => setZoom(Math.min(3, Math.round((zoom + 0.25) * 100) / 100))} disabled={zoom >= 3}
                 title={en ? "Zoom in" : "拡大"} style={{ ...btn(false), opacity: zoom >= 3 ? .4 : 1 }}>＋</button>
+        </>) : null}
         {noteCount > 0 && (
           <button onClick={() => setShowNotes(!showNotes)} aria-pressed={showNotes} style={btn(showNotes)}>
             {en ? `My notes (${noteCount})` : `自分のメモ（${noteCount}）`}
@@ -1269,6 +1288,11 @@ function FigFrame({ children, id, lang, hint, terms, topic }) {
         )}
       </div>
 
+      {autoZoom && zoom > 1 ? (
+        <div style={{ fontSize: 10.5, opacity: .75, margin: "-2px 0 6px" }}>
+          {en ? "Enlarged so the labels are readable — scroll sideways (− to shrink)." : "文字が読める大きさに拡大しています。横にスクロールできます（−で縮小）。"}
+        </div>
+      ) : null}
       <div style={{ overflowX: zoom > 1 ? "auto" : "visible", WebkitOverflowScrolling: "touch" }}>
         <div ref={box} style={{ width: `${zoom * 100}%` }}>{children}</div>
       </div>
@@ -1319,7 +1343,7 @@ function FigFrame({ children, id, lang, hint, terms, topic }) {
       ) : (
         <div style={{ marginTop: 8, fontSize: 10.5, opacity: .7, lineHeight: 1.6 }}>
           {labels === 0
-            ? (en ? "Use ＋ to enlarge this figure on a small screen." : "狭い画面では＋で拡大して読めます。")
+            ? (hasSvg ? (en ? "Use ＋ to enlarge this figure on a small screen." : "狭い画面では＋で拡大して読めます。") : null)
             : (hint || (en ? "Click any label to see its glossary definition, if there is one, and to add your own note."
                            : "図の中の文字をクリックすると、用語集にあれば意味が出て、自分の説明メモも残せます。"))}
         </div>
@@ -1339,14 +1363,49 @@ function FigFrame({ children, id, lang, hint, terms, topic }) {
 }
 
 // 汎用インタラクティブ図解。graph.kind で形（flow/cycle/layers/pyramid/matrix/timeline）を切替。
+// ノードのラベル幅の見積もり（11.5px 太字。全角は1字、半角は字形で幅を変える）。箱の高さを決めるのに使う
+function fdTextW(s) {
+  let w = 0;
+  for (const ch of String(s || "")) { const c = ch.codePointAt(0); w += (c >= 0x2e80 || c >= 0x1f000) ? 11.8 : ch === " " ? 3.4 : /[A-Z0-9MW@%&]/.test(ch) ? 7.8 : /[il.,:;'|!()\/-]/.test(ch) ? 4 : 6.6; }
+  return w;
+}
+// 幅 iw の箱に入れたときの行数の見積もり。英語は語の途中で折り返さないので、語を順に詰めて数える
+function fdLines(t, iw) {
+  const str = String(t || "");
+  if ((str.match(/[ -~]/g) || []).length <= str.length / 2) return Math.max(1, Math.ceil((fdTextW(str) * 1.08) / iw));
+  let lines = 1, cur = 0;
+  for (const word of str.split(/\s+/).filter(Boolean)) {
+    const ww = fdTextW(word) * 1.12;
+    if (ww > iw) { lines += (cur ? 1 : 0) + Math.floor(ww / iw); cur = ww % iw; continue; }
+    if (!cur) cur = ww; else if (cur + 3.8 + ww <= iw) cur += 3.8 + ww; else { lines++; cur = ww; }
+  }
+  return lines;
+}
+// 見積もり幅 maxW に収まるように行を分ける（英語は語で、日本語は字で区切る）。k は 11.5px に対する文字の倍率
+function fdWrap(t, maxW, k) {
+  const out = []; const str = String(t || ""); const toks = /\s/.test(str) ? str.split(/(\s+)/) : Array.from(str); let cur = "";
+  for (const tok of toks) { const nx = cur + tok; if (cur.trim() && fdTextW(nx.trim()) * k > maxW) { out.push(cur.trim()); cur = tok.replace(/^\s+/, ""); } else cur = nx; }
+  if (cur.trim()) out.push(cur.trim());
+  return out;
+}
 function FlowDiagram({ graph, lang, terms }) {
   const en = lang === "en";
   const kind = graph.kind || "flow";
   const [sel, setSel] = useState(null);
   const [hov, setHov] = useState(null);
-  const [vert, setVert] = useState(false); // flow のみ：false=横 / true=縦
+  const [vertPref, setVertPref] = useState(null); // flow のみ：null=画面幅で自動 / false=横 / true=縦
   const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
+  // 図を描く枠の幅。狭い画面では縮めすぎず（文字が読めなくなる）、横スクロールか縦向きに切り替える
+  const scroller = useRef(null);
+  const [availW, setAvailW] = useState(0);
+  React.useLayoutEffect(() => {
+    const el = scroller.current; if (!el) return;
+    const upd = () => setAvailW(Math.max(0, el.clientWidth - 24));
+    upd();
+    if (typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(upd); ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
   const [mounted, setMounted] = useState(false);
   const [query, setQuery] = useState("");
   const [step, setStep] = useState(null);   // null=全表示 / 0..n-1=ステップ再生
@@ -1365,63 +1424,88 @@ function FlowDiagram({ graph, lang, terms }) {
   const BW = 158, BH = 62, GX = 46, GY = 22, PAD = 14;
   const palette = (i) => DIAG_PALETTE[((i % DIAG_PALETTE.length) + DIAG_PALETTE.length) % DIAG_PALETTE.length];
   const pick = (ja, def) => (en ? (ja && ja.en) || def : (ja && ja.ja) || def);
+  // 文字を読める大きさに保つ下限の縮尺（ノードの文字 11.5px → 約 10.4px）
+  const FD_MIN = 0.9;
+  const hW = L.layers.length * BW + Math.max(0, L.layers.length - 1) * GX;
+  const vRows = Math.max(1, ...L.layers.map((l) => L.byLayer[l].length));
+  const vW = vRows * BW + (vRows - 1) * GX;
+  const autoVert = kind === "flow" && availW > 0 && hW * FD_MIN > availW && vW < hW;
+  const vert = vertPref == null ? autoVert : vertPref;
 
   // ---- kind ごとのレイアウト計算 ----
   const lay = useMemo(() => {
     let width = 0, height = 0; const pos = {}; let edgeList = []; const decos = []; let center = null; let showToggle = false;
+    // ラベルが箱に収まる高さ（長い英語ラベルが下で切れていたため、図ごとに箱の高さをそろえて広げる）
+    const lab = (n) => (en ? n.labelEn : n.labelJa) || "";
+    const needH = (n, w, icon) => fdLines(lab(n), Math.max(40, w - 22 - (icon ? 20 : 0))) * 15 + 16;
+    const hOf = (w, icon, min) => Math.max(min, ...nodes.map((n) => needH(n, w, icon)));
     if (kind === "cycle") {
-      const N = Math.max(1, nodes.length), w = 138, h = BH, R = Math.max(120, Math.round(N * 26)), C = R + w / 2 + PAD + 12;
+      const N = Math.max(1, nodes.length), w = 138, h = hOf(138, true, BH), R = Math.max(120, Math.round(N * 26)), C = R + w / 2 + PAD + 12;
       width = height = 2 * C;
-      center = en ? (graph.centerEn || graph.centerJa) : (graph.centerJa || graph.centerEn);
+      center = fdWrap(en ? (graph.centerEn || graph.centerJa) : (graph.centerJa || graph.centerEn), Math.max(60, 2 * R - w - 24), 12.5 / 11.5);
       nodes.forEach((n, i) => { const ang = -Math.PI / 2 + (i * 2 * Math.PI) / N; const cx = C + R * Math.cos(ang), cy = C + R * Math.sin(ang); pos[n.id] = { x: cx - w / 2, y: cy - h / 2, w, h, cx, cy }; });
       const seq = edges.length ? edges.map((e) => (Array.isArray(e) ? { from: e[0], to: e[1] } : e)) : nodes.map((n, i) => ({ from: n.id, to: nodes[(i + 1) % N].id }));
       edgeList = seq.map((e) => { const a = pos[e.from], b = pos[e.to]; if (!a || !b) return null; const mx = (a.cx + b.cx) / 2, my = (a.cy + b.cy) / 2; const ox = mx - C, oy = my - C, ol = Math.hypot(ox, oy) || 1; const px = mx + (ox / ol) * 30, py = my + (oy / ol) * 30; const trim = (fx, fy, tx, ty, d) => { const dx = tx - fx, dy = ty - fy, l = Math.hypot(dx, dy) || 1; return [fx + (dx / l) * d, fy + (dy / l) * d]; }; const [s0x, s0y] = trim(a.cx, a.cy, px, py, 46); const [t0x, t0y] = trim(b.cx, b.cy, px, py, 46); return { from: e.from, to: e.to, d: `M${s0x},${s0y} Q${px},${py} ${t0x},${t0y}` }; }).filter(Boolean);
       decos.push(<circle key="cg" cx={C} cy={C} r={R} fill="none" stroke="#e2e8f0" strokeWidth="1.5" strokeDasharray="4 7" />);
     } else if (kind === "layers") {
-      const LW = Math.min(480, Math.max(300, ...nodes.map((n) => (((en ? n.labelEn : n.labelJa) || "").length * 10 + 80))));
-      width = LW + PAD * 2; height = PAD * 2 + nodes.length * BH + (nodes.length - 1) * 12;
-      nodes.forEach((n, i) => { pos[n.id] = { x: PAD, y: PAD + i * (BH + 12), w: LW, h: BH }; });
+      const need = Math.min(480, Math.max(300, ...nodes.map((n) => (((en ? n.labelEn : n.labelJa) || "").length * 10 + 80))));
+      const LW = availW && availW / FD_MIN < need + PAD * 2 ? Math.max(220, Math.floor(availW / FD_MIN) - PAD * 2) : need;
+      const LH = hOf(LW, false, BH);
+      width = LW + PAD * 2; height = PAD * 2 + nodes.length * LH + (nodes.length - 1) * 12;
+      nodes.forEach((n, i) => { pos[n.id] = { x: PAD, y: PAD + i * (LH + 12), w: LW, h: LH }; });
     } else if (kind === "pyramid") {
-      const N = Math.max(1, nodes.length), maxW = 460, minW = 170; width = maxW + PAD * 2; height = PAD * 2 + N * BH + (N - 1) * 10;
-      nodes.forEach((n, i) => { const w = Math.round(minW + (maxW - minW) * (N <= 1 ? 1 : i / (N - 1))); pos[n.id] = { x: PAD + (maxW - w) / 2, y: PAD + i * (BH + 10), w, h: BH }; });
+      const N = Math.max(1, nodes.length), maxW = availW && availW / FD_MIN < 460 + PAD * 2 ? Math.max(240, Math.floor(availW / FD_MIN) - PAD * 2) : 460, minW = Math.min(170, Math.round(maxW * 0.45)), PH = hOf(minW, false, BH); width = maxW + PAD * 2; height = PAD * 2 + N * PH + (N - 1) * 10;
+      nodes.forEach((n, i) => { const w = Math.round(minW + (maxW - minW) * (N <= 1 ? 1 : i / (N - 1))); pos[n.id] = { x: PAD + (maxW - w) / 2, y: PAD + i * (PH + 10), w, h: PH }; });
     } else if (kind === "matrix") {
-      const CW = 230, CH = 152, OX = PAD + 54, OY = PAD + 22; width = OX + 2 * CW + PAD; height = OY + 2 * CH + 58;
+      const OX = PAD + 26, OY = PAD + 22;
+      const CW = availW && availW / FD_MIN < 2 * 230 + 26 + PAD * 2 ? Math.max(130, Math.floor((availW / FD_MIN - 26 - PAD * 2) / 2)) : 230;
+      const nw = CW - 26, nh = hOf(nw, false, 44);
+      const perQ = [0, 0, 0, 0]; nodes.forEach((n, i) => { perQ[n.q != null ? n.q : i % 4]++; });
       const ax = en ? (graph.axisXEn || graph.axisXJa || ["Low", "High"]) : (graph.axisXJa || ["低", "高"]);
       const ay = en ? (graph.axisYEn || graph.axisYJa || ["Low", "High"]) : (graph.axisYJa || ["低", "高"]);
+      const aw = (t) => fdTextW(t + " ▶") * 1.08;
+      const CH = Math.max(152, 18 + Math.max(...perQ) * (nh + 6), Math.ceil((aw(ay[0]) + aw(ay[1]) + 28) / 2));
+      const xTwo = aw(ax[0]) + aw(ax[1]) + 24 > 2 * CW;
+      width = OX + 2 * CW + PAD; height = OY + 2 * CH + 58 + (xTwo ? 16 : 0);
       decos.push(<rect key="mg" x={OX} y={OY} width={2 * CW} height={2 * CH} rx="8" fill="#fff" stroke="#cbd5e1" />);
       decos.push(<line key="mv" x1={OX + CW} y1={OY} x2={OX + CW} y2={OY + 2 * CH} stroke="#cbd5e1" strokeDasharray="4 4" />);
       decos.push(<line key="mh" x1={OX} y1={OY + CH} x2={OX + 2 * CW} y2={OY + CH} stroke="#cbd5e1" strokeDasharray="4 4" />);
-      decos.push(<text key="axl" x={OX + 2} y={OY + 2 * CH + 22} fontSize="11" fontWeight="700" fill="#64748b">◀ {ax[0]}</text>);
-      decos.push(<text key="axr" x={OX + 2 * CW - 2} y={OY + 2 * CH + 22} fontSize="11" fontWeight="700" fill="#64748b" textAnchor="end">{ax[1]} ▶</text>);
-      decos.push(<text key="ayt" x={OX - 10} y={OY + 12} fontSize="11" fontWeight="700" fill="#64748b" textAnchor="end">▲ {ay[1]}</text>);
-      decos.push(<text key="ayb" x={OX - 10} y={OY + 2 * CH - 2} fontSize="11" fontWeight="700" fill="#64748b" textAnchor="end">▼ {ay[0]}</text>);
+      decos.push(<text key="axl" x={OX + 2} y={OY + 2 * CH + 22} fontSize="11.5" fontWeight="700" fill="#64748b">◀ {ax[0]}</text>);
+      decos.push(<text key="axr" x={OX + 2 * CW - 2} y={OY + 2 * CH + 22 + (xTwo ? 17 : 0)} fontSize="11.5" fontWeight="700" fill="#64748b" textAnchor="end">{ax[1]} ▶</text>);
+      decos.push(<text key="ayt" x={OX - 10} y={OY + 4} transform={`rotate(-90 ${OX - 10} ${OY + 4})`} fontSize="11.5" fontWeight="700" fill="#64748b" textAnchor="end">{ay[1]} ▶</text>);
+      decos.push(<text key="ayb" x={OX - 10} y={OY + 2 * CH - 4} transform={`rotate(-90 ${OX - 10} ${OY + 2 * CH - 4})`} fontSize="11.5" fontWeight="700" fill="#64748b" textAnchor="start">◀ {ay[0]}</text>);
       const qc = [0, 0, 0, 0];
-      nodes.forEach((n, i) => { const q = (n.q != null ? n.q : i % 4); const col = q % 2, row = q < 2 ? 0 : 1, nw = CW - 26, nh = 44; const x = OX + col * CW + 13, y = OY + row * CH + 12 + qc[q] * (nh + 6); qc[q]++; pos[n.id] = { x, y, w: nw, h: nh }; });
+      nodes.forEach((n, i) => { const q = (n.q != null ? n.q : i % 4); const col = q % 2, row = q < 2 ? 0 : 1; const x = OX + col * CW + 13, y = OY + row * CH + 12 + qc[q] * (nh + 6); qc[q]++; pos[n.id] = { x, y, w: nw, h: nh }; });
     } else if (kind === "timeline") {
-      const N = Math.max(1, nodes.length), SX = 200, nw = 178, nh = BH, axisY = PAD + 22 + nh + 18; width = PAD * 2 + 44 + N * SX; height = axisY + nh + 42;
+      const N = Math.max(1, nodes.length), SX = 200, nw = 178, nh = hOf(178, true, BH), axisY = PAD + 22 + nh + 18; width = PAD * 2 + 44 + N * SX; height = axisY + nh + 42;
       decos.push(<line key="tax" x1={PAD + 20} y1={axisY} x2={width - PAD} y2={axisY} stroke="#94a3b8" strokeWidth="2.4" markerEnd="url(#fdArrow)" />);
       nodes.forEach((n, i) => { const cx = PAD + 44 + i * SX + nw / 2; const above = i % 2 === 0; const y = above ? axisY - 20 - nh : axisY + 20; pos[n.id] = { x: cx - nw / 2, y, w: nw, h: nh }; decos.push(<circle key={"td" + i} cx={cx} cy={axisY} r="6" fill={palette(i)} stroke="#fff" strokeWidth="2" />); decos.push(<line key={"tc" + i} x1={cx} y1={axisY} x2={cx} y2={above ? axisY - 20 : axisY + 20} stroke={palette(i)} strokeWidth="1.6" />); });
     } else { // flow (default)
       showToggle = true;
       const maxRows = Math.max(1, ...L.layers.map((l) => L.byLayer[l].length));
+      const FH = hOf(BW, true, BH);
       width = vert ? (maxRows * BW + (maxRows - 1) * GX) : (L.layers.length * BW + (L.layers.length - 1) * GX);
-      height = vert ? Math.max(BH, L.layers.length * BH + (L.layers.length - 1) * GY) : Math.max(BH, maxRows * BH + (maxRows - 1) * GY);
+      height = vert ? Math.max(FH, L.layers.length * FH + (L.layers.length - 1) * GY) : Math.max(FH, maxRows * FH + (maxRows - 1) * GY);
       L.layers.forEach((l, li) => {
         const ids = L.byLayer[l];
-        if (vert) { const rowW = ids.length * BW + (ids.length - 1) * GX; const x0 = (width - rowW) / 2; ids.forEach((id, j) => { pos[id] = { x: x0 + j * (BW + GX), y: li * (BH + GY), w: BW, h: BH }; }); }
-        else { const colH = ids.length * BH + (ids.length - 1) * GY; const y0 = (height - colH) / 2; ids.forEach((id, j) => { pos[id] = { x: li * (BW + GX), y: y0 + j * (BH + GY), w: BW, h: BH }; }); }
+        if (vert) { const rowW = ids.length * BW + (ids.length - 1) * GX; const x0 = (width - rowW) / 2; ids.forEach((id, j) => { pos[id] = { x: x0 + j * (BW + GX), y: li * (FH + GY), w: BW, h: FH }; }); }
+        else { const colH = ids.length * FH + (ids.length - 1) * GY; const y0 = (height - colH) / 2; ids.forEach((id, j) => { pos[id] = { x: li * (BW + GX), y: y0 + j * (FH + GY), w: BW, h: FH }; }); }
       });
       edgeList = L.E.map((e) => { const a = pos[e.from], b = pos[e.to]; if (!a || !b) return null; return { from: e.from, to: e.to, d: fdEdgePath(a, b, vert) }; }).filter(Boolean);
     }
     return { width: Math.max(width, 40), height: Math.max(height, 40), pos, edgeList, decos, center, showToggle };
-  }, [graph, kind, vert, en, L]);
+  }, [graph, kind, vert, en, L, availW]);
 
   const activeId = hov || sel;
   const selNode = sel ? (L.id2node[sel] || nodes.find((n) => n.id === sel)) : null;
   const colorOf = (n, i) => (kind === "flow" ? palette(L.layer[n.id]) : palette(i));
   const showLegend = (kind === "flow" || kind === "cycle" || kind === "timeline") && usedIcons.length;
   const kl = FD_KIND_LABEL[kind] || FD_KIND_LABEL.flow;
-  const onMove = (e) => { if (!drag.current) return; setPan({ x: e.clientX - drag.current.x, y: e.clientY - drag.current.y }); };
+  const fit = availW ? Math.min(1, availW / lay.width) : 1;
+  const sc = Math.min(1, Math.max(fit, FD_MIN)) * zoom;
+  const scrollsX = availW > 0 && lay.width * sc > availW + 2;
+  // ドラッグで枠をスクロールする（マウスのみ。指は端末の標準スクロールに任せる）
+  const onMove = (e) => { const d = drag.current, el = scroller.current; if (!d || !el) return; el.scrollLeft = d.sl - (e.clientX - d.x); el.scrollTop = d.st - (e.clientY - d.y); };
   const endPan = () => { drag.current = null; };
   const btn = { fontSize: 11, fontWeight: 700, border: "1px solid #cbd5e1", background: "#fff", color: "#475569", borderRadius: 7, padding: "3px 8px", cursor: "pointer", lineHeight: 1 };
   // 検索：ラベル一致ノードの集合
@@ -1442,58 +1526,62 @@ function FlowDiagram({ graph, lang, terms }) {
   const resetPlay = () => { setPlaying(false); setStep(null); };
 
   return (
-    <div style={{ margin: "6px 0 16px" }}>
+    <div data-fd="1" style={{ margin: "6px 0 16px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
         <span style={{ fontSize: 10.5, fontWeight: 800, color: "#475569", background: "#eef2ff", border: "1px solid #e0e7ff", borderRadius: 20, padding: "2px 9px" }}>{FD_KIND_ICON[kind] || "🔀"} {en ? kl[1] : kl[0]}</span>
         {(graph.titleJa || graph.titleEn) ? <div style={{ fontSize: 13, fontWeight: 800, color: "#1e293b" }}>{en ? graph.titleEn : graph.titleJa}</div> : null}
         <span style={{ flex: 1 }} />
+        <span style={{ display: "inline-flex", gap: 6, flexShrink: 0 }}>
         {lay.showToggle ? (
-          <button onClick={() => setVert((v) => !v)} style={btn}>{vert ? (en ? "⇄ Horizontal" : "⇄ 横向き") : (en ? "⇅ Vertical" : "⇅ 縦向き")}</button>
+          <button onClick={() => setVertPref(!vert)} style={btn}>{vert ? (en ? "⇄ Horizontal" : "⇄ 横向き") : (en ? "⇅ Vertical" : "⇅ 縦向き")}</button>
         ) : null}
         <button onClick={() => setZoom((z) => Math.max(0.5, +(z / 1.2).toFixed(3)))} style={btn} title="zoom out">－</button>
-        <button onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }} style={btn} title="reset">⟲</button>
+        <button onClick={() => { setZoom(1); const el = scroller.current; if (el) { el.scrollLeft = 0; el.scrollTop = 0; } }} style={btn} title="reset">⟲</button>
         <button onClick={() => setZoom((z) => Math.min(2.2, +(z * 1.2).toFixed(3)))} style={btn} title="zoom in">＋</button>
+        </span>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
         <input value={query} onChange={(e) => setQuery(e.target.value)} aria-label={en ? "🔍 search nodes" : "🔍 ノード検索"} placeholder={en ? "🔍 search nodes" : "🔍 ノード検索"}
           style={{ fontSize: 11.5, border: "1px solid #cbd5e1", borderRadius: 7, padding: "4px 9px", width: 150, color: "#334155" }} />
         {matchSet ? <span style={{ fontSize: 10.5, color: "#64748b", fontWeight: 700 }}>{matchSet.size}{en ? " hit" : "件"}</span> : null}
         <span style={{ flex: 1 }} />
-        <span style={{ fontSize: 10.5, color: "#94a3b8", fontWeight: 700 }}>{en ? "Play:" : "再生:"}</span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+        <span style={{ fontSize: 10.5, color: "#64748b", fontWeight: 700 }}>{en ? "Play:" : "再生:"}</span>
         <button onClick={() => setStep((s) => Math.max(0, (s == null ? 0 : s) - 1))} style={btn} title="prev">⏮</button>
         <button onClick={() => setPlaying((p) => !p)} style={{ ...btn, background: playing ? "#475569" : "#fff", color: playing ? "#fff" : "#475569" }} title="play/pause">{playing ? "⏸" : "▶"}</button>
         <button onClick={() => setStep((s) => Math.min(orderIds.length - 1, (s == null ? -1 : s) + 1))} style={btn} title="next">⏭</button>
         <button onClick={resetPlay} style={btn} title="reset">⟲{en ? " all" : " 全"}</button>
         {step != null ? <span style={{ fontSize: 10.5, color: "#475569", fontWeight: 700 }}>{step + 1}/{orderIds.length}</span> : null}
+        </span>
       </div>
       {showLegend ? (
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 8, alignItems: "center" }}>
-          <span style={{ fontSize: 10.5, color: "#94a3b8", fontWeight: 700 }}>{en ? "Legend:" : "凡例:"}</span>
+          <span style={{ fontSize: 10.5, color: "#64748b", fontWeight: 700 }}>{en ? "Legend:" : "凡例:"}</span>
           {usedIcons.map((ic) => (
             <span key={ic} style={{ fontSize: 10.5, color: "#64748b", display: "inline-flex", alignItems: "center", gap: 3 }}>
               <span style={{ fontSize: 13 }}>{ic}</span>{flowIconLabel(ic, en)}
             </span>
           ))}
-          <span style={{ fontSize: 10.5, color: "#94a3b8" }}>{en ? "🖱 hover to highlight ・ click for details" : "🖱 ホバーで強調 ・ クリックで詳細"}{terms ? (en ? " ・ terms explained" : " ・ 用語の意味も") : ""}</span>
+          <span style={{ fontSize: 10.5, color: "#64748b" }}>{en ? "🖱 hover to highlight · click for details" : "🖱 ホバーで強調 ・ クリックで詳細"}{terms ? (en ? " · terms explained" : " ・ 用語の意味も") : ""}</span>
         </div>
       ) : (
-        <div style={{ fontSize: 10.5, color: "#94a3b8", marginBottom: 8 }}>{en ? "🖱 hover to highlight ・ click for details ・ drag to pan" : "🖱 ホバーで強調 ・ クリックで詳細 ・ ドラッグで移動"}{terms ? (en ? " ・ terms explained" : " ・ 用語の意味も") : ""}</div>
+        <div style={{ fontSize: 10.5, color: "#64748b", marginBottom: 8 }}>{en ? "🖱 hover to highlight · click for details · drag to pan" : "🖱 ホバーで強調 ・ クリックで詳細 ・ ドラッグで移動"}{terms ? (en ? " · terms explained" : " ・ 用語の意味も") : ""}</div>
       )}
-      <div style={{ overflow: "auto", maxHeight: 580, border: "1px solid #e2e8f0", borderRadius: 12, background: "#fbfcfe", padding: 12 }}>
-        <svg width={lay.width} height={lay.height} viewBox={`0 0 ${lay.width} ${lay.height}`}
+      <div ref={scroller} style={{ overflow: "auto", border: "1px solid #e2e8f0", borderRadius: 12, background: "#fbfcfe", padding: 12 }}>
+        <svg width={Math.round(lay.width * sc)} height={Math.round(lay.height * sc)} viewBox={`0 0 ${lay.width} ${lay.height}`}
           onMouseMove={onMove} onMouseUp={endPan} onMouseLeave={endPan}
-          style={{ maxWidth: zoom <= 1 ? "100%" : "none", width: lay.width * zoom, height: lay.height * zoom, display: "block", touchAction: "none" }}>
+          style={{ display: "block", margin: scrollsX ? 0 : "0 auto", touchAction: "pan-x pan-y" }}>
           <defs>
             <marker id="fdArrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
               <path d="M0,0 L7,3 L0,6 Z" fill="#94a3b8" />
             </marker>
           </defs>
           <rect x="0" y="0" width={lay.width} height={lay.height} fill="transparent"
-            onMouseDown={(e) => { drag.current = { x: e.clientX - pan.x, y: e.clientY - pan.y }; }}
+            onMouseDown={(e) => { const el = scroller.current; drag.current = { x: e.clientX, y: e.clientY, sl: el ? el.scrollLeft : 0, st: el ? el.scrollTop : 0 }; }}
             style={{ cursor: "grab" }} />
-          <g transform={`translate(${pan.x},${pan.y}) scale(${zoom})`}>
+          <g>
             {lay.decos}
-            {lay.center ? <text x={lay.width / 2} y={lay.height / 2} textAnchor="middle" dominantBaseline="middle" fontSize="12.5" fontWeight="800" fill="#475569">{lay.center}</text> : null}
+            {lay.center && lay.center.length ? <text x={lay.width / 2} y={lay.height / 2 - (lay.center.length - 1) * 8} textAnchor="middle" dominantBaseline="middle" fontSize="12.5" fontWeight="800" fill="#475569">{lay.center.map((ln, i) => <tspan key={i} x={lay.width / 2} dy={i ? 16 : 0}>{ln}</tspan>)}</text> : null}
             {lay.edgeList.map((e, i) => {
               const shown = revealed(e.from) && revealed(e.to);
               const eact = activeId && (e.from === activeId || e.to === activeId);
@@ -1516,7 +1604,7 @@ function FlowDiagram({ graph, lang, terms }) {
                     onClick={() => setSel(isSel ? null : n.id)}
                     style={{ boxSizing: "border-box", width: p.w, height: p.h, border: `2px solid ${col}`, background: filled ? col : "#fff", color: filled ? "#fff" : "#1e293b", borderRadius: kind === "pyramid" ? 8 : 10, padding: "5px 9px", fontSize: 11.5, fontWeight: 700, lineHeight: 1.3, display: "flex", alignItems: "center", justifyContent: "center", gap: 5, textAlign: "center", cursor: (n.detailJa || n.detailEn) ? "pointer" : "default", overflow: "hidden", opacity: mounted ? (!show ? 0.08 : dim ? 0.28 : 1) : 0, pointerEvents: show ? "auto" : "none", transform: mounted ? (filled ? "scale(1.05)" : "scale(1)") : "scale(.95)", boxShadow: filled ? `0 5px 16px ${col}55` : "0 1px 2px #0000000f", transition: "opacity .25s ease, transform .2s cubic-bezier(.4,0,.2,1), background .18s, box-shadow .2s" }}>
                     {(kind === "flow" || kind === "cycle" || kind === "timeline") ? <span style={{ fontSize: 15, flexShrink: 0 }}>{iconOf(n)}</span> : null}
-                    <span style={{ overflow: "hidden" }}>{en ? n.labelEn : n.labelJa}</span>
+                    <span style={{ overflow: "hidden", overflowWrap: "anywhere" }}>{en ? n.labelEn : n.labelJa}</span>
                   </div>
                 </foreignObject>
               );
@@ -1524,6 +1612,7 @@ function FlowDiagram({ graph, lang, terms }) {
           </g>
         </svg>
       </div>
+      {scrollsX ? <div style={{ marginTop: 4, fontSize: 10.5, color: "#64748b", textAlign: "right" }}>{en ? "Scroll sideways to see the rest →" : "横にスクロールすると続きが見えます →"}</div> : null}
       {selNode && (selNode.detailJa || selNode.detailEn) ? (
         <div style={{ marginTop: 8, padding: "10px 14px", background: "#f1f5f9", borderLeft: "4px solid #475569", borderRadius: 8, fontSize: 12.5, lineHeight: 1.7, color: "#1e293b" }}>
           <b>{en ? selNode.labelEn : selNode.labelJa}:</b> {en ? (selNode.detailEn || selNode.detailJa) : (selNode.detailJa || selNode.detailEn)}
@@ -1532,7 +1621,7 @@ function FlowDiagram({ graph, lang, terms }) {
                               text={[selNode.labelJa, selNode.labelEn, selNode.detailJa, selNode.detailEn].join(" ")} /> : null}
         </div>
       ) : (
-        <div style={{ marginTop: 6, fontSize: 11, color: "#94a3b8" }}>{en ? "Click a box for details" : "ボックスをクリックで詳細"}</div>
+        <div style={{ marginTop: 6, fontSize: 11, color: "#64748b" }}>{en ? "Click a box for details" : "ボックスをクリックで詳細"}</div>
       )}
     </div>
   );
@@ -176869,7 +176958,7 @@ function DomainBars({ lang }) {
             <strong>{d.pct}%</strong>
           </div>
           <div style={{ background: C.light, borderRadius: 6, height: 16, overflow: "hidden", border: sel === d.id ? `2px solid ${C.deep}` : "none" }}>
-            <div style={{ width: `${d.pct / 30 * 100}%`, height: "100%", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: "#fff", fontSize: 10, fontWeight: 700 }}>{d.pct}%</div>
+            <div style={{ width: `${d.pct / 30 * 100}%`, height: "100%", minWidth: 38, boxSizing: "border-box", whiteSpace: "nowrap", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: nvInk("#ffffff", d.hue), fontSize: 10, fontWeight: 700 }}>{d.pct}%</div>
           </div>
         </div>
       ))}
@@ -177014,7 +177103,7 @@ function StorageParallel({ lang }) {
         <div key={i} style={{ border: `1.5px solid ${hue}`, borderRadius: 11, overflow: "hidden" }}>
           <div style={{ background: hue, color: "#fff", padding: "8px 10px", fontWeight: 700, fontSize: 13 }}>{name}</div>
           <div style={{ padding: "8px 10px" }}>
-            {items.map((it, j) => <div key={j} style={{ fontSize: 12, color: C.ink, padding: "3px 0", lineHeight: 1.4 }}>・{it}</div>)}
+            {items.map((it, j) => <div key={j} style={{ fontSize: 12, color: C.ink, padding: "3px 0", lineHeight: 1.4 }}>{en ? "• " : "・"}{it}</div>)}
           </div>
         </div>
       ))}
@@ -177319,7 +177408,7 @@ function PurchaseParallel({ lang }) {
         <div key={i} style={{ border: `1.5px solid ${hue}`, borderRadius: 11, overflow: "hidden" }}>
           <div style={{ background: hue, color: "#fff", padding: "8px 10px", fontWeight: 700, fontSize: 13 }}>{name}</div>
           <div style={{ padding: "8px 10px" }}>
-            {items.map((it, j) => <div key={j} style={{ fontSize: 12, color: C.ink, padding: "3px 0", lineHeight: 1.4 }}>・{it}</div>)}
+            {items.map((it, j) => <div key={j} style={{ fontSize: 12, color: C.ink, padding: "3px 0", lineHeight: 1.4 }}>{en ? "• " : "・"}{it}</div>)}
           </div>
         </div>
       ))}
@@ -179408,6 +179497,32 @@ const CC_TREE = { label:"Claude Code", children:[
     { label:"直接実行", note:"単純・スコープ明確向け" },
   ]},
 ]};
+const MCP_TREE_EN = { label:"MCP (Model Context Protocol)", children:[
+  { label:"Client (consumer side)", note:"Connects and makes the calls, e.g. Claude Code" },
+  { label:"Server (provider side)", children:[
+    { label:"Tools", note:"Actions that run and can have side effects" },
+    { label:"Resources", note:"Reference data, mainly read-only" },
+    { label:"Prompts", note:"Reusable instruction templates" },
+  ]},
+  { label:"Transport", children:[
+    { label:"stdio", note:"Local, standard input/output, small attack surface" },
+    { label:"HTTP/SSE", note:"Remote; authentication and authorization matter" },
+  ]},
+]};
+const CC_TREE_EN = { label:"Claude Code", children:[
+  { label:"CLAUDE.md", note:"Three levels: user / project / directory" },
+  { label:".claude/rules/", note:"Loaded conditionally by YAML paths globs" },
+  { label:".claude/commands/", note:"Shared slash commands" },
+  { label:".claude/skills/", children:[
+    { label:"context: fork", note:"Runs in an isolated sub-context" },
+    { label:"allowed-tools", note:"Restricts the tools" },
+    { label:"argument-hint", note:"Prompts for the argument when none is given" },
+  ]},
+  { label:"Execution mode", children:[
+    { label:"Plan mode", note:"For large or architectural decisions" },
+    { label:"Direct execution", note:"For simple, clearly scoped tasks" },
+  ]},
+]};
 const PATTERN_TREE = { label:"ワークフロー / エージェント", children:[
   { label:"ワークフロー（経路を事前固定）", children:[
     { label:"プロンプト チェイニング", note:"出力を次の入力へ渡す直列。途中にゲートを挟める" },
@@ -181052,7 +181167,7 @@ function DomainBars({ lang }) {
             <strong>{d.pct}%</strong>
           </div>
           <div style={{ background: C.light, borderRadius: 6, height: 16, overflow: "hidden", border: sel === d.id ? `2px solid ${C.ink}` : "none" }}>
-            <div style={{ width: `${d.pct / 27 * 100}%`, height: "100%", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: "#fff", fontSize: 10, fontWeight: 700 }}>{d.pct}%</div>
+            <div style={{ width: `${d.pct / 27 * 100}%`, height: "100%", minWidth: 38, boxSizing: "border-box", whiteSpace: "nowrap", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: nvInk("#ffffff", d.hue), fontSize: 10, fontWeight: 700 }}>{d.pct}%</div>
           </div>
         </div>
       ))}
@@ -181092,7 +181207,7 @@ function Diagrams({ lang, t }) {
       <div style={{ fontSize: 12, fontWeight: 700, color: C.deep, margin: "16px 0 8px", borderLeft: `3px solid ${C.primary}`, paddingLeft: 8 }}>
         {en?"D2 · Tool Design & MCP":"D2 · ツール設計とMCP"}
       </div>
-      <Section id="mcp" title={en?"⑧ MCP structure (expandable tree)":"⑧ MCPの構成（展開ツリー）"}><InteractiveTree data={MCP_TREE} /></Section>
+      <Section id="mcp" title={en?"⑧ MCP structure (expandable tree)":"⑧ MCPの構成（展開ツリー）"}><InteractiveTree data={en?MCP_TREE_EN:MCP_TREE} /></Section>
       <Section id="mcpflow" title={en?"⑨ MCP request flow":"⑨ MCPリクエストの流れ"}>
         <FlowDiagram lang={lang}
           steps={en ? [
@@ -181115,7 +181230,7 @@ function Diagrams({ lang, t }) {
       <div style={{ fontSize: 12, fontWeight: 700, color: C.deep, margin: "16px 0 8px", borderLeft: `3px solid ${C.primary}`, paddingLeft: 8 }}>
         {en?"D3 · Claude Code Config":"D3 · Claude Code 設定"}
       </div>
-      <Section id="cc" title={en?"⑪ Claude Code structure (expandable tree)":"⑪ Claude Codeの構成（展開ツリー）"}><InteractiveTree data={CC_TREE} /></Section>
+      <Section id="cc" title={en?"⑪ Claude Code structure (expandable tree)":"⑪ Claude Codeの構成（展開ツリー）"}><InteractiveTree data={en?CC_TREE_EN:CC_TREE} /></Section>
       <Section id="perm" title={en?"⑫ Permission hierarchy tree":"⑫ 権限設計の階層 樹形図"}><InteractiveTree data={en?PERMISSION_TREE_EN:PERMISSION_TREE} /></Section>
       <Section id="permmatrix" title={en?"⑬ Risk × reversibility matrix":"⑬ リスク×可逆性 マトリクス"}>
         <Matrix lang={lang}
@@ -186461,9 +186576,9 @@ function SecurityLadder() {
       {items.map((it, i) => (
         <div key={i} onClick={() => setSel(sel === i ? null : i)} style={{ display: "flex", alignItems: "center", marginBottom: 8, cursor: "pointer" }}>
           <div style={{ width: 26, fontSize: 11, color: "#53757f" }}>{i + 1}</div>
-          <div style={{ flex: 1, background: colors[i], color: "#fff", borderRadius: 8, padding: "9px 12px", border: sel === i ? `2px solid ${C.ink}` : "2px solid transparent" }}>
+          <div style={{ flex: 1, background: colors[i], color: "#fff", borderRadius: 8, padding: "9px 12px", border: sel === i ? `2px solid ${C.ink}` : "2px solid transparent", display: "flex", flexWrap: "wrap", alignItems: "baseline", columnGap: 8, rowGap: 2 }}>
             <span style={{ fontWeight: 700, fontSize: 13 }}>{it[0]}</span>
-            <span style={{ fontSize: 11.5, marginLeft: 8, opacity: 0.9 }}>{it[1]}</span>
+            <span style={{ fontSize: 11.5, opacity: 0.9 }}>{it[1]}</span>
           </div>
         </div>
       ))}
@@ -186521,7 +186636,7 @@ function DomainBars() {
             <strong>{d.pct}%</strong>
           </div>
           <div style={{ background: C.light, borderRadius: 6, height: 16, overflow: "hidden", border: sel === d.id ? `2px solid ${C.ink}` : "none" }}>
-            <div style={{ width: `${d.pct / max * 100}%`, height: "100%", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: "#fff", fontSize: 10, fontWeight: 700 }}>{d.pct}%</div>
+            <div style={{ width: `${d.pct / max * 100}%`, height: "100%", minWidth: 38, boxSizing: "border-box", whiteSpace: "nowrap", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: nvInk("#ffffff", d.hue), fontSize: 10, fontWeight: 700 }}>{d.pct}%</div>
           </div>
         </div>
       ))}
@@ -188390,7 +188505,7 @@ function DomainBars({ lang }) {
             <strong>{d.range}</strong>
           </div>
           <div style={{ background: C.light, borderRadius: 6, height: 18, overflow: "hidden", border: sel === d.id ? `2px solid ${C.ink}` : "none" }}>
-            <div style={{ width: `${d.pct / max * 100}%`, height: "100%", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: "#fff", fontSize: 10.5, fontWeight: 700 }}>{d.pct}%</div>
+            <div style={{ width: `${d.pct / max * 100}%`, height: "100%", minWidth: 38, boxSizing: "border-box", whiteSpace: "nowrap", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: nvInk("#ffffff", d.hue), fontSize: 10.5, fontWeight: 700 }}>{d.pct}%</div>
           </div>
           {sel === d.id && <div style={{ fontSize: 11.5, color: "#5b6b7d", marginTop: 4, lineHeight: 1.5 }}>{detail[d.id]}</div>}
         </div>
@@ -190699,7 +190814,7 @@ function Diagrams({ lang, t }) {
               <strong>{d.range}</strong>
             </div>
             <div style={{ background: C.light, borderRadius: 6, height: 18, overflow: "hidden" }}>
-              <div style={{ width: ((d.pct / max * 100) + "%"), height: "100%", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: "#fff", fontSize: 10.5, fontWeight: 700 }}>{d.pct}%</div>
+              <div style={{ width: ((d.pct / max * 100) + "%"), height: "100%", minWidth: 38, boxSizing: "border-box", whiteSpace: "nowrap", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: nvInk("#ffffff", d.hue), fontSize: 10.5, fontWeight: 700 }}>{d.pct}%</div>
             </div>
           </div>
         ))}
@@ -190732,7 +190847,7 @@ function DomainBars({ lang }) {
             <strong>{d.range}</strong>
           </div>
           <div style={{ background: C.light, borderRadius: 6, height: 18, overflow: "hidden", border: sel === d.id ? `2px solid ${C.ink}` : "none" }}>
-            <div style={{ width: `${d.pct / max * 100}%`, height: "100%", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: "#fff", fontSize: 10.5, fontWeight: 700 }}>{d.pct}%</div>
+            <div style={{ width: `${d.pct / max * 100}%`, height: "100%", minWidth: 38, boxSizing: "border-box", whiteSpace: "nowrap", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: nvInk("#ffffff", d.hue), fontSize: 10.5, fontWeight: 700 }}>{d.pct}%</div>
           </div>
           {sel === d.id && <div style={{ fontSize: 11.5, color: "#5b6b7d", marginTop: 4, lineHeight: 1.5 }}>{detail[d.id]}</div>}
         </div>
@@ -192426,7 +192541,7 @@ function Diagrams({ lang, t }) {
               <strong>{d.range}</strong>
             </div>
             <div style={{ background: C.light, borderRadius: 6, height: 18, overflow: "hidden" }}>
-              <div style={{ width: ((d.pct / max * 100) + "%"), height: "100%", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: "#fff", fontSize: 10.5, fontWeight: 700 }}>{d.pct}%</div>
+              <div style={{ width: ((d.pct / max * 100) + "%"), height: "100%", minWidth: 38, boxSizing: "border-box", whiteSpace: "nowrap", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: nvInk("#ffffff", d.hue), fontSize: 10.5, fontWeight: 700 }}>{d.pct}%</div>
             </div>
           </div>
         ))}
@@ -192458,7 +192573,7 @@ function DomainBars({ lang }) {
             <strong>{d.range}</strong>
           </div>
           <div style={{ background: C.light, borderRadius: 6, height: 18, overflow: "hidden", border: sel === d.id ? `2px solid ${C.ink}` : "none" }}>
-            <div style={{ width: `${d.pct / max * 100}%`, height: "100%", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: "#fff", fontSize: 10.5, fontWeight: 700 }}>{d.pct}%</div>
+            <div style={{ width: `${d.pct / max * 100}%`, height: "100%", minWidth: 38, boxSizing: "border-box", whiteSpace: "nowrap", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: nvInk("#ffffff", d.hue), fontSize: 10.5, fontWeight: 700 }}>{d.pct}%</div>
           </div>
           {sel === d.id && <div style={{ fontSize: 11.5, color: "#5b6b7d", marginTop: 4, lineHeight: 1.5 }}>{detail[d.id]}</div>}
         </div>
@@ -194152,7 +194267,7 @@ function Diagrams({ lang, t }) {
               <strong>{d.range}</strong>
             </div>
             <div style={{ background: C.light, borderRadius: 6, height: 18, overflow: "hidden" }}>
-              <div style={{ width: ((d.pct / max * 100) + "%"), height: "100%", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: "#fff", fontSize: 10.5, fontWeight: 700 }}>{d.pct}%</div>
+              <div style={{ width: ((d.pct / max * 100) + "%"), height: "100%", minWidth: 38, boxSizing: "border-box", whiteSpace: "nowrap", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: nvInk("#ffffff", d.hue), fontSize: 10.5, fontWeight: 700 }}>{d.pct}%</div>
             </div>
           </div>
         ))}
@@ -194184,7 +194299,7 @@ function DomainBars({ lang }) {
             <strong>{d.range}</strong>
           </div>
           <div style={{ background: C.light, borderRadius: 6, height: 18, overflow: "hidden", border: sel === d.id ? `2px solid ${C.ink}` : "none" }}>
-            <div style={{ width: `${d.pct / max * 100}%`, height: "100%", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: "#fff", fontSize: 10.5, fontWeight: 700 }}>{d.pct}%</div>
+            <div style={{ width: `${d.pct / max * 100}%`, height: "100%", minWidth: 38, boxSizing: "border-box", whiteSpace: "nowrap", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: nvInk("#ffffff", d.hue), fontSize: 10.5, fontWeight: 700 }}>{d.pct}%</div>
           </div>
           {sel === d.id && <div style={{ fontSize: 11.5, color: "#5b6b7d", marginTop: 4, lineHeight: 1.5 }}>{detail[d.id]}</div>}
         </div>
@@ -201016,7 +201131,7 @@ function DomainBars({ lang }) {
             <strong>{d.range}</strong>
           </div>
           <div style={{ background: C.light, borderRadius: 6, height: 18, overflow: "hidden", border: sel === d.id ? `2px solid ${C.ink}` : "none" }}>
-            <div style={{ width: `${d.pct / max * 100}%`, height: "100%", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: "#fff", fontSize: 10.5, fontWeight: 700 }}>{d.pct}%</div>
+            <div style={{ width: `${d.pct / max * 100}%`, height: "100%", minWidth: 38, boxSizing: "border-box", whiteSpace: "nowrap", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: nvInk("#ffffff", d.hue), fontSize: 10.5, fontWeight: 700 }}>{d.pct}%</div>
           </div>
           {sel === d.id && <div style={{ fontSize: 11.5, color: "#5b6b7d", marginTop: 4, lineHeight: 1.5 }}>{detail[d.id]}</div>}
         </div>
@@ -202447,7 +202562,7 @@ function DomainBars({ lang }) {
             <strong>{d.range}</strong>
           </div>
           <div style={{ background: C.light, borderRadius: 6, height: 18, overflow: "hidden", border: sel === d.id ? `2px solid ${C.ink}` : "none" }}>
-            <div style={{ width: `${d.pct / max * 100}%`, height: "100%", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: "#fff", fontSize: 10.5, fontWeight: 700 }}>{d.pct}%</div>
+            <div style={{ width: `${d.pct / max * 100}%`, height: "100%", minWidth: 38, boxSizing: "border-box", whiteSpace: "nowrap", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: nvInk("#ffffff", d.hue), fontSize: 10.5, fontWeight: 700 }}>{d.pct}%</div>
           </div>
           {sel === d.id && <div style={{ fontSize: 11.5, color: "#5b6b7d", marginTop: 4, lineHeight: 1.5 }}>{detail[d.id]}</div>}
         </div>
@@ -204047,7 +204162,7 @@ function DomainBars({ lang }) {
             <strong>{d.range}</strong>
           </div>
           <div style={{ background: C.light, borderRadius: 6, height: 18, overflow: "hidden", border: sel === d.id ? `2px solid ${C.ink}` : "none" }}>
-            <div style={{ width: `${d.pct / max * 100}%`, height: "100%", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: "#fff", fontSize: 10.5, fontWeight: 700 }}>{d.pct}%</div>
+            <div style={{ width: `${d.pct / max * 100}%`, height: "100%", minWidth: 38, boxSizing: "border-box", whiteSpace: "nowrap", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: nvInk("#ffffff", d.hue), fontSize: 10.5, fontWeight: 700 }}>{d.pct}%</div>
           </div>
           {sel === d.id && <div style={{ fontSize: 11.5, color: "#5b6b7d", marginTop: 4, lineHeight: 1.5 }}>{detail[d.id]}</div>}
         </div>
@@ -205667,7 +205782,7 @@ function DomainBars({ lang }) {
             <strong>{d.range}</strong>
           </div>
           <div style={{ background: C.light, borderRadius: 6, height: 18, overflow: "hidden", border: sel === d.id ? `2px solid ${C.ink}` : "none" }}>
-            <div style={{ width: `${d.pct / max * 100}%`, height: "100%", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: "#fff", fontSize: 10.5, fontWeight: 700 }}>{d.pct}%</div>
+            <div style={{ width: `${d.pct / max * 100}%`, height: "100%", minWidth: 38, boxSizing: "border-box", whiteSpace: "nowrap", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: nvInk("#ffffff", d.hue), fontSize: 10.5, fontWeight: 700 }}>{d.pct}%</div>
           </div>
           {sel === d.id && <div style={{ fontSize: 11.5, color: "#5b6b7d", marginTop: 4, lineHeight: 1.5 }}>{detail[d.id]}</div>}
         </div>
@@ -207593,7 +207708,7 @@ function DomainBars({ lang }) {
             <span><Badge id={d.id} hue={d.hue} />{domName(d.id, lang)}</span><strong>{d.pct}%</strong>
           </div>
           <div style={{ background: C.light, borderRadius: 6, height: 16, overflow: "hidden", border: sel === d.id ? `2px solid ${C.ink}` : "none" }}>
-            <div style={{ width: `${d.pct / max * 100}%`, height: "100%", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: "#fff", fontSize: 10, fontWeight: 700 }}>{d.pct}%</div>
+            <div style={{ width: `${d.pct / max * 100}%`, height: "100%", minWidth: 38, boxSizing: "border-box", whiteSpace: "nowrap", background: d.hue, display: "flex", alignItems: "center", paddingLeft: 6, color: nvInk("#ffffff", d.hue), fontSize: 10, fontWeight: 700 }}>{d.pct}%</div>
           </div>
         </div>
       ))}
