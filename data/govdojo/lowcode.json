@@ -468,7 +468,7 @@
     "Managed Environments: feature suite and licensing"
    ],
    "what": [
-    "大規模運用のためのプレミアムな管理機能群で、どの種類の環境でも有効化できる。含まれる機能の例：環境グループ、共有の制限、週次の利用状況インサイト、データポリシー、パイプライン、メーカー向けウェルカムコンテンツ、ソリューションチェッカー、IP ファイアウォール、IP Cookie バインディング、CMK、Lockbox、拡張バックアップ、既定の環境ルーティング、VNet サポート、マスキングルール。ライセンス：スタンドアロンの Power Apps／Power Automate／Copilot Studio／Power Pages／Dynamics 365 ライセンスに権利として含まれる（Developer Plan ではアセット実行時の権利に含まれない）。管理対象でない開発者環境は非推奨で、残すには 2026年12月15日までに Managed Environments を有効にする必要がある。",
+    "大規模運用のためのプレミアムな管理機能群で、どの種類の環境でも有効化できる。含まれる機能の例：環境グループ、共有の制限、週次の利用状況インサイト、データポリシー、パイプライン、メーカー向けウェルカムコンテンツ、ソリューションチェッカー、IP ファイアウォール、IP Cookie バインディング、CMK、Lockbox、拡張バックアップ、既定の環境ルーティング、VNet サポート、マスキングルール。ライセンス：スタンドアロンの Power Apps／Power Automate／Copilot Studio／Power Pages／Dynamics 365 ライセンスに権利として含まれる（Developer Plan ではアセット実行時の権利に含まれない）。管理対象でない開発者環境は非推奨で、残すには 2026年12月15日より前に Managed Environments を有効にする必要がある（停止は同日から）。",
     "Premium capabilities to manage Power Platform at scale, usable with any environment type. Features include environment groups, limit sharing, weekly usage insights, data policies, pipelines, maker welcome content, solution checker, IP firewall, IP cookie binding, CMK, Lockbox, extended backup, default environment routing, VNet support and masking rules. Licensing: an entitlement with standalone Power Apps, Power Automate, Copilot Studio, Power Pages and Dynamics 365 licenses (not for running assets under the Developer Plan). Unmanaged developer environments are deprecated; enable Managed Environments before December 15, 2026 to keep one."
    ],
    "where": [
