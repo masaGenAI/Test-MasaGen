@@ -41,25 +41,30 @@ npm run preview      # ビルド結果をローカル確認
 ```bash
 npm run build
 ```
-`dist/index.html` が本体（ポータルと多くのハブ）の HTML ファイルです（約25MB）。大きいハブは本体に埋め込まず、
+`dist/index.html` が本体（ポータルと小さいハブ）の HTML ファイルです（約3MB）。大きいハブは本体に埋め込まず、
 同じフォルダの別ファイルを、そのハブを開いたときに読み込みます。
 
 | ファイル | 中身 | 読み込むとき |
 |---|---|---|
-| `index.html` | ポータル・Finance・Consulting・Language・Linguistics などのハブ | 最初に開いたとき |
+| `index.html` | ポータル・Language・Training・Learning Tracker・Anything Memo | 最初に開いたとき |
+| `nova-hub-finance-<hash>.js` | Finance Hub（約8MB） | Finance Hub を開いたとき |
 | `nova-hub-megatech-<hash>.js` | TechHub（約25MB） | TechHub を開いたとき |
+| `nova-hub-consulting-<hash>.js` | Consulting Hub（約4MB） | Consulting Hub を開いたとき |
 | `nova-hub-certification-<hash>.js` | Certification Hub（約38MB） | Certification Hub を開いたとき（弱点レーダーで CLF の記録を数えるときも） |
+| `nova-hub-linguisticshub-<hash>.js` | Linguistics Hub（約4MB） | Linguistics Hub を開いたとき（弱点レーダーで Linguistics の記録を数えるときも） |
+| `nova-hub-sidework-<hash>.js` | Side Work Hub（約5MB） | Side Work Hub を開いたとき |
 | `booksummaryhub.html` / `liberal-arts.html` | Book-Summary / リベラルアーツ | そのハブを開いたとき |
 
 `dist/` は**フォルダごと**配置・コピーしてください。`index.html` だけを持ち出すと、上の別ファイルのハブは
 「読み込めませんでした」という案内を出して開きません（ポータルとほかのハブは動きます）。
-TechHub と Certification Hub は通常の `<script>` で読み込むので、`index.html` をダブルクリック（file://）で開いても、
+`nova-hub-*.js` は通常の `<script>` で読み込むので、`index.html` をダブルクリック（file://）で開いても、
 同じフォルダに `nova-hub-*.js` があれば開けます（Book-Summary とリベラルアーツは file:// では開けず、案内が出ます）。
 
-TechHub と Certification Hub の原稿は `src/ProjectNova.jsx` の中のまま（検査スクリプトやスキルが直接読むため）で、
+これらのハブの原稿は `src/ProjectNova.jsx` の中のまま（検査スクリプトやスキルが直接読むため）で、
 ビルドのときにだけ `scripts/lazy-hubs.mjs`（Vite プラグイン）が切り出します。ポータルが最初の描画で使う値
-（TechHub のタブ数・Mastery Track の問題数・横断検索の項目）はビルド時に計算して本体に埋め込みます。
-ハブの外からこの2つのハブの中身を読む箇所を増やすときは、`vite.config.js` の `novaLazyHubs` の説明を参照してください。
+（TechHub のタブ数・Linguistics の分野数・Mastery Track の問題数・横断検索の項目・弱点レーダーが読む Finance の保存キー）は
+ビルド時に計算して本体に埋め込みます。切り出すハブの一覧と、ハブの外からその中身を読む箇所を増やすときの決まりは、
+`vite.config.js` の `novaLazyHubs` を参照してください。
 
 ### Book-Summary の埋め込み方式（Blob URL）
 Book-Summary は 7MB 超の巨大な単一HTML（独自スクリプト多数）。`srcDoc` で埋め込むと

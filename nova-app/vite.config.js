@@ -12,9 +12,10 @@ import { novaLazyHubs } from "./scripts/lazy-hubs.mjs";
 // public/ から dist/ に置かれる別ファイルを、ハブを開いたときに読み込む（本体の読み込みを軽くするため）。
 // ポータルの目次に出す件数だけは、ビルド時にその2ファイルから数えて埋め込む。
 //
-// TechHub（MegaTechHubModule・約26MB）と Certification Hub（CertHubModule・約39MB）も本体に埋め込まない。
+// 大きい React のハブ（下の hubs：TechHub・Certification Hub・Finance Hub・Consulting Hub・Linguistics Hub・Side Work Hub。
+// 合わせて ProjectNova.jsx の 98% ほど）も本体に埋め込まない。
 // 原稿は ProjectNova.jsx のまま（検査スクリプトやスキルが直接読むため）で、ビルドのときにだけ novaLazyHubs が
-// 2つのハブを別ファイル dist/nova-hub-<key>-<hash>.js に切り出し、ハブを開いたときに <script> で読み込む（scripts/lazy-hubs.mjs）。
+// 各ハブを別ファイル dist/nova-hub-<key>-<hash>.js に切り出し、ハブを開いたときに <script> で読み込む（scripts/lazy-hubs.mjs）。
 // ポータルが最初の描画で使う値（下の values / byLang）は、ビルド時に計算して本体に埋め込む。
 function hubStats() {
   const read = (p) => { try { return fs.readFileSync(new URL(p, import.meta.url), "utf8"); } catch (e) { return ""; } };
@@ -55,8 +56,15 @@ export default defineConfig({
       entry: "src/ProjectNova.jsx",
       hubs: [
         // values: ポータルが読む静的プロパティ（そのまま埋め込む）／byLang: (en) => 値 の関数（日英の結果を埋め込む）
+        // key はハブの id（URL の #<id>）にそろえる。name は読み込み中・失敗時の案内に出す名前（ポータルの表示名）
         { decl: "MegaTechHubModule", key: "megatech", name: "TechHub", values: ["TAB_COUNT", "MASTERY_COUNTS"], byLang: ["PORTAL_INDEX"] },
         { decl: "CertHubModule", key: "certification", name: "Certification Hub", values: [], byLang: ["PORTAL_INDEX"] },
+        // WEAK_KEYS：弱点レーダーが読む保存キーと見出し
+        { decl: "FinanceHubModule", key: "finance", name: "Finance Hub", values: ["WEAK_KEYS"], byLang: ["PORTAL_INDEX"] },
+        { decl: "ConsultingHubModule", key: "consulting", name: "Consulting Hub", values: [], byLang: ["PORTAL_INDEX"] },
+        // FIELD_STATS：目次タグの分類数・分野数（弱点レーダーの WEAK_TABLE は関数なので、記録があるときだけ novaHubReady で読み込んで使う）
+        { decl: "LinguisticsHubModule", key: "linguisticshub", name: "Linguistics Hub", values: ["FIELD_STATS"], byLang: ["PORTAL_INDEX"] },
+        { decl: "SideWorkHubModule", key: "sidework", name: "Side Work Hub", values: [], byLang: [] },
       ],
     }),
     react(),

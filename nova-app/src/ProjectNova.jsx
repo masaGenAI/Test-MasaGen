@@ -2,8 +2,9 @@ import React, { useState, useEffect, useMemo, useRef, useCallback, useContext, c
 import { Waves, Clock3, Users, Brain, Cpu, BookOpen, Layers, ChevronRight, ArrowLeft, Check, Circle, X, Star, Sun, Moon, Globe, RotateCcw } from "lucide-react";
 // Book-Summary ハブ（public/booksummaryhub.html）とリベラルアーツ（public/liberal-arts.html）は本体に埋め込まず、
 // ハブを開いたときに別ファイルとして読み込む（novaHubHtml）。ポータルの件数はビルド時に数えた __NOVA_HUB_STATS__ を使う。
-// TechHub（MegaTechHubModule）と Certification Hub（CertHubModule）はこのファイルの中で書くが、ビルドでは別ファイルに切り出して
-// 開いたときに読み込む（scripts/lazy-hubs.mjs・novaLazyHub）。ポータルからこの2つのハブの中身を読むときは、その説明を参照。
+// 大きい React のハブ（Finance・TechHub・Consulting・Certification・Side Work・Linguistics の6つ。一覧は vite.config.js の novaLazyHubs）は
+// このファイルの中で書くが、ビルドでは別ファイルに切り出して開いたときに読み込む（scripts/lazy-hubs.mjs・novaLazyHub）。
+// ポータルからこれらのハブの中身を読むときは、その説明を参照。
 // 学習ロードマップ トラッカー（資格/Tools/講座/書籍/Udemy の一元管理・自動保存つき表アプリ）
 import LEARNING_TRACKER_HTML from "../public/learning-tracker.html?raw";
 // Anything Memo トラッカー（調べ済みノートの一覧・検索・ジャンル別・自動保存）
@@ -122531,8 +122532,9 @@ SECTIONS.push({
   });
 })();
 
-  // 弱点レーダー用：セクションごとのクイズの正誤（kb_<セクション>_progress_v1 = { 問題id: { picked, correct } }）
-  App.WEAK_KEYS = () => SECTIONS.map((x) => ({ key: "kb_" + x.id + "_progress_v1", label: [(x.no ? x.no + ". " : "") + (x.title ? x.title.ja : x.id), (x.no ? x.no + ". " : "") + (x.title ? x.title.en : x.id)] }));
+  // 弱点レーダー用：セクションごとのクイズの正誤（kb_<セクション>_progress_v1 = { 問題id: { picked, correct } }）の保存キーと見出し。
+  // 関数ではなく素のデータにしておく（ビルドではこのハブを開いたときに読み込むので、ポータルが読むこの値はビルド時に計算して埋め込む）
+  App.WEAK_KEYS = SECTIONS.map((x) => ({ key: "kb_" + x.id + "_progress_v1", label: [(x.no ? x.no + ". " : "") + (x.title ? x.title.ja : x.id), (x.no ? x.no + ". " : "") + (x.title ? x.title.en : x.id)] }));
   // ポータルの横断検索に出すセクション
   App.PORTAL_INDEX = (en) => SECTIONS.map((x) => ({ label: (x.no ? x.no + ". " : "") + (x.title ? x.title[en ? "en" : "ja"] : x.id), sub: (en ? "Finance · " : "Finance・") + (x.sub ? x.sub[en ? "en" : "ja"] : ""), hash: "finance/" + x.id, extra: x.title ? [x.title.ja, x.title.en, x.sub && x.sub.ja].join(" ") : "" }));
   return App;
@@ -218702,7 +218704,7 @@ function novaHubHtml(file) {
 }
 function NovaHubStatus({ state, file, name, kind, onRetry }) {
   const box = { maxWidth: 560, margin: "48px auto", padding: "20px 22px", borderRadius: 12, border: "1px solid #3A3350", background: "#1E1832", color: "#EDE8F4", fontSize: 14, lineHeight: 1.8 };
-  // kind="script"：ビルドで別ファイル（JS）にしたハブ（TechHub・Certification Hub）。英語の画面があるハブなので、ポータルの言語に合わせる
+  // kind="script"：ビルドで別ファイル（JS）にしたハブ（novaLazyHub）。案内はポータルの言語に合わせる
   const en = kind === "script" && typeof window !== "undefined" && window.__novaLang === "en";
   if (state === "fail" && kind === "script") {
     return (
@@ -218735,13 +218737,15 @@ function NovaHubStatus({ state, file, name, kind, onRetry }) {
   }
   return <div role="status" style={{ ...box, textAlign: "center", color: "#ADA4C6" }}>{en ? `Loading ${name}…` : `${name} を読み込んでいます…`}</div>;
 }
-// ================= 別ファイルに分けた React のハブ（TechHub・Certification Hub）の読み込み =================
-// npm run build では、この2つのハブ（MegaTechHubModule・CertHubModule）の中身を index.html に埋め込まず、
+// ================= 別ファイルに分けた React のハブ（Finance・TechHub・Consulting・Certification・Side Work・Linguistics）の読み込み =================
+// npm run build では、vite.config.js の novaLazyHubs に並べたハブ（FinanceHubModule・MegaTechHubModule・ConsultingHubModule・
+// CertHubModule・SideWorkHubModule・LinguisticsHubModule）の中身を index.html に埋め込まず、
 // 同じ場所の別ファイル（nova-hub-*.js）にして、開いたときに1回だけ読み込む（scripts/lazy-hubs.mjs が ProjectNova.jsx から
 // 切り出し、ここの novaLazyHub(...) の呼び出しに置き換える）。中身はトップレベルの共通部品（React・StarButton など）を
 // 引数で受け取るので、二重に評価されない。開発サーバー（npm run dev）と検査スクリプトは切り出さない元のファイルをそのまま使う。
-// ポータルの最初の描画で使う値（タブ数・Mastery Track の件数・横断検索の項目）は、ビルド時に計算して埋め込むので読み込みを待たない。
-// それ以外の中身（関数など）がポータル側で要るときは novaHubReady(…) で読み込みを待つ。
+// ポータルの最初の描画で使う値（タブ数・分野数・Mastery Track の件数・横断検索の項目・弱点レーダーの保存キー）は、
+// ビルド時に計算して埋め込むので読み込みを待たない。
+// それ以外の中身（関数など）がポータル側で要るときは novaHubReady(…) で読み込みを待つ（弱点レーダーの CLF・Linguistics）。
 // 読み込みは <script>（module ではない）で行うので、index.html をファイルとして直接開いても、別ファイルが同じフォルダにあれば開ける。
 const __novaHubScripts = {};
 function novaLoadHubScript(key, file) {
@@ -231196,14 +231200,21 @@ const NOVA_WEAK_EXTRA = [
       const m = await novaHubReady(CertHubModule);
       return m && m.CLF_WEAK ? m.CLF_WEAK(st) : [];
     } },
-  { hub: ["Finance Hub", "Finance Hub"], keys: () => (FinanceHubModule.WEAK_KEYS ? FinanceHubModule.WEAK_KEYS() : []).map((x) => x.key),
-    read: (vals) => (FinanceHubModule.WEAK_KEYS ? FinanceHubModule.WEAK_KEYS() : []).map((x) => {
+  // Finance の保存キーと見出しは素のデータ（ビルドでは埋め込み済み）なので、Finance Hub の読み込みを待たない
+  { hub: ["Finance Hub", "Finance Hub"], keys: () => (FinanceHubModule.WEAK_KEYS || []).map((x) => x.key),
+    read: (vals) => (FinanceHubModule.WEAK_KEYS || []).map((x) => {
       const v = vals[x.key]; if (!v || typeof v !== "object") return null;
       let a = 0, c = 0; Object.values(v).forEach((r) => { if (r && typeof r === "object" && "picked" in r) { a++; if (r.correct) c++; } });
       return a ? { dom: x.label, a, c } : null;
     }).filter(Boolean) },
+  // Linguistics の分類表は Linguistics Hub の中にある（ビルドでは開いたときに読み込む別ファイル）。解答の記録があるときだけ読み込んで数える
   { hub: ["Linguistics Hub", "Linguistics Hub"], keys: () => ["linguistics-hub-progress-v2"],
-    read: (vals) => (LinguisticsHubModule.WEAK_TABLE ? LinguisticsHubModule.WEAK_TABLE(vals["linguistics-hub-progress-v2"]) : []) },
+    read: async (vals) => {
+      const prog = vals["linguistics-hub-progress-v2"];
+      if (!prog || typeof prog !== "object" || !Object.values(prog).some((v) => v === true)) return [];
+      const m = await novaHubReady(LinguisticsHubModule);
+      return m && m.WEAK_TABLE ? m.WEAK_TABLE(prog) : [];
+    } },
   { hub: ["Language Hub", "Language Hub"], keys: () => ["quiz-stats"],
     read: (vals) => { const v = vals["quiz-stats"] || {}; const N = { es: ["スペイン語", "Spanish"], de: ["ドイツ語", "German"], fr: ["フランス語", "French"] };
       return Object.keys(N).map((k) => (v[k] && Number(v[k].totalAttempts) > 0 ? { dom: N[k], a: Number(v[k].totalAttempts), c: Number(v[k].totalCorrect) || 0 } : null)).filter(Boolean); } },

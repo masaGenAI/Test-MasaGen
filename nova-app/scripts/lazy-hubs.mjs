@@ -1,8 +1,8 @@
-// ビルド時だけ、ProjectNova.jsx から大きいハブ（TechHub・Certification Hub）を切り出して別ファイルにする Vite プラグイン。
+// ビルド時だけ、ProjectNova.jsx から大きいハブ（vite.config.js の hubs：TechHub・Certification Hub・Finance Hub・Consulting Hub・
+// Linguistics Hub・Side Work Hub）を切り出して別ファイルにする Vite プラグイン。
 //
-// なぜ：index.html（vite-plugin-singlefile で全部入り）は 88MB あり、ポータルを開くだけでこの2つのハブ（合わせて約 65MB）も
-// 毎回ダウンロード・解析していた。ProjectNova.jsx は多くの検査スクリプトやスキルが直接読む「唯一の原稿」なので、ファイルは分けず、
-// ビルドのときにだけ切り出す。
+// なぜ：index.html（vite-plugin-singlefile で全部入り）は 88MB あり、ポータルを開くだけでこれらのハブも毎回ダウンロード・解析していた。
+// ProjectNova.jsx は多くの検査スクリプトやスキルが直接読む「唯一の原稿」なので、ファイルは分けず、ビルドのときにだけ切り出す。
 //
 // 何をするか（ProjectNova.jsx を読み込むとき）：
 //   1. Rollup のパーサー（vite が再公開している parseAstAsync）で構文木を作り、`const <decl> = (function () { ... })();` の宣言を探す。
@@ -238,6 +238,7 @@ export function novaLazyHubs(opts) {
       chunks.push({ decl: h.decl, file: `nova-hub-${h.key}-${hash}.js`, code: out.code, deps: deps.length });
     }));
 
+    chunks.sort((a, b) => hubs.findIndex((h) => h.decl === a.decl) - hubs.findIndex((h) => h.decl === b.decl));
     const probed = await probe;
     let main = code;
     const order = hubs.slice().sort((a, b) => blocks.get(b.decl).start - blocks.get(a.decl).start);
