@@ -141532,6 +141532,31 @@ const CAT_HUE = {
   "09_セキュリティ": "#1E63C4", "10_管理・移行・料金": "#16518F", "4社の強み": "#0F3F73",
 };
 
+// ===== 英語表示（TechHub の言語設定に従う）=====
+// 保存キー（進捗の分野名 d、"☁AWSの問題"、完了チェック・途中セーブの見出し）は日本語のまま。ここは表示だけの対応表。
+const CLOUD_DOJO_DOMAIN_EN = {
+  "用語・基礎": "Terms & basics", "01_コンピュート": "Compute", "02_ストレージ": "Storage",
+  "03_データベース": "Databases", "04_ネットワーク": "Networking", "05_データ分析": "Data analytics",
+  "06_AI・生成AI": "AI & generative AI", "07_AI・ML機能": "AI/ML features", "08_既製AIサービス": "Prebuilt AI services",
+  "09_セキュリティ": "Security", "10_管理・移行・料金": "Management, migration & pricing", "4社の強み": "Strengths of the four providers",
+};
+function useCdEn() { return useLang() === "en"; }
+function cdDom(en, d) { return en ? CLOUD_DOJO_DOMAIN_EN[d] || d : d; }
+// 図解・用語集などの固定データ（日本語の文字列 → 英語。CLOUD_DOJO_EN は CLOUD_DATA の後ろで定義）
+function cdT(en, s) { return en && CLOUD_DOJO_EN[s] != null ? CLOUD_DOJO_EN[s] : s; }
+// 問題文・選択肢・解説。英語は qEn / oEn / eEn（選択肢の並びと正解番号 a は日英共通）
+function cdQ(en, it) { return en && it.qEn ? it.qEn : it.q; }
+function cdO(en, it) { return en && it.oEn ? it.oEn : it.o; }
+function cdE(en, it) { return en && it.eEn ? it.eEn : it.e; }
+// 途中セーブの見出し（保存するのは日本語の見出し）を表示用に訳す
+function cdSlotLabel(en, label) {
+  if (!en || !label) return label;
+  if (label === "全分野ミックス") return "All-domain mix";
+  const m = /^(AWS|Azure|GCP|OCI) の問題$/.exec(label);
+  if (m) return m[1] + " questions";
+  return cdDom(en, label);
+}
+
 const CLOUD_STORE_KEY = "cloud_study_progress_v2";
 
 function shuffle(arr, seed) {
@@ -141568,18 +141593,13 @@ function CloudDojoWrapper() {
       <div style={{ textAlign: "center", padding: "60px 20px" }}>
         <div style={{ fontSize: 40, marginBottom: 16 }}>☁️</div>
         <div className="gh-display" style={{ fontSize: 18, color: C.text, marginBottom: 8 }}>
-          4大クラウド 学習ダッシュボード
+          {lang === "en" ? "Big 4 Cloud Learning Dashboard" : "4大クラウド 学習ダッシュボード"}
         </div>
         <div style={{ fontSize: 12.5, color: C.muted, marginBottom: 24, lineHeight: 1.8 }}>
-          AWS・Azure・GCP・OCIを482問のクイズと図解で。全画面表示で開きます。
+          {lang === "en" ? `AWS, Azure, GCP and OCI through ${BANK.length} quiz questions and diagrams. Opens full screen.` : "AWS・Azure・GCP・OCIを482問のクイズと図解で。全画面表示で開きます。"}
         </div>
-        {lang === "en" && (
-          <div style={{ fontSize: 12.5, color: "#7A4B00", background: "#FFF7E6", borderRadius: 8, padding: "8px 12px", margin: "0 auto 18px", maxWidth: 520 }}>
-            Cloud Dojo is available in Japanese only: its 482 questions, diagrams and glossary have not been translated.
-          </div>
-        )}
         <button className="gh-btn gh-btn-primary" onClick={() => setOpen(true)} style={{ fontSize: 14, padding: "10px 24px" }}>
-          クラウド道場を開く →
+          {lang === "en" ? "Open Cloud Dojo →" : "クラウド道場を開く →"}
         </button>
       </div>
     );
@@ -141611,7 +141631,7 @@ function CloudDojoWrapper() {
           boxShadow: "0 2px 8px rgba(0,0,0,0.2)", fontFamily: "inherit",
         }}
       >
-        ✕ 閉じてハブへ戻る
+        {lang === "en" ? "✕ Close and return to the hub" : "✕ 閉じてハブへ戻る"}
       </button>
       <div style={{ padding: "18px 18px 24px" }}>
         <CloudDojo />
@@ -141621,6 +141641,7 @@ function CloudDojoWrapper() {
 }
 
 function CloudDojo() {
+  const en = useCdEn();
   const [tab, setTab] = useState("home");
   const __opBack = useLocalHistory([[tab, setTab]]);
   useRegisterBack(__opBack.back, __opBack.canBack);
@@ -141686,7 +141707,7 @@ function CloudDojo() {
   return (
     <div style={{ fontFamily: "var(--font-sans, sans-serif)", color: "var(--color-text-primary)", maxWidth: 880, margin: "0 auto", padding: "8px 12px 40px" }}>
       <Header tab={tab} setTab={setTab} />
-      {!loaded && <p style={{ color: "var(--color-text-tertiary)", fontSize: 14 }}>読み込み中…</p>}
+      {!loaded && <p style={{ color: "var(--color-text-tertiary)", fontSize: 14 }}>{en ? "Loading…" : "読み込み中…"}</p>}
       {loaded && tab === "home" && <Home counts={counts} progress={progress} totals={totals} setTab={setTab} resetAll={resetAll} meta={meta} dailyToday={dailyToday} />}
       {loaded && tab === "quiz" && <Quiz counts={counts} progress={progress} recordAnswer={recordAnswer} />}
       {loaded && tab === "exam" && <Exam recordAnswer={recordAnswer} />}
@@ -141698,14 +141719,17 @@ function CloudDojo() {
 }
 
 function Header({ tab, setTab }) {
-  const tabs = [["home", "進捗"], ["quiz", "クイズ"], ["exam", "模擬試験"], ["diagram", "図解"], ["interactive", "体感学習"], ["glossary", "用語集"]];
+  const en = useCdEn();
+  const tabs = en
+    ? [["home", "Progress"], ["quiz", "Quiz"], ["exam", "Mock exam"], ["diagram", "Diagrams"], ["interactive", "Hands-on"], ["glossary", "Glossary"]]
+    : [["home", "進捗"], ["quiz", "クイズ"], ["exam", "模擬試験"], ["diagram", "図解"], ["interactive", "体感学習"], ["glossary", "用語集"]];
   return (
     <div style={{ marginBottom: 18 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "6px 0 2px" }}>
         <div style={{ width: 30, height: 30, borderRadius: 8, background: `linear-gradient(135deg, ${BLUE.primary}, ${BLUE.deep})`, flexShrink: 0 }} />
-        <h1 style={{ fontSize: 22, fontWeight: 500, margin: 0, color: BLUE.deep }}>4大クラウド 学習ダッシュボード</h1>
+        <h1 style={{ fontSize: 22, fontWeight: 500, margin: 0, color: BLUE.deep }}>{en ? "Big 4 Cloud Learning Dashboard" : "4大クラウド 学習ダッシュボード"}</h1>
       </div>
-      <p style={{ fontSize: 13, color: "var(--color-text-tertiary)", margin: "0 0 14px" }}>AWS・Azure・GCP・OCI を {BANK.length}問のクイズと図解で。進捗は自動保存。</p>
+      <p style={{ fontSize: 13, color: "var(--color-text-tertiary)", margin: "0 0 14px" }}>{en ? `AWS, Azure, GCP and OCI through ${BANK.length} quiz questions and diagrams. Progress is saved automatically.` : <>AWS・Azure・GCP・OCI を {BANK.length}問のクイズと図解で。進捗は自動保存。</>}</p>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         {tabs.map(([k, label]) => (
           <button key={k} onClick={() => setTab(k)} style={{
@@ -141724,6 +141748,7 @@ function Header({ tab, setTab }) {
 function pct(p) { return p && p.attempts ? Math.round((p.correct / p.attempts) * 100) : null; }
 
 function Home({ counts, progress, totals, setTab, resetAll, meta, dailyToday }) {
+  const en = useCdEn();
   // 苦手分野: 5回以上回答かつ正答率60%未満
   const weak = CAT_ORDER.filter((c) => {
     const p = progress[c];
@@ -141734,17 +141759,17 @@ function Home({ counts, progress, totals, setTab, resetAll, meta, dailyToday }) 
   return (
     <div>
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 16 }}>
-        <Stat label="総回答数" value={totals.att} />
-        <Stat label="正解数" value={totals.cor} />
-        <Stat label="通算正答率" value={totals.rate + "%"} />
-        <Stat label="連続学習日数" value={(meta.streak || 0) + "日"} accent />
+        <Stat label={en ? "Total answers" : "総回答数"} value={totals.att} />
+        <Stat label={en ? "Correct answers" : "正解数"} value={totals.cor} />
+        <Stat label={en ? "Overall accuracy" : "通算正答率"} value={totals.rate + "%"} />
+        <Stat label={en ? "Study streak" : "連続学習日数"} value={(meta.streak || 0) + (en ? ((meta.streak || 0) === 1 ? " day" : " days") : "日")} accent />
       </div>
 
       {/* デイリー目標 */}
       <div style={{ padding: "14px 16px", borderRadius: "var(--border-radius-lg,12px)", background: BLUE.light, border: `0.5px solid ${BLUE.mid}`, marginBottom: 18 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-          <span style={{ fontSize: 14, fontWeight: 500, color: BLUE.deep }}>今日の目標</span>
-          <span style={{ fontSize: 13, color: BLUE.deep }}>{dailyToday} / {DAILY_GOAL} 問{goalPct >= 100 ? "  達成 🎉" : ""}</span>
+          <span style={{ fontSize: 14, fontWeight: 500, color: BLUE.deep }}>{en ? "Today's goal" : "今日の目標"}</span>
+          <span style={{ fontSize: 13, color: BLUE.deep }}>{dailyToday} / {DAILY_GOAL}{en ? " questions" : " 問"}{goalPct >= 100 ? (en ? "  Done 🎉" : "  達成 🎉") : ""}</span>
         </div>
         <div style={{ height: 12, borderRadius: 999, background: "#fff", overflow: "hidden", border: `0.5px solid ${BLUE.mid}` }}>
           <div style={{ width: goalPct + "%", height: "100%", background: `linear-gradient(90deg, ${BLUE.primary}, ${BLUE.deep})`, transition: "width .3s" }} />
@@ -141754,39 +141779,39 @@ function Home({ counts, progress, totals, setTab, resetAll, meta, dailyToday }) 
       {/* 苦手分野 */}
       {weak.length > 0 && (
         <div style={{ padding: "12px 16px", borderRadius: "var(--border-radius-lg,12px)", background: "var(--color-background-danger)", border: "0.5px solid var(--color-border-danger)", marginBottom: 18 }}>
-          <div style={{ fontSize: 14, fontWeight: 500, color: "var(--color-text-danger)", marginBottom: 6 }}>苦手分野（正答率60%未満）</div>
+          <div style={{ fontSize: 14, fontWeight: 500, color: "var(--color-text-danger)", marginBottom: 6 }}>{en ? "Weak areas (below 60% accuracy)" : "苦手分野（正答率60%未満）"}</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
             {weak.map((c) => (
               <span key={c} style={{ fontSize: 12, padding: "3px 10px", borderRadius: 999, background: "#fff", color: "var(--color-text-danger)", border: "0.5px solid var(--color-border-danger)" }}>
-                {c}（{pct(progress[c])}%）
+                {cdDom(en, c)}{en ? " (" : "（"}{pct(progress[c])}{en ? "%)" : "%）"}
               </span>
             ))}
           </div>
         </div>
       )}
 
-      <h2 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>分野ごとの習熟度</h2>
+      <h2 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>{en ? "Mastery by domain" : "分野ごとの習熟度"}</h2>
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {CAT_ORDER.map((cat) => {
           const p = progress[cat]; const rate = pct(p); const hue = CAT_HUE[cat];
           const isWeak = p && p.attempts >= 5 && rate < 60;
           return (
             <div key={cat} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <span style={{ width: 150, fontSize: 13, color: isWeak ? "var(--color-text-danger)" : "var(--color-text-secondary)", flexShrink: 0, fontWeight: isWeak ? 500 : 400 }}>{cat}</span>
+              <span style={{ width: en ? 190 : 150, fontSize: 13, color: isWeak ? "var(--color-text-danger)" : "var(--color-text-secondary)", flexShrink: 0, fontWeight: isWeak ? 500 : 400 }}>{cdDom(en, cat)}</span>
               <div style={{ flex: 1, height: 18, borderRadius: 999, background: BLUE.light, overflow: "hidden" }}>
                 <div style={{ width: (rate ?? 0) + "%", height: "100%", background: hue, transition: "width .3s" }} />
               </div>
-              <span style={{ width: 90, textAlign: "right", fontSize: 12, color: "var(--color-text-tertiary)" }}>
-                {p && p.attempts ? `${rate}% (${p.attempts}回)` : `未着手 (${counts[cat]||0}問)`}
+              <span style={{ width: en ? 112 : 90, textAlign: "right", fontSize: 12, color: "var(--color-text-tertiary)" }}>
+                {p && p.attempts ? (en ? `${rate}% (${p.attempts} ${p.attempts === 1 ? "try" : "tries"})` : `${rate}% (${p.attempts}回)`) : (en ? `Not started (${counts[cat]||0})` : `未着手 (${counts[cat]||0}問)`)}
               </span>
             </div>
           );
         })}
       </div>
       <div style={{ display: "flex", gap: 10, marginTop: 22, flexWrap: "wrap" }}>
-        <button onClick={() => setTab("quiz")} style={primaryBtn}>クイズを始める</button>
-        <button onClick={() => setTab("exam")} style={secondaryBtn}>模擬試験に挑戦</button>
-        <button onClick={resetAll} style={ghostBtn}>進捗をリセット</button>
+        <button onClick={() => setTab("quiz")} style={primaryBtn}>{en ? "Start a quiz" : "クイズを始める"}</button>
+        <button onClick={() => setTab("exam")} style={secondaryBtn}>{en ? "Take the mock exam" : "模擬試験に挑戦"}</button>
+        <button onClick={resetAll} style={ghostBtn}>{en ? "Reset progress" : "進捗をリセット"}</button>
       </div>
     </div>
   );
@@ -141845,6 +141870,7 @@ BANK.forEach((item, i) => {
 });
 
 function Quiz({ counts, progress, recordAnswer }) {
+  const en = useCdEn();
   const [cat, setCat] = useState(null);
   const [order, setOrder] = useState([]);
   const [idx, setIdx] = useState(0);
@@ -141881,23 +141907,23 @@ function Quiz({ counts, progress, recordAnswer }) {
           <div style={{ marginBottom: 16, padding: "12px 16px", borderRadius: 12, background: "#fff", border: `2px solid ${BLUE.primary}`, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
             <span style={{ fontSize: 20 }}>💾</span>
             <div style={{ flex: 1, minWidth: 150 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: BLUE.deep }}>セーブデータ</div>
-              <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: BLUE.deep }}>{en ? "Saved session" : "セーブデータ"}</div>
+              <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>{cdSlotLabel(en, slot.meta.label)}{slot.meta.label ? (en ? " / " : "／") : ""}{saveStamp(slot.meta.t)}</div>
             </div>
             <button onClick={async () => { const d = await slot.read(); if (!d) return; setOrder(d.order || []); setAnswered(d.answered || {}); setSel(d.sel == null ? null : d.sel); setReviewMode(false); setSessionCorrect(d.sc || 0); setSessionWrong(d.sw || 0); setIdx(d.idx || 0); setCat(d.cat); }}
-              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: BLUE.primary, color: "#fff", fontWeight: 600, cursor: "pointer" }}>▶ 続きから</button>
-            <button onClick={() => slot.remove()} style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: BLUE.deep, cursor: "pointer" }}>削除</button>
+              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: BLUE.primary, color: "#fff", fontWeight: 600, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
+            <button onClick={() => slot.remove()} style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: BLUE.deep, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
         )}
         <button onClick={() => startCat(MIX)} style={{
           width: "100%", textAlign: "left", padding: "16px 18px", borderRadius: "var(--border-radius-lg,12px)", cursor: "pointer",
           background: `linear-gradient(135deg, ${BLUE.primary}, ${BLUE.deep})`, border: "none", marginBottom: 16,
         }}>
-          <div style={{ fontSize: 16, fontWeight: 500, color: "#fff" }}>全分野ミックス（ランダム30問）</div>
-          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.85)", marginTop: 4 }}>全{BANK.length}問からランダムに出題。腕試しに最適。</div>
+          <div style={{ fontSize: 16, fontWeight: 500, color: "#fff" }}>{en ? "All-domain mix (30 random questions)" : "全分野ミックス（ランダム30問）"}</div>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.85)", marginTop: 4 }}>{en ? `Drawn at random from all ${BANK.length} questions. A good way to test yourself.` : <>全{BANK.length}問からランダムに出題。腕試しに最適。</>}</div>
         </button>
 
-        <h2 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 12px", color: BLUE.deep }}>クラウド別で解く</h2>
+        <h2 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 12px", color: BLUE.deep }}>{en ? "Practice by cloud" : "クラウド別で解く"}</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(140px,1fr))", gap: 10, marginBottom: 18 }}>
           {Object.entries(CLOUD_QUIZ).map(([label, cloud]) => {
             const cc = CLOUD_DATA[cloud];
@@ -141907,16 +141933,16 @@ function Quiz({ counts, progress, recordAnswer }) {
                 textAlign: "left", padding: "12px 14px", borderRadius: "var(--border-radius-lg,12px)", cursor: "pointer",
                 background: "#fff", border: `1.5px solid ${catDone.has(cloud) ? "#16A34A" : cc.color}`,
               }}>
-                <div style={{ display: "flex", alignItems: "center", fontSize: 15, fontWeight: 500, color: cc.color }}><DoneCheck on={catDone.has(cloud)} onToggle={(e) => catDone.toggle(cloud, e)} />{cloud}</div>
+                <div style={{ display: "flex", alignItems: "center", fontSize: 15, fontWeight: 500, color: cc.color }}><DoneCheck on={catDone.has(cloud)} onToggle={(e) => catDone.toggle(cloud, e)} en={en} />{cloud}</div>
                 <div style={{ fontSize: 12, color: "var(--color-text-tertiary)", marginTop: 4 }}>
-                  {CLOUD_IDX[cloud].length}問{p && p.attempts ? ` ・ 正答率${rate}%` : ""}
+                  {CLOUD_IDX[cloud].length}{en ? " questions" : "問"}{p && p.attempts ? (en ? ` · ${rate}% correct` : ` ・ 正答率${rate}%`) : ""}
                 </div>
               </button>
             );
           })}
         </div>
 
-        <h2 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 12px", color: BLUE.deep }}>分野を選んでください</h2>
+        <h2 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 12px", color: BLUE.deep }}>{en ? "Choose a domain" : "分野を選んでください"}</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 10 }}>
           {CAT_ORDER.map((c) => {
             const p = progress[c]; const rate = pct(p);
@@ -141925,9 +141951,9 @@ function Quiz({ counts, progress, recordAnswer }) {
                 textAlign: "left", padding: "12px 14px", borderRadius: "var(--border-radius-lg,12px)", cursor: "pointer",
                 background: "#fff", border: `${catDone.has(c) ? "1.5px solid #16A34A" : "0.5px solid " + BLUE.mid}`,
               }}>
-                <div style={{ display: "flex", alignItems: "center", fontSize: 14, fontWeight: 500, color: BLUE.deep }}><DoneCheck on={catDone.has(c)} onToggle={(e) => catDone.toggle(c, e)} />{c}</div>
+                <div style={{ display: "flex", alignItems: "center", fontSize: 14, fontWeight: 500, color: BLUE.deep }}><DoneCheck on={catDone.has(c)} onToggle={(e) => catDone.toggle(c, e)} en={en} />{cdDom(en, c)}</div>
                 <div style={{ fontSize: 12, color: "var(--color-text-tertiary)", marginTop: 4 }}>
-                  {counts[c]}問{p && p.attempts ? ` ・ 正答率${rate}%` : " ・ 未着手"}
+                  {counts[c]}{en ? " questions" : "問"}{p && p.attempts ? (en ? ` · ${rate}% correct` : ` ・ 正答率${rate}%`) : (en ? " · not started" : " ・ 未着手")}
                 </div>
                 <div style={{ marginTop: 8, height: 5, borderRadius: 999, background: BLUE.light, overflow: "hidden" }}>
                   <div style={{ width: (rate ?? 0) + "%", height: "100%", background: CAT_HUE[c] }} />
@@ -141941,7 +141967,8 @@ function Quiz({ counts, progress, recordAnswer }) {
   }
 
   const accent = cat === MIX ? BLUE.primary : (CLOUD_QUIZ[cat] ? CLOUD_DATA[CLOUD_QUIZ[cat]].color : CAT_HUE[cat]);
-  const headLabel = cat === MIX ? "全分野ミックス" : (CLOUD_QUIZ[cat] ? `${CLOUD_QUIZ[cat]} の問題` : cat);
+  const headLabel = cat === MIX ? "全分野ミックス" : (CLOUD_QUIZ[cat] ? `${CLOUD_QUIZ[cat]} の問題` : cat); // 途中セーブには日本語の見出しを保存
+  const headShown = cdSlotLabel(en, headLabel);
   const showCatTag = cat === MIX || !!CLOUD_QUIZ[cat];
   const view = reviewMode
     ? order.filter((i) => answered[i] !== undefined && answered[i] !== BANK[i].a)
@@ -141964,18 +141991,18 @@ function Quiz({ counts, progress, recordAnswer }) {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap: "wrap", gap: 8 }}>
-        <button onClick={() => setCat(null)} style={ghostBtn}>← 分野選択</button>
-        <span style={{ fontSize: 15, fontWeight: 500, color: BLUE.deep }}>{headLabel}</span>
+        <button onClick={() => setCat(null)} style={ghostBtn}>{en ? "← Domains" : "← 分野選択"}</button>
+        <span style={{ fontSize: 15, fontWeight: 500, color: BLUE.deep }}>{headShown}</span>
         <button onClick={() => { setReviewMode(!reviewMode); setIdx(0); setSel(null); }} style={ghostBtn}>
-          {reviewMode ? "全問に戻す" : "間違いだけ復習"}
+          {reviewMode ? (en ? "Show all questions" : "全問に戻す") : (en ? "Review mistakes only" : "間違いだけ復習")}
         </button>
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, color: "var(--color-text-secondary)", marginBottom: 6 }}>
-        <span>第 {view.length ? idx + 1 : 0} / {view.length} 問</span>
-        <span>正解 {sessionCorrect} ・ 誤答 {sessionWrong}</span>
+        <span>{en ? "Question " : "第 "}{view.length ? idx + 1 : 0} / {view.length}{en ? "" : " 問"}</span>
+        <span>{en ? "Correct " : "正解 "}{sessionCorrect}{en ? " · Wrong " : " ・ 誤答 "}{sessionWrong}</span>
         <button onClick={async () => { await slot.save({ cat, order, idx, sel, answered, sc: sessionCorrect, sw: sessionWrong }, headLabel); }}
           style={{ padding: "3px 10px", borderRadius: 8, border: `1px solid ${BLUE.primary}`, background: "#fff", color: BLUE.primary, fontWeight: 600, cursor: "pointer", fontSize: 12 }}
-          title="途中経過をセーブ">{slot.meta ? "💾 保存済" : "💾 セーブ"}</button>
+          title={en ? "Save your place" : "途中経過をセーブ"}>{slot.meta ? (en ? "💾 Saved" : "💾 保存済") : (en ? "💾 Save" : "💾 セーブ")}</button>
       </div>
       <div style={{ height: 6, borderRadius: 999, background: BLUE.light, marginBottom: 14, overflow: "hidden" }}>
         <div style={{ width: view.length ? ((idx + 1) / view.length * 100) + "%" : "0%", height: "100%", background: accent, transition: "width .2s" }} />
@@ -141983,17 +142010,17 @@ function Quiz({ counts, progress, recordAnswer }) {
 
       {!item && (
         <div style={{ padding: 24, textAlign: "center", color: "var(--color-text-secondary)", fontSize: 14 }}>
-          {reviewMode ? "復習する間違いはありません。" : "問題がありません。"}
+          {reviewMode ? (en ? "No mistakes to review." : "復習する間違いはありません。") : (en ? "No questions." : "問題がありません。")}
         </div>
       )}
 
       {item && (
         <div style={{ background: "#fff", border: `0.5px solid ${BLUE.mid}`, borderRadius: "var(--border-radius-lg,12px)", padding: "20px" }}>
-          {showCatTag && <div style={{ fontSize: 11, color: accent, marginBottom: 6 }}>{item.d}</div>}
-          <p style={{ fontSize: 16, fontWeight: 500, margin: "0 0 4px", lineHeight: 1.6 }}>Q. {item.q}</p>
-          <p style={{ fontSize: 13, color: "var(--color-text-tertiary)", margin: "0 0 16px" }}>正しいものを選んでください</p>
+          {showCatTag && <div style={{ fontSize: 11, color: accent, marginBottom: 6 }}>{cdDom(en, item.d)}</div>}
+          <p style={{ fontSize: 16, fontWeight: 500, margin: "0 0 4px", lineHeight: 1.6 }}>Q. {cdQ(en, item)}</p>
+          <p style={{ fontSize: 13, color: "var(--color-text-tertiary)", margin: "0 0 16px" }}>{en ? "Choose the correct answer." : "正しいものを選んでください"}</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {item.o.map((opt, i) => {
+            {cdO(en, item).map((opt, i) => {
               let bg = "#fff", bd = BLUE.mid, col = "var(--color-text-primary)";
               if (ad !== undefined) {
                 if (i === item.a) { bg = "var(--color-background-success)"; bd = "var(--color-border-success)"; col = "var(--color-text-success)"; }
@@ -142011,20 +142038,22 @@ function Quiz({ counts, progress, recordAnswer }) {
             <div style={{ marginTop: 14, padding: 12, borderRadius: "var(--border-radius-md,8px)", fontSize: 14, lineHeight: 1.6,
               background: ad === item.a ? "var(--color-background-success)" : "var(--color-background-danger)",
               color: ad === item.a ? "var(--color-text-success)" : "var(--color-text-danger)" }}>
-              {ad === item.a ? <b>正解</b> : <><b>不正解</b>（正解は {["A", "B", "C", "D"][item.a]}. {item.o[item.a]}）</>} — {item.e}
+              {ad === item.a ? <b>{en ? "Correct" : "正解"}</b> : <><b>{en ? "Incorrect" : "不正解"}</b>{en ? " (answer: " : "（正解は "}{["A", "B", "C", "D"][item.a]}. {cdO(en, item)[item.a]}{en ? ")" : "）"}</>} — {cdE(en, item)}
             </div>
           )}
           <div style={{ display: "flex", justifyContent: "space-between", gap: 10, marginTop: 18 }}>
-            <button onClick={() => { if (idx > 0) { setIdx(idx - 1); setSel(null); } }} style={{ ...ghostBtn, flex: 1, opacity: idx > 0 ? 1 : 0.5 }}>前へ</button>
-            <button onClick={check} disabled={ad !== undefined || sel == null} style={{ ...primaryBtn, flex: 1, opacity: (ad !== undefined || sel == null) ? 0.5 : 1 }}>回答する</button>
-            <button onClick={() => { if (idx < view.length - 1) { setIdx(idx + 1); setSel(null); } }} style={{ ...ghostBtn, flex: 1, opacity: idx < view.length - 1 ? 1 : 0.5 }}>次へ</button>
+            <button onClick={() => { if (idx > 0) { setIdx(idx - 1); setSel(null); } }} style={{ ...ghostBtn, flex: 1, opacity: idx > 0 ? 1 : 0.5 }}>{en ? "Previous" : "前へ"}</button>
+            <button onClick={check} disabled={ad !== undefined || sel == null} style={{ ...primaryBtn, flex: 1, opacity: (ad !== undefined || sel == null) ? 0.5 : 1 }}>{en ? "Submit" : "回答する"}</button>
+            <button onClick={() => { if (idx < view.length - 1) { setIdx(idx + 1); setSel(null); } }} style={{ ...ghostBtn, flex: 1, opacity: idx < view.length - 1 ? 1 : 0.5 }}>{en ? "Next" : "次へ"}</button>
           </div>
         </div>
       )}
 
       {allDone && (
         <p style={{ marginTop: 14, fontSize: 14, color: "var(--color-text-secondary)", lineHeight: 1.6 }}>
-          この範囲は完了。正解 {view.filter((i) => answered[i] === BANK[i].a).length} / {view.length}。誤答は「間違いだけ復習」で見直せます。
+          {en
+            ? <>Section complete. Correct: {view.filter((i) => answered[i] === BANK[i].a).length} / {view.length}. Use “Review mistakes only” to go over the ones you missed.</>
+            : <>この範囲は完了。正解 {view.filter((i) => answered[i] === BANK[i].a).length} / {view.length}。誤答は「間違いだけ復習」で見直せます。</>}
         </p>
       )}
     </div>
@@ -142035,6 +142064,7 @@ function Quiz({ counts, progress, recordAnswer }) {
 const EXAM_N = 30;
 
 function Exam({ recordAnswer }) {
+  const en = useCdEn();
   const [phase, setPhase] = useState("intro"); // intro / running / result
   const [order, setOrder] = useState([]);
   const [idx, setIdx] = useState(0);
@@ -142067,14 +142097,14 @@ function Exam({ recordAnswer }) {
   if (phase === "intro") {
     return (
       <div style={{ background: "#fff", border: `0.5px solid ${BLUE.mid}`, borderRadius: "var(--border-radius-lg,12px)", padding: "24px" }}>
-        <h2 style={{ fontSize: 18, fontWeight: 500, margin: "0 0 12px", color: BLUE.deep }}>模擬試験モード</h2>
+        <h2 style={{ fontSize: 18, fontWeight: 500, margin: "0 0 12px", color: BLUE.deep }}>{en ? "Mock exam mode" : "模擬試験モード"}</h2>
         <ul style={{ fontSize: 14, color: "var(--color-text-secondary)", lineHeight: 1.8, paddingLeft: 20, margin: "0 0 18px" }}>
-          <li>全{BANK.length}問からランダムに <b>{EXAM_N}問</b> 出題</li>
-          <li>制限時間 <b>{EXAM_N}分</b>（1問1分目安）</li>
-          <li>解答中は正誤を表示しません。最後にまとめて採点</li>
-          <li>結果は分野別の進捗にも反映されます</li>
+          {en ? <li><b>{EXAM_N} questions</b> drawn at random from all {BANK.length}</li> : <li>全{BANK.length}問からランダムに <b>{EXAM_N}問</b> 出題</li>}
+          {en ? <li>Time limit: <b>{EXAM_N} minutes</b> (about 1 minute per question)</li> : <li>制限時間 <b>{EXAM_N}分</b>（1問1分目安）</li>}
+          <li>{en ? "Answers are not marked as you go; everything is scored at the end" : "解答中は正誤を表示しません。最後にまとめて採点"}</li>
+          <li>{en ? "Results also count toward your progress by domain" : "結果は分野別の進捗にも反映されます"}</li>
         </ul>
-        <button onClick={start} style={{ ...primaryBtn, width: "100%" }}>試験を開始する</button>
+        <button onClick={start} style={{ ...primaryBtn, width: "100%" }}>{en ? "Start the exam" : "試験を開始する"}</button>
       </div>
     );
   }
@@ -142094,18 +142124,18 @@ function Exam({ recordAnswer }) {
     return (
       <div>
         <div style={{ background: pass ? "var(--color-background-success)" : "var(--color-background-danger)", border: `0.5px solid ${pass ? "var(--color-border-success)" : "var(--color-border-danger)"}`, borderRadius: "var(--border-radius-lg,12px)", padding: "24px", textAlign: "center", marginBottom: 16 }}>
-          <div style={{ fontSize: 14, color: pass ? "var(--color-text-success)" : "var(--color-text-danger)" }}>{pass ? "合格ライン到達 🎉" : "あと一歩"}</div>
+          <div style={{ fontSize: 14, color: pass ? "var(--color-text-success)" : "var(--color-text-danger)" }}>{pass ? (en ? "Passing score reached 🎉" : "合格ライン到達 🎉") : (en ? "Almost there" : "あと一歩")}</div>
           <div style={{ fontSize: 44, fontWeight: 500, color: pass ? "var(--color-text-success)" : "var(--color-text-danger)", margin: "4px 0" }}>{rate}%</div>
-          <div style={{ fontSize: 14, color: "var(--color-text-secondary)" }}>{correct} / {order.length} 問正解（合格目安 70%）</div>
+          <div style={{ fontSize: 14, color: "var(--color-text-secondary)" }}>{en ? <>{correct} / {order.length} correct (pass mark: 70%)</> : <>{correct} / {order.length} 問正解（合格目安 70%）</>}</div>
         </div>
 
-        <h3 style={{ fontSize: 15, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>分野別の結果</h3>
+        <h3 style={{ fontSize: 15, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>{en ? "Results by domain" : "分野別の結果"}</h3>
         <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 18 }}>
           {Object.entries(byCat).map(([c, v]) => {
             const r = Math.round((v.ok / v.t) * 100);
             return (
               <div key={c} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ width: 150, fontSize: 12, color: "var(--color-text-secondary)", flexShrink: 0 }}>{c}</span>
+                <span style={{ width: en ? 190 : 150, fontSize: 12, color: "var(--color-text-secondary)", flexShrink: 0 }}>{cdDom(en, c)}</span>
                 <div style={{ flex: 1, height: 14, borderRadius: 999, background: BLUE.light, overflow: "hidden" }}>
                   <div style={{ width: r + "%", height: "100%", background: r >= 70 ? BLUE.primary : "var(--color-text-danger)" }} />
                 </div>
@@ -142115,30 +142145,30 @@ function Exam({ recordAnswer }) {
           })}
         </div>
 
-        <h3 style={{ fontSize: 15, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>解答の見直し</h3>
+        <h3 style={{ fontSize: 15, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>{en ? "Review your answers" : "解答の見直し"}</h3>
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 18 }}>
           {order.map((gi, n) => {
             const it = BANK[gi]; const ua = answers[gi]; const ok = ua === it.a;
             return (
               <div key={gi} style={{ padding: "10px 14px", borderRadius: "var(--border-radius-md,8px)", background: "#fff", border: `0.5px solid ${ok ? "var(--color-border-success)" : "var(--color-border-danger)"}` }}>
                 <div style={{ fontSize: 13, fontWeight: 500, marginBottom: 4, color: ok ? "var(--color-text-success)" : "var(--color-text-danger)" }}>
-                  {n + 1}. {ok ? "正解" : "不正解"} <span style={{ color: BLUE.primary, fontWeight: 400 }}>［{it.d}］</span>
+                  {n + 1}. {ok ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")} <span style={{ color: BLUE.primary, fontWeight: 400 }}>{en ? "[" : "［"}{cdDom(en, it.d)}{en ? "]" : "］"}</span>
                 </div>
-                <div style={{ fontSize: 13, color: "var(--color-text-primary)", lineHeight: 1.5, marginBottom: 4 }}>Q. {it.q}</div>
+                <div style={{ fontSize: 13, color: "var(--color-text-primary)", lineHeight: 1.5, marginBottom: 4 }}>Q. {cdQ(en, it)}</div>
                 {!ok && (
                   <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 2 }}>
-                    あなたの解答: {ua !== undefined ? `${["A","B","C","D"][ua]}. ${it.o[ua]}` : "未解答"}
+                    {en ? "Your answer: " : "あなたの解答: "}{ua !== undefined ? `${["A","B","C","D"][ua]}. ${cdO(en, it)[ua]}` : (en ? "Not answered" : "未解答")}
                   </div>
                 )}
                 <div style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>
-                  正解: {["A","B","C","D"][it.a]}. {it.o[it.a]} — {it.e}
+                  {en ? "Answer: " : "正解: "}{["A","B","C","D"][it.a]}. {cdO(en, it)[it.a]} — {cdE(en, it)}
                 </div>
               </div>
             );
           })}
         </div>
 
-        <button onClick={() => setPhase("intro")} style={{ ...primaryBtn, width: "100%" }}>もう一度挑戦する</button>
+        <button onClick={() => setPhase("intro")} style={{ ...primaryBtn, width: "100%" }}>{en ? "Try again" : "もう一度挑戦する"}</button>
       </div>
     );
   }
@@ -142160,22 +142190,22 @@ function Exam({ recordAnswer }) {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, flexWrap: "wrap", gap: 8 }}>
-        <span style={{ fontSize: 15, fontWeight: 500, color: BLUE.deep }}>模擬試験</span>
+        <span style={{ fontSize: 15, fontWeight: 500, color: BLUE.deep }}>{en ? "Mock exam" : "模擬試験"}</span>
         <span style={{ fontSize: 18, fontWeight: 500, fontVariantNumeric: "tabular-nums", color: lowTime ? "var(--color-text-danger)" : BLUE.deep }}>{mm}:{ss}</span>
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 6 }}>
-        <span>第 {idx + 1} / {order.length} 問</span>
-        <span>解答済 {answeredCount} / {order.length}</span>
+        <span>{en ? "Question " : "第 "}{idx + 1} / {order.length}{en ? "" : " 問"}</span>
+        <span>{en ? "Answered " : "解答済 "}{answeredCount} / {order.length}</span>
       </div>
       <div style={{ height: 6, borderRadius: 999, background: BLUE.light, marginBottom: 14, overflow: "hidden" }}>
         <div style={{ width: ((idx + 1) / order.length * 100) + "%", height: "100%", background: BLUE.primary, transition: "width .2s" }} />
       </div>
 
       <div style={{ background: "#fff", border: `0.5px solid ${BLUE.mid}`, borderRadius: "var(--border-radius-lg,12px)", padding: "20px" }}>
-        <div style={{ fontSize: 11, color: BLUE.primary, marginBottom: 6 }}>{item.d}</div>
-        <p style={{ fontSize: 16, fontWeight: 500, margin: "0 0 16px", lineHeight: 1.6 }}>Q. {item.q}</p>
+        <div style={{ fontSize: 11, color: BLUE.primary, marginBottom: 6 }}>{cdDom(en, item.d)}</div>
+        <p style={{ fontSize: 16, fontWeight: 500, margin: "0 0 16px", lineHeight: 1.6 }}>Q. {cdQ(en, item)}</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {item.o.map((opt, i) => {
+          {cdO(en, item).map((opt, i) => {
             const on = cur === i;
             return (
               <button key={i} onClick={() => pick(i)} style={{
@@ -142187,14 +142217,14 @@ function Exam({ recordAnswer }) {
           })}
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, marginTop: 18 }}>
-          <button onClick={() => { if (idx > 0) { setIdx(idx - 1); setSel(null); } }} style={{ ...ghostBtn, flex: 1, opacity: idx > 0 ? 1 : 0.5 }}>前へ</button>
+          <button onClick={() => { if (idx > 0) { setIdx(idx - 1); setSel(null); } }} style={{ ...ghostBtn, flex: 1, opacity: idx > 0 ? 1 : 0.5 }}>{en ? "Previous" : "前へ"}</button>
           {idx < order.length - 1
-            ? <button onClick={() => { setIdx(idx + 1); setSel(null); }} style={{ ...primaryBtn, flex: 1 }}>次へ</button>
-            : <button onClick={finish} style={{ ...secondaryBtn, flex: 1 }}>採点する</button>}
+            ? <button onClick={() => { setIdx(idx + 1); setSel(null); }} style={{ ...primaryBtn, flex: 1 }}>{en ? "Next" : "次へ"}</button>
+            : <button onClick={finish} style={{ ...secondaryBtn, flex: 1 }}>{en ? "Score" : "採点する"}</button>}
         </div>
       </div>
 
-      <button onClick={finish} style={{ ...ghostBtn, width: "100%", marginTop: 12 }}>ここで終了して採点する</button>
+      <button onClick={finish} style={{ ...ghostBtn, width: "100%", marginTop: 12 }}>{en ? "Finish now and score" : "ここで終了して採点する"}</button>
     </div>
   );
 }
@@ -142520,7 +142550,233 @@ const CLOUD_DATA = {
   },
 };
 
+// CLOUD_DATA・4社の違い早見・用語集の分類名の英語（日本語の文字列 → 英語。無いものは日本語のまま表示）
+const CLOUD_DOJO_EN = {
+  // 分類名（CLOUD_DATA の cats・用語集の分類）
+  "コンピュート": "Compute", "ストレージ": "Storage", "データベース": "Databases", "ネットワーク": "Networking",
+  "データ分析": "Data analytics", "AI・生成AI": "AI & generative AI", "既製AI": "Prebuilt AI", "セキュリティ": "Security",
+  "管理・移行・料金": "Management, migration & pricing",
+  "すべて": "All", "クラウドの基本": "Cloud basics", "AI・基盤学習": "AI fundamentals", "生成AI・推論": "Generative AI & inference",
+  "既製AIサービス": "Prebuilt AI services", "責任あるAI・倫理": "Responsible AI & ethics", "セキュリティ・認証": "Security & authentication",
+  "運用・移行・料金": "Operations, migration & pricing",
+  // 各社の一言
+  "最も広く・成熟。デファクトの基準": "Broadest and most mature; the de facto benchmark",
+  "Microsoft資産・ハイブリッドに強い": "Strong with Microsoft assets and hybrid",
+  "データ分析・AI・K8sに強い": "Strong in data analytics, AI and K8s",
+  "データベース・コスト・性能に強い": "Strong in databases, cost and performance",
+  // サービス名（日本語を含むもの）
+  "Snowファミリー / DataSync": "Snow Family / DataSync", "OpenAIに依存": "Relies on OpenAI", "条件付きアクセス": "Conditional Access",
+  "RAG(2層構成)": "RAG (two-layer setup)", "継続利用割引(SUD)": "Sustained use discounts (SUD)", "SRE体系": "SRE practice",
+  "DRG / 他社クラウド直結": "DRG / direct links to other clouds", "文字単位課金": "Per-character billing",
+  "T-Few / LoRA + 専有クラスタ": "T-Few / LoRA + dedicated clusters",
+  // サービスの説明
+  "仮想サーバー(IaaS)。最も基本的な計算資源": "Virtual servers (IaaS); the most basic compute resource",
+  "サーバーレス関数(FaaS)。実行時のみ課金": "Serverless functions (FaaS); billed only while running",
+  "ECSはK8s非依存の独自基盤、EKSはマネージドK8s": "ECS is AWS's own K8s-independent platform; EKS is managed K8s",
+  "サーバーレスコンテナ基盤。ノード管理不要": "Serverless container platform; no nodes to manage",
+  "PaaS。コードを上げると自動デプロイ": "PaaS; upload your code and it deploys automatically",
+  "オンプレ拡張機器とmacOSビルド環境(固有)": "On-premises extension hardware and macOS build machines (unique)",
+  "バッチ計算と量子コンピューティング": "Batch computing and quantum computing",
+  "オブジェクトストレージのデファクト。APIが標準化": "The de facto object storage; its API became the standard",
+  "ブロックストレージ。OS/DB用の高速ディスク": "Block storage; fast disks for the OS and databases",
+  "共有ファイル。FSx for LustreはHPC向け高速": "Shared files; FSx for Lustre is high-speed storage for HPC",
+  "アーカイブ最安層。長期コンプライアンス保管": "Cheapest archive tier; long-term compliance retention",
+  "アクセス頻度で自動階層最適化": "Automatic tiering based on access frequency",
+  "物理デバイス移送とオンライン大容量転送": "Physical device shipping and online bulk transfer",
+  "統合バックアップと改ざん防止(WORM)保管": "Centralized backup and tamper-proof (WORM) retention",
+  "マネージドRDBと高性能クラウドRDB": "Managed RDB and high-performance cloud RDB",
+  "キー値/ドキュメント型NoSQL": "Key-value / document NoSQL",
+  "データウェアハウス(DWH)": "Data warehouse (DWH)",
+  "グラフDBと改ざん検知の台帳DB": "Graph DB and tamper-evident ledger DB",
+  "インメモリ/キャッシュ": "In-memory / cache",
+  "Mongo互換のドキュメントDB": "MongoDB-compatible document DB",
+  "自分専用の仮想ネットワーク区画": "Your own isolated virtual network",
+  "DNS(名前解決)": "DNS (name resolution)",
+  "CDN。近い拠点から高速配信": "CDN; fast delivery from nearby locations",
+  "L7/L4ロードバランサ": "L7/L4 load balancers",
+  "オンプレとの専用線接続": "Dedicated line to on-premises",
+  "複数VPC接続とPaaSプライベート接続": "Connecting many VPCs and private connections to PaaS",
+  "グローバル高速化(固有)": "Global traffic acceleration (unique)",
+  "S3を直接SQLで分析(固有)": "Query S3 directly with SQL (unique)",
+  "ETL。DataBrewはノーコード": "ETL; DataBrew is no-code",
+  "Spark/Hadoopのビッグデータ処理": "Big data processing with Spark/Hadoop",
+  "リアルタイムのデータ取込": "Real-time data ingestion",
+  "BI(ダッシュボード)": "BI (dashboards)",
+  "検索・ログ分析とManaged Airflow": "Search and log analytics, and Managed Airflow",
+  "複数ベンダーFMを単一APIで使う生成AI基盤": "Generative AI platform offering FMs from multiple vendors through one API",
+  "統合ML開発基盤": "Integrated ML development platform",
+  "自社フラッグシップFM": "In-house flagship FMs",
+  "AIエージェント基盤とガードレール": "AI agent platform and guardrails",
+  "RAG基盤": "RAG platform",
+  "業務AIアシスタント / Q Developer": "Business AI assistant / Q Developer",
+  "学習用・推論用の専用AIチップ": "Custom AI chips for training and inference",
+  "NLPと翻訳": "NLP and translation",
+  "音声認識(STT)と音声合成(TTS)": "Speech recognition (STT) and speech synthesis (TTS)",
+  "画像・動画認識とOCR/帳票抽出": "Image/video recognition and OCR / form extraction",
+  "エンタープライズ検索とレコメンド": "Enterprise search and recommendations",
+  "不正検知(固有)": "Fraud detection (unique)",
+  "時系列予測とコンタクトセンターAI": "Time-series forecasting and contact center AI",
+  "医療NLPと会話/対話AI": "Medical NLP and conversational AI",
+  "ID/アクセス管理とSSO": "Identity/access management and SSO",
+  "鍵管理と専有HSM": "Key management and dedicated HSM",
+  "脅威検知とインシデント調査": "Threat detection and incident investigation",
+  "機密データ検出と脆弱性スキャン": "Sensitive data discovery and vulnerability scanning",
+  "DDoS防御とWAF": "DDoS protection and WAF",
+  "CSPMと構成監査": "CSPM and configuration auditing",
+  "顧客向けID(CIAM)と秘密情報管理": "Customer identity (CIAM) and secrets management",
+  "IaC(構成のコード化)": "IaC (infrastructure as code)",
+  "統合監視と分散トレーシング": "Unified monitoring and distributed tracing",
+  "DB移行と移行管理(7R戦略)": "DB migration and migration tracking (7R strategies)",
+  "コスト可視化と予算アラート": "Cost visibility and budget alerts",
+  "良い設計のための6本柱フレーム": "Six-pillar framework for good architecture",
+  "運用自動化とカオスエンジニアリング": "Operations automation and chaos engineering",
+  "確約割引の2系統": "Two kinds of commitment discount",
+  "仮想サーバー(IaaS)": "Virtual servers (IaaS)",
+  "サーバーレス関数(FaaS)": "Serverless functions (FaaS)",
+  "マネージドKubernetes": "Managed Kubernetes",
+  "サーバーレスコンテナ": "Serverless containers",
+  "PaaS実行基盤": "PaaS runtime platform",
+  "自動スケーリング": "Auto scaling",
+  "他クラウド/オンプレまで一元管理": "Central management extending to other clouds and on-premises",
+  "オブジェクトストレージ": "Object storage",
+  "ブロックストレージ": "Block storage",
+  "共有ファイルストレージ": "Shared file storage",
+  "アーカイブ層": "Archive tier",
+  "物理デバイス移送": "Physical device shipping",
+  "統合バックアップ": "Centralized backup",
+  "マネージドRDBと高性能RDB": "Managed RDB and high-performance RDB",
+  "多モデル対応のNoSQL": "Multi-model NoSQL",
+  "OSS DBのマネージド版": "Managed open-source databases",
+  "仮想ネットワーク": "Virtual network",
+  "グローバル配信・CDN": "Global delivery / CDN",
+  "専用線接続": "Dedicated line connection",
+  "マルチVNet接続とプライベート接続": "Connecting many VNets and private connections",
+  "統合分析基盤・DWH": "Unified analytics platform / DWH",
+  "ETL/データ統合": "ETL / data integration",
+  "密連携のレイクハウス": "Tightly integrated lakehouse",
+  "M365連携が強いBI": "BI with strong M365 integration",
+  "KQLでログ/データ分析": "Log and data analytics with KQL",
+  "データカタログ/ガバナンス": "Data catalog / governance",
+  "GPT中心の生成AI基盤": "GPT-centered generative AI platform",
+  "自社フラッグシップLLMは持たない": "No in-house flagship LLM",
+  "プロンプト注入の防御": "Defense against prompt injection",
+  "マルチエージェント編成": "Multi-agent orchestration",
+  "M365統合の業務AIアシスタント": "Business AI assistant built into M365",
+  "RAGの中核となる検索": "Search at the core of RAG",
+  "音声認識・合成と音声翻訳(独立)": "Speech recognition/synthesis and speech translation (separate)",
+  "画像認識と顔認識(1:1検証/1:多識別)": "Image and face recognition (1:1 verification / 1:N identification)",
+  "独自画像分類と動画解析": "Custom image classification and video analysis",
+  "文書抽出(OCR)": "Document extraction (OCR)",
+  "異常検知": "Anomaly detection",
+  "細分化された会話/対話AI": "Conversational AI split into separate services",
+  "ID管理の事実上の標準": "The de facto standard for identity management",
+  "鍵管理とHSM": "Key management and HSM",
+  "脅威検知とSIEM": "Threat detection and SIEM",
+  "データガバナンス/DLP": "Data governance / DLP",
+  "ゼロトラストの実現": "Puts zero trust into practice",
+  "マネージドADと顧客向けID": "Managed AD and customer identity",
+  "移行評価とDB移行": "Migration assessment and DB migration",
+  "コスト管理": "Cost management",
+  "既存ライセンスの流用割引": "Discount for reusing existing licenses",
+  "成熟した宣言的ポリシー": "Mature declarative policies",
+  "カオス検証と運用自動化": "Chaos testing and operations automation",
+  "Kubernetes発祥のマネージドK8s": "Managed K8s from the birthplace of Kubernetes",
+  "マネージドインスタンスグループ(自動スケール)": "Managed instance groups (auto scaling)",
+  "低遅延を強調するアーカイブ層": "Archive tier that emphasizes low latency",
+  "自動階層最適化": "Automatic tiering",
+  "ドキュメント型とワイドカラムNoSQL": "Document and wide-column NoSQL",
+  "サーバーレスDWHの先駆": "Pioneer of the serverless DWH",
+  "世界規模で強整合のRDB(固有)": "Globally strongly consistent RDB (unique)",
+  "SQLでMLを実行": "Run ML with SQL",
+  "CDN。プライベート光網が強み": "CDN; Google's private fiber network is its strength",
+  "ロードバランサ": "Load balancer",
+  "高機能API管理とデータ流出防止": "Advanced API management and data exfiltration prevention",
+  "サーバーレスDWHの中核": "The core serverless DWH",
+  "Apache BeamベースのETL/ストリーミング": "Apache Beam-based ETL / streaming",
+  "Spark/Hadoopのマネージド処理": "Managed Spark/Hadoop processing",
+  "ガバナンスとデータ共有": "Governance and data sharing",
+  "Gemini中核+Model Gardenの生成AI/ML基盤": "Generative AI/ML platform built around Gemini, plus Model Garden",
+  "画像生成と動画生成": "Image generation and video generation",
+  "ツールを4種に細分化するエージェント": "Agents whose tools are split into four types",
+  "事前構築RAG+RAG API": "Prebuilt RAG + RAG API",
+  "業務AIアシスタント": "Business AI assistant",
+  "自社AI専用チップ": "In-house AI chips",
+  "NLPと翻訳(書式保持の文書翻訳も)": "NLP and translation (including format-preserving document translation)",
+  "音声認識とリアルタイム音声会話": "Speech recognition and real-time voice conversation",
+  "画像認識と文書抽出": "Image recognition and document extraction",
+  "レコメンド": "Recommendations",
+  "エンタープライズ検索": "Enterprise search",
+  "ID/アクセス管理(3段階の粒度)": "Identity/access management (three levels of granularity)",
+  "鍵管理と利用者供給鍵": "Key management and customer-supplied keys",
+  "脅威検知": "Threat detection",
+  "機密データ検出": "Sensitive data discovery",
+  "ゼロトラスト発祥": "Birthplace of zero trust",
+  "DDoS防御/WAF": "DDoS protection / WAF",
+  "証跡集約とボット対策": "Security log aggregation and bot protection",
+  "移行管理": "Migration management",
+  "契約不要で自動適用される割引(固有)": "Discount applied automatically, no contract needed (unique)",
+  "SLI/SLO/SLA+エラーバジェット発祥": "Where SLI/SLO/SLA and error budgets come from",
+  "仮想サーバー。ベアメタルを標準提供": "Virtual servers; bare metal offered as standard",
+  "堅牢ポータブルなエッジ機器": "Rugged, portable edge devices",
+  "顧客施設に1リージョンを置く(固有)": "A full region inside the customer's own facility (unique)",
+  "マネージドRDB": "Managed RDB",
+  "パッチ/調整/修復を自動化する自律運用DB": "Self-driving DB that automates patching, tuning and repair",
+  "専用ハードDB基盤。最大100万IOPS": "Dedicated-hardware DB platform; up to 1M IOPS",
+  "DB標準のベクトル型とMySQL高速分析": "Built-in vector data type and fast MySQL analytics",
+  "NoSQLと変更データキャプチャ(CDC)": "NoSQL and change data capture (CDC)",
+  "WAFと配信": "WAF and content delivery",
+  "動的ルーティングGWと他社直結": "Dynamic routing gateway and direct links to other clouds",
+  "自律運用のDWH": "Self-driving DWH",
+  "Spark/Hadoop処理": "Spark/Hadoop processing",
+  "Kafka互換のストリーミング": "Kafka-compatible streaming",
+  "Cohere/Llama採用の生成AI基盤": "Generative AI platform using Cohere and Llama",
+  "生成AIの課金が他社と異なる(固有)": "Generative AI is billed differently from the others (unique)",
+  "ファインチューニング手法": "Fine-tuning methods",
+  "AIエージェント基盤": "AI agent platform",
+  "NLP・翻訳": "NLP / translation",
+  "音声認識(STT)": "Speech recognition (STT)",
+  "異常検知(MSET-2特許)": "Anomaly detection (patented MSET-2)",
+  "時系列予測": "Time-series forecasting",
+  "ID管理。コンパートメントでテナンシ分割": "Identity management; compartments divide up the tenancy",
+  "鍵管理": "Key management",
+  "脅威検知/構成監査": "Threat detection / configuration auditing",
+  "機密データ保護": "Sensitive data protection",
+  "データ主権を訴求": "Promoted for data sovereignty",
+  "DDoS防御": "DDoS protection",
+  "TerraformベースのIaC": "Terraform-based IaC",
+  "統合監視": "Unified monitoring",
+  "DB移行": "DB migration",
+  "統一クレジットの料金モデル": "Pricing model based on universal credits",
+  "手厚い無料枠(固有)": "Generous free tier (unique)",
+  "運用自動化と監査": "Operations automation and auditing",
+  // 4社の違い早見（DIFF_TOPICS）
+  "マネージドK8s": "Managed K8s", "GKE（K8s発祥）": "GKE (where K8s began)",
+  "名称が各社で異なる。GKEはKubernetes発祥のGoogle製。": "The name differs by provider. GKE is made by Google, where Kubernetes began.",
+  "生成AIの課金単位": "Generative AI billing unit", "トークン": "Tokens", "文字単位": "Characters",
+  "OCIだけ文字単位課金で、他社のトークン課金と異なる。": "Only OCI bills per character, unlike the others' per-token billing.",
+  "確約割引の方式": "Commitment discounts", "RI / Savings Plans（2系統）": "RI / Savings Plans (two kinds)",
+  "予約 + Hybrid Benefit": "Reservations + Hybrid Benefit", "確約利用 + 継続利用割引(自動)": "Committed use + sustained use discounts (automatic)",
+  "GCPは契約不要で自動適用される継続利用割引(SUD)が特徴。AzureはライセンスをHybrid Benefitで流用可。": "GCP stands out for sustained use discounts (SUD), applied automatically with no contract. Azure lets you reuse licenses through Hybrid Benefit.",
+  "ID管理": "Identity management", "Entra ID（事実上の標準）": "Entra ID (the de facto standard)", "OCI IAM（コンパートメント）": "OCI IAM (compartments)",
+  "Entra IDはMicrosoft資産との統合で標準的地位。OCIはコンパートメントでテナンシを分割。": "Entra ID holds a standard position through its integration with Microsoft assets. OCI divides the tenancy with compartments.",
+  "IAMロール評価": "IAM role evaluation", "明示的拒否を最優先": "Explicit deny always wins", "宣言的ポリシーが成熟": "Mature declarative policies",
+  "基本/事前定義/カスタムの3粒度": "Three levels: basic / predefined / custom", "コンパートメント単位": "Per compartment",
+  "AWSは『拒否優先』、GCPはロール粒度の3段階が特徴。": "AWS is known for “deny wins”; GCP for its three levels of role granularity.",
+  "生成AI基盤": "Generative AI platform", "Bedrock（多モデル）": "Bedrock (multi-model)", "Vertex AI（Gemini中核）": "Vertex AI (built around Gemini)",
+  "OCI Generative AI（Cohere/Llama）": "OCI Generative AI (Cohere/Llama)",
+  "AWSは複数ベンダーFMを単一APIで。AzureはOpenAI依存で自社LLMなし。": "AWS offers FMs from multiple vendors through one API. Azure relies on OpenAI and has no in-house LLM.",
+  "自社AIチップ": "In-house AI chips", "なし（NVIDIA中心）": "None (mainly NVIDIA)",
+  "独自チップを持つのはAWSとGCPのみ。": "Only AWS and GCP have their own chips.",
+  "高性能DB / 強整合": "High-performance DB / strong consistency", "Spanner（世界規模で強整合）": "Spanner (globally strongly consistent)",
+  "Exadata（最大100万IOPS）": "Exadata (up to 1M IOPS)",
+  "GCP Spannerは世界規模の強整合、OCI ExadataはDB専用ハードが特徴。": "GCP Spanner stands out for global strong consistency; OCI Exadata for hardware dedicated to databases.",
+  "役割は同じだが名称が各社で異なる頻出項目。": "Same role, different name at each provider: a frequent exam topic.",
+  "S3 Glacier（最安）": "S3 Glacier (cheapest)", "Archive（低遅延を強調）": "Archive (emphasizes low latency)",
+  "GCPは取り出しの低遅延、AWSは最安を訴求。": "GCP promotes low-latency retrieval; AWS promotes the lowest price.",
+};
+
 function DiagByCloud() {
+  const en = useCdEn();
   const [cloud, setCloud] = useState("AWS");
   const [openCat, setOpenCat] = useState(null);
   const d = CLOUD_DATA[cloud];
@@ -142542,7 +142798,7 @@ function DiagByCloud() {
           );
         })}
       </div>
-      <p style={{ fontSize: 13, color: "var(--color-text-tertiary)", margin: "0 0 14px" }}>{cloud} — {d.tag}　／　カードをタップすると各サービスの説明が開きます</p>
+      <p style={{ fontSize: 13, color: "var(--color-text-tertiary)", margin: "0 0 14px" }}>{cloud} — {cdT(en, d.tag)}{en ? " / Tap a card to see what each service does" : "　／　カードをタップすると各サービスの説明が開きます"}</p>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))", gap: 10 }}>
         {cats.map(([cat, services]) => {
           const open = openCat === cat;
@@ -142552,14 +142808,14 @@ function DiagByCloud() {
                 width: "100%", textAlign: "left", background: d.color, color: "#fff", fontSize: 13.5, fontWeight: 500,
                 padding: "8px 12px", border: "none", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center",
               }}>
-                <span>{cat}</span>
-                <span style={{ fontSize: 11, opacity: 0.9 }}>{services.length}件 {open ? "▲" : "▼"}</span>
+                <span>{cdT(en, cat)}</span>
+                <span style={{ fontSize: 11, opacity: 0.9 }}>{services.length}{en ? (services.length === 1 ? " item" : " items") : "件"} {open ? "▲" : "▼"}</span>
               </button>
               <ul style={{ listStyle: "none", margin: 0, padding: "8px 0" }}>
                 {services.map(([name, desc], i) => (
                   <li key={i} style={{ fontSize: 12.5, color: d.text, padding: open ? "6px 12px" : "5px 12px", lineHeight: 1.45, borderTop: i === 0 ? "none" : `0.5px solid ${d.bg}` }}>
-                    <span style={{ fontWeight: open ? 500 : 400 }}>• {name}</span>
-                    {open && <div style={{ fontSize: 11.5, color: "var(--color-text-tertiary)", marginTop: 2, marginLeft: 10, lineHeight: 1.4 }}>{desc}</div>}
+                    <span style={{ fontWeight: open ? 500 : 400 }}>• {cdT(en, name)}</span>
+                    {open && <div style={{ fontSize: 11.5, color: "var(--color-text-tertiary)", marginTop: 2, marginLeft: 10, lineHeight: 1.4 }}>{cdT(en, desc)}</div>}
                   </li>
                 ))}
               </ul>
@@ -142576,6 +142832,7 @@ const FEATURE_CATS = ["コンピュート", "ストレージ", "データベー�
 const CLOUD_ORDER = ["AWS", "Azure", "GCP", "OCI"];
 
 function DiagByFeature() {
+  const en = useCdEn();
   const [feat, setFeat] = useState(FEATURE_CATS[0]);
   const [openCloud, setOpenCloud] = useState(null);
   const switchFeat = (f) => { setFeat(f); setOpenCloud(null); };
@@ -142590,11 +142847,11 @@ function DiagByFeature() {
               padding: "7px 13px", borderRadius: "var(--border-radius-md,8px)", cursor: "pointer", fontSize: 12.5, fontWeight: on ? 500 : 400,
               background: on ? BLUE.primary : BLUE.light, color: on ? "#fff" : BLUE.deep,
               border: `0.5px solid ${on ? BLUE.primary : BLUE.mid}`,
-            }}>{f}</button>
+            }}>{cdT(en, f)}</button>
           );
         })}
       </div>
-      <p style={{ fontSize: 13, color: "var(--color-text-tertiary)", margin: "0 0 14px" }}>「{feat}」を4社で横並び比較　／　カードをタップすると各サービスの説明が開きます</p>
+      <p style={{ fontSize: 13, color: "var(--color-text-tertiary)", margin: "0 0 14px" }}>{en ? <>Comparing “{cdT(en, feat)}” across the four providers / Tap a card to see what each service does</> : <>「{feat}」を4社で横並び比較　／　カードをタップすると各サービスの説明が開きます</>}</p>
 
       {/* 4社カード（横並び） */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 10 }}>
@@ -142609,13 +142866,13 @@ function DiagByFeature() {
                 padding: "8px 12px", border: "none", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center",
               }}>
                 <span>{cloud}</span>
-                <span style={{ fontSize: 11, opacity: 0.9 }}>{services.length}件 {open ? "▲" : "▼"}</span>
+                <span style={{ fontSize: 11, opacity: 0.9 }}>{services.length}{en ? (services.length === 1 ? " item" : " items") : "件"} {open ? "▲" : "▼"}</span>
               </button>
               <ul style={{ listStyle: "none", margin: 0, padding: "8px 0" }}>
                 {services.map(([name, desc], i) => (
                   <li key={i} style={{ fontSize: 12.5, color: cc.text, padding: open ? "6px 12px" : "5px 12px", lineHeight: 1.45, borderTop: i === 0 ? "none" : `0.5px solid ${cc.bg}` }}>
-                    <span style={{ fontWeight: open ? 500 : 400 }}>• {name}</span>
-                    {open && <div style={{ fontSize: 11.5, color: "var(--color-text-tertiary)", marginTop: 2, marginLeft: 10, lineHeight: 1.4 }}>{desc}</div>}
+                    <span style={{ fontWeight: open ? 500 : 400 }}>• {cdT(en, name)}</span>
+                    {open && <div style={{ fontSize: 11.5, color: "var(--color-text-tertiary)", marginTop: 2, marginLeft: 10, lineHeight: 1.4 }}>{cdT(en, desc)}</div>}
                   </li>
                 ))}
               </ul>
@@ -142751,6 +143008,120 @@ const GLOSSARY = [
   ["運用・移行・料金", "RPO/RTO", "Recovery Point / Time Objective", "障害復旧の目標。RPOはどこまで戻るか(データ損失許容)、RTOはどれだけ早く復旧するか"],
 ];
 
+// 用語集（GLOSSARY）の説明の英語。キーは用語名（2列目）
+const CLOUD_GLOSSARY_EN = {
+  "クラウド": "Renting another company's computers over the internet and paying only for what you use. Like electricity or water, metered billing is the norm.",
+  "オンプレミス": "Running your own servers in your own building. The opposite of cloud.",
+  "AWS": "The world's largest cloud service, provided by Amazon.",
+  "Azure": "Microsoft's cloud. Strong integration with Microsoft's own products such as M365.",
+  "GCP": "Google's cloud. Strong in data analytics and AI.",
+  "OCI": "Oracle's cloud. Strong in databases.",
+  "IaaS": "You rent only the foundation, such as servers and storage. Very flexible, but more setup work.",
+  "PaaS": "You rent everything up to the runtime your app runs on, so you can focus on development.",
+  "SaaS": "You use finished software as it is. Gmail and Microsoft 365 are typical examples.",
+  "従量課金": "You pay only for what you use, so it stays cheap when you don't use it.",
+  "CapEx": "Money paid up front to buy equipment. Buying servers for on-premises is the typical case.",
+  "OpEx": "Ongoing usage fees. Cloud spending falls in this category.",
+  "TCO": "Looking at the total cost from adoption through operation to disposal.",
+  "ROI": "The ratio of the profit gained to the money spent.",
+  "リージョン": "A geographic area where data centers are located, e.g. Tokyo or Osaka.",
+  "AZ": "Buildings within a region with independent power and networking. If one fails, the others keep running.",
+  "責任共有モデル": "Dividing who protects what between the cloud provider and the customer: the provider secures the foundation, the customer secures what runs on it.",
+  "ハイパースケーラー": "A collective term for the large clouds with data centers worldwide (AWS/Azure/GCP).",
+  "マルチクラウド": "A strategy of using several clouds and choosing the best one for each purpose.",
+  "ベンダーロックイン": "Depending on one cloud so much that it becomes hard to move to another provider.",
+  "egress（下り）": "Charges for sending data out of the cloud. An important cost factor in multicloud.",
+  "市場シェア": "As of 2026, AWS is put at about 30%, Azure at about 20–25%, GCP at about 10% and OCI at around 3%.",
+  "FinOps": "A financial-operations practice of making cloud costs visible and optimizing them.",
+  "仮想マシン": "The most basic compute resource: one physical machine divided up and rented out to several users.",
+  "オートスケール": "Automatically adding servers as traffic grows and removing them when it drops.",
+  "サーバーレス": "Your code runs without you managing servers, and you are billed only for the moments it runs.",
+  "FaaS": "Serverless execution in units of functions. AWS Lambda is the best-known example.",
+  "コンテナ": "A lightweight way to package an app with its parts so it runs the same anywhere.",
+  "Kubernetes": "A platform that automatically places and manages many containers. It originated at Google.",
+  "ベアメタル": "Renting a physical server directly, with no virtualization layer. Performance is stable; OCI offers it as standard.",
+  "サービスメッシュ": "A layer that controls and makes visible the communication between many microservices, e.g. Istio.",
+  "オブジェクトストレージ": "Cheap and highly durable. Used for backups, content delivery and data lakes, e.g. Amazon S3.",
+  "ブロックストレージ": "Fast disks attached directly to servers. Used to hold the OS and databases.",
+  "アーカイブ": "The cheapest long-term storage for data you rarely use. Retrieval takes time.",
+  "ファイルストレージ": "A shared file area that several servers can mount at the same time.",
+  "RDB": "The most common kind of database, managing data in tables (rows and columns).",
+  "NoSQL": "Flexible databases that are not tied to tables. Strong at large volumes and high speed.",
+  "DWH": "A large store built for analysis, where aggregation and analytics are fast.",
+  "データレイク": "A large repository that stores raw data as it is, structured or unstructured.",
+  "OLTP": "Processing small transactions such as orders and payments quickly, on the spot.",
+  "OLAP": "Aggregating and analyzing large volumes of data in bulk.",
+  "自律型DB": "A database that patches, tunes and repairs itself automatically. Unique to Oracle.",
+  "強整合性": "You always read the latest value, even right after a write, e.g. Cloud Spanner.",
+  "ベクトル検索": "Searching by how close texts are in meaning. The core of RAG.",
+  "VPC": "Your own isolated virtual network, built inside the cloud.",
+  "サブネット": "A smaller section of a VPC, split into public (exposed to the outside) and private (internal).",
+  "NAT": "Lets a private subnet send outbound traffic only, and blocks connections coming in from outside.",
+  "DNS": "Converts domain names into IP addresses, like a phone book.",
+  "CDN": "Delivers content quickly from edge locations around the world, close to each user.",
+  "ロードバランサ": "A device that spreads traffic across several servers to balance the load.",
+  "VPN": "Creates an encrypted private tunnel over the internet for secure communication.",
+  "APIゲートウェイ": "A single entrance that receives and manages the APIs that connect applications.",
+  "AI": "The umbrella term for technology that reproduces human intellectual work with computers.",
+  "ML": "Learning patterns from data to make predictions or classifications. The central technique of AI.",
+  "DL": "A kind of machine learning that learns with many layers modeled on the brain. Strong with images and audio.",
+  "生成AI": "AI that creates new content such as text, images and code.",
+  "FM": "A base AI model pre-trained on large amounts of data that can be used for many purposes.",
+  "LLM": "A huge AI model specialized in language. What powers ChatGPT and Claude.",
+  "マルチモーダル": "Able to handle several kinds of data at once: not just text but also images, audio and video.",
+  "TPU": "A custom chip Google built for AI computation.",
+  "GPU": "A chip originally for graphics that is also used for AI's parallel computation.",
+  "RAG": "Searching external information and answering based on it. Lets AI handle up-to-date information and internal knowledge.",
+  "ファインチューニング": "Training an existing model further so it fits a specific use or tone.",
+  "プロンプト": "The instructions or request you give to an AI.",
+  "プロンプトエンジニアリング": "The craft of wording instructions to get better answers.",
+  "ハルシネーション": "When AI produces plausible-sounding falsehoods (content that isn't true).",
+  "グラウンディング": "Basing AI answers on reliable sources to reduce falsehoods.",
+  "トークン": "The smallest unit in which AI processes text. Also the unit for pricing.",
+  "埋め込み": "Text converted into a list of numbers (a vector) that represents its meaning. Used for semantic search.",
+  "AIエージェント": "AI that, given a goal, thinks for itself and carries out several steps.",
+  "責任あるAI": "Principles and practices for using AI fairly, safely and transparently.",
+  "バイアス": "Skew or unfairness contained in data or in an AI's decisions.",
+  "匿名化": "Processing data so that individuals cannot be identified (it cannot be reversed).",
+  "仮名化": "Replacing names with placeholder codes (it can be reversed under certain conditions).",
+  "SAIF": "Google's framework for using AI securely.",
+  "HITL": "A setup in which humans, not just AI, take part in and check important decisions.",
+  "IAM": "The system that manages who can do what.",
+  "MFA": "Protecting sign-in with several checks, such as phone verification on top of a password.",
+  "RBAC": "Granting permissions in bundles by role.",
+  "最小権限": "The basic security principle of granting only the minimum permissions needed.",
+  "暗号化": "Protecting data by converting it into an unreadable form. Done both at rest and in transit.",
+  "CMK": "An encryption key that the customer manages.",
+  "ゼロトラスト": "Not treating anything as safe just because it is inside the company network; every access is verified every time.",
+  "WAF": "A defense that detects and blocks malicious attacks on websites.",
+  "DDoS": "An attack that floods a service with huge amounts of traffic at once to bring it down.",
+  "SIEM": "A monitoring system that collects logs from many places to find threats.",
+  "CIA": "The initials of the three elements of security: confidentiality, integrity and availability.",
+  "プロンプトインジェクション": "An attack that tricks an AI with malicious instructions so that it gets around its restrictions.",
+  "CSPM": "Continuously checking cloud settings for misconfigurations and vulnerabilities.",
+  "CIAM": "Identity management for customers (sign-up and sign-in).",
+  "TDE": "Automatically and transparently encrypting the data a database stores.",
+  "コンプライアンス認証": "Proof of conformance to third-party standards such as ISO, SOC, PCI DSS and HIPAA.",
+  "IaC": "Managing server configuration as code and building it automatically.",
+  "CI/CD": "A development practice that automates building, testing and delivering software.",
+  "確約利用割引": "A discount you get in exchange for committing to 1 or 3 years of use.",
+  "継続利用割引": "A GCP discount that applies automatically the longer you keep using a resource.",
+  "スポット": "The cheapest compute capacity, in exchange for accepting that it can be interrupted.",
+  "7R": "The seven cloud migration strategies (retire, retain, relocate, rehost, replatform, repurchase, refactor).",
+  "SLI": "A metric that measures service quality (e.g. measured uptime).",
+  "SLO": "An internal target for the service quality you aim for.",
+  "SLA": "A service quality contract with customers. Compensation applies if it is not met.",
+  "エラーバジェット": "The “acceptable amount of failure” worked out backward from the SLO.",
+  "SRE": "An engineering approach to making services more reliable. It originated at Google.",
+  "Well-Architected": "A set of guidelines (pillars) for building well-designed systems in the cloud.",
+  "オンデマンド": "The basic pricing: pay only for what you use, with no advance contract.",
+  "リザーブド/予約": "Getting a discount by committing to 1 to 3 years of use.",
+  "可観測性": "The ability to understand a system's state through logs, metrics and traces.",
+  "IOPS": "The number of reads and writes storage can handle per second. A measure of database performance.",
+  "冪等性": "The property that repeating the same operation any number of times gives the same result. Important when designing retries.",
+  "RPO/RTO": "Recovery targets after an outage: RPO is how far back you restore (acceptable data loss), RTO is how quickly you recover.",
+};
+
 // CLOUD_DATA から各社サービスを用語集エントリに展開
 // 形式: [カテゴリ, 用語名, 英語/正式名, 説明, 明示クラウド]
 const CAT_LABEL = {
@@ -142790,30 +143161,45 @@ function cloudsOfTerm(entry) {
 // 概念用語 + サービス用語を結合
 const ALL_GLOSSARY = [...GLOSSARY, ...SERVICE_GLOSSARY];
 
+// 用語集の英語表示。見出しは英語名（GLOSSARY の3列目から日本語の括弧書きを外したもの）、説明は CLOUD_GLOSSARY_EN。
+const CD_JP_RE = /[\u3040-\u30ff\u3400-\u9fff]/;
+function cdGloss(en, entry) {
+  const [c, term, full, desc, explicit] = entry;
+  if (!en) return { c, term, full, desc };
+  if (explicit) return { c: cdT(true, c), term: cdT(true, term), full: `${explicit} service`, desc: cdT(true, desc) };
+  const clean = full.replace(/（([^）]*)）/g, (m, x) => (CD_JP_RE.test(x) ? "" : ` (${x})`)).trim();
+  const jpTerm = CD_JP_RE.test(term);
+  return { c: cdT(true, c), term: jpTerm ? clean : term, full: jpTerm || clean === term ? "" : clean, desc: CLOUD_GLOSSARY_EN[term] || desc };
+}
+
 function Glossary() {
+  const en = useCdEn();
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("すべて");
   const [cloud, setCloud] = useState("すべて");
   const filtered = ALL_GLOSSARY.filter((entry) => {
-    const [c, term, en, desc] = entry;
+    const [c, term, full, desc] = entry;
     if (cat !== "すべて" && c !== cat) return false;
     if (cloud !== "すべて" && !cloudsOfTerm(entry).includes(cloud)) return false;
     if (!q.trim()) return true;
     const s = q.trim().toLowerCase();
-    return term.toLowerCase().includes(s) || en.toLowerCase().includes(s) || desc.toLowerCase().includes(s);
+    if (term.toLowerCase().includes(s) || full.toLowerCase().includes(s) || desc.toLowerCase().includes(s)) return true;
+    if (!en) return false;
+    const g = cdGloss(true, entry);
+    return g.term.toLowerCase().includes(s) || g.full.toLowerCase().includes(s) || g.desc.toLowerCase().includes(s);
   });
   const cloudColor = { AWS: "#BA7517", Azure: "#185FA5", GCP: "#3B6D11", OCI: "#A32D2D" };
   return (
     <div>
-      <h2 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 4px", color: BLUE.deep }}>略語・用語辞典</h2>
-      <p style={{ fontSize: 13, color: "var(--color-text-tertiary)", margin: "0 0 12px" }}>全{ALL_GLOSSARY.length}語（概念用語＋4社の固有サービス名）。用語名・英語・説明文のどれでも検索できます。</p>
+      <h2 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 4px", color: BLUE.deep }}>{en ? "Glossary of terms and acronyms" : "略語・用語辞典"}</h2>
+      <p style={{ fontSize: 13, color: "var(--color-text-tertiary)", margin: "0 0 12px" }}>{en ? `${ALL_GLOSSARY.length} terms (concepts plus each provider's own service names). Search by term, full name or description.` : <>全{ALL_GLOSSARY.length}語（概念用語＋4社の固有サービス名）。用語名・英語・説明文のどれでも検索できます。</>}</p>
       <input
-        type="text" value={q} onChange={(e) => setQ(e.target.value)} aria-label="検索（例: RAG、Bedrock、Spanner、暗号化…）" placeholder="検索（例: RAG、Bedrock、Spanner、暗号化…）"
+        type="text" value={q} onChange={(e) => setQ(e.target.value)} aria-label={en ? "Search (e.g. RAG, Bedrock, Spanner, encryption…)" : "検索（例: RAG、Bedrock、Spanner、暗号化…）"} placeholder={en ? "Search (e.g. RAG, Bedrock, Spanner, encryption…)" : "検索（例: RAG、Bedrock、Spanner、暗号化…）"}
         style={{ width: "100%", boxSizing: "border-box", padding: "10px 14px", borderRadius: "var(--border-radius-md,8px)", border: `1px solid ${BLUE.mid}`, fontSize: 14, marginBottom: 10, outline: "none" }}
       />
       {/* クラウド別フィルタ */}
       <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap", alignItems: "center" }}>
-        <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", marginRight: 2 }}>クラウド:</span>
+        <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", marginRight: 2 }}>{en ? "Cloud:" : "クラウド:"}</span>
         {["すべて", "AWS", "Azure", "GCP", "OCI"].map((cl) => {
           const on = cl === cloud;
           const col = cloudColor[cl];
@@ -142822,7 +143208,7 @@ function Glossary() {
               padding: "6px 14px", borderRadius: 999, cursor: "pointer", fontSize: 12.5, fontWeight: on ? 500 : 400,
               background: on ? (col || BLUE.primary) : "#fff", color: on ? "#fff" : (col || BLUE.deep),
               border: `1px solid ${col || BLUE.mid}`,
-            }}>{cl}</button>
+            }}>{cdT(en, cl)}</button>
           );
         })}
       </div>
@@ -142834,20 +143220,20 @@ function Glossary() {
             <button key={c} onClick={() => setCat(c)} style={{
               padding: "6px 12px", borderRadius: 999, cursor: "pointer", fontSize: 12.5, fontWeight: on ? 500 : 400,
               background: on ? BLUE.primary : BLUE.light, color: on ? "#fff" : BLUE.deep, border: `0.5px solid ${on ? BLUE.primary : BLUE.mid}`,
-            }}>{c}</button>
+            }}>{cdT(en, c)}</button>
           );
         })}
       </div>
-      <div style={{ fontSize: 12, color: "var(--color-text-tertiary)", marginBottom: 8 }}>{filtered.length}件{cloud !== "すべて" ? `（${cloud}関連）` : ""}</div>
+      <div style={{ fontSize: 12, color: "var(--color-text-tertiary)", marginBottom: 8 }}>{filtered.length}{en ? (filtered.length === 1 ? " term" : " terms") : "件"}{cloud !== "すべて" ? (en ? ` (${cloud}-related)` : `（${cloud}関連）`) : ""}</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {filtered.map((entry, i) => {
-          const [c, term, en, desc] = entry;
+          const { c, term, full, desc } = cdGloss(en, entry);
           const tcl = cloudsOfTerm(entry);
           return (
             <div key={i} style={{ padding: "12px 14px", borderRadius: "var(--border-radius-md,8px)", background: "#fff", border: `0.5px solid ${BLUE.mid}` }}>
               <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
                 <span style={{ fontSize: 15, fontWeight: 500, color: BLUE.deep }}>{term}</span>
-                <span style={{ fontSize: 12, color: "var(--color-text-tertiary)" }}>{en}</span>
+                <span style={{ fontSize: 12, color: "var(--color-text-tertiary)" }}>{full}</span>
                 <span style={{ display: "flex", gap: 4, marginLeft: "auto", alignItems: "center" }}>
                   {tcl.map((cl) => (
                     <span key={cl} style={{ fontSize: 10, color: "#fff", background: cloudColor[cl], padding: "2px 7px", borderRadius: 999 }}>{cl}</span>
@@ -142859,7 +143245,7 @@ function Glossary() {
             </div>
           );
         })}
-        {filtered.length === 0 && <div style={{ padding: 24, textAlign: "center", color: "var(--color-text-tertiary)", fontSize: 14 }}>該当する用語がありません。</div>}
+        {filtered.length === 0 && <div style={{ padding: 24, textAlign: "center", color: "var(--color-text-tertiary)", fontSize: 14 }}>{en ? "No matching terms." : "該当する用語がありません。"}</div>}
       </div>
     </div>
   );
@@ -142867,10 +143253,18 @@ function Glossary() {
 
 // ===== 体感学習（インタラクティブ） =====
 function Interactive() {
+  const en = useCdEn();
   const [sub, setSub] = useState("storage");
   const __opBack = useLocalHistory([[sub, setSub]]);
   useRegisterBack(__opBack.back, __opBack.canBack);
-  const subs = [
+  const subs = en ? [
+    ["storage", "① Storage tiers"], ["shared", "② Shared responsibility"], ["pricing", "③ Pricing simulator"],
+    ["autoscale", "④ Auto scaling"], ["lb", "⑤ Load balancer"], ["cdn", "⑥ CDN"],
+    ["rag", "⑦ RAG flow"], ["az", "⑧ Region / AZ"], ["scale", "⑨ Scaling methods"],
+    ["subnet", "⑩ Subnet / NAT"], ["crypto", "⑪ Encryption"], ["iam", "⑫ IAM evaluation"],
+    ["token", "⑬ Tokens & billing"], ["zerotrust", "⑭ Zero trust"], ["container", "⑮ Containers vs VMs"],
+    ["consistency", "⑯ Consistency models"], ["queue", "⑰ Sync vs async"], ["diff", "⑱ Provider differences"],
+  ] : [
     ["storage", "① ストレージ階層"], ["shared", "② 責任共有モデル"], ["pricing", "③ 料金シミュレータ"],
     ["autoscale", "④ オートスケール"], ["lb", "⑤ ロードバランサ"], ["cdn", "⑥ CDN"],
     ["rag", "⑦ RAGの流れ"], ["az", "⑧ リージョン/AZ"], ["scale", "⑨ スケール方式"],
@@ -142913,32 +143307,33 @@ function Interactive() {
 
 // ① ストレージ階層：アクセス頻度スライダーで最適な階層が光る
 function IxStorage() {
+  const en = useCdEn();
   const [freq, setFreq] = useState(50); // 0=ほぼ使わない 〜 100=毎日
   // freqに応じて推奨層を決定: 0-33 Archive, 34-66 Cool, 67-100 Hot
   const rec = freq <= 33 ? "archive" : freq <= 66 ? "cool" : "hot";
   const tiers = {
-    archive: { key: "archive", title: "Archive", sub1: "数時間かかる取得", sub2: "長期保管・最安", x: 60, y: 360, f: RAMP.blue, s: RAMP.blueS, t: RAMP.blueT },
-    cool: { key: "cool", title: "Cool / Nearline", sub1: "数分〜の取得", sub2: "月数回アクセス向け", x: 280, y: 240, f: RAMP.amber, s: RAMP.amberS, t: RAMP.amberT },
-    hot: { key: "hot", title: "Hot / Standard", sub1: "ミリ秒で即取得", sub2: "高頻度アクセス向け", x: 500, y: 120, f: RAMP.red, s: RAMP.redS, t: RAMP.redT },
+    archive: { key: "archive", title: "Archive", sub1: en ? "Retrieval takes hours" : "数時間かかる取得", sub2: en ? "Long-term, cheapest" : "長期保管・最安", x: 60, y: 360, f: RAMP.blue, s: RAMP.blueS, t: RAMP.blueT },
+    cool: { key: "cool", title: "Cool / Nearline", sub1: en ? "Retrieval in minutes" : "数分〜の取得", sub2: en ? "A few accesses a month" : "月数回アクセス向け", x: 280, y: 240, f: RAMP.amber, s: RAMP.amberS, t: RAMP.amberT },
+    hot: { key: "hot", title: "Hot / Standard", sub1: en ? "Instant (milliseconds)" : "ミリ秒で即取得", sub2: en ? "Frequent access" : "高頻度アクセス向け", x: 500, y: 120, f: RAMP.red, s: RAMP.redS, t: RAMP.redT },
   };
   const W = 720, H = 460, boxW = 190, boxH = 110;
-  const freqLabel = freq <= 33 ? "めったに使わない" : freq <= 66 ? "ときどき使う" : "毎日のように使う";
-  const recName = { archive: "Archive（最安・長期保管）", cool: "Cool / Nearline（中間）", hot: "Hot / Standard（即取得）" }[rec];
+  const freqLabel = en ? (freq <= 33 ? "Rarely used" : freq <= 66 ? "Used sometimes" : "Used almost daily") : (freq <= 33 ? "めったに使わない" : freq <= 66 ? "ときどき使う" : "毎日のように使う");
+  const recName = (en ? { archive: "Archive (cheapest, long-term)", cool: "Cool / Nearline (in between)", hot: "Hot / Standard (instant retrieval)" } : { archive: "Archive（最安・長期保管）", cool: "Cool / Nearline（中間）", hot: "Hot / Standard（即取得）" })[rec];
   return (
     <div>
-      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 4px", color: BLUE.deep }}>① ストレージ階層 <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>（アクセス頻度を動かすと最適な階層が光る）</span></h3>
+      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 4px", color: BLUE.deep }}>{en ? "① Storage tiers " : "① ストレージ階層 "}<span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>{en ? "(move the access frequency and the best tier lights up)" : "（アクセス頻度を動かすと最適な階層が光る）"}</span></h3>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block" }}>
-        <text x={50} y={36} fontSize={13} fill={RAMP.grayT}>保管コスト（上ほど高い）</text>
+        <text x={50} y={36} fontSize={13} fill={RAMP.grayT}>{en ? "Storage cost (higher = more expensive)" : "保管コスト（上ほど高い）"}</text>
         {/* 軸 */}
         <line x1={50} y1={50} x2={50} y2={400} stroke={RAMP.grayS} strokeWidth={1} />
         <line x1={50} y1={400} x2={W - 30} y2={400} stroke={RAMP.grayS} strokeWidth={1} />
-        <text x={(W) / 2} y={432} textAnchor="middle" fontSize={13} fill={RAMP.grayT}>取り出しの速さ（右ほど速い・低レイテンシ）</text>
+        <text x={(W) / 2} y={432} textAnchor="middle" fontSize={13} fill={RAMP.grayT}>{en ? "Retrieval speed (right = faster)" : "取り出しの速さ（右ほど速い・低レイテンシ）"}</text>
         {Object.values(tiers).map((tr) => {
           const on = rec === tr.key;
           return (
             <g key={tr.key} style={{ transition: "all .25s" }}>
               {on && <rect x={tr.x - 6} y={tr.y - 30} width={boxW + 12} height={boxH + 30} rx={12} fill="none" stroke={RAMP.greenS} strokeWidth={2.5} />}
-              {on && <g><rect x={tr.x + boxW / 2 - 55} y={tr.y - 30} width={110} height={24} rx={12} fill={RAMP.greenS} /><text x={tr.x + boxW / 2} y={tr.y - 18} textAnchor="middle" dominantBaseline="central" fontSize={12} fill="#fff">推奨：この層</text></g>}
+              {on && <g><rect x={tr.x + boxW / 2 - 55} y={tr.y - 30} width={110} height={24} rx={12} fill={RAMP.greenS} /><text x={tr.x + boxW / 2} y={tr.y - 18} textAnchor="middle" dominantBaseline="central" fontSize={12} fill="#fff">{en ? "Recommended" : "推奨：この層"}</text></g>}
               <rect x={tr.x} y={tr.y} width={boxW} height={boxH} rx={10} fill={tr.f} stroke={tr.s} strokeWidth={on ? 1.5 : 0.5} opacity={on ? 1 : 0.55} />
               <text x={tr.x + boxW / 2} y={tr.y + 28} textAnchor="middle" fontSize={16} fontWeight={500} fill={tr.t} opacity={on ? 1 : 0.6}>{tr.title}</text>
               <text x={tr.x + boxW / 2} y={tr.y + 58} textAnchor="middle" fontSize={12.5} fill={tr.t} opacity={on ? 1 : 0.6}>{tr.sub1}</text>
@@ -142949,14 +143344,14 @@ function IxStorage() {
       </svg>
       <div style={{ padding: "0 4px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 4 }}>
-          <span>アクセス頻度</span><span style={{ color: BLUE.deep, fontWeight: 500 }}>{freqLabel}</span>
+          <span>{en ? "Access frequency" : "アクセス頻度"}</span><span style={{ color: BLUE.deep, fontWeight: 500 }}>{freqLabel}</span>
         </div>
         <input type="range" min={0} max={100} value={freq} onChange={(e) => setFreq(Number(e.target.value))} style={{ width: "100%", accentColor: BLUE.primary }} />
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--color-text-tertiary)" }}>
-          <span>めったに使わない</span><span>毎日のように</span>
+          <span>{en ? "Rarely" : "めったに使わない"}</span><span>{en ? "Almost daily" : "毎日のように"}</span>
         </div>
         <p style={{ fontSize: 13.5, color: BLUE.deep, marginTop: 12, lineHeight: 1.6 }}>
-          → このアクセス頻度なら <b>{recName}</b> が最適。使うほど右上（高速・高コスト）の層が、使わないほど左下（低速・最安）の層が有利になります。
+          {en ? <>→ At this access frequency, <b>{recName}</b> is the best fit. The more often data is used, the more the upper-right tiers (fast, expensive) pay off; the less it is used, the more the lower-left tiers (slow, cheapest) win.</> : <>→ このアクセス頻度なら <b>{recName}</b> が最適。使うほど右上（高速・高コスト）の層が、使わないほど左下（低速・最安）の層が有利になります。</>}
         </p>
       </div>
     </div>
@@ -142965,16 +143360,19 @@ function IxStorage() {
 
 // ② 責任共有モデル：IaaS/PaaS/SaaSで責任分界が動く
 function IxShared() {
-  const models = [["オンプレ", 8], ["IaaS", 4], ["PaaS", 2], ["SaaS", 1]];
+  const en = useCdEn();
+  const models = [[en ? "On-prem" : "オンプレ", 8], ["IaaS", 4], ["PaaS", 2], ["SaaS", 1]];
   const [mi, setMi] = useState(1);
   const userMax = models[mi][1]; // この数まで(上から)が利用者管理
-  const layers = ["データ・アクセス権", "アプリケーション", "ランタイム/ミドルウェア", "OS", "仮想化", "サーバー(物理)", "ストレージ", "ネットワーク"];
+  const layers = en
+    ? ["Data & access rights", "Applications", "Runtime / middleware", "OS", "Virtualization", "Servers (physical)", "Storage", "Networking"]
+    : ["データ・アクセス権", "アプリケーション", "ランタイム/ミドルウェア", "OS", "仮想化", "サーバー(物理)", "ストレージ", "ネットワーク"];
   const W = 560, top = 20, rowH = 40, gap = 5, x0 = 200, boxW = 300;
   const H = top + layers.length * (rowH + gap) + 50;
   const userCount = Math.min(userMax, layers.length);
   return (
     <div>
-      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>② 責任共有モデル <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>（形態を切り替えると責任の境界線が動く）</span></h3>
+      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>{en ? "② Shared responsibility model " : "② 責任共有モデル "}<span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>{en ? "(switch the model and the responsibility line moves)" : "（形態を切り替えると責任の境界線が動く）"}</span></h3>
       <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
         {models.map(([name], i) => {
           const on = i === mi;
@@ -142997,7 +143395,7 @@ function IxShared() {
             <g key={li} style={{ transition: "all .3s" }}>
               <text x={x0 - 10} y={y + rowH / 2} textAnchor="end" dominantBaseline="central" fontSize={11.5} fill={RAMP.grayT}>{ly}</text>
               <rect x={x0} y={y} width={boxW} height={rowH} rx={6} fill={f} stroke={s} strokeWidth={0.5} />
-              <text x={x0 + boxW / 2} y={y + rowH / 2} textAnchor="middle" dominantBaseline="central" fontSize={12} fill={t}>{isUser ? "利用者が管理" : "事業者が管理"}</text>
+              <text x={x0 + boxW / 2} y={y + rowH / 2} textAnchor="middle" dominantBaseline="central" fontSize={12} fill={t}>{isUser ? (en ? "Customer manages" : "利用者が管理") : (en ? "Provider manages" : "事業者が管理")}</text>
             </g>
           );
         })}
@@ -143007,12 +143405,12 @@ function IxShared() {
         )}
         {/* 凡例 */}
         <rect x={x0} y={H - 30} width={14} height={14} rx={3} fill={RAMP.blue} stroke={RAMP.blueS} strokeWidth={0.5} />
-        <text x={x0 + 20} y={H - 23} dominantBaseline="central" fontSize={11.5} fill={RAMP.grayT}>利用者</text>
+        <text x={x0 + 20} y={H - 23} dominantBaseline="central" fontSize={11.5} fill={RAMP.grayT}>{en ? "Customer" : "利用者"}</text>
         <rect x={x0 + 80} y={H - 30} width={14} height={14} rx={3} fill={RAMP.gray} stroke={RAMP.grayS} strokeWidth={0.5} />
-        <text x={x0 + 100} y={H - 23} dominantBaseline="central" fontSize={11.5} fill={RAMP.grayT}>クラウド事業者</text>
+        <text x={x0 + 100} y={H - 23} dominantBaseline="central" fontSize={11.5} fill={RAMP.grayT}>{en ? "Cloud provider" : "クラウド事業者"}</text>
       </svg>
       <p style={{ fontSize: 13.5, color: BLUE.deep, marginTop: 6, lineHeight: 1.6 }}>
-        → <b>{models[mi][0]}</b> では利用者の責任は{userCount === 0 ? "ほぼなし（データのみ）" : `上から${userCount}層`}。SaaSに近づくほど事業者が多くを引き受け、利用者はデータとアクセス権の管理に集中できます。
+        {en ? <>→ With <b>{models[mi][0]}</b>, the customer is responsible for {userCount === 0 ? "almost nothing (data only)" : userCount === 1 ? "the top layer" : `the top ${userCount} layers`}. The closer you get to SaaS, the more the provider takes on, so the customer can focus on managing data and access rights.</> : <>→ <b>{models[mi][0]}</b> では利用者の責任は{userCount === 0 ? "ほぼなし（データのみ）" : `上から${userCount}層`}。SaaSに近づくほど事業者が多くを引き受け、利用者はデータとアクセス権の管理に集中できます。</>}
       </p>
     </div>
   );
@@ -143020,6 +143418,7 @@ function IxShared() {
 
 // ③ 料金シミュレータ：稼働率で各課金モデルのコストを比較
 function IxPricing() {
+  const en = useCdEn();
   const [util, setUtil] = useState(70); // 稼働率%
   const [interruptible, setInterruptible] = useState(false); // 中断許容か
   // 月720h想定。オンデマンド単価=1.0
@@ -143030,9 +143429,9 @@ function IxPricing() {
   // スポット: 単価0.2だが中断許容が前提
   const spot = hours * 0.2;
   const models = [
-    { key: "od", name: "オンデマンド", cost: onDemand, note: "事前契約なし・従量", color: RAMP.amberS, bg: RAMP.amber, avail: true },
-    { key: "ri", name: "確約利用(1年)", cost: reserved, note: "常時課金・単価約6割", color: RAMP.blueS, bg: RAMP.blue, avail: true },
-    { key: "sp", name: "スポット", cost: spot, note: "単価約2割・中断前提", color: RAMP.redS, bg: RAMP.red, avail: interruptible },
+    { key: "od", name: en ? "On-demand" : "オンデマンド", cost: onDemand, note: en ? "No contract, metered" : "事前契約なし・従量", color: RAMP.amberS, bg: RAMP.amber, avail: true },
+    { key: "ri", name: en ? "Committed (1 yr)" : "確約利用(1年)", cost: reserved, note: en ? "Billed 24/7 at ~60%" : "常時課金・単価約6割", color: RAMP.blueS, bg: RAMP.blue, avail: true },
+    { key: "sp", name: en ? "Spot" : "スポット", cost: spot, note: en ? "~20% rate, may stop" : "単価約2割・中断前提", color: RAMP.redS, bg: RAMP.red, avail: interruptible },
   ];
   const candidates = models.filter((m) => m.avail);
   const min = Math.min(...candidates.map((m) => m.cost));
@@ -143042,7 +143441,7 @@ function IxPricing() {
   const best = candidates.find((m) => m.cost === min);
   return (
     <div>
-      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>③ 料金シミュレータ <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>（稼働率を動かすと最安の課金モデルが光る）</span></h3>
+      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>{en ? "③ Pricing simulator " : "③ 料金シミュレータ "}<span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>{en ? "(move the utilization and the cheapest pricing model lights up)" : "（稼働率を動かすと最安の課金モデルが光る）"}</span></h3>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block" }}>
         {models.map((m, i) => {
           const y = barTop + i * (barH + gap);
@@ -143055,9 +143454,9 @@ function IxPricing() {
               <text x={x0 - 10} y={y + barH / 2 + 10} textAnchor="end" dominantBaseline="central" fontSize={10.5} fill={RAMP.grayT}>{m.note}</text>
               <rect x={x0} y={y} width={barMaxW} height={barH} rx={8} fill={RAMP.gray} opacity={0.4} />
               <rect x={x0} y={y} width={Math.max(w, 2)} height={barH} rx={8} fill={m.bg} stroke={m.color} strokeWidth={isBest ? 2 : 0.5} opacity={dimmed ? 0.35 : 1} />
-              {isBest && <g><rect x={x0 + Math.max(w, 2) + 8} y={y + barH / 2 - 12} width={64} height={24} rx={12} fill={RAMP.greenS} /><text x={x0 + Math.max(w, 2) + 40} y={y + barH / 2} textAnchor="middle" dominantBaseline="central" fontSize={12} fill="#fff">最安 ★</text></g>}
+              {isBest && <g><rect x={x0 + Math.max(w, 2) + 8} y={y + barH / 2 - 12} width={en ? 84 : 64} height={24} rx={12} fill={RAMP.greenS} /><text x={x0 + Math.max(w, 2) + (en ? 50 : 40)} y={y + barH / 2} textAnchor="middle" dominantBaseline="central" fontSize={12} fill="#fff">{en ? "Cheapest ★" : "最安 ★"}</text></g>}
               <text x={x0 + 12} y={y + barH / 2} dominantBaseline="central" fontSize={13} fontWeight={500} fill={m.color} opacity={dimmed ? 0.5 : 1}>
-                {dimmed ? "中断を許容しないと使えない" : `相対コスト ${m.cost.toFixed(0)}`}
+                {dimmed ? (en ? "Only if interruptions are OK" : "中断を許容しないと使えない") : (en ? `Relative cost ${m.cost.toFixed(0)}` : `相対コスト ${m.cost.toFixed(0)}`)}
               </text>
             </g>
           );
@@ -143065,17 +143464,17 @@ function IxPricing() {
       </svg>
       <div style={{ padding: "0 4px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 4 }}>
-          <span>月間の稼働率</span><span style={{ color: BLUE.deep, fontWeight: 500 }}>{util}%（約{Math.round(hours)}h / 720h）</span>
+          <span>{en ? "Monthly utilization" : "月間の稼働率"}</span><span style={{ color: BLUE.deep, fontWeight: 500 }}>{en ? <>{util}% (about {Math.round(hours)}h / 720h)</> : <>{util}%（約{Math.round(hours)}h / 720h）</>}</span>
         </div>
         <input type="range" min={5} max={100} value={util} onChange={(e) => setUtil(Number(e.target.value))} style={{ width: "100%", accentColor: BLUE.primary }} />
         <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--color-text-secondary)", marginTop: 12, cursor: "pointer" }}>
           <input type="checkbox" checked={interruptible} onChange={(e) => setInterruptible(e.target.checked)} style={{ accentColor: BLUE.primary }} />
-          中断されても構わない処理（スポットを候補に含める）
+          {en ? "The workload can tolerate interruptions (include spot)" : "中断されても構わない処理（スポットを候補に含める）"}
         </label>
         <p style={{ fontSize: 13.5, color: BLUE.deep, marginTop: 12, lineHeight: 1.6 }}>
-          → この条件では <b>{best ? best.name : "—"}</b> が最安。稼働率が高いほど常時課金の確約利用が有利になり、低い・断続的なら従量のオンデマンドが有利。中断を許せるバッチ処理ならスポットが圧倒的に安くなります。
+          {en ? <>→ Under these conditions, <b>{best ? best.name : "—"}</b> is cheapest. The higher the utilization, the more always-billed committed use pays off; at low or intermittent utilization, metered on-demand wins. For batch jobs that can tolerate interruptions, spot is by far the cheapest.</> : <>→ この条件では <b>{best ? best.name : "—"}</b> が最安。稼働率が高いほど常時課金の確約利用が有利になり、低い・断続的なら従量のオンデマンドが有利。中断を許せるバッチ処理ならスポットが圧倒的に安くなります。</>}
         </p>
-        <p style={{ fontSize: 11.5, color: "var(--color-text-tertiary)", marginTop: 6 }}>※相対コストは概念理解のための簡易モデルです（実際の料金は各社・条件で異なります）。</p>
+        <p style={{ fontSize: 11.5, color: "var(--color-text-tertiary)", marginTop: 6 }}>{en ? "* Relative costs come from a simplified model for understanding the idea (actual prices vary by provider and conditions)." : "※相対コストは概念理解のための簡易モデルです（実際の料金は各社・条件で異なります）。"}</p>
       </div>
     </div>
   );
@@ -143083,6 +143482,7 @@ function IxPricing() {
 
 // ④ オートスケール：負荷で台数が増減
 function IxAutoscale() {
+  const en = useCdEn();
   const [load, setLoad] = useState(40); // %
   // 1台あたり25%処理。必要台数 = ceil(load/25), 最小1・最大6
   const need = Math.max(1, Math.min(6, Math.ceil(load / 20)));
@@ -143090,9 +143490,9 @@ function IxAutoscale() {
   const perServer = Math.round(load / need);
   return (
     <div>
-      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>④ オートスケール <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>（負荷を上げるとサーバーが自動で増える）</span></h3>
+      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>{en ? "④ Auto scaling " : "④ オートスケール "}<span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>{en ? "(raise the load and servers are added automatically)" : "（負荷を上げるとサーバーが自動で増える）"}</span></h3>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block" }}>
-        <text x={sx} y={40} fontSize={13} fill={RAMP.grayT}>稼働中のサーバー</text>
+        <text x={sx} y={40} fontSize={13} fill={RAMP.grayT}>{en ? "Running servers" : "稼働中のサーバー"}</text>
         {Array.from({ length: 6 }).map((_, i) => {
           const active = i < need;
           const x = sx + i * (sw + sgap);
@@ -143100,7 +143500,7 @@ function IxAutoscale() {
             <g key={i} style={{ transition: "all .3s" }}>
               <rect x={x} y={sy} width={sw} height={sh} rx={8} fill={active ? RAMP.blue : RAMP.gray} stroke={active ? RAMP.blueS : RAMP.grayS} strokeWidth={active ? 1.2 : 0.5} opacity={active ? 1 : 0.3} />
               <text x={x + sw / 2} y={sy + 26} textAnchor="middle" fontSize={12} fontWeight={500} fill={active ? RAMP.blueT : RAMP.grayS} opacity={active ? 1 : 0.4}>VM {i + 1}</text>
-              {active && <text x={x + sw / 2} y={sy + 48} textAnchor="middle" fontSize={11} fill={RAMP.blueT}>負荷 {perServer}%</text>}
+              {active && <text x={x + sw / 2} y={sy + 48} textAnchor="middle" fontSize={11} fill={RAMP.blueT}>{en ? "Load " : "負荷 "}{perServer}%</text>}
             </g>
           );
         })}
@@ -143109,11 +143509,11 @@ function IxAutoscale() {
       </svg>
       <div style={{ padding: "0 4px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 4 }}>
-          <span>アクセス負荷</span><span style={{ color: BLUE.deep, fontWeight: 500 }}>{load}% → {need}台で分散</span>
+          <span>{en ? "Traffic load" : "アクセス負荷"}</span><span style={{ color: BLUE.deep, fontWeight: 500 }}>{load}% → {en ? `spread over ${need} server${need === 1 ? "" : "s"}` : <>{need}台で分散</>}</span>
         </div>
         <input type="range" min={5} max={100} value={load} onChange={(e) => setLoad(Number(e.target.value))} style={{ width: "100%", accentColor: BLUE.primary }} />
         <p style={{ fontSize: 13.5, color: BLUE.deep, marginTop: 12, lineHeight: 1.6 }}>
-          → 負荷が増えると自動でサーバーを<b>増やし</b>、減ると<b>減らして</b>コストを抑えます。1台あたりの負荷を一定に保つのがオートスケールの狙いです。
+          {en ? <>→ When the load rises, servers are <b>added</b> automatically; when it falls, they are <b>removed</b> to keep costs down. The aim of auto scaling is to keep the load per server steady.</> : <>→ 負荷が増えると自動でサーバーを<b>増やし</b>、減ると<b>減らして</b>コストを抑えます。1台あたりの負荷を一定に保つのがオートスケールの狙いです。</>}
         </p>
       </div>
     </div>
@@ -143122,6 +143522,7 @@ function IxAutoscale() {
 
 // ⑤ ロードバランサ：リクエストを複数サーバーへ振り分け
 function IxLB() {
+  const en = useCdEn();
   const [servers, setServers] = useState(3);
   const [reqs, setReqs] = useState(900); // 1分あたり
   const W = 720, H = 300;
@@ -143132,12 +143533,12 @@ function IxLB() {
   const per = Math.round(reqs / servers);
   return (
     <div>
-      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>⑤ ロードバランサ <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>（台数を変えると1台あたりの負荷が変わる）</span></h3>
+      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>{en ? "⑤ Load balancer " : "⑤ ロードバランサ "}<span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>{en ? "(change the number of servers and the load per server changes)" : "（台数を変えると1台あたりの負荷が変わる）"}</span></h3>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block" }}>
         {/* LB */}
         <rect x={lbX - 90} y={lbY} width={180} height={46} rx={10} fill={BLUE.light} stroke={BLUE.primary} strokeWidth={1.2} />
-        <text x={lbX} y={lbY + 23} textAnchor="middle" dominantBaseline="central" fontSize={13} fontWeight={500} fill={BLUE.deep}>ロードバランサ</text>
-        <text x={lbX} y={28} textAnchor="middle" fontSize={12} fill={RAMP.grayT}>受信 {reqs} req/分</text>
+        <text x={lbX} y={lbY + 23} textAnchor="middle" dominantBaseline="central" fontSize={13} fontWeight={500} fill={BLUE.deep}>{en ? "Load balancer" : "ロードバランサ"}</text>
+        <text x={lbX} y={28} textAnchor="middle" fontSize={12} fill={RAMP.grayT}>{en ? `Incoming ${reqs} req/min` : <>受信 {reqs} req/分</>}</text>
         {/* サーバー & 矢印 */}
         {Array.from({ length: servers }).map((_, i) => {
           const x = startX + i * (sw + 24);
@@ -143154,15 +143555,15 @@ function IxLB() {
       </svg>
       <div style={{ padding: "0 4px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 4 }}>
-          <span>サーバー台数</span><span style={{ color: BLUE.deep, fontWeight: 500 }}>{servers}台</span>
+          <span>{en ? "Number of servers" : "サーバー台数"}</span><span style={{ color: BLUE.deep, fontWeight: 500 }}>{servers}{en ? "" : "台"}</span>
         </div>
         <input type="range" min={1} max={6} value={servers} onChange={(e) => setServers(Number(e.target.value))} style={{ width: "100%", accentColor: BLUE.primary }} />
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--color-text-secondary)", margin: "12px 0 4px" }}>
-          <span>受信リクエスト</span><span style={{ color: BLUE.deep, fontWeight: 500 }}>{reqs} req/分</span>
+          <span>{en ? "Incoming requests" : "受信リクエスト"}</span><span style={{ color: BLUE.deep, fontWeight: 500 }}>{reqs}{en ? " req/min" : " req/分"}</span>
         </div>
         <input type="range" min={100} max={3000} step={100} value={reqs} onChange={(e) => setReqs(Number(e.target.value))} style={{ width: "100%", accentColor: BLUE.primary }} />
         <p style={{ fontSize: 13.5, color: BLUE.deep, marginTop: 12, lineHeight: 1.6 }}>
-          → LBはリクエストを各サーバーへ均等に振り分けます。台数を増やすと<b>1台あたり {per} req</b> まで下がり、1台が落ちても残りで処理を継続できます。
+          {en ? <>→ The LB spreads requests evenly across the servers. Adding servers brings the load down to <b>{per} req per server</b>, and if one server fails the rest keep handling the traffic.</> : <>→ LBはリクエストを各サーバーへ均等に振り分けます。台数を増やすと<b>1台あたり {per} req</b> まで下がり、1台が落ちても残りで処理を継続できます。</>}
         </p>
       </div>
     </div>
@@ -143171,6 +143572,7 @@ function IxLB() {
 
 // ⑥ CDN：ユーザー位置で配信元が変わる
 function IxCDN() {
+  const en = useCdEn();
   const [dist, setDist] = useState(70); // オリジンからの距離 0-100
   const [cdn, setCdn] = useState(true);
   // CDNあり: エッジから配信。遅延 = 近い(20ms前後)。 CDNなし: オリジン直。遅延 = 距離比例
@@ -143179,16 +143581,16 @@ function IxCDN() {
   const originX = 90, edgeX = 380, userX = 90 + (W - 180) * dist / 100, y = 110;
   return (
     <div>
-      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>⑥ CDN <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>（ユーザーが遠いほどCDNの効果が出る）</span></h3>
+      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>{en ? "⑥ CDN " : "⑥ CDN "}<span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>{en ? "(the farther away the user, the more a CDN helps)" : "（ユーザーが遠いほどCDNの効果が出る）"}</span></h3>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block" }}>
         {/* オリジン */}
         <rect x={originX - 45} y={y - 24} width={90} height={48} rx={8} fill={RAMP.gray} stroke={RAMP.grayS} strokeWidth={1} />
-        <text x={originX} y={y} textAnchor="middle" dominantBaseline="central" fontSize={11.5} fill={RAMP.grayT}>オリジン</text>
+        <text x={originX} y={y} textAnchor="middle" dominantBaseline="central" fontSize={11.5} fill={RAMP.grayT}>{en ? "Origin" : "オリジン"}</text>
         {/* エッジ */}
-        {cdn && <g><rect x={userX - 45} y={y - 70} width={90} height={40} rx={8} fill={RAMP.green} stroke={RAMP.greenS} strokeWidth={1.2} /><text x={userX} y={y - 50} textAnchor="middle" dominantBaseline="central" fontSize={11.5} fill={RAMP.greenT}>エッジ拠点</text></g>}
+        {cdn && <g><rect x={userX - 45} y={y - 70} width={90} height={40} rx={8} fill={RAMP.green} stroke={RAMP.greenS} strokeWidth={1.2} /><text x={userX} y={y - 50} textAnchor="middle" dominantBaseline="central" fontSize={11.5} fill={RAMP.greenT}>{en ? "Edge location" : "エッジ拠点"}</text></g>}
         {/* ユーザー */}
         <circle cx={userX} cy={y + 40} r={16} fill={RAMP.blue} stroke={RAMP.blueS} strokeWidth={1.2} />
-        <text x={userX} y={y + 72} textAnchor="middle" fontSize={11.5} fill={RAMP.blueT}>ユーザー</text>
+        <text x={userX} y={y + 72} textAnchor="middle" fontSize={11.5} fill={RAMP.blueT}>{en ? "User" : "ユーザー"}</text>
         {/* 配信線 */}
         {cdn ? (
           <>
@@ -143198,19 +143600,19 @@ function IxCDN() {
         ) : (
           <line x1={originX + 45} y1={y} x2={userX - 16} y2={y + 36} stroke={RAMP.redS} strokeWidth={2} />
         )}
-        <text x={W / 2} y={H - 16} textAnchor="middle" fontSize={14} fontWeight={500} fill={latency > 120 ? RAMP.redS : RAMP.greenS}>推定遅延 約 {latency} ms</text>
+        <text x={W / 2} y={H - 16} textAnchor="middle" fontSize={14} fontWeight={500} fill={latency > 120 ? RAMP.redS : RAMP.greenS}>{en ? "Estimated latency ≈ " : "推定遅延 約 "}{latency} ms</text>
       </svg>
       <div style={{ padding: "0 4px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 4 }}>
-          <span>ユーザーとオリジンの距離</span><span style={{ color: BLUE.deep, fontWeight: 500 }}>{dist < 33 ? "近い" : dist < 66 ? "やや遠い" : "とても遠い"}</span>
+          <span>{en ? "Distance between user and origin" : "ユーザーとオリジンの距離"}</span><span style={{ color: BLUE.deep, fontWeight: 500 }}>{en ? (dist < 33 ? "Near" : dist < 66 ? "Fairly far" : "Very far") : (dist < 33 ? "近い" : dist < 66 ? "やや遠い" : "とても遠い")}</span>
         </div>
         <input type="range" min={0} max={100} value={dist} onChange={(e) => setDist(Number(e.target.value))} style={{ width: "100%", accentColor: BLUE.primary }} />
         <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--color-text-secondary)", marginTop: 12, cursor: "pointer" }}>
           <input type="checkbox" checked={cdn} onChange={(e) => setCdn(e.target.checked)} style={{ accentColor: BLUE.primary }} />
-          CDNを使う（近くのエッジ拠点から配信）
+          {en ? "Use a CDN (deliver from a nearby edge location)" : "CDNを使う（近くのエッジ拠点から配信）"}
         </label>
         <p style={{ fontSize: 13.5, color: BLUE.deep, marginTop: 12, lineHeight: 1.6 }}>
-          → CDNなしだと遠いユーザーほど遅くなります。CDNは<b>ユーザーの近くのエッジ</b>にコンテンツをキャッシュするので、距離が遠くても遅延が小さく保たれます。
+          {en ? <>→ Without a CDN, the farther away the user, the slower it gets. A CDN caches content at <b>edges close to users</b>, so latency stays low even over long distances.</> : <>→ CDNなしだと遠いユーザーほど遅くなります。CDNは<b>ユーザーの近くのエッジ</b>にコンテンツをキャッシュするので、距離が遠くても遅延が小さく保たれます。</>}
         </p>
       </div>
     </div>
@@ -143219,8 +143621,15 @@ function IxCDN() {
 
 // ⑦ RAGの流れ：ステップ点灯
 function IxRAG() {
+  const en = useCdEn();
   const [step, setStep] = useState(0);
-  const steps = [
+  const steps = en ? [
+    ["Question", "The user enters a question"],
+    ["Retrieve", "Turn the question into an embedding and search the knowledge base for related documents"],
+    ["Ground", "Attach the documents found to the prompt as context (grounding)"],
+    ["Generate", "The LLM generates an answer based on that evidence"],
+    ["Answer", "Return an answer with sources to the user"],
+  ] : [
     ["質問", "ユーザーが質問を入力する"],
     ["検索", "質問を埋め込みに変換し、知識ベースから関連文書を検索"],
     ["根拠付け", "見つけた文書を文脈としてプロンプトに添える(グラウンディング)"],
@@ -143231,7 +143640,7 @@ function IxRAG() {
   const startX = (W - (5 * bw + 4 * gap)) / 2, y = 40;
   return (
     <div>
-      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>⑦ RAGの流れ <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>（ステップを進めて検索拡張生成を理解）</span></h3>
+      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>{en ? "⑦ RAG flow " : "⑦ RAGの流れ "}<span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>{en ? "(step through retrieval-augmented generation)" : "（ステップを進めて検索拡張生成を理解）"}</span></h3>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block" }}>
         {steps.map((s, i) => {
           const x = startX + i * (bw + gap);
@@ -143251,11 +143660,11 @@ function IxRAG() {
           <div style={{ fontSize: 13, color: "var(--color-text-secondary)", marginTop: 4, lineHeight: 1.6 }}>{steps[step][1]}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={() => setStep(Math.max(0, step - 1))} style={{ ...ghostBtn, flex: 1, opacity: step > 0 ? 1 : 0.5 }}>← 戻る</button>
-          <button onClick={() => setStep(Math.min(steps.length - 1, step + 1))} style={{ ...primaryBtn, flex: 1, opacity: step < steps.length - 1 ? 1 : 0.5 }}>次へ →</button>
+          <button onClick={() => setStep(Math.max(0, step - 1))} style={{ ...ghostBtn, flex: 1, opacity: step > 0 ? 1 : 0.5 }}>{en ? "← Back" : "← 戻る"}</button>
+          <button onClick={() => setStep(Math.min(steps.length - 1, step + 1))} style={{ ...primaryBtn, flex: 1, opacity: step < steps.length - 1 ? 1 : 0.5 }}>{en ? "Next →" : "次へ →"}</button>
         </div>
         <p style={{ fontSize: 13.5, color: BLUE.deep, marginTop: 12, lineHeight: 1.6 }}>
-          → RAGは「<b>検索して根拠を渡してから生成</b>」するため、最新情報や社内文書にも対応でき、ハルシネーション（もっともらしいウソ）を抑えられます。
+          {en ? <>→ Because RAG <b>retrieves evidence and passes it along before generating</b>, it can handle up-to-date information and internal documents, and it reduces hallucinations (plausible-sounding falsehoods).</> : <>→ RAGは「<b>検索して根拠を渡してから生成</b>」するため、最新情報や社内文書にも対応でき、ハルシネーション（もっともらしいウソ）を抑えられます。</>}
         </p>
       </div>
     </div>
@@ -143264,6 +143673,7 @@ function IxRAG() {
 
 // ⑧ リージョン/AZ：障害でどこまで生き残るか
 function IxAZ() {
+  const en = useCdEn();
   const [multiAZ, setMultiAZ] = useState(true);
   const [failed, setFailed] = useState(null); // 障害を起こしたAZ index
   const azs = multiAZ ? [0, 1, 2] : [0];
@@ -143274,9 +143684,9 @@ function IxAZ() {
   const serviceUp = aliveCount > 0;
   return (
     <div>
-      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>⑧ リージョン / AZ <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>（AZをタップして障害を起こしてみる）</span></h3>
+      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>{en ? "⑧ Region / AZ " : "⑧ リージョン / AZ "}<span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>{en ? "(tap an AZ to cause an outage)" : "（AZをタップして障害を起こしてみる）"}</span></h3>
       <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
-        {[["単一AZ", false], ["マルチAZ", true]].map(([name, v]) => {
+        {[[en ? "Single AZ" : "単一AZ", false], [en ? "Multi-AZ" : "マルチAZ", true]].map(([name, v]) => {
           const on = v === multiAZ;
           return (
             <button key={name} onClick={() => { setMultiAZ(v); setFailed(null); }} style={{
@@ -143288,7 +143698,7 @@ function IxAZ() {
       </div>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block" }}>
         <rect x={startX - 20} y={y - 30} width={totalW + 40} height={boxH + 60} rx={12} fill="none" stroke={RAMP.grayS} strokeWidth={1} strokeDasharray="5 4" />
-        <text x={startX - 14} y={y - 14} fontSize={12} fill={RAMP.grayT}>1リージョン（東京など）</text>
+        <text x={startX - 14} y={y - 14} fontSize={12} fill={RAMP.grayT}>{en ? "One region (e.g. Tokyo)" : "1リージョン（東京など）"}</text>
         {azs.map((i) => {
           const x = startX + i * (boxW + gap);
           const down = i === failed;
@@ -143296,8 +143706,8 @@ function IxAZ() {
             <g key={i} onClick={() => setFailed(down ? null : i)} style={{ cursor: "pointer", transition: "all .25s" }}>
               <rect x={x} y={y} width={boxW} height={boxH} rx={10} fill={down ? RAMP.red : RAMP.blue} stroke={down ? RAMP.redS : RAMP.blueS} strokeWidth={1.2} opacity={down ? 0.5 : 1} />
               <text x={x + boxW / 2} y={y + 38} textAnchor="middle" fontSize={14} fontWeight={500} fill={down ? RAMP.redT : RAMP.blueT}>AZ-{["a", "b", "c"][i]}</text>
-              <text x={x + boxW / 2} y={y + 66} textAnchor="middle" fontSize={12} fill={down ? RAMP.redT : RAMP.blueT}>{down ? "障害発生中" : "正常稼働"}</text>
-              <text x={x + boxW / 2} y={y + 88} textAnchor="middle" fontSize={10.5} fill={RAMP.grayT}>{down ? "タップで復旧" : "タップで障害"}</text>
+              <text x={x + boxW / 2} y={y + 66} textAnchor="middle" fontSize={12} fill={down ? RAMP.redT : RAMP.blueT}>{down ? (en ? "Outage" : "障害発生中") : (en ? "Running normally" : "正常稼働")}</text>
+              <text x={x + boxW / 2} y={y + 88} textAnchor="middle" fontSize={10.5} fill={RAMP.grayT}>{down ? (en ? "Tap to restore" : "タップで復旧") : (en ? "Tap to fail" : "タップで障害")}</text>
             </g>
           );
         })}
@@ -143306,11 +143716,11 @@ function IxAZ() {
         background: serviceUp ? "var(--color-background-success)" : "var(--color-background-danger)",
         border: `0.5px solid ${serviceUp ? "var(--color-border-success)" : "var(--color-border-danger)"}` }}>
         <span style={{ fontSize: 14, fontWeight: 500, color: serviceUp ? "var(--color-text-success)" : "var(--color-text-danger)" }}>
-          サービス状態：{serviceUp ? `稼働継続（${aliveCount}/${azs.length} AZが正常）` : "全停止"}
+          {en ? "Service status: " : "サービス状態："}{serviceUp ? (en ? `Still running (${aliveCount}/${azs.length} AZs healthy)` : `稼働継続（${aliveCount}/${azs.length} AZが正常）`) : (en ? "Fully down" : "全停止")}
         </span>
       </div>
       <p style={{ fontSize: 13.5, color: BLUE.deep, marginTop: 12, lineHeight: 1.6 }}>
-        → 単一AZだと、そのAZが落ちるとサービスは<b>全停止</b>。マルチAZなら1つのAZが障害でも<b>別のAZで継続</b>できます。可用性設計の基本です。
+        {en ? <>→ With a single AZ, if that AZ goes down the service <b>stops completely</b>. With multiple AZs, even if one fails the service <b>keeps running in another AZ</b>. This is the basis of high-availability design.</> : <>→ 単一AZだと、そのAZが落ちるとサービスは<b>全停止</b>。マルチAZなら1つのAZが障害でも<b>別のAZで継続</b>できます。可用性設計の基本です。</>}
       </p>
     </div>
   );
@@ -143318,14 +143728,15 @@ function IxAZ() {
 
 // ⑨ スケールアップ vs スケールアウト
 function IxScale() {
+  const en = useCdEn();
   const [mode, setMode] = useState("out"); // up / out
   const [level, setLevel] = useState(2); // 1-4
   const W = 720, H = 230;
   return (
     <div>
-      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>⑨ スケールアップ vs スケールアウト <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>（増やし方の違いを見る）</span></h3>
+      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>{en ? "⑨ Scale up vs scale out " : "⑨ スケールアップ vs スケールアウト "}<span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>{en ? "(see the two ways to add capacity)" : "（増やし方の違いを見る）"}</span></h3>
       <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
-        {[["スケールアップ（増強）", "up"], ["スケールアウト（増台）", "out"]].map(([name, v]) => {
+        {[[en ? "Scale up (bigger server)" : "スケールアップ（増強）", "up"], [en ? "Scale out (more servers)" : "スケールアウト（増台）", "out"]].map(([name, v]) => {
           const on = v === mode;
           return (
             <button key={v} onClick={() => setMode(v)} style={{
@@ -143342,8 +143753,8 @@ function IxScale() {
             return (
               <g style={{ transition: "all .3s" }}>
                 <rect x={x} y={y} width={w} height={h} rx={10} fill={RAMP.blue} stroke={RAMP.blueS} strokeWidth={1.4} />
-                <text x={W / 2} y={y + h / 2 - 8} textAnchor="middle" dominantBaseline="central" fontSize={14} fontWeight={500} fill={RAMP.blueT}>1台を強化</text>
-                <text x={W / 2} y={y + h / 2 + 12} textAnchor="middle" dominantBaseline="central" fontSize={12} fill={RAMP.blueT}>{level * 2}コア / {level * 8}GB</text>
+                <text x={W / 2} y={y + h / 2 - 8} textAnchor="middle" dominantBaseline="central" fontSize={14} fontWeight={500} fill={RAMP.blueT}>{en ? "One bigger server" : "1台を強化"}</text>
+                <text x={W / 2} y={y + h / 2 + 12} textAnchor="middle" dominantBaseline="central" fontSize={12} fill={RAMP.blueT}>{level * 2}{en ? " cores" : "コア"} / {level * 8}GB</text>
               </g>
             );
           })()
@@ -143363,11 +143774,11 @@ function IxScale() {
       </svg>
       <div style={{ padding: "0 4px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 4 }}>
-          <span>強化レベル</span><span style={{ color: BLUE.deep, fontWeight: 500 }}>{mode === "up" ? `スペック ${level}段階` : `${level}台`}</span>
+          <span>{en ? "Capacity level" : "強化レベル"}</span><span style={{ color: BLUE.deep, fontWeight: 500 }}>{en ? (mode === "up" ? `Spec level ${level}` : `${level} server${level === 1 ? "" : "s"}`) : (mode === "up" ? `スペック ${level}段階` : `${level}台`)}</span>
         </div>
         <input type="range" min={1} max={4} value={level} onChange={(e) => setLevel(Number(e.target.value))} style={{ width: "100%", accentColor: BLUE.primary }} />
         <p style={{ fontSize: 13.5, color: BLUE.deep, marginTop: 12, lineHeight: 1.6 }}>
-          → <b>スケールアップ</b>は1台のスペックを上げる（簡単だが上限あり・単一障害点）。<b>スケールアウト</b>は台数を増やす（上限が高く冗長性も得られるが分散設計が必要）。クラウドは後者が得意です。
+          {en ? <>→ <b>Scaling up</b> raises the specs of one server (simple, but there is a ceiling and it is a single point of failure). <b>Scaling out</b> adds servers (a higher ceiling and redundancy, but it needs a distributed design). The cloud excels at the latter.</> : <>→ <b>スケールアップ</b>は1台のスペックを上げる（簡単だが上限あり・単一障害点）。<b>スケールアウト</b>は台数を増やす（上限が高く冗長性も得られるが分散設計が必要）。クラウドは後者が得意です。</>}
         </p>
       </div>
     </div>
@@ -143376,6 +143787,7 @@ function IxScale() {
 
 // ⑩ サブネット/NAT：パブリック/プライベートと通信方向
 function IxSubnet() {
+  const en = useCdEn();
   const [where, setWhere] = useState("private"); // public / private
   const [nat, setNat] = useState(true);
   const W = 720, H = 280;
@@ -143385,9 +143797,9 @@ function IxSubnet() {
   const outbound = isPublic || nat; // 外へ出られるのはパブ리ック or NATあり
   return (
     <div>
-      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>⑩ サブネット / NAT <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>（配置と通信方向の関係を見る）</span></h3>
+      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>{en ? "⑩ Subnet / NAT " : "⑩ サブネット / NAT "}<span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>{en ? "(see how placement decides which way traffic can flow)" : "（配置と通信方向の関係を見る）"}</span></h3>
       <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
-        {[["パブリックサブネット", "public"], ["プライベートサブネット", "private"]].map(([name, v]) => {
+        {[[en ? "Public subnet" : "パブリックサブネット", "public"], [en ? "Private subnet" : "プライベートサブネット", "private"]].map(([name, v]) => {
           const on = v === where;
           return (
             <button key={v} onClick={() => setWhere(v)} style={{
@@ -143400,7 +143812,7 @@ function IxSubnet() {
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block" }}>
         {/* インターネット */}
         <ellipse cx={90} cy={140} rx={56} ry={34} fill={RAMP.gray} stroke={RAMP.grayS} strokeWidth={1} />
-        <text x={90} y={140} textAnchor="middle" dominantBaseline="central" fontSize={12} fill={RAMP.grayT}>インター<tspan x={90} dy={15}>ネット</tspan></text>
+        <text x={90} y={140} textAnchor="middle" dominantBaseline="central" fontSize={12} fill={RAMP.grayT}>{en ? "Internet" : <>インター<tspan x={90} dy={15}>ネット</tspan></>}</text>
         {/* VPC枠 */}
         <rect x={250} y={40} width={420} height={200} rx={12} fill="none" stroke={BLUE.mid} strokeWidth={1} strokeDasharray="5 4" />
         <text x={262} y={58} fontSize={12} fill={BLUE.deep}>VPC</text>
@@ -143410,16 +143822,16 @@ function IxSubnet() {
         <rect x={460} y={100} width={180} height={100} rx={10} fill={isPublic ? RAMP.green : RAMP.blue} stroke={isPublic ? RAMP.greenS : RAMP.blueS} strokeWidth={1.2} opacity={0.5} />
         <rect x={510} y={130} width={80} height={50} rx={8} fill={isPublic ? RAMP.green : RAMP.blue} stroke={isPublic ? RAMP.greenS : RAMP.blueS} strokeWidth={1.2} />
         <text x={550} y={155} textAnchor="middle" dominantBaseline="central" fontSize={12} fontWeight={500} fill={isPublic ? RAMP.greenT : RAMP.blueT}>VM</text>
-        <text x={550} y={214} textAnchor="middle" fontSize={11.5} fill={RAMP.grayT}>{isPublic ? "パブリック" : "プライベート"}</text>
+        <text x={550} y={214} textAnchor="middle" fontSize={11.5} fill={RAMP.grayT}>{isPublic ? (en ? "Public" : "パブリック") : (en ? "Private" : "プライベート")}</text>
         {/* 矢印: inbound */}
         <g opacity={inbound ? 1 : 0.25}>
           <line x1={146} y1={125} x2={508} y2={145} stroke={inbound ? RAMP.greenS : RAMP.redS} strokeWidth={2} markerEnd="url(#arrIn)" />
-          <text x={320} y={118} textAnchor="middle" fontSize={11.5} fill={inbound ? RAMP.greenT : RAMP.redT}>外→中（着信）{inbound ? "可" : "不可"}</text>
+          <text x={320} y={118} textAnchor="middle" fontSize={11.5} fill={inbound ? RAMP.greenT : RAMP.redT}>{en ? "Outside → inside (inbound): " : "外→中（着信）"}{inbound ? (en ? "allowed" : "可") : (en ? "blocked" : "不可")}</text>
         </g>
         {/* 矢印: outbound */}
         <g opacity={outbound ? 1 : 0.25}>
           <line x1={508} y1={170} x2={146} y2={155} stroke={outbound ? RAMP.blueS : RAMP.redS} strokeWidth={2} markerEnd="url(#arrOut)" />
-          <text x={320} y={188} textAnchor="middle" fontSize={11.5} fill={outbound ? RAMP.blueT : RAMP.redT}>中→外（発信）{outbound ? "可" : "不可"}</text>
+          <text x={320} y={188} textAnchor="middle" fontSize={11.5} fill={outbound ? RAMP.blueT : RAMP.redT}>{en ? "Inside → outside (outbound): " : "中→外（発信）"}{outbound ? (en ? "allowed" : "可") : (en ? "blocked" : "不可")}</text>
         </g>
         <defs>
           <marker id="arrIn" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill={inbound ? RAMP.greenS : RAMP.redS} /></marker>
@@ -143429,11 +143841,11 @@ function IxSubnet() {
       {!isPublic && (
         <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--color-text-secondary)", marginTop: 4, cursor: "pointer" }}>
           <input type="checkbox" checked={nat} onChange={(e) => setNat(e.target.checked)} style={{ accentColor: BLUE.primary }} />
-          NATゲートウェイを置く（外向き通信だけ許可）
+          {en ? "Add a NAT gateway (allow outbound traffic only)" : "NATゲートウェイを置く（外向き通信だけ許可）"}
         </label>
       )}
       <p style={{ fontSize: 13.5, color: BLUE.deep, marginTop: 12, lineHeight: 1.6 }}>
-        → <b>パブリック</b>は外から直接アクセス可（Webサーバー向き）。<b>プライベート</b>は外から遮断され安全だが、そのままだと外へも出られない。<b>NAT</b>を置くと「外へは出られるが外からは入れない」状態にでき、DBや内部処理サーバーに最適です。
+        {en ? <>→ A <b>public</b> subnet can be reached directly from outside (suits web servers). A <b>private</b> subnet is cut off from outside and safer, but on its own it cannot reach out either. Adding <b>NAT</b> lets it go out while nothing can come in, which is ideal for databases and internal processing servers.</> : <>→ <b>パブリック</b>は外から直接アクセス可（Webサーバー向き）。<b>プライベート</b>は外から遮断され安全だが、そのままだと外へも出られない。<b>NAT</b>を置くと「外へは出られるが外からは入れない」状態にでき、DBや内部処理サーバーに最適です。</>}
       </p>
     </div>
   );
@@ -143441,37 +143853,38 @@ function IxSubnet() {
 
 // ⑪ 暗号化：保管中/通信中
 function IxCrypto() {
+  const en = useCdEn();
   const [atRest, setAtRest] = useState(true);
   const [inTransit, setInTransit] = useState(true);
   const W = 720, H = 180;
   return (
     <div>
-      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>⑪ 暗号化 <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>（保管中と通信中、両方を守る）</span></h3>
+      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>{en ? "⑪ Encryption " : "⑪ 暗号化 "}<span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>{en ? "(protect data both at rest and in transit)" : "（保管中と通信中、両方を守る）"}</span></h3>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block" }}>
         {/* ユーザー */}
         <circle cx={90} cy={90} r={28} fill={RAMP.blue} stroke={RAMP.blueS} strokeWidth={1.2} />
-        <text x={90} y={90} textAnchor="middle" dominantBaseline="central" fontSize={12} fill={RAMP.blueT}>ユーザー</text>
+        <text x={90} y={90} textAnchor="middle" dominantBaseline="central" fontSize={12} fill={RAMP.blueT}>{en ? "User" : "ユーザー"}</text>
         {/* 通信路 */}
         <line x1={120} y1={90} x2={400} y2={90} stroke={inTransit ? RAMP.greenS : RAMP.redS} strokeWidth={3} strokeDasharray={inTransit ? "0" : "8 5"} />
-        <text x={260} y={70} textAnchor="middle" fontSize={12.5} fontWeight={500} fill={inTransit ? RAMP.greenT : RAMP.redT}>通信中 {inTransit ? "🔒 暗号化(TLS)" : "⚠ 平文"}</text>
+        <text x={260} y={70} textAnchor="middle" fontSize={12.5} fontWeight={500} fill={inTransit ? RAMP.greenT : RAMP.redT}>{en ? "In transit " : "通信中 "}{inTransit ? (en ? "🔒 Encrypted (TLS)" : "🔒 暗号化(TLS)") : (en ? "⚠ Plaintext" : "⚠ 平文")}</text>
         {/* ストレージ */}
         <rect x={430} y={50} width={200} height={80} rx={12} fill={atRest ? RAMP.green : RAMP.red} stroke={atRest ? RAMP.greenS : RAMP.redS} strokeWidth={1.2} opacity={0.4} />
         <rect x={470} y={70} width={120} height={42} rx={8} fill={atRest ? RAMP.green : RAMP.red} stroke={atRest ? RAMP.greenS : RAMP.redS} strokeWidth={1.2} />
-        <text x={530} y={91} textAnchor="middle" dominantBaseline="central" fontSize={12} fontWeight={500} fill={atRest ? RAMP.greenT : RAMP.redT}>{atRest ? "🔒 暗号化保管" : "⚠ 平文保管"}</text>
-        <text x={530} y={148} textAnchor="middle" fontSize={11.5} fill={RAMP.grayT}>ストレージ/DB（保管中）</text>
+        <text x={530} y={91} textAnchor="middle" dominantBaseline="central" fontSize={12} fontWeight={500} fill={atRest ? RAMP.greenT : RAMP.redT}>{atRest ? (en ? "🔒 Encrypted" : "🔒 暗号化保管") : (en ? "⚠ Plaintext" : "⚠ 平文保管")}</text>
+        <text x={530} y={148} textAnchor="middle" fontSize={11.5} fill={RAMP.grayT}>{en ? "Storage / DB (at rest)" : "ストレージ/DB（保管中）"}</text>
       </svg>
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginTop: 4 }}>
         <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--color-text-secondary)", cursor: "pointer" }}>
           <input type="checkbox" checked={inTransit} onChange={(e) => setInTransit(e.target.checked)} style={{ accentColor: BLUE.primary }} />
-          通信中の暗号化（TLS/HTTPS）
+          {en ? "Encryption in transit (TLS/HTTPS)" : "通信中の暗号化（TLS/HTTPS）"}
         </label>
         <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--color-text-secondary)", cursor: "pointer" }}>
           <input type="checkbox" checked={atRest} onChange={(e) => setAtRest(e.target.checked)} style={{ accentColor: BLUE.primary }} />
-          保管中の暗号化（KMS等の鍵管理）
+          {en ? "Encryption at rest (key management such as KMS)" : "保管中の暗号化（KMS等の鍵管理）"}
         </label>
       </div>
       <p style={{ fontSize: 13.5, color: BLUE.deep, marginTop: 12, lineHeight: 1.6 }}>
-        → データは<b>通信中</b>（移動するとき）と<b>保管中</b>（置かれているとき）の両方で守る必要があります。片方だけだと、もう片方が盗聴・流出の穴になります。鍵は各社の鍵管理（AWS KMS / Azure Key Vault / Cloud KMS / OCI Vault）で管理します。
+        {en ? <>→ Data must be protected both <b>in transit</b> (while it moves) and <b>at rest</b> (while it is stored). Protect only one and the other becomes a hole for eavesdropping or leaks. Keys are managed with each provider's key management service (AWS KMS / Azure Key Vault / Cloud KMS / OCI Vault).</> : <>→ データは<b>通信中</b>（移動するとき）と<b>保管中</b>（置かれているとき）の両方で守る必要があります。片方だけだと、もう片方が盗聴・流出の穴になります。鍵は各社の鍵管理（AWS KMS / Azure Key Vault / Cloud KMS / OCI Vault）で管理します。</>}
       </p>
     </div>
   );
@@ -143479,27 +143892,34 @@ function IxCrypto() {
 
 // ⑫ IAM権限評価：明示的拒否が最優先
 function IxIAM() {
+  const en = useCdEn();
   const [allow, setAllow] = useState(true);
   const [explicitDeny, setExplicitDeny] = useState(false);
   // AWS流: 明示的拒否 > 明示的許可 > 暗黙的拒否(デフォルト)
   const result = explicitDeny ? "deny" : allow ? "allow" : "deny";
-  const reason = explicitDeny ? "明示的な拒否があるため最優先で拒否" : allow ? "許可があり拒否がないので許可" : "許可がない（暗黙的拒否）ので拒否";
-  const steps = [
+  const reason = en
+    ? (explicitDeny ? "Denied: an explicit deny takes top priority" : allow ? "Allowed: there is an allow and no deny" : "Denied: there is no allow (implicit deny)")
+    : (explicitDeny ? "明示的な拒否があるため最優先で拒否" : allow ? "許可があり拒否がないので許可" : "許可がない（暗黙的拒否）ので拒否");
+  const steps = en ? [
+    ["Is there an explicit Deny?", explicitDeny, "If so, deny at once"],
+    ["Is there an explicit Allow?", allow && !explicitDeny, "If so, allow"],
+    ["If there is neither", !allow && !explicitDeny, "Implicitly denied"],
+  ] : [
     ["明示的な拒否(Deny)はあるか？", explicitDeny, "あれば即・拒否"],
     ["明示的な許可(Allow)はあるか？", allow && !explicitDeny, "あれば許可"],
     ["どちらもなければ", !allow && !explicitDeny, "暗黙的に拒否"],
   ];
   return (
     <div>
-      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>⑫ IAM 権限評価 <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>（明示的な拒否が最優先）</span></h3>
+      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>{en ? "⑫ IAM permission evaluation " : "⑫ IAM 権限評価 "}<span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>{en ? "(an explicit deny always wins)" : "（明示的な拒否が最優先）"}</span></h3>
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 14 }}>
         <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--color-text-secondary)", cursor: "pointer" }}>
           <input type="checkbox" checked={allow} onChange={(e) => setAllow(e.target.checked)} style={{ accentColor: BLUE.primary }} />
-          許可ポリシー(Allow)を付与
+          {en ? "Attach an Allow policy" : "許可ポリシー(Allow)を付与"}
         </label>
         <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--color-text-secondary)", cursor: "pointer" }}>
           <input type="checkbox" checked={explicitDeny} onChange={(e) => setExplicitDeny(e.target.checked)} style={{ accentColor: BLUE.primary }} />
-          明示的な拒否(Deny)を付与
+          {en ? "Attach an explicit Deny" : "明示的な拒否(Deny)を付与"}
         </label>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 }}>
@@ -143515,12 +143935,12 @@ function IxIAM() {
         background: result === "allow" ? "var(--color-background-success)" : "var(--color-background-danger)",
         border: `0.5px solid ${result === "allow" ? "var(--color-border-success)" : "var(--color-border-danger)"}` }}>
         <span style={{ fontSize: 18, fontWeight: 500, color: result === "allow" ? "var(--color-text-success)" : "var(--color-text-danger)" }}>
-          評価結果：{result === "allow" ? "✓ 許可" : "✗ 拒否"}
+          {en ? "Result: " : "評価結果："}{result === "allow" ? (en ? "✓ Allow" : "✓ 許可") : (en ? "✗ Deny" : "✗ 拒否")}
         </span>
         <div style={{ fontSize: 12.5, color: "var(--color-text-secondary)", marginTop: 4 }}>{reason}</div>
       </div>
       <p style={{ fontSize: 13.5, color: BLUE.deep, marginTop: 12, lineHeight: 1.6 }}>
-        → ポイントは<b>「明示的な拒否が何より優先」</b>される点。許可があっても拒否が1つでもあれば拒否されます。デフォルトは「暗黙的拒否」で、許可を明示しない限り何もできません（最小権限の原則）。
+        {en ? <>→ The key point is that <b>an explicit deny overrides everything</b>. Even with an allow, a single deny means the request is denied. The default is an implicit deny: nothing is possible unless it is explicitly allowed (the principle of least privilege).</> : <>→ ポイントは<b>「明示的な拒否が何より優先」</b>される点。許可があっても拒否が1つでもあれば拒否されます。デフォルトは「暗黙的拒否」で、許可を明示しない限り何もできません（最小権限の原則）。</>}
       </p>
     </div>
   );
@@ -143528,6 +143948,7 @@ function IxIAM() {
 
 // ⑬ トークンと課金
 function IxToken() {
+  const en = useCdEn();
   const [inTok, setInTok] = useState(1000);
   const [outTok, setOutTok] = useState(500);
   // 概念単価（1Mトークンあたり）: 入力$3, 出力$15 を相対値に
@@ -143537,32 +143958,32 @@ function IxToken() {
   const outW = Math.min(300, outTok / 4000 * 300);
   return (
     <div>
-      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>⑬ トークンと課金 <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>（入力・出力トークンで料金が決まる）</span></h3>
+      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>{en ? "⑬ Tokens and billing " : "⑬ トークンと課金 "}<span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>{en ? "(input and output tokens set the price)" : "（入力・出力トークンで料金が決まる）"}</span></h3>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block" }}>
-        <text x={20} y={30} fontSize={13} fill={RAMP.blueT}>入力トークン</text>
+        <text x={20} y={30} fontSize={13} fill={RAMP.blueT}>{en ? "Input tokens" : "入力トークン"}</text>
         <rect x={140} y={18} width={300} height={20} rx={6} fill={RAMP.gray} opacity={0.4} />
         <rect x={140} y={18} width={inW} height={20} rx={6} fill={RAMP.blue} stroke={RAMP.blueS} strokeWidth={0.5} />
         <text x={460} y={30} fontSize={12} fill={RAMP.grayT}>{inTok} tok</text>
-        <text x={20} y={72} fontSize={13} fill={RAMP.amberT}>出力トークン</text>
+        <text x={20} y={72} fontSize={13} fill={RAMP.amberT}>{en ? "Output tokens" : "出力トークン"}</text>
         <rect x={140} y={60} width={300} height={20} rx={6} fill={RAMP.gray} opacity={0.4} />
         <rect x={140} y={60} width={outW} height={20} rx={6} fill={RAMP.amber} stroke={RAMP.amberS} strokeWidth={0.5} />
-        <text x={460} y={72} fontSize={12} fill={RAMP.grayT}>{outTok} tok（単価は入力の数倍）</text>
+        <text x={460} y={72} fontSize={12} fill={RAMP.grayT}>{outTok}{en ? " tok (several times the input rate)" : " tok（単価は入力の数倍）"}</text>
       </svg>
       <div style={{ padding: "0 4px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 4 }}>
-          <span>入力トークン（プロンプト）</span><span style={{ color: BLUE.deep, fontWeight: 500 }}>{inTok}</span>
+          <span>{en ? "Input tokens (prompt)" : "入力トークン（プロンプト）"}</span><span style={{ color: BLUE.deep, fontWeight: 500 }}>{inTok}</span>
         </div>
         <input type="range" min={100} max={4000} step={100} value={inTok} onChange={(e) => setInTok(Number(e.target.value))} style={{ width: "100%", accentColor: BLUE.primary }} />
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--color-text-secondary)", margin: "12px 0 4px" }}>
-          <span>出力トークン（生成文）</span><span style={{ color: BLUE.deep, fontWeight: 500 }}>{outTok}</span>
+          <span>{en ? "Output tokens (generated text)" : "出力トークン（生成文）"}</span><span style={{ color: BLUE.deep, fontWeight: 500 }}>{outTok}</span>
         </div>
         <input type="range" min={100} max={4000} step={100} value={outTok} onChange={(e) => setOutTok(Number(e.target.value))} style={{ width: "100%", accentColor: BLUE.primary }} />
         <div style={{ padding: "12px 16px", borderRadius: "var(--border-radius-md,8px)", background: BLUE.light, border: `0.5px solid ${BLUE.mid}`, marginTop: 14, textAlign: "center" }}>
-          <span style={{ fontSize: 14, color: BLUE.deep }}>相対コスト目安　</span>
+          <span style={{ fontSize: 14, color: BLUE.deep }}>{en ? "Relative cost estimate  " : "相対コスト目安　"}</span>
           <span style={{ fontSize: 20, fontWeight: 500, color: BLUE.deep }}>{cost.toFixed(4)}</span>
         </div>
         <p style={{ fontSize: 13.5, color: BLUE.deep, marginTop: 12, lineHeight: 1.6 }}>
-          → 生成AIは<b>トークン（文章の最小単位）</b>で課金され、ふつう<b>出力の単価が入力より高い</b>。長い回答ほど高くつきます。なお<b>OCIだけは文字単位課金</b>で他社と異なります。
+          {en ? <>→ Generative AI is billed in <b>tokens (the smallest units of text)</b>, and <b>output usually costs more per token than input</b>. The longer the answer, the higher the cost. Note that <b>only OCI bills per character</b>, unlike the other providers.</> : <>→ 生成AIは<b>トークン（文章の最小単位）</b>で課金され、ふつう<b>出力の単価が入力より高い</b>。長い回答ほど高くつきます。なお<b>OCIだけは文字単位課金</b>で他社と異なります。</>}
         </p>
       </div>
     </div>
@@ -143571,6 +143992,7 @@ function IxToken() {
 
 // ⑭ ゼロトラスト
 function IxZeroTrust() {
+  const en = useCdEn();
   const [zt, setZt] = useState(true);
   const [insider, setInsider] = useState(false); // 社内ネットからの不正アクセス
   // 従来型: 社内なら検証なしで通す → insiderが通ってしまう
@@ -143579,9 +144001,9 @@ function IxZeroTrust() {
   const W = 720, H = 200;
   return (
     <div>
-      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>⑭ ゼロトラスト <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>（社内も信頼せず毎回検証する）</span></h3>
+      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>{en ? "⑭ Zero trust " : "⑭ ゼロトラスト "}<span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>{en ? "(trust nothing, not even the internal network, and verify every time)" : "（社内も信頼せず毎回検証する）"}</span></h3>
       <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
-        {[["従来型（境界防御）", false], ["ゼロトラスト", true]].map(([name, v]) => {
+        {[[en ? "Traditional (perimeter defense)" : "従来型（境界防御）", false], [en ? "Zero trust" : "ゼロトラスト", true]].map(([name, v]) => {
           const on = v === zt;
           return (
             <button key={name} onClick={() => setZt(v)} style={{
@@ -143594,28 +144016,30 @@ function IxZeroTrust() {
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block" }}>
         {/* 境界 */}
         {!zt && <rect x={300} y={20} width={400} height={160} rx={12} fill="none" stroke={RAMP.grayS} strokeWidth={1.5} strokeDasharray="6 4" />}
-        {!zt && <text x={312} y={38} fontSize={11.5} fill={RAMP.grayT}>社内ネットワーク（境界の内側は信頼）</text>}
+        {!zt && <text x={312} y={38} fontSize={11.5} fill={RAMP.grayT}>{en ? "Corporate network (inside the perimeter is trusted)" : "社内ネットワーク（境界の内側は信頼）"}</text>}
         {/* リソース */}
         <rect x={560} y={70} width={110} height={60} rx={10} fill={RAMP.blue} stroke={RAMP.blueS} strokeWidth={1.2} />
-        <text x={615} y={100} textAnchor="middle" dominantBaseline="central" fontSize={12} fontWeight={500} fill={RAMP.blueT}>機密リソース</text>
+        <text x={615} y={100} textAnchor="middle" dominantBaseline="central" fontSize={12} fontWeight={500} fill={RAMP.blueT}>{en ? "Sensitive data" : "機密リソース"}</text>
         {/* 検証ゲート（ゼロトラスト時は各アクセスごと） */}
-        {zt && <g><rect x={420} y={60} width={70} height={80} rx={8} fill={RAMP.green} stroke={RAMP.greenS} strokeWidth={1.2} /><text x={455} y={92} textAnchor="middle" fontSize={11} fill={RAMP.greenT}>毎回</text><text x={455} y={108} textAnchor="middle" fontSize={11} fill={RAMP.greenT}>検証</text></g>}
+        {zt && <g><rect x={420} y={60} width={70} height={80} rx={8} fill={RAMP.green} stroke={RAMP.greenS} strokeWidth={1.2} /><text x={455} y={92} textAnchor="middle" fontSize={11} fill={RAMP.greenT}>{en ? "Verify" : "毎回"}</text><text x={455} y={108} textAnchor="middle" fontSize={11} fill={RAMP.greenT}>{en ? "every time" : "検証"}</text></g>}
         {/* 内部アクセス者 */}
         <circle cx={355} cy={100} r={22} fill={insider ? RAMP.red : RAMP.gray} stroke={insider ? RAMP.redS : RAMP.grayS} strokeWidth={1.2} />
-        <text x={355} y={100} textAnchor="middle" dominantBaseline="central" fontSize={10.5} fill={insider ? RAMP.redT : RAMP.grayT}>{insider ? "不正" : "社内"}</text>
+        <text x={355} y={100} textAnchor="middle" dominantBaseline="central" fontSize={10.5} fill={insider ? RAMP.redT : RAMP.grayT}>{insider ? (en ? "Rogue" : "不正") : (en ? "Staff" : "社内")}</text>
         {/* アクセス線 */}
         <line x1={377} y1={100} x2={zt ? 418 : 558} y2={100} stroke={breached ? RAMP.redS : (zt ? RAMP.greenS : RAMP.blueS)} strokeWidth={2.5} />
         {zt && <line x1={490} y1={100} x2={558} y2={100} stroke={insider ? RAMP.redS : RAMP.greenS} strokeWidth={2.5} strokeDasharray={insider ? "6 4" : "0"} opacity={insider ? 0.4 : 1} />}
         <text x={W / 2} y={H - 8} textAnchor="middle" fontSize={13} fontWeight={500} fill={breached ? RAMP.redS : RAMP.greenS}>
-          {breached ? "⚠ 内部に入った不正アクセスがリソースに到達" : insider ? "✓ 不正アクセスを検証でブロック" : "✓ 正常アクセス"}
+          {en
+            ? (breached ? "⚠ An intruder inside the network reached the resource" : insider ? "✓ Verification blocked the unauthorized access" : "✓ Normal access")
+            : (breached ? "⚠ 内部に入った不正アクセスがリソースに到達" : insider ? "✓ 不正アクセスを検証でブロック" : "✓ 正常アクセス")}
         </text>
       </svg>
       <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--color-text-secondary)", marginTop: 4, cursor: "pointer" }}>
         <input type="checkbox" checked={insider} onChange={(e) => setInsider(e.target.checked)} style={{ accentColor: BLUE.primary }} />
-        社内ネットワークに侵入した不正アクセスを想定する
+        {en ? "Simulate an intruder who has got into the corporate network" : "社内ネットワークに侵入した不正アクセスを想定する"}
       </label>
       <p style={{ fontSize: 13.5, color: BLUE.deep, marginTop: 12, lineHeight: 1.6 }}>
-        → 従来型は「社内＝安全」とみなすため、内部に侵入されると素通りされます。<b>ゼロトラスト</b>は社内外を問わず<b>毎回検証</b>するので、内部の不正もブロックできます（GCPのBeyondCorp、AzureのEntra条件付きアクセスが代表）。
+        {en ? <>→ The traditional model treats “inside = safe”, so once an intruder gets in, nothing stops them. <b>Zero trust</b> <b>verifies every time</b>, inside or outside, so it blocks internal threats too (GCP's BeyondCorp and Azure's Entra Conditional Access are leading examples).</> : <>→ 従来型は「社内＝安全」とみなすため、内部に侵入されると素通りされます。<b>ゼロトラスト</b>は社内外を問わず<b>毎回検証</b>するので、内部の不正もブロックできます（GCPのBeyondCorp、AzureのEntra条件付きアクセスが代表）。</>}
       </p>
     </div>
   );
@@ -143623,15 +144047,16 @@ function IxZeroTrust() {
 
 // ⑮ コンテナ vs VM
 function IxContainer() {
+  const en = useCdEn();
   const [mode, setMode] = useState("container");
   const isC = mode === "container";
   const W = 720, H = 260;
   const appCount = 4;
   return (
     <div>
-      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>⑮ コンテナ vs VM <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>（同じ台数でどれだけアプリを動かせるか）</span></h3>
+      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>{en ? "⑮ Containers vs VMs " : "⑮ コンテナ vs VM "}<span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>{en ? "(how many apps can the same hardware run?)" : "（同じ台数でどれだけアプリを動かせるか）"}</span></h3>
       <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
-        {[["仮想マシン(VM)", "vm"], ["コンテナ", "container"]].map(([name, v]) => {
+        {[[en ? "Virtual machines (VMs)" : "仮想マシン(VM)", "vm"], [en ? "Containers" : "コンテナ", "container"]].map(([name, v]) => {
           const on = v === mode;
           return (
             <button key={v} onClick={() => setMode(v)} style={{
@@ -143644,20 +144069,20 @@ function IxContainer() {
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block" }}>
         {/* 物理サーバー */}
         <rect x={40} y={210} width={640} height={36} rx={6} fill={RAMP.gray} stroke={RAMP.grayS} strokeWidth={0.8} />
-        <text x={360} y={228} textAnchor="middle" dominantBaseline="central" fontSize={12} fill={RAMP.grayT}>物理サーバー（ハードウェア）</text>
+        <text x={360} y={228} textAnchor="middle" dominantBaseline="central" fontSize={12} fill={RAMP.grayT}>{en ? "Physical server (hardware)" : "物理サーバー（ハードウェア）"}</text>
         {isC ? (
           <>
             {/* ホストOS + コンテナエンジン */}
             <rect x={40} y={170} width={640} height={32} rx={6} fill={RAMP.green} stroke={RAMP.greenS} strokeWidth={0.8} opacity={0.5} />
-            <text x={360} y={186} textAnchor="middle" dominantBaseline="central" fontSize={11.5} fill={RAMP.greenT}>ホストOS + コンテナエンジン（共有）</text>
+            <text x={360} y={186} textAnchor="middle" dominantBaseline="central" fontSize={11.5} fill={RAMP.greenT}>{en ? "Host OS + container engine (shared)" : "ホストOS + コンテナエンジン（共有）"}</text>
             {Array.from({ length: appCount }).map((_, i) => {
               const cw = 150, x = 50 + i * (cw + 10);
               return (
                 <g key={i}>
                   <rect x={x} y={70} width={cw} height={90} rx={8} fill={RAMP.green} stroke={RAMP.greenS} strokeWidth={1} />
-                  <text x={x + cw / 2} y={100} textAnchor="middle" fontSize={12} fontWeight={500} fill={RAMP.greenT}>コンテナ{i + 1}</text>
-                  <text x={x + cw / 2} y={124} textAnchor="middle" fontSize={10.5} fill={RAMP.greenT}>アプリ+依存だけ</text>
-                  <text x={x + cw / 2} y={142} textAnchor="middle" fontSize={10} fill={RAMP.grayT}>軽量・数秒起動</text>
+                  <text x={x + cw / 2} y={100} textAnchor="middle" fontSize={12} fontWeight={500} fill={RAMP.greenT}>{en ? "Container " : "コンテナ"}{i + 1}</text>
+                  <text x={x + cw / 2} y={124} textAnchor="middle" fontSize={10.5} fill={RAMP.greenT}>{en ? "App + dependencies only" : "アプリ+依存だけ"}</text>
+                  <text x={x + cw / 2} y={142} textAnchor="middle" fontSize={10} fill={RAMP.grayT}>{en ? "Light, starts in seconds" : "軽量・数秒起動"}</text>
                 </g>
               );
             })}
@@ -143666,7 +144091,7 @@ function IxContainer() {
           <>
             {/* ハイパーバイザ */}
             <rect x={40} y={170} width={640} height={32} rx={6} fill={RAMP.amber} stroke={RAMP.amberS} strokeWidth={0.8} opacity={0.5} />
-            <text x={360} y={186} textAnchor="middle" dominantBaseline="central" fontSize={11.5} fill={RAMP.amberT}>ハイパーバイザ</text>
+            <text x={360} y={186} textAnchor="middle" dominantBaseline="central" fontSize={11.5} fill={RAMP.amberT}>{en ? "Hypervisor" : "ハイパーバイザ"}</text>
             {Array.from({ length: 2 }).map((_, i) => {
               const cw = 310, x = 50 + i * (cw + 10);
               return (
@@ -143674,9 +144099,9 @@ function IxContainer() {
                   <rect x={x} y={50} width={cw} height={110} rx={8} fill={RAMP.amber} stroke={RAMP.amberS} strokeWidth={1} />
                   <text x={x + cw / 2} y={74} textAnchor="middle" fontSize={12} fontWeight={500} fill={RAMP.amberT}>VM {i + 1}</text>
                   <rect x={x + 20} y={88} width={cw - 40} height={26} rx={5} fill="#fff" stroke={RAMP.amberS} strokeWidth={0.5} opacity={0.7} />
-                  <text x={x + cw / 2} y={101} textAnchor="middle" dominantBaseline="central" fontSize={10.5} fill={RAMP.amberT}>ゲストOS（丸ごと1つ）</text>
-                  <text x={x + cw / 2} y={134} textAnchor="middle" fontSize={10.5} fill={RAMP.amberT}>アプリ</text>
-                  <text x={x + cw / 2} y={150} textAnchor="middle" fontSize={10} fill={RAMP.grayT}>重い・分単位の起動</text>
+                  <text x={x + cw / 2} y={101} textAnchor="middle" dominantBaseline="central" fontSize={10.5} fill={RAMP.amberT}>{en ? "A whole guest OS" : "ゲストOS（丸ごと1つ）"}</text>
+                  <text x={x + cw / 2} y={134} textAnchor="middle" fontSize={10.5} fill={RAMP.amberT}>{en ? "App" : "アプリ"}</text>
+                  <text x={x + cw / 2} y={150} textAnchor="middle" fontSize={10} fill={RAMP.grayT}>{en ? "Heavy, starts in minutes" : "重い・分単位の起動"}</text>
                 </g>
               );
             })}
@@ -143684,7 +144109,7 @@ function IxContainer() {
         )}
       </svg>
       <p style={{ fontSize: 13.5, color: BLUE.deep, marginTop: 12, lineHeight: 1.6 }}>
-        → <b>VM</b>はゲストOSを丸ごと抱えるので重く、同じハードに少数しか載りません。<b>コンテナ</b>はOSを共有しアプリと依存関係だけを包むので軽量で、同じハードに多数を高速起動できます。
+        {en ? <>→ A <b>VM</b> carries a whole guest OS, so it is heavy and only a few fit on the same hardware. <b>Containers</b> share the OS and package only the app and its dependencies, so they are light and many can start quickly on the same hardware.</> : <>→ <b>VM</b>はゲストOSを丸ごと抱えるので重く、同じハードに少数しか載りません。<b>コンテナ</b>はOSを共有しアプリと依存関係だけを包むので軽量で、同じハードに多数を高速起動できます。</>}
       </p>
     </div>
   );
@@ -143692,14 +144117,15 @@ function IxContainer() {
 
 // ⑯ 整合性モデル
 function IxConsistency() {
+  const en = useCdEn();
   const [mode, setMode] = useState("strong");
   const strong = mode === "strong";
   const W = 720, H = 200;
   return (
     <div>
-      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>⑯ 整合性モデル <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>（強整合 vs 結果整合）</span></h3>
+      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>{en ? "⑯ Consistency models " : "⑯ 整合性モデル "}<span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>{en ? "(strong vs eventual)" : "（強整合 vs 結果整合）"}</span></h3>
       <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
-        {[["強整合性", "strong"], ["結果整合性", "eventual"]].map(([name, v]) => {
+        {[[en ? "Strong consistency" : "強整合性", "strong"], [en ? "Eventual consistency" : "結果整合性", "eventual"]].map(([name, v]) => {
           const on = v === mode;
           return (
             <button key={v} onClick={() => setMode(v)} style={{
@@ -143712,7 +144138,7 @@ function IxConsistency() {
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block" }}>
         {/* 書き込み */}
         <circle cx={80} cy={100} r={24} fill={RAMP.blue} stroke={RAMP.blueS} strokeWidth={1.2} />
-        <text x={80} y={100} textAnchor="middle" dominantBaseline="central" fontSize={11} fill={RAMP.blueT}>書込</text>
+        <text x={80} y={100} textAnchor="middle" dominantBaseline="central" fontSize={11} fill={RAMP.blueT}>{en ? "Write" : "書込"}</text>
         <text x={80} y={140} textAnchor="middle" fontSize={11} fill={RAMP.grayT}>"X=5"</text>
         {/* レプリカ3つ */}
         {[0, 1, 2].map((i) => {
@@ -143724,17 +144150,17 @@ function IxConsistency() {
               <line x1={104} y1={100} x2={356} y2={y} stroke={thisSync ? RAMP.greenS : RAMP.amberS} strokeWidth={1.6} strokeDasharray={thisSync ? "0" : "6 4"} opacity={0.7} />
               <rect x={360} y={y - 18} width={150} height={36} rx={7} fill={thisSync ? RAMP.green : RAMP.amber} stroke={thisSync ? RAMP.greenS : RAMP.amberS} strokeWidth={1} />
               <text x={435} y={y} textAnchor="middle" dominantBaseline="central" fontSize={11.5} fill={thisSync ? RAMP.greenT : RAMP.amberT}>
-                複製{i + 1}: {thisSync ? "X=5" : "X=4(古い)"}
+                {en ? "Replica " : "複製"}{i + 1}: {thisSync ? "X=5" : (en ? "X=4 (stale)" : "X=4(古い)")}
               </text>
             </g>
           );
         })}
         {/* 読み取り結果 */}
-        <text x={600} y={100} textAnchor="middle" fontSize={12} fill={RAMP.grayT}>読むと…</text>
-        <text x={600} y={122} textAnchor="middle" fontSize={13} fontWeight={500} fill={strong ? RAMP.greenT : RAMP.amberT}>{strong ? "常に最新" : "古い値の可能性"}</text>
+        <text x={600} y={100} textAnchor="middle" fontSize={12} fill={RAMP.grayT}>{en ? "A read returns…" : "読むと…"}</text>
+        <text x={600} y={122} textAnchor="middle" fontSize={13} fontWeight={500} fill={strong ? RAMP.greenT : RAMP.amberT}>{strong ? (en ? "Always the latest" : "常に最新") : (en ? "Possibly stale" : "古い値の可能性")}</text>
       </svg>
       <p style={{ fontSize: 13.5, color: BLUE.deep, marginTop: 12, lineHeight: 1.6 }}>
-        → <b>強整合性</b>は全複製を即同期し、書いた直後でも必ず最新が読める（銀行残高など）。<b>結果整合性</b>は同期に遅延があり一時的に古い値が返るが、その分速くスケールしやすい（SNSのいいね数など）。GCPの<b>Cloud Spanner</b>は世界規模で強整合を実現する点が特徴です。
+        {en ? <>→ <b>Strong consistency</b> syncs every replica at once, so you always read the latest value even right after a write (e.g. bank balances). <b>Eventual consistency</b> syncs with a delay and may briefly return stale values, but it is faster and scales more easily (e.g. like counts on social media). GCP's <b>Cloud Spanner</b> stands out for achieving strong consistency on a global scale.</> : <>→ <b>強整合性</b>は全複製を即同期し、書いた直後でも必ず最新が読める（銀行残高など）。<b>結果整合性</b>は同期に遅延があり一時的に古い値が返るが、その分速くスケールしやすい（SNSのいいね数など）。GCPの<b>Cloud Spanner</b>は世界規模で強整合を実現する点が特徴です。</>}
       </p>
     </div>
   );
@@ -143742,6 +144168,7 @@ function IxConsistency() {
 
 // ⑰ 同期 vs 非同期（キュー）
 function IxQueue() {
+  const en = useCdEn();
   const [mode, setMode] = useState("async");
   const [burst, setBurst] = useState(false);
   const isAsync = mode === "async";
@@ -143749,9 +144176,9 @@ function IxQueue() {
   const W = 720, H = 200;
   return (
     <div>
-      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>⑰ 同期 vs 非同期 <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>（キューが急な負荷を吸収する）</span></h3>
+      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>{en ? "⑰ Sync vs async " : "⑰ 同期 vs 非同期 "}<span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>{en ? "(a queue absorbs sudden load)" : "（キューが急な負荷を吸収する）"}</span></h3>
       <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
-        {[["同期（直接処理）", "sync"], ["非同期（キュー経由）", "async"]].map(([name, v]) => {
+        {[[en ? "Synchronous (direct)" : "同期（直接処理）", "sync"], [en ? "Asynchronous (via a queue)" : "非同期（キュー経由）", "async"]].map(([name, v]) => {
           const on = v === mode;
           return (
             <button key={v} onClick={() => setMode(v)} style={{
@@ -143764,8 +144191,8 @@ function IxQueue() {
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block" }}>
         {/* 送信側 */}
         <rect x={40} y={70} width={110} height={50} rx={8} fill={RAMP.blue} stroke={RAMP.blueS} strokeWidth={1.2} />
-        <text x={95} y={95} textAnchor="middle" dominantBaseline="central" fontSize={12} fill={RAMP.blueT}>送信側</text>
-        <text x={95} y={140} textAnchor="middle" fontSize={11} fill={RAMP.grayT}>{burst ? "リクエスト急増中" : "通常の流量"}</text>
+        <text x={95} y={95} textAnchor="middle" dominantBaseline="central" fontSize={12} fill={RAMP.blueT}>{en ? "Sender" : "送信側"}</text>
+        <text x={95} y={140} textAnchor="middle" fontSize={11} fill={RAMP.grayT}>{burst ? (en ? "Request surge" : "リクエスト急増中") : (en ? "Normal traffic" : "通常の流量")}</text>
         {isAsync && (
           <>
             {/* キュー */}
@@ -143774,7 +144201,7 @@ function IxQueue() {
                 <rect key={i} x={250 + i * 26} y={82} width={22} height={26} rx={4} fill={RAMP.amber} stroke={RAMP.amberS} strokeWidth={0.8} />
               ))}
             </g>
-            <text x={300} y={130} textAnchor="middle" fontSize={11.5} fill={RAMP.amberT}>キュー（順番待ち）</text>
+            <text x={300} y={130} textAnchor="middle" fontSize={11.5} fill={RAMP.amberT}>{en ? "Queue (waiting in line)" : "キュー（順番待ち）"}</text>
           </>
         )}
         {/* 矢印 */}
@@ -143782,15 +144209,15 @@ function IxQueue() {
         {isAsync && <line x1={425} y1={95} x2={555} y2={95} stroke={RAMP.greenS} strokeWidth={2.5} />}
         {/* 処理側 */}
         <rect x={560} y={70} width={120} height={50} rx={8} fill={overload ? RAMP.red : RAMP.green} stroke={overload ? RAMP.redS : RAMP.greenS} strokeWidth={1.2} />
-        <text x={620} y={95} textAnchor="middle" dominantBaseline="central" fontSize={12} fill={overload ? RAMP.redT : RAMP.greenT}>処理側</text>
-        <text x={620} y={140} textAnchor="middle" fontSize={11} fill={overload ? RAMP.redT : RAMP.greenT}>{overload ? "⚠ 処理しきれず落ちる" : "一定ペースで処理"}</text>
+        <text x={620} y={95} textAnchor="middle" dominantBaseline="central" fontSize={12} fill={overload ? RAMP.redT : RAMP.greenT}>{en ? "Worker" : "処理側"}</text>
+        <text x={620} y={140} textAnchor="middle" fontSize={11} fill={overload ? RAMP.redT : RAMP.greenT}>{overload ? (en ? "⚠ Overwhelmed, goes down" : "⚠ 処理しきれず落ちる") : (en ? "Steady processing pace" : "一定ペースで処理")}</text>
       </svg>
       <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--color-text-secondary)", marginTop: 4, cursor: "pointer" }}>
         <input type="checkbox" checked={burst} onChange={(e) => setBurst(e.target.checked)} style={{ accentColor: BLUE.primary }} />
-        リクエストが急増する状況を想定する
+        {en ? "Simulate a sudden surge in requests" : "リクエストが急増する状況を想定する"}
       </label>
       <p style={{ fontSize: 13.5, color: BLUE.deep, marginTop: 12, lineHeight: 1.6 }}>
-        → <b>同期</b>は送信側が処理完了を待つので、急増すると処理側が詰まって落ちることも。<b>非同期</b>は間に<b>キュー</b>（AWS SQS / Azure Service Bus / GCP Pub/Sub）を挟み、急な負荷を貯めて一定ペースで処理するので安定します。
+        {en ? <>→ With <b>synchronous</b> calls the sender waits for processing to finish, so a surge can clog the worker and bring it down. <b>Asynchronous</b> processing puts a <b>queue</b> in between (AWS SQS / Azure Service Bus / GCP Pub/Sub), which buffers sudden load so it is handled at a steady pace and stays stable.</> : <>→ <b>同期</b>は送信側が処理完了を待つので、急増すると処理側が詰まって落ちることも。<b>非同期</b>は間に<b>キュー</b>（AWS SQS / Azure Service Bus / GCP Pub/Sub）を挟み、急な負荷を貯めて一定ペースで処理するので安定します。</>}
       </p>
     </div>
   );
@@ -143811,13 +144238,14 @@ const DIFF_TOPICS = {
 };
 
 function IxDiff() {
+  const en = useCdEn();
   const topics = Object.keys(DIFF_TOPICS);
   const [topic, setTopic] = useState(topics[0]);
   const d = DIFF_TOPICS[topic];
   const order = [["AWS", "#BA7517", "#FAEEDA", "#854F0B"], ["Azure", "#185FA5", "#E6F1FB", "#0C447C"], ["GCP", "#3B6D11", "#EAF3DE", "#27500A"], ["OCI", "#A32D2D", "#FCEBEB", "#791F1F"]];
   return (
     <div>
-      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>⑱ 4社の違い早見 <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>（テーマを選ぶと4社の差が並ぶ）</span></h3>
+      <h3 style={{ fontSize: 16, fontWeight: 500, margin: "0 0 10px", color: BLUE.deep }}>{en ? "⑱ Provider differences at a glance " : "⑱ 4社の違い早見 "}<span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400 }}>{en ? "(pick a topic to see the four providers side by side)" : "（テーマを選ぶと4社の差が並ぶ）"}</span></h3>
       <div style={{ display: "flex", gap: 6, marginBottom: 14, flexWrap: "wrap" }}>
         {topics.map((t) => {
           const on = t === topic;
@@ -143825,7 +144253,7 @@ function IxDiff() {
             <button key={t} onClick={() => setTopic(t)} style={{
               padding: "7px 12px", borderRadius: "var(--border-radius-md,8px)", cursor: "pointer", fontSize: 12.5, fontWeight: on ? 500 : 400,
               background: on ? BLUE.primary : BLUE.light, color: on ? "#fff" : BLUE.deep, border: `0.5px solid ${on ? BLUE.primary : BLUE.mid}`,
-            }}>{t}</button>
+            }}>{cdT(en, t)}</button>
           );
         })}
       </div>
@@ -143833,20 +144261,26 @@ function IxDiff() {
         {order.map(([cloud, color, bg, text]) => (
           <div key={cloud} style={{ borderRadius: "var(--border-radius-lg,12px)", overflow: "hidden", border: `1px solid ${color}`, background: "#fff" }}>
             <div style={{ background: color, color: "#fff", fontSize: 14, fontWeight: 500, padding: "7px 12px" }}>{cloud}</div>
-            <div style={{ padding: "12px", fontSize: 13.5, color: text, lineHeight: 1.5, minHeight: 48, display: "flex", alignItems: "center" }}>{d[cloud]}</div>
+            <div style={{ padding: "12px", fontSize: 13.5, color: text, lineHeight: 1.5, minHeight: 48, display: "flex", alignItems: "center" }}>{cdT(en, d[cloud])}</div>
           </div>
         ))}
       </div>
       <div style={{ padding: "12px 16px", borderRadius: "var(--border-radius-md,8px)", background: BLUE.light, border: `0.5px solid ${BLUE.mid}` }}>
-        <span style={{ fontSize: 13.5, color: BLUE.deep, lineHeight: 1.6 }}>{d.note}</span>
+        <span style={{ fontSize: 13.5, color: BLUE.deep, lineHeight: 1.6 }}>{cdT(en, d.note)}</span>
       </div>
     </div>
   );
 }
 
 function Diagrams() {
+  const en = useCdEn();
   const [sub, setSub] = useState("services");
-  const subs = [
+  const subs = en ? [
+    ["bycloud", "Services by cloud"],
+    ["byfeature", "Compare by feature"],
+    ["services", "Service map"], ["dbtype", "DB type matrix"], ["strengths", "Strengths compared"],
+    ["shared", "Shared responsibility"], ["pricing", "Pricing compared"], ["migration", "Migration 7Rs"],
+  ] : [
     ["bycloud", "クラウド別 機能一覧"],
     ["byfeature", "機能別 4社比較"],
     ["services", "4社サービス対応"], ["dbtype", "DB種別マトリクス"], ["strengths", "4社の強み比較"],
@@ -143889,7 +144323,19 @@ function Cell({ x, y, w, h, fill, stroke, txt, color, sub }) {
 }
 
 function DiagServices() {
-  const rows = [
+  const en = useCdEn();
+  const rows = en ? [
+    ["Compute", "EC2 / Lambda", "VM / Functions", "Compute / GKE", "Compute / Functions"],
+    ["Storage", "S3 / EBS", "Blob / Disks", "Cloud Storage", "Object / Block"],
+    ["Databases", "RDS / DynamoDB", "SQL DB / Cosmos", "Spanner / BigQuery", "Autonomous DB"],
+    ["Networking", "VPC / Route 53", "VNet / Azure DNS", "VPC / Cloud DNS", "VCN / OCI DNS"],
+    ["Data analytics", "Athena / Redshift", "Synapse / Fabric", "BigQuery", "Autonomous DWH"],
+    ["Generative AI", "Bedrock", "Azure OpenAI", "Vertex AI", "OCI Generative AI"],
+    ["ML platform", "SageMaker", "Azure ML", "Vertex AI", "Data Science"],
+    ["IAM", "AWS IAM", "Entra ID", "Cloud IAM", "OCI IAM"],
+    ["IaC", "CloudFormation", "ARM / Bicep", "Terraform", "Resource Manager"],
+    ["Monitoring", "CloudWatch", "Azure Monitor", "Cloud Monitoring", "OCI Monitoring"],
+  ] : [
     ["コンピュート", "EC2 / Lambda", "VM / Functions", "Compute / GKE", "OCI Compute / 関数"],
     ["ストレージ", "S3 / EBS", "Blob / Disks", "Cloud Storage", "Object / Block"],
     ["データベース", "RDS / DynamoDB", "SQL DB / Cosmos", "Spanner / BigQuery", "Autonomous DB"],
@@ -143909,9 +144355,9 @@ function DiagServices() {
   const H = top + rows.length * (rowH + gap) + 10;
   return (
     <svg width="100%" viewBox={`0 0 680 ${H}`} role="img" style={{ display: "block" }}>
-      <title>4社の主要サービス対応表</title>
-      <desc>10分野について各クラウドの代表サービスを並べた表</desc>
-      <Cell x={x0} y={10} w={wc} h={32} fill={RAMP.gray} stroke={RAMP.grayS} txt="分野" color={RAMP.grayT} />
+      <title>{en ? "Key services of the four providers" : "4社の主要サービス対応表"}</title>
+      <desc>{en ? "A table of each cloud's representative services across 10 domains" : "10分野について各クラウドの代表サービスを並べた表"}</desc>
+      <Cell x={x0} y={10} w={wc} h={32} fill={RAMP.gray} stroke={RAMP.grayS} txt={en ? "Domain" : "分野"} color={RAMP.grayT} />
       {heads.map(([h, s], i) => (
         <g key={h}><rect x={x0 + wc + gap + i * (wd + gap)} y={10} width={wd} height={32} rx={6} fill={RAMP.gray} stroke={RAMP.grayS} strokeWidth={0.5} />
           <text x={x0 + wc + gap + i * (wd + gap) + wd / 2} y={26} textAnchor="middle" dominantBaseline="central" fontSize={14} fontWeight={500} fill={s}>{h}</text></g>
@@ -143932,7 +144378,14 @@ function DiagServices() {
 }
 
 function DiagDbType() {
-  const rows = [
+  const en = useCdEn();
+  const rows = en ? [
+    ["Managed RDB", "RDS", "SQL Database", "Cloud SQL", "Base Database"],
+    ["High-perf RDB", "Aurora", "SQL Hyperscale", "AlloyDB / Spanner", "Exadata"],
+    ["NoSQL", "DynamoDB", "Cosmos DB", "Firestore / Bigtable", "OCI NoSQL"],
+    ["DWH", "Redshift", "Synapse / Fabric", "BigQuery", "Autonomous DWH"],
+    ["Specialized", "Neptune / QLDB", "Cache for Redis", "BigQuery ML", "23ai / SELECT AI"],
+  ] : [
     ["マネージドRDB", "RDS", "SQL Database", "Cloud SQL", "Base Database"],
     ["高性能RDB", "Aurora", "SQL Hyperscale", "AlloyDB / Spanner", "Exadata"],
     ["NoSQL", "DynamoDB", "Cosmos DB", "Firestore / Bigtable", "OCI NoSQL"],
@@ -143947,9 +144400,9 @@ function DiagDbType() {
   const H = top + rows.length * (rowH + gap) + 10;
   return (
     <svg width="100%" viewBox={`0 0 680 ${H}`} role="img" style={{ display: "block" }}>
-      <title>データベース分野の種別×4社マトリクス</title>
-      <desc>RDB、高性能RDB、NoSQL、DWH、固有の種別ごとに各社サービスを整理</desc>
-      <Cell x={x0} y={10} w={wc} h={32} fill={RAMP.gray} stroke={RAMP.grayS} txt="種別" color={RAMP.grayT} />
+      <title>{en ? "Database types × the four providers" : "データベース分野の種別×4社マトリクス"}</title>
+      <desc>{en ? "Each provider's services by type: RDB, high-performance RDB, NoSQL, DWH and specialized" : "RDB、高性能RDB、NoSQL、DWH、固有の種別ごとに各社サービスを整理"}</desc>
+      <Cell x={x0} y={10} w={wc} h={32} fill={RAMP.gray} stroke={RAMP.grayS} txt={en ? "Type" : "種別"} color={RAMP.grayT} />
       {heads.map(([h, s], i) => (
         <g key={h}><rect x={x0 + wc + gap + i * (wd + gap)} y={10} width={wd} height={32} rx={6} fill={RAMP.gray} stroke={RAMP.grayS} strokeWidth={0.5} />
           <text x={x0 + wc + gap + i * (wd + gap) + wd / 2} y={26} textAnchor="middle" dominantBaseline="central" fontSize={14} fontWeight={500} fill={s}>{h}</text></g>
@@ -143970,6 +144423,14 @@ function DiagDbType() {
 }
 
 function DiagStrengths() {
+  const en = useCdEn();
+  // 英語の強み（data の並び・各6点に対応）
+  const itemsEn = [
+    ["S3: the de facto API", "Most AZs · 7R migration", "Trainium/Inferentia", "Multi-model Bedrock", "ECS (K8s-independent)", "Well-Architected"],
+    ["Entra ID is the standard", "Copilot built into M365", "Hybrid Benefit", "Among the most regions", "Tight OpenAI partnership", "Multi-model Cosmos DB"],
+    ["GKE, where K8s began", "BigQuery pioneer", "In-house TPU chips", "Gemini/Imagen/Veo", "Strongly consistent Spanner", "SRE origin · auto discounts"],
+    ["Autonomous DB", "Exadata dedicated HW", "23ai VECTOR", "Per-character billing", "Generous free tier", "Dedicated Region"],
+  ];
   const data = [
     ["AWS", RAMP.amber, RAMP.amberS, RAMP.amberT, ["S3デファクトAPI", "最多AZ・7R移行", "Trainium/Inferentia", "Bedrockで多モデル", "ECS(K8s非依存)", "Well-Architected"]],
     ["Azure", RAMP.blue, RAMP.blueS, RAMP.blueT, ["Entra IDが標準", "M365統合Copilot", "Hybrid Benefit", "リージョン最多級", "OpenAIと密連携", "Cosmos DB多モデル"]],
@@ -143980,15 +144441,15 @@ function DiagStrengths() {
   const H = top + 6 * (itemH + igap) + 50;
   return (
     <svg width="100%" viewBox={`0 0 680 ${H}`} role="img" style={{ display: "block" }}>
-      <title>4社の強み・固有サービス比較</title>
-      <desc>各クラウドの強み6点ずつを並べた比較</desc>
+      <title>{en ? "Strengths and unique services of the four providers" : "4社の強み・固有サービス比較"}</title>
+      <desc>{en ? "Six strengths of each cloud, side by side" : "各クラウドの強み6点ずつを並べた比較"}</desc>
       {data.map((d, ci) => {
         const x = x0 + ci * (colW + gap);
         return (
           <g key={ci}>
             <rect x={x} y={10} width={colW} height={38} rx={8} fill={d[1]} stroke={d[2]} strokeWidth={0.5} />
             <text x={x + colW / 2} y={29} textAnchor="middle" dominantBaseline="central" fontSize={15} fontWeight={500} fill={d[3]}>{d[0]}</text>
-            {d[4].map((s, si) => (
+            {(en ? itemsEn[ci] : d[4]).map((s, si) => (
               <g key={si}>
                 <rect x={x} y={top + si * (itemH + igap)} width={colW} height={itemH} rx={6} fill={d[1]} stroke={d[2]} strokeWidth={0.5} />
                 <text x={x + colW / 2} y={top + si * (itemH + igap) + itemH / 2} textAnchor="middle" dominantBaseline="central" fontSize={11.5} fill={d[3]}>{s}</text>
@@ -143998,15 +144459,18 @@ function DiagStrengths() {
         );
       })}
       <rect x={x0} y={H - 36} width={4 * colW + 3 * gap} height={28} rx={6} fill={RAMP.gray} stroke={RAMP.grayS} strokeWidth={0.5} />
-      <text x={340} y={H - 22} textAnchor="middle" dominantBaseline="central" fontSize={12} fill={RAMP.grayT}>選定の目安：広さ→AWS／MS資産→Azure／分析・AI→GCP／DB・コスト→OCI</text>
+      <text x={340} y={H - 22} textAnchor="middle" dominantBaseline="central" fontSize={12} fill={RAMP.grayT}>{en ? "Rule of thumb: breadth → AWS / Microsoft assets → Azure / analytics & AI → GCP / DB & cost → OCI" : "選定の目安：広さ→AWS／MS資産→Azure／分析・AI→GCP／DB・コスト→OCI"}</text>
     </svg>
   );
 }
 
 // ===== 追加図解1: 責任共有モデル =====
 function DiagShared() {
+  const en = useCdEn();
   // 各層を、誰が管理するか（利用者 or 事業者）で色分け。IaaS/PaaS/SaaSで境界が変わる。
-  const layers = ["データ・アクセス権", "アプリケーション", "ランタイム/ミドルウェア", "OS", "仮想化", "サーバー(物理)", "ストレージ", "ネットワーク"];
+  const layers = en
+    ? ["Data & access rights", "Applications", "Runtime / middleware", "OS", "Virtualization", "Servers (physical)", "Storage", "Networking"]
+    : ["データ・アクセス権", "アプリケーション", "ランタイム/ミドルウェア", "OS", "仮想化", "サーバー(物理)", "ストレージ", "ネットワーク"];
   // U=利用者, P=事業者。境界より上(=index小)が利用者寄り
   // IaaS: OSまで利用者(0-3利用者, 4-7事業者) / PaaS: アプリまで利用者(0-1利用者, 2-7事業者) / SaaS: データのみ利用者(0利用者, 1-7事業者)
   const models = [
@@ -144022,8 +144486,8 @@ function DiagShared() {
   const PROV = { f: RAMP.gray, s: RAMP.grayS, t: RAMP.grayT };
   return (
     <svg width="100%" viewBox={`0 0 ${W} ${H}`} role="img" style={{ display: "block" }}>
-      <title>責任共有モデル（IaaS / PaaS / SaaS）</title>
-      <desc>サービス形態ごとに利用者と事業者の責任分界がどう動くかを示した図</desc>
+      <title>{en ? "Shared responsibility model (IaaS / PaaS / SaaS)" : "責任共有モデル（IaaS / PaaS / SaaS）"}</title>
+      <desc>{en ? "How the line between customer and provider responsibility moves with each service model" : "サービス形態ごとに利用者と事業者の責任分界がどう動くかを示した図"}</desc>
       {/* 列見出し */}
       {models.map((m, mi) => (
         <g key={m.name}>
@@ -144044,7 +144508,7 @@ function DiagShared() {
               return (
                 <g key={mi}>
                   <rect x={x} y={y} width={colW} height={rowH} rx={5} fill={c.f} stroke={c.s} strokeWidth={0.5} />
-                  <text x={x + colW / 2} y={y + rowH / 2} textAnchor="middle" dominantBaseline="central" fontSize={11.5} fill={c.t}>{isUser ? "利用者が管理" : "事業者が管理"}</text>
+                  <text x={x + colW / 2} y={y + rowH / 2} textAnchor="middle" dominantBaseline="central" fontSize={11.5} fill={c.t}>{isUser ? (en ? "Customer manages" : "利用者が管理") : (en ? "Provider manages" : "事業者が管理")}</text>
                 </g>
               );
             })}
@@ -144053,16 +144517,24 @@ function DiagShared() {
       })}
       {/* 凡例 */}
       <rect x={startX} y={H - 34} width={16} height={16} rx={3} fill={USER.f} stroke={USER.s} strokeWidth={0.5} />
-      <text x={startX + 22} y={H - 26} dominantBaseline="central" fontSize={12} fill={RAMP.grayT}>利用者の責任</text>
-      <rect x={startX + 130} y={H - 34} width={16} height={16} rx={3} fill={PROV.f} stroke={PROV.s} strokeWidth={0.5} />
-      <text x={startX + 152} y={H - 26} dominantBaseline="central" fontSize={12} fill={RAMP.grayT}>クラウド事業者の責任</text>
+      <text x={startX + 22} y={H - 26} dominantBaseline="central" fontSize={12} fill={RAMP.grayT}>{en ? "Customer's responsibility" : "利用者の責任"}</text>
+      <rect x={startX + (en ? 200 : 130)} y={H - 34} width={16} height={16} rx={3} fill={PROV.f} stroke={PROV.s} strokeWidth={0.5} />
+      <text x={startX + (en ? 222 : 152)} y={H - 26} dominantBaseline="central" fontSize={12} fill={RAMP.grayT}>{en ? "Cloud provider's responsibility" : "クラウド事業者の責任"}</text>
     </svg>
   );
 }
 
 // ===== 追加図解2: 料金体系比較 =====
 function DiagPricing() {
-  const rows = [
+  const en = useCdEn();
+  const rows = en ? [
+    ["On-demand", "No contract, metered", "No contract, metered", "No contract, metered", "No contract, metered"],
+    ["Commitment", "RI / Savings Plans", "Reserved/Savings Plan", "Committed use (CUD)", "Universal Credits"],
+    ["Auto discount", "—", "—", "Sustained use (SUD)", "—"],
+    ["Spot (interruptible)", "Spot Instances", "Spot VMs", "Preemptible", "Preemptible"],
+    ["License reuse", "—", "Hybrid Benefit", "—", "BYOL"],
+    ["Free tier", "12 mo + Always Free", "12 mo + $200/30 days", "Always Free+$300", "Always Free+$300/30d"],
+  ] : [
     ["オンデマンド", "事前契約なし・従量", "事前契約なし・従量", "事前契約なし・従量", "事前契約なし・従量"],
     ["確約割引", "RI / Savings Plans", "Reserved / 節約プラン", "確約利用割引(CUD)", "Universal Credits"],
     ["自動割引", "—", "—", "継続利用割引(SUD)", "—"],
@@ -144078,9 +144550,9 @@ function DiagPricing() {
   const H = top + rows.length * (rowH + gap) + 44;
   return (
     <svg width="100%" viewBox={`0 0 690 ${H}`} role="img" style={{ display: "block" }}>
-      <title>4社の料金体系・割引比較</title>
-      <desc>オンデマンド、確約割引、自動割引、スポット、ライセンス流用、無料枠を4社で比較</desc>
-      <Cell x={x0} y={10} w={wc} h={32} fill={RAMP.gray} stroke={RAMP.grayS} txt="料金体系" color={RAMP.grayT} />
+      <title>{en ? "Pricing models and discounts of the four providers" : "4社の料金体系・割引比較"}</title>
+      <desc>{en ? "On-demand, commitment discounts, automatic discounts, spot, license reuse and free tiers compared across the four providers" : "オンデマンド、確約割引、自動割引、スポット、ライセンス流用、無料枠を4社で比較"}</desc>
+      <Cell x={x0} y={10} w={wc} h={32} fill={RAMP.gray} stroke={RAMP.grayS} txt={en ? "Pricing" : "料金体系"} color={RAMP.grayT} />
       {heads.map(([h, s], i) => (
         <g key={h}><rect x={x0 + wc + gap + i * (wd + gap)} y={10} width={wd} height={32} rx={6} fill={RAMP.gray} stroke={RAMP.grayS} strokeWidth={0.5} />
           <text x={x0 + wc + gap + i * (wd + gap) + wd / 2} y={26} textAnchor="middle" dominantBaseline="central" fontSize={14} fontWeight={500} fill={s}>{h}</text></g>
@@ -144096,14 +144568,23 @@ function DiagPricing() {
           </g>
         );
       })}
-      <text x={x0} y={H - 18} dominantBaseline="central" fontSize={11.5} fill={RAMP.grayT}>割引の目安：スポット最大〜90%／確約利用最大〜75%。SUDは契約不要で自動適用されるGCP固有の仕組み。</text>
+      <text x={x0} y={H - 18} dominantBaseline="central" fontSize={11.5} fill={RAMP.grayT}>{en ? "Typical discounts: spot up to ~90%, committed use up to ~75%. SUD is GCP-only and applies automatically." : "割引の目安：スポット最大〜90%／確約利用最大〜75%。SUDは契約不要で自動適用されるGCP固有の仕組み。"}</text>
     </svg>
   );
 }
 
 // ===== 追加図解3: 移行7R =====
 function DiagMigration() {
-  const items = [
+  const en = useCdEn();
+  const items = en ? [
+    ["1. Retire", "Shut down and dispose of systems nobody uses", false],
+    ["2. Retain", "Keep it on-premises as it is, without migrating", false],
+    ["3. Relocate", "Move it without changing the setup, e.g. the whole VMware environment", false],
+    ["4. Rehost", "Move it to the cloud almost unchanged (lift and shift)", true],
+    ["5. Replatform", "Move it with some optimization, such as switching parts to managed services", true],
+    ["6. Repurchase", "Drop the in-house system and switch to SaaS or similar", true],
+    ["7. Refactor", "Rebuild it as cloud native", true],
+  ] : [
     ["1. Retire（廃止）", "使われていないシステムを停止・廃棄する", false],
     ["2. Retain（保持）", "移行せず現状のオンプレに残す", false],
     ["3. Relocate（移設）", "構成を変えずVMware等ごと移す", false],
@@ -144116,10 +144597,10 @@ function DiagMigration() {
   const H = top + items.length * (rowH + gap) + 44;
   return (
     <svg width="100%" viewBox={`0 0 680 ${H}`} role="img" style={{ display: "block" }}>
-      <title>クラウド移行の7R戦略</title>
-      <desc>移行の7つの戦略を、難易度の低い順に並べた図</desc>
+      <title>{en ? "The 7R cloud migration strategies" : "クラウド移行の7R戦略"}</title>
+      <desc>{en ? "The seven migration strategies, from least to most difficult" : "移行の7つの戦略を、難易度の低い順に並べた図"}</desc>
       <rect x={x0} y={10} width={w} height={30} rx={6} fill={BLUE.primary} stroke={BLUE.deep} strokeWidth={0.5} />
-      <text x={x0 + w / 2} y={25} textAnchor="middle" dominantBaseline="central" fontSize={14} fontWeight={500} fill="#fff">クラウド移行の7R（AWSは7戦略・他社は6R相当）</text>
+      <text x={x0 + w / 2} y={25} textAnchor="middle" dominantBaseline="central" fontSize={14} fontWeight={500} fill="#fff">{en ? "The 7 Rs of cloud migration (AWS: 7 strategies; others: about 6 Rs)" : "クラウド移行の7R（AWSは7戦略・他社は6R相当）"}</text>
       {items.map((it, i) => {
         const y = top + i * (rowH + gap);
         const cloudMove = it[2];
@@ -144131,11 +144612,11 @@ function DiagMigration() {
             <rect x={x0} y={y} width={w} height={rowH} rx={7} fill={f} stroke={s} strokeWidth={0.5} />
             <text x={x0 + 16} y={y + rowH / 2 - 8} dominantBaseline="central" fontSize={13.5} fontWeight={500} fill={t}>{it[0]}</text>
             <text x={x0 + 16} y={y + rowH / 2 + 10} dominantBaseline="central" fontSize={11.5} fill={t}>{it[1]}</text>
-            <text x={x0 + w - 14} y={y + rowH / 2} textAnchor="end" dominantBaseline="central" fontSize={10.5} fill={t}>{cloudMove ? "クラウドへ移行" : "移行しない"}</text>
+            <text x={x0 + w - 14} y={y + rowH / 2} textAnchor="end" dominantBaseline="central" fontSize={10.5} fill={t}>{cloudMove ? (en ? "Moves to the cloud" : "クラウドへ移行") : (en ? "Not migrated" : "移行しない")}</text>
           </g>
         );
       })}
-      <text x={x0} y={H - 18} dominantBaseline="central" fontSize={11.5} fill={RAMP.grayT}>下に行くほど手間と効果が大きい。まず棚卸し（Retire/Retain）→Rehostで素早く移行、が定石。</text>
+      <text x={x0} y={H - 18} dominantBaseline="central" fontSize={11.5} fill={RAMP.grayT}>{en ? "Effort and payoff grow toward the bottom. Standard play: take stock first (Retire/Retain), then Rehost to move fast." : "下に行くほど手間と効果が大きい。まず棚卸し（Retire/Retain）→Rehostで素早く移行、が定石。"}</text>
     </svg>
   );
 }
