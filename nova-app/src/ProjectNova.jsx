@@ -173720,6 +173720,34 @@ function buildHardSets_AB(bank, plan, nSets){
   return sets;
 }
 
+// 模擬試験のセットの中で、単一正解の問題の正解位置を A〜D に均等に散らす（並びに規則が出ないよう種付き乱数で割り振る）。
+// arr は表示用に並べ替え済みの問題。正解の選択肢と割り振った位置の選択肢を入れ替える。fields は一緒に入れ替える配列（o・oEn など）。
+// 「上記のすべて」や「選択肢A」のように並びに頼る選択肢がある問題は動かさない。
+function novaBalanceAnswers(arr, key, fields) {
+  const F = fields || ["o"];
+  let seed = 2166136261; const k = String(key || ""); for (let i = 0; i < k.length; i++) { seed ^= k.charCodeAt(i); seed = Math.imul(seed, 16777619); }
+  const rnd = () => { seed = (seed + 0x6D2B79F5) | 0; let t = seed; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  const FIXED = /上記|以上の?すべて|いずれも|すべて正しい|All of the above|None of the above|Both [A-D]|選択肢\s*[A-DＡ-Ｄ]|（[A-D]）|\([A-D]\)/;
+  const byN = {};
+  arr.forEach((Q, i) => {
+    if (!Q || !Array.isArray(Q.o) || typeof Q.a !== "number" || Q.a < 0 || Q.a >= Q.o.length) return;
+    if (Q.o.some((x) => FIXED.test(String(x))) || (Array.isArray(Q.oEn) && Q.oEn.some((x) => FIXED.test(String(x))))) return;
+    (byN[Q.o.length] = byN[Q.o.length] || []).push(i);
+  });
+  const out = arr.slice();
+  Object.keys(byN).forEach((n) => {
+    const ids = byN[n]; const t = ids.map((_, j) => j % Number(n));
+    for (let i = t.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); const x = t[i]; t[i] = t[j]; t[j] = x; }
+    ids.forEach((qi, j) => {
+      const Q = out[qi]; const to = t[j]; if (to === Q.a) return;
+      const nq = { ...Q, a: to };
+      F.forEach((f) => { const v = Q[f]; if (Array.isArray(v) && v.length === Q.o.length) { const c = v.slice(); const x = c[Q.a]; c[Q.a] = c[to]; c[to] = x; nq[f] = c; } });
+      out[qi] = nq;
+    });
+  });
+  return out;
+}
+
 // MSExamShell — MS公式試験ライクな全画面本番シェル（単一/複数選択・バイリンガル・自己完結）
 // 既存ハブのネイティブ問題形状 {d, q, o[], a, e, (qEn, oEn[], eEn)} をそのまま受け取る。
 //   a: number（単一選択）または number[]（複数選択）。
@@ -173770,27 +173798,57 @@ function MSExamShell({ sets, setKeys, domainSets, domains, lang, C, PASS, dName,
   useEffect(() => { if (!backRef) return; backRef.current = () => { if (phase === "run" || phase === "result") { setPhase("select"); return true; } return false; }; return () => { if (backRef) backRef.current = null; }; }, [phase, backRef]);
 
   const rawQs = setNo != null ? (kind === "domain" ? (domainSets && domainSets[setNo]) || [] : (sets[setNo] || [])) : [];
+  // 選択肢の並び。shufV=2：セットの中で正解の位置が A〜D に均等に散り、並びに規則が出ないよう、
+  // 正解の位置を先に均等に割り振ってから種付き乱数で混ぜる（GovMix と同じ考え方）。
+  // shufV=1 は以前の並べ方（途中保存から再開したときだけ使い、保存時と同じ並びを保つ）
+  const [shufV, setShufV] = useState(2);
   const qs = useMemo(() => {
     const salt = "ms_" + kind + "_" + setNo + "_" + lang;
-    let h0 = 0; for (let i = 0; i < salt.length; i++) h0 = (h0 * 33 + salt.charCodeAt(i)) | 0;
+    if (shufV === 1) {
+      let h0 = 0; for (let i = 0; i < salt.length; i++) h0 = (h0 * 33 + salt.charCodeAt(i)) | 0;
+      return rawQs.map((Q, qi) => {
+        const src = en ? (Q.oEn || Q.o) : Q.o;
+        const n = src.length;
+        let h = (h0 ^ (qi * 2654435761)) >>> 0;
+        const idx = src.map((_, i) => i);
+        for (let i = n - 1; i > 0; i--) { h = (h * 1664525 + 1013904223) >>> 0; const j = h % (i + 1); const t = idx[i]; idx[i] = idx[j]; idx[j] = t; }
+        const o = idx.map(i => src[i]);
+        const isMulti = Array.isArray(Q.a);
+        const a = isMulti ? Q.a.map(x => idx.indexOf(x)).sort((p, q) => p - q) : idx.indexOf(Q.a);
+        return { ...Q, o, a, multi: isMulti };
+      });
+    }
+    const salt2 = (saveKey || examId || "") + "|" + salt;
+    let seed = 2166136261; for (let i = 0; i < salt2.length; i++) { seed ^= salt2.charCodeAt(i); seed = Math.imul(seed, 16777619); }
+    const rnd = () => { seed = (seed + 0x6D2B79F5) | 0; let t = seed; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+    const shuf = (arr) => { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); const t = arr[i]; arr[i] = arr[j]; arr[j] = t; } return arr; };
+    // 「上記のすべて」や「選択肢A」のように並びに頼る選択肢がある問題は並べ替えない
+    const FIXED = /上記|以上の?すべて|いずれも|すべて正しい|All of the above|None of the above|Both [A-D]|選択肢\s*[A-DＡ-Ｄ]|（[A-D]）|\([A-D]\)/;
+    const srcOf = (Q) => (en ? (Q.oEn || Q.o) : Q.o) || [];
+    const fixed = (Q) => srcOf(Q).some((x) => FIXED.test(String(x)));
+    const byN = {};
+    rawQs.forEach((Q, qi) => { if (Array.isArray(Q.a) || fixed(Q)) return; const n = srcOf(Q).length; if (!(Q.a >= 0 && Q.a < n)) return; (byN[n] = byN[n] || []).push(qi); });
+    const target = {};
+    Object.keys(byN).forEach((n) => { const ids = byN[n]; const t = shuf(ids.map((_, k) => k % Number(n))); ids.forEach((qi, k) => { target[qi] = t[k]; }); });
     return rawQs.map((Q, qi) => {
-      const src = en ? (Q.oEn || Q.o) : Q.o;
+      const src = srcOf(Q);
       const n = src.length;
-      let h = (h0 ^ (qi * 2654435761)) >>> 0;
-      const idx = src.map((_, i) => i);
-      for (let i = n - 1; i > 0; i--) { h = (h * 1664525 + 1013904223) >>> 0; const j = h % (i + 1); const t = idx[i]; idx[i] = idx[j]; idx[j] = t; }
-      const o = idx.map(i => src[i]);
       const isMulti = Array.isArray(Q.a);
+      let idx;
+      if (fixed(Q)) idx = src.map((_, i) => i);
+      else if (target[qi] === undefined) idx = shuf(src.map((_, i) => i));
+      else { const rest = shuf(src.map((_, i) => i).filter((i) => i !== Q.a)); idx = []; let r = 0; for (let p = 0; p < n; p++) idx.push(p === target[qi] ? Q.a : rest[r++]); }
+      const o = idx.map(i => src[i]);
       const a = isMulti ? Q.a.map(x => idx.indexOf(x)).sort((p, q) => p - q) : idx.indexOf(Q.a);
       return { ...Q, o, a, multi: isMulti };
     });
-  }, [setNo, kind, lang]);
+  }, [setNo, kind, lang, shufV]);
 
   useEffect(() => {
-    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain }, (en ? "Set " : "セット") + setNo);
+    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain, sv: shufV }, (en ? "Set " : "セット") + setNo);
     else if (phase === "result") slot.remove();
   }, [phase, pos, picks, sel, mSel, flags]);
-  const start = (n) => { const base = (kind === "domain" ? (domainSets && domainSets[n]) : sets[n]) || []; setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({}); setRemain(mode === "real" ? certExamSeconds(examId, base.length) : 0); setPhase("run"); };
+  const start = (n) => { const base = (kind === "domain" ? (domainSets && domainSets[n]) : sets[n]) || []; setShufV(2); setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({}); setRemain(mode === "real" ? certExamSeconds(examId, base.length) : 0); setPhase("run"); };
   const eq = (x, y) => { const a = [...(x || [])].sort((p, q) => p - q), b = [...(y || [])].sort((p, q) => p - q); return a.length === b.length && a.every((v, i) => v === b[i]); };
   const gradeReal = (Q, pk) => { if (pk === undefined) return false; if (Q.multi) return Array.isArray(pk) && eq(pk, Q.a); return pk === Q.a; };
 
@@ -173803,7 +173861,7 @@ function MSExamShell({ sets, setKeys, domainSets, domains, lang, C, PASS, dName,
   const next = () => { if (mode === "practice") { setSel(null); setMSel([]); } if (pos + 1 >= qs.length) finishExam(); else setPos(pos + 1); };
   const prev = () => { if (pos > 0) { setPos(pos - 1); if (mode === "practice") { setSel(picks[pos - 1] ?? null); setMSel([]); } } };
   const finishExam = () => {
-    if (mode === "real") { qs.forEach((Q, i) => { if (picks[i] === undefined) return; if (onAnswer) onAnswer(Q.d, gradeReal(Q, picks[i])); }); }
+    if (mode === "real") { qs.forEach((Q, i) => { if (picks[i] === undefined) return; const ok = gradeReal(Q, picks[i]); if (onAnswer) onAnswer(Q.d, ok); if (!ok && onWrong) onWrong(Q); }); }
     // 完了記録（進捗タブの模試完了率の元データ）：セットごとのベストスコアを全ステーション共通マップに保存
     try {
       let ok = 0; qs.forEach((Q, i) => { if (picks[i] !== undefined && gradeReal(Q, picks[i])) ok++; });
@@ -173831,7 +173889,7 @@ function MSExamShell({ sets, setKeys, domainSets, domains, lang, C, PASS, dName,
               <div style={{ fontSize: 12.5, fontWeight: 700, color: C.deep }}>{en ? "Exam in progress" : "中断した模試"}</div>
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
-            <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
+            <button onClick={async () => { const d = await slot.read(); if (!d) return; setShufV(d.sv === 2 ? 2 : 1); setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
               style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
@@ -173884,10 +173942,10 @@ function MSExamShell({ sets, setKeys, domainSets, domains, lang, C, PASS, dName,
     return (
       <div>
         <div style={{ background: passed ? "#E4F6EC" : "#FBE9E7", border: `2px solid ${passed ? C.ok : C.ng}`, borderRadius: 12, padding: 18, textAlign: "center", marginBottom: 14 }}>
-          <div style={{ fontSize: 13, color: "#5a7780" }}>{en ? `${T.setW} ${setNo} · Result` : `${T.setW}${setNo}・結果`}</div>
-          <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : C.ng }}>{rate}%</div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: passed ? C.ok : C.ng }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
-          <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
+          <div style={{ fontSize: 13, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7") }}>{en ? `${T.setW} ${setNo} · Result` : `${T.setW}${setNo}・結果`}</div>
+          <div style={{ fontSize: 40, fontWeight: 800, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{rate}%</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
+          <div style={{ fontSize: 12, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7"), marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
@@ -173903,8 +173961,8 @@ function MSExamShell({ sets, setKeys, domainSets, domains, lang, C, PASS, dName,
     const hh = String(Math.floor(remain / 3600)).padStart(2, "0");
     const mm = String(Math.floor((remain % 3600) / 60)).padStart(2, "0");
     const ss = String(remain % 60).padStart(2, "0");
-    const NAVY = "#12324a", STEEL = C.primary, INK = "#1b2a33";
-    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : "#5a7780", PAGE = contrast ? "#0b0f12" : "#eceff2";
+    const NAVY = "#12324a", STEEL = nvInk(C.primary, "#ffffff"), INK = "#1b2a33";
+    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : nvInk("#5a7780", "#eceff2"), PAGE = contrast ? "#0b0f12" : "#eceff2";
     const isMulti = !!Q.multi;
     const selArr = Array.isArray(curPick) ? curPick : [];
     const need = isMulti ? Q.a.length : 1;
@@ -173997,10 +174055,10 @@ function MSExamShell({ sets, setKeys, domainSets, domains, lang, C, PASS, dName,
           return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
         })}
         {pMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== pNeed} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === pNeed ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === pNeed ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === pNeed ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-        {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: (pMulti ? eq(selSet, Q.a) : sel === Q.a) ? C.ok : C.ng }}>{(pMulti ? eq(selSet, Q.a) : sel === Q.a) ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{en ? "Answer" : "正解"}：{(pMulti ? Q.a : [Q.a]).map(i => "ABCDE"[i]).join("・")}　{L2(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+        {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk((pMulti ? eq(selSet, Q.a) : sel === Q.a) ? C.ok : C.ng, C.light) }}>{(pMulti ? eq(selSet, Q.a) : sel === Q.a) ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{en ? "Answer" : "正解"}：{(pMulti ? Q.a : [Q.a]).map(i => "ABCDE"[i]).join("・")}　{L2(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
-        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : C.primary, cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
+        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : nvInk(C.primary, "#ffffff"), cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
         <span style={{ fontSize: 13, color: "#5a7780", fontWeight: 600 }}>{pos + 1} / {qs.length}</span>
         <button onClick={next} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), cursor: "pointer" }}>{en ? "Next →" : "次の問題へ →"}</button>
       </div>
@@ -176174,7 +176232,7 @@ function Quiz({ onAnswer, lang, t }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 13, fontSize: 13.5, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === Q.a ? C.ok : C.ng }}>{sel === Q.a ? t.correct : t.incorrect}</strong>・{t.answerIs("ABCD"[Q.a])}{qExpl(Q, lang)}
+              <strong style={{ color: nvInk(sel === Q.a ? C.ok : C.ng, C.light) }}>{sel === Q.a ? t.correct : t.incorrect}</strong>・{t.answerIs("ABCD"[Q.a])}{qExpl(Q, lang)}
             </div>
             {Q.ref ? <div style={{ marginTop: 8, fontSize: 11.5, color: "#8a94a6", lineHeight: 1.5 }}>{Q.ref}</div> : null}
             {pos + 1 < pool.length && (
@@ -176335,7 +176393,7 @@ function Review({ state, onAnswer, onResolve, onClear, lang, t }) {
         })}
         {revealed && (
           <div style={{ marginTop: 12, background: C.light, borderRadius: 9, padding: 13, fontSize: 13.5, lineHeight: 1.55 }}>
-            <strong style={{ color: isCorrect ? C.ok : C.ng }}>{isCorrect ? t.correct : t.incorrect}</strong>・{t.answerIs(correctAns.map(x => "ABCD"[x]).join(", "))}{qExpl(Q, lang)}
+            <strong style={{ color: nvInk(isCorrect ? C.ok : C.ng, C.light) }}>{isCorrect ? t.correct : t.incorrect}</strong>・{t.answerIs(correctAns.map(x => "ABCD"[x]).join(", "))}{qExpl(Q, lang)}
             {isCorrect && <div style={{ color: C.ok, fontWeight: 700, marginTop: 6 }}>✓ {t.reviewMastered}</div>}
           </div>
         )}
@@ -176638,8 +176696,8 @@ function Exam({ onAnswer, onWrong, lang, t }) {
       <div>
         <div style={{ background: passed ? "#E8F5EE" : "#FBEAE8", border: `2px solid ${passed ? C.ok : C.ng}`, borderRadius: 12, padding: 18, textAlign: "center", marginBottom: 14 }}>
           <div style={{ fontSize: 13, color: "#6b5d52" }}>{title} {t.result}</div>
-          <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : C.ng }}>{rate}%</div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: passed ? C.ok : C.ng }}>{passed ? t.reachedPass : t.needMore(PASS - rate)}</div>
+          <div style={{ fontSize: 40, fontWeight: 800, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{rate}%</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{passed ? t.reachedPass : t.needMore(PASS - rate)}</div>
           <div style={{ fontSize: 12, color: "#6b5d52", marginTop: 4 }}>{t.correctOf(c, qs.length)}</div>
         </div>
         <Card title={t.wrongTitle(wrong.length)}>
@@ -176650,8 +176708,8 @@ function Exam({ onAnswer, onWrong, lang, t }) {
               <div style={{ fontWeight: 600, marginBottom: 4 }}>
                 <span style={{ background: DOM_HUE[w.Q.d], color: nvInk("#ffffff", DOM_HUE[w.Q.d]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5, marginRight: 6 }}>{w.Q.d}</span>{qText(w.Q, lang)}
               </div>
-              <div style={{ color: C.ng, fontSize: 12.5 }}>{t.yourAnswer}：{w.pick.length ? w.pick.map(x => "ABCD"[x]).join(", ") : "—"}</div>
-              <div style={{ color: C.ok, fontSize: 12.5 }}>{t.answer}：{w.correctAns.map(x => "ABCD"[x]).join(", ")} {w.correctAns.map(x => qOpts(w.Q, lang)[x]).join(" / ")}</div>
+              <div style={{ color: nvInk(C.ng, "#ffffff"), fontSize: 12.5 }}>{t.yourAnswer}：{w.pick.length ? w.pick.map(x => "ABCD"[x]).join(", ") : "—"}</div>
+              <div style={{ color: nvInk(C.ok, "#ffffff"), fontSize: 12.5 }}>{t.answer}：{w.correctAns.map(x => "ABCD"[x]).join(", ")} {w.correctAns.map(x => qOpts(w.Q, lang)[x]).join(" / ")}</div>
               <div style={{ color: "#6b5d52", fontSize: 12.5, marginTop: 2 }}>{qExpl(w.Q, lang)}</div>
             </div>
           ))}
@@ -176718,7 +176776,7 @@ function Exam({ onAnswer, onWrong, lang, t }) {
         })}
         {isRevealed && (
           <div style={{ marginTop: 12, background: C.light, borderRadius: 9, padding: 13, fontSize: 13.5, lineHeight: 1.55 }}>
-            <strong style={{ color: arrEq(pick, correctAns) ? C.ok : C.ng }}>{arrEq(pick, correctAns) ? t.correct : t.incorrect}</strong>・{t.answerIs(correctAns.map(x => "ABCD"[x]).join(", "))}{qExpl(Q, lang)}
+            <strong style={{ color: nvInk(arrEq(pick, correctAns) ? C.ok : C.ng, C.light) }}>{arrEq(pick, correctAns) ? t.correct : t.incorrect}</strong>・{t.answerIs(correctAns.map(x => "ABCD"[x]).join(", "))}{qExpl(Q, lang)}
           </div>
         )}
       </div>
@@ -179826,7 +179884,7 @@ function App() {
   const clearWrong = () => { setWrong([]); saveWrong([]); };
 
   const record = (domId, correct, Q) => { try { novaLogStudy(); } catch (e) {}
-    const next = JSON.parse(JSON.stringify(state));
+    setState((prev) => { const next = JSON.parse(JSON.stringify(prev)); // 同じ描画中に続けて呼ばれても（本番モードの一括採点）前の更新に積み上げる
     if (!next.progress[domId]) next.progress[domId] = { correct: 0, attempts: 0 };
     next.progress[domId].attempts++;
     if (correct) next.progress[domId].correct++;
@@ -179838,7 +179896,7 @@ function App() {
       next.meta.streak = next.meta.lastDay === yesterday ? next.meta.streak + 1 : 1;
       next.meta.lastDay = today;
     }
-    persist(next);
+    saveState(next); return next; });
     if (!correct && Q && Q.src !== "quiz") recordWrong(Q);
   };
 
@@ -180135,7 +180193,7 @@ function Quiz({ onAnswer, lang, t }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === Q.a ? C.ok : C.ng }}>{sel === Q.a ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === Q.a ? C.ok : C.ng, C.light) }}>{sel === Q.a ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[Q.a])}{Q.e}
             </div>
             <button onClick={next}
@@ -180284,8 +180342,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
       <div>
         <div style={{ background: passed ? "#E8F5EE" : "#FBEAE8", border: `2px solid ${passed ? C.ok : C.ng}`, borderRadius: 12, padding: 18, textAlign: "center", marginBottom: 14 }}>
           <div style={{ fontSize: 13, color: "#6b5d52" }}>{setLabelOf(setNo)} · {mode === "practice" ? t.modePractice : t.modeReal} · {t.result}</div>
-          <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : C.ng }}>{rate}%</div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: passed ? C.ok : C.ng }}>{passed ? t.reachedPass : t.needMore(PASS - rate)}</div>
+          <div style={{ fontSize: 40, fontWeight: 800, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{rate}%</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{passed ? t.reachedPass : t.needMore(PASS - rate)}</div>
           <div style={{ fontSize: 12, color: "#6b5d52", marginTop: 4 }}>{t.correctOf(c, done.length)}</div>
         </div>
         <Card title={t.domBreakdown}>
@@ -180293,7 +180351,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <div key={d.id} style={{ marginBottom: 9 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
                 <span><span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>{domName(d.id, lang)}</span>
-                <strong style={{ color: d.correct / d.total >= PASS / 100 ? C.ok : C.ng }}>{d.correct}/{d.total}</strong>
+                <strong style={{ color: nvInk(d.correct / d.total >= PASS / 100 ? C.ok : C.ng, C.light) }}>{d.correct}/{d.total}</strong>
               </div>
               <Bar pct={Math.round(d.correct / d.total * 100)} color={d.correct / d.total >= PASS / 100 ? C.ok : C.ng} />
             </div>
@@ -180310,8 +180368,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
                   <span style={{ background: DOM_HUE[a.q.d], color: nvInk("#ffffff", DOM_HUE[a.q.d]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5, marginRight: 6 }}>{a.q.d}</span>
                   {lq.q}
                 </div>
-                <div style={{ color: C.ng, fontSize: 12.5 }}>{t.yourAnswer}：{"ABCD"[a.sel]} {lq.o[a.sel]}</div>
-                <div style={{ color: C.ok, fontSize: 12.5 }}>{t.answer}：{"ABCD"[a.q.a]} {lq.o[a.q.a]}</div>
+                <div style={{ color: nvInk(C.ng, "#ffffff"), fontSize: 12.5 }}>{t.yourAnswer}：{"ABCD"[a.sel]} {lq.o[a.sel]}</div>
+                <div style={{ color: nvInk(C.ok, "#ffffff"), fontSize: 12.5 }}>{t.answer}：{"ABCD"[a.q.a]} {lq.o[a.q.a]}</div>
                 <div style={{ color: "#6b5d52", fontSize: 12.5, marginTop: 2 }}>{lq.e}</div>
               </div>
             );
@@ -180376,7 +180434,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         {locked && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: shownSel === Q.a ? C.ok : C.ng }}>{shownSel === Q.a ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(shownSel === Q.a ? C.ok : C.ng, C.light) }}>{shownSel === Q.a ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[Q.a])}{Q.e}
             </div>
             <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
@@ -180669,7 +180727,7 @@ function Scenario({ onAnswer, lang, t }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === Q.a ? C.ok : C.ng }}>{sel === Q.a ? t.correct : t.incorrect}</strong>・{t.answerIs("ABCD"[Q.a])}{Q.e}
+              <strong style={{ color: nvInk(sel === Q.a ? C.ok : C.ng, C.light) }}>{sel === Q.a ? t.correct : t.incorrect}</strong>・{t.answerIs("ABCD"[Q.a])}{Q.e}
             </div>
             <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
               {pos + 1 >= total ? t.seeResult : t.nextQ}
@@ -183034,7 +183092,7 @@ function App() {
 
   const persist = (next) => { setState(next); saveState(next); };
   const record = (domId, correct, item, src) => { try { novaLogStudy(); } catch (e) {}
-    const next = JSON.parse(JSON.stringify(state));
+    setState((prev) => { const next = JSON.parse(JSON.stringify(prev)); // 同じ描画中に続けて呼ばれても（本番モードの一括採点）前の更新に積み上げる
     if (!next.progress[domId]) next.progress[domId] = { correct: 0, attempts: 0 };
     next.progress[domId].attempts++;
     if (correct) next.progress[domId].correct++;
@@ -183050,7 +183108,7 @@ function App() {
         next.review = next.review.filter(r => r.key !== key);
       }
     }
-    persist(next);
+    saveState(next); return next; });
   };
   const clearReview = () => { const next = JSON.parse(JSON.stringify(state)); next.review = []; persist(next); };
   const removeReview = (key) => { const next = JSON.parse(JSON.stringify(state)); next.review = (next.review || []).filter(r => r.key !== key); persist(next); };
@@ -183221,7 +183279,7 @@ function QuestionCard({ Q, sel, choose, next, lastBtn, lang }) {
       {sel !== null && (
         <div style={{ marginTop: 12 }}>
           <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-            <strong style={{ color: sel === Q.a ? C.ok : C.ng }}>{sel === Q.a ? t.correct : t.incorrect}</strong>
+            <strong style={{ color: nvInk(sel === Q.a ? C.ok : C.ng, C.light) }}>{sel === Q.a ? t.correct : t.incorrect}</strong>
             {t.answerIs("ABCD"[Q.a])}{Q.e}
           </div>
           <button onClick={next}
@@ -183349,7 +183407,7 @@ function Quiz({ onAnswer, lang }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
         <button onClick={prev} disabled={pos === 0}
           style={{ padding: "10px 30px", borderRadius: 8, fontSize: 13.5, fontWeight: 700, cursor: pos === 0 ? "default" : "pointer",
-            border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#b9c4d6" : C.primary }}>
+            border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#b9c4d6" : nvInk(C.primary, "#ffffff") }}>
           {t.prevQuestion}
         </button>
         <span style={{ fontSize: 12.5, color: "#5d6c83", fontWeight: 600 }}>{pos + 1} / {order.length}</span>
@@ -183461,8 +183519,8 @@ function Exam({ onAnswer, lang }) {
       <div>
         <div style={{ background: passed ? "#E6F4EC" : "#FBEAE8", border: `2px solid ${passed ? C.ok : C.ng}`, borderRadius: 12, padding: 18, textAlign: "center", marginBottom: 14 }}>
           <div style={{ fontSize: 13, color: "#5a6a85" }}>{t.setResult(setNo, modeLabel)}</div>
-          <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : C.ng }}>{rate}%</div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: passed ? C.ok : C.ng }}>{passed ? t.reachedPass : t.pointsToGo(PASS - rate)}</div>
+          <div style={{ fontSize: 40, fontWeight: 800, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{rate}%</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{passed ? t.reachedPass : t.pointsToGo(PASS - rate)}</div>
           <div style={{ fontSize: 12, color: "#5a6a85", marginTop: 4 }}>{t.correctOf(c, qs.length)}</div>
         </div>
         <Card title={t.domainBreakdown}>
@@ -183470,7 +183528,7 @@ function Exam({ onAnswer, lang }) {
             <div key={d.id} style={{ marginBottom: 9 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
                 <span><span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>{t.domainNames[d.id]}</span>
-                <strong style={{ color: d.correct / d.total >= PASS / 100 ? C.ok : C.ng }}>{d.correct}/{d.total}</strong>
+                <strong style={{ color: nvInk(d.correct / d.total >= PASS / 100 ? C.ok : C.ng, C.light) }}>{d.correct}/{d.total}</strong>
               </div>
               <Bar pct={Math.round(d.correct / d.total * 100)} color={d.correct / d.total >= PASS / 100 ? C.ok : C.ng} />
             </div>
@@ -183483,8 +183541,8 @@ function Exam({ onAnswer, lang }) {
                 <div style={{ fontWeight: 600, marginBottom: 4 }}>
                   <span style={{ background: DOM_HUE[a.q.d], color: nvInk("#ffffff", DOM_HUE[a.q.d]), borderRadius: 4, padding: "1px 6px", fontSize: 10.5, marginRight: 6 }}>{a.q.d}</span>{a.q.q}
                 </div>
-                <div style={{ color: C.ng, fontSize: 12.5 }}>{t.yourAnswer}{a.sel !== undefined ? `${"ABCD"[a.sel]} ${a.q.o[a.sel]}` : t.unanswered}</div>
-                <div style={{ color: C.ok, fontSize: 12.5 }}>{t.answer}{"ABCD"[a.q.a]} {a.q.o[a.q.a]}</div>
+                <div style={{ color: nvInk(C.ng, "#ffffff"), fontSize: 12.5 }}>{t.yourAnswer}{a.sel !== undefined ? `${"ABCD"[a.sel]} ${a.q.o[a.sel]}` : t.unanswered}</div>
+                <div style={{ color: nvInk(C.ok, "#ffffff"), fontSize: 12.5 }}>{t.answer}{"ABCD"[a.q.a]} {a.q.o[a.q.a]}</div>
                 <div style={{ color: "#5a6a85", fontSize: 12.5, marginTop: 2 }}>{a.q.e}</div>
               </div>
             ))}
@@ -183529,7 +183587,7 @@ function Exam({ onAnswer, lang }) {
           <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
             <button onClick={prevReal} disabled={pos === 0}
               style={{ flex: 1, padding: 12, borderRadius: 9, fontSize: 13.5, fontWeight: 700, cursor: pos === 0 ? "default" : "pointer",
-                border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#b9c4d6" : C.primary }}>
+                border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#b9c4d6" : nvInk(C.primary, "#ffffff") }}>
               {t.prev}
             </button>
             <button onClick={nextReal}
@@ -183911,7 +183969,7 @@ function ReviewCard({ rec, onAnswer, removeReview, lang }) {
       {sel !== null && (
         <div>
           <div style={{ background: (sel === answerIdx) ? "#E6F4EC" : "#FBEAE8", borderRadius: 9, padding: 11, fontSize: 12.5, lineHeight: 1.55 }}>
-            <strong style={{ color: sel === answerIdx ? C.ok : C.ng }}>{sel === answerIdx ? t.correct : t.incorrect}</strong>
+            <strong style={{ color: nvInk(sel === answerIdx ? C.ok : C.ng, C.light) }}>{sel === answerIdx ? t.correct : t.incorrect}</strong>
             {t.answerIs("ABCD"[answerIdx])}{it.options[answerIdx].fb}
           </div>
           {sel === answerIdx && <div style={{ fontSize: 12, color: C.ok, fontWeight: 700, textAlign: "center", marginTop: 8 }}>{t.removedHint}</div>}
@@ -184962,7 +185020,7 @@ function mulberry32(seed) {
 }
 // 問題オブジェクトを受け取り、シャッフル済みの選択肢配列と新しい正解indexを返す
 // 戻り値: { opts: [...], a: 新正解index }
-function shuffleOptions(Q) {
+function shuffleOptions(Q, legacy = false) {
   const rng = mulberry32(hashString(Q.q));
   // インデックス配列をFisher-Yatesでシャッフル
   const idx = Q.o.map((_, i) => i);
@@ -184970,9 +185028,10 @@ function shuffleOptions(Q) {
     const j = Math.floor(rng() * (i + 1));
     [idx[i], idx[j]] = [idx[j], idx[i]];
   }
-  // 万一、正解がまだ先頭(0番目)に来てしまった場合は、別の位置と入れ替える
+  // 正解の位置は偏らせない。以前は「正解を先頭に置かない」ようにしていた（A が正解にならないと分かると1択減らせる）ので、
+  // 変更前の途中保存から再開したとき（legacy）だけ、その並べ方を再現する
   let pos = idx.indexOf(Q.a);
-  if (pos === 0) {
+  if (legacy && pos === 0) {
     // rngで0以外の位置を選んで交換
     const swapWith = 1 + Math.floor(rng() * (idx.length - 1));
     [idx[0], idx[swapWith]] = [idx[swapWith], idx[0]];
@@ -185204,7 +185263,7 @@ function App() {
   const persist = (next) => { setState(next); saveState(next); };
 
   const record = (domId, correct) => { try { novaLogStudy(); } catch (e) {}
-    const next = JSON.parse(JSON.stringify(state));
+    setState((prev) => { const next = JSON.parse(JSON.stringify(prev)); // 同じ描画中に続けて呼ばれても（本番モードの一括採点）前の更新に積み上げる
     if (!next.progress[domId]) next.progress[domId] = { correct: 0, attempts: 0 };
     next.progress[domId].attempts++;
     if (correct) next.progress[domId].correct++;
@@ -185216,7 +185275,7 @@ function App() {
       next.meta.streak = next.meta.lastDay === yesterday ? next.meta.streak + 1 : 1;
       next.meta.lastDay = today;
     }
-    persist(next);
+    saveState(next); return next; });
   };
 
   if (!loaded) return <div style={{ padding: 40, textAlign: "center", color: C.deep }}>{t.loading}</div>;
@@ -185486,7 +185545,7 @@ function Quiz({ onAnswer, t, questions }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === correctIdx ? C.ok : C.ng }}>{sel === correctIdx ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === correctIdx ? C.ok : C.ng, C.light) }}>{sel === correctIdx ? t.correct : t.incorrect}</strong>
               {t.dot}{t.answerIs("ABCDE"[correctIdx])}{Lx(Q, "e")}<RefLink r={Q.ref} />
             </div>
             {pos + 1 < total && (
@@ -185501,7 +185560,7 @@ function Quiz({ onAnswer, t, questions }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
         <button onClick={prev} disabled={pos === 0}
           style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600,
-            border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : C.primary, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
+            border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : nvInk(C.primary, "#ffffff"), cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           {t.prevQ}
         </button>
         <span style={{ fontSize: 13, color: "#5a7780", fontWeight: 600 }}>{pos + 1} / {total}</span>
@@ -185585,8 +185644,10 @@ function Exam({ onAnswer, t, onWrong }) {
 
   const rawQs = setNo ? (kind === "domain" ? (DOMAIN_SETS[setNo] || []) : EXAM_SETS[setNo]) : [];
   // 各問の選択肢を決定的シャッフル（セット固定でも並びは安定）。本番モードの通常セットには複数選択問題を interleave。
+  const [legacyOrder, setLegacyOrder] = useState(false); // 変更前の途中保存から再開したときだけ true
   const qs = useMemo(() => {
-    let arr = rawQs.map(Q => { const { opts, a, oEn } = shuffleOptions(Q); return { ...Q, o: opts, a, oEn }; });
+    let arr = rawQs.map(Q => { const { opts, a, oEn } = shuffleOptions(Q, legacyOrder); return { ...Q, o: opts, a, oEn }; });
+    if (!legacyOrder && setNo) arr = novaBalanceAnswers(arr, STORE_KEY + "|" + setNo + "|" + kind, ["o", "oEn"]);
     if (!setNo) return arr;
     // ドメイン別は同一ドメインから、通常セットは全プールからセット番号でローテーション。複数形式を interleave。
     const isDom = kind === "domain";
@@ -185615,7 +185676,7 @@ function Exam({ onAnswer, t, onWrong }) {
     if (PL900_EXHIBIT.length) {
       const pool = isDom ? PL900_EXHIBIT.filter(q => q.d === setNo) : PL900_EXHIBIT.filter(q => q.d !== "PP"); // 旧範囲（Power Pages）は通常セットに入れない
       const k = isDom ? Math.min(1, pool.length) : Math.min(2, pool.length);
-      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, a, oEn } = shuffleOptions(Q); specials.push({ ...Q, o: opts, a, oEn, ex: true }); }
+      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, a, oEn } = shuffleOptions(Q, legacyOrder); specials.push({ ...Q, o: opts, a, oEn, ex: true }); }
     }
     if (PL900_MATRIX.length) {
       const pool = isDom ? PL900_MATRIX.filter(q => q.d === setNo) : PL900_MATRIX.filter(q => q.d !== "PP"); // 旧範囲（Power Pages）は通常セットに入れない
@@ -185635,11 +185696,11 @@ function Exam({ onAnswer, t, onWrong }) {
       arr = mixed;
     }
     return arr;
-  }, [setNo, mode, kind]);
+  }, [setNo, mode, kind, legacyOrder]);
 
   const start = (n) => {
     const base = (kind === "domain" ? (DOMAIN_SETS[n] || []) : EXAM_SETS[n]) || [];
-    setSetNo(n); setPos(0); setPicks({}); setSel(null); setFlags({}); savedRef.current = false;
+    setLegacyOrder(false); setSetNo(n); setPos(0); setPicks({}); setSel(null); setFlags({}); savedRef.current = false;
     setRemain(mode === "real" ? certExamSeconds("pl900", base.length) : 0);
     setPhase("run");
   };
@@ -185699,13 +185760,13 @@ function Exam({ onAnswer, t, onWrong }) {
           const ok = chosen === Q.correct[it.id];
           return (
             <div key={it.id} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, padding: "9px 11px", border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, borderRadius: 8, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
-              <span style={{ flex: 1, fontSize: 13.5, lineHeight: 1.4, color: C.ink }}>{Lx(it, "text")}</span>
+              <span style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere", fontSize: 13.5, lineHeight: 1.4, color: C.ink }}>{Lx(it, "text")}</span>
               <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)}
-                style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, background: "#fff", color: C.ink }}>
+                style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, maxWidth: "55%", background: "#fff", color: C.ink }}>
                 <option value="">{t.selectPh}</option>
                 {(Q.targets || []).map(tg => (<option key={tg.id} value={tg.id}>{Lx(tg, "label")}</option>))}
               </select>
-              {submitted && <span style={{ fontSize: 14, fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
+              {submitted && <span style={{ fontSize: 14, fontWeight: 900, flexShrink: 0, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
             </div>
           );
         })}
@@ -185741,8 +185802,8 @@ function Exam({ onAnswer, t, onWrong }) {
               <span style={{ fontWeight: 800, color: C.deep, minWidth: 18 }}>{idx + 1}.</span>
               <span style={{ flex: 1, fontSize: 13 }}>{txt(id)}</span>
               {submitted ? <span style={{ fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span> : (<>
-                <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : C.primary }}>▲</button>
-                <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
+                <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : nvInk(C.primary, C.light, 3) }}>▲</button>
+                <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : nvInk(C.primary, C.light, 3) }}>▼</button>
                 <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
               </>)}
             </div>
@@ -185778,7 +185839,7 @@ function Exam({ onAnswer, t, onWrong }) {
           <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, padding: "9px 11px", borderRadius: 8, border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
             <span style={{ flex: 1, fontSize: 13, color: C.ink }}>{Lx(c, "label")}</span>
             {c.type === "dropdown" && (
-              <select value={cur} disabled={submitted} onChange={e => setCtrl(c.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, background: "#fff", color: C.ink }}>
+              <select value={cur} disabled={submitted} onChange={e => setCtrl(c.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, maxWidth: "55%", background: "#fff", color: C.ink }}>
                 <option value="">{t.selectPh}</option>
                 {(c.options || []).map((o, oi) => (<option key={o} value={o}>{LxA(c, "options", oi)}</option>))}
               </select>
@@ -185794,7 +185855,7 @@ function Exam({ onAnswer, t, onWrong }) {
                 <button onClick={() => !submitted && setCtrl(c.id, Math.min(c.max ?? 99, (typeof cur === "number" ? cur : (c.min ?? 0)) + 1))} disabled={submitted} style={{ width: 26, height: 26, borderRadius: 6, border: `1px solid ${C.mid}`, background: "#fff", cursor: submitted ? "default" : "pointer", fontWeight: 800 }}>＋</button>
               </span>
             )}
-            {submitted && <span style={{ fontSize: 14, fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
+            {submitted && <span style={{ fontSize: 14, fontWeight: 900, flexShrink: 0, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
           </div>
         );
       })}
@@ -185830,7 +185891,7 @@ function Exam({ onAnswer, t, onWrong }) {
   useEffect(() => { setExTab(0); }, [pos]);
 
   useEffect(() => {
-    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain }, "セット" + setNo);
+    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain, bv: legacyOrder ? 1 : 2 }, "セット" + setNo);
     else if (phase === "result") slot.remove();
   }, [phase, pos, picks, sel, mSel, flags]);
   if (phase === "select") {
@@ -185843,7 +185904,7 @@ function Exam({ onAnswer, t, onWrong }) {
               <div style={{ fontSize: 12.5, fontWeight: 700, color: C.deep }}>{t.pausedExam}</div>
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{t.slotLabel(slot.meta.label)}{slot.meta.label ? t.labelSep : ""}{saveStamp(slot.meta.t)}</div>
             </div>
-            <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
+            <button onClick={async () => { const d = await slot.read(); if (!d) return; setLegacyOrder(d.bv !== 2); setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
               style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{t.slotResume}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{t.slotDelete}</button>
           </div>
@@ -185932,10 +185993,10 @@ function Exam({ onAnswer, t, onWrong }) {
     return (
       <div>
         <div style={{ background: passed ? "#E4F6EC" : "#FBE9E7", border: `2px solid ${passed ? C.ok : C.ng}`, borderRadius: 12, padding: 18, textAlign: "center", marginBottom: 14 }}>
-          <div style={{ fontSize: 13, color: "#5a7780" }}>{t.setLabel}{setNo} · {mode === "practice" ? t.modePractice : t.modeReal} {t.result}</div>
-          <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : C.ng }}>{rate}%</div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: passed ? C.ok : C.ng }}>{passed ? t.reachedPass : t.needMore(PASS - rate)}</div>
-          <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{t.correctOf(c, qs.length)}{answered.length < qs.length ? t.unansweredNote(qs.length - answered.length) : ""}</div>
+          <div style={{ fontSize: 13, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7") }}>{t.setLabel}{setNo} · {mode === "practice" ? t.modePractice : t.modeReal} {t.result}</div>
+          <div style={{ fontSize: 40, fontWeight: 800, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{rate}%</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{passed ? t.reachedPass : t.needMore(PASS - rate)}</div>
+          <div style={{ fontSize: 12, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7"), marginTop: 4 }}>{t.correctOf(c, qs.length)}{answered.length < qs.length ? t.unansweredNote(qs.length - answered.length) : ""}</div>
         </div>
 
         <Card title={t.domBreakdown}>
@@ -185943,7 +186004,7 @@ function Exam({ onAnswer, t, onWrong }) {
             <div key={d.id} style={{ marginBottom: 9 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
                 <span><span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius: 4, padding: "1px 6px", fontSize: 11, marginRight: 6 }}>{d.id}</span>{domName(d.id)}</span>
-                <strong style={{ color: d.correct / d.total >= PASS / 100 ? C.ok : C.ng }}>{d.correct}/{d.total}</strong>
+                <strong style={{ color: nvInk(d.correct / d.total >= PASS / 100 ? C.ok : C.ng, C.light) }}>{d.correct}/{d.total}</strong>
               </div>
               <Bar pct={Math.round(d.correct / d.total * 100)} color={d.correct / d.total >= PASS / 100 ? C.ok : C.ng} />
             </div>
@@ -185961,13 +186022,13 @@ function Exam({ onAnswer, t, onWrong }) {
               </div>
               {Array.isArray(a.q.o) && (Array.isArray(a.q.a) || a.q.multi) ? (
                 <>
-                  <div style={{ color: C.ng, fontSize: 12.5 }}>{t.yourAnswer}{t.colon}{Array.isArray(a.sel) && a.sel.length ? a.sel.map(i => `${"ABCDE"[i]} ${enOpt(a.q.oEn, i, a.q.o[i])}`).join(" / ") : "—"}</div>
-                  <div style={{ color: C.ok, fontSize: 12.5 }}>{t.answer}{t.colon}{(Array.isArray(a.q.a) ? a.q.a : []).map(i => `${"ABCDE"[i]} ${enOpt(a.q.oEn, i, a.q.o[i])}`).join(" / ")}</div>
+                  <div style={{ color: nvInk(C.ng, "#ffffff"), fontSize: 12.5 }}>{t.yourAnswer}{t.colon}{Array.isArray(a.sel) && a.sel.length ? a.sel.map(i => `${"ABCDE"[i]} ${enOpt(a.q.oEn, i, a.q.o[i])}`).join(" / ") : "—"}</div>
+                  <div style={{ color: nvInk(C.ok, "#ffffff"), fontSize: 12.5 }}>{t.answer}{t.colon}{(Array.isArray(a.q.a) ? a.q.a : []).map(i => `${"ABCDE"[i]} ${enOpt(a.q.oEn, i, a.q.o[i])}`).join(" / ")}</div>
                 </>
               ) : Array.isArray(a.q.o) ? (
                 <>
-                  <div style={{ color: C.ng, fontSize: 12.5 }}>{t.yourAnswer}{t.colon}{typeof a.sel === "number" ? `${"ABCDE"[a.sel]} ${enOpt(a.q.oEn, a.sel, a.q.o[a.sel])}` : "—"}</div>
-                  <div style={{ color: C.ok, fontSize: 12.5 }}>{t.answer}{t.colon}{typeof a.q.a === "number" ? `${"ABCDE"[a.q.a]} ${enOpt(a.q.oEn, a.q.a, a.q.o[a.q.a])}` : "—"}</div>
+                  <div style={{ color: nvInk(C.ng, "#ffffff"), fontSize: 12.5 }}>{t.yourAnswer}{t.colon}{typeof a.sel === "number" ? `${"ABCDE"[a.sel]} ${enOpt(a.q.oEn, a.sel, a.q.o[a.sel])}` : "—"}</div>
+                  <div style={{ color: nvInk(C.ok, "#ffffff"), fontSize: 12.5 }}>{t.answer}{t.colon}{typeof a.q.a === "number" ? `${"ABCDE"[a.q.a]} ${enOpt(a.q.oEn, a.q.a, a.q.o[a.q.a])}` : "—"}</div>
                 </>
               ) : null}
               <div style={{ color: "#476770", fontSize: 12.5, marginTop: 2 }}>{Lx(a.q, "e")}</div>
@@ -186031,7 +186092,7 @@ function Exam({ onAnswer, t, onWrong }) {
                   return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted}
                     style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>);
                 })}
-                {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}{t.mxCorrect(Q.correct[s.id] === "yes" ? t.yes : t.no)}</span>}
+                {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: nvInk(ok ? C.ok : C.ng, ok ? "#E4F6EC" : "#FBE9E7") }}>{ok ? "✓" : "✗"}{t.mxCorrect(Q.correct[s.id] === "yes" ? t.yes : t.no)}</span>}
               </div>
             </div>
           );
@@ -186084,7 +186145,7 @@ function Exam({ onAnswer, t, onWrong }) {
     const mm = String(Math.floor((remain % 3600) / 60)).padStart(2, "0");
     const ss = String(remain % 60).padStart(2, "0");
     const NAVY = "#12324a", STEEL = "#2f6f8f", INK = "#1b2a33";
-    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : "#5a7780", PAGE = contrast ? "#0b0f12" : "#eceff2";
+    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : nvInk("#5a7780", "#eceff2"), PAGE = contrast ? "#0b0f12" : "#eceff2";
     const answeredN = Object.keys(picks).length, flaggedN = Object.keys(flags).filter(k => flags[k]).length;
     const Toggle = ({ on, onToggle }) => (
       <span onClick={onToggle} role="switch" aria-checked={on}
@@ -186258,7 +186319,7 @@ function Exam({ onAnswer, t, onWrong }) {
               {renderMxBody(Q, submitted)}
               {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{t.submitAns}</button>)}
               {submitted && (<div style={{ marginTop: 12 }}>
-                <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mOk ? C.ok : C.ng }}>{mOk ? t.correct : t.incorrect}</strong>{t.sp}{Lx(Q, "e")}</div>
+                <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(mOk ? C.ok : C.ng, C.light) }}>{mOk ? t.correct : t.incorrect}</strong>{t.sp}{Lx(Q, "e")}</div>
                 <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? t.seeResult : t.nextQ}</button>
               </div>)}
             </>);
@@ -186272,7 +186333,7 @@ function Exam({ onAnswer, t, onWrong }) {
               {renderHotBody(Q, submitted)}
               {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{t.submitAns}</button>)}
               {submitted && (<div style={{ marginTop: 12 }}>
-                <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hOk ? C.ok : C.ng }}>{hOk ? t.correct : t.incorrect}</strong>{t.sp}{t.answerLbl}{Q.correct.map(id => Lx((Q.hotspots.find(h => h.id === id)) || {}, "label")).join(t.listSep)}{t.sp}{Lx(Q, "e")}</div>
+                <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(hOk ? C.ok : C.ng, C.light) }}>{hOk ? t.correct : t.incorrect}</strong>{t.sp}{t.answerLbl}{Q.correct.map(id => Lx((Q.hotspots.find(h => h.id === id)) || {}, "label")).join(t.listSep)}{t.sp}{Lx(Q, "e")}</div>
                 <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? t.seeResult : t.nextQ}</button>
               </div>)}
             </>);
@@ -186291,7 +186352,7 @@ function Exam({ onAnswer, t, onWrong }) {
               {submitted && (
                 <div style={{ marginTop: 12 }}>
                   <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-                    <strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? t.correct : t.incorrect}</strong>
+                    <strong style={{ color: nvInk(dndOk ? C.ok : C.ng, C.light) }}>{dndOk ? t.correct : t.incorrect}</strong>
                     {t.dot}{t.dndMap}{(Q.items || []).map(it => `${Lx(it, "text")}→${Lx(Q.targets.find(tg => tg.id === Q.correct[it.id]) || {}, "label")}`).join(" / ")}{t.sp}{Lx(Q, "e")}
                   </div>
                   <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? t.seeResult : t.nextQ}</button>
@@ -186313,7 +186374,7 @@ function Exam({ onAnswer, t, onWrong }) {
               {submitted && (
                 <div style={{ marginTop: 12 }}>
                   <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-                    <strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? t.correct : t.incorrect}</strong>
+                    <strong style={{ color: nvInk(bOk ? C.ok : C.ng, C.light) }}>{bOk ? t.correct : t.incorrect}</strong>
                     {t.dot}{t.buildOrder}{Q.answer.map((id, i) => `${i + 1}.${Lx((Q.candidates.find(c => c.id === id)) || {}, "text")}`).join(" / ")}{t.sp}{Lx(Q, "e")}
                   </div>
                   <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? t.seeResult : t.nextQ}</button>
@@ -186335,7 +186396,7 @@ function Exam({ onAnswer, t, onWrong }) {
               {submitted && (
                 <div style={{ marginTop: 12 }}>
                   <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-                    <strong style={{ color: sOk ? C.ok : C.ng }}>{sOk ? t.correct : t.incorrect}</strong>
+                    <strong style={{ color: nvInk(sOk ? C.ok : C.ng, C.light) }}>{sOk ? t.correct : t.incorrect}</strong>
                     {t.dot}{t.scrSettings}{(Q.controls || []).map(c => `${Lx(c, "label")}=${String(Q.correct[c.id] === true ? t.on : Q.correct[c.id] === false ? t.off : scrOptLabel(c, Q.correct[c.id]))}`).join(" / ")}{t.sp}{Lx(Q, "e")}
                   </div>
                   <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? t.seeResult : t.nextQ}</button>
@@ -186382,7 +186443,7 @@ function Exam({ onAnswer, t, onWrong }) {
             {submitted && (
               <div style={{ marginTop: 12 }}>
                 <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-                  <strong style={{ color: isRight ? C.ok : C.ng }}>{isRight ? t.correct : t.incorrect}</strong>
+                  <strong style={{ color: nvInk(isRight ? C.ok : C.ng, C.light) }}>{isRight ? t.correct : t.incorrect}</strong>
                   {t.dot}{isMulti ? `${t.answerLbl}${correctSet.map(i => "ABCDE"[i]).join(t.listSep)}${t.sp}` : t.answerIs("ABCDE"[Q.a])}{Lx(Q, "e")}<RefLink r={Q.ref} />
                 </div>
                 <button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
@@ -186394,7 +186455,7 @@ function Exam({ onAnswer, t, onWrong }) {
         })()}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
-        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : C.primary, cursor: pos === 0 ? "not-allowed" : "pointer" }}>{t.prevQ}</button>
+        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : nvInk(C.primary, "#ffffff"), cursor: pos === 0 ? "not-allowed" : "pointer" }}>{t.prevQ}</button>
         <span style={{ fontSize: 13, color: "#5a7780", fontWeight: 600 }}>{pos + 1} / {qs.length}</span>
         <button onClick={next} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), cursor: "pointer" }}>{t.nextQ}</button>
       </div>
@@ -187375,27 +187436,17 @@ function permFromSeed(n, seed) {
   }
   return idx;
 }
-// 問題の選択肢をシャッフルし、正答が必ず先頭に来ないようにする
+// 問題の選択肢をシャッフルする（正解の位置は偏らない）
 // salt を変えると同じ問題でも別の並びになる（クイズ⇔模試⇔セッションで分散）
-function shuffleChoices(q, lang, salt = 0) {
+function shuffleChoices(q, lang, salt = 0, legacy = false) {
   const opts = lang === "en" ? (q.oEn || q.o) : q.o;
   const n = opts.length;
   // キーから決定的シード
   let h = 0; const base = qKey(q) + "|" + salt;
   for (let i = 0; i < base.length; i++) { h = (h * 33 + base.charCodeAt(i)) | 0; }
   let perm = permFromSeed(n, h >>> 0);
-  // 正答が先頭に来てしまう場合は別シードで再試行（数回）し、最終的には強制スワップ
-  let tries = 0;
-  while (perm[0] === q.a && tries < 8) {
-    h = (h * 1103515245 + 12345) | 0;
-    perm = permFromSeed(n, h >>> 0);
-    tries++;
-  }
-  if (perm[0] === q.a) {
-    // 正答を後ろの位置と入れ替える（先頭回避を保証）
-    const target = 1 + ((h >>> 0) % (n - 1));
-    [perm[0], perm[target]] = [perm[target], perm[0]];
-  }
+  // 正解の位置は A〜D のどこにも同じ確率で来る（以前は「正解を先頭に置かない」ようにしていたが、A が正解にならないと分かると1択減らせてしまうのでやめた）
+  if (legacy) { let tries = 0; while (perm[0] === q.a && tries < 8) { h = (h * 1103515245 + 12345) | 0; perm = permFromSeed(n, h >>> 0); tries++; } if (perm[0] === q.a) { const target = 1 + ((h >>> 0) % (n - 1)); [perm[0], perm[target]] = [perm[target], perm[0]]; } } // 変更前の途中保存から再開したときだけ、以前の並べ方を再現する
   const shuffledOpts = perm.map(i => opts[i]);
   const newAnswer = perm.indexOf(q.a);
   const oeSrc = lang === "en" ? (q.oeEn || q.oe) : q.oe;
@@ -187585,11 +187636,11 @@ function App() {
   const persist = (next) => { setState(next); saveState(next); };
 
   const record = (domId, correct) => { try { novaLogStudy(); } catch (e) {}
-    const next = JSON.parse(JSON.stringify(state));
+    setState((prev) => { const next = JSON.parse(JSON.stringify(prev)); // 同じ描画中に続けて呼ばれても（本番モードの一括採点）前の更新に積み上げる
     if (!next.progress[domId]) next.progress[domId] = { correct: 0, attempts: 0 };
     next.progress[domId].attempts++;
     if (correct) next.progress[domId].correct++;
-    persist(next);
+    saveState(next); return next; });
   };
 
   if (!loaded) return <div style={{ padding: 40, textAlign: "center", color: C.deep }}>{t.loading}</div>;
@@ -187863,7 +187914,7 @@ function Quiz({ onAnswer, lang, t }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
           </div>
@@ -187928,14 +187979,16 @@ function Exam({ onAnswer, lang, t, backRef }) {
 
   useEffect(() => { if (!backRef) return; backRef.current = () => { if (phase === "run" || phase === "result") { setPhase("select"); return true; } return false; }; return () => { if (backRef) backRef.current = null; }; }, [phase, backRef]);
   useEffect(() => {
-    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain }, (en ? "Set " : "セット") + setNo);
+    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain, bv: legacyOrder ? 1 : 2 }, (en ? "Set " : "セット") + setNo);
     else if (phase === "result") slot.remove();
   }, [phase, pos, picks, sel, mSel, flags]);
 
   const rawQs = setNo ? (kind === "domain" ? (DOMAIN_SETS[setNo] || []) : EXAM_SETS[setNo]) : [];
+  const [legacyOrder, setLegacyOrder] = useState(false); // 変更前の途中保存から再開したときだけ true
   const qs = useMemo(() => {
     const salt = "ab_" + setNo + "_" + kind;
-    let arr = rawQs.map(Q => { const { opts, answer } = shuffleChoices(Q, lang, salt); return { ...Q, o: opts, a: answer }; });
+    let arr = rawQs.map(Q => { const { opts, answer } = shuffleChoices(Q, lang, salt, legacyOrder); return { ...Q, o: opts, a: answer }; });
+    if (!legacyOrder && setNo) arr = novaBalanceAnswers(arr, STORE_KEY + "|" + salt + "|" + lang);
     if (!setNo) return arr;
     const isDom = kind === "domain";
     const base = isDom ? 0 : ((typeof setNo === "number" ? setNo : 1) - 1);
@@ -187963,7 +188016,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     if (typeof AB620_EXHIBIT !== "undefined" && AB620_EXHIBIT.length) {
       const pool = isDom ? AB620_EXHIBIT.filter(q => q.d === setNo) : AB620_EXHIBIT;
       const k = isDom ? Math.min(1, pool.length) : Math.min(2, pool.length);
-      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, answer } = shuffleChoices(Q, lang, salt); specials.push({ ...Q, o: opts, a: answer, ex: true }); }
+      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, answer } = shuffleChoices(Q, lang, salt, legacyOrder); specials.push({ ...Q, o: opts, a: answer, ex: true }); }
     }
     if (typeof AB620_MATRIX !== "undefined" && AB620_MATRIX.length) {
       const pool = isDom ? AB620_MATRIX.filter(q => q.d === setNo) : AB620_MATRIX;
@@ -187983,11 +188036,11 @@ function Exam({ onAnswer, lang, t, backRef }) {
       arr = mixed;
     }
     return arr;
-  }, [setNo, mode, kind, lang]);
+  }, [setNo, mode, kind, lang, legacyOrder]);
 
   const start = (n) => {
     const base = (kind === "domain" ? (DOMAIN_SETS[n] || []) : EXAM_SETS[n]) || [];
-    setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({});
+    setLegacyOrder(false); setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({});
     setRemain(mode === "real" ? certExamSeconds("ab620", base.length) : 0);
     setPhase("run");
   };
@@ -188039,7 +188092,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <div style={{ fontSize: 12.5, fontWeight: 700, color: C.deep }}>{en ? "Exam in progress" : "中断した模試"}</div>
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
-            <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
+            <button onClick={async () => { const d = await slot.read(); if (!d) return; setLegacyOrder(d.bv !== 2); setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
               style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
@@ -188092,10 +188145,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div>
         <div style={{ background: passed ? "#E4F6EC" : "#FBE9E7", border: `2px solid ${passed ? C.ok : C.ng}`, borderRadius: 12, padding: 18, textAlign: "center", marginBottom: 14 }}>
-          <div style={{ fontSize: 13, color: "#5a7780" }}>{en ? `Set ${setNo} · Result` : `セット${setNo}・結果`}</div>
-          <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : C.ng }}>{rate}%</div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: passed ? C.ok : C.ng }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
-          <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
+          <div style={{ fontSize: 13, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7") }}>{en ? `Set ${setNo} · Result` : `セット${setNo}・結果`}</div>
+          <div style={{ fontSize: 40, fontWeight: 800, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{rate}%</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
+          <div style={{ fontSize: 12, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7"), marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
@@ -188110,12 +188163,12 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const val = picks[pos] || {};
     return (<div>{(Q.items || []).map(it => { const chosen = val[it.id] || ""; const ok = chosen === Q.correct[it.id]; return (
       <div key={it.id} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, padding: "9px 11px", border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, borderRadius: 8, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
-        <span style={{ flex: 1, fontSize: 13.5, color: C.ink }}>{L(it, "text", lang)}</span>
-        <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, background: "#fff", color: C.ink }}>
+        <span style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere", fontSize: 13.5, color: C.ink }}>{L(it, "text", lang)}</span>
+        <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, maxWidth: "55%", background: "#fff", color: C.ink }}>
           <option value="">{en ? "— select —" : "— 選択 —"}</option>
           {(Q.targets || []).map(tg => (<option key={tg.id} value={tg.id}>{L(tg, "label", lang)}</option>))}
         </select>
-        {submitted && <span style={{ fontSize: 14, fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
+        {submitted && <span style={{ fontSize: 14, fontWeight: 900, flexShrink: 0, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
       </div>); })}</div>);
   };
   const renderBuildBody = (Q, submitted) => {
@@ -188131,8 +188184,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <span style={{ fontWeight: 800, color: C.deep, minWidth: 18 }}>{idx + 1}.</span>
           <span style={{ flex: 1, fontSize: 13 }}>{txt(id)}</span>
           {submitted ? <span style={{ fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span> : (<>
-            <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : C.primary }}>▲</button>
-            <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
+            <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : nvInk(C.primary, C.light, 3) }}>▲</button>
+            <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : nvInk(C.primary, C.light, 3) }}>▼</button>
             <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
           </>)}
         </div>); }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
@@ -188168,7 +188221,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{L(s, "text", lang)}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
-          {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
+          {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: nvInk(ok ? C.ok : C.ng, ok ? "#E4F6EC" : "#FBE9E7") }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
         </div>
       </div>); })}</div>);
   };
@@ -188192,8 +188245,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const hh = String(Math.floor(remain / 3600)).padStart(2, "0");
     const mm = String(Math.floor((remain % 3600) / 60)).padStart(2, "0");
     const ss = String(remain % 60).padStart(2, "0");
-    const NAVY = "#12324a", STEEL = C.primary, INK = "#1b2a33";
-    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : "#5a7780", PAGE = contrast ? "#0b0f12" : "#eceff2";
+    const NAVY = "#12324a", STEEL = nvInk(C.primary, "#ffffff"), INK = "#1b2a33";
+    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : nvInk("#5a7780", "#eceff2"), PAGE = contrast ? "#0b0f12" : "#eceff2";
     const Toggle = ({ on, onToggle }) => (<span onClick={onToggle} role="switch" aria-checked={on} style={{ display: "inline-block", width: 34, height: 19, borderRadius: 20, background: on ? STEEL : "#b7c3cb", position: "relative", cursor: "pointer", verticalAlign: "middle", flexShrink: 0 }}><span style={{ position: "absolute", top: 2, left: on ? 17 : 2, width: 15, height: 15, borderRadius: "50%", background: "#fff", boxShadow: "0 1px 2px rgba(0,0,0,.35)" }} /></span>);
     const isMulti = !!Q.multi;
     const selArr = Array.isArray(curPick) ? curPick : [];
@@ -188286,37 +188339,37 @@ function Exam({ onAnswer, lang, t, backRef }) {
         {Array.isArray(Q.exhibits) && renderExhibits(Q.exhibits)}
         {(() => {
           if (Q.dnd) { const dndOk = dndRight(Q, picks[pos]); const done = dndComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderDndBody(Q, submitted)}
             {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(dndOk ? C.ok : C.ng, C.light) }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.build) { const bOk = buildRight(Q, picks[pos]); const done = buildComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderBuildBody(Q, submitted)}
             {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(bOk ? C.ok : C.ng, C.light) }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.mx) { const mxOk = mxRight(Q, picks[pos]); const done = mxComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "scenario")}</div>
             {renderMxBody(Q, submitted)}
             {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(mxOk ? C.ok : C.ng, C.light) }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.hot) { const hotOk = hotRight(Q, picks[pos]); const done = hotComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderHotBody(Q, submitted)}
             {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(hotOk ? C.ok : C.ng, C.light) }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           const isMulti = !!Q.multi; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); const selSet = Array.isArray(sel) ? sel : []; const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isR = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
           return (<>
-            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${need} answers. (${submitted ? selSet.length : mSel.length}/${need})` : `正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
+            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${need} answers. (${submitted ? selSet.length : mSel.length}/${need})` : `正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {opts.map((opt, i) => {
               if (isMulti) { const chosen = submitted ? selSet.includes(i) : mSel.includes(i); const isC = correctSet.includes(i); let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (isC) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (chosen) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } } else if (chosen) { bg = C.light; bd = C.primary; col = C.deep; }
@@ -188325,12 +188378,12 @@ function Exam({ onAnswer, lang, t, backRef }) {
               return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
             })}
             {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(isR ? C.ok : C.ng, C.light) }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>);
         })()}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
-        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : C.primary, cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
+        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : nvInk(C.primary, "#ffffff"), cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
         <span style={{ fontSize: 13, color: "#5a7780", fontWeight: 600 }}>{pos + 1} / {qs.length}</span>
         <button onClick={next} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
@@ -188440,7 +188493,7 @@ function Review({ lang, t, onAnswer }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
             {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
@@ -189596,27 +189649,17 @@ function permFromSeed(n, seed) {
   }
   return idx;
 }
-// 問題の選択肢をシャッフルし、正答が必ず先頭に来ないようにする
+// 問題の選択肢をシャッフルする（正解の位置は偏らない）
 // salt を変えると同じ問題でも別の並びになる（クイズ⇔模試⇔セッションで分散）
-function shuffleChoices(q, lang, salt = 0) {
+function shuffleChoices(q, lang, salt = 0, legacy = false) {
   const opts = lang === "en" ? (q.oEn || q.o) : q.o;
   const n = opts.length;
   // キーから決定的シード
   let h = 0; const base = qKey(q) + "|" + salt;
   for (let i = 0; i < base.length; i++) { h = (h * 33 + base.charCodeAt(i)) | 0; }
   let perm = permFromSeed(n, h >>> 0);
-  // 正答が先頭に来てしまう場合は別シードで再試行（数回）し、最終的には強制スワップ
-  let tries = 0;
-  while (perm[0] === q.a && tries < 8) {
-    h = (h * 1103515245 + 12345) | 0;
-    perm = permFromSeed(n, h >>> 0);
-    tries++;
-  }
-  if (perm[0] === q.a) {
-    // 正答を後ろの位置と入れ替える（先頭回避を保証）
-    const target = 1 + ((h >>> 0) % (n - 1));
-    [perm[0], perm[target]] = [perm[target], perm[0]];
-  }
+  // 正解の位置は A〜D のどこにも同じ確率で来る（以前は「正解を先頭に置かない」ようにしていたが、A が正解にならないと分かると1択減らせてしまうのでやめた）
+  if (legacy) { let tries = 0; while (perm[0] === q.a && tries < 8) { h = (h * 1103515245 + 12345) | 0; perm = permFromSeed(n, h >>> 0); tries++; } if (perm[0] === q.a) { const target = 1 + ((h >>> 0) % (n - 1)); [perm[0], perm[target]] = [perm[target], perm[0]]; } } // 変更前の途中保存から再開したときだけ、以前の並べ方を再現する
   const shuffledOpts = perm.map(i => opts[i]);
   const newAnswer = perm.indexOf(q.a);
   const oeSrc = lang === "en" ? (q.oeEn || q.oe) : q.oe;
@@ -189806,11 +189849,11 @@ function App() {
   const persist = (next) => { setState(next); saveState(next); };
 
   const record = (domId, correct) => { try { novaLogStudy(); } catch (e) {}
-    const next = JSON.parse(JSON.stringify(state));
+    setState((prev) => { const next = JSON.parse(JSON.stringify(prev)); // 同じ描画中に続けて呼ばれても（本番モードの一括採点）前の更新に積み上げる
     if (!next.progress[domId]) next.progress[domId] = { correct: 0, attempts: 0 };
     next.progress[domId].attempts++;
     if (correct) next.progress[domId].correct++;
-    persist(next);
+    saveState(next); return next; });
   };
 
   if (!loaded) return <div style={{ padding: 40, textAlign: "center", color: C.deep }}>{t.loading}</div>;
@@ -190084,7 +190127,7 @@ function Quiz({ onAnswer, lang, t }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
           </div>
@@ -190149,14 +190192,16 @@ function Exam({ onAnswer, lang, t, backRef }) {
 
   useEffect(() => { if (!backRef) return; backRef.current = () => { if (phase === "run" || phase === "result") { setPhase("select"); return true; } return false; }; return () => { if (backRef) backRef.current = null; }; }, [phase, backRef]);
   useEffect(() => {
-    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain }, (en ? "Set " : "セット") + setNo);
+    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain, bv: legacyOrder ? 1 : 2 }, (en ? "Set " : "セット") + setNo);
     else if (phase === "result") slot.remove();
   }, [phase, pos, picks, sel, mSel, flags]);
 
   const rawQs = setNo ? (kind === "domain" ? (DOMAIN_SETS[setNo] || []) : EXAM_SETS[setNo]) : [];
+  const [legacyOrder, setLegacyOrder] = useState(false); // 変更前の途中保存から再開したときだけ true
   const qs = useMemo(() => {
     const salt = "ab_" + setNo + "_" + kind;
-    let arr = rawQs.map(Q => { const { opts, answer } = shuffleChoices(Q, lang, salt); return { ...Q, o: opts, a: answer }; });
+    let arr = rawQs.map(Q => { const { opts, answer } = shuffleChoices(Q, lang, salt, legacyOrder); return { ...Q, o: opts, a: answer }; });
+    if (!legacyOrder && setNo) arr = novaBalanceAnswers(arr, STORE_KEY + "|" + salt + "|" + lang);
     if (!setNo) return arr;
     const isDom = kind === "domain";
     const base = isDom ? 0 : ((typeof setNo === "number" ? setNo : 1) - 1);
@@ -190184,7 +190229,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     if (typeof AB620_EXHIBIT !== "undefined" && AB620_EXHIBIT.length) {
       const pool = isDom ? AB620_EXHIBIT.filter(q => q.d === setNo) : AB620_EXHIBIT;
       const k = isDom ? Math.min(1, pool.length) : Math.min(2, pool.length);
-      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, answer } = shuffleChoices(Q, lang, salt); specials.push({ ...Q, o: opts, a: answer, ex: true }); }
+      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, answer } = shuffleChoices(Q, lang, salt, legacyOrder); specials.push({ ...Q, o: opts, a: answer, ex: true }); }
     }
     if (typeof AB620_MATRIX !== "undefined" && AB620_MATRIX.length) {
       const pool = isDom ? AB620_MATRIX.filter(q => q.d === setNo) : AB620_MATRIX;
@@ -190204,11 +190249,11 @@ function Exam({ onAnswer, lang, t, backRef }) {
       arr = mixed;
     }
     return arr;
-  }, [setNo, mode, kind, lang]);
+  }, [setNo, mode, kind, lang, legacyOrder]);
 
   const start = (n) => {
     const base = (kind === "domain" ? (DOMAIN_SETS[n] || []) : EXAM_SETS[n]) || [];
-    setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({});
+    setLegacyOrder(false); setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({});
     setRemain(mode === "real" ? certExamSeconds("dp900", base.length) : 0);
     setPhase("run");
   };
@@ -190260,7 +190305,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <div style={{ fontSize: 12.5, fontWeight: 700, color: C.deep }}>{en ? "Exam in progress" : "中断した模試"}</div>
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
-            <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
+            <button onClick={async () => { const d = await slot.read(); if (!d) return; setLegacyOrder(d.bv !== 2); setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
               style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
@@ -190313,10 +190358,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div>
         <div style={{ background: passed ? "#E4F6EC" : "#FBE9E7", border: `2px solid ${passed ? C.ok : C.ng}`, borderRadius: 12, padding: 18, textAlign: "center", marginBottom: 14 }}>
-          <div style={{ fontSize: 13, color: "#5a7780" }}>{en ? `Set ${setNo} · Result` : `セット${setNo}・結果`}</div>
-          <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : C.ng }}>{rate}%</div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: passed ? C.ok : C.ng }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
-          <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
+          <div style={{ fontSize: 13, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7") }}>{en ? `Set ${setNo} · Result` : `セット${setNo}・結果`}</div>
+          <div style={{ fontSize: 40, fontWeight: 800, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{rate}%</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
+          <div style={{ fontSize: 12, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7"), marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
@@ -190331,12 +190376,12 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const val = picks[pos] || {};
     return (<div>{(Q.items || []).map(it => { const chosen = val[it.id] || ""; const ok = chosen === Q.correct[it.id]; return (
       <div key={it.id} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, padding: "9px 11px", border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, borderRadius: 8, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
-        <span style={{ flex: 1, fontSize: 13.5, color: C.ink }}>{L(it, "text", lang)}</span>
-        <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, background: "#fff", color: C.ink }}>
+        <span style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere", fontSize: 13.5, color: C.ink }}>{L(it, "text", lang)}</span>
+        <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, maxWidth: "55%", background: "#fff", color: C.ink }}>
           <option value="">{en ? "— select —" : "— 選択 —"}</option>
           {(Q.targets || []).map(tg => (<option key={tg.id} value={tg.id}>{L(tg, "label", lang)}</option>))}
         </select>
-        {submitted && <span style={{ fontSize: 14, fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
+        {submitted && <span style={{ fontSize: 14, fontWeight: 900, flexShrink: 0, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
       </div>); })}</div>);
   };
   const renderBuildBody = (Q, submitted) => {
@@ -190352,8 +190397,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <span style={{ fontWeight: 800, color: C.deep, minWidth: 18 }}>{idx + 1}.</span>
           <span style={{ flex: 1, fontSize: 13 }}>{txt(id)}</span>
           {submitted ? <span style={{ fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span> : (<>
-            <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : C.primary }}>▲</button>
-            <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
+            <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : nvInk(C.primary, C.light, 3) }}>▲</button>
+            <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : nvInk(C.primary, C.light, 3) }}>▼</button>
             <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
           </>)}
         </div>); }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
@@ -190389,7 +190434,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{L(s, "text", lang)}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
-          {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
+          {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: nvInk(ok ? C.ok : C.ng, ok ? "#E4F6EC" : "#FBE9E7") }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
         </div>
       </div>); })}</div>);
   };
@@ -190413,8 +190458,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const hh = String(Math.floor(remain / 3600)).padStart(2, "0");
     const mm = String(Math.floor((remain % 3600) / 60)).padStart(2, "0");
     const ss = String(remain % 60).padStart(2, "0");
-    const NAVY = "#12324a", STEEL = C.primary, INK = "#1b2a33";
-    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : "#5a7780", PAGE = contrast ? "#0b0f12" : "#eceff2";
+    const NAVY = "#12324a", STEEL = nvInk(C.primary, "#ffffff"), INK = "#1b2a33";
+    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : nvInk("#5a7780", "#eceff2"), PAGE = contrast ? "#0b0f12" : "#eceff2";
     const Toggle = ({ on, onToggle }) => (<span onClick={onToggle} role="switch" aria-checked={on} style={{ display: "inline-block", width: 34, height: 19, borderRadius: 20, background: on ? STEEL : "#b7c3cb", position: "relative", cursor: "pointer", verticalAlign: "middle", flexShrink: 0 }}><span style={{ position: "absolute", top: 2, left: on ? 17 : 2, width: 15, height: 15, borderRadius: "50%", background: "#fff", boxShadow: "0 1px 2px rgba(0,0,0,.35)" }} /></span>);
     const isMulti = !!Q.multi;
     const selArr = Array.isArray(curPick) ? curPick : [];
@@ -190507,37 +190552,37 @@ function Exam({ onAnswer, lang, t, backRef }) {
         {Array.isArray(Q.exhibits) && renderExhibits(Q.exhibits)}
         {(() => {
           if (Q.dnd) { const dndOk = dndRight(Q, picks[pos]); const done = dndComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderDndBody(Q, submitted)}
             {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(dndOk ? C.ok : C.ng, C.light) }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.build) { const bOk = buildRight(Q, picks[pos]); const done = buildComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderBuildBody(Q, submitted)}
             {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(bOk ? C.ok : C.ng, C.light) }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.mx) { const mxOk = mxRight(Q, picks[pos]); const done = mxComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "scenario")}</div>
             {renderMxBody(Q, submitted)}
             {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(mxOk ? C.ok : C.ng, C.light) }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.hot) { const hotOk = hotRight(Q, picks[pos]); const done = hotComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderHotBody(Q, submitted)}
             {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(hotOk ? C.ok : C.ng, C.light) }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           const isMulti = !!Q.multi; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); const selSet = Array.isArray(sel) ? sel : []; const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isR = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
           return (<>
-            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${need} answers. (${submitted ? selSet.length : mSel.length}/${need})` : `正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
+            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${need} answers. (${submitted ? selSet.length : mSel.length}/${need})` : `正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {opts.map((opt, i) => {
               if (isMulti) { const chosen = submitted ? selSet.includes(i) : mSel.includes(i); const isC = correctSet.includes(i); let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (isC) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (chosen) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } } else if (chosen) { bg = C.light; bd = C.primary; col = C.deep; }
@@ -190546,12 +190591,12 @@ function Exam({ onAnswer, lang, t, backRef }) {
               return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
             })}
             {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(isR ? C.ok : C.ng, C.light) }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>);
         })()}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
-        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : C.primary, cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
+        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : nvInk(C.primary, "#ffffff"), cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
         <span style={{ fontSize: 13, color: "#5a7780", fontWeight: 600 }}>{pos + 1} / {qs.length}</span>
         <button onClick={next} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
@@ -190661,7 +190706,7 @@ function Review({ lang, t, onAnswer }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
             {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
@@ -191348,27 +191393,17 @@ function permFromSeed(n, seed) {
   }
   return idx;
 }
-// 問題の選択肢をシャッフルし、正答が必ず先頭に来ないようにする
+// 問題の選択肢をシャッフルする（正解の位置は偏らない）
 // salt を変えると同じ問題でも別の並びになる（クイズ⇔模試⇔セッションで分散）
-function shuffleChoices(q, lang, salt = 0) {
+function shuffleChoices(q, lang, salt = 0, legacy = false) {
   const opts = lang === "en" ? (q.oEn || q.o) : q.o;
   const n = opts.length;
   // キーから決定的シード
   let h = 0; const base = qKey(q) + "|" + salt;
   for (let i = 0; i < base.length; i++) { h = (h * 33 + base.charCodeAt(i)) | 0; }
   let perm = permFromSeed(n, h >>> 0);
-  // 正答が先頭に来てしまう場合は別シードで再試行（数回）し、最終的には強制スワップ
-  let tries = 0;
-  while (perm[0] === q.a && tries < 8) {
-    h = (h * 1103515245 + 12345) | 0;
-    perm = permFromSeed(n, h >>> 0);
-    tries++;
-  }
-  if (perm[0] === q.a) {
-    // 正答を後ろの位置と入れ替える（先頭回避を保証）
-    const target = 1 + ((h >>> 0) % (n - 1));
-    [perm[0], perm[target]] = [perm[target], perm[0]];
-  }
+  // 正解の位置は A〜D のどこにも同じ確率で来る（以前は「正解を先頭に置かない」ようにしていたが、A が正解にならないと分かると1択減らせてしまうのでやめた）
+  if (legacy) { let tries = 0; while (perm[0] === q.a && tries < 8) { h = (h * 1103515245 + 12345) | 0; perm = permFromSeed(n, h >>> 0); tries++; } if (perm[0] === q.a) { const target = 1 + ((h >>> 0) % (n - 1)); [perm[0], perm[target]] = [perm[target], perm[0]]; } } // 変更前の途中保存から再開したときだけ、以前の並べ方を再現する
   const shuffledOpts = perm.map(i => opts[i]);
   const newAnswer = perm.indexOf(q.a);
   const oeSrc = lang === "en" ? (q.oeEn || q.oe) : q.oe;
@@ -191558,11 +191593,11 @@ function App() {
   const persist = (next) => { setState(next); saveState(next); };
 
   const record = (domId, correct) => { try { novaLogStudy(); } catch (e) {}
-    const next = JSON.parse(JSON.stringify(state));
+    setState((prev) => { const next = JSON.parse(JSON.stringify(prev)); // 同じ描画中に続けて呼ばれても（本番モードの一括採点）前の更新に積み上げる
     if (!next.progress[domId]) next.progress[domId] = { correct: 0, attempts: 0 };
     next.progress[domId].attempts++;
     if (correct) next.progress[domId].correct++;
-    persist(next);
+    saveState(next); return next; });
   };
 
   if (!loaded) return <div style={{ padding: 40, textAlign: "center", color: C.deep }}>{t.loading}</div>;
@@ -191836,7 +191871,7 @@ function Quiz({ onAnswer, lang, t }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
           </div>
@@ -191901,14 +191936,16 @@ function Exam({ onAnswer, lang, t, backRef }) {
 
   useEffect(() => { if (!backRef) return; backRef.current = () => { if (phase === "run" || phase === "result") { setPhase("select"); return true; } return false; }; return () => { if (backRef) backRef.current = null; }; }, [phase, backRef]);
   useEffect(() => {
-    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain }, (en ? "Set " : "セット") + setNo);
+    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain, bv: legacyOrder ? 1 : 2 }, (en ? "Set " : "セット") + setNo);
     else if (phase === "result") slot.remove();
   }, [phase, pos, picks, sel, mSel, flags]);
 
   const rawQs = setNo ? (kind === "domain" ? (DOMAIN_SETS[setNo] || []) : EXAM_SETS[setNo]) : [];
+  const [legacyOrder, setLegacyOrder] = useState(false); // 変更前の途中保存から再開したときだけ true
   const qs = useMemo(() => {
     const salt = "ab_" + setNo + "_" + kind;
-    let arr = rawQs.map(Q => { const { opts, answer } = shuffleChoices(Q, lang, salt); return { ...Q, o: opts, a: answer }; });
+    let arr = rawQs.map(Q => { const { opts, answer } = shuffleChoices(Q, lang, salt, legacyOrder); return { ...Q, o: opts, a: answer }; });
+    if (!legacyOrder && setNo) arr = novaBalanceAnswers(arr, STORE_KEY + "|" + salt + "|" + lang);
     if (!setNo) return arr;
     const isDom = kind === "domain";
     const base = isDom ? 0 : ((typeof setNo === "number" ? setNo : 1) - 1);
@@ -191936,7 +191973,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     if (typeof AB620_EXHIBIT !== "undefined" && AB620_EXHIBIT.length) {
       const pool = isDom ? AB620_EXHIBIT.filter(q => q.d === setNo) : AB620_EXHIBIT;
       const k = isDom ? Math.min(1, pool.length) : Math.min(2, pool.length);
-      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, answer } = shuffleChoices(Q, lang, salt); specials.push({ ...Q, o: opts, a: answer, ex: true }); }
+      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, answer } = shuffleChoices(Q, lang, salt, legacyOrder); specials.push({ ...Q, o: opts, a: answer, ex: true }); }
     }
     if (typeof AB620_MATRIX !== "undefined" && AB620_MATRIX.length) {
       const pool = isDom ? AB620_MATRIX.filter(q => q.d === setNo) : AB620_MATRIX;
@@ -191956,11 +191993,11 @@ function Exam({ onAnswer, lang, t, backRef }) {
       arr = mixed;
     }
     return arr;
-  }, [setNo, mode, kind, lang]);
+  }, [setNo, mode, kind, lang, legacyOrder]);
 
   const start = (n) => {
     const base = (kind === "domain" ? (DOMAIN_SETS[n] || []) : EXAM_SETS[n]) || [];
-    setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({});
+    setLegacyOrder(false); setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({});
     setRemain(mode === "real" ? certExamSeconds("sc500", base.length) : 0);
     setPhase("run");
   };
@@ -192012,7 +192049,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <div style={{ fontSize: 12.5, fontWeight: 700, color: C.deep }}>{en ? "Exam in progress" : "中断した模試"}</div>
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
-            <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
+            <button onClick={async () => { const d = await slot.read(); if (!d) return; setLegacyOrder(d.bv !== 2); setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
               style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
@@ -192066,10 +192103,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div>
         <div style={{ background: passed ? "#E4F6EC" : "#FBE9E7", border: `2px solid ${passed ? C.ok : C.ng}`, borderRadius: 12, padding: 18, textAlign: "center", marginBottom: 14 }}>
-          <div style={{ fontSize: 13, color: "#5a7780" }}>{en ? `Set ${setNo} · Result` : `セット${setNo}・結果`}</div>
-          <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : C.ng }}>{rate}%</div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: passed ? C.ok : C.ng }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
-          <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
+          <div style={{ fontSize: 13, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7") }}>{en ? `Set ${setNo} · Result` : `セット${setNo}・結果`}</div>
+          <div style={{ fontSize: 40, fontWeight: 800, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{rate}%</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
+          <div style={{ fontSize: 12, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7"), marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
@@ -192084,12 +192121,12 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const val = picks[pos] || {};
     return (<div>{(Q.items || []).map(it => { const chosen = val[it.id] || ""; const ok = chosen === Q.correct[it.id]; return (
       <div key={it.id} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, padding: "9px 11px", border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, borderRadius: 8, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
-        <span style={{ flex: 1, fontSize: 13.5, color: C.ink }}>{L(it, "text", lang)}</span>
-        <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, background: "#fff", color: C.ink }}>
+        <span style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere", fontSize: 13.5, color: C.ink }}>{L(it, "text", lang)}</span>
+        <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, maxWidth: "55%", background: "#fff", color: C.ink }}>
           <option value="">{en ? "— select —" : "— 選択 —"}</option>
           {(Q.targets || []).map(tg => (<option key={tg.id} value={tg.id}>{L(tg, "label", lang)}</option>))}
         </select>
-        {submitted && <span style={{ fontSize: 14, fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
+        {submitted && <span style={{ fontSize: 14, fontWeight: 900, flexShrink: 0, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
       </div>); })}</div>);
   };
   const renderBuildBody = (Q, submitted) => {
@@ -192105,8 +192142,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <span style={{ fontWeight: 800, color: C.deep, minWidth: 18 }}>{idx + 1}.</span>
           <span style={{ flex: 1, fontSize: 13 }}>{txt(id)}</span>
           {submitted ? <span style={{ fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span> : (<>
-            <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : C.primary }}>▲</button>
-            <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
+            <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : nvInk(C.primary, C.light, 3) }}>▲</button>
+            <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : nvInk(C.primary, C.light, 3) }}>▼</button>
             <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
           </>)}
         </div>); }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
@@ -192142,7 +192179,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{L(s, "text", lang)}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
-          {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
+          {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: nvInk(ok ? C.ok : C.ng, ok ? "#E4F6EC" : "#FBE9E7") }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
         </div>
       </div>); })}</div>);
   };
@@ -192166,8 +192203,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const hh = String(Math.floor(remain / 3600)).padStart(2, "0");
     const mm = String(Math.floor((remain % 3600) / 60)).padStart(2, "0");
     const ss = String(remain % 60).padStart(2, "0");
-    const NAVY = "#12324a", STEEL = C.primary, INK = "#1b2a33";
-    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : "#5a7780", PAGE = contrast ? "#0b0f12" : "#eceff2";
+    const NAVY = "#12324a", STEEL = nvInk(C.primary, "#ffffff"), INK = "#1b2a33";
+    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : nvInk("#5a7780", "#eceff2"), PAGE = contrast ? "#0b0f12" : "#eceff2";
     const Toggle = ({ on, onToggle }) => (<span onClick={onToggle} role="switch" aria-checked={on} style={{ display: "inline-block", width: 34, height: 19, borderRadius: 20, background: on ? STEEL : "#b7c3cb", position: "relative", cursor: "pointer", verticalAlign: "middle", flexShrink: 0 }}><span style={{ position: "absolute", top: 2, left: on ? 17 : 2, width: 15, height: 15, borderRadius: "50%", background: "#fff", boxShadow: "0 1px 2px rgba(0,0,0,.35)" }} /></span>);
     const isMulti = !!Q.multi;
     const selArr = Array.isArray(curPick) ? curPick : [];
@@ -192260,37 +192297,37 @@ function Exam({ onAnswer, lang, t, backRef }) {
         {Array.isArray(Q.exhibits) && renderExhibits(Q.exhibits)}
         {(() => {
           if (Q.dnd) { const dndOk = dndRight(Q, picks[pos]); const done = dndComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderDndBody(Q, submitted)}
             {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(dndOk ? C.ok : C.ng, C.light) }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.build) { const bOk = buildRight(Q, picks[pos]); const done = buildComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderBuildBody(Q, submitted)}
             {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(bOk ? C.ok : C.ng, C.light) }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.mx) { const mxOk = mxRight(Q, picks[pos]); const done = mxComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "scenario")}</div>
             {renderMxBody(Q, submitted)}
             {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(mxOk ? C.ok : C.ng, C.light) }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.hot) { const hotOk = hotRight(Q, picks[pos]); const done = hotComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderHotBody(Q, submitted)}
             {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(hotOk ? C.ok : C.ng, C.light) }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           const isMulti = !!Q.multi; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); const selSet = Array.isArray(sel) ? sel : []; const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isR = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
           return (<>
-            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${need} answers. (${submitted ? selSet.length : mSel.length}/${need})` : `正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
+            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${need} answers. (${submitted ? selSet.length : mSel.length}/${need})` : `正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {opts.map((opt, i) => {
               if (isMulti) { const chosen = submitted ? selSet.includes(i) : mSel.includes(i); const isC = correctSet.includes(i); let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (isC) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (chosen) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } } else if (chosen) { bg = C.light; bd = C.primary; col = C.deep; }
@@ -192299,12 +192336,12 @@ function Exam({ onAnswer, lang, t, backRef }) {
               return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
             })}
             {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(isR ? C.ok : C.ng, C.light) }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>);
         })()}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
-        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : C.primary, cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
+        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : nvInk(C.primary, "#ffffff"), cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
         <span style={{ fontSize: 13, color: "#5a7780", fontWeight: 600 }}>{pos + 1} / {qs.length}</span>
         <button onClick={next} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
@@ -192414,7 +192451,7 @@ function Review({ lang, t, onAnswer }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
             {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
@@ -193074,27 +193111,17 @@ function permFromSeed(n, seed) {
   }
   return idx;
 }
-// 問題の選択肢をシャッフルし、正答が必ず先頭に来ないようにする
+// 問題の選択肢をシャッフルする（正解の位置は偏らない）
 // salt を変えると同じ問題でも別の並びになる（クイズ⇔模試⇔セッションで分散）
-function shuffleChoices(q, lang, salt = 0) {
+function shuffleChoices(q, lang, salt = 0, legacy = false) {
   const opts = lang === "en" ? (q.oEn || q.o) : q.o;
   const n = opts.length;
   // キーから決定的シード
   let h = 0; const base = qKey(q) + "|" + salt;
   for (let i = 0; i < base.length; i++) { h = (h * 33 + base.charCodeAt(i)) | 0; }
   let perm = permFromSeed(n, h >>> 0);
-  // 正答が先頭に来てしまう場合は別シードで再試行（数回）し、最終的には強制スワップ
-  let tries = 0;
-  while (perm[0] === q.a && tries < 8) {
-    h = (h * 1103515245 + 12345) | 0;
-    perm = permFromSeed(n, h >>> 0);
-    tries++;
-  }
-  if (perm[0] === q.a) {
-    // 正答を後ろの位置と入れ替える（先頭回避を保証）
-    const target = 1 + ((h >>> 0) % (n - 1));
-    [perm[0], perm[target]] = [perm[target], perm[0]];
-  }
+  // 正解の位置は A〜D のどこにも同じ確率で来る（以前は「正解を先頭に置かない」ようにしていたが、A が正解にならないと分かると1択減らせてしまうのでやめた）
+  if (legacy) { let tries = 0; while (perm[0] === q.a && tries < 8) { h = (h * 1103515245 + 12345) | 0; perm = permFromSeed(n, h >>> 0); tries++; } if (perm[0] === q.a) { const target = 1 + ((h >>> 0) % (n - 1)); [perm[0], perm[target]] = [perm[target], perm[0]]; } } // 変更前の途中保存から再開したときだけ、以前の並べ方を再現する
   const shuffledOpts = perm.map(i => opts[i]);
   const newAnswer = perm.indexOf(q.a);
   const oeSrc = lang === "en" ? (q.oeEn || q.oe) : q.oe;
@@ -193284,11 +193311,11 @@ function App() {
   const persist = (next) => { setState(next); saveState(next); };
 
   const record = (domId, correct) => { try { novaLogStudy(); } catch (e) {}
-    const next = JSON.parse(JSON.stringify(state));
+    setState((prev) => { const next = JSON.parse(JSON.stringify(prev)); // 同じ描画中に続けて呼ばれても（本番モードの一括採点）前の更新に積み上げる
     if (!next.progress[domId]) next.progress[domId] = { correct: 0, attempts: 0 };
     next.progress[domId].attempts++;
     if (correct) next.progress[domId].correct++;
-    persist(next);
+    saveState(next); return next; });
   };
 
   if (!loaded) return <div style={{ padding: 40, textAlign: "center", color: C.deep }}>{t.loading}</div>;
@@ -193562,7 +193589,7 @@ function Quiz({ onAnswer, lang, t }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
           </div>
@@ -193627,14 +193654,16 @@ function Exam({ onAnswer, lang, t, backRef }) {
 
   useEffect(() => { if (!backRef) return; backRef.current = () => { if (phase === "run" || phase === "result") { setPhase("select"); return true; } return false; }; return () => { if (backRef) backRef.current = null; }; }, [phase, backRef]);
   useEffect(() => {
-    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain }, (en ? "Set " : "セット") + setNo);
+    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain, bv: legacyOrder ? 1 : 2 }, (en ? "Set " : "セット") + setNo);
     else if (phase === "result") slot.remove();
   }, [phase, pos, picks, sel, mSel, flags]);
 
   const rawQs = setNo ? (kind === "domain" ? (DOMAIN_SETS[setNo] || []) : EXAM_SETS[setNo]) : [];
+  const [legacyOrder, setLegacyOrder] = useState(false); // 変更前の途中保存から再開したときだけ true
   const qs = useMemo(() => {
     const salt = "ab_" + setNo + "_" + kind;
-    let arr = rawQs.map(Q => { const { opts, answer } = shuffleChoices(Q, lang, salt); return { ...Q, o: opts, a: answer }; });
+    let arr = rawQs.map(Q => { const { opts, answer } = shuffleChoices(Q, lang, salt, legacyOrder); return { ...Q, o: opts, a: answer }; });
+    if (!legacyOrder && setNo) arr = novaBalanceAnswers(arr, STORE_KEY + "|" + salt + "|" + lang);
     if (!setNo) return arr;
     const isDom = kind === "domain";
     const base = isDom ? 0 : ((typeof setNo === "number" ? setNo : 1) - 1);
@@ -193662,7 +193691,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     if (typeof AB620_EXHIBIT !== "undefined" && AB620_EXHIBIT.length) {
       const pool = isDom ? AB620_EXHIBIT.filter(q => q.d === setNo) : AB620_EXHIBIT;
       const k = isDom ? Math.min(1, pool.length) : Math.min(2, pool.length);
-      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, answer } = shuffleChoices(Q, lang, salt); specials.push({ ...Q, o: opts, a: answer, ex: true }); }
+      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, answer } = shuffleChoices(Q, lang, salt, legacyOrder); specials.push({ ...Q, o: opts, a: answer, ex: true }); }
     }
     if (typeof AB620_MATRIX !== "undefined" && AB620_MATRIX.length) {
       const pool = isDom ? AB620_MATRIX.filter(q => q.d === setNo) : AB620_MATRIX;
@@ -193682,11 +193711,11 @@ function Exam({ onAnswer, lang, t, backRef }) {
       arr = mixed;
     }
     return arr;
-  }, [setNo, mode, kind, lang]);
+  }, [setNo, mode, kind, lang, legacyOrder]);
 
   const start = (n) => {
     const base = (kind === "domain" ? (DOMAIN_SETS[n] || []) : EXAM_SETS[n]) || [];
-    setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({});
+    setLegacyOrder(false); setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({});
     setRemain(mode === "real" ? certExamSeconds("sc900", base.length) : 0);
     setPhase("run");
   };
@@ -193738,7 +193767,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <div style={{ fontSize: 12.5, fontWeight: 700, color: C.deep }}>{en ? "Exam in progress" : "中断した模試"}</div>
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
-            <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
+            <button onClick={async () => { const d = await slot.read(); if (!d) return; setLegacyOrder(d.bv !== 2); setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
               style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
@@ -193792,10 +193821,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div>
         <div style={{ background: passed ? "#E4F6EC" : "#FBE9E7", border: `2px solid ${passed ? C.ok : C.ng}`, borderRadius: 12, padding: 18, textAlign: "center", marginBottom: 14 }}>
-          <div style={{ fontSize: 13, color: "#5a7780" }}>{en ? `Set ${setNo} · Result` : `セット${setNo}・結果`}</div>
-          <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : C.ng }}>{rate}%</div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: passed ? C.ok : C.ng }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
-          <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
+          <div style={{ fontSize: 13, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7") }}>{en ? `Set ${setNo} · Result` : `セット${setNo}・結果`}</div>
+          <div style={{ fontSize: 40, fontWeight: 800, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{rate}%</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
+          <div style={{ fontSize: 12, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7"), marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
@@ -193810,12 +193839,12 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const val = picks[pos] || {};
     return (<div>{(Q.items || []).map(it => { const chosen = val[it.id] || ""; const ok = chosen === Q.correct[it.id]; return (
       <div key={it.id} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, padding: "9px 11px", border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, borderRadius: 8, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
-        <span style={{ flex: 1, fontSize: 13.5, color: C.ink }}>{L(it, "text", lang)}</span>
-        <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, background: "#fff", color: C.ink }}>
+        <span style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere", fontSize: 13.5, color: C.ink }}>{L(it, "text", lang)}</span>
+        <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, maxWidth: "55%", background: "#fff", color: C.ink }}>
           <option value="">{en ? "— select —" : "— 選択 —"}</option>
           {(Q.targets || []).map(tg => (<option key={tg.id} value={tg.id}>{L(tg, "label", lang)}</option>))}
         </select>
-        {submitted && <span style={{ fontSize: 14, fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
+        {submitted && <span style={{ fontSize: 14, fontWeight: 900, flexShrink: 0, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
       </div>); })}</div>);
   };
   const renderBuildBody = (Q, submitted) => {
@@ -193831,8 +193860,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <span style={{ fontWeight: 800, color: C.deep, minWidth: 18 }}>{idx + 1}.</span>
           <span style={{ flex: 1, fontSize: 13 }}>{txt(id)}</span>
           {submitted ? <span style={{ fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span> : (<>
-            <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : C.primary }}>▲</button>
-            <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
+            <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : nvInk(C.primary, C.light, 3) }}>▲</button>
+            <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : nvInk(C.primary, C.light, 3) }}>▼</button>
             <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
           </>)}
         </div>); }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
@@ -193868,7 +193897,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{L(s, "text", lang)}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
-          {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
+          {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: nvInk(ok ? C.ok : C.ng, ok ? "#E4F6EC" : "#FBE9E7") }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
         </div>
       </div>); })}</div>);
   };
@@ -193892,8 +193921,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const hh = String(Math.floor(remain / 3600)).padStart(2, "0");
     const mm = String(Math.floor((remain % 3600) / 60)).padStart(2, "0");
     const ss = String(remain % 60).padStart(2, "0");
-    const NAVY = "#12324a", STEEL = C.primary, INK = "#1b2a33";
-    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : "#5a7780", PAGE = contrast ? "#0b0f12" : "#eceff2";
+    const NAVY = "#12324a", STEEL = nvInk(C.primary, "#ffffff"), INK = "#1b2a33";
+    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : nvInk("#5a7780", "#eceff2"), PAGE = contrast ? "#0b0f12" : "#eceff2";
     const Toggle = ({ on, onToggle }) => (<span onClick={onToggle} role="switch" aria-checked={on} style={{ display: "inline-block", width: 34, height: 19, borderRadius: 20, background: on ? STEEL : "#b7c3cb", position: "relative", cursor: "pointer", verticalAlign: "middle", flexShrink: 0 }}><span style={{ position: "absolute", top: 2, left: on ? 17 : 2, width: 15, height: 15, borderRadius: "50%", background: "#fff", boxShadow: "0 1px 2px rgba(0,0,0,.35)" }} /></span>);
     const isMulti = !!Q.multi;
     const selArr = Array.isArray(curPick) ? curPick : [];
@@ -193986,37 +194015,37 @@ function Exam({ onAnswer, lang, t, backRef }) {
         {Array.isArray(Q.exhibits) && renderExhibits(Q.exhibits)}
         {(() => {
           if (Q.dnd) { const dndOk = dndRight(Q, picks[pos]); const done = dndComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderDndBody(Q, submitted)}
             {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(dndOk ? C.ok : C.ng, C.light) }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.build) { const bOk = buildRight(Q, picks[pos]); const done = buildComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderBuildBody(Q, submitted)}
             {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(bOk ? C.ok : C.ng, C.light) }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.mx) { const mxOk = mxRight(Q, picks[pos]); const done = mxComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "scenario")}</div>
             {renderMxBody(Q, submitted)}
             {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(mxOk ? C.ok : C.ng, C.light) }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.hot) { const hotOk = hotRight(Q, picks[pos]); const done = hotComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderHotBody(Q, submitted)}
             {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(hotOk ? C.ok : C.ng, C.light) }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           const isMulti = !!Q.multi; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); const selSet = Array.isArray(sel) ? sel : []; const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isR = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
           return (<>
-            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${need} answers. (${submitted ? selSet.length : mSel.length}/${need})` : `正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
+            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${need} answers. (${submitted ? selSet.length : mSel.length}/${need})` : `正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {opts.map((opt, i) => {
               if (isMulti) { const chosen = submitted ? selSet.includes(i) : mSel.includes(i); const isC = correctSet.includes(i); let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (isC) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (chosen) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } } else if (chosen) { bg = C.light; bd = C.primary; col = C.deep; }
@@ -194025,12 +194054,12 @@ function Exam({ onAnswer, lang, t, backRef }) {
               return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
             })}
             {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(isR ? C.ok : C.ng, C.light) }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>);
         })()}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
-        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : C.primary, cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
+        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : nvInk(C.primary, "#ffffff"), cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
         <span style={{ fontSize: 13, color: "#5a7780", fontWeight: 600 }}>{pos + 1} / {qs.length}</span>
         <button onClick={next} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
@@ -194140,7 +194169,7 @@ function Review({ lang, t, onAnswer }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
             {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
@@ -194792,27 +194821,17 @@ function permFromSeed(n, seed) {
   }
   return idx;
 }
-// 問題の選択肢をシャッフルし、正答が必ず先頭に来ないようにする
+// 問題の選択肢をシャッフルする（正解の位置は偏らない）
 // salt を変えると同じ問題でも別の並びになる（クイズ⇔模試⇔セッションで分散）
-function shuffleChoices(q, lang, salt = 0) {
+function shuffleChoices(q, lang, salt = 0, legacy = false) {
   const opts = lang === "en" ? (q.oEn || q.o) : q.o;
   const n = opts.length;
   // キーから決定的シード
   let h = 0; const base = qKey(q) + "|" + salt;
   for (let i = 0; i < base.length; i++) { h = (h * 33 + base.charCodeAt(i)) | 0; }
   let perm = permFromSeed(n, h >>> 0);
-  // 正答が先頭に来てしまう場合は別シードで再試行（数回）し、最終的には強制スワップ
-  let tries = 0;
-  while (perm[0] === q.a && tries < 8) {
-    h = (h * 1103515245 + 12345) | 0;
-    perm = permFromSeed(n, h >>> 0);
-    tries++;
-  }
-  if (perm[0] === q.a) {
-    // 正答を後ろの位置と入れ替える（先頭回避を保証）
-    const target = 1 + ((h >>> 0) % (n - 1));
-    [perm[0], perm[target]] = [perm[target], perm[0]];
-  }
+  // 正解の位置は A〜D のどこにも同じ確率で来る（以前は「正解を先頭に置かない」ようにしていたが、A が正解にならないと分かると1択減らせてしまうのでやめた）
+  if (legacy) { let tries = 0; while (perm[0] === q.a && tries < 8) { h = (h * 1103515245 + 12345) | 0; perm = permFromSeed(n, h >>> 0); tries++; } if (perm[0] === q.a) { const target = 1 + ((h >>> 0) % (n - 1)); [perm[0], perm[target]] = [perm[target], perm[0]]; } } // 変更前の途中保存から再開したときだけ、以前の並べ方を再現する
   const shuffledOpts = perm.map(i => opts[i]);
   const newAnswer = perm.indexOf(q.a);
   const oeSrc = lang === "en" ? (q.oeEn || q.oe) : q.oe;
@@ -195002,11 +195021,11 @@ function App() {
   const persist = (next) => { setState(next); saveState(next); };
 
   const record = (domId, correct) => { try { novaLogStudy(); } catch (e) {}
-    const next = JSON.parse(JSON.stringify(state));
+    setState((prev) => { const next = JSON.parse(JSON.stringify(prev)); // 同じ描画中に続けて呼ばれても（本番モードの一括採点）前の更新に積み上げる
     if (!next.progress[domId]) next.progress[domId] = { correct: 0, attempts: 0 };
     next.progress[domId].attempts++;
     if (correct) next.progress[domId].correct++;
-    persist(next);
+    saveState(next); return next; });
   };
 
   if (!loaded) return <div style={{ padding: 40, textAlign: "center", color: C.deep }}>{t.loading}</div>;
@@ -195280,7 +195299,7 @@ function Quiz({ onAnswer, lang, t }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
           </div>
@@ -195345,14 +195364,16 @@ function Exam({ onAnswer, lang, t, backRef }) {
 
   useEffect(() => { if (!backRef) return; backRef.current = () => { if (phase === "run" || phase === "result") { setPhase("select"); return true; } return false; }; return () => { if (backRef) backRef.current = null; }; }, [phase, backRef]);
   useEffect(() => {
-    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain }, (en ? "Set " : "セット") + setNo);
+    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain, bv: legacyOrder ? 1 : 2 }, (en ? "Set " : "セット") + setNo);
     else if (phase === "result") slot.remove();
   }, [phase, pos, picks, sel, mSel, flags]);
 
   const rawQs = setNo ? (kind === "domain" ? (DOMAIN_SETS[setNo] || []) : EXAM_SETS[setNo]) : [];
+  const [legacyOrder, setLegacyOrder] = useState(false); // 変更前の途中保存から再開したときだけ true
   const qs = useMemo(() => {
     const salt = "ab_" + setNo + "_" + kind;
-    let arr = rawQs.map(Q => { const { opts, answer } = shuffleChoices(Q, lang, salt); return { ...Q, o: opts, a: answer }; });
+    let arr = rawQs.map(Q => { const { opts, answer } = shuffleChoices(Q, lang, salt, legacyOrder); return { ...Q, o: opts, a: answer }; });
+    if (!legacyOrder && setNo) arr = novaBalanceAnswers(arr, STORE_KEY + "|" + salt + "|" + lang);
     if (!setNo) return arr;
     const isDom = kind === "domain";
     const base = isDom ? 0 : ((typeof setNo === "number" ? setNo : 1) - 1);
@@ -195380,7 +195401,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     if (typeof GH600_EXHIBIT !== "undefined" && GH600_EXHIBIT.length) {
       const pool = isDom ? GH600_EXHIBIT.filter(q => q.d === setNo) : GH600_EXHIBIT;
       const k = isDom ? Math.min(1, pool.length) : Math.min(2, pool.length);
-      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, answer } = shuffleChoices(Q, lang, salt); specials.push({ ...Q, o: opts, a: answer, ex: true }); }
+      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, answer } = shuffleChoices(Q, lang, salt, legacyOrder); specials.push({ ...Q, o: opts, a: answer, ex: true }); }
     }
     if (typeof GH600_MATRIX !== "undefined" && GH600_MATRIX.length) {
       const pool = isDom ? GH600_MATRIX.filter(q => q.d === setNo) : GH600_MATRIX;
@@ -195400,11 +195421,11 @@ function Exam({ onAnswer, lang, t, backRef }) {
       arr = mixed;
     }
     return arr;
-  }, [setNo, mode, kind, lang]);
+  }, [setNo, mode, kind, lang, legacyOrder]);
 
   const start = (n) => {
     const base = (kind === "domain" ? (DOMAIN_SETS[n] || []) : EXAM_SETS[n]) || [];
-    setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({});
+    setLegacyOrder(false); setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({});
     setRemain(mode === "real" ? certExamSeconds("gh600", base.length) : 0);
     setPhase("run");
   };
@@ -195456,7 +195477,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <div style={{ fontSize: 12.5, fontWeight: 700, color: C.deep }}>{en ? "Exam in progress" : "中断した模試"}</div>
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
-            <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
+            <button onClick={async () => { const d = await slot.read(); if (!d) return; setLegacyOrder(d.bv !== 2); setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
               style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
@@ -195510,10 +195531,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div>
         <div style={{ background: passed ? "#E4F6EC" : "#FBE9E7", border: `2px solid ${passed ? C.ok : C.ng}`, borderRadius: 12, padding: 18, textAlign: "center", marginBottom: 14 }}>
-          <div style={{ fontSize: 13, color: "#5a7780" }}>{en ? `Set ${setNo} · Result` : `セット${setNo}・結果`}</div>
-          <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : C.ng }}>{rate}%</div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: passed ? C.ok : C.ng }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
-          <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
+          <div style={{ fontSize: 13, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7") }}>{en ? `Set ${setNo} · Result` : `セット${setNo}・結果`}</div>
+          <div style={{ fontSize: 40, fontWeight: 800, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{rate}%</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
+          <div style={{ fontSize: 12, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7"), marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
@@ -195528,12 +195549,12 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const val = picks[pos] || {};
     return (<div>{(Q.items || []).map(it => { const chosen = val[it.id] || ""; const ok = chosen === Q.correct[it.id]; return (
       <div key={it.id} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, padding: "9px 11px", border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, borderRadius: 8, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
-        <span style={{ flex: 1, fontSize: 13.5, color: C.ink }}>{L(it, "text", lang)}</span>
-        <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, background: "#fff", color: C.ink }}>
+        <span style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere", fontSize: 13.5, color: C.ink }}>{L(it, "text", lang)}</span>
+        <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, maxWidth: "55%", background: "#fff", color: C.ink }}>
           <option value="">{en ? "— select —" : "— 選択 —"}</option>
           {(Q.targets || []).map(tg => (<option key={tg.id} value={tg.id}>{L(tg, "label", lang)}</option>))}
         </select>
-        {submitted && <span style={{ fontSize: 14, fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
+        {submitted && <span style={{ fontSize: 14, fontWeight: 900, flexShrink: 0, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
       </div>); })}</div>);
   };
   const renderBuildBody = (Q, submitted) => {
@@ -195549,8 +195570,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <span style={{ fontWeight: 800, color: C.deep, minWidth: 18 }}>{idx + 1}.</span>
           <span style={{ flex: 1, fontSize: 13 }}>{txt(id)}</span>
           {submitted ? <span style={{ fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span> : (<>
-            <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : C.primary }}>▲</button>
-            <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
+            <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : nvInk(C.primary, C.light, 3) }}>▲</button>
+            <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : nvInk(C.primary, C.light, 3) }}>▼</button>
             <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
           </>)}
         </div>); }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
@@ -195586,7 +195607,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{L(s, "text", lang)}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
-          {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
+          {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: nvInk(ok ? C.ok : C.ng, ok ? "#E4F6EC" : "#FBE9E7") }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
         </div>
       </div>); })}</div>);
   };
@@ -195610,8 +195631,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const hh = String(Math.floor(remain / 3600)).padStart(2, "0");
     const mm = String(Math.floor((remain % 3600) / 60)).padStart(2, "0");
     const ss = String(remain % 60).padStart(2, "0");
-    const NAVY = "#12324a", STEEL = C.primary, INK = "#1b2a33";
-    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : "#5a7780", PAGE = contrast ? "#0b0f12" : "#eceff2";
+    const NAVY = "#12324a", STEEL = nvInk(C.primary, "#ffffff"), INK = "#1b2a33";
+    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : nvInk("#5a7780", "#eceff2"), PAGE = contrast ? "#0b0f12" : "#eceff2";
     const Toggle = ({ on, onToggle }) => (<span onClick={onToggle} role="switch" aria-checked={on} style={{ display: "inline-block", width: 34, height: 19, borderRadius: 20, background: on ? STEEL : "#b7c3cb", position: "relative", cursor: "pointer", verticalAlign: "middle", flexShrink: 0 }}><span style={{ position: "absolute", top: 2, left: on ? 17 : 2, width: 15, height: 15, borderRadius: "50%", background: "#fff", boxShadow: "0 1px 2px rgba(0,0,0,.35)" }} /></span>);
     const isMulti = !!Q.multi;
     const selArr = Array.isArray(curPick) ? curPick : [];
@@ -195704,37 +195725,37 @@ function Exam({ onAnswer, lang, t, backRef }) {
         {Array.isArray(Q.exhibits) && renderExhibits(Q.exhibits)}
         {(() => {
           if (Q.dnd) { const dndOk = dndRight(Q, picks[pos]); const done = dndComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderDndBody(Q, submitted)}
             {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(dndOk ? C.ok : C.ng, C.light) }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.build) { const bOk = buildRight(Q, picks[pos]); const done = buildComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderBuildBody(Q, submitted)}
             {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(bOk ? C.ok : C.ng, C.light) }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.mx) { const mxOk = mxRight(Q, picks[pos]); const done = mxComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "scenario")}</div>
             {renderMxBody(Q, submitted)}
             {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(mxOk ? C.ok : C.ng, C.light) }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.hot) { const hotOk = hotRight(Q, picks[pos]); const done = hotComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderHotBody(Q, submitted)}
             {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(hotOk ? C.ok : C.ng, C.light) }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           const isMulti = !!Q.multi; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); const selSet = Array.isArray(sel) ? sel : []; const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isR = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
           return (<>
-            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${need} answers. (${submitted ? selSet.length : mSel.length}/${need})` : `正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
+            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${need} answers. (${submitted ? selSet.length : mSel.length}/${need})` : `正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {opts.map((opt, i) => {
               if (isMulti) { const chosen = submitted ? selSet.includes(i) : mSel.includes(i); const isC = correctSet.includes(i); let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (isC) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (chosen) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } } else if (chosen) { bg = C.light; bd = C.primary; col = C.deep; }
@@ -195743,12 +195764,12 @@ function Exam({ onAnswer, lang, t, backRef }) {
               return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
             })}
             {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(isR ? C.ok : C.ng, C.light) }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>);
         })()}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
-        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : C.primary, cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
+        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : nvInk(C.primary, "#ffffff"), cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
         <span style={{ fontSize: 13, color: "#5a7780", fontWeight: 600 }}>{pos + 1} / {qs.length}</span>
         <button onClick={next} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
@@ -195858,7 +195879,7 @@ function Review({ lang, t, onAnswer }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
             {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
@@ -196092,27 +196113,17 @@ function permFromSeed(n, seed) {
   }
   return idx;
 }
-// 問題の選択肢をシャッフルし、正答が必ず先頭に来ないようにする
+// 問題の選択肢をシャッフルする（正解の位置は偏らない）
 // salt を変えると同じ問題でも別の並びになる（クイズ⇔模試⇔セッションで分散）
-function shuffleChoices(q, lang, salt = 0) {
+function shuffleChoices(q, lang, salt = 0, legacy = false) {
   const opts = lang === "en" ? (q.oEn || q.o) : q.o;
   const n = opts.length;
   // キーから決定的シード
   let h = 0; const base = qKey(q) + "|" + salt;
   for (let i = 0; i < base.length; i++) { h = (h * 33 + base.charCodeAt(i)) | 0; }
   let perm = permFromSeed(n, h >>> 0);
-  // 正答が先頭に来てしまう場合は別シードで再試行（数回）し、最終的には強制スワップ
-  let tries = 0;
-  while (perm[0] === q.a && tries < 8) {
-    h = (h * 1103515245 + 12345) | 0;
-    perm = permFromSeed(n, h >>> 0);
-    tries++;
-  }
-  if (perm[0] === q.a) {
-    // 正答を後ろの位置と入れ替える（先頭回避を保証）
-    const target = 1 + ((h >>> 0) % (n - 1));
-    [perm[0], perm[target]] = [perm[target], perm[0]];
-  }
+  // 正解の位置は A〜D のどこにも同じ確率で来る（以前は「正解を先頭に置かない」ようにしていたが、A が正解にならないと分かると1択減らせてしまうのでやめた）
+  if (legacy) { let tries = 0; while (perm[0] === q.a && tries < 8) { h = (h * 1103515245 + 12345) | 0; perm = permFromSeed(n, h >>> 0); tries++; } if (perm[0] === q.a) { const target = 1 + ((h >>> 0) % (n - 1)); [perm[0], perm[target]] = [perm[target], perm[0]]; } } // 変更前の途中保存から再開したときだけ、以前の並べ方を再現する
   const shuffledOpts = perm.map(i => opts[i]);
   const newAnswer = perm.indexOf(q.a);
   const oeSrc = lang === "en" ? (q.oeEn || q.oe) : q.oe;
@@ -196302,11 +196313,11 @@ function App() {
   const persist = (next) => { setState(next); saveState(next); };
 
   const record = (domId, correct) => { try { novaLogStudy(); } catch (e) {}
-    const next = JSON.parse(JSON.stringify(state));
+    setState((prev) => { const next = JSON.parse(JSON.stringify(prev)); // 同じ描画中に続けて呼ばれても（本番モードの一括採点）前の更新に積み上げる
     if (!next.progress[domId]) next.progress[domId] = { correct: 0, attempts: 0 };
     next.progress[domId].attempts++;
     if (correct) next.progress[domId].correct++;
-    persist(next);
+    saveState(next); return next; });
   };
 
   if (!loaded) return <div style={{ padding: 40, textAlign: "center", color: C.deep }}>{t.loading}</div>;
@@ -196580,7 +196591,7 @@ function Quiz({ onAnswer, lang, t }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
           </div>
@@ -196645,14 +196656,16 @@ function Exam({ onAnswer, lang, t, backRef }) {
 
   useEffect(() => { if (!backRef) return; backRef.current = () => { if (phase === "run" || phase === "result") { setPhase("select"); return true; } return false; }; return () => { if (backRef) backRef.current = null; }; }, [phase, backRef]);
   useEffect(() => {
-    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain }, (en ? "Set " : "セット") + setNo);
+    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain, bv: legacyOrder ? 1 : 2 }, (en ? "Set " : "セット") + setNo);
     else if (phase === "result") slot.remove();
   }, [phase, pos, picks, sel, mSel, flags]);
 
   const rawQs = setNo ? (kind === "domain" ? (DOMAIN_SETS[setNo] || []) : EXAM_SETS[setNo]) : [];
+  const [legacyOrder, setLegacyOrder] = useState(false); // 変更前の途中保存から再開したときだけ true
   const qs = useMemo(() => {
     const salt = "ab_" + setNo + "_" + kind;
-    let arr = rawQs.map(Q => { const { opts, answer } = shuffleChoices(Q, lang, salt); return { ...Q, o: opts, a: answer }; });
+    let arr = rawQs.map(Q => { const { opts, answer } = shuffleChoices(Q, lang, salt, legacyOrder); return { ...Q, o: opts, a: answer }; });
+    if (!legacyOrder && setNo) arr = novaBalanceAnswers(arr, STORE_KEY + "|" + salt + "|" + lang);
     if (!setNo) return arr;
     const isDom = kind === "domain";
     const base = isDom ? 0 : ((typeof setNo === "number" ? setNo : 1) - 1);
@@ -196680,7 +196693,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     if (typeof AB100_EXHIBIT !== "undefined" && AB100_EXHIBIT.length) {
       const pool = isDom ? AB100_EXHIBIT.filter(q => q.d === setNo) : AB100_EXHIBIT;
       const k = isDom ? Math.min(1, pool.length) : Math.min(2, pool.length);
-      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, answer } = shuffleChoices(Q, lang, salt); specials.push({ ...Q, o: opts, a: answer, ex: true }); }
+      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, answer } = shuffleChoices(Q, lang, salt, legacyOrder); specials.push({ ...Q, o: opts, a: answer, ex: true }); }
     }
     if (typeof AB100_MATRIX !== "undefined" && AB100_MATRIX.length) {
       const pool = isDom ? AB100_MATRIX.filter(q => q.d === setNo) : AB100_MATRIX;
@@ -196700,11 +196713,11 @@ function Exam({ onAnswer, lang, t, backRef }) {
       arr = mixed;
     }
     return arr;
-  }, [setNo, mode, kind, lang]);
+  }, [setNo, mode, kind, lang, legacyOrder]);
 
   const start = (n) => {
     const base = (kind === "domain" ? (DOMAIN_SETS[n] || []) : EXAM_SETS[n]) || [];
-    setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({});
+    setLegacyOrder(false); setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({});
     setRemain(mode === "real" ? certExamSeconds("ab100", base.length) : 0);
     setPhase("run");
   };
@@ -196756,7 +196769,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <div style={{ fontSize: 12.5, fontWeight: 700, color: C.deep }}>{en ? "Exam in progress" : "中断した模試"}</div>
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
-            <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
+            <button onClick={async () => { const d = await slot.read(); if (!d) return; setLegacyOrder(d.bv !== 2); setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
               style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
@@ -196810,10 +196823,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div>
         <div style={{ background: passed ? "#E4F6EC" : "#FBE9E7", border: `2px solid ${passed ? C.ok : C.ng}`, borderRadius: 12, padding: 18, textAlign: "center", marginBottom: 14 }}>
-          <div style={{ fontSize: 13, color: "#5a7780" }}>{en ? `Set ${setNo} · Result` : `セット${setNo}・結果`}</div>
-          <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : C.ng }}>{rate}%</div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: passed ? C.ok : C.ng }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
-          <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
+          <div style={{ fontSize: 13, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7") }}>{en ? `Set ${setNo} · Result` : `セット${setNo}・結果`}</div>
+          <div style={{ fontSize: 40, fontWeight: 800, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{rate}%</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
+          <div style={{ fontSize: 12, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7"), marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
@@ -196828,12 +196841,12 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const val = picks[pos] || {};
     return (<div>{(Q.items || []).map(it => { const chosen = val[it.id] || ""; const ok = chosen === Q.correct[it.id]; return (
       <div key={it.id} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, padding: "9px 11px", border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, borderRadius: 8, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
-        <span style={{ flex: 1, fontSize: 13.5, color: C.ink }}>{L(it, "text", lang)}</span>
-        <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, background: "#fff", color: C.ink }}>
+        <span style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere", fontSize: 13.5, color: C.ink }}>{L(it, "text", lang)}</span>
+        <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, maxWidth: "55%", background: "#fff", color: C.ink }}>
           <option value="">{en ? "— select —" : "— 選択 —"}</option>
           {(Q.targets || []).map(tg => (<option key={tg.id} value={tg.id}>{L(tg, "label", lang)}</option>))}
         </select>
-        {submitted && <span style={{ fontSize: 14, fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
+        {submitted && <span style={{ fontSize: 14, fontWeight: 900, flexShrink: 0, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
       </div>); })}</div>);
   };
   const renderBuildBody = (Q, submitted) => {
@@ -196849,8 +196862,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <span style={{ fontWeight: 800, color: C.deep, minWidth: 18 }}>{idx + 1}.</span>
           <span style={{ flex: 1, fontSize: 13 }}>{txt(id)}</span>
           {submitted ? <span style={{ fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span> : (<>
-            <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : C.primary }}>▲</button>
-            <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
+            <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : nvInk(C.primary, C.light, 3) }}>▲</button>
+            <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : nvInk(C.primary, C.light, 3) }}>▼</button>
             <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
           </>)}
         </div>); }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
@@ -196886,7 +196899,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{L(s, "text", lang)}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
-          {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
+          {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: nvInk(ok ? C.ok : C.ng, ok ? "#E4F6EC" : "#FBE9E7") }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
         </div>
       </div>); })}</div>);
   };
@@ -196910,8 +196923,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const hh = String(Math.floor(remain / 3600)).padStart(2, "0");
     const mm = String(Math.floor((remain % 3600) / 60)).padStart(2, "0");
     const ss = String(remain % 60).padStart(2, "0");
-    const NAVY = "#12324a", STEEL = C.primary, INK = "#1b2a33";
-    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : "#5a7780", PAGE = contrast ? "#0b0f12" : "#eceff2";
+    const NAVY = "#12324a", STEEL = nvInk(C.primary, "#ffffff"), INK = "#1b2a33";
+    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : nvInk("#5a7780", "#eceff2"), PAGE = contrast ? "#0b0f12" : "#eceff2";
     const Toggle = ({ on, onToggle }) => (<span onClick={onToggle} role="switch" aria-checked={on} style={{ display: "inline-block", width: 34, height: 19, borderRadius: 20, background: on ? STEEL : "#b7c3cb", position: "relative", cursor: "pointer", verticalAlign: "middle", flexShrink: 0 }}><span style={{ position: "absolute", top: 2, left: on ? 17 : 2, width: 15, height: 15, borderRadius: "50%", background: "#fff", boxShadow: "0 1px 2px rgba(0,0,0,.35)" }} /></span>);
     const isMulti = !!Q.multi;
     const selArr = Array.isArray(curPick) ? curPick : [];
@@ -197004,37 +197017,37 @@ function Exam({ onAnswer, lang, t, backRef }) {
         {Array.isArray(Q.exhibits) && renderExhibits(Q.exhibits)}
         {(() => {
           if (Q.dnd) { const dndOk = dndRight(Q, picks[pos]); const done = dndComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderDndBody(Q, submitted)}
             {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(dndOk ? C.ok : C.ng, C.light) }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.build) { const bOk = buildRight(Q, picks[pos]); const done = buildComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderBuildBody(Q, submitted)}
             {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(bOk ? C.ok : C.ng, C.light) }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.mx) { const mxOk = mxRight(Q, picks[pos]); const done = mxComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "scenario")}</div>
             {renderMxBody(Q, submitted)}
             {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(mxOk ? C.ok : C.ng, C.light) }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.hot) { const hotOk = hotRight(Q, picks[pos]); const done = hotComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderHotBody(Q, submitted)}
             {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(hotOk ? C.ok : C.ng, C.light) }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           const isMulti = !!Q.multi; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); const selSet = Array.isArray(sel) ? sel : []; const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isR = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
           return (<>
-            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${need} answers. (${submitted ? selSet.length : mSel.length}/${need})` : `正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
+            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${need} answers. (${submitted ? selSet.length : mSel.length}/${need})` : `正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {opts.map((opt, i) => {
               if (isMulti) { const chosen = submitted ? selSet.includes(i) : mSel.includes(i); const isC = correctSet.includes(i); let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (isC) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (chosen) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } } else if (chosen) { bg = C.light; bd = C.primary; col = C.deep; }
@@ -197043,12 +197056,12 @@ function Exam({ onAnswer, lang, t, backRef }) {
               return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
             })}
             {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(isR ? C.ok : C.ng, C.light) }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>);
         })()}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
-        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : C.primary, cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
+        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : nvInk(C.primary, "#ffffff"), cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
         <span style={{ fontSize: 13, color: "#5a7780", fontWeight: 600 }}>{pos + 1} / {qs.length}</span>
         <button onClick={next} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
@@ -197158,7 +197171,7 @@ function Review({ lang, t, onAnswer }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
             {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
@@ -197390,27 +197403,17 @@ function permFromSeed(n, seed) {
   }
   return idx;
 }
-// 問題の選択肢をシャッフルし、正答が必ず先頭に来ないようにする
+// 問題の選択肢をシャッフルする（正解の位置は偏らない）
 // salt を変えると同じ問題でも別の並びになる（クイズ⇔模試⇔セッションで分散）
-function shuffleChoices(q, lang, salt = 0) {
+function shuffleChoices(q, lang, salt = 0, legacy = false) {
   const opts = lang === "en" ? (q.oEn || q.o) : q.o;
   const n = opts.length;
   // キーから決定的シード
   let h = 0; const base = qKey(q) + "|" + salt;
   for (let i = 0; i < base.length; i++) { h = (h * 33 + base.charCodeAt(i)) | 0; }
   let perm = permFromSeed(n, h >>> 0);
-  // 正答が先頭に来てしまう場合は別シードで再試行（数回）し、最終的には強制スワップ
-  let tries = 0;
-  while (perm[0] === q.a && tries < 8) {
-    h = (h * 1103515245 + 12345) | 0;
-    perm = permFromSeed(n, h >>> 0);
-    tries++;
-  }
-  if (perm[0] === q.a) {
-    // 正答を後ろの位置と入れ替える（先頭回避を保証）
-    const target = 1 + ((h >>> 0) % (n - 1));
-    [perm[0], perm[target]] = [perm[target], perm[0]];
-  }
+  // 正解の位置は A〜D のどこにも同じ確率で来る（以前は「正解を先頭に置かない」ようにしていたが、A が正解にならないと分かると1択減らせてしまうのでやめた）
+  if (legacy) { let tries = 0; while (perm[0] === q.a && tries < 8) { h = (h * 1103515245 + 12345) | 0; perm = permFromSeed(n, h >>> 0); tries++; } if (perm[0] === q.a) { const target = 1 + ((h >>> 0) % (n - 1)); [perm[0], perm[target]] = [perm[target], perm[0]]; } } // 変更前の途中保存から再開したときだけ、以前の並べ方を再現する
   const shuffledOpts = perm.map(i => opts[i]);
   const newAnswer = perm.indexOf(q.a);
   const oeSrc = lang === "en" ? (q.oeEn || q.oe) : q.oe;
@@ -197600,11 +197603,11 @@ function App() {
   const persist = (next) => { setState(next); saveState(next); };
 
   const record = (domId, correct) => { try { novaLogStudy(); } catch (e) {}
-    const next = JSON.parse(JSON.stringify(state));
+    setState((prev) => { const next = JSON.parse(JSON.stringify(prev)); // 同じ描画中に続けて呼ばれても（本番モードの一括採点）前の更新に積み上げる
     if (!next.progress[domId]) next.progress[domId] = { correct: 0, attempts: 0 };
     next.progress[domId].attempts++;
     if (correct) next.progress[domId].correct++;
-    persist(next);
+    saveState(next); return next; });
   };
 
   if (!loaded) return <div style={{ padding: 40, textAlign: "center", color: C.deep }}>{t.loading}</div>;
@@ -197878,7 +197881,7 @@ function Quiz({ onAnswer, lang, t }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
           </div>
@@ -197943,14 +197946,16 @@ function Exam({ onAnswer, lang, t, backRef }) {
 
   useEffect(() => { if (!backRef) return; backRef.current = () => { if (phase === "run" || phase === "result") { setPhase("select"); return true; } return false; }; return () => { if (backRef) backRef.current = null; }; }, [phase, backRef]);
   useEffect(() => {
-    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain }, (en ? "Set " : "セット") + setNo);
+    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain, bv: legacyOrder ? 1 : 2 }, (en ? "Set " : "セット") + setNo);
     else if (phase === "result") slot.remove();
   }, [phase, pos, picks, sel, mSel, flags]);
 
   const rawQs = setNo ? (kind === "domain" ? (DOMAIN_SETS[setNo] || []) : EXAM_SETS[setNo]) : [];
+  const [legacyOrder, setLegacyOrder] = useState(false); // 変更前の途中保存から再開したときだけ true
   const qs = useMemo(() => {
     const salt = "ab_" + setNo + "_" + kind;
-    let arr = rawQs.map(Q => { const { opts, answer } = shuffleChoices(Q, lang, salt); return { ...Q, o: opts, a: answer }; });
+    let arr = rawQs.map(Q => { const { opts, answer } = shuffleChoices(Q, lang, salt, legacyOrder); return { ...Q, o: opts, a: answer }; });
+    if (!legacyOrder && setNo) arr = novaBalanceAnswers(arr, STORE_KEY + "|" + salt + "|" + lang);
     if (!setNo) return arr;
     const isDom = kind === "domain";
     const base = isDom ? 0 : ((typeof setNo === "number" ? setNo : 1) - 1);
@@ -197978,7 +197983,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     if (typeof AB410_EXHIBIT !== "undefined" && AB410_EXHIBIT.length) {
       const pool = isDom ? AB410_EXHIBIT.filter(q => q.d === setNo) : AB410_EXHIBIT;
       const k = isDom ? Math.min(1, pool.length) : Math.min(2, pool.length);
-      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, answer } = shuffleChoices(Q, lang, salt); specials.push({ ...Q, o: opts, a: answer, ex: true }); }
+      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, answer } = shuffleChoices(Q, lang, salt, legacyOrder); specials.push({ ...Q, o: opts, a: answer, ex: true }); }
     }
     if (typeof AB410_MATRIX !== "undefined" && AB410_MATRIX.length) {
       const pool = isDom ? AB410_MATRIX.filter(q => q.d === setNo) : AB410_MATRIX;
@@ -197998,11 +198003,11 @@ function Exam({ onAnswer, lang, t, backRef }) {
       arr = mixed;
     }
     return arr;
-  }, [setNo, mode, kind, lang]);
+  }, [setNo, mode, kind, lang, legacyOrder]);
 
   const start = (n) => {
     const base = (kind === "domain" ? (DOMAIN_SETS[n] || []) : EXAM_SETS[n]) || [];
-    setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({});
+    setLegacyOrder(false); setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({});
     setRemain(mode === "real" ? certExamSeconds("ab410", base.length) : 0);
     setPhase("run");
   };
@@ -198054,7 +198059,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <div style={{ fontSize: 12.5, fontWeight: 700, color: C.deep }}>{en ? "Exam in progress" : "中断した模試"}</div>
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
-            <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
+            <button onClick={async () => { const d = await slot.read(); if (!d) return; setLegacyOrder(d.bv !== 2); setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
               style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
@@ -198108,10 +198113,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div>
         <div style={{ background: passed ? "#E4F6EC" : "#FBE9E7", border: `2px solid ${passed ? C.ok : C.ng}`, borderRadius: 12, padding: 18, textAlign: "center", marginBottom: 14 }}>
-          <div style={{ fontSize: 13, color: "#5a7780" }}>{en ? `Set ${setNo} · Result` : `セット${setNo}・結果`}</div>
-          <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : C.ng }}>{rate}%</div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: passed ? C.ok : C.ng }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
-          <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
+          <div style={{ fontSize: 13, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7") }}>{en ? `Set ${setNo} · Result` : `セット${setNo}・結果`}</div>
+          <div style={{ fontSize: 40, fontWeight: 800, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{rate}%</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
+          <div style={{ fontSize: 12, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7"), marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
@@ -198126,12 +198131,12 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const val = picks[pos] || {};
     return (<div>{(Q.items || []).map(it => { const chosen = val[it.id] || ""; const ok = chosen === Q.correct[it.id]; return (
       <div key={it.id} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, padding: "9px 11px", border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, borderRadius: 8, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
-        <span style={{ flex: 1, fontSize: 13.5, color: C.ink }}>{L(it, "text", lang)}</span>
-        <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, background: "#fff", color: C.ink }}>
+        <span style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere", fontSize: 13.5, color: C.ink }}>{L(it, "text", lang)}</span>
+        <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, maxWidth: "55%", background: "#fff", color: C.ink }}>
           <option value="">{en ? "— select —" : "— 選択 —"}</option>
           {(Q.targets || []).map(tg => (<option key={tg.id} value={tg.id}>{L(tg, "label", lang)}</option>))}
         </select>
-        {submitted && <span style={{ fontSize: 14, fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
+        {submitted && <span style={{ fontSize: 14, fontWeight: 900, flexShrink: 0, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
       </div>); })}</div>);
   };
   const renderBuildBody = (Q, submitted) => {
@@ -198147,8 +198152,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <span style={{ fontWeight: 800, color: C.deep, minWidth: 18 }}>{idx + 1}.</span>
           <span style={{ flex: 1, fontSize: 13 }}>{txt(id)}</span>
           {submitted ? <span style={{ fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span> : (<>
-            <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : C.primary }}>▲</button>
-            <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
+            <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : nvInk(C.primary, C.light, 3) }}>▲</button>
+            <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : nvInk(C.primary, C.light, 3) }}>▼</button>
             <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
           </>)}
         </div>); }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
@@ -198184,7 +198189,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{L(s, "text", lang)}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
-          {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
+          {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: nvInk(ok ? C.ok : C.ng, ok ? "#E4F6EC" : "#FBE9E7") }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
         </div>
       </div>); })}</div>);
   };
@@ -198208,8 +198213,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const hh = String(Math.floor(remain / 3600)).padStart(2, "0");
     const mm = String(Math.floor((remain % 3600) / 60)).padStart(2, "0");
     const ss = String(remain % 60).padStart(2, "0");
-    const NAVY = "#12324a", STEEL = C.primary, INK = "#1b2a33";
-    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : "#5a7780", PAGE = contrast ? "#0b0f12" : "#eceff2";
+    const NAVY = "#12324a", STEEL = nvInk(C.primary, "#ffffff"), INK = "#1b2a33";
+    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : nvInk("#5a7780", "#eceff2"), PAGE = contrast ? "#0b0f12" : "#eceff2";
     const Toggle = ({ on, onToggle }) => (<span onClick={onToggle} role="switch" aria-checked={on} style={{ display: "inline-block", width: 34, height: 19, borderRadius: 20, background: on ? STEEL : "#b7c3cb", position: "relative", cursor: "pointer", verticalAlign: "middle", flexShrink: 0 }}><span style={{ position: "absolute", top: 2, left: on ? 17 : 2, width: 15, height: 15, borderRadius: "50%", background: "#fff", boxShadow: "0 1px 2px rgba(0,0,0,.35)" }} /></span>);
     const isMulti = !!Q.multi;
     const selArr = Array.isArray(curPick) ? curPick : [];
@@ -198302,37 +198307,37 @@ function Exam({ onAnswer, lang, t, backRef }) {
         {Array.isArray(Q.exhibits) && renderExhibits(Q.exhibits)}
         {(() => {
           if (Q.dnd) { const dndOk = dndRight(Q, picks[pos]); const done = dndComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderDndBody(Q, submitted)}
             {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(dndOk ? C.ok : C.ng, C.light) }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.build) { const bOk = buildRight(Q, picks[pos]); const done = buildComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderBuildBody(Q, submitted)}
             {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(bOk ? C.ok : C.ng, C.light) }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.mx) { const mxOk = mxRight(Q, picks[pos]); const done = mxComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "scenario")}</div>
             {renderMxBody(Q, submitted)}
             {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(mxOk ? C.ok : C.ng, C.light) }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.hot) { const hotOk = hotRight(Q, picks[pos]); const done = hotComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderHotBody(Q, submitted)}
             {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(hotOk ? C.ok : C.ng, C.light) }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           const isMulti = !!Q.multi; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); const selSet = Array.isArray(sel) ? sel : []; const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isR = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
           return (<>
-            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${need} answers. (${submitted ? selSet.length : mSel.length}/${need})` : `正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
+            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${need} answers. (${submitted ? selSet.length : mSel.length}/${need})` : `正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {opts.map((opt, i) => {
               if (isMulti) { const chosen = submitted ? selSet.includes(i) : mSel.includes(i); const isC = correctSet.includes(i); let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (isC) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (chosen) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } } else if (chosen) { bg = C.light; bd = C.primary; col = C.deep; }
@@ -198341,12 +198346,12 @@ function Exam({ onAnswer, lang, t, backRef }) {
               return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
             })}
             {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(isR ? C.ok : C.ng, C.light) }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>);
         })()}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
-        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : C.primary, cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
+        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : nvInk(C.primary, "#ffffff"), cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
         <span style={{ fontSize: 13, color: "#5a7780", fontWeight: 600 }}>{pos + 1} / {qs.length}</span>
         <button onClick={next} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
@@ -198456,7 +198461,7 @@ function Review({ lang, t, onAnswer }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
             {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
@@ -198688,27 +198693,17 @@ function permFromSeed(n, seed) {
   }
   return idx;
 }
-// 問題の選択肢をシャッフルし、正答が必ず先頭に来ないようにする
+// 問題の選択肢をシャッフルする（正解の位置は偏らない）
 // salt を変えると同じ問題でも別の並びになる（クイズ⇔模試⇔セッションで分散）
-function shuffleChoices(q, lang, salt = 0) {
+function shuffleChoices(q, lang, salt = 0, legacy = false) {
   const opts = lang === "en" ? (q.oEn || q.o) : q.o;
   const n = opts.length;
   // キーから決定的シード
   let h = 0; const base = qKey(q) + "|" + salt;
   for (let i = 0; i < base.length; i++) { h = (h * 33 + base.charCodeAt(i)) | 0; }
   let perm = permFromSeed(n, h >>> 0);
-  // 正答が先頭に来てしまう場合は別シードで再試行（数回）し、最終的には強制スワップ
-  let tries = 0;
-  while (perm[0] === q.a && tries < 8) {
-    h = (h * 1103515245 + 12345) | 0;
-    perm = permFromSeed(n, h >>> 0);
-    tries++;
-  }
-  if (perm[0] === q.a) {
-    // 正答を後ろの位置と入れ替える（先頭回避を保証）
-    const target = 1 + ((h >>> 0) % (n - 1));
-    [perm[0], perm[target]] = [perm[target], perm[0]];
-  }
+  // 正解の位置は A〜D のどこにも同じ確率で来る（以前は「正解を先頭に置かない」ようにしていたが、A が正解にならないと分かると1択減らせてしまうのでやめた）
+  if (legacy) { let tries = 0; while (perm[0] === q.a && tries < 8) { h = (h * 1103515245 + 12345) | 0; perm = permFromSeed(n, h >>> 0); tries++; } if (perm[0] === q.a) { const target = 1 + ((h >>> 0) % (n - 1)); [perm[0], perm[target]] = [perm[target], perm[0]]; } } // 変更前の途中保存から再開したときだけ、以前の並べ方を再現する
   const shuffledOpts = perm.map(i => opts[i]);
   const newAnswer = perm.indexOf(q.a);
   const oeSrc = lang === "en" ? (q.oeEn || q.oe) : q.oe;
@@ -198898,11 +198893,11 @@ function App() {
   const persist = (next) => { setState(next); saveState(next); };
 
   const record = (domId, correct) => { try { novaLogStudy(); } catch (e) {}
-    const next = JSON.parse(JSON.stringify(state));
+    setState((prev) => { const next = JSON.parse(JSON.stringify(prev)); // 同じ描画中に続けて呼ばれても（本番モードの一括採点）前の更新に積み上げる
     if (!next.progress[domId]) next.progress[domId] = { correct: 0, attempts: 0 };
     next.progress[domId].attempts++;
     if (correct) next.progress[domId].correct++;
-    persist(next);
+    saveState(next); return next; });
   };
 
   if (!loaded) return <div style={{ padding: 40, textAlign: "center", color: C.deep }}>{t.loading}</div>;
@@ -199176,7 +199171,7 @@ function Quiz({ onAnswer, lang, t }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
           </div>
@@ -199241,14 +199236,16 @@ function Exam({ onAnswer, lang, t, backRef }) {
 
   useEffect(() => { if (!backRef) return; backRef.current = () => { if (phase === "run" || phase === "result") { setPhase("select"); return true; } return false; }; return () => { if (backRef) backRef.current = null; }; }, [phase, backRef]);
   useEffect(() => {
-    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain }, (en ? "Set " : "セット") + setNo);
+    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain, bv: legacyOrder ? 1 : 2 }, (en ? "Set " : "セット") + setNo);
     else if (phase === "result") slot.remove();
   }, [phase, pos, picks, sel, mSel, flags]);
 
   const rawQs = setNo ? (kind === "domain" ? (DOMAIN_SETS[setNo] || []) : EXAM_SETS[setNo]) : [];
+  const [legacyOrder, setLegacyOrder] = useState(false); // 変更前の途中保存から再開したときだけ true
   const qs = useMemo(() => {
     const salt = "ab_" + setNo + "_" + kind;
-    let arr = rawQs.map(Q => { const { opts, answer } = shuffleChoices(Q, lang, salt); return { ...Q, o: opts, a: answer }; });
+    let arr = rawQs.map(Q => { const { opts, answer } = shuffleChoices(Q, lang, salt, legacyOrder); return { ...Q, o: opts, a: answer }; });
+    if (!legacyOrder && setNo) arr = novaBalanceAnswers(arr, STORE_KEY + "|" + salt + "|" + lang);
     if (!setNo) return arr;
     const isDom = kind === "domain";
     const base = isDom ? 0 : ((typeof setNo === "number" ? setNo : 1) - 1);
@@ -199276,7 +199273,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     if (typeof AI300_EXHIBIT !== "undefined" && AI300_EXHIBIT.length) {
       const pool = isDom ? AI300_EXHIBIT.filter(q => q.d === setNo) : AI300_EXHIBIT;
       const k = isDom ? Math.min(1, pool.length) : Math.min(2, pool.length);
-      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, answer } = shuffleChoices(Q, lang, salt); specials.push({ ...Q, o: opts, a: answer, ex: true }); }
+      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, answer } = shuffleChoices(Q, lang, salt, legacyOrder); specials.push({ ...Q, o: opts, a: answer, ex: true }); }
     }
     if (typeof AI300_MATRIX !== "undefined" && AI300_MATRIX.length) {
       const pool = isDom ? AI300_MATRIX.filter(q => q.d === setNo) : AI300_MATRIX;
@@ -199296,11 +199293,11 @@ function Exam({ onAnswer, lang, t, backRef }) {
       arr = mixed;
     }
     return arr;
-  }, [setNo, mode, kind, lang]);
+  }, [setNo, mode, kind, lang, legacyOrder]);
 
   const start = (n) => {
     const base = (kind === "domain" ? (DOMAIN_SETS[n] || []) : EXAM_SETS[n]) || [];
-    setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({});
+    setLegacyOrder(false); setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({});
     setRemain(mode === "real" ? certExamSeconds("ai300", base.length) : 0);
     setPhase("run");
   };
@@ -199352,7 +199349,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <div style={{ fontSize: 12.5, fontWeight: 700, color: C.deep }}>{en ? "Exam in progress" : "中断した模試"}</div>
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
-            <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
+            <button onClick={async () => { const d = await slot.read(); if (!d) return; setLegacyOrder(d.bv !== 2); setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
               style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
@@ -199406,10 +199403,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div>
         <div style={{ background: passed ? "#E4F6EC" : "#FBE9E7", border: `2px solid ${passed ? C.ok : C.ng}`, borderRadius: 12, padding: 18, textAlign: "center", marginBottom: 14 }}>
-          <div style={{ fontSize: 13, color: "#5a7780" }}>{en ? `Set ${setNo} · Result` : `セット${setNo}・結果`}</div>
-          <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : C.ng }}>{rate}%</div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: passed ? C.ok : C.ng }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
-          <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
+          <div style={{ fontSize: 13, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7") }}>{en ? `Set ${setNo} · Result` : `セット${setNo}・結果`}</div>
+          <div style={{ fontSize: 40, fontWeight: 800, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{rate}%</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
+          <div style={{ fontSize: 12, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7"), marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
@@ -199424,12 +199421,12 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const val = picks[pos] || {};
     return (<div>{(Q.items || []).map(it => { const chosen = val[it.id] || ""; const ok = chosen === Q.correct[it.id]; return (
       <div key={it.id} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, padding: "9px 11px", border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, borderRadius: 8, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
-        <span style={{ flex: 1, fontSize: 13.5, color: C.ink }}>{L(it, "text", lang)}</span>
-        <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, background: "#fff", color: C.ink }}>
+        <span style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere", fontSize: 13.5, color: C.ink }}>{L(it, "text", lang)}</span>
+        <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, maxWidth: "55%", background: "#fff", color: C.ink }}>
           <option value="">{en ? "— select —" : "— 選択 —"}</option>
           {(Q.targets || []).map(tg => (<option key={tg.id} value={tg.id}>{L(tg, "label", lang)}</option>))}
         </select>
-        {submitted && <span style={{ fontSize: 14, fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
+        {submitted && <span style={{ fontSize: 14, fontWeight: 900, flexShrink: 0, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
       </div>); })}</div>);
   };
   const renderBuildBody = (Q, submitted) => {
@@ -199445,8 +199442,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <span style={{ fontWeight: 800, color: C.deep, minWidth: 18 }}>{idx + 1}.</span>
           <span style={{ flex: 1, fontSize: 13 }}>{txt(id)}</span>
           {submitted ? <span style={{ fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span> : (<>
-            <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : C.primary }}>▲</button>
-            <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
+            <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : nvInk(C.primary, C.light, 3) }}>▲</button>
+            <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : nvInk(C.primary, C.light, 3) }}>▼</button>
             <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
           </>)}
         </div>); }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
@@ -199482,7 +199479,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{L(s, "text", lang)}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
-          {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
+          {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: nvInk(ok ? C.ok : C.ng, ok ? "#E4F6EC" : "#FBE9E7") }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
         </div>
       </div>); })}</div>);
   };
@@ -199506,8 +199503,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const hh = String(Math.floor(remain / 3600)).padStart(2, "0");
     const mm = String(Math.floor((remain % 3600) / 60)).padStart(2, "0");
     const ss = String(remain % 60).padStart(2, "0");
-    const NAVY = "#12324a", STEEL = C.primary, INK = "#1b2a33";
-    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : "#5a7780", PAGE = contrast ? "#0b0f12" : "#eceff2";
+    const NAVY = "#12324a", STEEL = nvInk(C.primary, "#ffffff"), INK = "#1b2a33";
+    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : nvInk("#5a7780", "#eceff2"), PAGE = contrast ? "#0b0f12" : "#eceff2";
     const Toggle = ({ on, onToggle }) => (<span onClick={onToggle} role="switch" aria-checked={on} style={{ display: "inline-block", width: 34, height: 19, borderRadius: 20, background: on ? STEEL : "#b7c3cb", position: "relative", cursor: "pointer", verticalAlign: "middle", flexShrink: 0 }}><span style={{ position: "absolute", top: 2, left: on ? 17 : 2, width: 15, height: 15, borderRadius: "50%", background: "#fff", boxShadow: "0 1px 2px rgba(0,0,0,.35)" }} /></span>);
     const isMulti = !!Q.multi;
     const selArr = Array.isArray(curPick) ? curPick : [];
@@ -199600,37 +199597,37 @@ function Exam({ onAnswer, lang, t, backRef }) {
         {Array.isArray(Q.exhibits) && renderExhibits(Q.exhibits)}
         {(() => {
           if (Q.dnd) { const dndOk = dndRight(Q, picks[pos]); const done = dndComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderDndBody(Q, submitted)}
             {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(dndOk ? C.ok : C.ng, C.light) }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.build) { const bOk = buildRight(Q, picks[pos]); const done = buildComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderBuildBody(Q, submitted)}
             {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(bOk ? C.ok : C.ng, C.light) }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.mx) { const mxOk = mxRight(Q, picks[pos]); const done = mxComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "scenario")}</div>
             {renderMxBody(Q, submitted)}
             {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(mxOk ? C.ok : C.ng, C.light) }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.hot) { const hotOk = hotRight(Q, picks[pos]); const done = hotComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderHotBody(Q, submitted)}
             {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(hotOk ? C.ok : C.ng, C.light) }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           const isMulti = !!Q.multi; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); const selSet = Array.isArray(sel) ? sel : []; const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isR = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
           return (<>
-            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${need} answers. (${submitted ? selSet.length : mSel.length}/${need})` : `正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
+            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${need} answers. (${submitted ? selSet.length : mSel.length}/${need})` : `正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {opts.map((opt, i) => {
               if (isMulti) { const chosen = submitted ? selSet.includes(i) : mSel.includes(i); const isC = correctSet.includes(i); let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (isC) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (chosen) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } } else if (chosen) { bg = C.light; bd = C.primary; col = C.deep; }
@@ -199639,12 +199636,12 @@ function Exam({ onAnswer, lang, t, backRef }) {
               return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
             })}
             {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(isR ? C.ok : C.ng, C.light) }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>);
         })()}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
-        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : C.primary, cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
+        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : nvInk(C.primary, "#ffffff"), cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
         <span style={{ fontSize: 13, color: "#5a7780", fontWeight: 600 }}>{pos + 1} / {qs.length}</span>
         <button onClick={next} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
@@ -199754,7 +199751,7 @@ function Review({ lang, t, onAnswer }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
             {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
@@ -199972,27 +199969,17 @@ function permFromSeed(n, seed) {
   }
   return idx;
 }
-// 問題の選択肢をシャッフルし、正答が必ず先頭に来ないようにする
+// 問題の選択肢をシャッフルする（正解の位置は偏らない）
 // salt を変えると同じ問題でも別の並びになる（クイズ⇔模試⇔セッションで分散）
-function shuffleChoices(q, lang, salt = 0) {
+function shuffleChoices(q, lang, salt = 0, legacy = false) {
   const opts = lang === "en" ? (q.oEn || q.o) : q.o;
   const n = opts.length;
   // キーから決定的シード
   let h = 0; const base = qKey(q) + "|" + salt;
   for (let i = 0; i < base.length; i++) { h = (h * 33 + base.charCodeAt(i)) | 0; }
   let perm = permFromSeed(n, h >>> 0);
-  // 正答が先頭に来てしまう場合は別シードで再試行（数回）し、最終的には強制スワップ
-  let tries = 0;
-  while (perm[0] === q.a && tries < 8) {
-    h = (h * 1103515245 + 12345) | 0;
-    perm = permFromSeed(n, h >>> 0);
-    tries++;
-  }
-  if (perm[0] === q.a) {
-    // 正答を後ろの位置と入れ替える（先頭回避を保証）
-    const target = 1 + ((h >>> 0) % (n - 1));
-    [perm[0], perm[target]] = [perm[target], perm[0]];
-  }
+  // 正解の位置は A〜D のどこにも同じ確率で来る（以前は「正解を先頭に置かない」ようにしていたが、A が正解にならないと分かると1択減らせてしまうのでやめた）
+  if (legacy) { let tries = 0; while (perm[0] === q.a && tries < 8) { h = (h * 1103515245 + 12345) | 0; perm = permFromSeed(n, h >>> 0); tries++; } if (perm[0] === q.a) { const target = 1 + ((h >>> 0) % (n - 1)); [perm[0], perm[target]] = [perm[target], perm[0]]; } } // 変更前の途中保存から再開したときだけ、以前の並べ方を再現する
   const shuffledOpts = perm.map(i => opts[i]);
   const newAnswer = perm.indexOf(q.a);
   const oeSrc = lang === "en" ? (q.oeEn || q.oe) : q.oe;
@@ -200182,11 +200169,11 @@ function App() {
   const persist = (next) => { setState(next); saveState(next); };
 
   const record = (domId, correct) => { try { novaLogStudy(); } catch (e) {}
-    const next = JSON.parse(JSON.stringify(state));
+    setState((prev) => { const next = JSON.parse(JSON.stringify(prev)); // 同じ描画中に続けて呼ばれても（本番モードの一括採点）前の更新に積み上げる
     if (!next.progress[domId]) next.progress[domId] = { correct: 0, attempts: 0 };
     next.progress[domId].attempts++;
     if (correct) next.progress[domId].correct++;
-    persist(next);
+    saveState(next); return next; });
   };
 
   if (!loaded) return <div style={{ padding: 40, textAlign: "center", color: C.deep }}>{t.loading}</div>;
@@ -200460,7 +200447,7 @@ function Quiz({ onAnswer, lang, t }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
           </div>
@@ -200524,14 +200511,16 @@ function Exam({ onAnswer, lang, t, backRef }) {
 
   useEffect(() => { if (!backRef) return; backRef.current = () => { if (phase === "run" || phase === "result") { setPhase("select"); return true; } return false; }; return () => { if (backRef) backRef.current = null; }; }, [phase, backRef]);
   useEffect(() => {
-    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain }, (en ? "Set " : "セット") + setNo);
+    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain, bv: legacyOrder ? 1 : 2 }, (en ? "Set " : "セット") + setNo);
     else if (phase === "result") slot.remove();
   }, [phase, pos, picks, sel, mSel, flags]);
 
   const rawQs = setNo ? (kind === "domain" ? (DOMAIN_SETS[setNo] || []) : EXAM_SETS[setNo]) : [];
+  const [legacyOrder, setLegacyOrder] = useState(false); // 変更前の途中保存から再開したときだけ true
   const qs = useMemo(() => {
     const salt = "ab_" + setNo + "_" + kind;
-    let arr = rawQs.map(Q => { const { opts, answer } = shuffleChoices(Q, lang, salt); return { ...Q, o: opts, a: answer }; });
+    let arr = rawQs.map(Q => { const { opts, answer } = shuffleChoices(Q, lang, salt, legacyOrder); return { ...Q, o: opts, a: answer }; });
+    if (!legacyOrder && setNo) arr = novaBalanceAnswers(arr, STORE_KEY + "|" + salt + "|" + lang);
     if (!setNo) return arr;
     const isDom = kind === "domain";
     const base = isDom ? 0 : ((typeof setNo === "number" ? setNo : 1) - 1);
@@ -200559,7 +200548,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     if (typeof AI103_EXHIBIT !== "undefined" && AI103_EXHIBIT.length) {
       const pool = isDom ? AI103_EXHIBIT.filter(q => q.d === setNo) : AI103_EXHIBIT;
       const k = isDom ? Math.min(1, pool.length) : Math.min(2, pool.length);
-      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, answer } = shuffleChoices(Q, lang, salt); specials.push({ ...Q, o: opts, a: answer, ex: true }); }
+      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, answer } = shuffleChoices(Q, lang, salt, legacyOrder); specials.push({ ...Q, o: opts, a: answer, ex: true }); }
     }
     if (typeof AI103_MATRIX !== "undefined" && AI103_MATRIX.length) {
       const pool = isDom ? AI103_MATRIX.filter(q => q.d === setNo) : AI103_MATRIX;
@@ -200579,11 +200568,11 @@ function Exam({ onAnswer, lang, t, backRef }) {
       arr = mixed;
     }
     return arr;
-  }, [setNo, mode, kind, lang]);
+  }, [setNo, mode, kind, lang, legacyOrder]);
 
   const start = (n) => {
     const base = (kind === "domain" ? (DOMAIN_SETS[n] || []) : EXAM_SETS[n]) || [];
-    setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({});
+    setLegacyOrder(false); setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({});
     setRemain(mode === "real" ? certExamSeconds("ai103", base.length) : 0);
     setPhase("run");
   };
@@ -200635,7 +200624,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <div style={{ fontSize: 12.5, fontWeight: 700, color: C.deep }}>{en ? "Exam in progress" : "中断した模試"}</div>
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
-            <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
+            <button onClick={async () => { const d = await slot.read(); if (!d) return; setLegacyOrder(d.bv !== 2); setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
               style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
@@ -200688,10 +200677,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div>
         <div style={{ background: passed ? "#E4F6EC" : "#FBE9E7", border: `2px solid ${passed ? C.ok : C.ng}`, borderRadius: 12, padding: 18, textAlign: "center", marginBottom: 14 }}>
-          <div style={{ fontSize: 13, color: "#5a7780" }}>{en ? `Set ${setNo} · Result` : `セット${setNo}・結果`}</div>
-          <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : C.ng }}>{rate}%</div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: passed ? C.ok : C.ng }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
-          <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
+          <div style={{ fontSize: 13, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7") }}>{en ? `Set ${setNo} · Result` : `セット${setNo}・結果`}</div>
+          <div style={{ fontSize: 40, fontWeight: 800, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{rate}%</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
+          <div style={{ fontSize: 12, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7"), marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
@@ -200706,12 +200695,12 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const val = picks[pos] || {};
     return (<div>{(Q.items || []).map(it => { const chosen = val[it.id] || ""; const ok = chosen === Q.correct[it.id]; return (
       <div key={it.id} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, padding: "9px 11px", border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, borderRadius: 8, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
-        <span style={{ flex: 1, fontSize: 13.5, color: C.ink }}>{L(it, "text", lang)}</span>
-        <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, background: "#fff", color: C.ink }}>
+        <span style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere", fontSize: 13.5, color: C.ink }}>{L(it, "text", lang)}</span>
+        <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, maxWidth: "55%", background: "#fff", color: C.ink }}>
           <option value="">{en ? "— select —" : "— 選択 —"}</option>
           {(Q.targets || []).map(tg => (<option key={tg.id} value={tg.id}>{L(tg, "label", lang)}</option>))}
         </select>
-        {submitted && <span style={{ fontSize: 14, fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
+        {submitted && <span style={{ fontSize: 14, fontWeight: 900, flexShrink: 0, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
       </div>); })}</div>);
   };
   const renderBuildBody = (Q, submitted) => {
@@ -200727,8 +200716,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <span style={{ fontWeight: 800, color: C.deep, minWidth: 18 }}>{idx + 1}.</span>
           <span style={{ flex: 1, fontSize: 13 }}>{txt(id)}</span>
           {submitted ? <span style={{ fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span> : (<>
-            <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : C.primary }}>▲</button>
-            <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
+            <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : nvInk(C.primary, C.light, 3) }}>▲</button>
+            <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : nvInk(C.primary, C.light, 3) }}>▼</button>
             <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
           </>)}
         </div>); }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
@@ -200764,7 +200753,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{L(s, "text", lang)}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
-          {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
+          {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: nvInk(ok ? C.ok : C.ng, ok ? "#E4F6EC" : "#FBE9E7") }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
         </div>
       </div>); })}</div>);
   };
@@ -200788,8 +200777,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const hh = String(Math.floor(remain / 3600)).padStart(2, "0");
     const mm = String(Math.floor((remain % 3600) / 60)).padStart(2, "0");
     const ss = String(remain % 60).padStart(2, "0");
-    const NAVY = "#12324a", STEEL = C.primary, INK = "#1b2a33";
-    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : "#5a7780", PAGE = contrast ? "#0b0f12" : "#eceff2";
+    const NAVY = "#12324a", STEEL = nvInk(C.primary, "#ffffff"), INK = "#1b2a33";
+    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : nvInk("#5a7780", "#eceff2"), PAGE = contrast ? "#0b0f12" : "#eceff2";
     const Toggle = ({ on, onToggle }) => (<span onClick={onToggle} role="switch" aria-checked={on} style={{ display: "inline-block", width: 34, height: 19, borderRadius: 20, background: on ? STEEL : "#b7c3cb", position: "relative", cursor: "pointer", verticalAlign: "middle", flexShrink: 0 }}><span style={{ position: "absolute", top: 2, left: on ? 17 : 2, width: 15, height: 15, borderRadius: "50%", background: "#fff", boxShadow: "0 1px 2px rgba(0,0,0,.35)" }} /></span>);
     const isMulti = !!Q.multi;
     const selArr = Array.isArray(curPick) ? curPick : [];
@@ -200882,37 +200871,37 @@ function Exam({ onAnswer, lang, t, backRef }) {
         {Array.isArray(Q.exhibits) && renderExhibits(Q.exhibits)}
         {(() => {
           if (Q.dnd) { const dndOk = dndRight(Q, picks[pos]); const done = dndComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderDndBody(Q, submitted)}
             {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(dndOk ? C.ok : C.ng, C.light) }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.build) { const bOk = buildRight(Q, picks[pos]); const done = buildComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderBuildBody(Q, submitted)}
             {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(bOk ? C.ok : C.ng, C.light) }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.mx) { const mxOk = mxRight(Q, picks[pos]); const done = mxComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "scenario")}</div>
             {renderMxBody(Q, submitted)}
             {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(mxOk ? C.ok : C.ng, C.light) }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.hot) { const hotOk = hotRight(Q, picks[pos]); const done = hotComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderHotBody(Q, submitted)}
             {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(hotOk ? C.ok : C.ng, C.light) }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           const isMulti = !!Q.multi; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); const selSet = Array.isArray(sel) ? sel : []; const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isR = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
           return (<>
-            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${need} answers. (${submitted ? selSet.length : mSel.length}/${need})` : `正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
+            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${need} answers. (${submitted ? selSet.length : mSel.length}/${need})` : `正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {opts.map((opt, i) => {
               if (isMulti) { const chosen = submitted ? selSet.includes(i) : mSel.includes(i); const isC = correctSet.includes(i); let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (isC) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (chosen) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } } else if (chosen) { bg = C.light; bd = C.primary; col = C.deep; }
@@ -200921,12 +200910,12 @@ function Exam({ onAnswer, lang, t, backRef }) {
               return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
             })}
             {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(isR ? C.ok : C.ng, C.light) }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>);
         })()}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
-        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : C.primary, cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
+        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : nvInk(C.primary, "#ffffff"), cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
         <span style={{ fontSize: 13, color: "#5a7780", fontWeight: 600 }}>{pos + 1} / {qs.length}</span>
         <button onClick={next} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
@@ -201036,7 +201025,7 @@ function Review({ lang, t, onAnswer }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
             {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
@@ -201404,27 +201393,17 @@ function permFromSeed(n, seed) {
   }
   return idx;
 }
-// 問題の選択肢をシャッフルし、正答が必ず先頭に来ないようにする
+// 問題の選択肢をシャッフルする（正解の位置は偏らない）
 // salt を変えると同じ問題でも別の並びになる（クイズ⇔模試⇔セッションで分散）
-function shuffleChoices(q, lang, salt = 0) {
+function shuffleChoices(q, lang, salt = 0, legacy = false) {
   const opts = lang === "en" ? (q.oEn || q.o) : q.o;
   const n = opts.length;
   // キーから決定的シード
   let h = 0; const base = qKey(q) + "|" + salt;
   for (let i = 0; i < base.length; i++) { h = (h * 33 + base.charCodeAt(i)) | 0; }
   let perm = permFromSeed(n, h >>> 0);
-  // 正答が先頭に来てしまう場合は別シードで再試行（数回）し、最終的には強制スワップ
-  let tries = 0;
-  while (perm[0] === q.a && tries < 8) {
-    h = (h * 1103515245 + 12345) | 0;
-    perm = permFromSeed(n, h >>> 0);
-    tries++;
-  }
-  if (perm[0] === q.a) {
-    // 正答を後ろの位置と入れ替える（先頭回避を保証）
-    const target = 1 + ((h >>> 0) % (n - 1));
-    [perm[0], perm[target]] = [perm[target], perm[0]];
-  }
+  // 正解の位置は A〜D のどこにも同じ確率で来る（以前は「正解を先頭に置かない」ようにしていたが、A が正解にならないと分かると1択減らせてしまうのでやめた）
+  if (legacy) { let tries = 0; while (perm[0] === q.a && tries < 8) { h = (h * 1103515245 + 12345) | 0; perm = permFromSeed(n, h >>> 0); tries++; } if (perm[0] === q.a) { const target = 1 + ((h >>> 0) % (n - 1)); [perm[0], perm[target]] = [perm[target], perm[0]]; } } // 変更前の途中保存から再開したときだけ、以前の並べ方を再現する
   const shuffledOpts = perm.map(i => opts[i]);
   const newAnswer = perm.indexOf(q.a);
   const oeSrc = lang === "en" ? (q.oeEn || q.oe) : q.oe;
@@ -201614,11 +201593,11 @@ function App() {
   const persist = (next) => { setState(next); saveState(next); };
 
   const record = (domId, correct) => { try { novaLogStudy(); } catch (e) {}
-    const next = JSON.parse(JSON.stringify(state));
+    setState((prev) => { const next = JSON.parse(JSON.stringify(prev)); // 同じ描画中に続けて呼ばれても（本番モードの一括採点）前の更新に積み上げる
     if (!next.progress[domId]) next.progress[domId] = { correct: 0, attempts: 0 };
     next.progress[domId].attempts++;
     if (correct) next.progress[domId].correct++;
-    persist(next);
+    saveState(next); return next; });
   };
 
   if (!loaded) return <div style={{ padding: 40, textAlign: "center", color: C.deep }}>{t.loading}</div>;
@@ -201892,7 +201871,7 @@ function Quiz({ onAnswer, lang, t }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
           </div>
@@ -201956,14 +201935,16 @@ function Exam({ onAnswer, lang, t, backRef }) {
 
   useEffect(() => { if (!backRef) return; backRef.current = () => { if (phase === "run" || phase === "result") { setPhase("select"); return true; } return false; }; return () => { if (backRef) backRef.current = null; }; }, [phase, backRef]);
   useEffect(() => {
-    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain }, (en ? "Set " : "セット") + setNo);
+    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain, bv: legacyOrder ? 1 : 2 }, (en ? "Set " : "セット") + setNo);
     else if (phase === "result") slot.remove();
   }, [phase, pos, picks, sel, mSel, flags]);
 
   const rawQs = setNo ? (kind === "domain" ? (DOMAIN_SETS[setNo] || []) : EXAM_SETS[setNo]) : [];
+  const [legacyOrder, setLegacyOrder] = useState(false); // 変更前の途中保存から再開したときだけ true
   const qs = useMemo(() => {
     const salt = "ab_" + setNo + "_" + kind;
-    let arr = rawQs.map(Q => { const { opts, answer } = shuffleChoices(Q, lang, salt); return { ...Q, o: opts, a: answer }; });
+    let arr = rawQs.map(Q => { const { opts, answer } = shuffleChoices(Q, lang, salt, legacyOrder); return { ...Q, o: opts, a: answer }; });
+    if (!legacyOrder && setNo) arr = novaBalanceAnswers(arr, STORE_KEY + "|" + salt + "|" + lang);
     if (!setNo) return arr;
     const isDom = kind === "domain";
     const base = isDom ? 0 : ((typeof setNo === "number" ? setNo : 1) - 1);
@@ -201991,7 +201972,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     if (typeof AI200_EXHIBIT !== "undefined" && AI200_EXHIBIT.length) {
       const pool = isDom ? AI200_EXHIBIT.filter(q => q.d === setNo) : AI200_EXHIBIT;
       const k = isDom ? Math.min(1, pool.length) : Math.min(2, pool.length);
-      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, answer } = shuffleChoices(Q, lang, salt); specials.push({ ...Q, o: opts, a: answer, ex: true }); }
+      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, answer } = shuffleChoices(Q, lang, salt, legacyOrder); specials.push({ ...Q, o: opts, a: answer, ex: true }); }
     }
     if (typeof AI200_MATRIX !== "undefined" && AI200_MATRIX.length) {
       const pool = isDom ? AI200_MATRIX.filter(q => q.d === setNo) : AI200_MATRIX;
@@ -202011,11 +201992,11 @@ function Exam({ onAnswer, lang, t, backRef }) {
       arr = mixed;
     }
     return arr;
-  }, [setNo, mode, kind, lang]);
+  }, [setNo, mode, kind, lang, legacyOrder]);
 
   const start = (n) => {
     const base = (kind === "domain" ? (DOMAIN_SETS[n] || []) : EXAM_SETS[n]) || [];
-    setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({});
+    setLegacyOrder(false); setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({});
     setRemain(mode === "real" ? certExamSeconds("ai200", base.length) : 0);
     setPhase("run");
   };
@@ -202067,7 +202048,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <div style={{ fontSize: 12.5, fontWeight: 700, color: C.deep }}>{en ? "Exam in progress" : "中断した模試"}</div>
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
-            <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
+            <button onClick={async () => { const d = await slot.read(); if (!d) return; setLegacyOrder(d.bv !== 2); setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
               style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
@@ -202120,10 +202101,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div>
         <div style={{ background: passed ? "#E4F6EC" : "#FBE9E7", border: `2px solid ${passed ? C.ok : C.ng}`, borderRadius: 12, padding: 18, textAlign: "center", marginBottom: 14 }}>
-          <div style={{ fontSize: 13, color: "#5a7780" }}>{en ? `Set ${setNo} · Result` : `セット${setNo}・結果`}</div>
-          <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : C.ng }}>{rate}%</div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: passed ? C.ok : C.ng }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
-          <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
+          <div style={{ fontSize: 13, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7") }}>{en ? `Set ${setNo} · Result` : `セット${setNo}・結果`}</div>
+          <div style={{ fontSize: 40, fontWeight: 800, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{rate}%</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
+          <div style={{ fontSize: 12, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7"), marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
@@ -202138,12 +202119,12 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const val = picks[pos] || {};
     return (<div>{(Q.items || []).map(it => { const chosen = val[it.id] || ""; const ok = chosen === Q.correct[it.id]; return (
       <div key={it.id} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, padding: "9px 11px", border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, borderRadius: 8, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
-        <span style={{ flex: 1, fontSize: 13.5, color: C.ink }}>{L(it, "text", lang)}</span>
-        <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, background: "#fff", color: C.ink }}>
+        <span style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere", fontSize: 13.5, color: C.ink }}>{L(it, "text", lang)}</span>
+        <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, maxWidth: "55%", background: "#fff", color: C.ink }}>
           <option value="">{en ? "— select —" : "— 選択 —"}</option>
           {(Q.targets || []).map(tg => (<option key={tg.id} value={tg.id}>{L(tg, "label", lang)}</option>))}
         </select>
-        {submitted && <span style={{ fontSize: 14, fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
+        {submitted && <span style={{ fontSize: 14, fontWeight: 900, flexShrink: 0, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
       </div>); })}</div>);
   };
   const renderBuildBody = (Q, submitted) => {
@@ -202159,8 +202140,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <span style={{ fontWeight: 800, color: C.deep, minWidth: 18 }}>{idx + 1}.</span>
           <span style={{ flex: 1, fontSize: 13 }}>{txt(id)}</span>
           {submitted ? <span style={{ fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span> : (<>
-            <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : C.primary }}>▲</button>
-            <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
+            <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : nvInk(C.primary, C.light, 3) }}>▲</button>
+            <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : nvInk(C.primary, C.light, 3) }}>▼</button>
             <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
           </>)}
         </div>); }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
@@ -202196,7 +202177,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{L(s, "text", lang)}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
-          {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
+          {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: nvInk(ok ? C.ok : C.ng, ok ? "#E4F6EC" : "#FBE9E7") }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
         </div>
       </div>); })}</div>);
   };
@@ -202220,8 +202201,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const hh = String(Math.floor(remain / 3600)).padStart(2, "0");
     const mm = String(Math.floor((remain % 3600) / 60)).padStart(2, "0");
     const ss = String(remain % 60).padStart(2, "0");
-    const NAVY = "#12324a", STEEL = C.primary, INK = "#1b2a33";
-    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : "#5a7780", PAGE = contrast ? "#0b0f12" : "#eceff2";
+    const NAVY = "#12324a", STEEL = nvInk(C.primary, "#ffffff"), INK = "#1b2a33";
+    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : nvInk("#5a7780", "#eceff2"), PAGE = contrast ? "#0b0f12" : "#eceff2";
     const Toggle = ({ on, onToggle }) => (<span onClick={onToggle} role="switch" aria-checked={on} style={{ display: "inline-block", width: 34, height: 19, borderRadius: 20, background: on ? STEEL : "#b7c3cb", position: "relative", cursor: "pointer", verticalAlign: "middle", flexShrink: 0 }}><span style={{ position: "absolute", top: 2, left: on ? 17 : 2, width: 15, height: 15, borderRadius: "50%", background: "#fff", boxShadow: "0 1px 2px rgba(0,0,0,.35)" }} /></span>);
     const isMulti = !!Q.multi;
     const selArr = Array.isArray(curPick) ? curPick : [];
@@ -202318,28 +202299,28 @@ function Exam({ onAnswer, lang, t, backRef }) {
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderDndBody(Q, submitted)}
             {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(dndOk ? C.ok : C.ng, C.light) }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.build) { const bOk = buildRight(Q, picks[pos]); const done = buildComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderBuildBody(Q, submitted)}
             {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(bOk ? C.ok : C.ng, C.light) }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.mx) { const mxOk = mxRight(Q, picks[pos]); const done = mxComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "scenario")}</div>
             {renderMxBody(Q, submitted)}
             {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(mxOk ? C.ok : C.ng, C.light) }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.hot) { const hotOk = hotRight(Q, picks[pos]); const done = hotComplete(Q, picks[pos]); return (<>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderHotBody(Q, submitted)}
             {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(hotOk ? C.ok : C.ng, C.light) }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           const isMulti = !!Q.multi; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); const selSet = Array.isArray(sel) ? sel : []; const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isR = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
@@ -202353,12 +202334,12 @@ function Exam({ onAnswer, lang, t, backRef }) {
               return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
             })}
             {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(isR ? C.ok : C.ng, C.light) }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>);
         })()}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
-        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : C.primary, cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
+        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : nvInk(C.primary, "#ffffff"), cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
         <span style={{ fontSize: 13, color: "#5a7780", fontWeight: 600 }}>{pos + 1} / {qs.length}</span>
         <button onClick={next} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: nvInk(C.primary, "#ffffff"), cursor: "pointer" }}>{t.nextQ}</button>
       </div>
@@ -202468,7 +202449,7 @@ function Review({ lang, t, onAnswer }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
             {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
@@ -203001,27 +202982,17 @@ function permFromSeed(n, seed) {
   }
   return idx;
 }
-// 問題の選択肢をシャッフルし、正答が必ず先頭に来ないようにする
+// 問題の選択肢をシャッフルする（正解の位置は偏らない）
 // salt を変えると同じ問題でも別の並びになる（クイズ⇔模試⇔セッションで分散）
-function shuffleChoices(q, lang, salt = 0) {
+function shuffleChoices(q, lang, salt = 0, legacy = false) {
   const opts = lang === "en" ? (q.oEn || q.o) : q.o;
   const n = opts.length;
   // キーから決定的シード
   let h = 0; const base = qKey(q) + "|" + salt;
   for (let i = 0; i < base.length; i++) { h = (h * 33 + base.charCodeAt(i)) | 0; }
   let perm = permFromSeed(n, h >>> 0);
-  // 正答が先頭に来てしまう場合は別シードで再試行（数回）し、最終的には強制スワップ
-  let tries = 0;
-  while (perm[0] === q.a && tries < 8) {
-    h = (h * 1103515245 + 12345) | 0;
-    perm = permFromSeed(n, h >>> 0);
-    tries++;
-  }
-  if (perm[0] === q.a) {
-    // 正答を後ろの位置と入れ替える（先頭回避を保証）
-    const target = 1 + ((h >>> 0) % (n - 1));
-    [perm[0], perm[target]] = [perm[target], perm[0]];
-  }
+  // 正解の位置は A〜D のどこにも同じ確率で来る（以前は「正解を先頭に置かない」ようにしていたが、A が正解にならないと分かると1択減らせてしまうのでやめた）
+  if (legacy) { let tries = 0; while (perm[0] === q.a && tries < 8) { h = (h * 1103515245 + 12345) | 0; perm = permFromSeed(n, h >>> 0); tries++; } if (perm[0] === q.a) { const target = 1 + ((h >>> 0) % (n - 1)); [perm[0], perm[target]] = [perm[target], perm[0]]; } } // 変更前の途中保存から再開したときだけ、以前の並べ方を再現する
   const shuffledOpts = perm.map(i => opts[i]);
   const newAnswer = perm.indexOf(q.a);
   const oeSrc = lang === "en" ? (q.oeEn || q.oe) : q.oe;
@@ -203211,11 +203182,11 @@ function App() {
   const persist = (next) => { setState(next); saveState(next); };
 
   const record = (domId, correct) => { try { novaLogStudy(); } catch (e) {}
-    const next = JSON.parse(JSON.stringify(state));
+    setState((prev) => { const next = JSON.parse(JSON.stringify(prev)); // 同じ描画中に続けて呼ばれても（本番モードの一括採点）前の更新に積み上げる
     if (!next.progress[domId]) next.progress[domId] = { correct: 0, attempts: 0 };
     next.progress[domId].attempts++;
     if (correct) next.progress[domId].correct++;
-    persist(next);
+    saveState(next); return next; });
   };
 
   if (!loaded) return <div style={{ padding: 40, textAlign: "center", color: C.deep }}>{t.loading}</div>;
@@ -203489,7 +203460,7 @@ function Quiz({ onAnswer, lang, t }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
           </div>
@@ -203553,14 +203524,16 @@ function Exam({ onAnswer, lang, t, backRef }) {
 
   useEffect(() => { if (!backRef) return; backRef.current = () => { if (phase === "run" || phase === "result") { setPhase("select"); return true; } return false; }; return () => { if (backRef) backRef.current = null; }; }, [phase, backRef]);
   useEffect(() => {
-    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain }, (en ? "Set " : "セット") + setNo);
+    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain, bv: legacyOrder ? 1 : 2 }, (en ? "Set " : "セット") + setNo);
     else if (phase === "result") slot.remove();
   }, [phase, pos, picks, sel, mSel, flags]);
 
   const rawQs = setNo ? (kind === "domain" ? (DOMAIN_SETS[setNo] || []) : EXAM_SETS[setNo]) : [];
+  const [legacyOrder, setLegacyOrder] = useState(false); // 変更前の途中保存から再開したときだけ true
   const qs = useMemo(() => {
     const salt = "ab_" + setNo + "_" + kind;
-    let arr = rawQs.map(Q => { const { opts, answer } = shuffleChoices(Q, lang, salt); return { ...Q, o: opts, a: answer }; });
+    let arr = rawQs.map(Q => { const { opts, answer } = shuffleChoices(Q, lang, salt, legacyOrder); return { ...Q, o: opts, a: answer }; });
+    if (!legacyOrder && setNo) arr = novaBalanceAnswers(arr, STORE_KEY + "|" + salt + "|" + lang);
     if (!setNo) return arr;
     const isDom = kind === "domain";
     const base = isDom ? 0 : ((typeof setNo === "number" ? setNo : 1) - 1);
@@ -203588,7 +203561,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     if (typeof GH900_EXHIBIT !== "undefined" && GH900_EXHIBIT.length) {
       const pool = isDom ? GH900_EXHIBIT.filter(q => q.d === setNo) : GH900_EXHIBIT;
       const k = isDom ? Math.min(1, pool.length) : Math.min(2, pool.length);
-      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, answer } = shuffleChoices(Q, lang, salt); specials.push({ ...Q, o: opts, a: answer, ex: true }); }
+      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, answer } = shuffleChoices(Q, lang, salt, legacyOrder); specials.push({ ...Q, o: opts, a: answer, ex: true }); }
     }
     if (typeof GH900_MATRIX !== "undefined" && GH900_MATRIX.length) {
       const pool = isDom ? GH900_MATRIX.filter(q => q.d === setNo) : GH900_MATRIX;
@@ -203608,11 +203581,11 @@ function Exam({ onAnswer, lang, t, backRef }) {
       arr = mixed;
     }
     return arr;
-  }, [setNo, mode, kind, lang]);
+  }, [setNo, mode, kind, lang, legacyOrder]);
 
   const start = (n) => {
     const base = (kind === "domain" ? (DOMAIN_SETS[n] || []) : EXAM_SETS[n]) || [];
-    setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({});
+    setLegacyOrder(false); setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({});
     setRemain(mode === "real" ? certExamSeconds("gh900", base.length) : 0);
     setPhase("run");
   };
@@ -203664,7 +203637,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <div style={{ fontSize: 12.5, fontWeight: 700, color: C.deep }}>{en ? "Exam in progress" : "中断した模試"}</div>
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
-            <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
+            <button onClick={async () => { const d = await slot.read(); if (!d) return; setLegacyOrder(d.bv !== 2); setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
               style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
@@ -203717,10 +203690,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div>
         <div style={{ background: passed ? "#E4F6EC" : "#FBE9E7", border: `2px solid ${passed ? C.ok : C.ng}`, borderRadius: 12, padding: 18, textAlign: "center", marginBottom: 14 }}>
-          <div style={{ fontSize: 13, color: "#5a7780" }}>{en ? `Set ${setNo} · Result` : `セット${setNo}・結果`}</div>
-          <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : C.ng }}>{rate}%</div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: passed ? C.ok : C.ng }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
-          <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
+          <div style={{ fontSize: 13, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7") }}>{en ? `Set ${setNo} · Result` : `セット${setNo}・結果`}</div>
+          <div style={{ fontSize: 40, fontWeight: 800, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{rate}%</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
+          <div style={{ fontSize: 12, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7"), marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
@@ -203735,12 +203708,12 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const val = picks[pos] || {};
     return (<div>{(Q.items || []).map(it => { const chosen = val[it.id] || ""; const ok = chosen === Q.correct[it.id]; return (
       <div key={it.id} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, padding: "9px 11px", border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, borderRadius: 8, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
-        <span style={{ flex: 1, fontSize: 13.5, color: C.ink }}>{L(it, "text", lang)}</span>
-        <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, background: "#fff", color: C.ink }}>
+        <span style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere", fontSize: 13.5, color: C.ink }}>{L(it, "text", lang)}</span>
+        <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, maxWidth: "55%", background: "#fff", color: C.ink }}>
           <option value="">{en ? "— select —" : "— 選択 —"}</option>
           {(Q.targets || []).map(tg => (<option key={tg.id} value={tg.id}>{L(tg, "label", lang)}</option>))}
         </select>
-        {submitted && <span style={{ fontSize: 14, fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
+        {submitted && <span style={{ fontSize: 14, fontWeight: 900, flexShrink: 0, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
       </div>); })}</div>);
   };
   const renderBuildBody = (Q, submitted) => {
@@ -203756,8 +203729,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <span style={{ fontWeight: 800, color: C.deep, minWidth: 18 }}>{idx + 1}.</span>
           <span style={{ flex: 1, fontSize: 13 }}>{txt(id)}</span>
           {submitted ? <span style={{ fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span> : (<>
-            <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : C.primary }}>▲</button>
-            <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
+            <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : nvInk(C.primary, C.light, 3) }}>▲</button>
+            <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : nvInk(C.primary, C.light, 3) }}>▼</button>
             <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
           </>)}
         </div>); }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
@@ -203793,7 +203766,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{L(s, "text", lang)}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
-          {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
+          {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: nvInk(ok ? C.ok : C.ng, ok ? "#E4F6EC" : "#FBE9E7") }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
         </div>
       </div>); })}</div>);
   };
@@ -203817,8 +203790,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const hh = String(Math.floor(remain / 3600)).padStart(2, "0");
     const mm = String(Math.floor((remain % 3600) / 60)).padStart(2, "0");
     const ss = String(remain % 60).padStart(2, "0");
-    const NAVY = "#12324a", STEEL = C.primary, INK = "#1b2a33";
-    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : "#5a7780", PAGE = contrast ? "#0b0f12" : "#eceff2";
+    const NAVY = "#12324a", STEEL = nvInk(C.primary, "#ffffff"), INK = "#1b2a33";
+    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : nvInk("#5a7780", "#eceff2"), PAGE = contrast ? "#0b0f12" : "#eceff2";
     const Toggle = ({ on, onToggle }) => (<span onClick={onToggle} role="switch" aria-checked={on} style={{ display: "inline-block", width: 34, height: 19, borderRadius: 20, background: on ? STEEL : "#b7c3cb", position: "relative", cursor: "pointer", verticalAlign: "middle", flexShrink: 0 }}><span style={{ position: "absolute", top: 2, left: on ? 17 : 2, width: 15, height: 15, borderRadius: "50%", background: "#fff", boxShadow: "0 1px 2px rgba(0,0,0,.35)" }} /></span>);
     const isMulti = !!Q.multi;
     const selArr = Array.isArray(curPick) ? curPick : [];
@@ -203911,37 +203884,37 @@ function Exam({ onAnswer, lang, t, backRef }) {
         {Array.isArray(Q.exhibits) && renderExhibits(Q.exhibits)}
         {(() => {
           if (Q.dnd) { const dndOk = dndRight(Q, picks[pos]); const done = dndComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderDndBody(Q, submitted)}
             {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(dndOk ? C.ok : C.ng, C.light) }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.build) { const bOk = buildRight(Q, picks[pos]); const done = buildComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderBuildBody(Q, submitted)}
             {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(bOk ? C.ok : C.ng, C.light) }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.mx) { const mxOk = mxRight(Q, picks[pos]); const done = mxComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "scenario")}</div>
             {renderMxBody(Q, submitted)}
             {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(mxOk ? C.ok : C.ng, C.light) }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.hot) { const hotOk = hotRight(Q, picks[pos]); const done = hotComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderHotBody(Q, submitted)}
             {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(hotOk ? C.ok : C.ng, C.light) }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           const isMulti = !!Q.multi; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); const selSet = Array.isArray(sel) ? sel : []; const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isR = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
           return (<>
-            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${need} answers. (${submitted ? selSet.length : mSel.length}/${need})` : `正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
+            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${need} answers. (${submitted ? selSet.length : mSel.length}/${need})` : `正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {opts.map((opt, i) => {
               if (isMulti) { const chosen = submitted ? selSet.includes(i) : mSel.includes(i); const isC = correctSet.includes(i); let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (isC) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (chosen) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } } else if (chosen) { bg = C.light; bd = C.primary; col = C.deep; }
@@ -203950,12 +203923,12 @@ function Exam({ onAnswer, lang, t, backRef }) {
               return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
             })}
             {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(isR ? C.ok : C.ng, C.light) }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>);
         })()}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
-        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : C.primary, cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
+        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : nvInk(C.primary, "#ffffff"), cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
         <span style={{ fontSize: 13, color: "#5a7780", fontWeight: 600 }}>{pos + 1} / {qs.length}</span>
         <button onClick={next} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
@@ -204065,7 +204038,7 @@ function Review({ lang, t, onAnswer }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
             {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
@@ -204622,27 +204595,17 @@ function permFromSeed(n, seed) {
   }
   return idx;
 }
-// 問題の選択肢をシャッフルし、正答が必ず先頭に来ないようにする
+// 問題の選択肢をシャッフルする（正解の位置は偏らない）
 // salt を変えると同じ問題でも別の並びになる（クイズ⇔模試⇔セッションで分散）
-function shuffleChoices(q, lang, salt = 0) {
+function shuffleChoices(q, lang, salt = 0, legacy = false) {
   const opts = lang === "en" ? (q.oEn || q.o) : q.o;
   const n = opts.length;
   // キーから決定的シード
   let h = 0; const base = qKey(q) + "|" + salt;
   for (let i = 0; i < base.length; i++) { h = (h * 33 + base.charCodeAt(i)) | 0; }
   let perm = permFromSeed(n, h >>> 0);
-  // 正答が先頭に来てしまう場合は別シードで再試行（数回）し、最終的には強制スワップ
-  let tries = 0;
-  while (perm[0] === q.a && tries < 8) {
-    h = (h * 1103515245 + 12345) | 0;
-    perm = permFromSeed(n, h >>> 0);
-    tries++;
-  }
-  if (perm[0] === q.a) {
-    // 正答を後ろの位置と入れ替える（先頭回避を保証）
-    const target = 1 + ((h >>> 0) % (n - 1));
-    [perm[0], perm[target]] = [perm[target], perm[0]];
-  }
+  // 正解の位置は A〜D のどこにも同じ確率で来る（以前は「正解を先頭に置かない」ようにしていたが、A が正解にならないと分かると1択減らせてしまうのでやめた）
+  if (legacy) { let tries = 0; while (perm[0] === q.a && tries < 8) { h = (h * 1103515245 + 12345) | 0; perm = permFromSeed(n, h >>> 0); tries++; } if (perm[0] === q.a) { const target = 1 + ((h >>> 0) % (n - 1)); [perm[0], perm[target]] = [perm[target], perm[0]]; } } // 変更前の途中保存から再開したときだけ、以前の並べ方を再現する
   const shuffledOpts = perm.map(i => opts[i]);
   const newAnswer = perm.indexOf(q.a);
   const oeSrc = lang === "en" ? (q.oeEn || q.oe) : q.oe;
@@ -204832,11 +204795,11 @@ function App() {
   const persist = (next) => { setState(next); saveState(next); };
 
   const record = (domId, correct) => { try { novaLogStudy(); } catch (e) {}
-    const next = JSON.parse(JSON.stringify(state));
+    setState((prev) => { const next = JSON.parse(JSON.stringify(prev)); // 同じ描画中に続けて呼ばれても（本番モードの一括採点）前の更新に積み上げる
     if (!next.progress[domId]) next.progress[domId] = { correct: 0, attempts: 0 };
     next.progress[domId].attempts++;
     if (correct) next.progress[domId].correct++;
-    persist(next);
+    saveState(next); return next; });
   };
 
   if (!loaded) return <div style={{ padding: 40, textAlign: "center", color: C.deep }}>{t.loading}</div>;
@@ -205110,7 +205073,7 @@ function Quiz({ onAnswer, lang, t }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
           </div>
@@ -205174,14 +205137,16 @@ function Exam({ onAnswer, lang, t, backRef }) {
 
   useEffect(() => { if (!backRef) return; backRef.current = () => { if (phase === "run" || phase === "result") { setPhase("select"); return true; } return false; }; return () => { if (backRef) backRef.current = null; }; }, [phase, backRef]);
   useEffect(() => {
-    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain }, (en ? "Set " : "セット") + setNo);
+    if (phase === "run") slot.save({ setNo, kind, mode, phase, pos, picks, sel, mSel, flags, remain, bv: legacyOrder ? 1 : 2 }, (en ? "Set " : "セット") + setNo);
     else if (phase === "result") slot.remove();
   }, [phase, pos, picks, sel, mSel, flags]);
 
   const rawQs = setNo ? (kind === "domain" ? (DOMAIN_SETS[setNo] || []) : EXAM_SETS[setNo]) : [];
+  const [legacyOrder, setLegacyOrder] = useState(false); // 変更前の途中保存から再開したときだけ true
   const qs = useMemo(() => {
     const salt = "ab_" + setNo + "_" + kind;
-    let arr = rawQs.map(Q => { const { opts, answer } = shuffleChoices(Q, lang, salt); return { ...Q, o: opts, a: answer }; });
+    let arr = rawQs.map(Q => { const { opts, answer } = shuffleChoices(Q, lang, salt, legacyOrder); return { ...Q, o: opts, a: answer }; });
+    if (!legacyOrder && setNo) arr = novaBalanceAnswers(arr, STORE_KEY + "|" + salt + "|" + lang);
     if (!setNo) return arr;
     const isDom = kind === "domain";
     const base = isDom ? 0 : ((typeof setNo === "number" ? setNo : 1) - 1);
@@ -205209,7 +205174,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
     if (typeof GH300_EXHIBIT !== "undefined" && GH300_EXHIBIT.length) {
       const pool = isDom ? GH300_EXHIBIT.filter(q => q.d === setNo) : GH300_EXHIBIT;
       const k = isDom ? Math.min(1, pool.length) : Math.min(2, pool.length);
-      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, answer } = shuffleChoices(Q, lang, salt); specials.push({ ...Q, o: opts, a: answer, ex: true }); }
+      for (let i = 0; i < k; i++) { const Q = pool[(i + base * k) % pool.length]; const { opts, answer } = shuffleChoices(Q, lang, salt, legacyOrder); specials.push({ ...Q, o: opts, a: answer, ex: true }); }
     }
     if (typeof GH300_MATRIX !== "undefined" && GH300_MATRIX.length) {
       const pool = isDom ? GH300_MATRIX.filter(q => q.d === setNo) : GH300_MATRIX;
@@ -205229,11 +205194,11 @@ function Exam({ onAnswer, lang, t, backRef }) {
       arr = mixed;
     }
     return arr;
-  }, [setNo, mode, kind, lang]);
+  }, [setNo, mode, kind, lang, legacyOrder]);
 
   const start = (n) => {
     const base = (kind === "domain" ? (DOMAIN_SETS[n] || []) : EXAM_SETS[n]) || [];
-    setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({});
+    setLegacyOrder(false); setSetNo(n); setPos(0); setPicks({}); setSel(null); setMSel([]); setFlags({});
     setRemain(mode === "real" ? certExamSeconds("gh300", base.length) : 0);
     setPhase("run");
   };
@@ -205285,7 +205250,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
               <div style={{ fontSize: 12.5, fontWeight: 700, color: C.deep }}>{en ? "Exam in progress" : "中断した模試"}</div>
               <div style={{ fontSize: 11, color: "#7d93a8" }}>{slot.meta.label}{slot.meta.label ? "／" : ""}{saveStamp(slot.meta.t)}</div>
             </div>
-            <button onClick={async () => { const d = await slot.read(); if (!d) return; setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
+            <button onClick={async () => { const d = await slot.read(); if (!d) return; setLegacyOrder(d.bv !== 2); setSetNo(d.setNo); setKind(d.kind || "normal"); setMode(d.mode || "practice"); setPos(d.pos || 0); setPicks(d.picks || {}); setSel(d.sel == null ? null : d.sel); setMSel(d.mSel || []); setFlags(d.flags || {}); setRemain(d.remain || 0); setPhase("run"); }}
               style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary), fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>{en ? "▶ Resume" : "▶ 続きから"}</button>
             <button onClick={() => slot.remove()} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.mid}`, background: "#fff", color: "#7d93a8", fontSize: 11, cursor: "pointer" }}>{en ? "Delete" : "削除"}</button>
           </div>
@@ -205338,10 +205303,10 @@ function Exam({ onAnswer, lang, t, backRef }) {
     return (
       <div>
         <div style={{ background: passed ? "#E4F6EC" : "#FBE9E7", border: `2px solid ${passed ? C.ok : C.ng}`, borderRadius: 12, padding: 18, textAlign: "center", marginBottom: 14 }}>
-          <div style={{ fontSize: 13, color: "#5a7780" }}>{en ? `Set ${setNo} · Result` : `セット${setNo}・結果`}</div>
-          <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : C.ng }}>{rate}%</div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: passed ? C.ok : C.ng }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
-          <div style={{ fontSize: 12, color: "#5a7780", marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
+          <div style={{ fontSize: 13, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7") }}>{en ? `Set ${setNo} · Result` : `セット${setNo}・結果`}</div>
+          <div style={{ fontSize: 40, fontWeight: 800, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{rate}%</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{passed ? (en ? "Passed" : "合格ライン到達") : (en ? `Need +${PASS - rate}%` : `あと${PASS - rate}%`)}</div>
+          <div style={{ fontSize: 12, color: nvInk("#5a7780", passed ? "#E4F6EC" : "#FBE9E7"), marginTop: 4 }}>{en ? `${c} / ${qs.length} correct` : `正解 ${c} / ${qs.length} 問`}</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={() => start(setNo)} style={{ flex: 1, padding: 13, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{en ? "Retry" : "もう一度"}</button>
@@ -205356,12 +205321,12 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const val = picks[pos] || {};
     return (<div>{(Q.items || []).map(it => { const chosen = val[it.id] || ""; const ok = chosen === Q.correct[it.id]; return (
       <div key={it.id} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, padding: "9px 11px", border: `1.5px solid ${submitted ? (ok ? C.ok : C.ng) : C.mid}`, borderRadius: 8, background: submitted ? (ok ? "#E4F6EC" : "#FBE9E7") : "#fff" }}>
-        <span style={{ flex: 1, fontSize: 13.5, color: C.ink }}>{L(it, "text", lang)}</span>
-        <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, background: "#fff", color: C.ink }}>
+        <span style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere", fontSize: 13.5, color: C.ink }}>{L(it, "text", lang)}</span>
+        <select value={chosen} disabled={submitted} onChange={e => chooseDnd(it.id, e.target.value)} style={{ padding: "7px 9px", borderRadius: 6, border: `1px solid ${C.mid}`, fontSize: 13, minWidth: 130, maxWidth: "55%", background: "#fff", color: C.ink }}>
           <option value="">{en ? "— select —" : "— 選択 —"}</option>
           {(Q.targets || []).map(tg => (<option key={tg.id} value={tg.id}>{L(tg, "label", lang)}</option>))}
         </select>
-        {submitted && <span style={{ fontSize: 14, fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
+        {submitted && <span style={{ fontSize: 14, fontWeight: 900, flexShrink: 0, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span>}
       </div>); })}</div>);
   };
   const renderBuildBody = (Q, submitted) => {
@@ -205377,8 +205342,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
           <span style={{ fontWeight: 800, color: C.deep, minWidth: 18 }}>{idx + 1}.</span>
           <span style={{ flex: 1, fontSize: 13 }}>{txt(id)}</span>
           {submitted ? <span style={{ fontWeight: 900, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}</span> : (<>
-            <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : C.primary }}>▲</button>
-            <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : C.primary }}>▼</button>
+            <button onClick={() => moveBuild(idx, -1)} disabled={idx === 0} style={{ border: "none", background: "none", cursor: idx === 0 ? "default" : "pointer", fontSize: 15, color: idx === 0 ? C.mid : nvInk(C.primary, C.light, 3) }}>▲</button>
+            <button onClick={() => moveBuild(idx, 1)} disabled={idx === chosen.length - 1} style={{ border: "none", background: "none", cursor: idx === chosen.length - 1 ? "default" : "pointer", fontSize: 15, color: idx === chosen.length - 1 ? C.mid : nvInk(C.primary, C.light, 3) }}>▼</button>
             <button onClick={() => removeBuild(id)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 15, color: C.ng }}>×</button>
           </>)}
         </div>); }) : <div style={{ fontSize: 12, color: "#5d6c83", padding: "8px 0" }}>{en ? `Tap candidates to add (${Q.answer.length}).` : `候補をタップして追加してください（${Q.answer.length}項目）。`}</div>}
@@ -205414,7 +205379,7 @@ function Exam({ onAnswer, lang, t, backRef }) {
         <div style={{ fontSize: 13, marginBottom: 8, color: C.ink, lineHeight: 1.5 }}>{L(s, "text", lang)}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {[["yes", en ? "Yes" : "はい"], ["no", en ? "No" : "いいえ"]].map(([v, label]) => { const on = chosen === v; return (<button key={v} onClick={() => !submitted && setStmt(s.id, v)} disabled={submitted} style={{ padding: "6px 18px", borderRadius: 16, border: `1.5px solid ${on ? C.primary : C.mid}`, background: on ? C.primary : "#fff", color: on ? nvInk("#ffffff", C.primary) : nvInk("#5a7780", "#ffffff"), fontSize: 12.5, fontWeight: 700, cursor: submitted ? "default" : "pointer" }}>{label}</button>); })}
-          {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: ok ? C.ok : C.ng }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
+          {submitted && <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: nvInk(ok ? C.ok : C.ng, ok ? "#E4F6EC" : "#FBE9E7") }}>{ok ? "✓" : "✗"}（{Q.correct[s.id] === "yes" ? (en ? "Yes" : "はい") : (en ? "No" : "いいえ")}）</span>}
         </div>
       </div>); })}</div>);
   };
@@ -205438,8 +205403,8 @@ function Exam({ onAnswer, lang, t, backRef }) {
     const hh = String(Math.floor(remain / 3600)).padStart(2, "0");
     const mm = String(Math.floor((remain % 3600) / 60)).padStart(2, "0");
     const ss = String(remain % 60).padStart(2, "0");
-    const NAVY = "#12324a", STEEL = C.primary, INK = "#1b2a33";
-    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : "#5a7780", PAGE = contrast ? "#0b0f12" : "#eceff2";
+    const NAVY = "#12324a", STEEL = nvInk(C.primary, "#ffffff"), INK = "#1b2a33";
+    const LINE = contrast ? "#3a4650" : "#d5dde2", SUB = contrast ? "#dfe7ec" : nvInk("#5a7780", "#eceff2"), PAGE = contrast ? "#0b0f12" : "#eceff2";
     const Toggle = ({ on, onToggle }) => (<span onClick={onToggle} role="switch" aria-checked={on} style={{ display: "inline-block", width: 34, height: 19, borderRadius: 20, background: on ? STEEL : "#b7c3cb", position: "relative", cursor: "pointer", verticalAlign: "middle", flexShrink: 0 }}><span style={{ position: "absolute", top: 2, left: on ? 17 : 2, width: 15, height: 15, borderRadius: "50%", background: "#fff", boxShadow: "0 1px 2px rgba(0,0,0,.35)" }} /></span>);
     const isMulti = !!Q.multi;
     const selArr = Array.isArray(curPick) ? curPick : [];
@@ -205532,37 +205497,37 @@ function Exam({ onAnswer, lang, t, backRef }) {
         {Array.isArray(Q.exhibits) && renderExhibits(Q.exhibits)}
         {(() => {
           if (Q.dnd) { const dndOk = dndRight(Q, picks[pos]); const done = dndComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "Match each item to the correct category." : "各項目を正しい分類先に対応付けてください（各行のドロップダウンで選択）。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderDndBody(Q, submitted)}
             {!submitted && (<button onClick={submitDndPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: dndOk ? C.ok : C.ng }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(dndOk ? C.ok : C.ng, C.light) }}>{dndOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.build) { const bOk = buildRight(Q, picks[pos]); const done = buildComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.answer.length} steps and order them.` : `必要な手順を${Q.answer.length}つ選び、正しい順序に並べてください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderBuildBody(Q, submitted)}
             {!submitted && (<button onClick={submitBuildPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: bOk ? C.ok : C.ng }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(bOk ? C.ok : C.ng, C.light) }}>{bOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.mx) { const mxOk = mxRight(Q, picks[pos]); const done = mxComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? "For each statement, select Yes or No." : "各記述について「はい」か「いいえ」を選択してください。"}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "scenario")}</div>
             {renderMxBody(Q, submitted)}
             {!submitted && (<button onClick={submitMxPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: mxOk ? C.ok : C.ng }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(mxOk ? C.ok : C.ng, C.light) }}>{mxOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           if (Q.hot) { const hotOk = hotRight(Q, picks[pos]); const done = hotComplete(Q, picks[pos]); return (<>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${Q.n || Q.correct.length} area(s) on the screen.` : `画面上で${Q.n || Q.correct.length}箇所を選択してください。`}</div>
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {renderHotBody(Q, submitted)}
             {!submitted && (<button onClick={submitHotPractice} disabled={!done} style={{ marginTop: 8, width: "100%", padding: 12, borderRadius: 9, border: "none", background: done ? C.primary : C.mid, color: nvInk("#ffffff", done ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: done ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: hotOk ? C.ok : C.ng }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(hotOk ? C.ok : C.ng, C.light) }}>{hotOk ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>　{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>); }
           const isMulti = !!Q.multi; const need = Q.n || (Array.isArray(Q.a) ? Q.a.length : 1); const selSet = Array.isArray(sel) ? sel : []; const correctSet = Array.isArray(Q.a) ? Q.a : [Q.a];
           const isR = isMulti ? (selSet.length === correctSet.length && [...selSet].sort((a, b) => a - b).join(",") === [...correctSet].sort((a, b) => a - b).join(",")) : (sel === Q.a);
           return (<>
-            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 8 }}>{en ? `Select ${need} answers. (${submitted ? selSet.length : mSel.length}/${need})` : `正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
+            {isMulti && <div style={{ fontSize: 12.5, fontWeight: 700, color: nvInk(C.primary, "#ffffff"), marginBottom: 8 }}>{en ? `Select ${need} answers. (${submitted ? selSet.length : mSel.length}/${need})` : `正しい回答を${need}つ選択してください。（${submitted ? selSet.length : mSel.length}/${need} 選択中）`}</div>}
             <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 14, lineHeight: 1.5 }}>{tr(Q, "q")}</div>
             {opts.map((opt, i) => {
               if (isMulti) { const chosen = submitted ? selSet.includes(i) : mSel.includes(i); const isC = correctSet.includes(i); let bg = "#fff", bd = C.mid, col = C.ink; if (submitted) { if (isC) { bg = "#E4F6EC"; bd = C.ok; col = C.ok; } else if (chosen) { bg = "#FBE9E7"; bd = C.ng; col = C.ng; } } else if (chosen) { bg = C.light; bd = C.primary; col = C.deep; }
@@ -205571,12 +205536,12 @@ function Exam({ onAnswer, lang, t, backRef }) {
               return (<button key={i} onClick={() => choosePractice(i)} disabled={submitted} style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "11px 13px", borderRadius: 9, border: `1.5px solid ${bd}`, background: bg, color: col, cursor: submitted ? "default" : "pointer", fontSize: 13.5, lineHeight: 1.4 }}><span style={{ fontWeight: 700, marginRight: 8 }}>{submitted && i === Q.a ? "✓" : submitted && i === sel ? "✗" : "ABCDE"[i]}</span>{opt}</button>);
             })}
             {isMulti && !submitted && (<button onClick={submitMultiPractice} disabled={mSel.length !== need} style={{ marginTop: 6, width: "100%", padding: 12, borderRadius: 9, border: "none", background: mSel.length === need ? C.primary : C.mid, color: nvInk("#ffffff", mSel.length === need ? C.primary : C.mid, 3), fontSize: 14, fontWeight: 700, cursor: mSel.length === need ? "pointer" : "default" }}>{en ? "Submit" : "解答する"}</button>)}
-            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: isR ? C.ok : C.ng }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
+            {submitted && (<div style={{ marginTop: 12 }}><div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}><strong style={{ color: nvInk(isR ? C.ok : C.ng, C.light) }}>{isR ? (en ? "Correct" : "正解") : (en ? "Incorrect" : "不正解")}</strong>・{isMulti ? `${en ? "Answer" : "正解"}：${correctSet.map(i => "ABCDE"[i]).join("・")}　` : ""}{tr(Q, "e")}</div><button onClick={next} style={{ marginTop: 12, width: "100%", padding: 12, borderRadius: 9, border: "none", background: C.primary, color: nvInk("#ffffff", C.primary, 3), fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{isLast ? (en ? "See result" : "結果を見る") : (en ? "Next" : "次の問題")}</button></div>)}
           </>);
         })()}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
-        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : C.primary, cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
+        <button onClick={prev} disabled={pos === 0} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#a8c2cc" : nvInk(C.primary, "#ffffff"), cursor: pos === 0 ? "default" : "pointer" }}>{en ? "← Prev" : "← 前の問題"}</button>
         <span style={{ fontSize: 13, color: "#5a7780", fontWeight: 600 }}>{pos + 1} / {qs.length}</span>
         <button onClick={next} style={{ padding: "10px 30px", borderRadius: 9, fontSize: 13.5, fontWeight: 600, border: `1.5px solid ${C.primary}`, background: "#fff", color: C.primary, cursor: "pointer" }}>{t.nextQ}</button>
       </div>
@@ -205686,7 +205651,7 @@ function Review({ lang, t, onAnswer }) {
         {sel !== null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? t.correct : t.incorrect}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? t.correct : t.incorrect}</strong>
               ・{t.answerIs("ABCD"[ans])}{L(Q, "e", lang)}{sc.ref ? <span style={{ display: "block", marginTop: 6, fontSize: 11.5, color: "#8a94a6" }}>{sc.ref}</span> : null}
             </div>
             {cleared && <div style={{ marginTop: 8, fontSize: 12.5, color: C.ok, fontWeight: 700 }}>✓ {t.reviewCleared}</div>}
@@ -206705,7 +206670,7 @@ function App() {
   const persistReview = (next) => { setReview(next); saveJSON(REVIEW_KEY, next); };
 
   const record = (domId, correct) => { try { novaLogStudy(); } catch (e) {}
-    const next = JSON.parse(JSON.stringify(state));
+    setState((prev) => { const next = JSON.parse(JSON.stringify(prev)); // 同じ描画中に続けて呼ばれても（本番モードの一括採点）前の更新に積み上げる
     if (!next.progress[domId]) next.progress[domId] = { correct: 0, attempts: 0 };
     next.progress[domId].attempts++;
     if (correct) next.progress[domId].correct++;
@@ -206717,14 +206682,16 @@ function App() {
       next.meta.streak = next.meta.lastDay === yesterday ? next.meta.streak + 1 : 1;
       next.meta.lastDay = today;
     }
-    persist(next);
+    saveJSON(STORE_KEY, next); return next; });
   };
 
+  // ids：問題IDの配列。模擬試験（MSExamShell）からは問題オブジェクトが1つずつ届くので、どちらも受け取って ID にそろえる
   const addToReview = (ids) => {
-    const set = new Set(review);
-    let added = 0;
-    ids.forEach(i => { if (!set.has(i)) { set.add(i); added++; } });
-    if (added > 0) { persistReview([...set]); setToast(t.addedToReview(added)); }
+    const list = [].concat(ids).map(i => (i && typeof i === "object" ? i.id : i)).filter(i => i != null && BANK_BY_ID[i]);
+    const added = list.filter(i => review.indexOf(i) < 0).length;
+    if (!list.length) return;
+    setReview(prev => { const set = new Set(prev); list.forEach(i => set.add(i)); if (set.size === prev.length) return prev; const next = [...set]; saveJSON(REVIEW_KEY, next); return next; });
+    if (added > 0) setToast(t.addedToReview(added));
   };
   const removeFromReview = (id) => persistReview(review.filter(x => x !== id));
   const clearReview = () => persistReview([]);
@@ -206922,7 +206889,7 @@ function QuestionCard({ Q, sel, onChoose, lang, reveal, t }) {
       })}
       {sel !== null && reveal && (
         <div style={{ marginTop: 12, background: C.light, borderRadius: 9, padding: 12, fontSize: 13, lineHeight: 1.55 }}>
-          <strong style={{ color: sel === Q.a ? C.ok : C.ng }}>{sel === Q.a ? t.correct : t.incorrect}</strong>・{t.answerIs("ABCD"[Q.a])}{exp}
+          <strong style={{ color: nvInk(sel === Q.a ? C.ok : C.ng, C.light) }}>{sel === Q.a ? t.correct : t.incorrect}</strong>・{t.answerIs("ABCD"[Q.a])}{exp}
         </div>
       )}
     </div>
@@ -207002,7 +206969,7 @@ function Quiz({ onAnswer, lang, t }) {
       <QuestionCard Q={Q} sel={sel} onChoose={choose} lang={lang} reveal t={t} />
       <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
         <button onClick={prev} disabled={pos === 0}
-          style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#6b7076" : C.primary, fontSize: 14, fontWeight: 700, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
+          style={{ flex: 1, padding: 12, borderRadius: 9, border: `1.5px solid ${pos === 0 ? C.mid : C.primary}`, background: "#fff", color: pos === 0 ? "#6b7076" : nvInk(C.primary, "#ffffff"), fontSize: 14, fontWeight: 700, cursor: pos === 0 ? "not-allowed" : "pointer" }}>
           ← {t.prevQ}
         </button>
         <button onClick={next} disabled={pos + 1 >= order.length}
@@ -207147,8 +207114,8 @@ function ExamResult({ answers, setNo, onRetry, onBack, lang, t }) {
     <div>
       <div style={{ background: passed ? "#E6F4EA" : "#FCE8E6", border: `2px solid ${passed ? C.ok : C.ng}`, borderRadius: 12, padding: 18, textAlign: "center", marginBottom: 14 }}>
         <div style={{ fontSize: 13, color: "#5f6368" }}>{t.setLabel}{setNo} {t.result}</div>
-        <div style={{ fontSize: 40, fontWeight: 800, color: passed ? C.ok : C.ng }}>{rate}%</div>
-        <div style={{ fontSize: 14, fontWeight: 700, color: passed ? C.ok : C.ng }}>{passed ? t.reachedPass : t.needMore(PASS - rate)}</div>
+        <div style={{ fontSize: 40, fontWeight: 800, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{rate}%</div>
+        <div style={{ fontSize: 14, fontWeight: 700, color: nvInk(passed ? C.ok : C.ng, passed ? "#E4F6EC" : "#FBE9E7", 3) }}>{passed ? t.reachedPass : t.needMore(PASS - rate)}</div>
         <div style={{ fontSize: 12, color: "#5f6368", marginTop: 4 }}>{t.correctOf(c, answers.length)}</div>
       </div>
       {wrong.length > 0 && <div style={{ fontSize: 12.5, color: C.warn, fontWeight: 600, marginBottom: 12 }}>↪ {t.addedToReview(wrong.length)}</div>}
@@ -207157,7 +207124,7 @@ function ExamResult({ answers, setNo, onRetry, onBack, lang, t }) {
           <div key={d.id} style={{ marginBottom: 9 }}>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
               <span><Badge id={d.id} hue={d.hue} />{domName(d.id, lang)}</span>
-              <strong style={{ color: d.correct / d.total >= PASS / 100 ? C.ok : C.ng }}>{d.correct}/{d.total}</strong>
+              <strong style={{ color: nvInk(d.correct / d.total >= PASS / 100 ? C.ok : C.ng, C.light) }}>{d.correct}/{d.total}</strong>
             </div>
             <Bar pct={Math.round(d.correct / d.total * 100)} color={d.correct / d.total >= PASS / 100 ? C.ok : C.ng} />
           </div>
@@ -207172,8 +207139,8 @@ function ExamResult({ answers, setNo, onRetry, onBack, lang, t }) {
           return (
           <div key={idx} style={{ padding: "8px 0", borderBottom: `1px solid ${C.light}`, fontSize: 13 }}>
             <div style={{ fontWeight: 600, marginBottom: 4 }}><Badge id={a.q.d} hue={DOM_HUE[a.q.d]} />{q}</div>
-            <div style={{ color: C.ng, fontSize: 12.5 }}>{t.yourAnswer}：{"ABCD"[a.sel]} {opts[a.sel]}</div>
-            <div style={{ color: C.ok, fontSize: 12.5 }}>{t.answer}：{"ABCD"[a.q.a]} {opts[a.q.a]}</div>
+            <div style={{ color: nvInk(C.ng, "#ffffff"), fontSize: 12.5 }}>{t.yourAnswer}：{"ABCD"[a.sel]} {opts[a.sel]}</div>
+            <div style={{ color: nvInk(C.ok, "#ffffff"), fontSize: 12.5 }}>{t.answer}：{"ABCD"[a.q.a]} {opts[a.q.a]}</div>
             <div style={{ color: "#5f6368", fontSize: 12.5, marginTop: 2 }}>{exp}</div>
           </div>
           );
@@ -208624,7 +208591,7 @@ function Quiz({ onAnswer, onWrong, lang }) {
         {sel !== null && (
           <div style={{ marginTop:12 }}>
             <div style={{ background:C.light, borderRadius:9, padding:12, fontSize:13, lineHeight:1.55, color:C.ink }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? (en?"Correct":"正解") : (en?"Incorrect":"不正解")}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? (en?"Correct":"正解") : (en?"Incorrect":"不正解")}</strong>
               ・{en?`The answer is ${"ABCD"[ans]}. `:`正解は ${"ABCD"[ans]}。`}{en?Q.eEn:Q.e}
             </div>
           </div>
@@ -209760,7 +209727,7 @@ function Quiz({ onAnswer, onWrong, lang }) {
         {sel !== null && (
           <div style={{ marginTop:12 }}>
             <div style={{ background:C.light, borderRadius:9, padding:12, fontSize:13, lineHeight:1.55, color:C.ink }}>
-              <strong style={{ color: sel === ans ? C.ok : C.ng }}>{sel === ans ? (en?"Correct":"正解") : (en?"Incorrect":"不正解")}</strong>
+              <strong style={{ color: nvInk(sel === ans ? C.ok : C.ng, C.light) }}>{sel === ans ? (en?"Correct":"正解") : (en?"Incorrect":"不正解")}</strong>
               ・{en?`The answer is ${"ABCD"[ans]}. `:`正解は ${"ABCD"[ans]}。`}{en?Q.eEn:Q.e}
             </div>
           </div>
@@ -210208,7 +210175,7 @@ function makeSecGovStation(cfg){
           {sel!==null && (
             <div style={{ marginTop:12 }}>
               <div style={{ background:C.light, borderRadius:9, padding:12, fontSize:13, lineHeight:1.55, color:C.ink }}>
-                <strong style={{ color: sel===ans?C.ok:C.ng }}>{sel===ans?(en?"Correct":"正解"):(en?"Incorrect":"不正解")}</strong>
+                <strong style={{ color: nvInk(sel===ans ? C.ok : C.ng, C.light) }}>{sel===ans?(en?"Correct":"正解"):(en?"Incorrect":"不正解")}</strong>
                 ・{en?`The answer is ${"ABCD"[ans]}. `:`正解は ${"ABCD"[ans]}。`}{en?Q.eEn:Q.e}
               </div>
             </div>
@@ -231504,6 +231471,9 @@ function NovaStationRow({ st, lang, onEnter }) {
 
 const NOVA_RESPONSIVE_CSS = `
 @media (max-width: 480px) {
+  /* 長い URL・パス・スラッシュでつないだ語（azureml://… など）が画面幅を押し広げないよう、スマホ幅では語の途中でも折り返す */
+  body { overflow-wrap: break-word; }
+  button { overflow-wrap: anywhere; }
   .nova-container { padding-left: 16px !important; padding-right: 16px !important; }
   .nova-row { gap: 14px !important; padding-top: 14px !important; padding-bottom: 14px !important; }
   .nova-icon { width: 38px !important; }
