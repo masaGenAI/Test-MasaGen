@@ -15,27 +15,117 @@
     "LinguisticsHubModule": "linguisticshub"
   },
   "stations": {
-    "CLF": "AWS CLF-C02", "SAA": "AWS SAA-C03", "ISO42001F": "ISO/IEC 42001 Foundation",
-    "ISO42001LI": "ISO/IEC 42001 Lead Implementer", "GovMix": "横断模試（GovMix）"
+    "CLF": "AWS CLF-C02",
+    "SAA": "AWS SAA-C03",
+    "ISO42001F": "ISO/IEC 42001 Foundation",
+    "ISO42001LI": "ISO/IEC 42001 Lead Implementer",
+    "GovMix": "横断模試（GovMix）"
   },
   "paths": [
-    {"prefix": "nova-app/public/booksummaryhub.html", "hub": "booksummary"},
-    {"prefix": "nova-app/public/learning-tracker.html", "hub": "tracker"},
-    {"prefix": "nova-app/public/anything-memo.html", "hub": "anythingmemo"},
-    {"prefix": "nova-app/public/liberal-arts.html", "hub": "liberalarts"},
-    {"prefix": "nova-app/public/gartner-figs/", "hub": "megatech", "tab": "noteissues", "what": "Gartner ダイジェストの図（画像）"},
-    {"prefix": "nova-app/public/kindle-figs/", "hub": "booksummary", "what": "Kindle 要約の図（画像）"},
-    {"prefix": "data/govdojo/", "hub": "megatech", "tab": "govdojo", "what": "道場の根拠データ（ビルドで画面の定数に生成）"},
-    {"prefix": "nova-app/src/data/itsec", "hub": "megatech", "tab": "itsec"},
-    {"prefix": "nova-app/src/data/foresight", "hub": "megatech", "what": "Foresight 系タブのデータ"},
-    {"prefix": "nova-app/scripts/", "offapp": "ビルド・読み込みの仕組み（画面の中身は変わらない）"},
-    {"prefix": "nova-app/vite.config", "offapp": "ビルド・読み込みの仕組み（画面の中身は変わらない）"},
-    {"prefix": "nova-app/package", "offapp": "ビルド・読み込みの仕組み（画面の中身は変わらない）"},
-    {"prefix": ".github/", "offapp": "デプロイ設定"},
-    {"prefix": ".claude/skills/", "offapp": "作業用スキル（アプリには出ない）"},
-    {"prefix": "CLAUDE.md", "offapp": "リポジトリの文書（アプリには出ない）"},
-    {"prefix": "docs/", "offapp": "リポジトリの文書（アプリには出ない）"},
-    {"prefix": "src/", "offapp": "todoapp（学習用の題材。Nova とは別）"},
-    {"prefix": "tests/", "offapp": "todoapp（学習用の題材。Nova とは別）"}
-  ]
+    {
+      "prefix": "nova-app/src/main.jsx",
+      "hub": "COMMON",
+      "what": "アプリの起動部分（バックアップ・バーなど全ハブに出るもの）"
+    },
+    {
+      "prefix": "nova-app/src/kbdAccess.js",
+      "hub": "COMMON",
+      "what": "キーボード操作の補助（全ハブ）"
+    },
+    {
+      "prefix": "nova-app/README.md",
+      "offapp": "リポジトリの文書（アプリには出ない）"
+    },
+    {
+      "prefix": "nova-app/app_",
+      "offapp": "確認用の画面写真（アプリには出ない）"
+    },
+    {
+      "prefix": "nova-app/public/booksummaryhub.html",
+      "hub": "booksummary"
+    },
+    {
+      "prefix": "nova-app/public/learning-tracker.html",
+      "hub": "tracker"
+    },
+    {
+      "prefix": "nova-app/public/anything-memo.html",
+      "hub": "anythingmemo"
+    },
+    {
+      "prefix": "nova-app/public/liberal-arts.html",
+      "hub": "liberalarts"
+    },
+    {
+      "prefix": "nova-app/public/gartner-figs/",
+      "hub": "megatech",
+      "tab": "noteissues",
+      "what": "Gartner ダイジェストの図（画像）"
+    },
+    {
+      "prefix": "nova-app/public/kindle-figs/",
+      "hub": "booksummary",
+      "what": "Kindle 要約の図（画像）"
+    },
+    {
+      "prefix": "data/govdojo/",
+      "hub": "megatech",
+      "tab": "govdojo",
+      "what": "道場の根拠データ（ビルドで画面の定数に生成）"
+    },
+    {
+      "prefix": "nova-app/src/data/itsec",
+      "hub": "megatech",
+      "tab": "itsec"
+    },
+    {
+      "prefix": "nova-app/src/data/foresight",
+      "hub": "megatech",
+      "what": "Foresight 系タブのデータ"
+    },
+    {
+      "prefix": "nova-app/scripts/",
+      "offapp": "ビルド・読み込みの仕組み（画面の中身は変わらない）"
+    },
+    {
+      "prefix": "nova-app/vite.config",
+      "offapp": "ビルド・読み込みの仕組み（画面の中身は変わらない）"
+    },
+    {
+      "prefix": "nova-app/package",
+      "offapp": "ビルド・読み込みの仕組み（画面の中身は変わらない）"
+    },
+    {
+      "prefix": ".github/",
+      "offapp": "デプロイ設定"
+    },
+    {
+      "prefix": ".claude/skills/",
+      "offapp": "作業用スキル（アプリには出ない）"
+    },
+    {
+      "prefix": "CLAUDE.md",
+      "offapp": "リポジトリの文書（アプリには出ない）"
+    },
+    {
+      "prefix": "docs/",
+      "offapp": "リポジトリの文書（アプリには出ない）"
+    },
+    {
+      "prefix": "src/",
+      "offapp": "todoapp（学習用の題材。Nova とは別）"
+    },
+    {
+      "prefix": "tests/",
+      "offapp": "todoapp（学習用の題材。Nova とは別）"
+    }
+  ],
+  "names": {
+    "_note": "TechHub の関数・定数名 → タブ id の上書き（参照をたどっても1つに決まらないもの）",
+    "FsLibrary": "fs_library",
+    "FsRefresh": "fs_refresh",
+    "FsCollection": "fs_collection",
+    "FsCollectionTree": "fs_collection",
+    "FsTreeItem": "fs_collection"
+  }
 }

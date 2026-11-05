@@ -125,15 +125,20 @@ def head_maps() -> dict:
             if m:
                 decl.append((i, m.group(1)))
         names = {n for _, n in decl}
-        tokens = {}
+        tokens, best_branches = {}, 0
         for k, (i, n) in enumerate(decl):
             j = decl[k + 1][0] if k + 1 < len(decl) else len(body)
             tokens.setdefault(n, set()).update(set(re.findall(r"[A-Za-z_$][A-Za-z0-9_$]*", "\n".join(body[i:j]))) & names)
-            if shell is None and 'tab === "' in "\n".join(body[i:j]) and re.search(r'tab === "[a-z0-9_]+" && <', "\n".join(body[i:j])):
-                shell = n
+            nb = len(re.findall(r'tab === "[a-z0-9_]+" && <', "\n".join(body[i:j])))
+            if nb > best_branches:
+                best_branches, shell = nb, n
         roots = collections.defaultdict(set)
         for m in re.finditer(r'tab === "([a-z0-9_]+)" && <([A-Za-z0-9_]+)', text):
             roots[m.group(2)].add(m.group(1))
+        for m in re.finditer(r"\{([A-Z0-9_]+)\[tab\] && <([A-Za-z0-9_]+)", text):
+            mm = re.search(r"const " + m.group(1) + r" = \{([^}]*)\}", text)
+            if mm:
+                roots[m.group(2)].update(re.findall(r"([a-z0-9_]+):", mm.group(1)))
         for comp, tset in roots.items():
             seen, stack = set(), [comp]
             while stack:
@@ -143,6 +148,9 @@ def head_maps() -> dict:
                 seen.add(x)
                 name2tabs.setdefault(x, set()).update(tset)
                 stack.extend(tokens.get(x, ()))
+    for n, t in PLACES.get("names", {}).items():
+        if not n.startswith("_"):
+            name2tabs[n] = {t}
     return {"hubs": hubs, "tabs": tabs, "tab_order": order, "name2tabs": name2tabs, "shell": shell}
 
 
@@ -195,6 +203,8 @@ def place_of_path(path: str, M: dict) -> tuple | None:
     hubs = M["hubs"]
     hub_order = ["PORTAL", "COMMON"] + list(hubs)
     hid = best["hub"]
+    if hid == "COMMON":
+        return (1, 0, "全ハブ共通の部品")
     name = hubs.get(hid, hid)
     sub = 0
     if best.get("tab"):
