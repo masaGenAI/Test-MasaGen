@@ -234359,9 +234359,8 @@ function novaLogStudy() {
 // Cowork の「デイリータスク トラッカー」で手動記録になっている Others 9項目を、Nova で日々つけるための台帳。
 // Nova にすでにある記録（資格の回答・Language Hub・Book Summary・学習トラッカー）は、保存のたびに日付つきで自動計上し、
 // もう一度入力させない。Nova の外でやること（English (ELZA) など）はワンタップで記録する。
-// Nova（GitHub Pages）から Notion へは直接書き込めないので、Notion へは Cowork のチャットに貼る更新文で反映する。
 const NOVA_DAILY_KEY = "nova_daily_v1";
-// name は Notion「Scheduled task tracker」の行名（「<name> — Day N」）と同じ表記。並びは Cowork のトラッカーと同じ
+// name と並びは Cowork のトラッカーの Others と同じ
 const NOVA_DAILY_CATS = [
   { id: "E", name: "English (ELZA)" },
   { id: "L", name: "Languages（ES/DE）", hub: "languagehub", src: ["Language Hub のスペイン語・ドイツ語（クイズ・聞き流し・単語）", "Language Hub Spanish/German (quiz, listening, vocab)"] },
@@ -234384,9 +234383,9 @@ function novaDailyDayNo(day) {
 function novaDailyRead() {
   try {
     const o = JSON.parse(window.localStorage.getItem(NOVA_DAILY_KEY) || "null");
-    if (o && typeof o === "object" && o.days && typeof o.days === "object") { if (!o.sent || typeof o.sent !== "object") o.sent = {}; return o; }
+    if (o && typeof o === "object" && o.days && typeof o.days === "object") return o;
   } catch (e) {}
-  return { v: 1, days: {}, sent: {} };
+  return { v: 1, days: {} };
 }
 function novaDailySave(o) {
   try { window.localStorage.setItem(NOVA_DAILY_KEY, JSON.stringify(o)); } catch (e) {}
@@ -234424,41 +234423,6 @@ function novaDailyAutoText(d, c, en) {
   }).join(en ? ", " : "・");
 }
 function novaDailyDoneIds(d) { return NOVA_DAILY_CATS.filter((c) => novaDailyIsDone(d, c.id)).map((c) => c.id); }
-function novaDailyNotes(d) { const n = (d && d.n) || {}; const out = {}; Object.keys(n).forEach((k) => { const t = String(n[k] || "").trim(); if (t) out[k] = t; }); return out; }
-// Notion 用にコピーした時点の状態。これと違う日だけを次の更新文に入れる
-function novaDailySig(d) { return novaDailyDoneIds(d).join(",") + "|" + JSON.stringify(novaDailyNotes(d)); }
-function novaDailyPending(o, today, back) {
-  const out = [];
-  const t = new Date(today + "T00:00:00");
-  for (let i = (back || 31) - 1; i >= 0; i--) {
-    const dt = new Date(t); dt.setDate(t.getDate() - i);
-    const day = novaLocalDay(dt);
-    const sent = o.sent[day];
-    if (novaDailySig(o.days[day]) !== (sent ? sent.sig : "|{}")) out.push(day);
-  }
-  return out;
-}
-// Cowork のチャットに貼ると、Claude が Notion の行を更新できる文（Notion の値に合わせて日本語で作る）
-function novaDailyNotionText(o, days) {
-  const nm = (id) => (NOVA_DAILY_CATS.find((c) => c.id === id) || { name: id }).name;
-  const L = [
-    "Notion の「Scheduled task tracker」で、種別が「個人タスク」の行のステータスを次のとおり更新してください。",
-    "行名は「<タスク名> — Day N」です。日付の列で照合し、その日の行が無ければ同じ形式（種別＝個人タスク）で作成してください。",
-  ];
-  days.forEach((day) => {
-    const d = o.days[day] || {};
-    const done = novaDailyDoneIds(d);
-    const prev = (o.sent[day] && o.sent[day].ids) || [];
-    const undo = prev.filter((id) => done.indexOf(id) < 0);
-    const notes = novaDailyNotes(d);
-    L.push("", "■ " + day + "（Day " + novaDailyDayNo(day) + "）");
-    L.push("・完了：" + (done.length ? done.map((id) => nm(id) + (novaDailyStatus(d, id) === "auto" ? "（Nova の記録：" + novaDailyAutoText(d, id, false) + "）" : "")).join("、") : "なし"));
-    if (undo.length) L.push("・未着手に戻す：" + undo.map(nm).join("、"));
-    Object.keys(notes).forEach((id) => L.push("・" + nm(id) + " の本文に追記：" + notes[id]));
-  });
-  L.push("", "（Project Nova のデイリー記録から作成）");
-  return L.join("\n");
-}
 // ---- 自動計上：Nova の既存の保存を横から見て、増えた分だけを今日に足す ----
 // 資格ごとの保存キー（CERT_STORE と同じもの：clf_c02_dashboard_v1 と *_study_vN / *_hub_study_vN）
 const NOVA_DAILY_CERT_RE = /^(clf_c02_dashboard_v1|[a-z0-9_]+_study_v\d+)$/;
@@ -236191,7 +236155,7 @@ function PortalLibrary({ lang, onResume }) {
 }
 
 // ポータルの「デイリー記録（Others）」。今日の9項目はいつも見えていて、タップで記録する。
-// 開くと日付の切り替え・メモ・月の一覧・Notion 用の更新文のコピーが出る。台帳は novaDailyRead/novaDailySave（nova_daily_v1）。
+// 開くと日付の切り替え・メモ・月の一覧が出る。台帳は novaDailyRead/novaDailySave（nova_daily_v1）。
 function PortalDaily({ lang, onResume }) {
   const en = lang === "en";
   const [o, setO] = useState(() => novaDailyRead());
@@ -236199,8 +236163,6 @@ function PortalDaily({ lang, onResume }) {
   const [sel, setSel] = useState(() => novaLocalDay());
   const [open, setOpen] = useState(false);
   const [noteFor, setNoteFor] = useState(null);
-  const [copyMsg, setCopyMsg] = useState("");
-  const [preview, setPreview] = useState(null);
   useEffect(() => {
     const re = () => {
       setO(novaDailyRead());
@@ -236247,8 +236209,6 @@ function PortalDaily({ lang, onResume }) {
   const dToday = rec(today);
   const doneToday = novaDailyDoneIds(dToday).length;
   const dSel = rec(sel);
-  const pending = novaDailyPending(o, today, 31);
-  const lastSent = Object.keys(o.sent || {}).map((k) => o.sent[k].at || 0).reduce((a, b) => Math.max(a, b), 0);
   const CHIP = {
     done: { bg: NOVA.accent, fg: "#FFFFFF", bd: NOVA.accent },
     auto: { bg: "#E3ECF8", fg: nvInk(NOVA.accent, "#E3ECF8"), bd: "#7FA3D3" },
@@ -236277,20 +236237,6 @@ function PortalDaily({ lang, onResume }) {
   const nDays = new Date(pY, pM, 0).getDate();
   const daysOfMonth = Array.from({ length: nDays }, (_, i) => ym + "-" + String(i + 1).padStart(2, "0"));
   const cellBg = (s) => (s === "done" ? NOVA.accent : s === "auto" ? "#5A88C6" : s === "off" ? "#FFFFFF" : NOVA.panelSoft);
-  const doCopy = async (days) => {
-    const text = novaDailyNotionText(o, days);
-    setPreview({ text, days });
-    let ok = false;
-    try { if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(text); ok = true; } } catch (e) {}
-    if (!ok) {
-      try { const ta = document.createElement("textarea"); ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); ok = document.execCommand("copy"); document.body.removeChild(ta); } catch (e) {}
-    }
-    if (ok) {
-      update((x) => { const at = Date.now(); days.forEach((day) => { x.sent[day] = { ids: novaDailyDoneIds(x.days[day]), sig: novaDailySig(x.days[day]), at }; }); });
-      setCopyMsg(en ? "Copied " + days.length + " day(s). Paste it into a Cowork chat." : days.length + "日分をコピーしました。Cowork のチャットに貼ってください。");
-    } else setCopyMsg(en ? "Could not copy automatically. Select the text below and copy it." : "自動でコピーできませんでした。下の文を選んでコピーしてください。");
-  };
-  const last7 = () => { const out = []; const t = new Date(today + "T00:00:00"); for (let i = 6; i >= 0; i--) { const dt = new Date(t); dt.setDate(t.getDate() - i); out.push(novaLocalDay(dt)); } return out; };
   const small = { fontSize: 11, color: NOVA.sub };
   const btn = { background: "#FFFFFF", border: "1px solid " + NOVA.line, color: NOVA.ink, borderRadius: 6, padding: "6px 11px", fontSize: 12, cursor: "pointer", fontFamily: NOVA_SANS, minHeight: 32 };
   return (
@@ -236338,7 +236284,7 @@ function PortalDaily({ lang, onResume }) {
                     {c.src ? ((en ? "Counted automatically from " : "自動：") + c.src[en ? 1 : 0] + (s === "off" ? (en ? " (cancelled for this day)" : "（この日は取消）") : "")) : (en ? "Outside Nova — tap to record." : "Nova の外でやること。タップで記録。")}
                   </div>
                   {noteFor === c.id ? (
-                    <textarea defaultValue={note} maxLength={300} rows={2} placeholder={en ? "Optional note (goes into the Notion page body)" : "任意のメモ（Notion の本文に追記されます）"}
+                    <textarea defaultValue={note} maxLength={300} rows={2} placeholder={en ? "Optional note" : "任意のメモ"}
                       onBlur={(e) => setNote(sel, c.id, e.target.value)}
                       style={{ display: "block", width: "100%", boxSizing: "border-box", marginTop: 6, border: "1px solid " + NOVA.line, borderRadius: 6, padding: "6px 8px", fontSize: 13, fontFamily: NOVA_SANS, color: NOVA.ink, background: "#FFFFFF" }} />
                   ) : note ? <div style={{ fontSize: 12, color: NOVA.ink, marginTop: 4, whiteSpace: "pre-wrap" }}>✎ {note}</div> : null}
@@ -236374,24 +236320,6 @@ function PortalDaily({ lang, onResume }) {
                 <span key={s} style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><span aria-hidden="true" style={{ width: 10, height: 10, borderRadius: 2, background: cellBg(s), border: "1px solid " + (s === "off" ? NOVA.faint : "transparent") }} />{l}</span>
               ))}
             </div>
-          </div>
-          {/* Notion への反映 */}
-          <div style={{ marginTop: 14, border: "1px solid " + NOVA.line, borderRadius: 10, padding: "10px 12px", background: NOVA.panel }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: NOVA.ink, marginBottom: 4 }}>{en ? "Reflect in Notion (Cowork tracker)" : "Notion（Cowork のトラッカー）に反映"}</div>
-            <div style={{ ...small, lineHeight: 1.6, marginBottom: 8 }}>
-              {en
-                ? "This page cannot write to Notion directly. Copy the update text and paste it into a Cowork chat; Claude there updates the rows of “Scheduled task tracker”, and the Cowork tracker shows them."
-                : "このページから Notion へは直接書き込めません。更新文をコピーして Cowork のチャットに貼ると、Claude が「Scheduled task tracker」の行を更新し、Cowork のトラッカーに反映されます。"}
-            </div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-              <button type="button" style={{ ...btn, background: NOVA.accent, color: "#FFFFFF", border: "1px solid " + NOVA.accent, fontWeight: 700 }} onClick={() => doCopy(pending.length ? pending : [today])}>
-                {pending.length ? (en ? "Copy update for " + pending.length + " day(s)" : "未反映の " + pending.length + " 日分をコピー") : (en ? "Copy today's update" : "今日の分をコピー")}
-              </button>
-              <button type="button" style={btn} onClick={() => doCopy(last7())}>{en ? "Recreate last 7 days" : "直近7日分を作り直す"}</button>
-              {lastSent ? <span style={small}>{en ? "Last copied: " : "前回コピー："}{new Date(lastSent).toLocaleString(en ? "en-US" : "ja-JP", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" })}</span> : null}
-            </div>
-            {copyMsg ? <div role="status" style={{ fontSize: 12, color: NOVA.ink, marginTop: 8 }}>{copyMsg}</div> : null}
-            {preview ? <textarea readOnly value={preview.text} rows={Math.min(14, preview.text.split("\n").length + 1)} onFocus={(e) => e.target.select()} style={{ display: "block", width: "100%", boxSizing: "border-box", marginTop: 8, border: "1px solid " + NOVA.line, borderRadius: 6, padding: "6px 8px", fontSize: 12, fontFamily: "ui-monospace, Menlo, monospace", color: NOVA.ink, background: "#FFFFFF" }} /> : null}
           </div>
         </div>
       )}
