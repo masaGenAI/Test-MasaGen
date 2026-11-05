@@ -101,6 +101,7 @@ footer.foot ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
 }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 
+.days-scroll { overflow-x: auto; padding-bottom: 2px; }
 .days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; align-items: end; max-width: 520px; }
 .day { display: grid; gap: 4px; justify-items: center; }
 .day .bar { width: 100%; max-width: 44px; background: var(--hub-megatech); border-radius: 3px 3px 0 0; }

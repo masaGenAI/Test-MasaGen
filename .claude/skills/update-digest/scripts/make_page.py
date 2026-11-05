@@ -82,8 +82,9 @@ def main() -> None:
         mx = max(n for _, n in days) or 1
         aria = "日別のコミット数：" + "、".join(f"{d} {n}件" for d, n in days)
         bars = "".join(f'<div class="day"><span class="cnt">{n}</span><span class="bar" style="height:{round(90 * n / mx)}px"></span><span class="dt">{E(d)}</span></div>' for d, n in days)
-        cols = f' style="grid-template-columns: repeat({len(days)}, minmax(0, 1fr)); max-width: {min(1000, 74 * len(days))}px"'
-        out.append(f'    <div class="days" role="img" aria-label="{E(aria)}"{cols}>{bars}</div>')
+        # 日数が多いときは列に最小幅を持たせ、帯の中だけ横にスクロールさせる（ラベルが重ならないように）
+        cols = f' style="grid-template-columns: repeat({len(days)}, minmax(38px, 1fr)); max-width: {min(1000, 74 * len(days))}px"'
+        out.append(f'    <div class="days-scroll"><div class="days" role="img" aria-label="{E(aria)}"{cols}>{bars}</div></div>')
         if S.get("days_note"):
             out.append(f'    <p class="days-cap">{E(S["days_note"])}</p>')
     if P and P.get("note"):
