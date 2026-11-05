@@ -148562,11 +148562,54 @@ const DELIVERY_MODELS = [
     x: ["探索型・短サイクルに弱く、AI部分の目利きが薄いことがある", "Weak on exploration and short cycles; AI judgment can run thin"],
     vs: ["正面から取らずAI部分（方式設計・モデル・Evals）のプライム/サブ連携に切り替える — 既存バトルカードの定石どおり", "Don't contest head-on — switch to prime/sub collaboration on the AI workstream, per the standing battlecard"] },
 ];
+// 企業研究のカード：閉じているときは社名・組織・主な製品だけ。開くと職種・選考・刺さる人物像・アーキ・聞かれること・確認日
+function CompanyCard({ co, clang }) {
+  const en = clang === "en";
+  const [open, toggle] = useFold("co-" + co.name);
+  return (
+    <Card style={open ? { borderColor: C.gold } : {}}>
+      <div {...foldHead(open, toggle)} style={{ cursor: "pointer" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
+          <span className="gh-display" style={{ fontSize: 19 }}>{thEn(co.name, en)}</span>
+          <span style={{ display: "inline-flex", alignItems: "baseline", gap: 8, minWidth: 0 }}>
+            <span style={{ fontSize: 11, color: C.muted, textAlign: "right" }}>{thEn(co.org, en)}</span>
+            <FoldCaret open={open} />
+          </span>
+        </div>
+        <div style={{ fontSize: 11, color: C.teal, marginTop: 6 }}>{thEn(co.prod, en)}</div>
+      </div>
+      {open && (
+        <div style={{ fontSize: 12, lineHeight: 1.7, marginTop: 10 }}>
+          <div style={{ marginBottom: 8 }}>
+            <div style={{ color: C.gold, fontWeight: 700, fontSize: 11, marginBottom: 5 }}>{t(clang, "co_roles")}</div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+              {String(en ? co.rolesEn : co.roles).split(/[、,]/).map((r) => r.trim()).filter(Boolean).map((r, ri) => (
+                <span key={ri} style={{ fontSize: 11, color: C.text, background: C.surface2, border: `1px solid ${C.line}`, borderRadius: 999, padding: "3px 9px" }}>{r}</span>
+              ))}
+            </div>
+          </div>
+          <div style={{ marginBottom: 8 }}><span style={{ color: C.gold, fontWeight: 700 }}>{t(clang, "co_loop")}</span>{en ? co.loopEn : co.loop}</div>
+          <div style={{ background: C.surface2, borderRadius: 8, padding: "8px 10px", borderLeft: `3px solid ${C.wine}` }}>
+            <span style={{ color: C.wineInk, fontWeight: 700 }}>{t(clang, "co_fit")}</span>{en ? co.fitEn : co.fit}
+          </div>
+          <div style={{ marginTop: 10, display: "grid", gap: 8 }}>
+            <div><span style={{ color: C.teal, fontWeight: 700 }}>{t(clang, "co_arch")}</span>{en ? co.archEn : co.arch}</div>
+            <div><span style={{ color: C.teal, fontWeight: 700 }}>{t(clang, "co_asks")}</span>{en ? co.asksEn : co.asks}</div>
+            <div style={{ background: C.bg, borderRadius: 8, padding: "8px 10px", borderLeft: `3px solid ${C.gold}` }}>
+              <span style={{ color: C.gold, fontWeight: 700 }}>{t(clang, "co_edge")}</span>{en ? co.edgeEn : co.edge}
+            </div>
+            <div style={{ fontSize: 11.5, color: C.muted, fontStyle: "italic" }}>{t(clang, "co_askthem")}{en ? co.ask_themEn : co.ask_them}</div>
+          </div>
+          <div style={{ fontSize: 10.5, color: C.dim, marginTop: 8, lineHeight: 1.5 }}>{t(clang, "co_asof")}{en ? co.checkedEn : co.checked}</div>
+        </div>
+      )}
+    </Card>
+  );
+}
 function TabCompanies() {
   const clang = useLang();
   const [view, setView] = useState("orgs");
-  const [openCo, setOpenCo] = useState(null);
-  const __opBack = useLocalHistory([[view, setView], [openCo, setOpenCo]]);
+  const __opBack = useLocalHistory([[view, setView]]);
   useRegisterBack(__opBack.back, __opBack.canBack);
   return (
     <div>
@@ -148581,47 +148624,8 @@ function TabCompanies() {
       {view === "orgs" && (
         <div>
           <div style={{ fontSize: 11, color: C.dim, marginBottom: 12 }}>{t(clang, "co_note")}</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%, 320px),1fr))", gap: 14 }}>
-            {COMPANIES.map((co) => {
-              const open = openCo === co.name;
-              return (
-                <Card key={co.name} style={open ? { borderColor: C.gold } : {}}>
-                  <div style={{ cursor: "pointer" }} onClick={() => setOpenCo(open ? null : co.name)}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                      <span className="gh-display" style={{ fontSize: 19 }}>{thEn(co.name, clang === "en")}</span>
-                      <span style={{ fontSize: 11, color: C.muted }}>{thEn(co.org, clang === "en")}</span>
-                    </div>
-                    <div style={{ fontSize: 11, color: C.teal, margin: "6px 0 10px" }}>{thEn(co.prod, clang === "en")}</div>
-                  </div>
-                  <div style={{ fontSize: 12, lineHeight: 1.7 }}>
-                    <div style={{ marginBottom: 8 }}>
-                      <div style={{ color: C.gold, fontWeight: 700, fontSize: 11, marginBottom: 5 }}>{t(clang, "co_roles")}</div>
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                        {String(clang === "en" ? co.rolesEn : co.roles).split(/[、,]/).map((r) => r.trim()).filter(Boolean).map((r, ri) => (
-                          <span key={ri} style={{ fontSize: 11, color: C.text, background: C.surface2, border: `1px solid ${C.line}`, borderRadius: 999, padding: "3px 9px" }}>{r}</span>
-                        ))}
-                      </div>
-                    </div>
-                    <div style={{ marginBottom: 8 }}><span style={{ color: C.gold, fontWeight: 700 }}>{t(clang, "co_loop")}</span>{clang === "en" ? co.loopEn : co.loop}</div>
-                    <div style={{ background: C.surface2, borderRadius: 8, padding: "8px 10px", borderLeft: `3px solid ${C.wine}` }}>
-                      <span style={{ color: C.wineInk, fontWeight: 700 }}>{t(clang, "co_fit")}</span>{clang === "en" ? co.fitEn : co.fit}
-                    </div>
-                    {open && (
-                      <div style={{ marginTop: 10, display: "grid", gap: 8 }}>
-                        <div><span style={{ color: C.teal, fontWeight: 700 }}>{t(clang, "co_arch")}</span>{clang === "en" ? co.archEn : co.arch}</div>
-                        <div><span style={{ color: C.teal, fontWeight: 700 }}>{t(clang, "co_asks")}</span>{clang === "en" ? co.asksEn : co.asks}</div>
-                        <div style={{ background: C.bg, borderRadius: 8, padding: "8px 10px", borderLeft: `3px solid ${C.gold}` }}>
-                          <span style={{ color: C.gold, fontWeight: 700 }}>{t(clang, "co_edge")}</span>{clang === "en" ? co.edgeEn : co.edge}
-                        </div>
-                        <div style={{ fontSize: 11.5, color: C.muted, fontStyle: "italic" }}>{t(clang, "co_askthem")}{clang === "en" ? co.ask_themEn : co.ask_them}</div>
-                      </div>
-                    )}
-                    <div style={{ fontSize: 10.5, color: C.dim, marginTop: 8, lineHeight: 1.5 }}>{t(clang, "co_asof")}{clang === "en" ? co.checkedEn : co.checked}</div>
-                    {!open && <div style={{ fontSize: 11, color: C.dim, marginTop: 8, textAlign: "right" }}>{t(clang, "co_clickdetail")}</div>}
-                  </div>
-                </Card>
-              );
-            })}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%, 320px),1fr))", gap: 14, alignItems: "start" }}>
+            {COMPANIES.map((co) => <CompanyCard key={co.name} co={co} clang={clang} />)}
           </div>
         </div>
       )}
@@ -148833,6 +148837,16 @@ function MoreRow({ shown, total, step, setN, en, span }) {
     </div>
   );
 }
+// 折りたたみの中の一覧も少しずつ出す（usePaged＋MoreRow のまとめ）
+function PagedGrid({ items, step, render, en, min }) {
+  const [n, setN] = usePaged(items.length, step);
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill,minmax(min(100%,${min || 300}px),1fr))`, gap: 12 }}>
+      {items.slice(0, n).map(render)}
+      <MoreRow shown={Math.min(n, items.length)} total={items.length} step={step} setN={setN} en={en} span />
+    </div>
+  );
+}
 function TabLexicon() {
   const lang = useLang();
   const { jump, setJump } = useJump();
@@ -148900,11 +148914,8 @@ function TabLexicon() {
           );
         })}
       </div>
-      {list.length === 0 ? (
-        <div style={{ fontSize: 12, color: C.muted, padding: "20px 0", textAlign: "center" }}>{t(lang, "lx_nomatch")}</div>
-      ) : (
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%, 290px),1fr))", gap: 12 }}>
-        {list.slice(0, lxN).map((g) => (
+      {(() => {
+        const card = (g) => (
           <Card key={g.t}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
               <span className="gh-display" style={{ fontSize: 16, color: C.gold }}>{lang === "en" ? (g.en || g.t) : g.t}</span>
@@ -148928,10 +148939,26 @@ function TabLexicon() {
               </button>
             </div>
           </Card>
-        ))}
-        <MoreRow shown={Math.min(lxN, list.length)} total={list.length} step={30} setN={setLxN} en={lang === "en"} span />
-      </div>
-      )}
+        );
+        const gridStyle = { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%, 290px),1fr))", gap: 12 };
+        if (list.length === 0) return <div style={{ fontSize: 12, color: C.muted, padding: "20px 0", textAlign: "center" }}>{t(lang, "lx_nomatch")}</div>;
+        // 分類も検索語も指定していないときは、分類ごとに折りたたむ（分類ボタン・検索・クイズからの移動では一覧で出す）
+        if (cat === ALL && q === "") return cats.filter((c) => c !== ALL).map((c) => {
+          const items = list.filter((g) => g.cat === c);
+          if (!items.length) return null;
+          return (
+            <FoldSection key={c} id={"lx-" + c} color={C.gold} title={catLabel(c)} meta={lang === "en" ? `${items.length} terms` : `${items.length}語`}>
+              <div style={gridStyle}>{items.map(card)}</div>
+            </FoldSection>
+          );
+        });
+        return (
+          <div style={gridStyle}>
+            {list.slice(0, lxN).map(card)}
+            <MoreRow shown={Math.min(lxN, list.length)} total={list.length} step={30} setN={setLxN} en={lang === "en"} span />
+          </div>
+        );
+      })()}
     </div>
   );
 }
@@ -149000,7 +149027,7 @@ function TabFactbook() {
   const [cat, setCat] = useState("all");
   const [q, setQ] = useState("");
   const [region, setRegion] = useState("all"); // all | world | jp
-  const [propOpen, setPropOpen] = useState(true);
+  const resRef = useRef(null);
   const [age, setAge] = useState("all"); // all | new（2025年以降） | mid（2023〜2024年） | old（2022年以前）
   const [fbN, setFbN] = usePaged([cat, q, region, age].join("|"), 24);
   const { jump } = useJump();
@@ -149027,22 +149054,37 @@ function TabFactbook() {
   const regBtn = (k, label) => (
     <button key={k} onClick={() => setRegion(k)} style={{ background: region === k ? C.teal : C.surface2, border: `1px solid ${region === k ? C.teal : C.line}`, color: region === k ? C.bg : C.text, borderRadius: 999, padding: "4px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>{label}</button>
   );
+  const fbCard = (it, i) => (
+          <Card key={i} style={{ display: "flex", flexDirection: "column", gap: 6, ...(isJp(it) ? { borderColor: C.teal } : {}) }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 10, fontWeight: 800, color: C.gold, letterSpacing: ".05em" }}>{isJp(it) ? "🗾 " : ""}{FB(it, "c")}{it.s ? " · " + FB(it, "s") : ""}</span>
+              <span style={{ display: "inline-flex", gap: 4, alignItems: "center" }}>{(() => { const y = fbDataYear(it.yr); if (y == null) return null; const old = ageOf(it); const col = old === "old" ? C.wineInk : old === "mid" ? C.gold : C.teal; return <span title={en ? `Data year ${y} (from: ${it.yr})` : `データの年 ${y}（表記：${it.yr}）`} style={{ fontSize: 9.5, fontWeight: 700, color: col, border: `1px solid ${col}`, borderRadius: 4, padding: "0 5px", whiteSpace: "nowrap" }}>{en ? `data ${y}` : `${y}年のデータ`}</span>; })()}<FbBadge st={it.st} en={en} /></span>
+            </div>
+            <div style={{ display: "flex", gap: 5, flexWrap: "wrap", alignItems: "center" }}>
+              {it.tp ? <span style={{ fontSize: 9, fontWeight: 800, color: C.deep || C.bg, background: C.gold, borderRadius: 4, padding: "1px 6px" }}>{FB(it, "tp")}</span> : null}
+              {it.lens ? <span style={{ fontSize: 9, color: C.muted, border: `1px solid ${C.line}`, borderRadius: 4, padding: "1px 6px" }}>{FB(it, "lens")}</span> : null}
+            </div>
+            <div style={{ fontSize: 13.5, fontWeight: 700, lineHeight: 1.4 }}>{FB(it, "h")}</div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: C.teal, lineHeight: 1.2 }}>{FB(it, "v")}</div>
+            {it.y ? <div style={{ fontSize: 11.5, color: C.muted }}>{FB(it, "y")}</div> : null}
+            {it.n ? <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.6 }}>{FB(it, "n")}</div> : null}
+            {it.use ? <div style={{ fontSize: 11, color: C.dim, lineHeight: 1.55, borderTop: `1px solid ${C.line}`, paddingTop: 6 }}><span style={{ color: C.wineInk, fontWeight: 700 }}>{en ? "Use: " : "使いどころ："}</span>{FB(it, "use")}</div> : null}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, marginTop: 2, fontSize: 10.5, color: C.dim }}>
+              <span>{[FB(it, "r"), thEn(it.yr, en)].filter(Boolean).join(" · ")}</span>
+              {it.u ? <a href={it.u} target="_blank" rel="noreferrer" style={{ color: C.gold, textDecoration: "none", fontWeight: 700, whiteSpace: "nowrap" }}>{en ? "Source ↗" : "出典 ↗"}</a> : null}
+            </div>
+            {it.src ? <div style={{ fontSize: 10, color: C.dim, lineHeight: 1.4 }}>{it.src}</div> : null}
+            {it.nu ? <div style={{ fontSize: 9.5, lineHeight: 1.4, color: it.nu.indexOf("◎") >= 0 ? C.teal : it.nu.indexOf("△") >= 0 || it.nu.indexOf("▲") >= 0 ? C.gold : C.dim }}>{en ? "Neutrality: " : "中立度："}{FB(it, "nu")}</div> : null}
+          </Card>
+  );
   return (
     <div>
       <SectionTitle jp="定量ファクトブック" en="Quantitative Factbook" />
       <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.7, marginBottom: 14 }}>{en ? "AI / generative AI / DX quantitative data (v4) — 144 data points across 8 themes (T1–T8), each with its issue type, expert lens, source and neutrality. Japan-market data is included; use the Region toggle to isolate it." : "AI・生成AI・DXの定量データ（v4）。8テーマ（T1〜T8）・144件を、論点タイプ・専門レンズ・出典・中立度つきで収録。日本市場データも本体に含み、地域トグルで絞り込めます。"}</div>
 
-      {/* 提案材料 — 組み合わせて使える定量ロジック */}
-      <Card style={{ marginBottom: 18, borderColor: C.wine }}>
-        <div onClick={() => setPropOpen((v) => !v)} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-          <span style={{ fontSize: 15 }}>🎁</span>
-          <span className="gh-display" style={{ fontSize: 16, fontWeight: 700, color: C.gold }}>{en ? "Proposal Material" : "提案材料"}</span>
-          <span style={{ fontSize: 11, color: C.muted }}>{en ? "combos to use in client proposals" : "クライアント提案で組み合わせて使える定量ロジック"}</span>
-          <span style={{ flex: 1 }} />
-          <span style={{ fontSize: 12, fontWeight: 700, color: C.muted }}>{propOpen ? (en ? "Close ▲" : "閉じる ▲") : (en ? "Open ▼" : "開く ▼")}</span>
-        </div>
-        {propOpen ? (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(min(100%,320px),1fr))", gap: 12, marginTop: 14 }}>
+      {/* 提案材料 — 組み合わせて使える定量ロジック（最初は閉じる。「関連データで絞り込む」で下の一覧へ移る） */}
+      <FoldSection id="fb-proposal" color={C.gold} title={"🎁 " + (en ? "Proposal Material" : "提案材料")} meta={en ? `${FB_PROPOSAL.length} combos to use in client proposals` : `クライアント提案で組み合わせて使える定量ロジック ${FB_PROPOSAL.length}本`}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(min(100%,320px),1fr))", gap: 12, marginBottom: 14 }}>
             {FB_PROPOSAL.map((p, i) => (
               <div key={i} style={{ background: C.surface2, border: `1px solid ${C.line}`, borderRadius: 10, padding: 13 }}>
                 <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 4 }}>{p.t[en ? 1 : 0]}</div>
@@ -149051,16 +149093,16 @@ function TabFactbook() {
                   {p.pts.map((pt, j) => <li key={j} style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.55 }}>{thEn(pt, en)}</li>)}
                 </ul>
                 {p.f ? (
-                  <button onClick={() => { if (p.f.cat) { setCat(p.f.cat); setRegion("all"); } if (p.f.region) { setRegion(p.f.region); setCat("all"); } setQ(""); setPropOpen(false); }}
+                  <button onClick={() => { if (p.f.cat) { setCat(p.f.cat); setRegion("all"); } if (p.f.region) { setRegion(p.f.region); setCat("all"); } setQ(""); setTimeout(() => { if (resRef.current) resRef.current.scrollIntoView({ behavior: "smooth", block: "start" }); }, 60); }}
                     style={{ marginTop: 10, background: "transparent", border: `1px solid ${C.wine}`, color: C.gold, borderRadius: 999, padding: "3px 12px", fontSize: 10.5, fontWeight: 700, cursor: "pointer" }}>
                     {en ? "▶ Filter to related data" : "▶ 関連データで絞り込む"}
                   </button>
                 ) : null}
               </div>
             ))}
-          </div>
-        ) : null}
-      </Card>
+        </div>
+      </FoldSection>
+      <div style={{ height: 8 }} />
 
       <div style={{ display: "flex", gap: 7, alignItems: "center", flexWrap: "wrap", marginBottom: 8 }}>
         <span style={{ fontSize: 10.5, color: C.dim, fontWeight: 700, width: 62 }}>{en ? "Region" : "地域"}</span>
@@ -149093,7 +149135,7 @@ function TabFactbook() {
         <span style={{ fontSize: 10.5, color: C.dim }}>{en ? "Figures are as of their source; older ones may have newer releases — check the source before quoting." : "数値は出典の時点のもの。古いものは新しい数値が出ている可能性がある。使う前に出典で確かめる。"}</span>
       </div>
       {/* 現在地（いま何で絞り込んでいるか） */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 10, fontSize: 11 }}>
+      <div ref={resRef} style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 10, fontSize: 11, scrollMarginTop: 80 }}>
         <span style={{ color: C.muted }}>{en ? "Showing:" : "表示中："}</span>
         <span style={{ color: C.teal, fontWeight: 700 }}>{region === "all" ? (en ? "All regions" : "すべての地域") : region === "jp" ? "🗾 日本" : (en ? "World" : "世界")}</span>
         <span style={{ color: C.dim }}>×</span>
@@ -149101,32 +149143,22 @@ function TabFactbook() {
         <span style={{ color: C.text, fontWeight: 800 }}>— {list.length}{en ? "" : "件"}</span>
         {(cat !== "all" || region !== "all" || q) ? <button onClick={() => { setCat("all"); setRegion("all"); setQ(""); }} style={{ background: "transparent", border: `1px solid ${C.line}`, color: C.muted, borderRadius: 999, padding: "2px 10px", fontSize: 10, cursor: "pointer" }}>{en ? "clear" : "クリア"}</button> : null}
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(min(100%,320px),1fr))", gap: 12 }}>
-        {list.slice(0, fbN).map((it, i) => (
-          <Card key={i} style={{ display: "flex", flexDirection: "column", gap: 6, ...(isJp(it) ? { borderColor: C.teal } : {}) }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-              <span style={{ fontSize: 10, fontWeight: 800, color: C.gold, letterSpacing: ".05em" }}>{isJp(it) ? "🗾 " : ""}{FB(it, "c")}{it.s ? " · " + FB(it, "s") : ""}</span>
-              <span style={{ display: "inline-flex", gap: 4, alignItems: "center" }}>{(() => { const y = fbDataYear(it.yr); if (y == null) return null; const old = ageOf(it); const col = old === "old" ? C.wineInk : old === "mid" ? C.gold : C.teal; return <span title={en ? `Data year ${y} (from: ${it.yr})` : `データの年 ${y}（表記：${it.yr}）`} style={{ fontSize: 9.5, fontWeight: 700, color: col, border: `1px solid ${col}`, borderRadius: 4, padding: "0 5px", whiteSpace: "nowrap" }}>{en ? `data ${y}` : `${y}年のデータ`}</span>; })()}<FbBadge st={it.st} en={en} /></span>
-            </div>
-            <div style={{ display: "flex", gap: 5, flexWrap: "wrap", alignItems: "center" }}>
-              {it.tp ? <span style={{ fontSize: 9, fontWeight: 800, color: C.deep || C.bg, background: C.gold, borderRadius: 4, padding: "1px 6px" }}>{FB(it, "tp")}</span> : null}
-              {it.lens ? <span style={{ fontSize: 9, color: C.muted, border: `1px solid ${C.line}`, borderRadius: 4, padding: "1px 6px" }}>{FB(it, "lens")}</span> : null}
-            </div>
-            <div style={{ fontSize: 13.5, fontWeight: 700, lineHeight: 1.4 }}>{FB(it, "h")}</div>
-            <div style={{ fontSize: 20, fontWeight: 800, color: C.teal, lineHeight: 1.2 }}>{FB(it, "v")}</div>
-            {it.y ? <div style={{ fontSize: 11.5, color: C.muted }}>{FB(it, "y")}</div> : null}
-            {it.n ? <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.6 }}>{FB(it, "n")}</div> : null}
-            {it.use ? <div style={{ fontSize: 11, color: C.dim, lineHeight: 1.55, borderTop: `1px solid ${C.line}`, paddingTop: 6 }}><span style={{ color: C.wineInk, fontWeight: 700 }}>{en ? "Use: " : "使いどころ："}</span>{FB(it, "use")}</div> : null}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, marginTop: 2, fontSize: 10.5, color: C.dim }}>
-              <span>{[FB(it, "r"), thEn(it.yr, en)].filter(Boolean).join(" · ")}</span>
-              {it.u ? <a href={it.u} target="_blank" rel="noreferrer" style={{ color: C.gold, textDecoration: "none", fontWeight: 700, whiteSpace: "nowrap" }}>{en ? "Source ↗" : "出典 ↗"}</a> : null}
-            </div>
-            {it.src ? <div style={{ fontSize: 10, color: C.dim, lineHeight: 1.4 }}>{it.src}</div> : null}
-            {it.nu ? <div style={{ fontSize: 9.5, lineHeight: 1.4, color: it.nu.indexOf("◎") >= 0 ? C.teal : it.nu.indexOf("△") >= 0 || it.nu.indexOf("▲") >= 0 ? C.gold : C.dim }}>{en ? "Neutrality: " : "中立度："}{FB(it, "nu")}</div> : null}
-          </Card>
-        ))}
-        <MoreRow shown={Math.min(fbN, list.length)} total={list.length} step={24} setN={setFbN} en={en} span />
-      </div>
+      {cat === "all" && !qn ? FB_CATS.map((c) => {
+        // ジャンルも検索語も指定していないときは、ジャンルごとに折りたたむ（地域・年の絞り込みは中にも効く）
+        const items = list.filter((it) => it.c === c);
+        if (!items.length) return null;
+        const p = FB_PURPOSE[c] ? FB_PURPOSE[c][en ? 1 : 0] : "";
+        return (
+          <FoldSection key={c} id={"fb-" + c} title={(en && FACTBOOK_CATS_EN.c[c]) || c} meta={en ? `${items.length} figures · ${p}` : `${items.length}件 · ${p}`}>
+            <PagedGrid items={items} step={12} render={fbCard} en={en} min={320} />
+          </FoldSection>
+        );
+      }) : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(min(100%,320px),1fr))", gap: 12 }}>
+          {list.slice(0, fbN).map(fbCard)}
+          <MoreRow shown={Math.min(fbN, list.length)} total={list.length} step={24} setN={setFbN} en={en} span />
+        </div>
+      )}
     </div>
   );
 }
@@ -152510,7 +152542,7 @@ function FoldScope({ scope, children }) {
     <FoldCtx.Provider value={ctx}>
       {count >= 2 ? (
         <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 6, flexWrap: "wrap", margin: "0 0 8px" }}>
-          <span style={{ fontSize: 11, color: C.dim }}>{en ? `${count} sections` : `折りたたみ ${count}節`}</span>
+          <span style={{ fontSize: 11, color: C.dim }}>{en ? `Collapsible: ${count}` : `折りたたみ ${count}件`}</span>
           <button type="button" style={btn} onClick={() => setCmd((c) => ({ n: c.n + 1, open: true }))}>{en ? "Open all" : "すべて開く"}</button>
           <button type="button" style={btn} onClick={() => setCmd((c) => ({ n: c.n + 1, open: false }))}>{en ? "Close all" : "すべて閉じる"}</button>
         </div>
@@ -152519,9 +152551,9 @@ function FoldScope({ scope, children }) {
     </FoldCtx.Provider>
   );
 }
-function FoldSection({ title, color, defaultOpen, children, id, meta }) {
+// 開閉の状態：タブ（FoldScope の scope）ごとに端末へ覚え、「すべて開く／すべて閉じる」に従う。節（FoldSection）とカード（企業研究）で共用
+function useFold(name, defaultOpen) {
   const ctx = useContext(FoldCtx);
-  const name = id || (typeof title === "string" ? title : null);
   const key = ctx && name ? ctx.scope + ":" + name : null;
   const [open, setOpen] = useState(() => {
     if (key) { const m = foldLoad(); if (Object.prototype.hasOwnProperty.call(m, key)) return !!m[key]; }
@@ -152538,13 +152570,25 @@ function FoldSection({ title, color, defaultOpen, children, id, meta }) {
     if (key) foldSave(key, ctx.cmd.open);
   }, [cmdN]); // eslint-disable-line react-hooks/exhaustive-deps
   const toggle = () => { const v = !open; setOpen(v); if (key) foldSave(key, v); };
+  return [open, toggle];
+}
+// 開閉する見出しに付ける属性（クリック・Enter・Space。中の別の操作部品からのキーは拾わない）
+const foldHead = (open, toggle) => ({
+  role: "button", tabIndex: 0, "aria-expanded": open, onClick: toggle,
+  onKeyDown: (e) => { if (e.target !== e.currentTarget) return; if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); } },
+});
+function FoldCaret({ open }) {
+  return <span aria-hidden="true" style={{ fontSize: 12, color: C.dim, flexShrink: 0, display: "inline-block", transition: "transform 0.16s ease", transform: open ? "rotate(90deg)" : "rotate(0deg)" }}>▸</span>;
+}
+function FoldSection({ title, color, defaultOpen, children, id, meta }) {
+  const [open, toggle] = useFold(id || (typeof title === "string" ? title : null), defaultOpen);
   const col = color || C.teal;
   return (
     <div style={{ marginBottom: 8 }}>
-      <div className="fold-h" role="button" tabIndex={0} aria-expanded={open} onClick={toggle} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); } }} style={{ cursor: "pointer", fontSize: 15, fontWeight: 800, color: col, borderLeft: `4px solid ${col}`, paddingLeft: 10, letterSpacing: 1, margin: "14px 0 8px" }}>
+      <div className="fold-h" {...foldHead(open, toggle)} style={{ cursor: "pointer", fontSize: 15, fontWeight: 800, color: col, borderLeft: `4px solid ${col}`, paddingLeft: 10, letterSpacing: 1, margin: "14px 0 8px" }}>
         <span style={{ minWidth: 0 }}>{title}</span>
         {meta ? <span className="fold-m" style={{ fontSize: 11, fontWeight: 500, letterSpacing: 0, color: C.muted, minWidth: 0 }}>{meta}</span> : null}
-        <span style={{ fontSize: 12, color: C.dim, flexShrink: 0, display: "inline-block", transition: "transform 0.16s ease", transform: open ? "rotate(90deg)" : "rotate(0deg)" }}>▸</span>
+        <FoldCaret open={open} />
       </div>
       {open ? children : null}
     </div>
@@ -157809,12 +157853,32 @@ function FsBrief({ b, en }) {
     </Card>
   );
 }
+// 情報源ライブラリの行を少しずつ出す（絞り込みや検索が変わったら最初の件数に戻す）
+function FsLibRows({ rows, render, en }) {
+  const [n, setN] = usePaged(rows.map((r) => r.id).join("|"), 40);
+  return (
+    <>
+      <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 12, overflow: "hidden", marginBottom: 6 }}>
+        {rows.slice(0, n).map(render)}
+      </div>
+      <MoreRow shown={Math.min(n, rows.length)} total={rows.length} step={40} setN={setN} en={en} />
+    </>
+  );
+}
 function FsLibrary({ en }) {
   const [q, setQ] = useState(""); const [ly, setLy] = useState(""); const [sub, setSub] = useState(""); const [rg, setRg] = useState(""); const [st, setSt] = useState("");
-  const [libN, setLibN] = usePaged([q, ly, sub, rg, st].join("|"), 40);
   const subs = useMemo(() => [...new Set(FORESIGHT_SOURCES.filter((s) => !ly || s.layer === ly).map((s) => s.layer + "|" + FS_PICK(s.sub, false)))], [ly]);
   const rows = FORESIGHT_SOURCES.filter((s) => (!ly || s.layer === ly) && (!sub || s.layer + "|" + FS_PICK(s.sub, false) === sub) && (!st || s.status === st)
     && (!rg || (rg === "jp") === s.jp) && (!q || [FS_PICK(s.name, false), FS_PICK(s.name, true), s.org, FS_PICK(s.desc, false), FS_PICK(s.desc, true)].join(" ").toLowerCase().includes(q.toLowerCase())));
+  const libRow = (s) => { const [l, col] = FS_STATUS[s.status] || FS_STATUS.unverified; return (
+          <div key={s.id} className="fs-row" style={{ borderTop: `1px solid ${C.line}` }}>
+            <div className="gh-display" style={{ fontWeight: 700, color: C.gold, fontSize: 15 }}>{s.layer}</div>
+            <div><a href={s.url} target="_blank" rel="noopener noreferrer" style={{ color: C.text, textDecoration: "none", fontWeight: 700, borderBottom: `1px solid ${C.line}` }}>{FS_PICK(s.name, en)}</a>
+              <div style={{ fontSize: 11, color: C.dim, marginTop: 2 }}>{thEn(s.org, en)}{s.org ? " · " : ""}{FS_PICK(s.sub, en)}</div></div>
+            <div>{FS_PICK(s.desc, en)}</div>
+            <div style={{ fontSize: 11.5, color: C.muted }}>{FS_PICK(s.freq, en) || "—"}<br />{FS_PICK(s.region, en) || "—"}{FS_PICK(s.fee, en) ? " · " + FS_PICK(s.fee, en) : ""}</div>
+            <div><span style={{ display: "inline-block", fontSize: 11, fontWeight: 700, padding: "2px 9px", borderRadius: 999, border: `1px solid ${col}`, color: col }}>{l[en ? 1 : 0]}</span></div>
+          </div>); };
   return (
     <div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
@@ -157837,18 +157901,17 @@ function FsLibrary({ en }) {
       </div>
       <FsLegend en={en} />
       <div style={{ fontSize: 11.5, color: C.dim, marginBottom: 8 }}>{rows.length} {en ? "sources" : "件"}</div>
-      <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 12, overflow: "hidden" }}>
-        {rows.slice(0, libN).map((s) => { const [l, col] = FS_STATUS[s.status] || FS_STATUS.unverified; return (
-          <div key={s.id} className="fs-row" style={{ borderTop: `1px solid ${C.line}` }}>
-            <div className="gh-display" style={{ fontWeight: 700, color: C.gold, fontSize: 15 }}>{s.layer}</div>
-            <div><a href={s.url} target="_blank" rel="noopener noreferrer" style={{ color: C.text, textDecoration: "none", fontWeight: 700, borderBottom: `1px solid ${C.line}` }}>{FS_PICK(s.name, en)}</a>
-              <div style={{ fontSize: 11, color: C.dim, marginTop: 2 }}>{thEn(s.org, en)}{s.org ? " · " : ""}{FS_PICK(s.sub, en)}</div></div>
-            <div>{FS_PICK(s.desc, en)}</div>
-            <div style={{ fontSize: 11.5, color: C.muted }}>{FS_PICK(s.freq, en) || "—"}<br />{FS_PICK(s.region, en) || "—"}{FS_PICK(s.fee, en) ? " · " + FS_PICK(s.fee, en) : ""}</div>
-            <div><span style={{ display: "inline-block", fontSize: 11, fontWeight: 700, padding: "2px 9px", borderRadius: 999, border: `1px solid ${col}`, color: col }}>{l[en ? 1 : 0]}</span></div>
-          </div>); })}
-      </div>
-      <MoreRow shown={Math.min(libN, rows.length)} total={rows.length} step={40} setN={setLibN} en={en} />
+      {!q && !ly && !sub && !rg && !st ? FORESIGHT.layers.map((l) => {
+        // 絞り込み・検索をしていないときは、レイヤーごとに折りたたむ
+        const its = rows.filter((s) => s.layer === l.id);
+        if (!its.length) return null;
+        const subsOf = [...new Set(its.map((s) => FS_PICK(s.sub, en)))].join(en ? " · " : "・");
+        return (
+          <FoldSection key={l.id} id={"lib-" + l.id} color={C.gold} title={l.id + "  " + FS_PICK(l.tab, en)} meta={(en ? `${its.length} sources · ` : `${its.length}件 · `) + subsOf}>
+            <FsLibRows rows={its} render={libRow} en={en} />
+          </FoldSection>
+        );
+      }) : <FsLibRows rows={rows} render={libRow} en={en} />}
     </div>
   );
 }
@@ -157918,13 +157981,13 @@ function FsTreeItem({ x, en }) {
     </div>
   );
 }
-function FsCollectionTree({ rows, en, open, setOpen, layerName }) {
+function FsCollectionTree({ rows, en, open, setOpen, layerName, fold }) {
   const byTheme = {}; const mine = [];
   rows.forEach((x) => { if (x.mine) mine.push(x); else { const t = FS_THEME_OF[x.id]; (byTheme[t] = byTheme[t] || []).push(x); } });
   const groups = [...FORESIGHT.layers.map((l) => l.id), ""];
   const item = (x) => <FsTreeItem key={x.id} x={x} en={en} />;
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+    <div style={fold ? {} : { display: "flex", flexDirection: "column", gap: 18 }}>
       {mine.length > 0 && (
         <div>
           <div className="gh-display" style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>{en ? "Added by me" : "自分で追加"} <span style={{ fontSize: 12, color: C.dim }}>{mine.length}</span></div>
@@ -157935,12 +157998,8 @@ function FsCollectionTree({ rows, en, open, setOpen, layerName }) {
         const themes = FORESIGHT_THEMES.filter((t) => t.layer === g && byTheme[t.id]);
         if (!themes.length) return null;
         const n = themes.reduce((a, t) => a + byTheme[t.id].length, 0);
-        return (
-          <div key={g || "other"}>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 8 }}>
-              <span className="gh-display" style={{ fontSize: 17, fontWeight: 700, color: C.fore }}>{layerName(g)}</span>
-              <span style={{ fontSize: 12, color: C.dim }}>{themes.length} {en ? "themes" : "テーマ"} · {n} {en ? "items" : "件"}</span>
-            </div>
+        const meta = <>{themes.length} {en ? "themes" : "テーマ"} · {n} {en ? "items" : "件"}</>;
+        const body = (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,330px),1fr))", gap: 10 }}>
               {themes.map((t) => { const its = byTheme[t.id]; const on = !!open[t.id]; return (
                 <Card key={t.id} style={on ? { gridColumn: "1 / -1" } : {}}>
@@ -157956,6 +158015,16 @@ function FsCollectionTree({ rows, en, open, setOpen, layerName }) {
                   {on && <div style={{ marginTop: 10 }}>{its.map(item)}</div>}
                 </Card>); })}
             </div>
+        );
+        // 絞り込み・検索をしていないときは、レイヤーごとに折りたたむ
+        if (fold) return <FoldSection key={g || "other"} id={"col-" + (g || "other")} color={C.fore} title={layerName(g)} meta={meta}>{body}</FoldSection>;
+        return (
+          <div key={g || "other"}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 8 }}>
+              <span className="gh-display" style={{ fontSize: 17, fontWeight: 700, color: C.fore }}>{layerName(g)}</span>
+              <span style={{ fontSize: 12, color: C.dim }}>{meta}</span>
+            </div>
+            {body}
           </div>
         );
       })}
@@ -158040,7 +158109,7 @@ function FsCollection({ en }) {
         <button className="gh-btn" onClick={() => setShowHidden((v) => !v)} style={showHidden ? { borderColor: C.gold, color: C.gold } : {}}>{showHidden ? (en ? "Back to list" : "一覧に戻る") : (en ? `Hidden (${hidden.length})` : `非表示（${hidden.length}）`)}</button>
       </div>
       <div style={{ fontSize: 11.5, color: C.dim, marginBottom: 8 }}>{rows.length} {en ? "items" : "件"}</div>
-      {view === "struct" && rows.length ? <FsCollectionTree rows={rows} en={en} open={openTh} setOpen={setOpenTh} layerName={layerName} /> : !rows.length ? <div style={{ fontSize: 12.5, color: C.dim }}>{en ? "No matching items." : "条件に合う項目はありません。"}</div> : (
+      {view === "struct" && rows.length ? <FsCollectionTree rows={rows} en={en} open={openTh} setOpen={setOpenTh} layerName={layerName} fold={!q && !ly && !src && !showHidden} /> : !rows.length ? <div style={{ fontSize: 12.5, color: C.dim }}>{en ? "No matching items." : "条件に合う項目はありません。"}</div> : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,330px),1fr))", gap: 10 }}>
           {rows.map((x) => (
             <Card key={x.id}>
@@ -159914,9 +159983,7 @@ function ArchBlocks({ blocks, lang, sectionId }) {
   // 演習ブロックに演習順のindexを割り当てる（ARCH_EXERCISE_STEPS 参照用）
   const exOf = {};
   { let eo = 0; (blocks || []).forEach((b, idx) => { if (b.t === "exercise") { exOf[idx] = eo; eo++; } }); }
-  return (
-    <div>
-      {(blocks || []).map((b, i) => {
+  const renderBlock = (b, i) => {
         if (b.t === "h") return (
           <div key={i}>
             <h3 style={{ fontSize: 15, fontWeight: 800, color: C.gold, margin: "20px 0 8px" }}>{L(b.ja, b.en)}</h3>
@@ -160004,7 +160071,24 @@ function ArchBlocks({ blocks, lang, sectionId }) {
         }
         if (b.t === "exercise") return <ArchExercise key={i} b={b} lang={lang} idx={exOf[i]} />;
         return null;
-      })}
+  };
+  const all = blocks || [];
+  // 見出しが2つ以上ある節は、見出しごとに折りたたむ（最初は閉じる）。見出しが1つの節（演習）はそのまま並べる
+  if (all.filter((b) => b.t === "h").length < 2) return <div>{all.map(renderBlock)}</div>;
+  const parts = []; let cur = null;
+  all.forEach((b, i) => {
+    if (b.t === "h") { cur = { i, b, kids: [] }; parts.push(cur); }
+    else if (cur) cur.kids.push(renderBlock(b, i));
+    else parts.push({ el: renderBlock(b, i) });
+  });
+  return (
+    <div>
+      {parts.map((p) => (p.b ? (
+        <FoldSection key={"h" + p.i} id={"arch-" + sectionId + "-" + p.b.ja} color={C.gold} title={L(p.b.ja, p.b.en)}>
+          {sectionId === "industry" ? <ArchFlowFig industry={p.b.ja} lang={lang} /> : null}
+          {p.kids}
+        </FoldSection>
+      ) : p.el))}
     </div>
   );
 }
@@ -165253,8 +165337,11 @@ function GovOverview({ en, onMode }) {
           </button>
         ))}
       </div>
-      <GovTierPyramid en={en} tiers={tiers} />
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))", gap: 10 }}>
+      <FoldSection id="gov-tiers" color={C.gold} title={(en ? "Risk tiers — " : "リスク階層 — ") + ["prohibited", "high", "limited", "minimal"].map((k) => (GOVDOJO_TIER_LABEL[k] || ["", ""])[en ? 1 : 0]).join(en ? " · " : "・")} meta={en ? "4 tiers and the control for each" : "4段と、段ごとの統制"}>
+        <GovTierPyramid en={en} tiers={tiers} />
+      </FoldSection>
+      <FoldSection id="gov-mods" color={C.gold} title={en ? "Five reference topics — from use policy to incident response" : "リファレンスの5項目 — 利用規程からインシデント対応まで"} meta={en ? `${mods.length} topics` : `${mods.length}項目`}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))", gap: 10, marginBottom: 10 }}>
         {mods.map(([no, t, d]) => (
           <div key={no} style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 10, padding: "13px 15px" }}>
             <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 5 }}>
@@ -165265,7 +165352,10 @@ function GovOverview({ en, onMode }) {
           </div>
         ))}
       </div>
-      <GovFrameworks en={en} />
+      </FoldSection>
+      <FoldSection id="gov-frameworks" color={C.gold} title={en ? "Where the main frameworks stand (checked October 2026)" : "主要な枠組みの現在地（2026年10月確認）"} meta={en ? `${GOVDOJO_FRAMEWORKS.length} frameworks` : `${GOVDOJO_FRAMEWORKS.length}件`}>
+        <GovFrameworks en={en} />
+      </FoldSection>
     </div>
   );
 }
@@ -165985,8 +166075,7 @@ function GovOwaspNote({ en }) {
 // 主要な枠組みの現在地（2026年10月確認）
 function GovFrameworks({ en }) {
   return (
-    <div style={{ marginTop: 18 }}>
-      <div className="gh-display" style={{ fontSize: 14.5, fontWeight: 700, color: C.text, marginBottom: 4 }}>{en ? "Where the main frameworks stand (checked October 2026)" : "主要な枠組みの現在地（2026年10月確認）"}</div>
+    <div style={{ marginBottom: 10 }}>
       <div style={{ fontSize: 11.5, color: C.muted, marginBottom: 8 }}>{en ? "Cite the edition when you quote one — numbers and names change between editions." : "引用するときは版まで書く。番号や名称は版で変わる。"}</div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 8 }}>
         {GOVDOJO_FRAMEWORKS.map((f, i) => (
