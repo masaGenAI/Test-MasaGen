@@ -73,6 +73,9 @@ def is_data_line(line):
     t = line.lstrip()
     if t.startswith(('{"d"', '{"id"', '{ cat:', '{"cat"', '{d:', '{"q', '{"qJa"', '{"j"', '{ d:')):
         return True
+    # 英訳の辞書（日本語→英語）。キーは記事題名や図の文言そのものなので、件数の主張として数えない
+    if t.startswith('const TH_EN = '):
+        return True
     if len(line) > 3000:
         # 問題文・記事本文を持つ行か（計画表の "q": 1 のような数値は数えない）
         qs = len(re.findall(r'(?:"q"|\bq)\s*:\s*"', line)) + len(re.findall(r'"(?:oneLiner|claim|t|w)"\s*:\s*"', line))
