@@ -1,0 +1,313 @@
+{
+ "_note": "make_page.py に渡す形の例（2026-10-30〜11-05 の週の一覧）。sections[].color は portal / megatech / cert / finance / consulting / ling / lang / book / liberal / side / training / tracker / off のどれか。",
+ "title": "Project Nova 週間更新",
+ "eyebrow": "Project Nova · change ledger · week",
+ "heading": "ここ1週間の更新と、出ている場所",
+ "lede": "2026年10月30日〜11月5日にリポジトリへ入った変更を、画面で辿る場所（ハブ › タブ／資格）ごとにまとめました。日付は変更が入った日です。",
+ "facts": [
+  {
+   "label": "期間",
+   "value": "10/30–11/05"
+  },
+  {
+   "label": "コミット",
+   "value": "123",
+   "suffix": " 件"
+  }
+ ],
+ "pages": {
+  "state": "published",
+  "sha": "ea928eb",
+  "note": "Pages はアプリを変えた最後のコミット（ea928eb）を公開中です。これ以降のコミットは作業用スキルの追加・修正だけです。公開ページそのものはこの作業環境から開けないため、GitHub 側のデプロイ記録で確かめています。"
+ },
+ "days": [
+  [
+   "10/30",
+   4
+  ],
+  [
+   "10/31",
+   14
+  ],
+  [
+   "11/01",
+   26
+  ],
+  [
+   "11/02",
+   5
+  ],
+  [
+   "11/03",
+   38
+  ],
+  [
+   "11/04",
+   13
+  ],
+  [
+   "11/05",
+   23
+  ]
+ ],
+ "days_note": "日別のコミット数（ea928eb まで）。",
+ "sections": [
+  {
+   "id": "portal",
+   "name": "ポータル（トップページ）・全ハブ共通",
+   "short": "ポータル・共通",
+   "color": "portal",
+   "groups": [
+    {
+     "items": [
+      {
+       "when": "11/01",
+       "html": "全ハブを横断して探せる検索ボックスを追加。"
+      },
+      {
+       "when": "11/01",
+       "html": "弱点レーダーにハブを5つ追加。"
+      },
+      {
+       "when": "11/03",
+       "html": "その日の「その他の学習」を記録する欄を追加。"
+      },
+      {
+       "when": "11/01",
+       "html": "再読み込みや「戻る」をしても、各ハブで見ていた場所に戻るように。"
+      },
+      {
+       "when": "11/01, 11/03",
+       "html": "進捗バックアップのバーをスマホで内容に重ならないようにし（11/01）、ポータルの言語で表示するように（11/03）。"
+      },
+      {
+       "when": "11/03",
+       "html": "ハブをポータルの言語で開くように。"
+      },
+      {
+       "when": "11/01",
+       "html": "クリックできるカードをキーボードでも操作できるようにし、文字のコントラストを上げた。"
+      },
+      {
+       "when": "11/01–11/03",
+       "html": "一部のハブを開いたときに読み込む方式に変え、最初の表示を軽くした（TechHub・Certification Hub・Finance・Consulting・Side Work・Linguistics・Book-Summary・Liberal Arts）。"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "techhub",
+   "name": "TechHub",
+   "short": "TechHub",
+   "color": "megatech",
+   "groups": [
+    {
+     "heading": "タブの外枠",
+     "items": [
+      {
+       "when": "11/01",
+       "html": "今いるタブを示すバーを付け、スマホではタブ一覧を折りたためるように。TechHub 全体の検索とタブごとのリンクを追加。文字のコントラストを 4.5:1 まで引き上げ。"
+      }
+     ]
+    },
+    {
+     "heading": "セキュリティ・ガバナンス道場",
+     "items": [
+      {
+       "when": "10/30–10/31",
+       "html": "規制マップと業界別チェックを新設。法域の比較と期限も付けた。"
+      },
+      {
+       "when": "10/31",
+       "html": "業種を<span class=\"n\">7</span>つ、続けて<span class=\"n\">5</span>つ追加し、問題を<span class=\"n\">111</span>＋<span class=\"n\">105</span>＋<span class=\"n\">100</span>問追加。業界で問題を絞り込めるように。"
+      },
+      {
+       "when": "10/31, 11/01",
+       "html": "業界×市場から作るチェックリストを追加し、ギャップ評価に発展させた。充足バーはクリックでき、12か月の期限帯も付けた。"
+      },
+      {
+       "when": "10/31, 11/01",
+       "html": "ユースケースから入る入口と、ユースケースの一覧表を追加。"
+      },
+      {
+       "when": "10/31",
+       "html": "全行に出典が付いたテンプレートを4種追加。講師用ワークショップモードと共有リンクも追加。"
+      },
+      {
+       "when": "11/01",
+       "html": "見せ方の改良：\n        <ul>\n          <li>規制マップをコンパクトにし、詳細を横に固定表示</li>\n          <li>報告期限の時計にラベルと経過時間のスライダーを追加</li>\n          <li>業界ヒートマップを改良</li>\n          <li>トリフェクタの脚を切る演習を追加し、統制レイヤーを掘り下げられるように</li>\n        </ul>"
+      },
+      {
+       "when": "10/31, 11/03",
+       "html": "根拠データをリポジトリに置き、情報の鮮度を表示するように。期限の文言を修正（11/03）。"
+      }
+     ]
+    },
+    {
+     "heading": "実務論点マップ",
+     "items": [
+      {
+       "when": "11/04",
+       "html": "Studymeter のノート集と Gartner AI ダイジェストを統合し、Gartner の図<span class=\"n\">346</span>枚を追加。"
+      },
+      {
+       "when": "11/04–11/05",
+       "html": "論点クイズを追加：Gartner <span class=\"n\">120</span>問、Studymeter <span class=\"n\">108</span>問、BPR <span class=\"n\">100</span>問、データサイエンス <span class=\"n\">120</span>問。"
+      },
+      {
+       "when": "11/05",
+       "html": "英語表示に対応。記事の要約・根拠・人名を英語化し、図<span class=\"n\">346</span>枚の英語版を追加。英語版の図は元の図と見比べて、形・色・配置を合わせた。"
+      }
+     ]
+    },
+    {
+     "heading": "技術道場（Cloud Dojo）",
+     "items": [
+      {
+       "when": "11/01–11/03",
+       "html": "問題を英語でも表示。正解が1つに決まらない問題と古い問題を修正し、名称が変わったサービス6つを現名称に。模試の時間を公式の試験時間に合わせ、出題順・採点・サービスマップを修正。"
+      }
+     ]
+    },
+    {
+     "heading": "そのほかのタブ",
+     "items": [
+      {
+       "when": "11/01",
+       "html": "<strong>戦略</strong>：全道場の学習記録を1枚のカードにまとめ、図やトレンド問題がどれだけ古いかを表示。"
+      },
+      {
+       "when": "11/01",
+       "html": "<strong>ITセキュリティ基盤・定量データ・用語辞典・情報源ライブラリ</strong>：英語表示を補い、長い一覧をページ分けした。"
+      },
+      {
+       "when": "11/01–11/03",
+       "html": "<strong>ほかの多くのタブ</strong>：コントラストの改善、英語表示の補完、「Azure AI Foundry」→「Microsoft Foundry」の改名。"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cert",
+   "name": "Certification Hub",
+   "short": "Certification Hub",
+   "color": "cert",
+   "groups": [
+    {
+     "heading": "全資格共通",
+     "items": [
+      {
+       "when": "11/01–11/03",
+       "html": "ハブの一覧に資格ごとの回答数と正答率を表示。各資格に公式試験の状況を表示し、Microsoft・GitHub 資格には公式の学習リンクを追加。"
+      },
+      {
+       "when": "11/03–11/04",
+       "html": "模試の記録の不具合を修正し、正解の位置や選択肢の長さの偏りをならした。図をスマホとPCで読みやすくし、低コントラストの文字（SAA のオレンジなど）を全資格で直した。"
+      }
+     ]
+    },
+    {
+     "heading": "資格ごと",
+     "items": [
+      {
+       "when": "11/01–11/03",
+       "html": "<strong>PL-900</strong>：2026年7月の出題範囲で作り直し<span class=\"n\">245</span>問を追加（11/01）。削除されたスキルの5問を旧範囲に移動（11/02）。英語モードを追加し、重複問題・選択肢の長さ・廃止機能の記述を直した（11/03）。"
+      },
+      {
+       "when": "11/02–11/03",
+       "html": "<strong>AB-100</strong>：2026年11月の配点に合わせ（11/02）、Plan 領域の問題を<span class=\"n\">107</span>問追加（11/03）。"
+      },
+      {
+       "when": "11/03",
+       "html": "<strong>GH-300・GH-900</strong>：GH-300 に GitHub Docs を根拠にした問題を<span class=\"n\">113</span>問追加。Copilot CLI・プラン名・課金の記述を更新。"
+      },
+      {
+       "when": "11/03",
+       "html": "<strong>CLF-C02</strong>：英語モードを追加し、AWS Support プランの事実を更新。"
+      },
+      {
+       "when": "11/03",
+       "html": "<strong>改訂された Microsoft・GitHub 試験</strong>：<span class=\"n\">266</span>問を追加（AB-100・DP-900・GH-300・GH-900・SC-900）。"
+      },
+      {
+       "when": "11/04",
+       "html": "<strong>模試用の難問</strong>：DP-900 に<span class=\"n\">152</span>問。AAIR・CCSK・CISM・AAISM・ISO 42001 F・AAIA・CISA・AICX・CCAF・AIGP・ISO 42001 LI にもそれぞれ追加。誤りの選択肢を、もっともらしいものに作り直した。"
+      }
+     ]
+    },
+    {
+     "heading": "答えと解説",
+     "items": [
+      {
+       "when": "11/01–11/03",
+       "html": "正解キーの誤り<span class=\"n\">12</span>件と、問いが不明瞭な<span class=\"n\">18</span>件を修正（TechHub の問題も含む）。短すぎた解説<span class=\"n\">490</span>件を書き直し。公式ページを確かめ、CISM・AAIR・ISO 42001 LI の配点を修正（11/02）。"
+      },
+      {
+       "when": "11/03",
+       "html": "<strong>横断模試（GovMix）</strong>：各問題バンクから偏りなく出題し、正解の位置をならした。"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "others",
+   "name": "そのほかのハブ",
+   "short": "そのほかのハブ",
+   "color": "lang",
+   "groups": [
+    {
+     "items": [
+      {
+       "when": "11/03",
+       "html": "<strong>Language Hub</strong>：英語モードを追加し、男性と女性の声を切り替えられるように。"
+      },
+      {
+       "when": "10/30, 11/03",
+       "html": "<strong>Training Hub・Side Work Hub</strong>：英語モードを追加（11/03）。Side Work は1か月目の内容の事実を出典で確かめた（10/30）。"
+      },
+      {
+       "when": "11/01",
+       "html": "<strong>Learning Tracker・Anything Memo</strong>：スマホの画面に合わせた。"
+      },
+      {
+       "when": "11/01, 11/03",
+       "html": "<strong>Book-Summary・Liberal Arts</strong>：小さいページと、開いたときの分割読み込みに変え、表示を軽くした。"
+      },
+      {
+       "when": "11/01–11/03",
+       "html": "<strong>Finance・Consulting・Linguistics</strong>：横断の変更（検索・場所の保持・弱点レーダー・キーボード操作）だけ。"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "offapp",
+   "name": "アプリに出ない変更",
+   "short": "アプリ外",
+   "color": "off",
+   "groups": [
+    {
+     "items": [
+      {
+       "when": "10/31, 11/05",
+       "html": "<strong>作業用スキル</strong>：govdojo-maintenance を新設（10/31）。今回の一覧を作る update-digest を新設（11/05、ea928eb より後）。"
+      },
+      {
+       "when": "10/31–11/03",
+       "html": "<strong>文書</strong>：README・CLAUDE.md。<strong>ビルドの仕組み</strong>：ハブを分けて読み込む設定、道場データから画面の定数を作る処理など。"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "footer": [
+  "リポジトリの <code>update-digest</code> スキル（<code>scripts/changes.py</code>）で、各コミットの変更行をハブ・TechHub のタブ・資格に割り当て、場所ごとに整理しました。",
+  "TechHub のどのタブに当たるかはスクリプトの推定で、名前の付いたタブにまで割り当てられなかった変更はコミットの件名で補いました。",
+  "問題数・件数はコミットの件名と本文から取っています。問題は1バンク1行で入っているため、行数は量の目安にしていません。"
+ ]
+}
