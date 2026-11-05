@@ -1,0 +1,41 @@
+{
+  "_note": "パス・モジュール名から『画面のどこか』への対応表。新しいハブ・ページ・データ置き場を足したらここにも足す。hub はポータルの id（NOVA_HUBS）、tab は TechHub の TABS の id。",
+  "modules": {
+    "FinanceHubModule": "finance",
+    "MegaTechHubModule": "megatech",
+    "ConsultingHubModule": "consulting",
+    "CertHubModule": "certification",
+    "LanguageHubModule": "languagehub",
+    "BookSummaryModule": "booksummary",
+    "LearningTrackerModule": "tracker",
+    "AnythingMemoModule": "anythingmemo",
+    "SideWorkHubModule": "sidework",
+    "LiberalArtsModule": "liberalarts",
+    "TrainingHubModule": "training",
+    "LinguisticsHubModule": "linguisticshub"
+  },
+  "stations": {
+    "CLF": "AWS CLF-C02", "SAA": "AWS SAA-C03", "ISO42001F": "ISO/IEC 42001 Foundation",
+    "ISO42001LI": "ISO/IEC 42001 Lead Implementer", "GovMix": "横断模試（GovMix）"
+  },
+  "paths": [
+    {"prefix": "nova-app/public/booksummaryhub.html", "hub": "booksummary"},
+    {"prefix": "nova-app/public/learning-tracker.html", "hub": "tracker"},
+    {"prefix": "nova-app/public/anything-memo.html", "hub": "anythingmemo"},
+    {"prefix": "nova-app/public/liberal-arts.html", "hub": "liberalarts"},
+    {"prefix": "nova-app/public/gartner-figs/", "hub": "megatech", "tab": "noteissues", "what": "Gartner ダイジェストの図（画像）"},
+    {"prefix": "nova-app/public/kindle-figs/", "hub": "booksummary", "what": "Kindle 要約の図（画像）"},
+    {"prefix": "data/govdojo/", "hub": "megatech", "tab": "govdojo", "what": "道場の根拠データ（ビルドで画面の定数に生成）"},
+    {"prefix": "nova-app/src/data/itsec", "hub": "megatech", "tab": "itsec"},
+    {"prefix": "nova-app/src/data/foresight", "hub": "megatech", "what": "Foresight 系タブのデータ"},
+    {"prefix": "nova-app/scripts/", "offapp": "ビルド・読み込みの仕組み（画面の中身は変わらない）"},
+    {"prefix": "nova-app/vite.config", "offapp": "ビルド・読み込みの仕組み（画面の中身は変わらない）"},
+    {"prefix": "nova-app/package", "offapp": "ビルド・読み込みの仕組み（画面の中身は変わらない）"},
+    {"prefix": ".github/", "offapp": "デプロイ設定"},
+    {"prefix": ".claude/skills/", "offapp": "作業用スキル（アプリには出ない）"},
+    {"prefix": "CLAUDE.md", "offapp": "リポジトリの文書（アプリには出ない）"},
+    {"prefix": "docs/", "offapp": "リポジトリの文書（アプリには出ない）"},
+    {"prefix": "src/", "offapp": "todoapp（学習用の題材。Nova とは別）"},
+    {"prefix": "tests/", "offapp": "todoapp（学習用の題材。Nova とは別）"}
+  ]
+}

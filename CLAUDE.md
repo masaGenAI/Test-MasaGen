@@ -42,6 +42,9 @@ Book-Summary の原稿は `nova-app/public/booksummaryhub.html` の1ファイル
 規制マップ・業界別チェック・ローコード・実務キットは `data/govdojo/` を直して `build.py` で生成する（jsx の定数を手で直さない）。
 `npm run build` の前に事実の台帳（`data/govdojo/facts.json`）の照合が走るので、食い違いを 0 にしてから入れる。
 
+## 更新内容を一覧にするとき
+`.claude/skills/update-digest/` の手順に従う（`scripts/changes.py` でコミットを画面の場所＝ハブ › タブ／資格ごとに整理し、Pages の公開状況まで確かめる）。
+
 ## やってはいけないこと
 - `_tasks` など内部状態に外部から直接触れない。必ず `TaskStore` のメソッド経由
 - 新しい依存ライブラリの追加は事前に相談する
