@@ -123006,6 +123006,10 @@ const GLOBAL_CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;700&family=IBM+Plex+Sans+JP:wght@400;500;700&display=swap');
 .gh-root{font-family:'IBM Plex Sans JP',system-ui,sans-serif;background:${C.bg};color:${C.text};min-height:100vh;}
 .gh-display{font-family:'Shippori Mincho',serif;letter-spacing:.04em;}
+.fold-h{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:baseline;column-gap:8px;}
+.fold-h .fold-m{text-align:right;}
+.fold-h:focus-visible{outline:2px solid ${C.gold};outline-offset:3px;}
+@media (max-width:560px){.fold-h{grid-template-columns:minmax(0,1fr) auto;}.fold-h .fold-m{grid-column:1 / -1;grid-row:2;text-align:left;margin-top:2px;}}
 .gh-btn{background:${C.surface2};border:1px solid ${C.line};color:${C.text};border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;transition:border-color .15s;}
 .gh-btn:hover{border-color:${C.gold};}
 .fs-row{display:grid;grid-template-columns:40px 1.5fr 2.3fr 130px 150px;gap:12px;padding:11px 16px;font-size:12.5px;line-height:1.65;align-items:start;}
@@ -149686,6 +149690,7 @@ function TabIssues() {
           })}
         </div>
       </FoldSection>
+      <FoldSection id="issue-map" title={en ? "ISSUE MAP — top issues A–I, mid issues (1)–(27), steps 1–9" : "論点マップ — 大論点A〜I・中論点（1）〜（27）・検討ステップ1〜9"} meta={en ? "81 sub-issues" : "小論点81"}>
       <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginBottom: 10, fontSize: 11, color: C.dim }}>
         <span style={{ color: C.teal, fontWeight: 700 }}>{en ? "Upstream A–C" : "上流 A–C"}</span><span>→</span>
         <span style={{ color: C.gold, fontWeight: 700 }}>{en ? "Midstream D–F" : "中流 D–F"}</span><span>→</span>
@@ -149803,6 +149808,7 @@ function TabIssues() {
       <div style={{ fontSize: 11, color: C.dim, lineHeight: 1.7, marginTop: 10 }}>
         {en ? "How to use: pick the 2–3 top issues that decide the client's case, follow their lines to the mid issues and steps, then drill into the sub-issues and lead with the practice and the number. The full map is for coverage checks; the meeting is for the few issues that decide the case." : "使い方：クライアントの状況で勝敗を決める大論点を2〜3個選び、線をたどって中論点→検討ステップへ落とし、小論点の打ち手と数字で具体化する。全体マップは「漏れの点検」用、会議は「勝敗を決める少数の論点」用。定量データの一次／二次区分は「定量データ」タブを参照。セキュリティ・ガバナンス・エージェント運用の打ち手は、OWASP LLM Top 10／NIST AI RMF／ISO/IEC 42001・42005／AI事業者ガイドライン／EU AI Act等の公式フレームワークに準拠。"}
       </div>
+      </FoldSection>
     </div>
   );
 }
@@ -152420,7 +152426,7 @@ function TabAgi() {
       <div style={{ background: C.surface, border: `1px dashed ${C.gold}`, borderRadius: 10, padding: "10px 14px", marginBottom: 12, fontSize: 12.5, color: C.muted, lineHeight: 1.7 }}>
         ⚠️ {en ? "This tab is a thinking gym, not a forecast. AGI (human-level generality) and ASI (beyond-human) have no agreed definitions, and credible timelines span years to decades. The skill being trained is not predicting the date — it is holding explicit hypotheses about what changes and what does not, and knowing what evidence would falsify them." : "本タブは予測ではなく思考の筋トレ。AGI（人間並みの汎用性）・ASI（人間超え）の定義は定まっておらず、時期の見立ても数年〜数十年と幅がある。鍛えるのは「時期を当てる力」でなく、「何が変わり・何が変わらないか」の仮説を明示的に持ち、その反証条件を言える力。"}
       </div>
-      <div style={{ fontSize: 15, fontWeight: 800, color: C.teal, borderLeft: `4px solid ${C.teal}`, paddingLeft: 10, letterSpacing: 1, margin: "20px 0 10px" }}>{en ? "I. SIX SHIFT HYPOTHESES — what changes, what doesn't" : "I. 変化の仮説8軸 — 何が変わり、何が変わらないか"}</div>
+      <FoldSection id="agi-axes" title={en ? "I. EIGHT SHIFT HYPOTHESES — what changes, what doesn't" : "I. 変化の仮説8軸 — 何が変わり、何が変わらないか"}>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,330px),1fr))", gap: 10, marginBottom: 18 }}>
         {AGI_AXES.map((a, i) => (
           <Card key={i}>
@@ -152432,7 +152438,8 @@ function TabAgi() {
           </Card>
         ))}
       </div>
-      <div style={{ fontSize: 15, fontWeight: 800, color: C.teal, borderLeft: `4px solid ${C.teal}`, paddingLeft: 10, letterSpacing: 1, margin: "20px 0 10px" }}>{en ? "II. HYPOTHESIS DRILLS — think first, then open" : "II. 仮説思考ドリル15問 — 開く前に自分の仮説を立てる"}</div>
+      </FoldSection>
+      <FoldSection id="agi-drills" title={en ? "II. HYPOTHESIS DRILLS — think first, then open" : "II. 仮説思考ドリル15問 — 開く前に自分の仮説を立てる"}>
       <div style={{ fontSize: 12, color: C.dim, lineHeight: 1.6, marginBottom: 8 }}>{en ? "Rule: write (or say) your own hypothesis before opening the card. The example inside is one answer, not the answer — beating it is the exercise." : "ルール：カードを開く前に自分の仮説を先に立てる（書く・口に出す）。中の「仮説例」は正解でなく一例 — それより良い仮説を作るのが訓練。"}</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 18 }}>
         {AGI_DRILLS.map((dr, i) => {
@@ -152454,10 +152461,12 @@ function TabAgi() {
           );
         })}
       </div>
-      <div style={{ fontSize: 15, fontWeight: 800, color: C.teal, borderLeft: `4px solid ${C.teal}`, paddingLeft: 10, letterSpacing: 1, margin: "20px 0 10px" }}>{en ? "III. SCENARIO MATRIX — capability speed × social acceptance" : "III. シナリオマトリクス — 能力の進展速度 × 社会の受容"}</div>
+      </FoldSection>
+      <FoldSection id="agi-scenarios" title={en ? "III. SCENARIO MATRIX — capability speed × social acceptance" : "III. シナリオマトリクス — 能力の進展速度 × 社会の受容"}>
       <AgiScenarioMatrix en={en} />
       <div style={{ fontSize: 12, color: C.dim, lineHeight: 1.65, marginBottom: 18 }}>{en ? "Scenario planning is not choosing the likely one — it is stress-testing today's plan against all four. A strategy that only works in one quadrant is a bet, not a strategy." : "シナリオプランニングは「当たりそうな未来を選ぶ」ことではなく、今日の計画を4象限すべてに当てて壊れる箇所を探すこと。1象限でしか成立しない戦略は戦略でなく賭け。"}</div>
-      <div style={{ fontSize: 15, fontWeight: 800, color: C.teal, borderLeft: `4px solid ${C.teal}`, paddingLeft: 10, letterSpacing: 1, margin: "20px 0 10px" }}>{en ? "IV. SIX NO-REGRET MOVES — right in every quadrant" : "IV. 後悔しない6手 — どのシナリオでも損しない打ち手"}</div>
+      </FoldSection>
+      <FoldSection id="agi-noregret" title={en ? "IV. SIX NO-REGRET MOVES — right in every quadrant" : "IV. 後悔しない6手 — どのシナリオでも損しない打ち手"}>
       <Card>
         {AGI_NOREGRET.map((n, i) => (
           <div key={i} style={{ display: "flex", gap: 9, alignItems: "flex-start", marginBottom: i < AGI_NOREGRET.length - 1 ? 8 : 0 }}>
@@ -152466,6 +152475,7 @@ function TabAgi() {
           </div>
         ))}
       </Card>
+      </FoldSection>
       <div style={{ fontSize: 12, color: C.dim, lineHeight: 1.7, marginTop: 10 }}>
         {en ? "Use in client work: axes I and the no-regret moves make a strong closing chapter for value-up proposals (\"whatever the future, these moves compound\"). The drills are for your own weekly practice — one question, one written hypothesis, one falsification condition." : "商談での使い方：Iの6軸とIVの5手は、バリューアップ提案の締め章（「どの未来でも複利で効く打ち手」）にそのまま使える。IIのドリルは自分の週次訓練用 — 週1問、仮説を書き、反証条件を1つ添える。現在の実務の延長は「漸進×受容」象限にあり、本ハブの他タブ（論点・全体像・価値ドライバー）がその主戦場。"}
       </div>
@@ -152481,13 +152491,59 @@ const PM_CASES = [{"id": "zillow", "year": "2021", "cat": "market", "t": ["Zillo
 const RADAR_ITEMS = [{"cat": "tech", "h": "0-12", "t": ["エージェント本番運用の投資先行ギャップ", "The Investment-Ahead-of-Deployment Gap in Production Agents"], "sig": ["企業のAI関連支出は2025年に約370億ドル規模へ拡大したが、エージェントを本番環境で稼働させている企業は16%にとどまるとの調査がある（Menlo Ventures調査）。投資は先行し実装は遅れている。", "Corporate AI spending expanded to roughly $37B in 2025, yet only 16% of companies report running agents in production, per a Menlo Ventures study — investment is outpacing deployment."], "guess": ["この投資と実装のギャップは今後1年で徐々に縮むと見られるが、ROI検証が遅れる企業ほど社内でAI予算が絞られる可能性もあり、様子見が長引けば逆に投資ペースそのものが鈍化するとの見方もある。", "This gap likely narrows over the coming year, though firms slow to prove ROI may see AI budgets tightened — and prolonged hesitation could itself slow the broader investment pace."], "imp": ["PoC止まりの投資は評価軸を欠き、次年度予算の説明責任リスクとして顧客の投資判断に影響する。", "PoC-stuck spending lacks evaluation criteria and creates budget-accountability risk for next year's investment decisions."], "act": ["提案に本番稼働の評価指標（KPI・監査ログ）を必須項目として組み込み、PoCから本番移行の契約条項を先に固める。", "Bake production-readiness KPIs and audit logging into the proposal as required items, and lock in the PoC-to-production contract clause up front."]}, {"cat": "tech", "h": "12-24", "t": ["エージェント相互運用標準（MCP・A2A）の普及", "Spread of Agent Interoperability Standards (MCP, A2A)"], "sig": ["MCP・A2Aなどエージェント同士の相互運用標準が2025年に相次いで登場し、主要ベンダーを横断して採用が広がっている。単一ベンダー依存を前提にしないアーキテクチャが現実的になってきた。", "Interoperability standards for agents such as MCP and A2A emerged in rapid succession in 2025 and are being adopted across major vendors, making vendor-agnostic architectures increasingly practical."], "guess": ["今後は特定ベンダーへのロックインを避けたい企業ほど標準準拠を選定基準に加えると見られ、標準非対応のツールは商談で不利になる可能性がある。ただ標準化が乱立すれば逆に統合コストが増す恐れもある。", "Enterprises wary of vendor lock-in are likely to make standards compliance a selection criterion, putting non-compliant tools at a disadvantage — though if too many competing standards emerge, integration costs could rise instead."], "imp": ["システム選定基準にベンダーロックイン耐性が加わり、既存の単一ベンダー提案は再交渉の対象になりやすい。", "Lock-in resilience becomes a system-selection criterion, putting existing single-vendor proposals at risk of renegotiation."], "act": ["提案アーキテクチャにMCP等準拠のコネクタ層を明記し、将来のベンダー切替コストを診断項目として提示する。", "Specify an MCP-compliant connector layer in the proposed architecture and present future vendor-switching cost as a diagnostic line item."]}, {"cat": "tech", "h": "24-36", "t": ["推論コストの急速な低下", "Rapid Decline in Inference Cost"], "sig": ["同等性能のAI推論コストは約18か月で1/280に低下したとの推計がある（Stanford HAI）。処理性能あたりの単価は急速に下がり続けている。", "Estimates suggest the cost of equivalent-performance AI inference has fallen to 1/280th over roughly 18 months (Stanford HAI), with unit costs continuing to drop rapidly."], "guess": ["この下落が続けば、これまで採算が合わず見送っていた高頻度・大量処理のAI活用が来年度以降に採算ラインへ入ると見られる。逆にコスト低下が鈍化すれば投資回収計画の前提から見直しが必要になる。", "If the decline continues, high-frequency, high-volume AI use cases once deemed uneconomical are likely to cross the viability line within the next fiscal year — though a slowdown in cost declines would force a rethink of ROI assumptions."], "imp": ["従来は投資回収が合わなかった業務領域が採算ラインに入り、対象業務の再選定が必要になる。", "Use cases previously ruled out on ROI grounds may now clear the bar, requiring a re-selection of target processes."], "act": ["現行提案のROI計算を最新の推論単価で再計算し、コスト低下を前提にした段階的スコープ拡張条項を仕込む。", "Recompute the current proposal's ROI using the latest inference unit costs, and build in a phased scope-expansion clause that assumes continued cost declines."]}, {"cat": "tech", "h": "0-12", "t": ["コーディングエージェントの先行導入と生産性実証", "Early Coding-Agent Adoption and Proven Productivity Gains"], "sig": ["ソフトウェア開発はコーディングエージェント導入が最も速く進んだ業務領域のひとつであり、開発者の生産性が55%向上したとの研究結果が公表されている。他業務に先行して効果が実証された代表領域といえる。", "Software development is one of the business areas where coding-agent adoption has advanced fastest, with a published study reporting a 55% developer productivity gain."], "guess": ["この開発領域での実証データは、他部門への導入提案の説得材料として今後さらに使われると見られる。ただ職種による適用差が大きく、同水準の効果を単純に他業務へ横展開できるとは限らない。", "This development-domain evidence will likely be cited increasingly to justify rollouts in other departments, though effects vary widely by role and cannot simply be extrapolated at the same rate elsewhere."], "imp": ["開発部門での実証済み効果が、他部門への投資判断の比較基準として持ち出されやすくなる。", "The proven gains in engineering become a benchmark customers cite when weighing investment in other departments."], "act": ["開発領域の実証値を基準ケースとして提示しつつ、対象業務ごとの適用可否を診断するアセスメント項目を提案に加える。", "Present the engineering benchmark as a reference case while adding an assessment item to the proposal that diagnoses applicability for each target process."]}, {"cat": "tech", "h": "12-24", "t": ["オンデバイス・エッジ実行の実用域拡大", "Expanding Practical Range of On-Device and Edge Execution"], "sig": ["量子化技術や小型モデルの性能向上により、オンデバイス・エッジでのAI実行が実用的な範囲まで広がってきている。従来はクラウド側でしか成立しなかった処理の一部が、端末側でも成立し始めている。", "Advances in quantization and smaller models are pushing on-device and edge AI execution into a practically usable range."], "guess": ["通信環境やデータ持ち出し制約が厳しい現場では、クラウド前提の提案よりエッジ実行を組み込んだ構成が今後選ばれやすくなると見られる。性能差が縮まらなければクラウド一択の提案は競争力を失う可能性がある。", "In sites with tight connectivity or data-export constraints, configurations incorporating edge execution are likely to be favored over cloud-only proposals — and cloud-only pitches risk losing competitiveness if the performance gap keeps narrowing."], "imp": ["工場・医療・公共など通信制約の強い現場で、クラウド一択の提案が再検討を迫られる。", "Cloud-only proposals face renewed scrutiny in connectivity-constrained sites such as factories, healthcare, and public-sector facilities."], "act": ["提案にオンデバイス実行のオプション構成を診断項目として加え、データ持ち出し規制のある現場での適用可否を先に確認する。", "Add an on-device execution option as a diagnostic item in the proposal, and confirm upfront whether it fits sites under data-export restrictions."]}, {"cat": "reg", "h": "0-12", "t": ["EU AI Actの段階施行", "Phased Enforcement of the EU AI Act"], "sig": ["EU AI Actは2024年に発効し、禁止規定・汎用AI規定・高リスク規定の順に段階的な適用が進行している。発効からすでに一部規定は施行済みで、対象範囲は今後さらに広がっていく構造になっている。", "The EU AI Act took effect in 2024 and is being phased in stage by stage — prohibited practices, then general-purpose AI, then high-risk systems."], "guess": ["高リスク規定の適用時期が近づくほど、EU域内向け提案では分類対応の準備が交渉の前提条件になると見られる。ただ運用細則の公表が遅れれば、対応スケジュールそのものが後ろ倒しになる可能性もある。", "As the high-risk provisions' effective date approaches, EU-facing proposals will likely need risk-classification readiness as a precondition for negotiation — though delayed implementing guidance could itself push back the compliance timeline."], "imp": ["EU向け事業を持つ顧客は、自社AIシステムのリスク分類作業を投資判断の前段に組み込む必要が出てくる。", "Customers with EU-facing operations will need to fold AI system risk-classification work into the front end of their investment decisions."], "act": ["提案に高リスク分類の予備診断メニューを組み込み、対象システムの分類作業を先行フェーズとして契約に含める。", "Build a preliminary high-risk classification diagnostic into the proposal, and include the classification work as an upfront contracted phase."]}, {"cat": "reg", "h": "0-12", "t": ["日本のAI事業者ガイドラインの定着", "Entrenchment of Japan's AI Business Operator Guidelines"], "sig": ["日本では経済産業省・総務省が2024年に「AI事業者ガイドライン」（10原則）を公表し、企業のAI活用における参照規範として定着が進んでいる。", "In Japan, METI and MIC published the 'AI Business Operator Guidelines' (10 principles) in 2024, which are increasingly used as the reference norm for corporate AI use."], "guess": ["調達審査や社内規程の参照先としてこのガイドラインを引用する企業が増えると見られる。順守が事実上の業界標準になれば、対応していない提案は選定の初期段階で外れる可能性がある。", "More companies are likely to cite these guidelines as a reference in procurement screening and internal policy, and once compliance becomes a de facto industry norm, non-aligned proposals risk being screened out early."], "imp": ["調達審査や社内規程の整備で、ガイドライン準拠を示せない提案は初期選定で不利になりやすい。", "Proposals that cannot demonstrate guideline alignment risk an early disadvantage in procurement screening and internal policy reviews."], "act": ["提案書に10原則との対応表を添付し、自社AI活用がどの原則にどう対応しているかを可視化する。", "Attach a mapping table to the proposal showing how the client's AI use aligns with each of the 10 principles."]}, {"cat": "reg", "h": "12-24", "t": ["日本のAI推進法によるハードロー化", "Japan's AI Promotion Act Hardens Soft Law into Statute"], "sig": ["日本では2025年にAI推進法が成立したと報じられており、ガイドラインという指針から法制度としての枠組みへ移行が進んでいる。2024年の「AI事業者ガイドライン」公表からの延長線上にある動きとされる。", "Japan is reported to have enacted an AI Promotion Act in 2025, marking a shift from voluntary guidelines toward a statutory framework."], "guess": ["施行細則の整備が進むにつれ、これまで任意対応だった事項が報告義務や監督対象に変わる可能性があると見られる。細則が緩やかであれば、実務上の変化は当面小さいままとの見方もある。", "As implementing rules take shape, matters once handled voluntarily may become subject to reporting duties or oversight — though if those rules turn out lenient, the practical impact could remain limited for now."], "imp": ["任意対応だった社内AI統制が、将来の報告・監督義務を見据えた体制整備の対象になる。", "Internal AI governance that was previously voluntary becomes a target for building structures ahead of possible future reporting and oversight duties."], "act": ["提案に法制化を見据えたAI統制体制（責任者・記録・監査ログ）の整備メニューを先行提案として加える。", "Add an AI governance readiness menu — accountable owner, record-keeping, audit logs — as an early-mover proposal item anticipating the new statutory framework."]}, {"cat": "reg", "h": "12-24", "t": ["米国の州法先行による規制の分断", "US Regulatory Fragmentation as State Law Leads"], "sig": ["米国では連邦レベルの方針が政権によって変動する一方、コロラド州のAI法などの州法が先行して整備される構図になっている。連邦の方向性が定まらない間、州単位の規制整備が実質的に先行して進んでいる。", "In the US, federal policy shifts with each administration, while state laws such as Colorado's AI Act are moving ahead on their own."], "guess": ["今後は複数州で異なる規制が並立し、米国拠点を持つ企業ほど州ごとの対応が事務負担になると見られる。連邦法が一本化されれば、逆に州法対応の重複コストは解消に向かう可能性もある。", "Multiple states enacting differing rules is likely to raise the administrative burden for companies with US operations — though a unifying federal law could instead resolve the duplicated state-by-state compliance costs."], "imp": ["米国複数州に拠点を持つ顧客は、州ごとに異なる規制対応をどこまで一本化できるかが投資判断の論点になる。", "For customers operating across multiple US states, how far compliance can be unified across differing state rules becomes a key investment consideration."], "act": ["提案に主要州（コロラド州等）の規制差分を整理した比較表を添え、拠点展開に応じた対応順序を提示する。", "Include a comparison table of regulatory differences across key states (e.g., Colorado) in the proposal, and sequence compliance work by site rollout order."]}, {"cat": "reg", "h": "24-36", "t": ["AIマネジメント認証の商取引審査への実装", "AI Management Certification Enters B2B Procurement Screening"], "sig": ["ISO/IEC 42001（AIマネジメントシステム）やNIST AI RMFへの準拠・認証が、企業間取引の審査項目として現れ始めている。認証や準拠の有無が取引先選定の判断材料に加わる動きが出てきている。", "Compliance and certification against ISO/IEC 42001 (AI management systems) and the NIST AI RMF are starting to appear as screening items in B2B transactions."], "guess": ["この動きが広がれば、認証取得が大企業向け商談の入札資格そのものになると見られる。認証コストが重ければ、中小の取引先が入札から外れる副作用が出る可能性もある。", "If this trend spreads, certification is likely to become an outright bid-eligibility requirement for enterprise deals — though if certification costs run high, smaller vendors could be squeezed out of bidding as a side effect."], "imp": ["大企業向け商談では認証の有無が入札資格の条件に加わり、未取得の取引先は選定から外れるリスクが出る。", "In enterprise deals, certification status becomes an eligibility condition, putting uncertified vendors at risk of being excluded from selection."], "act": ["ISO/IEC 42001取得を見据えたAIマネジメント体制の診断・整備メニューを提案に組み込み、認証準備を先行フェーズにする。", "Incorporate a diagnostic and build-out menu for AI management-system readiness aimed at ISO/IEC 42001 certification, positioning certification prep as an upfront phase."]}, {"cat": "labor", "h": "24-36", "t": ["労働力不足を前提にした業務再設計への需要拡大", "Demand for workforce-shortage-driven process redesign"], "sig": ["パーソル総合研究所と中央大学の推計では、日本の労働力不足は2035年に1日あたり1,775万時間に達するとされる。この規模の不足は特定業種だけでなく、事務・現場を問わず広範に及ぶと同推計は示している。", "A Persol Research Institute/Chuo University estimate projects Japan's labor shortage will reach 17.75 million hours per day by 2035. The same estimate indicates the gap spans white-collar and frontline work broadly, not a single industry."], "guess": ["この不足幅を前提にすると、企業は人員採用よりも業務量そのものを削減する方向に投資判断を移すと見られる。ただし移民・高齢者雇用の制度変更が進めば、自動化投資の緊急度は緩む可能性もある。", "Given this projected gap, companies are likely to shift investment from hiring toward reducing task volume itself. That said, if immigration or senior-employment policy shifts significantly, the urgency of automation investment could ease."], "imp": ["中期の人員計画・拠点統合・業務委託の見直しが、AI投資の承認理由として使われやすくなる。", "Mid-term staffing plans, site consolidation, and outsourcing reviews become easier to justify as reasons for AI investment approval."], "act": ["提案書に2035年時点の要員シミュレーション（部門別・削減時間換算）を組み込み、契約に3年後の要員再算定条項を入れておく。", "Embed a 2035 headcount simulation (by department, converted to hours saved) into the proposal, and add a three-year headcount recalculation clause to the contract."]}, {"cat": "labor", "h": "0-12", "t": ["自動化可能業務45%を起点にした診断需要", "Diagnostic demand anchored on the 45% automatable-task estimate"], "sig": ["McKinseyの推計では、既存技術で自動化可能な業務時間は全体の45%に達するとされる。この数値は業種横断の一般論として引用されており、個社の内訳は別途調査が必要とされる。", "McKinsey estimates that 45% of work hours are automatable with existing technology. The figure is cited as a cross-industry generalization, meaning each company's actual breakdown still requires its own assessment."], "guess": ["この数値をきっかけに、まず自社の45%がどこに当たるかを診断したい企業からの相談が今後増えると見られる。ただし診断結果が期待より低く出た場合、投資意欲がむしろ冷える可能性もある。", "This figure is likely to drive more inquiries from companies wanting to diagnose where their own 45% lies. However, if a diagnosis comes back lower than expected, it could just as easily cool investment appetite."], "imp": ["業務量調査・自動化診断が提案の入口として機能し、以降のロードマップ受注につながりやすい。", "Task-volume surveys and automation diagnostics work as an entry point, making it easier to win the follow-on roadmap engagement."], "act": ["初回提案に低価格の業務時間診断パッケージを用意し、診断結果を次フェーズの自動化投資提案に直結させる。", "Offer a low-priced task-time diagnostic package as the first engagement, and wire its results directly into the next-phase automation investment proposal."]}, {"cat": "labor", "h": "12-24", "t": ["AI活用の人事制度への組込みが選定基準化", "AI usage becoming embedded in HR evaluation criteria"], "sig": ["「AI活用を全社員の基本動作とする」と方針を掲げ、採用・評価基準に組み込む企業が国内外で増えている。この動きは特定企業に限らず複数報じられている傾向として確認できる。", "A growing number of companies, both in Japan and abroad, are declaring that AI use should be a basic behavior for every employee, and are building it into hiring and evaluation criteria. This trend is reported across multiple companies, not a single case."], "guess": ["評価制度に組み込む企業が増えるほど、AI活用の巧拙が人事考課や昇進の材料として定着していくと見られる。他方、評価基準の運用が形式化すれば、実質的な活用促進につながらない企業も出てくるだろう。", "As more firms embed this into evaluation, AI proficiency is likely to become a fixture in performance reviews and promotion decisions. On the other hand, if the criteria become a formality, some companies may see little real uplift in usage."], "imp": ["人事・評価制度の設計そのものがAX提案の対象領域に入り、IT部門単独の話ではなくなる。", "HR and evaluation system design itself becomes part of the AX proposal scope, no longer an IT-department-only conversation."], "act": ["評価項目にAI活用の行動指標を組み込むテンプレートを人事部門向けに提示し、研修とセットで提案する。", "Present HR with a template that embeds AI-usage behavioral indicators into evaluation criteria, and bundle it with a training program in the proposal."]}, {"cat": "labor", "h": "0-12", "t": ["顧客対応全自動化の揺り戻しへの対処需要", "Demand to address the backlash against full customer-service automation"], "sig": ["顧客対応を大規模にAI化した企業の一部で、品質面の課題から人の対応を再強化する動きが報じられている。全自動化からの揺り戻しとして紹介されている事例である。", "Some companies that heavily automated customer service with AI have been reported reinforcing human support again due to quality concerns. This is presented as a pullback from full automation."], "guess": ["この揺り戻しを踏まえると、今後の顧客対応AI導入は全自動化ではなく人とAIの役割分担設計が主流になると見られる。ただし人手不足が一段と深刻化する業種では、品質より稼働継続が優先される可能性もある。", "Given this pullback, future customer-service AI rollouts are likely to center on human-AI role design rather than full automation. That said, in sectors where labor shortages worsen further, keeping operations running may end up outweighing quality concerns."], "imp": ["コールセンター・サポート部門の投資判断が、コスト最適化だけでなく品質保証の設計を伴う提案を求めるようになる。", "Investment decisions in call centers and support functions start requiring proposals that pair cost optimization with quality-assurance design, not cost alone."], "act": ["AI対応と人対応の切替基準（エスカレーション条件）を診断項目として提案書に明記し、品質モニタリング体制を契約に含める。", "Specify AI-to-human handoff criteria (escalation conditions) as a diagnostic item in the proposal, and include a quality-monitoring framework in the contract."]}, {"cat": "labor", "h": "12-24", "t": ["FDE型人材需要の高まりと採用・育成支援ニーズ", "Rising demand for FDE-type talent and related hiring/development support"], "sig": ["顧客先に常駐して実装まで担うFDE（Forward Deployed Engineer）型の人材への需要が高まっているとされる。実装まで踏み込む人材像として、通常のSEやコンサルタントと区別して言及されている。", "Demand is reportedly rising for Forward Deployed Engineer (FDE) type talent who embed on-site with clients through implementation. This role is referenced as distinct from a typical SE or consultant, precisely because it carries through to implementation."], "guess": ["この需要の高まりを踏まえると、ファーム側もFDE的な常駐実装人材を自社で確保・育成する動きを強めると見られる。ただし人材の採用競争が激化すれば、育成より即戦力の中途採用に比重が移る可能性もある。", "Given this rising demand, firms are likely to intensify efforts to secure and develop their own FDE-style embedded implementation talent. However, if hiring competition intensifies, the balance could shift from internal development toward hiring experienced hires directly."], "imp": ["提案の実行体制そのものが差別化要因となり、常駐実装を前提とした契約形態・費用設計が問われる。", "The delivery team's makeup itself becomes a differentiator, putting on-site implementation-based contract structures and pricing to the test."], "act": ["提案にFDE型人材の常駐期間・工数を明示したプランを用意し、社内でも同型人材のローテーション育成プログラムを仕込む。", "Prepare a proposal plan that specifies the on-site duration and effort of FDE-type staff, and set up an internal rotation-based development program for the same talent type."]}, {"cat": "market", "h": "12-24", "t": ["ヘルスケア特化AIへの投資集中と提案の垂直特化", "Investment concentration in healthcare-vertical AI and the case for vertical specialization"], "sig": ["Menlo Venturesの調査では、垂直特化型AIの中でヘルスケアが最大セグメントとされ、規模は15億ドル・全体の43%を占めるとされる。単一業種にこれだけ資金が集中している点が同調査で示されている。", "Menlo Ventures' research identifies healthcare as the largest vertical-AI segment, at $1.5 billion and 43% of the total. The research highlights how concentrated this funding is in a single vertical."], "guess": ["この集中度からすると、他業種でも同様に業界特化型のAIソリューションへ資金と提案が向かう流れが広がると見られる。ただしヘルスケアは規制対応需要が特に強い業種であり、他業種で同水準の集中は起きない可能性もある。", "Given this concentration, funding and proposals are likely to increasingly flow toward vertical-specific AI solutions in other industries too. That said, healthcare's unusually strong regulatory-compliance demand means other industries may not see the same degree of concentration."], "imp": ["汎用的な業務改善提案よりも、業界固有の課題に踏み込んだ垂直特化型の提案が選ばれやすくなる。", "Vertical, industry-specific proposals that dig into sector-particular problems become more likely to win out over generic process-improvement pitches."], "act": ["提案テンプレートを業種別に再構成し、業界固有の規制・業務フローに合わせた診断項目を先行して用意する。", "Restructure proposal templates by industry, and prepare diagnostic items tailored to each sector's specific regulations and workflows in advance."]}, {"cat": "market", "h": "0-12", "t": ["席課金から従量・成果課金への移行への対応", "Adapting to the shift from seat-based to usage/outcome-based pricing"], "sig": ["AI製品の課金は席課金から従量・成果課金へ移る傾向が公開例として示されている。Salesforceは会話単位、Intercomは解決単位での課金モデルを採用している。", "AI-product pricing is shifting from seat-based to usage- or outcome-based models, per publicly cited examples. Salesforce charges per conversation and Intercom per resolution."], "guess": ["この移行が広がれば、日本企業向けの提案も座席数ベースの見積もりから、処理件数や解決件数に応じた課金設計へ移っていくと見られる。ただし社内予算制度が座席課金前提のままだと、成果課金の導入は稟議段階で足止めされる可能性もある。", "As this shift spreads, proposals for Japanese companies are likely to move from seat-count-based quotes toward pricing tied to volume or resolution counts. However, if internal budgeting is still built around seat-based licensing, outcome-based pricing could stall at the approval stage."], "imp": ["調達・予算部門との交渉が座席数の議論から、処理量・成果指標の定義そのものの議論に変わる。", "Negotiations with procurement and budget teams shift from seat-count discussions to defining the volume or outcome metrics themselves."], "act": ["契約に成果指標（解決件数・対応件数等）の定義と算定方法を明記し、座席課金と従量課金を併用する移行プランを提案に添える。", "Define outcome metrics (resolution counts, handled cases, etc.) and their calculation method in the contract, and attach a transition plan combining seat-based and usage-based pricing to the proposal."]}, {"cat": "market", "h": "24-36", "t": ["データセンター電力消費拡大を見据えた投資設計", "Investment design anticipating rising data-center power consumption"], "sig": ["IEAの見通しでは、世界のデータセンターの電力消費は2030年に945TWhへ拡大するとされる。この拡大はAI関連需要の伸びを背景とした見通しとして示されている。", "IEA projections put global data-center power consumption at 945 TWh by 2030. The growth is presented against a backdrop of rising AI-related demand."], "guess": ["この見通しが実現に近づくほど、電力コストや調達制約がAI投資の意思決定に直接影響する要素として顕在化すると見られる。一方で電力の効率化技術が想定以上に進めば、コスト面の懸念は現状より軽くなる可能性もある。", "As this outlook moves closer to reality, power costs and supply constraints are likely to emerge as factors that directly shape AI investment decisions. On the other hand, if power-efficiency technology advances faster than expected, cost concerns could end up lighter than they look now."], "imp": ["大規模モデル利用を前提とした投資計画に、電力・インフラコストの中長期見通しを組み込む必要性が増す。", "Investment plans premised on heavy large-model usage increasingly need to incorporate mid-to-long-term power and infrastructure cost outlooks."], "act": ["提案に推論コストの電力・インフラ前提を明示し、オンプレ・エッジ・小型モデルとの併用によるコスト分散案を仕込んでおく。", "Make the power and infrastructure assumptions behind inference costs explicit in the proposal, and build in a cost-diversification option combining on-prem, edge, and smaller models."]}, {"cat": "market", "h": "12-24", "t": ["顧客サービス自律解決80%予測が示す再設計圧力", "The 80%-autonomous-resolution forecast and the pressure to redesign service"], "sig": ["Gartnerの予測では、顧客サービス案件の80%が2029年までにAIによって自律的に解決されるとされる。これは将来時点の予測値として公表されているものである。", "Gartner forecasts that 80% of customer-service cases will be autonomously resolved by AI by 2029. This is published as a forward-looking projection, not a current measurement."], "guess": ["この予測が本命シナリオとして進むなら、既存のコンタクトセンター組織は人員規模より対応品質設計の役割に重心が移ると見られる。予測が外れて自律解決率が伸び悩む場合は、むしろ人とAIの協働設計への投資が長引く可能性もある。", "If this forecast plays out as the base-case scenario, existing contact-center organizations are likely to shift their center of gravity from headcount toward quality-of-response design. If autonomous resolution instead stalls short of the forecast, investment in human-AI collaboration design could instead persist longer than expected."], "imp": ["コンタクトセンターの中期組織設計・要員計画が、自律解決率の想定値を前提に見直される。", "Mid-term contact-center organizational and staffing plans get revisited with an assumed autonomous-resolution rate as the baseline."], "act": ["提案に自律解決率の段階的な目標値（現状・1年後・3年後）を設定し、達成状況に応じた要員再配置条項を契約に組み込む。", "Set staged autonomous-resolution targets (current, one-year, three-year) in the proposal, and build a staffing-reallocation clause tied to achievement into the contract."]}, {"cat": "market", "h": "0-12", "t": ["導入率とEBIT実証のギャップを突く提案機会", "A proposal opening in the gap between adoption rates and proven EBIT impact"], "sig": ["総務省調査では生成AIの導入率は日本の都道府県で87.2%、市区町村で29.9%、NRI調査では日本企業で57.7%とされる。一方でMcKinsey調査の文脈ではEBITへの効果が実証された割合は5.5%とされている。", "Japanese government survey data puts generative-AI adoption at 87.2% among prefectures and 29.9% among municipalities, while NRI puts corporate adoption at 57.7%. Yet, in the McKinsey survey context, only 5.5% report a proven EBIT impact."], "guess": ["このギャップを踏まえると、導入済み企業・自治体の間で「使っているが効果が説明できない」案件への相談が今後増えると見られる。ただし効果検証の手法自体が標準化されれば、このギャップはある程度縮小する可能性もある。", "Given this gap, inquiries are likely to increase from companies and municipalities that have adopted generative AI but cannot yet explain its bottom-line effect. That said, if effect-measurement methodology itself becomes standardized, this gap could narrow to some degree."], "imp": ["新規導入支援よりも、既存導入の効果測定・再設計を求める案件が予算化されやすくなる。", "Rather than fresh rollout support, engagements to measure and redesign the effect of already-adopted AI become easier to get budgeted."], "act": ["提案に既存導入の効果測定フレーム（指標定義・測定期間）を先行メニューとして用意し、測定結果を次期投資提案につなげる設計にする。", "Offer an effect-measurement framework for existing deployments (metric definitions, measurement period) as a lead-in menu item in the proposal, designed to feed results directly into the next investment proposal."]}];
 const MAT_LABEL = { prod: ["実用", "In production"], pilot: ["実証", "Piloting"], emerging: ["萌芽", "Emerging"] };
 const MAT_COL = { prod: "#5FB8A5", pilot: "#D6B152", emerging: "#8FA8E8" };
-function FoldSection({ title, color, defaultOpen, children }) {
-  const [open, setOpen] = useState(!!defaultOpen);
+// 開閉できる節。TechHub のタブ本文は FoldScope で包まれていて、
+// ・節が2つ以上あるタブには「すべて開く／すべて閉じる」が出る
+// ・開け閉めした状態は端末に覚える（techhub_fold_v1。キーは タブid:節の id か見出し）
+// 既定は閉じた状態。defaultOpen は TechHub では使わない（閉じて並べ、読みたい節だけ開く）。
+const FoldCtx = createContext(null);
+const FOLD_STORE = "techhub_fold_v1";
+const foldLoad = () => { try { return JSON.parse(localStorage.getItem(FOLD_STORE) || "{}") || {}; } catch (e) { return {}; } };
+const foldSave = (k, v) => { try { const m = foldLoad(); m[k] = v; localStorage.setItem(FOLD_STORE, JSON.stringify(m)); } catch (e) { /* 保存できなくても開閉はできる */ } };
+function FoldScope({ scope, children }) {
+  const en = useLang() === "en";
+  const [cmd, setCmd] = useState({ n: 0, open: false });
+  const [count, setCount] = useState(0);
+  const reg = useCallback((d) => setCount((c) => c + d), []);
+  const ctx = useMemo(() => ({ scope, cmd, reg }), [scope, cmd, reg]);
+  const btn = { fontSize: 11.5, fontWeight: 700, color: C.muted, background: C.surface, border: `1px solid ${C.line}`, borderRadius: 999, padding: "4px 12px", cursor: "pointer" };
+  return (
+    <FoldCtx.Provider value={ctx}>
+      {count >= 2 ? (
+        <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 6, flexWrap: "wrap", margin: "0 0 8px" }}>
+          <span style={{ fontSize: 11, color: C.dim }}>{en ? `${count} sections` : `折りたたみ ${count}節`}</span>
+          <button type="button" style={btn} onClick={() => setCmd((c) => ({ n: c.n + 1, open: true }))}>{en ? "Open all" : "すべて開く"}</button>
+          <button type="button" style={btn} onClick={() => setCmd((c) => ({ n: c.n + 1, open: false }))}>{en ? "Close all" : "すべて閉じる"}</button>
+        </div>
+      ) : null}
+      {children}
+    </FoldCtx.Provider>
+  );
+}
+function FoldSection({ title, color, defaultOpen, children, id, meta }) {
+  const ctx = useContext(FoldCtx);
+  const name = id || (typeof title === "string" ? title : null);
+  const key = ctx && name ? ctx.scope + ":" + name : null;
+  const [open, setOpen] = useState(() => {
+    if (key) { const m = foldLoad(); if (Object.prototype.hasOwnProperty.call(m, key)) return !!m[key]; }
+    return !!defaultOpen;
+  });
+  const seen = useRef(ctx ? ctx.cmd.n : 0);
+  const reg = ctx ? ctx.reg : null;
+  useEffect(() => { if (!reg) return undefined; reg(1); return () => reg(-1); }, [reg]);
+  const cmdN = ctx ? ctx.cmd.n : 0;
+  useEffect(() => {
+    if (!ctx || cmdN === seen.current) return;
+    seen.current = cmdN;
+    setOpen(ctx.cmd.open);
+    if (key) foldSave(key, ctx.cmd.open);
+  }, [cmdN]); // eslint-disable-line react-hooks/exhaustive-deps
+  const toggle = () => { const v = !open; setOpen(v); if (key) foldSave(key, v); };
   const col = color || C.teal;
   return (
     <div style={{ marginBottom: 8 }}>
-      <div onClick={() => setOpen((o) => !o)} style={{ cursor: "pointer", display: "flex", alignItems: "baseline", gap: 8, fontSize: 15, fontWeight: 800, color: col, borderLeft: `4px solid ${col}`, paddingLeft: 10, letterSpacing: 1, margin: "14px 0 8px" }}>
-        <span style={{ flex: "1 1 auto", minWidth: 0 }}>{title}</span>
+      <div className="fold-h" role="button" tabIndex={0} aria-expanded={open} onClick={toggle} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); } }} style={{ cursor: "pointer", fontSize: 15, fontWeight: 800, color: col, borderLeft: `4px solid ${col}`, paddingLeft: 10, letterSpacing: 1, margin: "14px 0 8px" }}>
+        <span style={{ minWidth: 0 }}>{title}</span>
+        {meta ? <span className="fold-m" style={{ fontSize: 11, fontWeight: 500, letterSpacing: 0, color: C.muted, minWidth: 0 }}>{meta}</span> : null}
         <span style={{ fontSize: 12, color: C.dim, flexShrink: 0, display: "inline-block", transition: "transform 0.16s ease", transform: open ? "rotate(90deg)" : "rotate(0deg)" }}>▸</span>
       </div>
       {open ? children : null}
@@ -155904,13 +155960,13 @@ function TabArchCases() {
       <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.7, marginBottom: 6 }}>
         {en ? "What a production generative-AI system actually looks like, layer by layer. Five reference patterns you can draw on a whiteboard in a meeting, the components that sit in each layer, the question that decides each choice, and the trap that follows the wrong one. The patterns are composites of how these systems are commonly built — not any one company's system; the public cases with named sources sit in their own section. Sections VII to XI are measured data: 109 production architectures at Japanese companies, 735 tool reviews and 27 cross-company articles, tallied. The point is to get past 'here is how it is usually built' to 'here is how it actually was built, and here is where it hurt afterwards'." : "本番の生成AIシステムが実際どう組まれているかを、層ごとに見る。商談のホワイトボードで描ける5つの構成パターン、各層に入る要素、選択を決める問い、外したときの落とし穴。パターンは一般的な組み方の合成であって特定企業の構成そのものではない — 出典つきの公開事例は別セクションに置く。後半（VII〜XI）は実測データで、日本企業の本番アーキテクチャ109件・ツールレビュー735件・横断記事27本を集計してある。「一般にはこう組む」で終わらせず、「実際にはこう組まれていて、導入後にここでつまずいている」まで見られるようにした。"}
       </div>
-      <FoldSection title={en ? "I. ARCHITECTURE PATTERNS — five shapes and their layers" : "I. 構成パターン — 5つの型と7層の中身"} color={C.teal} defaultOpen>
+      <FoldSection title={en ? "I. ARCHITECTURE PATTERNS — five shapes and their layers" : "I. 構成パターン — 5つの型と7層の中身"} color={C.teal}>
         <ArchStackDiagram en={en} layer={layer} onLayer={setLayer} />
       </FoldSection>
       <FoldSection title={en ? "II. COMPONENT MAP — what sits in each layer" : "II. 構成ツール早見表 — 各層に何が入るか"} color={C.gold}>
         <ArchToolTable en={en} layer={layer} onLayer={setLayer} />
       </FoldSection>
-      <FoldSection title={en ? "III. AGENT SYSTEMS — nine published architectures" : "III. AIエージェントの実装事例 — 構成図が公開されている9件"} color={C.gold} defaultOpen>
+      <FoldSection title={en ? "III. AGENT SYSTEMS — nine published architectures" : "III. AIエージェントの実装事例 — 構成図が公開されている9件"} color={C.gold}>
         <ArchAgentCases en={en} />
       </FoldSection>
       <FoldSection title={en ? "IV. CLOUD VENDORS' OWN CASE STUDIES — four Japanese systems, first-party sources" : "IV. クラウド公式事例 — 一次情報つきの日本企業4件"} color={C.gold}>
@@ -155923,7 +155979,7 @@ function TabArchCases() {
       <FoldSection title={en ? "VI. WHAT REPEATS ACROSS THE CASES" : "VI. 事例を横断して繰り返し現れるもの"} color={C.teal}>
         <ArchCrossAnalysis en={en} />
       </FoldSection>
-      <FoldSection title={en ? `VII. MEASURED — how ${FT_META.nArch} real architectures were actually built` : `VII. 実測 — 実在する${FT_META.nArch}件は実際どう組まれているか`} color={C.teal} defaultOpen>
+      <FoldSection title={en ? `VII. MEASURED — how ${FT_META.nArch} real architectures were actually built` : `VII. 実測 — 実在する${FT_META.nArch}件は実際どう組まれているか`} color={C.teal}>
         <FtStatsBoard en={en} />
       </FoldSection>
       <FoldSection title={en ? `VIII. CASE EXPLORER — all ${FT_META.nArch}, filterable` : `VIII. 事例エクスプローラ — ${FT_META.nArch}件を絞り込む`} color={C.gold}>
@@ -156099,7 +156155,7 @@ function TabXform() {
       <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.7, marginBottom: 6 }}>
         {en ? "The other half of AI work: not building the system, but moving an organization onto it. This is the craft of a transformation role at a consulting firm — the deliverable is adoption and organizational capability, not a running model. Generic professional practice; adapt the vocabulary to whichever firm you sit in." : "AI案件のもう半分 — システムを作ることでなく、組織をそこへ移すこと。コンサルティングファームの変革ロールが担う技能で、成果物は「動くモデル」ではなく「定着と組織のケイパビリティ」。ここは一般的な実務の型であり、用語は所属するファームの言い方に合わせて読み替えること。"}
       </div>
-      <FoldSection title={en ? "I. THE ROLE — connective tissue and three hats" : "I. 役割の正体 — 束ねる立場と3つの帽子"} color={C.teal} defaultOpen>
+      <FoldSection title={en ? "I. THE ROLE — connective tissue and three hats" : "I. 役割の正体 — 束ねる立場と3つの帽子"} color={C.teal}>
         <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.65, marginBottom: 8 }}>
           {en ? "A transformation consultant is not a specialist in one capability but the tissue that connects them — advising on the change, delivering hands-on, and lifting the client's own capability so the work survives your exit. In practice that means wearing three hats, often within the same week." : "変革コンサルタントは単一ケイパビリティの専門家ではなく、それらを繋ぐ結合組織として振る舞う — 変革の助言、ハンズオンでのデリバリー、そして自分が抜けた後も残るよう顧客側のケイパビリティを引き上げること。実務上は3つの帽子を、しばしば同じ週のうちに掛け替えることになる。"}
         </div>
@@ -156814,7 +156870,7 @@ function TabSGlobal() {
       <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.7, marginBottom: 6 }}>
         {en ? "Eleven published engagements — the US, Germany, Ireland, New Zealand and three in Japan — read for the pattern rather than the logo. Every figure here comes from a vendor, partner or press announcement: these are published claims, not independently audited results, and each card carries the qualifier that applies to it. This environment could not open slalom.com or jetro.go.jp directly, so the summaries were assembled from search results and partner pages; check the linked source before quoting anything. Figures and milestones are as verified on 21 September 2026." : "米国・ドイツ・アイルランド・ニュージーランド、そして日本3件の、公表されている11件を、ロゴではなく型として読む。数値はすべてベンダー・パートナー・報道の公表値で、第三者監査を経た実績ではない。各カードには該当する但し書きを付けてある。なおこの環境からは slalom.com や jetro.go.jp に直接アクセスできなかったため、要約は検索結果とパートナー側の公開ページから構成している。引用する前に必ずリンク先を確認すること。数値と沿革は2026年9月21日に確認した時点のもの。"}
       </div>
-      <FoldSection title={en ? "I. THE CASES — challenge, what was built, what moved" : "I. 事例 — 課題・打ち手・動いた指標"} color={C.teal} defaultOpen>
+      <FoldSection title={en ? "I. THE CASES — challenge, what was built, what moved" : "I. 事例 — 課題・打ち手・動いた指標"} color={C.teal}>
         <SgCaseExplorer en={en} />
       </FoldSection>
       <FoldSection title={en ? "II. FOUR PATTERNS behind the eleven" : "II. 11件の裏にある4つの型"} color={C.gold}>
@@ -156925,7 +156981,7 @@ function TabGFirm() {
       <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.7, marginBottom: 6 }}>
         {en ? "Moving between firm types changes what counts as good work more than it changes the work itself. This tab covers the parts nobody writes in the job description: how deals originate, what the ladder actually measures, and what to do in the first quarter. Described as general practice at large consulting firms — verify the specifics against the firm you are joining, since names and structures differ by market." : "ファームの種類が変わると、仕事そのものより「何が良い仕事とされるか」が変わる。このタブは職務記述書に書かれない部分 — 案件がどう生まれるか、ラダーが実際に何を見ているか、最初の四半期に何をするか。大手コンサルティングファーム一般の実務として記述しており、呼称や構造は市場ごとに異なるため、詳細は入社先で確認すること。"}
       </div>
-      <FoldSection title={en ? "I. WHERE DEALS COME FROM — two different worlds" : "I. 案件はどこから来るか — 2つの世界"} color={C.teal} defaultOpen>
+      <FoldSection title={en ? "I. WHERE DEALS COME FROM — two different worlds" : "I. 案件はどこから来るか — 2つの世界"} color={C.teal}>
         <GfDealFlow en={en} />
       </FoldSection>
       <FoldSection title={en ? "II. THE LADDER — what each rung is measured on" : "II. ラダー — 各段で見られるもの"} color={C.gold}>
@@ -158613,7 +158669,7 @@ function TabBpr() {
         {en ? "Source: a digest of all 53 regular videos (13 Jul – 13 Oct 2026) from the YouTube channel 泥臭コンサルの非常識なDX学 [Mudness Partners], taken from the full auto-generated captions. Nearly every figure is the speaker's own field experience or estimate (evidence strength C) and was not independently verified — check in your own setting before reusing a number. Every #number links to the video; the full list is under Dojo & Research › Practice Issue Map."
             : "出所：YouTube「泥臭コンサルの非常識なDX学【Mudness Partners】」の通常動画53本（2026-07-13〜10-13）を自動字幕の全文から要約したダイジェスト。数値のほとんどは話者の支援現場の経験・試算（エビデンス強度C）で、独自検証はしていません。持ち出す前に自社で再現を確かめてください。#番号から各動画へ飛べます。全動画の一覧は 道場・リサーチ › 実務論点マップ にあります。"}
       </div>
-      <FoldSection title={en ? "I. ROADMAP — one process, end to end, in six months" : "I. 改善ロードマップ — 1業務を半年でやり切る"} color={C.gold} defaultOpen>
+      <FoldSection title={en ? "I. ROADMAP — one process, end to end, in six months" : "I. 改善ロードマップ — 1業務を半年でやり切る"} color={C.gold}>
         <BprRoadmap en={en} />
       </FoldSection>
       <FoldSection title={en ? "II. WORKSHEET — ten kinds of work to remove before hiring" : "II. ワークシート — 求人の前に消せる仕事10類型"} color={C.teal}>
@@ -159247,7 +159303,7 @@ function ItSecPractice({ en }) {
             : "現状把握から、成熟度とギャップの測り方、優先順位、製品・委託先の確認点、生成AIを入れる前に広義ITで確かめることまでの進め方。各項目に、根拠になる概念を添えた。"}
       </div>
       {ITSEC_PRAC.map((sec, i) => (
-        <FoldSection key={i} title={`${i + 1}. ${sec.t[en ? 1 : 0]}`} color={[C.gold, C.teal, C.wine, C.fore, C.muted][i % 5]} defaultOpen={i === 0}>
+        <FoldSection key={i} title={`${i + 1}. ${sec.t[en ? 1 : 0]}`} color={[C.gold, C.teal, C.wine, C.fore, C.muted][i % 5]}>
           <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.7, marginBottom: 8 }}>{sec.lead[en ? 1 : 0]}</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,300px),1fr))", gap: 8 }}>
             {sec.items.map((it, k) => (
@@ -162297,11 +162353,8 @@ function NoteMapView({ en }) {
     <div>
       <NoteSourceNote en={en} />
       {NOTE_CORPORA.map((c) => (
-        <div key={c.id} style={{ marginBottom: 22 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 8, marginBottom: 6 }}>
-            <span className="gh-display" style={{ fontSize: 18 }}>{thEn(c.title, en)}</span>
-            <span style={{ fontSize: 11, color: C.muted }}>{thEn(c.sub, en)}{en ? " · " : " ・ "}{c.period}{en ? " · " : " ・ "}{c.n}{en ? " articles" : "本"}</span>
-          </div>
+        <FoldSection key={c.id} id={"note-" + c.id} title={thEn(c.title, en)} meta={<>{thEn(c.sub, en)}{en ? " · " : " ・ "}{c.period}{en ? " · " : " ・ "}{c.n}{en ? " articles" : "本"}{en ? " · " : " ・ "}{c.themes.length}{en ? " themes" : "論点"}</>}>
+        <div style={{ marginBottom: 22 }}>
           {c.axis && <div style={{ fontSize: 11, color: C.teal, marginBottom: 10 }}>{en ? "Axis: " : "分類軸："}{thEn(c.axis, en)}</div>}
           {c.insights && c.insights.length ? (
             <Card style={{ marginBottom: 12 }}>
@@ -162359,6 +162412,7 @@ function NoteMapView({ en }) {
             })}
           </div>
         </div>
+        </FoldSection>
       ))}
     </div>
   );
@@ -163616,7 +163670,7 @@ function SlProfileView({ en }) {
         {en ? "Source note: slalom.com and press sites could not be opened from the build environment, so this page is assembled from web-search summaries. Every fact carries a confidence label; vendor-published figures are marked as such. Verify on primary pages and internally before quoting."
             : "出所について：制作環境からは slalom.com や報道各社のページを直接開けなかったため、Web検索の要約から組み立てています。各事実に確度を付け、自社発表の数値はその旨を明記しました。引用の前に一次ページと社内で確認してください。"}
       </div>
-      <FoldSection title={en ? "I. THE FIRM — what is known, and how sure we are" : "I. 会社像 — 分かっていることと、その確度"} color={C.teal} defaultOpen>
+      <FoldSection title={en ? "I. THE FIRM — what is known, and how sure we are" : "I. 会社像 — 分かっていることと、その確度"} color={C.teal}>
         <div style={{ display: "grid", gap: 8 }}>
           {SL_FACTS.map((f, i) => (
             <div key={i} style={{ ...card, display: "grid", gridTemplateColumns: "minmax(90px,130px) 1fr", gap: 10 }}>
@@ -163631,7 +163685,7 @@ function SlProfileView({ en }) {
           ))}
         </div>
       </FoldSection>
-      <FoldSection title={en ? "II. WHAT TRANSFORMATION SELLS — the global offer" : "II. Transformationが提供するもの — グローバルのサービス像"} color={C.gold} defaultOpen>
+      <FoldSection title={en ? "II. WHAT TRANSFORMATION SELLS — the global offer" : "II. Transformationが提供するもの — グローバルのサービス像"} color={C.gold}>
         <div style={G}>
           {SL_OFFER.map((o, i) => (
             <div key={i} style={card}>
@@ -163806,7 +163860,7 @@ function SlPlanView({ en }) {
   const card = { background: C.surface2, borderRadius: 10, padding: "11px 13px" };
   return (
     <div>
-      <FoldSection title={en ? "I. THE FIRST 90 DAYS" : "I. 最初の90日"} color={C.teal} defaultOpen>
+      <FoldSection title={en ? "I. THE FIRST 90 DAYS" : "I. 最初の90日"} color={C.teal}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,280px),1fr))", gap: 10 }}>
           {SL_PLAN.map((p, i) => (
             <div key={i} style={card}>
@@ -163816,7 +163870,7 @@ function SlPlanView({ en }) {
           ))}
         </div>
       </FoldSection>
-      <FoldSection title={en ? "II. SELF-ASSESSMENT — where to spend the next quarter" : "II. 自己評価 — 次の四半期にどこを伸ばすか"} color={C.gold} defaultOpen>
+      <FoldSection title={en ? "II. SELF-ASSESSMENT — where to spend the next quarter" : "II. 自己評価 — 次の四半期にどこを伸ばすか"} color={C.gold}>
         <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 10 }}>
           <span style={{ fontSize: 12, color: C.muted }}>{en ? "Target level:" : "目標の水準:"}</span>
           {SL_LEVELS.map((l, i) => (
@@ -168363,6 +168417,7 @@ function GafaHub() {
         })()}
 
         <HubBackCtx.Provider value={hubBack.ctx}>
+        <FoldScope key={"fold-" + tab + "-" + resetKey} scope={tab}>
         {tab === "strategy" && <TabStrategy key={resetKey} radarCur={radarCur} onRadarChange={changeRadar} />}
         {tab === "issues" && <TabIssues key={resetKey} />}
         {tab === "consult" && <TabConsultMap key={resetKey} />}
@@ -168396,6 +168451,7 @@ function GafaHub() {
         {tab === "lexicon" && <TabLexicon key={resetKey} />}
         {tab === "noteissues" && <TabNoteIssues key={resetKey} />}
         {FS_VIEWS[tab] && <TabForesight key={resetKey + tab} view={tab} />}
+        </FoldScope>
         </HubBackCtx.Provider>
       </div>
     </div>
