@@ -162030,7 +162030,8 @@ function NoteSourceNote({ en }) {
 
 // ===== Gartner 統合図解（ダイジェストの構造化スペックをその場で描く。英語表示では文言を TH_EN の英訳に置き換える。図の画像は日本語のまま）=====
 // 図解の画像（ダイジェスト作成者が日本語で組み直した図。public/gartner-figs/<id>.webp。開いたときだけ読み込む）
-const GT_FIG_URL = (id) => "gartner-figs/" + id + ".webp";
+// 英語表示では英語で描き直した図（gartner-figs/en/<id>.webp）を出す
+const GT_FIG_URL = (id, en) => "gartner-figs/" + (en ? "en/" : "") + id + ".webp";
 const GT_GAL_BY_ID = (() => { const m = {}; NOTE_GT_GAL.forEach((g) => { m[g.id] = g; }); return m; })();
 const GtFigCtx = createContext(null);
 // 図を拡大表示する枠。ids を渡すと ←→ で前後の図へ移れる
@@ -162058,16 +162059,17 @@ function GtFigProvider({ en, children }) {
             <div style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 8 }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 700, fontSize: 13, lineHeight: 1.5 }}>{g.id}　{thEn(g.t, en)}</div>
-                <div style={{ fontSize: 11, color: C.muted }}>{[thEn(g.g, en), g.d, thEn(g.k, en)].filter(Boolean).join(" ・ ")}{en ? " (the image text is in Japanese)" : ""}</div>
+                <div style={{ fontSize: 11, color: C.muted }}>{[thEn(g.g, en), g.d, thEn(g.k, en)].filter(Boolean).join(en ? " · " : " ・ ")}</div>
               </div>
               {st.ids.length > 1 ? <><button type="button" className="gh-btn" onClick={() => step(-1)} aria-label={en ? "Previous figure" : "前の図"}>←</button><span style={{ fontSize: 11, color: C.muted, alignSelf: "center" }}>{st.ids.indexOf(st.id) + 1}/{st.ids.length}</span><button type="button" className="gh-btn" onClick={() => step(1)} aria-label={en ? "Next figure" : "次の図"}>→</button></> : null}
               <button type="button" className="gh-btn" onClick={close} autoFocus aria-label={en ? "Close" : "閉じる"}>✕</button>
             </div>
-            <img src={GT_FIG_URL(g.id)} alt={g.id + " " + g.t} style={{ width: "100%", height: "auto", display: "block", background: "#fcfcfb", borderRadius: 6 }} />
+            <img src={GT_FIG_URL(g.id, en)} alt={g.id + " " + thEn(g.t, en)} style={{ width: "100%", height: "auto", display: "block", background: "#fcfcfb", borderRadius: 6 }} />
             <div style={{ display: "flex", gap: 14, flexWrap: "wrap", fontSize: 11.5, marginTop: 8 }}>
               {post ? <a href={post} target="_blank" rel="noopener noreferrer" style={{ color: C.teal }}>{en ? "Original post (Instagram)" : "元の投稿を開く（Instagram）"}</a> : null}
-              <a href={GT_FIG_URL(g.id)} target="_blank" rel="noopener noreferrer" style={{ color: C.teal }}>{en ? "Open the image in a new tab" : "画像を新しいタブで開く"}</a>
-              <span style={{ color: C.dim }}>{en ? "Redrawn in Japanese by the digest's author; not Gartner's original design." : "ダイジェスト作成者が日本語で組み直した図（原図のデザインは複製していない）。"}</span>
+              <a href={GT_FIG_URL(g.id, en)} target="_blank" rel="noopener noreferrer" style={{ color: C.teal }}>{en ? "Open the image in a new tab" : "画像を新しいタブで開く"}</a>
+              {en ? <a href={GT_FIG_URL(g.id)} target="_blank" rel="noopener noreferrer" style={{ color: C.teal }}>Japanese original</a> : null}
+              <span style={{ color: C.dim }}>{en ? "Redrawn in English from the digest author's Japanese figure, which re-composed the post's chart without copying Gartner's original design." : "ダイジェスト作成者が日本語で組み直した図（原図のデザインは複製していない）。"}</span>
             </div>
           </div>
         </div>
@@ -162105,7 +162107,7 @@ function NoteGtGallery({ en }) {
         {list.slice(0, n).map((x) => (
           <button key={x.id} type="button" onClick={() => open && open(x.id, ids)} title={x.id + " " + thEn(x.t, en)}
             style={{ textAlign: "left", font: "inherit", color: C.text, background: C.surface2, border: `1px solid ${C.line}`, borderRadius: 8, padding: 6, cursor: "pointer", display: "flex", flexDirection: "column", gap: 4, minWidth: 0 }}>
-            <img src={GT_FIG_URL(x.id)} alt="" loading="lazy" decoding="async" style={{ width: "100%", aspectRatio: "16 / 10", objectFit: "cover", objectPosition: "top", background: "#fcfcfb", borderRadius: 4, display: "block" }} />
+            <img src={GT_FIG_URL(x.id, en)} alt="" loading="lazy" decoding="async" style={{ width: "100%", aspectRatio: "16 / 10", objectFit: "cover", objectPosition: "top", background: "#fcfcfb", borderRadius: 4, display: "block" }} />
             <span style={{ fontSize: 10.5, color: C.muted }}>{x.id}{x.d ? " ・ " + x.d : ""}</span>
             <span style={{ fontSize: 11.5, lineHeight: 1.45, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{thEn(x.t, en)}</span>
           </button>
@@ -162246,7 +162248,7 @@ function NoteGtDiag({ g, en }) {
 function NoteGtFigs({ en }) {
   return (
     <details style={{ marginBottom: 12, fontSize: 12 }}>
-      <summary style={{ cursor: "pointer", color: C.teal, fontWeight: 700 }}>{en ? `Diagrams: ${NOTE_GT_FIGS.length - 1} integrated, ${NOTE_GT_GAL.length} figures in all (figure images in Japanese)` : `図解 — 統合図${NOTE_GT_FIGS.length - 1}枚（アプリ内で描画）と図解ギャラリー${NOTE_GT_GAL.length}枚（投稿・分析・統合）`}</summary>
+      <summary style={{ cursor: "pointer", color: C.teal, fontWeight: 700 }}>{en ? `Diagrams: ${NOTE_GT_FIGS.length - 1} integrated, ${NOTE_GT_GAL.length} figures in all` : `図解 — 統合図${NOTE_GT_FIGS.length - 1}枚（アプリ内で描画）と図解ギャラリー${NOTE_GT_GAL.length}枚（投稿・分析・統合）`}</summary>
       <GtFigProvider en={en}><NoteGtFigsBody en={en} /></GtFigProvider>
     </details>
   );
@@ -162258,7 +162260,7 @@ function NoteGtFigsBody({ en }) {
   return (
     <div>
       <div style={{ fontSize: 11, color: C.dim, margin: "8px 0", lineHeight: 1.7 }}>
-        {en ? "All figures were redrawn in Japanese by the digest's author from the charts in Gartner's posts, without copying the original designs. In the integrated diagrams some headings, arrows and groupings are the author's arrangement (see 'How it was built'). Tap a P-number to open that post's figure; the figure links on to the original post. In English mode the diagram text is an English rendering of that Japanese text, not Gartner's original wording; the figure images stay in Japanese."
+        {en ? "All figures were redrawn in Japanese by the digest's author from the charts in Gartner's posts, without copying the original designs. In the integrated diagrams some headings, arrows and groupings are the author's arrangement (see 'How it was built'). Tap a P-number to open that post's figure; the figure links on to the original post. In English mode the diagram text and the figure images are English renderings of that Japanese material, not Gartner's original wording; each enlarged figure links to its Japanese original."
             : "図はすべて、ダイジェスト作成者がGartnerの投稿の図表を日本語で組み直したもの（原図のデザインは複製していない）。統合図の列見出し・矢印・分類の一部は作成者の整理です（「作り方」を参照）。P-番号を押すとその投稿の図解が開き、そこから元の投稿にも移れます。"}
       </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10, alignItems: "center" }}>
@@ -162272,7 +162274,7 @@ function NoteGtFigsBody({ en }) {
       <Card>
         <div style={{ display: "flex", gap: 8, alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap" }}>
           <div style={{ fontWeight: 700, fontSize: 14 }}>{f.id === "A" ? "" : f.id + " "}{thEn(f.t, en)}</div>
-          {GT_GAL_BY_ID[f.id] && open ? <button type="button" className="gh-btn" onClick={() => open(f.id, NOTE_GT_FIGS.filter((x) => GT_GAL_BY_ID[x.id]).map((x) => x.id))} style={{ fontSize: 11, padding: "4px 8px" }}>{en ? "View as the author's image" : "作成者の図（画像）で見る"}</button> : null}
+          {GT_GAL_BY_ID[f.id] && open ? <button type="button" className="gh-btn" onClick={() => open(f.id, NOTE_GT_FIGS.filter((x) => GT_GAL_BY_ID[x.id]).map((x) => x.id))} style={{ fontSize: 11, padding: "4px 8px" }}>{en ? "View as an image" : "作成者の図（画像）で見る"}</button> : null}
         </div>
         <div style={{ fontSize: 12, lineHeight: 1.75, marginTop: 6, borderLeft: `3px solid ${C.gold}`, paddingLeft: 8 }}>{gtLink(thEn(f.k, en))}</div>
         {f.g.map((g, i) => <NoteGtDiag key={f.id + "-" + i} g={g} en={en} />)}
@@ -162470,7 +162472,7 @@ function GtThumb({ id, en }) {
   if (!g) return null;
   return (
     <button type="button" onClick={() => open && open(id)} style={{ display: "block", marginTop: 10, padding: 0, border: `1px solid ${C.line}`, borderRadius: 6, background: "#fcfcfb", cursor: "zoom-in", width: "100%", maxWidth: 420 }} aria-label={(en ? "Enlarge figure " : "図解を拡大 ") + id}>
-      <img src={GT_FIG_URL(id)} alt={id + " " + g.t} loading="lazy" decoding="async" style={{ width: "100%", height: "auto", display: "block", borderRadius: 6 }} />
+      <img src={GT_FIG_URL(id, en)} alt={id + " " + thEn(g.t, en)} loading="lazy" decoding="async" style={{ width: "100%", height: "auto", display: "block", borderRadius: 6 }} />
     </button>
   );
 }
