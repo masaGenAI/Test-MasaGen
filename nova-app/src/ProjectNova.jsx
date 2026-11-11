@@ -157777,15 +157777,19 @@ const NOVA_GUIDES = [
     ["industry", "業界別", "その業種の入り方・参加資格・事例を確認", "Entry logic & entry ticket for the sector"],
     ["salesdojo", "商談ドリル", "業種のディスカバリー質問20問で60分を設計", "Design the hour with 20 discovery questions"],
     ["value", "価値ドライバー", "刺さりそうなレバー2〜3本と反論の返しを装備", "Arm 2-3 levers with objection counters"],
+    ["govdojo", "ガバナンス道場", "「ユースケースから引く」で、今回の使い方に関わる規定と事例を確認", "Look up the rules and cases for this use in \"From a use case\""],
     ["proposal", "提案の型", "バトルカードと想定問答を直前に流し読み", "Skim battlecards & the 12 objections"]] },
   { t: "PROPOSAL", icon: "\u270d\ufe0f", ja: "提案書を書く前に — 骨子と数字を固める", en: "Before writing a proposal", steps: [
     ["casework", "ケース演習", "近い業種のケースで骨子を素振りしてから書く", "Dry-run the skeleton on a similar case"],
     ["issues", "論点", "大論点A〜Iから今回の2〜3論点を特定", "Pick the 2-3 issues that decide this client"],
     ["proposal", "提案の型", "骨子7項目で構成し10点検査で自己審査", "Draft on the 7 sections, run the 10-point check"],
-    ["factbook", "定量データ", "「なぜ今か」に使う数字を出典つきで確定", "Lock the why-now numbers with sources"],
+    ["factbook", "定量データ", "「なぜ今か」は顧客固有の事実を2つ以上。統計は補助に1つまで、出典つきで", "Why now: two or more facts specific to this client; at most one statistic, with its source"],
+    ["toolbox", "AX手法箱", "PoC憲章とEvals設計で、合格の基準と品質の測り方を1枚にする", "PoC charter and Evals design: put pass criteria and how quality is measured on one page"],
+    ["govdojo", "ガバナンス道場", "ひな形のユースケース審査票で、データ・権限・止める条件の項を埋める", "Fill the data, access and stop-condition items with the use-case review template"],
     ["consult", "全体像", "スコープの切れ目と出口ゲートを契約に対応付け", "Map scope & gates to contract stages"]] },
   { t: "EXEC PITCH", icon: "\ud83c\udfaf", ja: "役員プレゼンの前夜に — 数字と返しの最終装備", en: "The night before an exec pitch", steps: [
-    ["factbook", "定量データ", "主張の裏づけ統計を3つに絞って暗記", "Memorize the 3 stats behind your claims"],
+    ["issues", "論点", "結論→根拠3本→決めてほしいこと（何を・いくらまで・いつまでに）の順で1枚に組む", "Build one page: conclusion, three grounds, the decision you are asking for (what, up to how much, by when)"],
+    ["factbook", "定量データ", "根拠ごとに裏づけの数字を1つずつ、出典つきで言えるようにする", "One supporting number per ground, with its source"],
     ["value", "価値ドライバー", "想定される役員の反論と返しを口に出して練習", "Rehearse the exec objections aloud"],
     ["agi", "AGI・ASI", "「AGIでどうなるの？」への仮説思考の返しを準備", "Prep the AGI question with hypothesis framing"],
     ["checkax", "理解度チェック", "↻復習キューで間違えた問題だけ総ざらい", "Sweep your review queue"]] },
@@ -157798,9 +157802,25 @@ const NOVA_GUIDES = [
     ["proposal", "提案の型", "【W7-13 証明する】初の単独診断→灯台提案1本を10点検査で仕上げて提出する", "[W7-13] Run your first solo assessment and ship one lighthouse proposal"],
     ["checkax", "理解度チェック", "【W7-13 証明する】復習キューと弱点をゼロにして武器庫を完成させる", "[W7-13] Zero out the review queue and weak spots"]] },
   { t: "DAILY LOOP", icon: "\u21bb", ja: "毎日のルーチン — 15分で回す", en: "Daily 15-minute loop", steps: [
-    ["checkcore", "理解度チェック 基礎", "↻復習キュー→★弱点出題の順に回す", "Review queue, then weak-spot mode"],
-    ["checkax", "理解度チェック AX実務", "同じく復習→弱点。パートを1つずつ完了", "Same loop; finish parts one at a time"],
+    ["checkcore", "理解度チェック 基礎", "↻復習キュー→★弱点出題の順に回す（AX実務と日替わりで）", "Review queue, then weak-spot mode (alternate with the AX check)"],
+    ["issues", "論点", "変換ドリルを1枚、仮説カードを1枚書く（書く練習を毎日入れる）", "Write one conversion drill and one hypothesis card (write something every day)"],
     ["salesdojo", "商談ドリル", "シナリオを1本だけ通す（毎日別のペルソナ）", "One scenario a day, rotating personas"]] },
+  { t: "POC DESIGN", icon: "\ud83e\uddea", ja: "PoCを設計する前に — 合格の基準と測り方を先に決める", en: "Before designing a PoC", steps: [
+    ["toolbox", "AX手法箱", "III PoC憲章：仮説・Go/No-Goの指標・ベースライン・期間と件数・判定会議・4つの出口を書く", "III PoC charter: hypothesis, Go/No-Go measures, baseline, period and sample, decision meeting, four exits"],
+    ["toolbox", "AX手法箱", "IV Evals設計：評価セットの中身と採点の方法を決める", "IV Evals design: what goes in the evaluation set and how it is scored"],
+    ["dojo", "技術道場", "概算ドリルで、1件あたりの費用と応答時間を見積もる", "Estimate cost and latency per request with the estimation drills"],
+    ["govdojo", "ガバナンス道場", "扱うデータと止める条件を確かめ、審査にかかる期間を計画に入れる", "Confirm the data and stop conditions, and plan for the review lead time"],
+    ["consult", "全体像", "PoC・実証の出口ゲートと照らし、判定日を先に決める", "Check against the PoC exit gate and fix the decision date first"]] },
+  { t: "ADOPT 90", icon: "\ud83c\udf31", ja: "本番のあと90日 — 使われ続ける形にする", en: "The 90 days after go-live", steps: [
+    ["assess", "AX診断", "定着の設計（ツール・プロセス・カルチャーの三層）で抜けを確かめる", "Check the three layers of adoption design (tool, process, culture)"],
+    ["xform", "変革の実務", "定着の診断で、実際に詰まっている段階を見つける", "Find the stage where adoption is actually stuck"],
+    ["bpr", "業務再設計（BPR）", "導入の谷・風化・抵抗への手当てと、KPIの付け替えを決める", "Plan for the dip, fade-out and resistance, and re-point the KPIs"],
+    ["toolbox", "AX手法箱", "効果を台帳で追い、損益のどの科目に出すかを確かめる", "Track the benefit in a ledger and confirm which P&L line it lands on"]] },
+  { t: "POV", icon: "\ud83d\udce3", ja: "指名される前に — 月に1本、1枚の見解を書く", en: "Before you are asked for: one page a month", steps: [
+    ["fs_client", "経営アジェンダ", "ブリーフの冒頭に書かれた問いを1つ選ぶ", "Pick one of the questions that open each brief"],
+    ["fs_collection", "コレクション", "その問いに関わる材料を3件集める", "Collect three pieces of material on that question"],
+    ["factbook", "定量データ", "根拠にする数字を、出典と性質（調査・推計・事例）つきで選ぶ", "Choose the numbers to cite, with source and type (survey, estimate, case)"],
+    ["strategy", "戦略", "通説→反証→根拠3つ→経営への問い→最初の一歩、の順で1枚に書き、ポジショニングの一文と合っているか確かめる", "Write one page: received view, counter-evidence, three grounds, the question for management, a first step; check it against your positioning sentence"]] },
 ];
 
 function GuideStrip({ setTab }) {
