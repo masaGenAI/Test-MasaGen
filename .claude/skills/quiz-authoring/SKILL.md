@@ -157,6 +157,11 @@ node .claude/skills/quiz-authoring/check-batch.mjs new-questions.json --bank GOV
 cd nova-app && npm run build
 ```
 
+商談ドリル（`SALES_DRILLS`。顧客の発言に4択で返す形で、問題バンクの検査の対象外）を直したら、
+`python3 .claude/skills/quiz-authoring/sales-drill-check.py` を流す。長さの偏りに加えて、
+正解だけに数字・『』・「・」がある、誤答にしか出ない決まり文句がある、といった「読まずに当てられる書き方」も数える。
+誤答は藁人形にせず、現場でつい言ってしまう、もっともらしいが筋の悪い返しにする。
+
 `check-batch.mjs` が見るもの：100問の下限／最長選択の悪用（同点含む）／
 長さの偏りが両方向とも過剰でないか／正解位置の分布／簡体字とキリル文字／
 選択肢の重複・空・正解との一致／水増し表現／自己申告タグ／
