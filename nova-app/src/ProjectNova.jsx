@@ -122641,8 +122641,8 @@ const JumpContext = createContext({ jump: null, setJump: () => {} });
 function useJump() { return useContext(JumpContext); }
 // UIラベル辞書: キー -> [日本語, English]
 const UI = {
-  tagline: ["ビジネスの言葉とアーキテクチャの言葉、その両方で設計を語れる人材になる。", "Speak design in both the language of business and the language of architecture."],
-  track: ["ARCHITECT TRACK", "ARCHITECT TRACK"],
+  tagline: ["顧客の経営課題をAIで解き、定着まで率いる。経営の言葉と技術の言葉の両方で、根拠を守れる人になる。", "Solve a client's management problem with AI and lead it through adoption, defending the reasoning in both the language of management and the language of technology."],
+  track: ["AI CONSULTANT TRACK", "AI CONSULTANT TRACK"],
   // トップタブ
   tab_strategy: ["戦略", "Strategy"],
   tab_issues: ["論点", "Issues"],
@@ -122868,7 +122868,7 @@ const UI = {
   dr_reveal: ["答えと教訓", "Answer & lesson"],
   dr_close: ["閉じる", "Close"],
   // 戦略タブ
-  st_radar: ["スキルギャップ・レーダー（自己評価は保存されます）", "Skill Gap Radar (your self-assessment is saved)"],
+  st_radar: ["9つの能力のレーダー（自己評価は保存されます）", "Radar of the nine abilities (your self-assessment is saved)"],
   lh_title: ["学習ホーム", "Learning Home"],
   lh_sub: ["クイズの解答履歴から、定着度と次にやるべきことを集約。技術道場で解くほど精度が上がります。", "Aggregates retention and next actions from your quiz history. The more you solve in the Dojo, the sharper it gets."],
   lh_due: ["今日の復習", "Due today"],
@@ -122881,8 +122881,8 @@ const UI = {
   lh_start: ["今日の復習を始める", "Start today's review"],
   lh_masteredhint: ["（間隔21日以上を定着とみなす）", "(interval ≥21 days counts as mastered)"],
   st_now: ["■ 現在地（自己評価）", "■ Current (self-assessment)"],
-  st_target: ["▨ メガテックAI職の要求水準", "▨ MegaTech AI-role bar"],
-  st_radarnote: ["模擬面接の講評を受けるたびにここへ戻り、自己評価を更新する運用を推奨。", "Come back here after each mock-interview review and update your self-assessment."],
+  st_target: ["▨ 目標の最低線（全領域で4。看板にする2領域は5）", "▨ Minimum target (4 everywhere; 5 in your two signature areas)"],
+  st_radarnote: ["各能力の練習を一区切りするたびにここへ戻り、下の基準で付け直す。", "Come back after each block of practice and re-rate against the scale below."],
   st_assets: ["すでに持っている武器", "Assets You Already Have"],
   // 用語辞典
   lx_intro: ["面接で差がつくのは用語の定義ではなく「その概念で何を判断できるか」。各カード下段は面接でそのまま使える言い回し。", "What sets you apart isn't the definition but what you can decide with the concept. The bottom of each card is a phrase you can use verbatim in interviews."],
@@ -123045,22 +123045,139 @@ const GLOBAL_CSS = `
 `;
 
 // ============ Tab1: strategy data ============
-const RADAR = {
-  axes: ["システム設計", "生成AI/ML基礎", "クラウド実装", "ビジネス構想", "英語・面接力", "LLMOps/評価"],
-  axesEn: ["System Design", "GenAI/ML Basics", "Cloud Implementation", "Business Vision", "English/Interview", "LLMOps/Eval"],
-  current: [2.5, 3.5, 3.0, 4.5, 3.5, 2.0],
-  target: [4.5, 4.0, 4.5, 5.0, 4.5, 4.5]
-};
+// ============ 学習ホームの物差し：超一流のAIコンサルタントの9つの能力 ============
+// 到達像は「顧客の経営課題をAIで解く案件を、論点設定から定着・横展開まで率い、顧客の前で根拠を守れる人」。
+// 自己評価は 0（未評価）〜5。目標線は全領域で4（一人で回せる）。看板にする2領域は5を目指す。
+// 鍛える場所（places）は tab＝タブid、d＝core（ここで鍛える）/ ref（必要なとき引く）/ opt（任意）、
+// m＝write（書く）/ quiz（解く）/ talk（話す）/ use（使う）/ read（読む）。gap は、まだ練習の場が無い点（正直に書く）。
+const COMP_LEVELS = [
+  ["1", "用語を知っている", "Know the terms"],
+  ["2", "仕組みと型を説明できる", "Can explain the mechanism and the method"],
+  ["3", "型どおりに書ける・解ける", "Can write and solve by the method"],
+  ["4", "一人で案件を回せる", "Can run an engagement alone"],
+  ["5", "顧客の前で守れ、人に教えられる", "Can defend it in front of a client and teach it"],
+];
+const COMP = [
+  { id: "issue", short: ["論点・仮説", "Issues"], name: ["論点と仮説", "Issues and hypotheses"],
+    can: ["曖昧な依頼を「答えが出れば意思決定が変わる問い」に言い換え、反証条件つきの仮説として言い切れる。", "Turn a vague request into a question whose answer changes a decision, and state it as a hypothesis with a condition that would disprove it."],
+    places: [
+      { tab: "issues", d: "core", m: "write", n: ["変換ドリル・仮説トレーナー", "Conversion drills, hypothesis trainer"] },
+      { tab: "agi", d: "core", m: "write", n: ["仮説思考ドリル", "Hypothesis drills"] },
+      { tab: "fs_client", d: "ref", m: "read", n: ["経営アジェンダの問い", "Questions on the client agenda"] },
+      { tab: "fs_macro", d: "ref", m: "read", n: ["技術とマクロの兆し", "Signals in technology and the macro picture"] },
+      { tab: "fs_market", d: "ref", m: "read", n: ["市場とエコシステムの兆し", "Signals in the market and ecosystem"] },
+      { tab: "noteissues", d: "ref", m: "quiz", n: ["実務で出る論点を広く知る", "Know the issues that come up in practice"] },
+    ] },
+  { id: "diagnose", short: ["診断・構想", "Diagnosis"], name: ["診断と構想", "Diagnosis and design of the programme"],
+    can: ["顧客の現在地を見立て、最初に解くユースケースを絞り、PoCから本番までの道筋と判定基準を先に決められる。", "Read where the client stands, narrow down the first use cases, and set the path from PoC to production with decision criteria up front."],
+    places: [
+      { tab: "consult", d: "core", m: "read", n: ["7フェーズと出口ゲート", "Seven phases and exit gates"] },
+      { tab: "assess", d: "core", m: "use", n: ["10問で現在地を判定", "Ten questions to place the client"] },
+      { tab: "toolbox", d: "core", m: "quiz", n: ["発掘・優先順位・PoC設計・判定ドリル", "Discovery, prioritisation, PoC design, gate drills"] },
+      { tab: "industry", d: "core", m: "read", n: ["8業種のバリューチェーン", "Value chains of eight industries"] },
+      { tab: "agentshelf", d: "ref", m: "read", n: ["業種別のエージェント例", "Agent examples by industry"] },
+      { tab: "checkcore", d: "ref", m: "quiz", n: ["基礎の確認", "Check the basics"] },
+    ] },
+  { id: "value", short: ["価値・財務", "Value & finance"], name: ["価値と財務", "Value and finance"],
+    can: ["AIの効果を売上・コスト・資本のどこに出すかを決め、前提を置いて数字を組み、CFOの質問に数字で答えられる。", "Decide where the benefit lands (revenue, cost or capital), build the numbers from stated assumptions, and answer a CFO with figures."],
+    places: [
+      { tab: "value", d: "core", m: "read", n: ["企業価値とAIのレバー", "Enterprise value and AI levers"] },
+      { tab: "proposal", d: "core", m: "use", n: ["計算（PL・BS・CF）と FIN GATE", "Calculator (P&L, BS, CF) and FIN GATE"] },
+      { tab: "factbook", d: "ref", m: "read", n: ["根拠にする数字", "Numbers to cite"] },
+      { tab: "checkax", d: "ref", m: "quiz", n: ["AX実務の確認", "Check AX practice"] },
+    ],
+    gap: ["白紙から自分でビジネスケースを組み、前提を動かして守る演習は、まだありません。", "There is no exercise yet for building a business case from a blank page and defending it as assumptions move."] },
+  { id: "tech", short: ["技術・設計", "Tech & design"], name: ["技術の目利きと設計", "Technical judgement and design"],
+    can: ["要件から方式（RAG・エージェント・微調整など）を選び、選ばなかった案と理由を添えて、構成を30秒で説明できる。", "Choose an approach (RAG, agents, fine-tuning and so on) from the requirements, name the options rejected and why, and explain the architecture in 30 seconds."],
+    places: [
+      { tab: "dojo", d: "core", m: "quiz", n: ["図面道場・クイズ", "Diagram dojo, quizzes"] },
+      { tab: "architect", d: "core", m: "quiz", n: ["設計プロセス・確認クイズ", "Design process, quizzes"] },
+      { tab: "archcase", d: "core", m: "read", n: ["公開事例の構成と選定理由", "Published architectures and why they were chosen"] },
+      { tab: "lexicon", d: "ref", m: "read", n: ["辞書として引く", "Use as a dictionary"] },
+      { tab: "frontier", d: "ref", m: "read", n: ["先端技術の成熟度", "Maturity of frontier technology"] },
+    ] },
+  { id: "eval", short: ["評価・運用", "Evals & ops"], name: ["評価と運用", "Evaluation and operations"],
+    can: ["合格の基準を数字で決め、評価セットと採点方法を設計し、1件あたりの費用と応答時間を見積もって運用に渡せる。", "Set pass criteria in numbers, design the evaluation set and scoring, estimate cost and latency per request, and hand it to operations."],
+    places: [
+      { tab: "toolbox", d: "core", m: "read", n: ["Evals設計（ゴールデンセット・採点）", "Evals design (golden set, scoring)"] },
+      { tab: "architect", d: "ref", m: "quiz", n: ["実測ドリル", "Measured-result drills"] },
+      { tab: "dojo", d: "ref", m: "quiz", n: ["評価・LLMOps の問題", "Questions on evaluation and LLMOps"] },
+    ],
+    gap: ["評価セットを自分で作り、採点のぶれを確かめる演習は、まだありません。", "There is no exercise yet for building an evaluation set yourself and checking how consistent the scoring is."] },
+  { id: "gov", short: ["統制・リスク", "Governance"], name: ["統制とリスク", "Governance and risk"],
+    can: ["案件の最初に、扱うデータ・規制・責任の所在を確かめ、止める条件と人の関与を設計に組み込める。", "At the start of an engagement, establish the data, the rules and who is accountable, and build stop conditions and human oversight into the design."],
+    places: [
+      { tab: "govdojo", d: "core", m: "quiz", n: ["判定演習・シナリオ", "Judgement drills, scenarios"] },
+      { tab: "proposal", d: "ref", m: "read", n: ["GOV GATE（審査で聞かれること）", "GOV GATE (what reviewers ask)"] },
+      { tab: "itsec", d: "ref", m: "quiz", n: ["ITセキュリティの基礎", "IT security foundations"] },
+      { tab: "postmortem", d: "ref", m: "read", n: ["失敗事例から学ぶ", "Learn from failures"] },
+    ],
+    gap: ["統制を白紙から設計して書く演習は、まだありません。", "There is no exercise yet for designing controls from a blank page."] },
+  { id: "change", short: ["変革・定着", "Change"], name: ["変革実行と定着", "Delivering change and making it stick"],
+    can: ["AIを入れる前に業務を組み直し、現場が使い続ける仕組みと、効果を損益に出すまでの追い方を設計できる。", "Redesign the work before adding AI, and design how the front line keeps using it and how the benefit is tracked into the P&L."],
+    places: [
+      { tab: "xform", d: "core", m: "read", n: ["運営の設計・定着の診断", "Operating model, adoption diagnosis"] },
+      { tab: "bpr", d: "core", m: "read", n: ["業務を組み直す7ステップ", "Seven steps to redesign a process"] },
+      { tab: "tacit", d: "core", m: "read", n: ["暗黙知を形式知にする", "Turning tacit knowledge explicit"] },
+      { tab: "slalom", d: "ref", m: "quiz", n: ["場面演習・スキルクイズ", "Situation drills, skills quiz"] },
+      { tab: "sglobal", d: "ref", m: "read", n: ["海外と日本の実例", "Cases abroad and in Japan"] },
+    ] },
+  { id: "deal", short: ["提案・商談", "Proposal & sales"], name: ["提案と商談", "Proposals and client conversations"],
+    can: ["顧客の言葉から懸念の構造を聞き出し、効果・進め方・判定基準をそろえた提案を書き、反論に打ち返せる。", "Draw out the structure of a client's concern, write a proposal with benefit, approach and decision criteria, and answer objections."],
+    places: [
+      { tab: "proposal", d: "core", m: "read", n: ["提案骨子・競合対策・想定問答", "Proposal outline, competitors, expected questions"] },
+      { tab: "casework", d: "core", m: "write", n: ["白紙から書く", "Write from a blank page"] },
+      { tab: "salesdojo", d: "core", m: "quiz", n: ["次の一手を選ぶ", "Choose the next move"] },
+      { tab: "livedojo", d: "core", m: "talk", n: ["AIが顧客役で打ち返す", "AI plays the client"] },
+      { tab: "companies", d: "opt", m: "read", n: ["提携先・競合の理解、転職の準備", "Partners and competitors; job-move preparation"] },
+    ] },
+  { id: "name", short: ["指名・発信", "Positioning"], name: ["指名される力", "Being the one clients ask for"],
+    can: ["誰のどんな課題なら自分かを一文で言い、見解と実績を外に出して、相見積りの前に声がかかる状態をつくれる。", "Say in one sentence whose problem you are the person for, publish a point of view and results, and be approached before a bake-off starts."],
+    places: [
+      { tab: "strategy", d: "core", m: "write", n: ["下のポジショニング", "The positioning card below"] },
+      { tab: "gfirm", d: "ref", m: "read", n: ["案件の入口（テーマ提示）", "Where engagements come from"] },
+      { tab: "fs_craft", d: "ref", m: "read", n: ["情報摂取を仕組みにする", "Make reading a routine"] },
+      { tab: "fs_collection", d: "ref", m: "use", n: ["見解の材料を集める", "Collect material for a point of view"] },
+      { tab: "fs_library", d: "ref", m: "read", n: ["情報源", "Sources"] },
+      { tab: "fs_refresh", d: "opt", m: "read", n: ["情報源の鮮度を保つ", "Keep sources fresh"] },
+    ],
+    gap: ["見解（POV）を書く演習と、自分の導入事例を書く演習は、まだありません。", "There is no exercise yet for writing a point of view or your own case study."] },
+];
+const COMP_TARGET = 4; // 目標の最低線（全領域）
+const COMP_MODE = { write: ["✍ 書く", "✍ write"], quiz: ["☑ 解く", "☑ solve"], talk: ["🗣 話す", "🗣 talk"], use: ["🧰 使う", "🧰 use"], read: ["📖 読む", "📖 read"] };
+const COMP_DEPTH = { core: ["ここで鍛える", "Train here"], ref: ["必要なとき引く", "Look up when needed"], opt: ["任意", "Optional"] };
 
 const ASSETS = [
-  { t: "AI導入の現場経験", tEn: "Hands-on AI adoption", d: "全社AI展開・AI子会社立ち上げの実務。メガテック各社のビジネス系AI職が最も欲しがる「エンタープライズにAIを入れた人」の実績。", dEn: "Company-wide AI rollout and launching an AI subsidiary. The 'someone who actually put AI into an enterprise' track record that megatech business-side AI roles want most." },
-  { t: "英語 (TOEIC 900)", tEn: "English (TOEIC 900)", d: "英語面接ラインに乗れる水準。あとは技術英語の口頭運用（本ハブの模擬面接ENモードで鍛える）。", dEn: "Enough to clear the English-interview bar. What remains is speaking technical English fluently (train it in this hub's EN mode)." },
-  { t: "マルチクラウド資格", tEn: "Multi-cloud certs", d: "Azure保有＋AWS/GCP学習中。ベンダー横断の視点はSA/コンサル職の差別化要素。", dEn: "Azure certified, studying AWS/GCP. A cross-vendor perspective differentiates you for SA/consulting roles." },
-  { t: "理論言語学のバックグラウンド", tEn: "Theoretical linguistics background", d: "LLMの挙動（意味論・統語構造）を第一原理から語れる稀少性。面接の自己紹介で必ず刺さる。", dEn: "A rare ability to explain LLM behavior (semantics, syntax) from first principles. Always lands in an interview intro." },
-  { t: "学習システムの自作力", tEn: "Building your own study systems", d: "React製の大規模学習ハブを自ら設計・構築している事実自体が「ビジネス→アーキテクト」移行の証拠物件。", dEn: "The very fact that you designed and built a large React study hub is exhibit A for a 'business → architect' transition." }
+  { t: "AI導入の現場経験", tEn: "Hands-on AI adoption", d: "全社AI展開・AI子会社立ち上げの実務。提案で終わらず導入と定着まで持った経験は、顧客が「現場を知っている」と判断する根拠になる。", dEn: "Company-wide AI rollout and launching an AI subsidiary. Having owned adoption as well as the proposal is what makes a client decide you know the front line." },
+  { t: "英語 (TOEIC 900)", tEn: "English (TOEIC 900)", d: "海外の決算・規制・技術文書を原文で読み、グローバル案件の議論に入れる水準。技術英語の口頭運用は、本ハブのENモードで鍛える。", dEn: "Enough to read overseas filings, rules and technical documents in the original and join a global engagement. Train spoken technical English in this hub's EN mode." },
+  { t: "マルチクラウド資格", tEn: "Multi-cloud certs", d: "Azure保有＋AWS/GCP学習中。特定のベンダーに寄らずに方式を比べられることが、顧客の側に立つ助言の前提になる。", dEn: "Azure certified, studying AWS/GCP. Being able to compare approaches without leaning on one vendor is the basis for advice on the client's side." },
+  { t: "理論言語学のバックグラウンド", tEn: "Theoretical linguistics background", d: "LLMの挙動（意味論・統語構造）を第一原理から説明できる。技術者でない経営層に「なぜそう振る舞うか」を言葉で渡せる。", dEn: "Can explain LLM behaviour (semantics, syntax) from first principles, and put into words for non-technical executives why a model behaves as it does." },
+  { t: "学習システムの自作力", tEn: "Building your own study systems", d: "React製の大規模学習ハブを自分で設計・構築している。手を動かして作った経験は、実装の見積りと品質の議論に説得力を与える。", dEn: "Designed and built a large React study hub. Having built things by hand adds weight to estimates and to discussions of quality." }
 ];
 
-const ROADMAP = [
+// 12か月の進め方：四半期ごとに「残る成果物」で区切る。件数は各タブの実データから出す（古い数字を残さない）
+const roadmapPlan = () => {
+  const conv = Object.values(CONV_DRILLS).reduce((a, x) => a + (Array.isArray(x) ? x.length : 0), 0);
+  const hypo = HYPO_THEMES.length, cases = CASE_CARDS.length, personas = LIVE_PERSONAS.length;
+  const core = CHECK_CORE_BANK.length, ax = CHECK_AX_BANK.length;
+  return [
+    { q: "Q1", theme: "型を体に入れる — 論点・診断・数字", themeEn: "Absorb the methods — issues, diagnosis, numbers",
+      items: [`論点タブの変換ドリル${conv}枚を一巡し、仮説トレーナー${hypo}題で仮説カードを書く`, "AX診断と手法箱を使い、1社を想定した診断メモ（現在地・最初の論点・ユースケース3件）を1本書く", `理解度チェック（基礎${core}問・AX実務${ax}問）を正答率80%にする`],
+      itemsEn: [`Go once through the ${conv} conversion drills in Issues and write a hypothesis card for each of the ${hypo} trainer themes`, "With AX Assess and the Toolbox, write one diagnosis memo for an imagined client (where they stand, the first issue, three use cases)", `Bring the checks (Core ${core}, AX ${ax}) to 80% accuracy`] },
+    { q: "Q2", theme: "一件を書き切る — 提案とPoC", themeEn: "Write one engagement through — proposal and PoC",
+      items: [`ケース演習${cases}件を白紙から書き、ルーブリックで自己採点する`, "提案の型の計算（PL・BS・CF）を自分の前提で組み直し、前提を3つ動かして結果の変わり方を説明する", "手法箱のPoC憲章とEvals設計を、ケース1件について書く"],
+      itemsEn: [`Write all ${cases} cases from a blank page and score yourself with the rubric`, "Rebuild the Proposal Kit calculation (P&L, BS, CF) on your own assumptions, move three of them and explain how the result changes", "Write the Toolbox PoC charter and Evals design for one case"] },
+    { q: "Q3", theme: "顧客の前で守る — 反論・統制・設計", themeEn: "Defend it in front of the client — objections, governance, design",
+      items: [`模擬商談LIVEの${personas}人全員と対話し、講評の言い直し例を自分の言葉で書き直す`, "ガバナンス道場の判定演習を正答率80%にし、提案の型の GOV GATE の質問に口頭で答える", "図面道場で主な構成を30秒で説明し、選んだ方式と捨てた案の理由を1枚に書く"],
+      itemsEn: [`Talk with all ${personas} Live Deal personas and rewrite the suggested better lines in your own words`, "Bring the Governance Dojo drills to 80% and answer the Proposal Kit GOV GATE questions aloud", "Explain the main architectures in 30 seconds in the Diagram dojo, and write one page on the approach chosen and the options rejected"] },
+    { q: "Q4", theme: "指名される — 立ち位置と発信", themeEn: "Be asked for — positioning and publishing",
+      items: ["下のポジショニングを言い切り、やらない領域を3つ決める", "AIフォーサイトのブリーフから問いを1つ選び、1枚の見解（通説→反証→根拠3つ→経営への問い）を月1本書く", "自分の導入経験を、課題・打ち手・動いた指標の順で事例2本にまとめる（守秘に配慮して抽象化する）"],
+      itemsEn: ["Commit to the positioning below and name three areas you will not take on", "Pick one question from an AI Foresight brief and write a one-page point of view each month (received view, counter-evidence, three grounds, the question for management)", "Write up two of your own adoptions as cases: problem, action, the metric that moved (abstracted for confidentiality)"] },
+  ];
+};
+
+// 別トラック（任意）：メガテックAI職への転職の段取り。以前の学習ホームのロードマップをそのまま残している
+const ROADMAP_MEGATECH = [
   { q: "Q1", theme: "技術の言語化", themeEn: "Verbalizing the tech", items: ["技術道場のRAG/Agent構成を白紙に描いて説明できる状態に", "AWS ML系資格の取得", "各コンポーネントのトレードオフを30秒で語る練習"], itemsEn: ["Be able to draw & explain the Dojo's RAG/Agent architectures on a blank page", "Earn an AWS ML-track certification", "Practice stating each component's trade-off in 30 seconds"] },
   { q: "Q2", theme: "実績のポートフォリオ化", themeEn: "Portfolio-izing your work", items: ["導入案件をアーキテクチャ図＋ROIの2枚で文書化（NDA配慮の抽象化）", "英語レジュメをアーキテクト文脈で書き直し", "登壇 or 記事1本で外部発信"], itemsEn: ["Document projects as 2 pages: architecture diagram + ROI (abstracted for NDAs)", "Rewrite your English resume in an architect framing", "Publish externally via one talk or article"] },
   { q: "Q3", theme: "面接筋トレ", themeEn: "Interview conditioning", items: ["企業研究タブの面接準備プレイブックで型を反復（EN比率50%）", "STAR形式の行動面接ストーリー10本を仕込む", "社員リファラルの開拓（LinkedIn/勉強会）"], itemsEn: ["Drill the templates in the Companies tab's interview playbook (50% in English)", "Prepare 10 STAR-format behavioral stories", "Cultivate employee referrals (LinkedIn / meetups)"] },
@@ -137742,7 +137859,7 @@ function Radar({ axes, current, target }) {
   };
   const poly = (vals) => vals.map((v, i) => pt(i, v).join(",")).join(" ");
   return (
-    <svg viewBox="0 0 320 300" style={{ width: "100%", maxWidth: 380 }} role="img" aria-label="スキルギャップレーダー">
+    <svg viewBox="0 0 320 300" style={{ width: "100%", maxWidth: 380 }} role="img" aria-label="能力のレーダー">
       {[1, 2, 3, 4, 5].map((r) => (
         <polygon key={r} points={poly(axes.map(() => r))} fill="none" stroke={C.line} strokeWidth="1" />
       ))}
@@ -138565,6 +138682,13 @@ function TechHubRecords() {
         const w = doms.map((d) => ({ d, v: st[d.id] })).filter((x) => x.v && x.v.a >= 3).sort((p, q) => p.v.c / p.v.a - q.v.c / q.v.a)[0];
         out.push({ id: c.key, name: c.name, size: c.bank().length, seen: null, ans: a, acc: a ? Math.round((ok / a) * 100) : null, weak: w ? `${en ? w.d.en : w.d.ja}（${Math.round((w.v.c / w.v.a) * 100)}%）` : null, review: Object.keys(wr).length, reviewL: ["復習キュー", "in review queue"], open: c.open });
       }
+      // ケース演習（書く）：メモを書いたケース数と、ルーブリックの自己採点の平均
+      const cn = (await get("axcase_notes_v1")) || {};
+      const cr = (await get("axcase_rubric_v1")) || {};
+      const wrote = Object.keys(cn).filter((k) => cn[k] && Object.values(cn[k]).some((x) => String(x || "").trim())).length;
+      const scored = Object.keys(cr).filter((k) => cr[k] && Object.keys(cr[k]).length);
+      const avg = scored.length ? scored.reduce((p, k) => p + Object.keys(cr[k]).length, 0) / scored.length : null;
+      out.push({ id: "casework", name: ["ケース演習（書く）", "Case Work (written)"], size: CASE_CARDS.length, seen: wrote, unit: ["件に記入", " written"], ans: null, acc: null, weak: null, note: avg != null ? (en ? `rubric avg ${avg.toFixed(1)} (${scored.length} scored)` : `自己採点 平均${avg.toFixed(1)}項目（${scored.length}件）`) : null, review: 0, reviewL: ["", ""], open: { tab: "casework" } });
       if (live) setRows(out);
     })();
     return () => { live = false; };
@@ -138592,11 +138716,11 @@ function TechHubRecords() {
               <React.Fragment key={r.id}>
                 <div style={{ color: has ? C.text : C.muted, fontWeight: 700 }}>{L(r.name)}</div>
                 <div style={{ color: C.muted, fontVariantNumeric: "tabular-nums" }}>{r.size}</div>
-                <div style={{ color: C.text, fontVariantNumeric: "tabular-nums" }}>{r.ans != null ? r.ans : `${r.seen}${en ? " seen" : "問"}`}</div>
+                <div style={{ color: C.text, fontVariantNumeric: "tabular-nums" }}>{r.ans != null ? r.ans : `${r.seen}${r.unit ? L(r.unit) : (en ? " seen" : "問")}`}</div>
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                   {r.acc != null ? <><div style={{ flex: 1, height: 6, background: C.surface2, borderRadius: 3, overflow: "hidden" }}><div style={{ width: r.acc + "%", height: "100%", background: accCol(r.acc) }} /></div><span style={{ color: C.text, fontVariantNumeric: "tabular-nums", width: 34, textAlign: "right" }}>{r.acc}%</span></> : <span style={{ color: C.dim }}>—</span>}
                 </div>
-                <div style={{ color: r.weak ? C.wineInk : C.dim }}>{r.weak || "—"}</div>
+                <div style={{ color: r.weak ? C.wineInk : r.note ? C.muted : C.dim }}>{r.weak || r.note || "—"}</div>
                 <div style={{ color: r.review ? C.gold : C.dim, fontVariantNumeric: "tabular-nums" }}>{r.review ? `${r.review}` : "0"}<span style={{ fontSize: 10, color: C.dim }}> {L(r.reviewL)}</span></div>
                 <button className="gh-btn" onClick={() => go(r.open)} style={{ fontSize: 11, padding: "3px 9px" }}>{has ? (en ? "Open" : "開く") : (en ? "Start" : "始める")}</button>
               </React.Fragment>
@@ -138608,60 +138732,206 @@ function TechHubRecords() {
   );
 }
 
-function TabStrategy({ radarCur, onRadarChange }) {
+// 立ち位置（ポジショニング）を一文にするカード。入力はこの端末に保存する
+const POSITIONING_KEY = "techhub_positioning_v1";
+const POSITIONING_FIELDS = [
+  { k: "who", l: ["誰の（業界 × 規模 × AIの成熟度）", "For whom (industry × size × AI maturity)"], ph: ["例：従業員1,000人前後の製造業で、PoCは経験したが本番に進めていない会社", "e.g. manufacturers of about 1,000 people that have run a PoC but not reached production"] },
+  { k: "pain", l: ["どんな課題", "Which problem"], ph: ["例：効果を損益で説明できず、次の予算が通らない", "e.g. cannot explain the benefit in P&L terms, so the next budget does not pass"] },
+  { k: "alt", l: ["比べられる相手（代わりの選択肢）", "Compared with (the alternatives)"], ph: ["例：大手SIerの一括請負、ツール販売、内製", "e.g. a large integrator's fixed-price build, a tool vendor, building in-house"] },
+  { k: "value", l: ["自分だけの価値（武器の組み合わせ）", "What only you offer (your assets combined)"], ph: ["例：導入と定着まで持った経験 × ベンダーに寄らない方式の比較", "e.g. having owned adoption end to end × vendor-neutral comparison of approaches"] },
+  { k: "not", l: ["やらない領域（3つ）", "What you will not take on (three)"], ph: ["例：ツールの再販／判定基準を決めないPoC／…", "e.g. reselling tools / a PoC without decision criteria / …"] },
+];
+function PositioningCard() {
+  const en = useLang() === "en";
+  const [v, setV] = useState({});
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => {
+    let live = true;
+    (async () => {
+      try { const r = await window.storage.get(POSITIONING_KEY); if (live && r && r.value) setV(JSON.parse(r.value) || {}); } catch (e) { /* 初回は記録が無い */ }
+      if (live) setLoaded(true);
+    })();
+    return () => { live = false; };
+  }, []);
+  const set = (k, val) => {
+    const d = new Date();
+    const next = { ...v, [k]: val, at: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}` };
+    setV(next);
+    try { window.storage.set(POSITIONING_KEY, JSON.stringify(next)); } catch (e) { /* 保存できない環境では画面の間だけ */ }
+  };
+  if (!loaded) return null;
+  const f = (k) => (v[k] || "").trim();
+  const ready = f("who") && f("pain") && f("value");
+  const sentence = en
+    ? `For ${f("who") || "…"}, facing ${f("pain") || "…"}, I provide ${f("value") || "…"}${f("alt") ? `, unlike ${f("alt")}` : ""}.`
+    : `${f("who") || "…"}の「${f("pain") || "…"}」に対して、${f("alt") ? f("alt") + "と違い、" : ""}${f("value") || "…"}を提供する。`;
+  const box = { width: "100%", boxSizing: "border-box", background: C.surface2, color: C.text, border: `1px solid ${C.line}`, borderRadius: 8, padding: "7px 10px", fontSize: 12.5, fontFamily: "inherit", lineHeight: 1.6, resize: "vertical" };
+  return (
+    <Card style={{ marginBottom: 8 }}>
+      <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.75, marginBottom: 10 }}>
+        {en ? "A top-tier consultant is recalled in one sentence: whose problem you are the person for. Fill the blanks, read the sentence aloud in 30 seconds, and revisit it every quarter. What you type is saved on this device."
+          : "超一流のコンサルタントは「誰のどんな課題なら、この人」と一文で思い出される。欄を埋めて、下の一文を30秒で声に出し、四半期ごとに見直す。入力はこの端末に保存される。"}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%, 280px),1fr))", gap: 10 }}>
+        {POSITIONING_FIELDS.map((x) => (
+          <label key={x.k} style={{ display: "block", fontSize: 11.5, color: C.gold, fontWeight: 700 }}>
+            {x.l[en ? 1 : 0]}
+            <textarea rows={2} value={v[x.k] || ""} onChange={(e) => set(x.k, e.target.value)} placeholder={x.ph[en ? 1 : 0]} style={{ ...box, marginTop: 4 }} />
+          </label>
+        ))}
+      </div>
+      <div style={{ marginTop: 12, background: C.surface2, borderLeft: `3px solid ${ready ? C.teal : C.line}`, borderRadius: 6, padding: "9px 12px" }}>
+        <div style={{ fontSize: 10.5, color: C.dim, fontWeight: 700, letterSpacing: ".08em", marginBottom: 3 }}>{en ? "YOUR ONE SENTENCE" : "あなたの一文"}</div>
+        <div style={{ fontSize: 13.5, color: ready ? C.text : C.muted, lineHeight: 1.75 }}>{sentence}</div>
+        {f("not") ? <div style={{ fontSize: 12, color: C.muted, marginTop: 6, lineHeight: 1.7 }}>{en ? "Will not take on: " : "やらない領域："}{f("not")}</div> : null}
+        {v.at ? <div style={{ fontSize: 10.5, color: C.dim, marginTop: 6 }}>{en ? `Last edited ${v.at}` : `最終更新 ${v.at}`}</div> : null}
+      </div>
+    </Card>
+  );
+}
+
+// 能力ごとの「できること」と、鍛える場所（押すとそのタブへ移る）
+function CompetencyMap() {
   const lang = useLang();
-  const axisLabels = lang === "en" ? RADAR.axesEn : RADAR.axes;
+  const en = lang === "en";
+  const { setJump } = useJump();
+  const L = (x) => x[en ? 1 : 0];
+  const dCol = { core: C.teal, ref: C.muted, opt: C.dim };
+  const go = (tab) => { if (tab === "strategy") { const el = document.getElementById("th-positioning"); if (el && el.scrollIntoView) el.scrollIntoView({ behavior: "smooth", block: "start" }); return; } setJump({ tab }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) { /* 何もしない */ } };
   return (
     <div>
-      <SectionTitle jp="ビジネスサイドからAIアーキテクトへ" en="Positioning" />
+      <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.75, marginBottom: 10 }}>
+        {en ? "Nine abilities, each with what it looks like and where to train it. \"Train here\" tabs are the core; \"look up\" tabs are dictionaries you do not need to read through; \"optional\" tabs can be skipped."
+          : "9つの能力ごとに、できる姿と鍛える場所を並べた。「ここで鍛える」が核、「必要なとき引く」は辞書として使い通読しなくてよい、「任意」は飛ばしてよい。"}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%, 330px),1fr))", gap: 10 }}>
+        {COMP.map((c, i) => (
+          <Card key={c.id} style={{ padding: 13 }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+              <span className="gh-display" style={{ color: C.gold, fontSize: 17 }}>{i + 1}</span>
+              <span style={{ fontSize: 13.5, fontWeight: 800 }}>{L(c.name)}</span>
+            </div>
+            <div style={{ fontSize: 12, color: C.text, lineHeight: 1.7, margin: "6px 0 8px" }}>{L(c.can)}</div>
+            {["core", "ref", "opt"].map((d) => {
+              const ps = c.places.filter((p) => p.d === d);
+              if (!ps.length) return null;
+              return (
+                <div key={d} style={{ marginBottom: 6 }}>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, color: dCol[d], letterSpacing: ".04em", marginBottom: 3 }}>{L(COMP_DEPTH[d])}</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                    {ps.map((p) => (
+                      <button key={p.tab + p.m} type="button" className="gh-btn" onClick={() => go(p.tab)} title={L(p.n)}
+                        style={{ fontSize: 11.5, padding: "4px 9px", borderRadius: 8, border: `1px solid ${d === "core" ? C.teal : C.line}`, background: "transparent", color: d === "core" ? C.text : C.muted, cursor: "pointer", textAlign: "left", lineHeight: 1.5 }}>
+                        <b style={{ fontWeight: 700 }}>{p.tab === "strategy" ? (en ? "This page" : "このページ") : t(lang, "tab_" + p.tab)}</b>
+                        <span style={{ color: C.dim }}> · {L(COMP_MODE[p.m])} · {L(p.n)}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+            {c.gap ? <div style={{ fontSize: 11.5, color: C.wineInk, lineHeight: 1.65, marginTop: 6 }}>△ {L(c.gap)}</div> : null}
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TabStrategy({ radarCur, onRadarChange }) {
+  const lang = useLang();
+  const en = lang === "en";
+  const axisLabels = COMP.map((c) => c.short[en ? 1 : 0]);
+  const plan = roadmapPlan();
+  const rated = radarCur.filter((x) => x > 0).length;
+  const quarter = (r) => (
+    <Card key={r.q}>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+        <span className="gh-display" style={{ color: C.gold, fontSize: 20 }}>{r.q}</span>
+        <span style={{ fontSize: 13, fontWeight: 700 }}>{en ? r.themeEn : r.theme}</span>
+      </div>
+      <ul style={{ margin: "10px 0 0", paddingLeft: 18, fontSize: 12, color: C.muted, lineHeight: 1.7 }}>
+        {(en ? r.itemsEn : r.items).map((it) => <li key={it}>{it}</li>)}
+      </ul>
+    </Card>
+  );
+  return (
+    <div>
+      <SectionTitle jp="超一流のAIコンサルタントへ" en="North Star" />
+      <Card style={{ marginBottom: 16, borderColor: C.gold }}>
+        <div style={{ fontSize: 13.5, fontWeight: 800, color: C.gold, marginBottom: 6 }}>{en ? "Where this hub is taking you" : "このハブの到達像"}</div>
+        <div style={{ fontSize: 13, color: C.text, lineHeight: 1.8 }}>
+          {en ? "Lead an engagement that solves a client's management problem with AI, from framing the issue through adoption and rollout, and defend the reasoning in front of the client."
+            : "顧客の経営課題をAIで解く案件を、論点設定から定着・横展開まで率い、顧客の前で根拠を守れる。"}
+        </div>
+        <ul style={{ margin: "8px 0 0", paddingLeft: 18, fontSize: 12, color: C.muted, lineHeight: 1.75 }}>
+          <li>{en ? "Measured by nine abilities (the radar and the table below), not by the number of questions answered." : "物差しは下の9つの能力（レーダーと能力表）。解いた問題の数では測らない。"}</li>
+          <li>{en ? "Each ability moves through three kinds of practice: solve, write, talk. Reading alone does not raise a level." : "どの能力も「解く → 書く → 話す」の順に進める。読むだけでは段階は上がらない。"}</li>
+          <li>{en ? "Tabs marked \"look up when needed\" are dictionaries. Do not read them through; that time goes to writing." : "「必要なとき引く」のタブは辞書。通読しない。その時間を「書く」に回す。"}</li>
+        </ul>
+      </Card>
       <LearningHome />
       <TechHubRecords />
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%, 300px),1fr))", gap: 16 }}>
         <Card>
           <div style={{ fontSize: 13, color: C.gold, marginBottom: 8, fontWeight: 700 }}>{t(lang, "st_radar")}</div>
-          <Radar axes={axisLabels} current={radarCur} target={RADAR.target} />
+          <Radar axes={axisLabels} current={radarCur} target={COMP.map(() => COMP_TARGET)} />
           <div style={{ display: "grid", gap: 5, margin: "8px 0 10px" }}>
             {axisLabels.map((a, i) => (
               <div key={a} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11 }}>
                 <span style={{ width: 92, color: C.muted }}>{a}</span>
-                <input type="range" min="1" max="5" step="0.5" value={radarCur[i]}
+                <input type="range" min="0" max="5" step="0.5" value={radarCur[i]}
                        onChange={(e) => onRadarChange(i, parseFloat(e.target.value))}
                        style={{ flex: 1, accentColor: C.wine }} aria-label={a} />
-                <span style={{ width: 28, color: C.gold, textAlign: "right" }}>{radarCur[i]}</span>
+                <span style={{ width: 28, color: radarCur[i] > 0 ? C.gold : C.dim, textAlign: "right" }}>{radarCur[i] > 0 ? radarCur[i] : "—"}</span>
               </div>
             ))}
           </div>
-          <div style={{ fontSize: 11, color: C.muted }}>
+          <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.7 }}>
             <span style={{ color: C.wineInk }}>{t(lang, "st_now")}</span>　<span style={{ color: C.teal }}>{t(lang, "st_target")}</span><br />
+            {rated === 0 ? <><span style={{ color: C.gold }}>{en ? "Not rated yet. Move each slider to where you are now." : "まだ付けていません。各スライダーを今の位置に動かしてください。"}</span><br /></> : null}
             {t(lang, "st_radarnote")}
+          </div>
+          <div style={{ marginTop: 8, display: "grid", gap: 2 }}>
+            {COMP_LEVELS.map((lv) => <div key={lv[0]} style={{ fontSize: 11, color: C.muted }}><b style={{ color: C.gold, fontWeight: 700, display: "inline-block", width: 14 }}>{lv[0]}</b>{lv[en ? 2 : 1]}</div>)}
           </div>
         </Card>
         <Card>
           <div style={{ fontSize: 13, color: C.gold, marginBottom: 10, fontWeight: 700 }}>{t(lang, "st_assets")}</div>
           {ASSETS.map((a) => (
             <div key={a.t} style={{ marginBottom: 10, paddingBottom: 10, borderBottom: `1px solid ${C.line}` }}>
-              <div style={{ fontSize: 13, fontWeight: 700 }}>{lang === "en" ? a.tEn : a.t}</div>
-              <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>{lang === "en" ? a.dEn : a.d}</div>
+              <div style={{ fontSize: 13, fontWeight: 700 }}>{en ? a.tEn : a.t}</div>
+              <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>{en ? a.dEn : a.d}</div>
             </div>
           ))}
         </Card>
       </div>
+      <FoldSection id="st-comp" defaultOpen title={en ? "ABILITIES — nine abilities and where to train them" : "能力表 — 9つの能力と、鍛える場所"}>
+        <CompetencyMap />
+      </FoldSection>
+      <div id="th-positioning" />
+      <FoldSection id="st-pos" defaultOpen title={en ? "POSITIONING — whose problem you are the person for" : "ポジショニング — 誰のどんな課題なら自分か"}>
+        <PositioningCard />
+      </FoldSection>
       <div style={{ marginTop: 20 }}>
         <SectionTitle jp="12ヶ月ロードマップ" en="Roadmap" />
+        <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.75, margin: "-8px 0 12px" }}>
+          {en ? "Each quarter ends with something that remains: written notes, scored cases, a one-page view. Counts come from the tabs themselves."
+            : "四半期ごとに「残る成果物」で区切る（書いたメモ、採点したケース、1枚の見解）。件数は各タブの実データから出している。"}
+        </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12 }}>
-          {ROADMAP.map((r) => (
-            <Card key={r.q}>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-                <span className="gh-display" style={{ color: C.gold, fontSize: 20 }}>{r.q}</span>
-                <span style={{ fontSize: 13, fontWeight: 700 }}>{lang === "en" ? r.themeEn : r.theme}</span>
-              </div>
-              <ul style={{ margin: "10px 0 0", paddingLeft: 18, fontSize: 12, color: C.muted, lineHeight: 1.7 }}>
-                {(lang === "en" ? r.itemsEn : r.items).map((it) => <li key={it}>{it}</li>)}
-              </ul>
-            </Card>
-          ))}
+          {plan.map(quarter)}
         </div>
       </div>
+      <FoldSection id="st-megatech" title={en ? "SEPARATE TRACK (optional) — moving to an AI role at a megatech company" : "別トラック（任意）— メガテックAI職への転職"}>
+        <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.75, marginBottom: 10 }}>
+          {en ? "The earlier roadmap, kept as it was. Use it with the Companies tab if you are preparing a job move; it is not required for the consultant path above."
+            : "以前のロードマップをそのまま残している。転職の準備をするときに企業研究タブと合わせて使う。上のコンサルタントの道筋には必須ではない。"}
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12 }}>
+          {ROADMAP_MEGATECH.map(quarter)}
+        </div>
+      </FoldSection>
     </div>
   );
 }
@@ -168533,7 +168803,8 @@ function GafaHub() {
   useEffect(() => { if (navLoaded) { try { window.storage.set("techhub_nav_v1", JSON.stringify({ recent, open: navOpen })); } catch (e) {} } }, [recent, navOpen, navLoaded]);
   const [lang, setLang] = useState(() => (typeof window !== "undefined" && window.__novaLang) || "ja"); // ポータルの言語で開く
   useEffect(() => { aiSetLang(lang); }, [lang]); // AI講評の窓もこの言語で出す
-  const [radarCur, setRadarCur] = useState(RADAR.current);
+  const [radarCur, setRadarCur] = useState(() => COMP.map(() => 0)); // 9つの能力の自己評価（0＝未評価）
+  const oldRadarRef = useRef(null); // 以前の6軸の自己評価。別トラック用に消さずに持ち回る
   const [jump, setJumpState] = useState(null);
   // ジャンプ発行: 対象タブへ切り替えつつ、絞り込み指示(jump)を配布。nonceで同一指示の再発火も検知可能に。
   const setJump = (j) => {
@@ -168567,7 +168838,8 @@ function GafaHub() {
         const r = await window.storage.get(CLOUD_STORE_KEY);
         if (r && r.value) {
           const v = JSON.parse(r.value);
-          if (Array.isArray(v.radar) && v.radar.length === RADAR.axes.length) setRadarCur(v.radar);
+          if (Array.isArray(v.comp) && v.comp.length === COMP.length) setRadarCur(v.comp);
+          if (Array.isArray(v.radar)) oldRadarRef.current = v.radar;
           if (v.lang === "en" || v.lang === "ja") setLang(v.lang);
         }
       } catch (e) { /* 初回はキーが無いだけなので無視 */ }
@@ -168580,9 +168852,9 @@ function GafaHub() {
   const changeRadar = (i, v) => {
     const r = [...radarCur]; r[i] = v;
     setRadarCur(r);
-    persist({ radar: r, lang });
+    persist({ ...(oldRadarRef.current ? { radar: oldRadarRef.current } : {}), comp: r, lang });
   };
-  const changeLang = (l) => { setLang(l); persist({ radar: radarCur, lang: l }); };
+  const changeLang = (l) => { setLang(l); persist({ ...(oldRadarRef.current ? { radar: oldRadarRef.current } : {}), comp: radarCur, lang: l }); };
 
   return (
     <LangContext.Provider value={lang}>
