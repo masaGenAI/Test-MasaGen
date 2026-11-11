@@ -57,6 +57,8 @@ for rid in ok:
     rec = json.dumps({k: r[k] for k in ORDER if k in r}, ensure_ascii=False) + ","
     if rid in pos: lines[pos[rid]] = rec; replaced += 1
     else: new_lines.append(rec)
+# 既存の最後の行に区切りのカンマが無いことがある。足してから新しい行を続ける
+lines = [(l + ",") if (l.startswith("{") and l.rstrip().endswith("}")) else l for l in lines]
 h = h[:body_s] + "\n".join(lines + new_lines) + h[end:]
 
 # 2) 出典ツリー
