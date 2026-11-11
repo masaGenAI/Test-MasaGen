@@ -138112,7 +138112,7 @@ function ArchQuizView() {
     (async () => { try { const r = await window.storage.get(AQ_TRANS_KEY); if (r && r.value) setTrans(JSON.parse(r.value)); } catch (e) {} })();
   }, []);
   // 形式別に翻訳すべきフィールドを抽出→翻訳→structuralフィールドは温存
-  const translateItem = async (m, i, item) => {
+  const translateItem = async (m, i, item, manual) => {
     const key = m + ":" + i;
     if (trans[key]) return;
     setTransBusy(true); setTransErr("");
@@ -138131,7 +138131,7 @@ function ArchQuizView() {
         sys = "Translate Japanese AI-architecture quiz to English. Output STRICT JSON only, keys: scene (string), bad (string), why (string), fix (string).";
         usr = "scene: " + item.scene + "\nbad: " + item.bad + "\nwhy: " + item.why + "\nfix: " + item.fix;
       }
-      const raw = await callClaude(sys, [{ role: "user", content: usr }]);
+      const raw = await callClaude(sys, [{ role: "user", content: usr }], { quiet: !manual });
       const parsed = extractJSON(raw);
       // 最低限の形状チェック
       if (m === "node" && (!parsed.ask || !parsed.exp)) throw new Error("bad");
@@ -138222,7 +138222,7 @@ function ArchQuizView() {
       {lang === "en" && (
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10, fontSize: 11 }}>
           {transBusy && !tq && <span style={{ color: C.teal }}>{t(lang, "qz_translating")}</span>}
-          {transErr && !tq && <span style={{ color: C.wineInk }}>{transErr} <button className="gh-btn" style={{ fontSize: 10, padding: "2px 8px" }} onClick={() => translateItem(mode, idx, list[idx])}>↻</button></span>}
+          {transErr && !tq && <span style={{ color: C.wineInk }}>{transErr} <button className="gh-btn" style={{ fontSize: 10, padding: "2px 8px" }} onClick={() => translateItem(mode, idx, list[idx], true)}>↻</button></span>}
           {tq && <button className="gh-btn" style={{ fontSize: 10, padding: "2px 10px" }} onClick={() => setShowOrig((v) => !v)}>{showOrig ? t(lang, "qz_translate") : t(lang, "qz_showoriginal")}</button>}
         </div>
       )}
@@ -138889,13 +138889,13 @@ function McqView() {
     try { await window.storage.set(TRANS_KEY, JSON.stringify(next)); } catch (e) {}
   };
   // 現在の問題(qi)を翻訳して取得。キャッシュ優先。
-  const translateQ = async (qi, mq) => {
+  const translateQ = async (qi, mq, manual) => {
     if (trans[qi]) return;
     setTransBusy(true); setTransErr("");
     try {
       const sys = "You are a precise technical translator for AI-architecture exam questions (Japanese→English). Translate faithfully, keeping technical terms standard (e.g. KV cache, RAG, quantization). Output STRICT JSON only, no markdown, with keys: q (string), opts (array of 4 strings, same order), exp (string). Do not add or drop options.";
       const usr = "Translate this quiz item to English.\nq: " + mq.q + "\nopts: " + JSON.stringify(mq.opts) + "\nexp: " + mq.exp;
-      const raw = await callClaude(sys, [{ role: "user", content: usr }]);
+      const raw = await callClaude(sys, [{ role: "user", content: usr }], { quiet: !manual });
       const parsed = extractJSON(raw);
       if (!parsed.q || !Array.isArray(parsed.opts) || parsed.opts.length !== 4 || !parsed.exp) throw new Error("bad shape");
       const next = { ...trans, [qi]: { q: parsed.q, opts: parsed.opts, exp: parsed.exp } };
@@ -139412,7 +139412,7 @@ function McqView() {
       {lang === "en" && (
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10, fontSize: 11 }}>
           {transBusy && !tr && !hasStatic && <span style={{ color: C.teal }}>{t(lang, "qz_translating")}</span>}
-          {transErr && !tr && !hasStatic && <span style={{ color: C.wineInk }}>{transErr} <button className="gh-btn" style={{ fontSize: 10, padding: "2px 8px" }} onClick={() => translateQ(qi, m)}>↻</button></span>}
+          {transErr && !tr && !hasStatic && <span style={{ color: C.wineInk }}>{transErr} <button className="gh-btn" style={{ fontSize: 10, padding: "2px 8px" }} onClick={() => translateQ(qi, m, true)}>↻</button></span>}
           {(tr || hasStatic || showOrig) && (
             <button className="gh-btn" style={{ fontSize: 10, padding: "2px 10px" }} onClick={() => setShowOrig((v) => !v)}>
               {showOrig ? t(lang, "qz_translate") : t(lang, "qz_showoriginal")}
@@ -139471,16 +139471,178 @@ function McqView() {
   );
 }
 
-// 口頭試問の採点に使う軽量ヘルパー（図面道場で使用）
-async function callClaude(system, messages) {
+// ===== AI講評の呼び出し（公開サイトでも動くように） =====
+// 公開サイト（GitHub Pages）にはサーバーが無いので、API キーなしでは Anthropic API を呼べない。そこで2つの道を用意する。
+//   1. 既定：講評用のプロンプトを Claude（claude.ai やアプリ）に貼り、返ってきた答えを貼り戻す。キー不要・追加費用なし。
+//   2. 任意：自分の Anthropic API キーを入れると、この画面から直接呼ぶ。キーはこの端末にだけ保存し、api.anthropic.com にだけ送る。
+// どちらの道でも callClaude(system, messages) は講評の本文（文字列）を返すので、呼び出し側の採点表示はそのまま使える。
+// キーは名前を nova_secret_ で始め、進捗バックアップ（main.jsx の collectProgress）に入らないようにしている。
+const AI_SECRET_KEY = "nova_secret_anthropic_api_key";
+const AI_MODEL = "claude-opus-5-5";
+// 表示言語は TechHub の切替に合わせる（aiSetLang）。まだ呼ばれていなければポータルの言語を使う
+let AI_LANG = "";
+function aiSetLang(l) { AI_LANG = l || ""; }
+const aiEn = () => { if (AI_LANG) return AI_LANG === "en"; try { return window.__novaLang === "en"; } catch (e) { return false; } };
+function aiKeyRead() {
+  try { return window.sessionStorage.getItem(AI_SECRET_KEY) || window.localStorage.getItem(AI_SECRET_KEY) || ""; } catch (e) { return ""; }
+}
+function aiKeyRemembered() { try { return !!window.localStorage.getItem(AI_SECRET_KEY); } catch (e) { return false; } }
+function aiKeyWrite(key, remember) {
+  try { window.sessionStorage.removeItem(AI_SECRET_KEY); } catch (e) { /* 使えない環境では何もしない */ }
+  try { window.localStorage.removeItem(AI_SECRET_KEY); } catch (e) { /* 同上 */ }
+  if (!key) return;
+  try { (remember ? window.localStorage : window.sessionStorage).setItem(AI_SECRET_KEY, key); } catch (e) { /* 保存できなければこの画面の間だけ使う */ }
+}
+
+// 自分のキーで Messages API を直接呼ぶ（ブラウザから呼ぶため anthropic-dangerous-direct-browser-access が要る）
+async function callClaudeApi(key, system, messages) {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 1000, system, messages })
+    headers: {
+      "content-type": "application/json",
+      "x-api-key": key,
+      "anthropic-version": "2026-10-21",
+      "anthropic-beta": "server-side-fallback-2026-07-01",
+      "anthropic-dangerous-direct-browser-access": "true",
+    },
+    // 講評は1回の応答。思考は常にオン（Claude Opus 5.5）なので max_tokens は余裕を持たせる。断られたときは既定の代替モデルで続ける
+    body: JSON.stringify({ model: AI_MODEL, max_tokens: 16000, output_config: { effort: "medium" }, fallbacks: "default", system, messages }),
   });
-  const data = await res.json();
-  if (data.error) throw new Error(data.error.message || "API error");
-  return (data.content || []).filter((b) => b.type === "text").map((b) => b.text).join("\n");
+  let data = null;
+  try { data = await res.json(); } catch (e) { /* 本文が JSON でない */ }
+  if (!res.ok) {
+    const msg = (data && data.error && data.error.message) || ("HTTP " + res.status);
+    const err = new Error(res.status === 401 ? (aiEn() ? "The API key was rejected (401). Check the key." : "APIキーが受け付けられませんでした（401）。キーを確認してください。") : msg);
+    err.aiStatus = res.status;
+    throw err;
+  }
+  if (data && data.stop_reason === "refusal") {
+    const ex = data.stop_details && data.stop_details.explanation;
+    throw new Error((aiEn() ? "The model declined this request" : "モデルがこの依頼を断りました") + (ex ? "：" + ex : ""));
+  }
+  const text = ((data && data.content) || []).filter((b) => b.type === "text").map((b) => b.text).join("\n");
+  if (!text) throw new Error(aiEn() ? "Empty response" : "応答が空でした");
+  return text;
+}
+
+// 貼り付け用の1本のプロンプト（指示＋会話）にまとめる
+function aiPastePrompt(system, messages) {
+  const en = aiEn();
+  const roleName = (r) => (r === "assistant" ? (en ? "[You (AI)]" : "［あなた（AI）］") : (en ? "[User]" : "［利用者］"));
+  const body = (messages || []).map((m) => roleName(m.role) + "\n" + (typeof m.content === "string" ? m.content : (m.content || []).map((b) => b.text || "").join("\n"))).join("\n\n");
+  return (en
+    ? "Follow the INSTRUCTIONS below and reply to the last [User] turn of the CONVERSATION. Output only what the instructions ask for (if they ask for JSON, output only the JSON).\n\n=== INSTRUCTIONS ===\n"
+    : "次の【指示】に従い、【会話】の最後の［利用者］の発言に応答してください。指示が求める形式だけを出力してください（JSON を求められたら JSON だけ）。\n\n【指示】\n")
+    + (system || "") + (en ? "\n\n=== CONVERSATION ===\n" : "\n\n【会話】\n") + body;
+}
+
+// 画面の上に出す小さな窓（React の外で作るので、どのタブから呼ばれても同じものが出る）
+function aiModal({ prompt, note }) {
+  return new Promise((resolve, reject) => {
+    const en = aiEn();
+    const T = (ja, e) => (en ? e : ja);
+    const prev = document.activeElement;
+    const wrap = document.createElement("div");
+    wrap.setAttribute("role", "dialog");
+    wrap.setAttribute("aria-modal", "true");
+    wrap.setAttribute("aria-label", T("Claudeで講評を受ける", "Get feedback from Claude"));
+    wrap.style.cssText = "position:fixed;inset:0;z-index:2147483000;background:rgba(10,8,18,.72);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:24px 12px;font-family:'IBM Plex Sans JP',system-ui,sans-serif;";
+    const box = document.createElement("div");
+    box.style.cssText = `width:min(680px,100%);background:${C.surface};color:${C.text};border:1px solid ${C.gold};border-radius:12px;padding:16px 16px 14px;box-sizing:border-box;line-height:1.65;font-size:13px;`;
+    const keyNow = aiKeyRead();
+    box.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:6px">
+        <div style="font-size:15.5px;font-weight:800;color:${C.gold}">${T("Claudeで講評を受ける", "Get feedback from Claude")}</div>
+        <button data-k="close" style="background:transparent;border:1px solid ${C.line};color:${C.text};border-radius:8px;padding:3px 10px;cursor:pointer;font-size:12px">${T("閉じる", "Close")}</button>
+      </div>
+      ${note ? `<div data-k="note" style="font-size:12px;color:${C.wineInk};margin-bottom:8px"></div>` : ""}
+      <div style="font-size:12.5px;color:${C.muted};margin-bottom:8px">${T("この公開サイトにはサーバーが無いため、講評は次のどちらかで受けます。", "This public site has no server, so feedback comes one of two ways.")}</div>
+      <div style="font-weight:700;margin:4px 0 4px">${T("A. Claude に貼る（キー不要・追加費用なし）", "A. Paste into Claude (no key, no extra cost)")}</div>
+      <ol style="margin:0 0 8px;padding-left:20px;font-size:12.5px;color:${C.text}">
+        <li>${T("「プロンプトをコピー」を押す", "Press “Copy prompt”")}</li>
+        <li>${T("Claude（claude.ai やアプリ）の新しい会話に貼って送る", "Paste it into a new Claude chat (claude.ai or the app) and send")}</li>
+        <li>${T("返ってきた答えを全部コピーし、下の欄に貼って「講評を表示」", "Copy the whole reply, paste it below and press “Show feedback”")}</li>
+      </ol>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+        <button data-k="copy" style="background:${C.wineDeep};border:1px solid ${C.wine};color:${C.text};border-radius:8px;padding:7px 14px;cursor:pointer;font-weight:700;font-size:12.5px">${T("プロンプトをコピー", "Copy prompt")}</button>
+        <a href="https://claude.ai/new" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;background:${C.surface2};border:1px solid ${C.line};color:${C.text};border-radius:8px;padding:7px 14px;font-size:12.5px;text-decoration:none">${T("Claude を開く ↗", "Open Claude ↗")}</a>
+        <span data-k="copied" style="font-size:12px;color:${C.teal};align-self:center"></span>
+      </div>
+      <details style="margin-bottom:8px"><summary style="cursor:pointer;font-size:12px;color:${C.muted}">${T("プロンプトの中身を見る", "Show the prompt")}</summary>
+        <textarea data-k="prompt" readonly rows="6" style="width:100%;box-sizing:border-box;margin-top:6px;background:${C.bg};color:${C.text};border:1px solid ${C.line};border-radius:8px;padding:8px;font-size:11.5px;font-family:inherit"></textarea></details>
+      <textarea data-k="reply" rows="6" aria-label="${T("Claudeの答えを貼る", "Paste Claude's reply")}" placeholder="${T("Claudeの答えをここに貼る", "Paste Claude's reply here")}" style="width:100%;box-sizing:border-box;background:${C.surface2};color:${C.text};border:1px solid ${C.line};border-radius:8px;padding:8px 10px;font-size:12.5px;font-family:inherit"></textarea>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 12px">
+        <button data-k="use" style="background:${C.teal};border:none;color:#08131A;border-radius:8px;padding:8px 16px;cursor:pointer;font-weight:800;font-size:12.5px">${T("講評を表示", "Show feedback")}</button>
+      </div>
+      <details data-k="keybox" ${keyNow ? "open" : ""} style="border-top:1px solid ${C.line};padding-top:8px">
+        <summary style="cursor:pointer;font-weight:700">${T("B. 自分の Anthropic API キーで直接講評する（任意）", "B. Use your own Anthropic API key (optional)")}</summary>
+        <div style="font-size:12px;color:${C.muted};margin:6px 0">${T(
+          "キーはこの端末のブラウザにだけ保存し、api.anthropic.com にだけ送ります。進捗バックアップのファイルには入りません。利用料金はキーの持ち主に請求されます。共用の端末では「この端末に記憶する」をオフにしてください（タブを閉じると消えます）。",
+          "The key is stored only in this browser and sent only to api.anthropic.com. It is never written into the progress backup file. Usage is billed to the key's owner. On a shared device leave “Remember on this device” off (the key is then forgotten when the tab closes).")}</div>
+        <input data-k="key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-..." aria-label="${T("Anthropic API キー", "Anthropic API key")}" style="width:100%;box-sizing:border-box;background:${C.surface2};color:${C.text};border:1px solid ${C.line};border-radius:8px;padding:8px 10px;font-size:12.5px;font-family:inherit">
+        <label style="display:flex;gap:6px;align-items:center;font-size:12px;margin:6px 0"><input data-k="remember" type="checkbox"> ${T("この端末に記憶する", "Remember on this device")}</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button data-k="savekey" style="background:${C.surface2};border:1px solid ${C.gold};color:${C.text};border-radius:8px;padding:7px 14px;cursor:pointer;font-size:12.5px;font-weight:700">${T("このキーで講評する", "Use this key")}</button>
+          <button data-k="forget" style="background:transparent;border:1px solid ${C.line};color:${C.muted};border-radius:8px;padding:7px 12px;cursor:pointer;font-size:12px">${T("保存したキーを消す", "Forget saved key")}</button>
+          <span data-k="keymsg" style="font-size:12px;color:${C.muted}">${keyNow ? T("キーを保存済み", "A key is saved") : ""}</span>
+        </div>
+      </details>`;
+    wrap.appendChild(box);
+    const $ = (k) => box.querySelector(`[data-k="${k}"]`);
+    if (note) $("note").textContent = note;
+    $("prompt").value = prompt;
+    $("remember").checked = aiKeyRemembered();
+    let done = false;
+    const close = (fn, v) => {
+      if (done) return; done = true;
+      document.removeEventListener("keydown", onKey, true);
+      wrap.remove();
+      try { if (prev && prev.focus) prev.focus(); } catch (e) { /* 前の場所が無い */ }
+      fn(v);
+    };
+    const cancel = () => close(reject, new Error(aiEn() ? "Cancelled" : "キャンセルしました"));
+    const onKey = (e) => { if (e.key === "Escape") { e.preventDefault(); cancel(); } };
+    document.addEventListener("keydown", onKey, true);
+    wrap.addEventListener("click", (e) => { if (e.target === wrap) cancel(); });
+    $("close").onclick = cancel;
+    $("copy").onclick = async () => {
+      let ok = false;
+      try { await navigator.clipboard.writeText(prompt); ok = true; } catch (e) { /* 下で選択して手動コピー */ }
+      if (!ok) { const d = box.querySelector("details"); d.open = true; $("prompt").focus(); $("prompt").select(); }
+      $("copied").textContent = ok ? T("コピーしました", "Copied") : T("下の欄を選択してコピーしてください", "Select the text below and copy it");
+    };
+    $("use").onclick = () => {
+      const v = $("reply").value.trim();
+      if (!v) { $("reply").focus(); return; }
+      close(resolve, v);
+    };
+    $("savekey").onclick = async () => {
+      const k = $("key").value.trim() || aiKeyRead();
+      if (!k) { $("key").focus(); return; }
+      aiKeyWrite(k, $("remember").checked);
+      $("keymsg").textContent = T("講評を取得しています…", "Getting feedback…");
+      try { const text = await callClaudeApi(k, AI_PENDING.system, AI_PENDING.messages); close(resolve, text); }
+      catch (e) { $("keymsg").textContent = (e && e.message) || String(e); }
+    };
+    $("forget").onclick = () => { aiKeyWrite(""); $("key").value = ""; $("remember").checked = false; $("keymsg").textContent = T("消しました", "Forgotten"); };
+    document.body.appendChild(wrap);
+    setTimeout(() => { try { $("copy").focus(); } catch (e) { /* 何もしない */ } }, 0);
+  });
+}
+let AI_PENDING = { system: "", messages: [] };
+
+// 講評を受ける共通の入口。キーが保存されていれば API を直接呼び、無ければ（または失敗したら）貼り付けの窓を出す。
+// opts.quiet：画面を開いただけで自動で走る呼び出し（英訳など）。キーが無いときは窓を出さずにエラーを返し、利用者が押したときだけ窓を出す
+async function callClaude(system, messages, opts) {
+  AI_PENDING = { system, messages };
+  const key = aiKeyRead();
+  if (!key && opts && opts.quiet) throw new Error(aiEn() ? "AI is not connected (press retry to use Claude)" : "AI 未接続（再試行を押すと Claude で続けられます）");
+  if (key) {
+    if (opts && opts.quiet) return callClaudeApi(key, system, messages);
+    try { return await callClaudeApi(key, system, messages); }
+    catch (e) { return aiModal({ prompt: aiPastePrompt(system, messages), note: (aiEn() ? "Direct call failed: " : "直接の呼び出しに失敗しました：") + ((e && e.message) || e) + (aiEn() ? " — you can continue by pasting into Claude." : "。Claude に貼る方法で続けられます。") }); }
+  }
+  return aiModal({ prompt: aiPastePrompt(system, messages) });
 }
 
 // モデル応答から頑健にJSONを取り出す（```json フェンスや前後テキストを許容）
@@ -168370,6 +168532,7 @@ function GafaHub() {
   useEffect(() => { setRecent((r) => [tab, ...r.filter((x) => x !== tab)].slice(0, 8)); }, [tab]);
   useEffect(() => { if (navLoaded) { try { window.storage.set("techhub_nav_v1", JSON.stringify({ recent, open: navOpen })); } catch (e) {} } }, [recent, navOpen, navLoaded]);
   const [lang, setLang] = useState(() => (typeof window !== "undefined" && window.__novaLang) || "ja"); // ポータルの言語で開く
+  useEffect(() => { aiSetLang(lang); }, [lang]); // AI講評の窓もこの言語で出す
   const [radarCur, setRadarCur] = useState(RADAR.current);
   const [jump, setJumpState] = useState(null);
   // ジャンプ発行: 対象タブへ切り替えつつ、絞り込み指示(jump)を配布。nonceで同一指示の再発火も検知可能に。

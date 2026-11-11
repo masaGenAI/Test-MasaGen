@@ -91,6 +91,10 @@ function collectProgress() {
     }
   }
   Object.assign(data, mem); // セッション中の最新値を優先
+  // 秘密の値（AI講評用の API キーなど。名前が nova_secret_ で始まる）はバックアップのファイルに入れない
+  Object.keys(data).forEach((k) => {
+    if (/^nova_secret_/.test(k)) delete data[k];
+  });
   return data;
 }
 
@@ -188,7 +192,7 @@ function BackupBar() {
           const parsed = JSON.parse(String(reader.result));
           const data = parsed && parsed.data ? parsed.data : parsed;
           if (!data || typeof data !== "object") throw new Error("形式が不正です");
-          const keys = Object.keys(data);
+          const keys = Object.keys(data).filter((k) => !/^nova_secret_/.test(k)); // 秘密の値は読み込まない
           if (!window.confirm(en ? `Restore ${keys.length} progress items? This overwrites your current progress.` : `${keys.length}件の進捗を復元します。現在の進捗に上書きされます。よろしいですか？`))
             return;
           keys.forEach((k) => {
