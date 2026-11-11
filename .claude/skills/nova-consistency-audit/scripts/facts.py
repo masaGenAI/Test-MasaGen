@@ -174,7 +174,7 @@ def main():
         b = BOOK.read_text(encoding="utf-8")
         yt = b.count('{"id":"yt_')
         note = b.count('{"id":"note_')
-        ig = b.count('{"id":"ig_')
+        ig = len(re.findall(r'\{"id": ?"ig_', b))  # IG_BOOKS は「"id": "ig_…」と空白入りで書かれている
         allb = b.count('"oneLiner":')
         f["Book.youtube"] = yt
         f["Book.note"] = note

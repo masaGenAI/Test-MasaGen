@@ -60,6 +60,15 @@ description: Book-Summary（nova-app/public/booksummaryhub.html）の「YouTube�
     `python3 .claude/skills/nova-consistency-audit/scripts/stale_scan.py`（MISMATCH 0）、ブラウザで新チャンネルを開いて表示を確認する（原稿の `public/booksummaryhub.html` はそのまま開ける。配布する分割版は `npm run build` 後の `dist/booksummaryhub.html`）。
     - 直すのは原稿の `nova-app/public/booksummaryhub.html` だけ（このスキルの道具もそれを読み書きする）。ビルドはこれを dist 用に「索引だけの小さい booksummaryhub.html」と「本文・クイズ・出典の総括の booksummary-*.js」に分ける（`nova-app/scripts/booksummary-split.mjs`）。`dist/` のそれらは生成物なので直さない。原稿のデータの形が崩れている（`DATA` などがリテラルでない、データの文が画面のコードを読む等）とビルドがここで止まり、場所を示す。
 
+## Instagram のリールを足すとき（発言を紹介する型）
+Instagram アカウントのダイジェスト（キャプションとカバー画像が根拠）は、YouTube 枠ではなく **Instagram 枠**（`SOURCES` の ig、`IG_BOOKS`）に入れる。
+YouTube 枠の脚注は「字幕全文から作成」と書くので、キャプションが根拠の要約を YouTube 枠に入れると事実と合わなくなる。
+- 長さと検査は short 段（`check_yt.py`）をそのまま使う。`inputs/<id>.json` に `tier: "short"` と、ダイジェストの項目（summary・content・insight・speaker・speaker_basis など）を入れる。
+- 1件の中の3つの声を書き分ける：発言者本人の言葉／アカウントの見立てと教訓の一行／ダイジェスト作成者の応用（示唆）。
+- 要点は投稿の中身、発言者・元の番組・反応の数字・読み取り範囲は注記（画面では「出典・読み取りメモ」）に入れる。
+- ダイジェストの総括の数字は、投稿別のデータで検算してから載せる（2026-11 の @insider.jp では、総括の「いいね率が最高の回」の人物名が投稿別データと食い違っていた）。
+- 差し込みは `python3 -I scripts/apply_ig.py <作業フォルダ> nova-app/public/booksummaryhub.html`（何度流しても同じ結果。`skel.json` と `account.json` の形はスクリプト冒頭を見る）。IG_BOOKS 先頭のコメント（アカウント数・件数）を実数に直す。
+
 ## 書き方の約束（agent_brief.md に詳細）
 - 誰の主張かを書く:「〜と動画は論じる」「本書は〜と説く」「解説者は〜と補足する」「〜と（発言者）は語る」
 - ダイジェストの「実務示唆」は**ダイジェスト作成者が導いた応用**。示唆欄では「職場に当てはめるなら〜」と書き、動画の勧めとして書かない
