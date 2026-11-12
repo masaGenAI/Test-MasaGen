@@ -47,8 +47,7 @@
   [
    "itsec",
    "checks-notes",
-   "dojo-quiz-a",
-   "dojo-quiz-b"
+   "dojo-quiz"
   ],
   [
    "foresight-library-a",
@@ -487,32 +486,8 @@
    "hint": "タブ toolbox（TBX_* の Evals ツール名・データ基盤・事例 TBX_CASES）、proposal（PROP_*・FIN_GATE_*・PF3_PLANS・LAB_*・CONTRACT_FORMS：料金・単価・モデル価格・会計基準や税制の時点、GOV_GATE_LAW・GOV_GATE_WORLD・GOV_GATE_VENDOR の規制の記述）、salesdojo・casework・livedojo の中の時点に依存する記述。規制の記述は data/govdojo の台帳（facts.json）と食い違わないかも見る。"
   },
   {
-   "key": "dojo-quiz-a",
-   "title": "技術道場クイズ MCQS（前半）",
-   "tabs": [
-    "dojo"
-   ],
-   "cadence": "quarterly",
-   "consts": [
-    "MCQS"
-   ],
-   "files": [],
-   "hosts": [
-    "www.anthropic.com",
-    "openai.com",
-    "blog.google",
-    "aws.amazon.com",
-    "docs.aws.amazon.com",
-    "learn.microsoft.com",
-    "cloud.google.com",
-    "www.nist.gov",
-    "digital-strategy.ec.europa.eu"
-   ],
-   "hint": "技術道場のクイズ MCQS（全5,000問）の前半。行番号は consts_index.py で確かめ、MCQS の先頭から2,500問目までを担当する。全問は読まない。年（2023〜2026）・「最新」「現在」・モデル名（GPT / Claude / Gemini / Llama など）・料金・上限値・規制の日付を含む問題を grep で洗い出し、正解や解説が今の事実と食い違うものを探す。クイズなので置換案は is_quiz: true。"
-  },
-  {
-   "key": "dojo-quiz-b",
-   "title": "技術道場クイズ MCQS（後半）",
+   "key": "dojo-quiz",
+   "title": "技術道場クイズ MCQS",
    "tabs": [
     "dojo"
    ],
@@ -533,7 +508,7 @@
     "www.nist.gov",
     "digital-strategy.ec.europa.eu"
    ],
-   "hint": "技術道場のクイズ MCQS（全5,000問）の後半。行番号は consts_index.py で確かめ、2,501問目から最後までを担当する。全問は読まない。年（2023〜2026）・「最新」「現在」・モデル名・料金・上限値・規制の日付を含む問題を grep で洗い出し、正解や解説が今の事実と食い違うものを探す。クイズなので置換案は is_quiz: true。"
+   "hint": "技術道場のクイズ MCQS（全5,000問）。全問は読まない。年（2023〜2026）・「最新」「現在」・モデル名（GPT / Claude / Gemini / Llama など）・製品名・料金・上限値・統計の数字・規制の日付を含む問題を grep で洗い出し、正解や解説が今の事実と食い違うものを探す。クイズなので置換案は is_quiz: true（正解の番号と選択肢の長さの釣り合いを崩さない。崩れるなら unverified に理由を書く）。"
   },
   {
    "key": "slalom-global",
