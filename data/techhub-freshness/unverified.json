@@ -612,87 +612,6 @@
   "last_tried": "2026-11-12"
  },
  {
-  "area": "dojo-certs",
-  "tab": "dojo-certs (資格対策 CertPrepView / AIGP_DOMAINS)",
-  "current_text": "AIGP_DOMAINS は「ドメインI 〜 VII」の7ドメイン（AIの基礎／責任あるAIの原則と影響／現行法のAIへの適用／AI固有の法規制と標準／AIライフサイクル／ガバナンスとリスク管理の実装／継続的な課題）。画面の注記には「ドメイン名・設問は学習用に簡略化」とある。",
-  "concern": "IAPP の AIGP 出題範囲 (Body of Knowledge) は、検索結果の要約では v2.1（2026-02-02 発効、v2.0.1 を置き換え）で4ドメイン構成と報じられている。7ドメイン構成は旧版の構成か、独自の再編の可能性がある。",
-  "why": "一次情報 (iapp.org/certify/body-of-knowledge-aigp) は PDF (assets.contentstack.io) に転送されるが、このセッションのネットワークでは assets.contentstack.io と pages.iapp.org に接続できず本文を開けなかった。二次情報は検索要約だけで、開いて確かめていない。許可後に BoK PDF を開いて再確認が必要。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "dojo-certs",
-  "tab": "dojo-certs (CISSP_DOMAINS)",
-  "current_text": "CISSP 8ドメイン（セキュリティとリスクマネジメント〜ソフトウェア開発セキュリティ）",
-  "concern": "検索要約では現行の出題範囲は2024-04-15 発効の8ドメインで、2027-04-15 に新アウトラインとする報告が1件ある。8ドメイン構成自体は現行と一致する見込みだが、後継版の予定は未確認。",
-  "why": "www.isc2.org に接続できず、公式ページを開けなかった。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "dojo-certs",
-  "tab": "dojo-certs (CERTS / CC_DOMAINS)",
-  "current_text": "ISC2 CC（Certified in Cybersecurity）5ドメイン、ISO/IEC 42001 Foundation（PECB）5ドメイン",
-  "concern": "試験アウトラインの版・PECB の試験構成の最新を確認できていない。",
-  "why": "ISC2・PECB の公式ページに接続できず未確認。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "dojo-certs",
-  "tab": "dojo-certs (PLAYBOOK / DEV_QUIZ / ARCH_QUIZ / VERSUS / DRILLS / CURRICULUM)",
-  "current_text": "PLAYBOOK(行146354付近) 内の製品名・規制の時点記述",
-  "concern": "2026年・2027年・予定・施行といった日付語の簡易 grep では PLAYBOOK 内に該当がなく、時点依存の記述は少ない。製品名の改称などは個別に開いて確かめていない。",
-  "why": "外部サイトへの接続が制限されており、製品・規制の公式ページを開いて確かめられなかった。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "strategy-xform",
-  "tab": "xform",
-  "current_text": "G検定：145問前後／100分・13,200円（学生5,500円）、累計合格15万人超、合格率8割前後",
-  "concern": "受験料・問題数・累計合格者数・試験回数・シラバス改定が2026年11月時点で変わっていないか",
-  "why": "JDLA公式（www.jdla.org）が WebFetch でホスト解決できず開けなかった。WebSearch の要約（TAC資料・解説記事など二次情報）では13,200円・学生5,500円と一致したが、公式本文は未確認。問題数・時間・累計合格者数・シラバス改定は未確認。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "strategy-xform",
-  "tab": "xform",
-  "current_text": "生成AIパスポート：60問／60分・42問正解（70%）で合格・11,000円、自宅受験（IBT）",
-  "concern": "受験料・出題数・合格基準・出題範囲（シラバス）の改定有無",
-  "why": "公式（guga.or.jp）が許可ネットワーク外で開けず、検索でも確認していない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "strategy-xform",
-  "tab": "xform",
-  "current_text": "統計検定2級：CBT 35問前後／90分・60点以上で合格、受験料7,000円（学生5,000円）、一般電卓1台",
-  "concern": "受験料改定、出題範囲の改定、電卓規定の変更",
-  "why": "公式（www.sikaku.gr.jp）が許可ネットワーク外で開けず、未確認。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "strategy-xform",
-  "tab": "strategy",
-  "current_text": "ROADMAP・RADAR・ASSETS（資格名など）",
-  "concern": "時点依存の記述が残っていないか",
-  "why": "出典を開く手段が無かったため、原稿の洗い出し自体を実施していない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "strategy-xform",
-  "tab": "consult / tacit / bpr",
-  "current_text": "CONSULT_STATS・CONSULT_MAP・TACIT_WORLD・BPR_*",
-  "concern": "統計の版・事例の時点",
-  "why": "原稿は読んでいないうえ、出典ページも取得できなかった。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
   "area": "archcase",
   "tab": "archcase",
   "current_text": "gc: [\"Vertex AI Search\", \"Cloud Storage\"]（データ・RAG層）",
@@ -1328,6 +1247,150 @@
   "current_text": "c215 IBM / c287 gihyo / c308 gamma / c311 seplus / c312 courrier / c313 newsinlevels / c338 studyhacker / c344 rondely ほか Instagram・X(t.co)・LinkedIn・Notion・share.google・brainpad",
   "concern": "リンクが開くか",
   "why": "プロキシが拒否するか、ログイン・短縮URLで確認できない",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "dojo-certs",
+  "tab": "dojo-certs (資格対策 CertPrepView / AIGP_DOMAINS)",
+  "current_text": "AIGP_DOMAINS は「ドメインI 〜 VII」の7ドメイン（AIの基礎／責任あるAIの原則と影響／現行法のAIへの適用／AI固有の法規制と標準／AIライフサイクル／ガバナンスとリスク管理の実装／継続的な課題）。画面の注記には「ドメイン名・設問は学習用に簡略化」とある。",
+  "concern": "検索要約では AIGP BoK v2.1（2026-02-02 発効、v2.0.1 を置換）は4ドメイン構成（7→4への再編は2025年2月の v2.0.1）。アプリの7ドメインは旧構成か学習用の独自再編の疑いが強い。ただし4ドメインの名称は未確認で、置換案を作れない。",
+  "why": "iapp.org/certify/body-of-knowledge-aigp は assets.contentstack.io の PDF へ 308 転送され開けない。iapp.org/certify/aigp/ は開けたが BoK の版・ドメインの記載なし。二次情報（trainingcamp.com, privacybootcamp.com）は名前解決できず。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "dojo-certs",
+  "tab": "dojo-certs (CISSP_DOMAINS)",
+  "current_text": "CISSP 8ドメイン（セキュリティとリスクマネジメント〜ソフトウェア開発セキュリティ）",
+  "concern": "CISSP の現行アウトラインは2024-04-15 発効の8ドメインで、アプリの8ドメインと整合する見込み。2027-04-15 発効の新アウトラインが発表済みとの報告が複数あるが、公式で確認できない（2026-11 時点ではまだ現行版が有効）。",
+  "why": "www.isc2.org は開けない。検索結果の要約のみで、公式アウトラインを開いていない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "dojo-certs",
+  "tab": "dojo-certs (CERTS / CC_DOMAINS)",
+  "current_text": "ISC2 CC（Certified in Cybersecurity）5ドメイン、ISO/IEC 42001 Foundation（PECB）5ドメイン",
+  "concern": "ISO 42001 Foundation（PECB）の公式ページ(pecb.com)を開いたところ、試験は「2つのコンピテンシードメイン（Domain 1: AIMSの基本原則と概念／Domain 2: AIMS）」と記載され、アプリの5ドメインと粒度が異なる。画面注記の『学習用に簡略化』で説明できる可能性があり、構成の作り替えが要るため置換案は出さない。ISC2 CC のアウトライン版は未確認。",
+  "why": "PECB 側は構成差のみ確認（試験時間・形式は記載なし）。ISC2 CC は www.isc2.org が開けない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "dojo-certs",
+  "tab": "dojo-certs (PLAYBOOK / DEV_QUIZ / ARCH_QUIZ / VERSUS / DRILLS / CURRICULUM)",
+  "current_text": "PLAYBOOK(行146354付近) 内の製品名・規制の時点記述",
+  "concern": "PLAYBOOK 本体に時点依存の記述は見当たらない。範囲全体（DEV_QUIZ〜CERTS）を grep すると製品名・規制の時点は『2026年10月/11月時点』と明記済みの注記が多く、その代表は下の checked_ok のとおり出典で再確認できた。残りの製品名は個別には開いていない。",
+  "why": "代表のみ確認。全件は見ていない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "dojo-certs",
+  "tab": "dojo-certs (DEV_QUIZ・Python GIL の問題)",
+  "current_text": "\"exp\":\"PEP 703等を経て、GILを無効化できるfree-threadedビルドが公式サポートへ移行中。\"",
+  "concern": "検索結果では Python 3.14（2025年10月）で PEP 779 により free-threaded ビルドが公式サポートになり、既定ビルドではなく任意(Phase II)。解説の『移行中』は古い可能性が高い（選択肢の正解文『公式サポートされ』とも食い違う）。案: 『…free-threadedビルドがPython 3.14で公式サポートとなった（既定ビルドではなく任意・2026年11月時点）。』と英語側 'are moving toward official support.' の同時修正。",
+  "why": "python.org / peps.python.org / docs.python.org / discuss.python.org が名前解決できず、一次情報を開けなかった。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "dojo-certs",
+  "tab": "dojo-certs (資料: EU AI Act デジタル・オムニバス)",
+  "current_text": "デジタル・オムニバス(2026年7月27日発効)により、Annex III単体高リスクAIシステムの義務適用開始日は当初の2026年8月2日から2027年12月2日に延期された(Annex Iの製品組込み型は2028年8月2日)。",
+  "concern": "検索では 2027-12-02 / 2028-08-02 への延期は複数の記事で一致（2026-05-07 に政治合意、6月に採択）。ただし『7月27日発効』を示す記事は無く、官報(EUR-Lex)を開いていない。",
+  "why": "一次情報を開いて原文を控えるところまで届かなかった（検索要約のみ）。誤りの兆候は無い。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "dojo-certs",
+  "tab": "dojo-certs (クラウド比較クイズ: Vertex AI)",
+  "current_text": "2026年4月22日にGemini Enterprise Agent Platformへ改称された",
+  "concern": "検索結果（The Register 等の報道・Google のリリースノート見出し）は 2026-04-22 の改称で一致。Google 公式ページ(docs.cloud.google.com)は名前解決できず開いていない。",
+  "why": "一次情報を開いて原文を控えるところまで届かなかった（検索要約のみ）。誤りの兆候は無い。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "dojo-certs",
+  "tab": "dojo-certs (韓国AI基本法)",
+  "current_text": "韓国AI基本法(2026年1月22日施行)",
+  "concern": "施行日 2026-01-22 と1年以上の過料猶予は報道（Cooley 等）で一致。政府・法令の一次情報は開いていない。",
+  "why": "一次情報を開いて原文を控えるところまで届かなかった（検索要約のみ）。誤りの兆候は無い。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "dojo-certs",
+  "tab": "dojo-certs (Gartner agentic AI 予測)",
+  "current_text": "Gartnerは、2028年までに日常業務の判断の約15%をagentic AIが自律的に行うと予測している",
+  "concern": "Gartner 2025-06-25 のプレスリリースとして複数報道で一致、改訂の形跡なし。gartner.com のページ本文は開いていない。",
+  "why": "一次情報を開いて原文を控えるところまで届かなかった（検索要約のみ）。誤りの兆候は無い。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "strategy-xform",
+  "tab": "xform",
+  "current_text": "G検定：145問前後／100分・13,200円（学生5,500円）、累計合格15万人超、合格率8割前後",
+  "concern": "受験料・問題数・累計合格者数・シラバス改定。検索要約に『2026年からオンライン100分・145問に加え会場試験120分・145問が年3回新設』『シラバスは2024年11月改訂版』とあり、会場試験の追加で『100分』の書き方が不完全になる可能性",
+  "why": "JDLA公式は開けず、二次情報（TAC資料・ai-souken・craftai）はホスト解決できず本文を開けなかった。開けたページが無く、検索結果の要約だけでは根拠にしない規則のため未確認。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "strategy-xform",
+  "tab": "xform",
+  "current_text": "生成AIパスポート：60問／60分・42問正解（70%）で合格・11,000円、自宅受験（IBT）",
+  "concern": "受験料・合格基準。検索要約に『学生は5,500円』『合格基準は非公開とする記事もある』とあり、『42問正解（70%）で合格』と『学生料金の有無』が食い違う可能性",
+  "why": "guga.or.jp は開けず、LEC・atsoho・agaroot・uravation も本文を開けなかった。開けたページが無く、検索結果の要約だけでは根拠にしない規則のため未確認。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "strategy-xform",
+  "tab": "xform",
+  "current_text": "統計検定2級：CBT 35問前後／90分・60点以上で合格、受験料7,000円（学生5,000円）、一般電卓1台",
+  "concern": "受験料・出題範囲・電卓規定。検索要約では7,000円（学生5,000円）・90分・35問前後・60点と一致したが二次情報のみ",
+  "why": "toukei-kentei.jp / sikaku.gr.jp は開けず、LEC も開けなかった。開けたページが無く、検索結果の要約だけでは根拠にしない規則のため未確認。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "strategy-xform",
+  "tab": "strategy",
+  "current_text": "ROADMAP・RADAR・ASSETS（資格名など）",
+  "concern": "ROADMAP_MEGATECH・COMP・ASSETS の資格名",
+  "why": "原稿の洗い出しは実施: 候補は『最新手法』の2件のみで時点依存ではない。ASSETS の『Azure保有＋AWS/GCP学習中』は本人の状況で外部事実ではない。ROADMAP_MEGATECH の『AWS ML系資格』は名称が特定されず、出典で照合できる固有の資格名が無い。COMP の資格名は出典を開けず照合していない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "strategy-xform",
+  "tab": "consult",
+  "current_text": "CONSULT_STATS・CONSULT_MAP・TACIT_WORLD・BPR_*",
+  "concern": "CONSULT_STATS: McKinsey『88%→5.5%』『21%』、S&P Global『46%』、Prosci『88% vs 13%』が新しい版に置き換わっていないか。検索結果に McKinsey『The state of AI in 2026: On the road to ROI』があり、二次情報はEBIT貢献37%・高成果6%と報じる。原稿の5.5%とは別の版・別の指標の可能性",
+  "why": "mckinsey.com は 503、spglobal.com・prosci.com は名前解決失敗で開けず。二次情報は本文を開けていない。tacit（TACIT_WORLD）・bpr は出典付きの統計が無く事例の時点も照合できなかった。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "strategy-xform",
+  "tab": "consult",
+  "current_text": "DXで成果を実感する企業は日本58%に対し米国89%（IPA DX白書）",
+  "concern": "どの年の調査か書かれていない。IPA「DX動向2025」のディスカッション・ペーパーは別の指標（効率化と成長の両方で成果：日本26.8%・米国80.9%・ドイツ77.6%）を示しており、ファクトブックは「日本約6割 vs 米独8割超」と書いている。58%・89% の出典の版を確かめて時点を明記する必要がある。",
+  "why": "58%・89% が載っている DX白書の本文を開いて確かめていない（ディスカッション・ペーパーには無い）。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "strategy-xform",
+  "tab": "consult",
+  "current_text": "AI定常利用は88%に達する一方、EBIT貢献を実証できる企業は約5.5%（McKinsey）／ワークフロー再設計は実施21%（McKinsey）／AI PoCの46%が本番前に放棄（S&P Global）／ISO/IEC 42001認証は既に350組織超",
+  "concern": "McKinsey は2026年版の State of AI を出しているとの二次情報があり、数字が変わっている可能性がある。S&P と ISO 42001 の件数も新しい値がある可能性。",
+  "why": "www.mckinsey.com は 503、www.spglobal.com は許可リスト外で開けない。",
   "first_seen": "2026-11-12",
   "last_tried": "2026-11-12"
  }

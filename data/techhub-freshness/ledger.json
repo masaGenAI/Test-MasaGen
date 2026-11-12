@@ -10,7 +10,8 @@
    "checked_ok": 15,
    "blocked_hosts": [],
    "coverage": "【見た範囲】companies タブの定数 COMPANIES のうち担当8社（Google／Amazon／Meta／Apple／Microsoft／Anthropic／OpenAI／NVIDIA）の全項目、COMPARE（比較表）の該当8行、CASES（実装事例）19件の本文、職種別攻略のうち担当企業の製品名が出る行。逆質問・日本市場・提供モデル・面接準備は目を通したが、担当企業の時点依存の記述は無く、出典確認はしていない（日本市場の統計は担当外）。 【確かめ方】置換案13件・47置換は、指示書の検査コマンドで全件合格（最終実行 2026-11-11 14:58 UTC、検査ファイルは /tmp/claude-0/-home-user-Test-MasaGen/75876541-d666-5824-a83c-5ca9cdbe8f9b/scratchpad/fresh/out/companies-a.json）。全置換を順に当てた結果をメモリ上で試し、JS として読めること、製品欄の日本語と英訳辞書 TH_EN のキーが8社とも一致することを確かめた（リポジトリは書き換えていない）。製品欄は COMPANIES と TH_EN のキーの2か所に同じ文字列があるため count 2 にしてある。 【開けなかった一次情報】この環境の通信制限で次は開けなかった：openai.com（40…",
-   "last_checked": "2026-11-12"
+   "last_checked": "2026-11-12",
+   "proxy_blocked": []
   },
   "companies-b": {
    "status": "checked",
@@ -22,7 +23,8 @@
    "checked_ok": 14,
    "blocked_hosts": [],
    "coverage": "見た範囲：定数 COMPANIES のうち Oracle・Palantir・Salesforce・Databricks・Snowflake・ServiceNow・SAP・IBM の8枚（org・prod・arch・asks・ask_them・checked を全文）、CASES のうち8社に関わる3件（Reddit × Agentforce、業界横断調査、各社エージェント基盤の競争）、COMPARE の8社の行。タブ内の残り7画面は8社の名前で検索しただけ。 置換案12件は repl_check.py で全件合格（/tmp/claude-0/-home-user-Test-MasaGen/75876541-d666-5824-a83c-5ca9cdbe8f9b/scratchpad/fresh/out/companies-b.json）。企業カードの prod は TH_EN の訳語表のキーにも同じ日本語があるため count 2 で出し、英語の訳語は別の置換にした。作業中に ProjectNova.jsx が別の作業で書き換わり行番号が約117行ずれたので、行番号ではなく文字列で特定している。カードの「最終確認」の日付は触っていない。 確かめ切れなかった範囲（ネットワーク制限）：このセッションから開けた公式サイトは salesforce.com、databricks.com、sn…",
-   "last_checked": "2026-11-12"
+   "last_checked": "2026-11-12",
+   "proxy_blocked": []
   },
   "companies-c": {
    "status": "checked",
@@ -34,7 +36,8 @@
    "checked_ok": 11,
    "blocked_hosts": [],
    "coverage": "【見た範囲】原稿の COMPANIES のうち Slalom / PKSHA Technology / Laboro.AI / エクサウィザーズ / ABEJA / ギブリー / FLUX の全項目、JP_MARKET（23項目すべて）と JPM_LENS・注記（jm_intro / jm_note）、DELIVERY_MODELS（4型）、ROLES_GUIDE（職種別攻略 14職種）、INTERVIEW_PLAYBOOK（面接準備）、REVERSE_Q（逆質問）を原稿で通読した。提供モデル・面接準備・逆質問には時点に依存する記述がほぼ無く、指摘は職種別攻略の製品名1件だけ。 【確かめ方】一次情報の本文を開いて確認できたのは slalom.com、総務省（令和8年版情報通信白書の概要・第Ⅰ部第1章と第2章・第Ⅱ部、自治体の生成AI導入状況 令和7年度、AI事業者ガイドラインのアンケート2回分）、Stanford HAI AI Index 2026（第1・3・4章のPDF）、IPA DX動向2026／2025、JUAS 企業IT動向調査報告書2026、PwC Japan、NRI、Google Cloud 公式ブログ、Microsoft 公式ブログ（IDC調査）。 【見られなかった範囲】日本のAI企業6社（PKSHA・Laboro.AI・エクサウィザーズ・ABEJA・ギブリー・FLU…",
-   "last_checked": "2026-11-12"
+   "last_checked": "2026-11-12",
+   "proxy_blocked": []
   },
   "factbook-a": {
    "status": "checked",
@@ -46,7 +49,8 @@
    "checked_ok": 11,
    "blocked_hosts": [],
    "coverage": "見た範囲: ファクトブックの「市場・マクロ」18件、「導入・普及」14件、「成果・ROI」21件の全53件と、提案材料6本（18行）を全部読み、出典の版・年・リンクを洗い出した。出典を開いて新しい版まで確かめたのは、総務省 情報通信白書（令和8年版）、総務省 自治体の生成AI導入状況（令和7年度）、IPA DX動向2026、Stanford AI Index 2026、Menlo Ventures 2026、IDC（世界・国内）、BCG、Google Cloud、Salesforce、Microsoft/IDC、NRI、中国政府網（トークン量・生成AIユーザー・AI企業数）。予測の対象年（2027年末・2028年・2029年・2030年・2035年）はどれもまだ過ぎていない。開けなかったもの: mckinsey.com、pwc.com、gartner.com、ibm.com、dora.dev、spglobal.com、businesswire.com、goldmansachs.com、nber.org、github.blog、mlq.ai、news.cn、cnnic.cn、qianzhan.com、my.idc.com、chusho.meti.go.jp（この環境の通信許可の外か403。確かめるには通信設定でこれらのホストを許可する必要がある）。これらを出典にする項目は未確認に回し…",
-   "last_checked": "2026-11-12"
+   "last_checked": "2026-11-12",
+   "proxy_blocked": []
   },
   "factbook-b": {
    "status": "checked",
@@ -58,7 +62,8 @@
    "checked_ok": 13,
    "blocked_hosts": [],
    "coverage": "【見た範囲】MEGATECH_FACTBOOK のうち担当5ジャンルの全91件（変革実行・BPR 26、技術・アーキテクチャ 11、リスク・規制・信頼 22、人材・スキル・組織 17、データ・IT基盤 15）を一覧にして時点依存の記述を洗い出し、開ける出典は本文（PDFは本文と図の画像）で確かめた。一次情報を開いて確かめたのは JUAS、総務省、IPA、経産省、内閣府、Menlo Ventures、Microsoft、Anthropic、Stanford HAI、国家网信办、EU AI Act（第99条）、Deloitte、Google（DORA）。直した数字は原稿全体を grep し、同じ事実を引く他タブ（ISSUE_TREE・CONSULT_MAP・VALUE_TREE・IND_DATA・IND_DEEP・DISC_QS）とクイズ（CHECK_CORE_GEN2・CHECK_AX_GEN2・CHECK_CORE_GEN3）も置換案に入れた。 【置換案】全59件を repl_check.py で検査し 合格59／不合格0。全件を順に当てた状態で MEGATECH_FACTBOOK・クイズ3本・DISC_QS・IND_DEEP が JSON として読めることも確認した。検査済みのファイルは /tmp/claude-0/-home-user-Test-MasaGen/75876541…",
-   "last_checked": "2026-11-12"
+   "last_checked": "2026-11-12",
+   "proxy_blocked": []
   },
   "lexicon-frontier": {
    "status": "checked",
@@ -70,7 +75,8 @@
    "checked_ok": 12,
    "blocked_hosts": [],
    "coverage": "【見た範囲】lexicon：LEXICON 157語すべての日本語本文（d・say）を通読し、年・社名・モデル名・数値を含む記述を英語側（dEn）と合わせて抽出。LEX_ALIASES と TabLexicon の地の文（時点依存の記述なし）。frontier：FRONTIER_DOMAINS 15ドメイン59トピックの日本語全文（what/why/fit/talk/lab と成熟度フラグ）、TabFrontier の説明文。FT_META・FT_STAT・FT_FORK・FT_THEME・FT_TOOL・FT_SRC_NOTE は全文、FT_ART は先頭8本程度と構造を確認（これらは frontier ではなく archcase タブのVII〜XIV節に表示される、findy-tools.io の2026年9月収集データ）。置換案9件は repl_check.py で全件合格（/tmp/claude-0/-home-user-Test-MasaGen/75876541-d666-5824-a83c-5ca9cdbe8f9b/scratchpad/fresh/out/lexicon-frontier.json）。リポジトリは書き換えていない。 【見ていない・確かめ切れていない範囲】(1) このセッションは外向き通信が許可リスト制で、開けたのは anthropic.com・clau…",
-   "last_checked": "2026-11-12"
+   "last_checked": "2026-11-12",
+   "proxy_blocked": []
   },
   "foresight-briefs": {
    "status": "checked",
@@ -82,7 +88,8 @@
    "checked_ok": 8,
    "blocked_hosts": [],
    "coverage": "見た範囲：fs_macro・fs_market・fs_client・fs_craft の27ブリーフのうち、直近の読みが空欄のもの（f08・f13・f16・f21・f22・f23・f27）と、f01・f02・f03・f09〜f12・f15・f17 の読みを情報源と照合した。agi タブは RADAR_ITEMS のうち AI導入・EU AI Act・日本のAI法制・コロラド州・Menlo・総務省・MCP の項目と AGI_SCEN の「16%」を確認。事実は、Epoch・Anthropic・AWS・Microsoft Ignite・IDC・Menlo Ventures・Consultancy.uk・経産省・内閣府・総務省・欧州委員会・Stanford・OWID・Import AI のページ本文を自分で開いて照合し、Alphabet・Amazon の決算は SEC の公式リリース（WebFetch）で確認した。見ていない範囲：f04〜f07・f14・f18〜f20・f24〜f26 の読みの照合、f17 の IPA 調査の新版有無、RADAR_ITEMS の残りの項目、AGI_AXES、f21（Gartner のページが取得できず空欄のまま）。コロラド州の項目は州議会ページで署名日・廃止再制定を確認したが施行範囲の詳細は法律事務所の解説のみのため「要再確認」とした。置換案の検査：Pro…",
-   "last_checked": "2026-11-12"
+   "last_checked": "2026-11-12",
+   "proxy_blocked": []
   },
   "cloud-dojo": {
    "status": "checked",
@@ -100,37 +107,92 @@
     "www.srgresearch.com"
    ],
    "coverage": "見た範囲：CLOUD_DATA（4社×9分類の全サービス行）と CLOUD_DOJO_EN の対応、GLOSSARY（全行を通読。時点依存は市場シェアの1行のみ）、SERVICE_GLOSSARY（空配列）、CLOUD_QUIZ、BANK（141287〜142366行）のうち「2026年10月時点」の注記が付いた22問の注記内容。確認済みの置換案は9件（18か所、repl_check 全件合格）。見ていない範囲：BANK のうち注記が付いていない約1,050問の個別の事実（数字・料金・SLAなど）は全数確認していない。早見表（144920行付近）は担当外の定数として本文の訂正案を出していない。tabtext.mjs の「クラウド道場を開く」は全画面へ遷移する入口で、下位画面は原稿（定数）で確認した。ネットワーク制限で blogs.oracle.com、docs.oracle.com、docs.cloud.google.com、learn.microsoft.com（WebFetch。Learn は MCP で取得）、srgresearch.com、dev.to、atmarkit.itmedia.co.jp、dev.classmethod.jp は開けず、Oracle 26ai・市場シェア・Google側の改称は unverified に回した。",
-   "last_checked": "2026-11-12"
+   "last_checked": "2026-11-12",
+   "proxy_blocked": [
+    "blogs.oracle.com",
+    "docs.oracle.com",
+    "docs.cloud.google.com",
+    "www.srgresearch.com"
+   ]
   },
   "dojo-certs": {
-   "status": "blocked",
+   "status": "checked",
    "last_attempt": "2026-11-12",
    "fixed": 0,
    "partial": 0,
    "rejected": 0,
-   "unverified": 4,
-   "checked_ok": 0,
+   "unverified": 9,
+   "checked_ok": 5,
    "blocked_hosts": [
     "assets.contentstack.io",
-    "pages.iapp.org",
-    "www.isc2.org"
+    "www.isc2.org",
+    "trainingcamp.com",
+    "www.privacybootcamp.com",
+    "www.python.org",
+    "peps.python.org",
+    "docs.python.org",
+    "discuss.python.org",
+    "pydevtools.com",
+    "docs.cloud.google.com",
+    "www.iso.org(403)",
+    "www.oracle.com(403)",
+    "www.ilga.gov(503)"
    ],
-   "coverage": "見たのは CERTS・AIGP/CISSP/CC/ISO42001F のドメイン定義とクイズ定義の冒頭、画面注記、PLAYBOOK 内の日付語の簡易 grep のみ。DEV_QUIZ・ARCH_QUIZ・VERSUS・DRILLS・CASE_DRILLS・SIM_FACTORS・L1〜L5・CURRICULUM は内容を読んでいない。クイズ本文（AIGP_QUIZ など）の個別設問も未精査。このセッションでは iapp.org の入口ページしか開けず、BoK PDF（assets.contentstack.io）、pages.iapp.org、isc2.org、trainingcamp.com、privacybootcamp.com は名前解決に失敗した。そのため出典本文を開いて確かめた修正案は0件。置換案は作っていないので repl_check.py も実行していない。ネットワーク許可後に AIGP の4ドメイン問題を最優先で再点検してほしい。"
+   "coverage": "carry 4件は全て再試行（いずれも確定できず unverified）。範囲内の固有名詞・日付を grep し、Microsoft Learn・AWS Docs・PECB の出典を開いて4件+1件を照合、他は検索要約止まり。7ドメインの AIGP、CISSP、ISC2 CC は公式を開けず未確認。DEV_QUIZ（約140万字）・ARCH_QUIZ・DRILLS・VERSUS・CASE_DRILLS・L1〜L5・SIM_FACTORS・CISSP_QUIZ/CC_QUIZ/AIGP_QUIZ/ISO42001F_QUIZ の問題本文は日付語と製品名の抜き出しのみで、全問は読んでいない。受験料・試験形式（問題数・時間）は出典を開けず確認していない。『既に古いと確かめた語の残り』は0件。",
+   "last_checked": "2026-11-12",
+   "proxy_blocked": [
+    "assets.contentstack.io",
+    "discuss.python.org",
+    "docs.cloud.google.com",
+    "docs.python.org",
+    "peps.python.org",
+    "pydevtools.com",
+    "trainingcamp.com",
+    "www.isc2.org",
+    "www.privacybootcamp.com",
+    "www.python.org"
+   ]
   },
   "strategy-xform": {
-   "status": "blocked",
+   "status": "checked",
    "last_attempt": "2026-11-12",
-   "fixed": 0,
+   "fixed": 2,
    "partial": 0,
    "rejected": 0,
-   "unverified": 5,
-   "checked_ok": 0,
+   "unverified": 7,
+   "checked_ok": 1,
    "blocked_hosts": [
     "www.jdla.org",
+    "guga.or.jp",
+    "www.toukei-kentei.jp",
     "www.sikaku.gr.jp",
-    "guga.or.jp"
+    "www.mckinsey.com(503)",
+    "www.lec-jp.com",
+    "bookstore.tac-school.co.jp",
+    "www.itpro.com",
+    "www.ai-souken.com",
+    "uravation.com",
+    "www.prosci.com",
+    "www.spglobal.com",
+    "atsoho.com",
+    "craftai.jp",
+    "www.agaroot.jp"
    ],
-   "coverage": "実質ほぼ未点検。BRIEF.md は読み、XT_CERTS（xform タブ、ProjectNova.jsx の156717行付近）の3資格の記述だけを原稿で確認した。出典確認に使う WebFetch は、jdla.org・sikaku.gr.jp・guga.or.jp のいずれもホスト解決に失敗した（セッションの許可ネットワーク外）。公式ページを一つも開けていないため、確認済みと言える事実は無く、修正案（findings）は0件で、置換案の検査も実施していない。WebSearch は G検定の受験料13,200円（学生5,500円）が二次情報と一致することだけ示したが、公式の本文ではない。strategy（ROADMAP・RADAR・ASSETS）、consult、tacit、bpr は原稿の洗い出しをしていない。再実施するには、上記3ドメインと各担当範囲の出典ドメインをセッションの許可ネットワークに追加する必要がある。"
+   "coverage": "carry 5件はすべて未確認のまま持ち越し。出典を開けたページは0件（WebSearch は動くが、検索要約のみで根拠にしない）。原稿は XT_CERTS・CONSULT_STATS・ASSETS・ROADMAP_MEGATECH・roadmapPlan の本文を読み、候補2件（『最新手法』）は時点依存でないと判断。COMP・CONSULT_MAP本体（13万字）・TACIT_WORLD・BPR_*・XF_* は内容を読んでおらず、固有名詞・数字の15件照合は未達。『既に古いと確かめた語の残り』は0件。 ／【追記・主の点検】CONSULT_STATS と CONSULT_MAP の出典つき統計（BCG・Menlo・IPA・McKinsey・Prosci・S&P・JUAS・MIT NANDA）を洗い出し、BCG と Menlo は出典のページを開いて照合した。同じ BCG の数字を引く提案・ケース演習・論点・価値・理解度チェックの箇所も一緒に置換案に入れた。XT_CERTS（G検定・生成AIパスポート・統計検定）は公式サイトが許可リスト外のままで未点検。TACIT_WORLD・BPR_*・XF_* は出典つきの統計がほぼ無く、個別の事例は照合していない。",
+   "last_checked": "2026-11-12",
+   "proxy_blocked": [
+    "www.jdla.org",
+    "guga.or.jp",
+    "www.toukei-kentei.jp",
+    "www.sikaku.gr.jp",
+    "www.lec-jp.com",
+    "bookstore.tac-school.co.jp",
+    "www.itpro.com",
+    "www.ai-souken.com",
+    "uravation.com",
+    "www.prosci.com",
+    "www.spglobal.com"
+   ]
   },
   "archcase": {
    "status": "checked",
@@ -145,7 +207,10 @@
     "learn.microsoft.com"
    ],
    "coverage": "見た範囲: archcase タブの本文を通読し、ARCH_TOOLS（ツール早見表）の製品名を中心に、AWS、Azure、Google Cloud の改称・統合・提供終了を確かめた。Kendra、Bedrock Agents、Vertex AI、Azure OpenAI は一次情報を開いて確認した。見ていない範囲: 公開事例の出典リンク（findy-tools.io、AWS、Google Cloud の事例ブログ）の生死は未確認。ARCH_CASES、ARCH_AG、ARCH_OFC の個別事例の数値や構成は、当時の記述として扱い、原典との照合はしていない。ARCH_SPECS、ARCH_GUIDE、クイズ類は先頭の抽出のみ。Google Cloud の docs.cloud.google.com と learn.microsoft.com はこの環境の WebFetch では開けず、Microsoft Learn は MCP 経由で取得した。",
-   "last_checked": "2026-11-12"
+   "last_checked": "2026-11-12",
+   "proxy_blocked": [
+    "docs.cloud.google.com"
+   ]
   },
   "architect-sa": {
    "status": "checked",
@@ -159,7 +224,10 @@
     "docs.anthropic.com"
    ],
    "coverage": "候補75件は全て「最新」という語の一般用法（RAGの最新性、最新モデル至上主義批判など）で、過ぎた予定・古い時点の候補は0件。モデル名・料金・年号は DIAGRAMS／SA／ARCH 系定数を正規表現で洗い出し、Anthropic の世代名と料金の記述、Foundry カタログの規模のみ出典で照合。他社(Google/OpenAI/Meta/Apple/Databricks等)の製品名・日付、INDUSTRY_PATTERNS・SA_SYSDESIGN・SA_ADVISORY・ARCH_EXERCISE_STEPS の個別事実、ACAD_QUIZの全問は見ていない。 【追記】候補『古いと確かめた語』のうち Vertex AI・Kendra・Bedrock Agents・Amazon Q Business・Agentspace・Assistants API を出典（Google Cloud Blog、AWS Docs、Google Blog）で再確認し、SA_INTERVIEW_QA の各定義箇所の代表のみ置換案にした。各語の残り約40〜50か所（SA_QUIZ、DIAGRAMS、INDUSTRY_SCENARIOS、ARCH_SECTIONS、ACAD_QUIZ ほか）は精査していない。",
-   "last_checked": "2026-11-12"
+   "last_checked": "2026-11-12",
+   "proxy_blocked": [
+    "docs.anthropic.com"
+   ]
   },
   "toolbox-proposal": {
    "status": "checked",
@@ -179,7 +247,14 @@
     "www8.cao.go.jp"
    ],
    "coverage": "候補ファイル21件は全て『今年・最新』等の一般語の誤検出で、過ぎた予定・期限・古い時点は0件。GOV_GATE_WORLD/LAW/VENDOR、FIN_GATE_MAP、PF3_PLANS、TBX_EVAL_OPS、TBX_CASES、PROP系の時点依存語をgrepで確認。EU AI Act(附属書III 2027-12-02)・Colorado SB26-189の記述はfacts.jsonの台帳と食い違わず、TBX_*(Evalsツール名)に特定製品名・価格は見当たらなかった。salesdojo/casework/livedojoは候補以外を網羅していない。出典ページは1件も開けず、findingsは0件。 今回の追記：総務省PDF2件を取得しpdftotextで原文確認、残りの語3件のうち当担当分（GOV_GATE_WORLD、CASE_CARDS、DISC_QS）を置換案化。87.2%/29.9%は他範囲の定数（IND_DEEP 152295/152304/152331、CHECK_AX_GEN2/CHECK_CORE_GEN3のクイズ157961/157962、MEGATECH_FACTBOOK）にも残るが担当外・クイズは選択肢整合のため置換案を出していない。Intercom/会計/DBS/MITは未確認のまま。照合した出典は15件に届いていない。",
-   "last_checked": "2026-11-12"
+   "last_checked": "2026-11-12",
+   "proxy_blocked": [
+    "businesslawyers.jp",
+    "fin.ai",
+    "www.cao.go.jp",
+    "www.fin.ai",
+    "www.intercom.com"
+   ]
   },
   "govdojo": {
    "status": "checked",
@@ -194,7 +269,8 @@
     "eur-lex.europa.eu (未試行・既知のボット確認)"
    ],
    "coverage": "compare.json の upcoming は最早が2026-12-02で、今日(2026-11-12)までに過ぎた予定は無い。画面の「未確認」点のうち、EU AI Omnibus日程・NIST・文科省・個情委・コロラド・韓国AI基本法・インド・米連邦先占を確認。韓国と米連邦先占は検索結果のみ(一次ページ未開封)。日本のAI基本計画・AI指針(内閣官房ページは404)、英国・シンガポール・中国、ISO、industries.json の各業界(EUR-Lex依存の未確認注記など)、GOVDOJO_BANK の個別問題は見ていない。10月31日以降に動いた確認済みの変更は見つからず、置換案は無し。",
-   "last_checked": "2026-11-12"
+   "last_checked": "2026-11-12",
+   "proxy_blocked": []
   },
   "slalom-global": {
    "status": "checked",
@@ -208,7 +284,10 @@
     "macaubusiness.com"
    ],
    "coverage": "見た範囲：SG_FACTS・SG_JPN・SG_TL・SL_FACTS（拠点・規模・経営陣・提携・日本法人・日本の体制）を公式ニュースルーム／リーダーシップ／日本ページ／AWSリリース／Garrison リリースで照合。SLALOM_BANK は『最新』等の一般語の候補のみで、事実に当たる問題（SL の Garrison 解説、AI事業者ガイドライン）は SL_FACTS と整合を目視したが、AI事業者ガイドラインの最新版は確認していない。見ていない範囲：SL_CASES・SL_SURVEY の出典照合、GF_*、SG_CASES（11,306字）、SG_NUM・SG_SRC・SG_MAP・SG_PAT、SLALOM_BANK 本体（81万字）の事実系問題。Oct 28・Nov 3・Sep 30 は見出しのみ確認で本文未取得。照合した事項は約19件（findings 2・checked_ok 10・unverified 6）で、最低15件の基準は満たすが、独立した出典ページを開いた数は約8ページ。",
-   "last_checked": "2026-11-12"
+   "last_checked": "2026-11-12",
+   "proxy_blocked": [
+    "macaubusiness.com"
+   ]
   },
   "postmortem-industry": {
    "status": "checked",
@@ -249,7 +328,19 @@
     "www.abc.net.au"
    ],
    "coverage": "候補ファイルの『既に古いと確かめた語』6件（87.2%）は全件処理（原稿上は旧値が約23か所：置換案は7種、クイズは unverified）。『最新』系の候補23件は『直近』『最新版』という一般語で、日付つきの古い事実ではないため直していない。PM_CASES は10事例のうち Zillow・Air Canada・Avianca・Watson・A-level・Bard を確認、NYC・McDonald's・Deloitte は続報を検索で見つけたが原文は開けず unverified。IND_DATA/IND_DEEP/IND_DEEP2 は自治体・Menlo・Salesforce・FSA・Gartner(検索のみ)・企業発表数字を抜き取り、企業発表系の多くは出典ホストが開けず未確認。VALUE_TREE は Stanford・総務省白書・Menlo を確認、PwC・IPA・DORA・IBM・Veracode・Prosci・BCG・S&P・EY・NRI は未確認または一部のみ。SHELF_GROUPS・AX_* は製品名・日付・統計の固有表現がほぼなく、機械的な grep のみ（問題なし）。照合した出典は約20件、そのうち原文を開いたもの約14件。",
-   "last_checked": "2026-11-12"
+   "last_checked": "2026-11-12",
+   "proxy_blocked": [
+    "themarkup.org",
+    "www.statescoop.com",
+    "www.route-fifty.com",
+    "www.vice.com",
+    "chat.nyc.gov",
+    "www.theregister.com",
+    "www.techradar.com",
+    "futurism.com",
+    "www.emarketer.com",
+    "atmarkit.itmedia.co.jp"
+   ]
   },
   "itsec": {
    "status": "checked",
@@ -281,7 +372,19 @@
     "www.bsigroup.com"
    ],
    "coverage": "見た範囲：W/cand-itsec.md の候補全部（『最新』と書いた18件はいずれも一般語で、時点依存ではない。過ぎた予定・近い期限・古い時点・残りの語は0件）。ITSEC_FACTS（能動的サイバー防御法・NCO・SCS・経営ガイドライン・個人情報保護法改正・金融庁）、ITSEC_TOP10、ITSEC_CLOCKS の個人情報保護法の期限、用語解説のMicrosoft製品の記述（Entra Agent ID、Sentinel、MCSB v2）、規格の版（CSF、CIS、テレワークGL）。確かめた事実は照合15件超。見ていない範囲：ITSEC_BANK（約39万字）の問題文は規格の版・Microsoft製品の記述を中心に抜き出して見ただけで、全問は読んでいない。PCI DSS、政府統一基準の本文、ISMAP管理基準の改定（検索では2025年12月25日に改定案、2027年3月に関係規程類の公表予定とあるが、原稿に時点依存の記述は無く未照合）、ITSEC_INCIDENTS の2024年以前の事例の続報は見ていない。",
-   "last_checked": "2026-11-12"
+   "last_checked": "2026-11-12",
+   "proxy_blocked": [
+    "www.pcisecuritystandards.org",
+    "www.cisecurity.org",
+    "www.jpcert.or.jp",
+    "csrc.nist.gov",
+    "www.cao.go.jp",
+    "www.idcf.jp",
+    "en.dkkaraoke.co.jp",
+    "internet.watch.impress.co.jp",
+    "scan.netsecurity.ne.jp",
+    "rocket-boys.co.jp"
+   ]
   },
   "checks-notes": {
    "status": "checked",
@@ -308,7 +411,18 @@
     "www.pwc.com(403)"
    ],
    "coverage": "確かめた範囲：自治体の生成AI導入率（総務省PDFで本文を確認、checkcore/checkax/industry系の旧値を置換案に）、Claude Cowork統合、Menlo Ventures 2025年版と2026年版、金融庁、AI推進法、EU AI Act罰則、NOTE_CORPORAの件数・期間と画面の出所注記のアプリ内照合。既に古いと確かめた語の残り：87.2%/29.9%（14か所を直し、他は149403の『前回調査』として正しいので残す。82.7%は81%へ置換）、26.7%（8か所すべて別の統計のため直さない。個人利用率として使っている箇所は見つからず）、Claude Cowork（NOTE_CORPORAの1か所を直す。NOTE_ARTICLES内の言及は記事要約なので直さない）。見ていない範囲：CHECK_*（約65万字）とCONV_DRILLS・HYPO_*は年・モデル名・数字を含む問題のうち代表だけで全量は見ていない（モデル名はほぼ無く、Gartner/McKinsey/IBM/S&P等の統計が中心）。NOTE_ARTICLES・NOTE_ART_ENは要約のため書き換えない前提で、期間表記の候補（過ぎた予定33件）は元記事の予測として正しく過去の言及なので触れていない。NOTE_GOVの一次ソースは金融庁のみ開けた。NOTE_GT_FIGS/PMAP/…",
-   "last_checked": "2026-11-12"
+   "last_checked": "2026-11-12",
+   "proxy_blocked": [
+    "newsroom.ibm.com",
+    "darioamodei.com",
+    "www.axios.com",
+    "www.gov.ca.gov",
+    "www.spglobal.com",
+    "www.cao.go.jp",
+    "www.klarna.com",
+    "dora.dev",
+    "www.flexera.com"
+   ]
   },
   "dojo-quiz": {
    "status": "checked",
@@ -323,7 +437,10 @@
     "openai.com"
    ],
    "coverage": "MCQS（約4,991問）から、現在形・「現在」「現時点」「最新」・年・モデル名・規制日付を含む問題文83問をスクリプトで洗い出し、候補ファイルの各語（Vertex AI、Project Mariner、49.7%、26.7%、85.1%、過ぎた予定）と合わせて照合。出典を開いて照合したのは約18件。見ていない範囲：問題文に年・語を含まない解説内の数値、料金・上限値の問題（Claude 3.5 Sonnet 入力単価、GPT-4 Turbo 128k など）は個別に出典を開いていない。候補の「最新と書く」314件は先頭80件のうち大半が『最新技術』『最新値』などの一般語・カテゴリ名「最新動向」で、時点依存の主張ではなかった。GPT-5（2025-08）の仕組みの問題は openai.com が403で未確認。",
-   "last_checked": "2026-11-12"
+   "last_checked": "2026-11-12",
+   "proxy_blocked": [
+    "deepmind.google"
+   ]
   },
   "foresight-library-a": {
    "status": "checked",
@@ -353,7 +470,8 @@
     "reg.googlecloudevents.com"
    ],
    "coverage": "層A・B（s001〜s132、132件）の全URLを curl で到達確認。内容照合は日付つきの desc（MS IR、Anthropic news/research/engineering、MS Cloud Blog、Work Trend Index、Economic Index、AISI、IAPP×2、AI Index、Pew、Ramp、State of AI、Menlo、Accenture）に絞った。層B の desc が『ENOTFOUND』のままの約50件は現在 200 で開くが、内容を開いて書き直してはいない（前回の到達結果の残骸で、直すには各ページの確認が必要）。Gartner・Census・JUAS 等の定点資料の新版は未照合。層C/D は担当外。",
-   "last_checked": "2026-11-12"
+   "last_checked": "2026-11-12",
+   "proxy_blocked": []
   },
   "foresight-library-b": {
    "status": "checked",
@@ -385,7 +503,10 @@
     "rondely.com"
    ],
    "coverage": "層C（s133〜s187）・層D（s188〜s225）の88件全部を curl で到達確認（200: 76件、403: 約12件、404: 3件、転送: s195のみ）。内容照合は約17件（FSA、SSBJ、IPA、JUAS、NIST、gov.uk、EU AI Actタイムライン、GHG、DS-920、人工知能基本計画、デジタルスキル標準、IFTF、The Batch、NISTEP ほか）。fs_collection は既定227件のうち、YouTube108件の存在を oEmbed で確認、非SNSの外部リンク11件のうち到達確認できたのは3件。Instagram・X(t.co)・LinkedIn・Notion・share.google・Gmail は確認していない。メモ（要点・So What）や動画の中身の鮮度は見ていない。c335「クラウドサービス比較表(2023年7月)」は時点を明記した過去資料のため直さない。層A・Bは範囲外。候補の「最新」と書いた15件のうち、s149/s150（JUAS）、s159（MIT SMR）、s184（kantei）、s195（IFTF）は上記で照合、Microsoft・Anthropic・Meeker・Slack系は層A・B側の項目と思われ未確認。「既に古いと確かめた語の残り」は0件。",
-   "last_checked": "2026-11-12"
+   "last_checked": "2026-11-12",
+   "proxy_blocked": [
+    "www.ibm.com"
+   ]
   }
  },
  "runs": [
@@ -454,6 +575,17 @@
    "partial": 0,
    "rejected": 0,
    "unverified": 17
+  },
+  {
+   "date": "2026-11-12",
+   "areas": [
+    "dojo-certs",
+    "strategy-xform"
+   ],
+   "fixed": 2,
+   "partial": 0,
+   "rejected": 0,
+   "unverified": 16
   }
  ]
 }
