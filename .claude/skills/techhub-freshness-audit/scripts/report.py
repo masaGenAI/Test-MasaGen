@@ -81,7 +81,9 @@ def main() -> None:
             for f, v in fixed:
                 fact = v.get("verified_fact") or f.get("verified_fact")
                 url = v.get("source_url") or f.get("source_url")
-                flag = "　**要再確認**（一次情報で確かめ切れていない）" if "要再確認" in str(f.get("confidence")) else ""
+                # 検算者が一次情報で確かめ直して確度を上げた（または下げた）ときは、検算者の印を使う
+                conf = v.get("confidence") or f.get("confidence")
+                flag = "　**要再確認**（一次情報で確かめ切れていない）" if "要再確認" in str(conf) else ""
                 if flag:
                     total["recheck"] += 1
                 md.append(f"- 【{f.get('tab')} › {one_line(f.get('where'), 60)}】{one_line(f.get('problem'))}{flag}")

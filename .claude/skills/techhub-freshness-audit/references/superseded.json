@@ -7,11 +7,14 @@
    "source": "https://cloud.google.com/blog/products/ai-machine-learning/introducing-gemini-enterprise-agent-platform",
    "as_of": "2026-11-12",
    "ok_near": [
+    "AI Commerce Search",
+    "Agent Platform",
+    "Agent Search",
     "Gemini Enterprise Agent Platform",
-    "旧Vertex",
-    "formerly Vertex"
+    "formerly Vertex",
+    "旧Vertex"
    ],
-   "how": "比較表・早見表・定義・クイズの正解に関わる箇所は「Gemini Enterprise Agent Platform（旧Vertex AI）」に。ついでに触れているだけの箇所や当時の事例はそのまま"
+   "how": "比較表・早見表・定義・クイズの正解に関わる箇所は「Gemini Enterprise Agent Platform（旧Vertex AI）」に。ついでに触れているだけの箇所や当時の事例はそのまま。機能名は Google の名称変更表で確かめたものだけ使う（例：Vertex AI Search→Agent Search、Feature Store→Feature Store on Gemini Enterprise Agent Platform、Model Registry→Model Registry on Gemini Enterprise Agent Platform、Pipelines→Gemini Enterprise Agent Platform Pipelines。Vertex AI Search for commerce は 2026-06-29 に AI Commerce Search in Gemini Enterprise for Customer Experience へ。表 https://docs.cloud.google.com/gemini-enterprise-agent-platform/vertex-ai-name-changes は curl では開けず WebFetch で読める）"
   },
   {
    "old": "Agentspace",
@@ -393,6 +396,70 @@
     "throughput"
    ],
    "how": "BCG の先行企業の倍率として使っている箇所だけ（別の 3.6x は対象外）"
+  },
+  {
+   "old": "Amazon Quick",
+   "now": "AWS は 2026-11-09 に Amazon Quick を AWS Quick に改称した（BI 機能の Amazon Quick Sight も AWS Quick Sight に。既存顧客の操作は不要）",
+   "source": "https://aws.amazon.com/about-aws/whats-new/2026/11/amazon-quick-aws-quick/",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "AWS Quick",
+    "旧Amazon Quick",
+    "formerly Amazon Quick",
+    "Amazon Quickから改称",
+    "renamed from Amazon Quick",
+    "renamed AWS Quick",
+    "AWS Quickへ改称"
+   ],
+   "how": "現役の製品名として書く箇所は「AWS Quick（旧Amazon Quick）」に。当時の事例・記事要約はそのまま"
+  },
+  {
+   "old": "Amazon QuickSight",
+   "now": "BI 機能は Amazon Quick Sight を経て、2026-11-09 に AWS Quick Sight へ改称された",
+   "source": "https://aws.amazon.com/about-aws/whats-new/2026/11/amazon-quick-aws-quick/",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "Quick Sight",
+    "AWS Quick"
+   ],
+   "how": "製品として説明する箇所は「AWS Quick Sight（旧Amazon QuickSight）」に。選択肢の短いラベル「QuickSight」、API・IAM の名前、当時の事例・記事要約はそのまま"
+  },
+  {
+   "old": "Chronicle",
+   "now": "Chronicle Security Operations は Google Security Operations（Google SecOps）に改称された（2024-04-25）",
+   "source": "https://docs.cloud.google.com/chronicle/docs/secops/release-notes",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "SecOps",
+    "Security Operations"
+   ],
+   "how": "現役の製品名として書く箇所は「Google SecOps（旧Chronicle）」に。当時の事例はそのまま（出典は curl では開けず WebFetch で読める）"
+  },
+  {
+   "old": "Deployment Manager",
+   "now": "Google Cloud Deployment Manager は 2027-06-30 以降利用できなくなる。移行先は Infrastructure Manager（Infra Manager）",
+   "source": "https://docs.cloud.google.com/deployment-manager/docs/deprecations",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "retiring",
+    "Infra Manager",
+    "Infrastructure Manager",
+    "終了",
+    "停止"
+   ],
+   "how": "現役の推奨として書く箇所に終了時期と移行先を添える"
+  },
+  {
+   "old": "Custom Vision",
+   "now": "Azure AI Custom Vision は 2028-09-25 に終了する",
+   "source": "https://learn.microsoft.com/azure/ai-services/custom-vision-service/migration-options",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "retiring",
+    "2028",
+    "終了"
+   ],
+   "how": "現役の推奨として書く箇所に終了時期を添える"
   }
  ]
 }

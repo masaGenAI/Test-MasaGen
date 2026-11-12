@@ -558,60 +558,6 @@
   "last_tried": "2026-11-12"
  },
  {
-  "area": "cloud-dojo",
-  "tab": "dojo",
-  "current_text": "[\"Neptune / QLDB\", \"グラフDBと改ざん検知の台帳DB\"]（比較表 AWS データベース。他に 144920/144926 行の早見表にも QLDB）",
-  "concern": "Amazon QLDB は 2025-07-31 に提供終了（移行先は Aurora PostgreSQL）と複数の二次情報で出たが、現役サービスとして載っている可能性が高い。",
-  "why": "AWS 公式の QLDB ページ（docs.aws.amazon.com/qldb/... と aws.amazon.com/qldb/）は 404 か該当記載なしで、本文で終了日を確認できなかった。検索結果の要約（Tutorials Dojo、InfoQ、Classmethod）のみ。同じアプリのクイズ解説は既に「2025年7月31日に提供終了」と書いている。AWS 公式の移行ガイド（AWS Database Blog）の本文を開けば置換可。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "cloud-dojo",
-  "tab": "dojo",
-  "current_text": "[\"23ai VECTOR / HeatWave\", ...]（比較表 OCI）、GLOSSARY/早見表の「23ai」「23ai / SELECT AI」",
-  "concern": "Oracle Database 23ai は 2025-10-14 に Oracle AI Database 26ai へ改称・後継化（検索結果の要約）。比較表・早見表は23aiのまま。",
-  "why": "blogs.oracle.com / docs.oracle.com / atmarkit が本セッションのネットワークで名前解決できず、一次情報の本文を開けなかった。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "cloud-dojo",
-  "tab": "dojo",
-  "current_text": "GLOSSARY「市場シェア」：2026年時点でAWS約30%、Azure約20〜25%、GCP約10%、OCIは3%前後とされる",
-  "concern": "Synergy Research の最新値は AWS 28%・Microsoft 20%・Google 15%（2026年Q2、2026-07-30発表と検索要約）で、GCP約10%は古い。クイズ（行678付近）は「AWS約30%」と書いている。",
-  "why": "srgresearch.com が本セッションから取得できず、検索結果の要約しか見られなかった。Q3 2026の値は二次サイトのみで一次未確認。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "cloud-dojo",
-  "tab": "dojo",
-  "current_text": "[\"Agent Builder / ADK\", \"ツールを4種に細分化するエージェント\"]",
-  "concern": "クイズ解説は「Agent Builder は製品名として使われなくなり、2026年4月に Gemini Enterprise Agent Platform へ組み込まれた」と書くが、Google の発表記事には Agent Builder の言及がなかった。",
-  "why": "docs.cloud.google.com のリリースノートが取得できず、Agent Builder の扱いを一次情報で確認できなかった。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "cloud-dojo",
-  "tab": "dojo",
-  "current_text": "[\"Chronicle / reCAPTCHA\", \"証跡集約とボット対策\"]、[\"Terraform / Deployment Manager\", ...]、[\"Recommendations AI\", \"レコメンド\"]",
-  "concern": "Chronicle は Google Security Operations（Google SecOps）へ改称（クイズ解説は2024年4月と記載）。Deployment Manager は廃止方向、Recommendations AI は Vertex AI Search for commerce 系へ再編されている可能性。",
-  "why": "Google Cloud の該当ページが取得不能（docs.cloud.google.com 名前解決不可）か本文が切れており、改称・廃止日を確認できなかった。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "cloud-dojo",
-  "tab": "dojo",
-  "current_text": "[\"Azure OpenAI / Foundry\", \"GPT中心の生成AI基盤\"]、[\"Custom Vision / Video Indexer\", ...]",
-  "concern": "Azure AI Foundry は Microsoft Foundry に改称済み（Learn で確認）で、Azure OpenAI は「Azure OpenAI in Foundry Models」と呼ばれる。ただし「Azure OpenAI / Foundry」は誤りとまでは言えず置換案は出していない。Custom Vision は終了予定（クイズ解説は2028年9月25日）だが本セッションで未確認。",
-  "why": "改称の事実は Learn で確認したが、表現が誤りか好みかの境界で、事実を断定できる箇所が無い。Custom Vision の終了日は一次情報を開いていない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
   "area": "archcase",
   "tab": "archcase",
   "current_text": "gc: [\"Vertex AI Search\", \"Cloud Storage\"]（データ・RAG層）",
@@ -644,78 +590,6 @@
   "current_text": "事例中の Azure OpenAI Service 表記（ARCH_AG・ARCH_OFC の個別事例、Azure AI Document Intelligence など）",
   "concern": "当時の構成の記述なので現行名への書き換えは不要と判断。",
   "why": "Azure AI Document Intelligence の現行名は未確認。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "architect-sa",
-  "tab": "architect",
-  "current_text": "Azure OpenAI ServiceはGPT-4oやo3などOpenAIモデル（SA_INTERVIEW_QA）",
-  "concern": "サービス名が「Azure OpenAI in Microsoft Foundry Models」に改称されている。例示モデルもGPT-5系などが加わり古め。",
-  "why": "文書は旧名と新名が併記され、名称が誤りとまでは言えず、例示も「など」で事実誤りではない。表記の好みの範囲として置換案は出さない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "architect-sa",
-  "tab": "architect",
-  "current_text": "ARCH_SECTIONS・ACAD_QUIZ の例示「Haiku/GPT-4o-mini相当」「GPT-4クラス」",
-  "concern": "例示モデルが旧世代",
-  "why": "一般的な階層の例示で、事実の主張ではない。クイズ解説の長さ釣り合いにも触れるため変更しない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "architect-sa",
-  "tab": "architect",
-  "current_text": "ARCH_REF_FIGS／ACAD_QUIZ 内の企業事例（セゾンテクノロジーのClaude 3 Haiku＋Command R+ など）",
-  "concern": "記事の記述時点のモデル名",
-  "why": "元記事が言ったことの要約（歴史的事実）で書き換え対象外。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "architect-sa",
-  "tab": "architect",
-  "current_text": "DIAGRAMS COMPANIES のGoogle(Gemini 4系)・OpenAI(GPT-6.1系)・Meta・Apple・Databricks等の製品名・日付",
-  "concern": "数が多く、各社の最新状況は未再確認",
-  "why": "各社に2026年11月11日の確認済み印があり、今回は Anthropic 分のみ公式ページで照合した。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "architect-sa",
-  "tab": "architect",
-  "current_text": "Wells Fargo の事例 cloud: 'Google Agentspace + Apigee'（SA_ADVISORY）",
-  "concern": "Agentspace は Gemini Enterprise に統合されたが、事例当時の構成名",
-  "why": "事例（歴史的事実）として書かれており、現在の製品名に直すと当時の事実を変えるため置換案は出さない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "architect-sa",
-  "tab": "architect",
-  "current_text": "Amazon Q Business のコネクタ『40超』、Kendra のコネクタ数以外の各数字（SA_INTERVIEW_QA）",
-  "concern": "Q Business のコネクタ数は公式の現行値を確認していない",
-  "why": "Q Business のページに数値の記載が無く、確かめられなかった。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "architect-sa",
-  "tab": "architect",
-  "current_text": "ARCH_REF_FIGS 内『Assistants APIは2026年半ば終了予定』（記事要約）",
-  "concern": "終了予定日が過ぎている可能性",
-  "why": "元記事（2025年）が言ったことの要約で書き換え対象外。Learn の文書は『非推奨・後継 Responses』までで、終了日は確認できなかった。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "architect-sa",
-  "tab": "architect",
-  "current_text": "Vertex AI／Kendra／Bedrock Agents の残り各約40〜50か所（クイズ・図解・比較表・ARCH_SECTIONS・INDUSTRY_SCENARIOS など）",
-  "concern": "同じ改称・受付終了が他の箇所にも残る",
-  "why": "量が多く代表の定義箇所のみ置換案にした。残りは文脈ごとの判断が必要で未精査。",
   "first_seen": "2026-11-12",
   "last_tried": "2026-11-12"
  },
@@ -1409,6 +1283,150 @@
   "current_text": "範囲内の製品名・規制の時点記述",
   "concern": "時点が明記された注記の代表だけ確認。残りの製品名・料金・版は個別に開いていない。",
   "why": "時間内に全件は見られず。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "cloud-dojo",
+  "tab": "dojo",
+  "current_text": "[\"Chronicle / reCAPTCHA\", \"証跡集約とボット対策\"]、[\"Terraform / Deployment Manager\", ...]、[\"Recommendations AI\", \"レコメンド\"]",
+  "concern": "Chronicle は Google Security Operations（Google SecOps）へ改称（クイズ解説は2024年4月と記載）。Deployment Manager は廃止方向、Recommendations AI は Vertex AI Search for commerce 系へ再編されている可能性。",
+  "why": "Google Cloud の該当ページが取得不能（docs.cloud.google.com 名前解決不可）か本文が切れており、改称・廃止日を確認できなかった。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "cloud-dojo",
+  "tab": "dojo",
+  "current_text": "[\"Azure OpenAI / Foundry\", \"GPT中心の生成AI基盤\"]、[\"Custom Vision / Video Indexer\", ...]",
+  "concern": "Azure AI Foundry は Microsoft Foundry に改称済み（Learn で確認）で、Azure OpenAI は「Azure OpenAI in Foundry Models」と呼ばれる。ただし「Azure OpenAI / Foundry」は誤りとまでは言えず置換案は出していない。Custom Vision は終了予定（クイズ解説は2028年9月25日）だが本セッションで未確認。",
+  "why": "改称の事実は Learn で確認したが、表現が誤りか好みかの境界で、事実を断定できる箇所が無い。Custom Vision の終了日は一次情報を開いていない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "cloud-dojo",
+  "tab": "dojo",
+  "current_text": "[\"Neptune / QLDB\", \"グラフDBと改ざん検知の台帳DB\"]（比較表 AWS データベース。他に 144920/144926 行の早見表にも QLDB）",
+  "concern": "Amazon QLDB は 2025-07-31 に提供終了（移行先は Aurora PostgreSQL）とされ、比較表・早見表は現役のように載っている。BANK の解説は既に提供終了と書いている。",
+  "why": "AWS 公式の QLDB ドキュメント（docs.aws.amazon.com/qldb/…）と AWS Database Blog の移行記事は、開いても 404 か QLDB の記載なし。クラスメソッドの記事は名前解決できず開けない。検索要約しか根拠がないので直さない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "cloud-dojo",
+  "tab": "dojo",
+  "current_text": "[\"23ai VECTOR / HeatWave\", ...]（比較表 OCI）、GLOSSARY/早見表の「23ai」「23ai / SELECT AI」",
+  "concern": "Oracle Database 23ai は 2025-10-14 に Oracle AI Database 26ai に置き換わったとされる。BANK の 141626・141692・141693 行、CLOUD_DATA の OCI 行、早見表 DiagDbType は 23ai のまま（141710・142007 行は既に 26ai（旧 23ai））。",
+  "why": "www.oracle.com は 403、blogs.oracle.com・docs.oracle.com は名前解決できず、一次情報の本文を開けなかった。検索結果の要約だけでは直さない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "cloud-dojo",
+  "tab": "dojo",
+  "current_text": "GLOSSARY「市場シェア」：2026年時点でAWS約30%、Azure約20〜25%、GCP約10%、OCIは3%前後とされる（英訳は CLOUD_GLOSSARY_EN）",
+  "concern": "Synergy Research の 2026年Q2（2026-07-30 発表）は AWS 28%・Microsoft 20%・Google 15%と検索結果の要約にあり、GCP 約10%は古い疑いが強い。",
+  "why": "www.srgresearch.com と、それを報じた二次サイト（datacenterdynamics・itpro・petri）が名前解決できず開けなかった。OCI の 3% の出典も未確認。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "cloud-dojo",
+  "tab": "dojo",
+  "current_text": "Amazon Q Business は2026年7月31日から新規顧客の受付を終了（BANK 141701 行の解説、CLOUD_DATA は日付なし）",
+  "concern": "受付終了の日付が 7月31日で合っているか。",
+  "why": "AWS の Q Business ドキュメントは『no longer open to new customers』とだけ書いていて日付が無い。日付は直さず残す（受付終了そのものは確認済み）。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "cloud-dojo",
+  "tab": "dojo",
+  "current_text": "Agent Platform（旧Vertex AI）の安全フィルタ・AutoML・ラベリング・蒸留・RAG Engine（BANK 141698・141699・141706・141717・141728・141732 行）",
+  "concern": "これらの機能に、Pipelines・Feature Store・Model Registry・Model Monitoring のような新しい正式名があるか。",
+  "why": "Google の名称変更表にこれらの行が無い（RAG Engine は新旧とも同じ表記）。新名称を作らず、基盤名の旧称だけを直した。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "cloud-dojo",
+  "tab": "dojo",
+  "current_text": "『Amazon Quick』の記述（本範囲では BANK 141701 と CLOUD_DATA の2か所を直す。他の範囲の 123946・140351・154782・175790・176042・176056・176244 行付近にも残る）",
+  "concern": "Amazon Quick は 2026-11-09 に AWS Quick へ改称。他の範囲（architect-sa など）の記述も同じ改称の対象。",
+  "why": "担当範囲外なので置換案は出していない。別の担当者の範囲で確かめて直す。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "architect-sa",
+  "tab": "architect",
+  "current_text": "ARCH_SECTIONS・ACAD_QUIZ の例示「Haiku/GPT-4o-mini相当」「GPT-4クラス」",
+  "concern": "例示モデルが旧世代",
+  "why": "一般的な階層の例示で、事実の主張ではない。クイズ解説の長さ釣り合いにも触れるため変更しない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "architect-sa",
+  "tab": "architect",
+  "current_text": "ARCH_REF_FIGS／ACAD_QUIZ 内の企業事例（セゾンテクノロジーのClaude 3 Haiku＋Command R+ など）",
+  "concern": "記事の記述時点のモデル名",
+  "why": "元記事が言ったことの要約（歴史的事実）で書き換え対象外。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "architect-sa",
+  "tab": "architect",
+  "current_text": "DIAGRAMS COMPANIES のGoogle(Gemini 4系)・OpenAI(GPT-6.1系)・Meta・Apple・Databricks等の製品名・日付",
+  "concern": "数が多く、各社の最新状況は未再確認",
+  "why": "各社に2026年11月11日の確認済み印があり、今回は Anthropic 分のみ公式ページで照合した。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "architect-sa",
+  "tab": "architect",
+  "current_text": "Wells Fargo の事例 cloud: 'Google Agentspace + Apigee'（SA_ADVISORY）",
+  "concern": "Agentspace は Gemini Enterprise に統合されたが、事例当時の構成名",
+  "why": "事例（歴史的事実）として書かれており、現在の製品名に直すと当時の事実を変えるため置換案は出さない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "architect-sa",
+  "tab": "architect",
+  "current_text": "ARCH_REF_FIGS 内『Assistants APIは2026年半ば終了予定』（記事要約）",
+  "concern": "終了予定日が過ぎている可能性",
+  "why": "元記事（2025年）が言ったことの要約で書き換え対象外。Learn の文書は『非推奨・後継 Responses』までで、終了日は確認できなかった。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "architect-sa",
+  "tab": "architect",
+  "current_text": "Vertex AI／Kendra／Bedrock Agents の残り各約40〜50か所（クイズ・図解・比較表・ARCH_SECTIONS・INDUSTRY_SCENARIOS など）",
+  "concern": "同じ改称・受付終了が他の箇所にも残る",
+  "why": "量が多く代表の定義箇所のみ置換案にした。残りは文脈ごとの判断が必要で未精査。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "architect-sa",
+  "tab": "architect",
+  "current_text": "Amazon Q Business のコネクタ『40超』、Kendra のコネクタ数以外の各数字（SA_INTERVIEW_QA）",
+  "concern": "Amazon Q Business のコネクタ『40超』の現行値。Kendra の 32+ は AWS の Kendra ページで確認できた（SA_INTERVIEW_QA は『32超』で一致）。",
+  "why": "Amazon Q Business の availability-change ページに数値の記載が無く、現行のコネクタ数を確かめられなかった。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "architect-sa",
+  "tab": "architect",
+  "current_text": "DIAGRAMS の外部モデルAPIノードのラベル en: \"Bedrock/Vertex/Azure\"",
+  "concern": "Vertex は改称済み",
+  "why": "図のノード幅に収まる長さが分からず、ラベルだけ伸ばすと崩れる恐れ。説明文は直した。表記上の短縮であり事実誤りとまでは言えないため置換案を出さない。",
   "first_seen": "2026-11-12",
   "last_tried": "2026-11-12"
  }

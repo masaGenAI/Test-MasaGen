@@ -94,25 +94,31 @@
   "cloud-dojo": {
    "status": "checked",
    "last_attempt": "2026-11-12",
-   "fixed": 10,
+   "fixed": 41,
    "partial": 0,
    "rejected": 0,
    "unverified": 6,
-   "checked_ok": 7,
+   "checked_ok": 14,
    "blocked_hosts": [
+    "www.srgresearch.com",
+    "www.oracle.com (403)",
     "blogs.oracle.com",
     "docs.oracle.com",
-    "docs.cloud.google.com",
-    "learn.microsoft.com",
-    "www.srgresearch.com"
+    "dev.classmethod.jp",
+    "www.datacenterdynamics.com",
+    "www.itpro.com",
+    "petri.com"
    ],
-   "coverage": "見た範囲：CLOUD_DATA（4社×9分類の全サービス行）と CLOUD_DOJO_EN の対応、GLOSSARY（全行を通読。時点依存は市場シェアの1行のみ）、SERVICE_GLOSSARY（空配列）、CLOUD_QUIZ、BANK（141287〜142366行）のうち「2026年10月時点」の注記が付いた22問の注記内容。確認済みの置換案は9件（18か所、repl_check 全件合格）。見ていない範囲：BANK のうち注記が付いていない約1,050問の個別の事実（数字・料金・SLAなど）は全数確認していない。早見表（144920行付近）は担当外の定数として本文の訂正案を出していない。tabtext.mjs の「クラウド道場を開く」は全画面へ遷移する入口で、下位画面は原稿（定数）で確認した。ネットワーク制限で blogs.oracle.com、docs.oracle.com、docs.cloud.google.com、learn.microsoft.com（WebFetch。Learn は MCP で取得）、srgresearch.com、dev.to、atmarkit.itmedia.co.jp、dev.classmethod.jp は開けず、Oracle 26ai・市場シェア・Google側の改称は unverified に回した。",
+   "coverage": "見た範囲：cand-cloud-dojo.md の残り131件（Vertex AI 約103・Kendra 7・Bedrock Agents 5・Amazon Q Business 2・AD B2C・Amazon Forecast・Anomaly Detector・Cache for Redis・Fraud Detector・Migration Hub）を全部確認し、BANK（141561〜142042）の Vertex 26問・Kendra・Bedrock Agents・Q Business・Redis・QuickSight と、CLOUD_DATA・DIFF_TOPICS・4社対応図の該当行を原稿で読んだ。直した：BANK の Vertex AI 26問（基盤名は Agent Platform（旧Vertex AI）、Vertex AI Search は Agent Search、Pipelines/Feature Store/Model Registry/Model Monitoring は名称変更表の新名、Vertex AI Search for commerce は AI Commerce Search）、Kendra 1問（状態を添える）、Bedrock Agents 2問（正解の選択肢を AgentCore に）、Q Business 1問（受付終了を添える）、Ama…",
    "last_checked": "2026-11-12",
    "proxy_blocked": [
+    "www.srgresearch.com",
     "blogs.oracle.com",
     "docs.oracle.com",
-    "docs.cloud.google.com",
-    "www.srgresearch.com"
+    "dev.classmethod.jp",
+    "www.datacenterdynamics.com",
+    "www.itpro.com",
+    "petri.com"
    ]
   },
   "dojo-certs": {
@@ -203,19 +209,15 @@
   "architect-sa": {
    "status": "checked",
    "last_attempt": "2026-11-12",
-   "fixed": 5,
+   "fixed": 37,
    "partial": 0,
    "rejected": 0,
-   "unverified": 8,
-   "checked_ok": 9,
-   "blocked_hosts": [
-    "docs.anthropic.com"
-   ],
-   "coverage": "候補75件は全て「最新」という語の一般用法（RAGの最新性、最新モデル至上主義批判など）で、過ぎた予定・古い時点の候補は0件。モデル名・料金・年号は DIAGRAMS／SA／ARCH 系定数を正規表現で洗い出し、Anthropic の世代名と料金の記述、Foundry カタログの規模のみ出典で照合。他社(Google/OpenAI/Meta/Apple/Databricks等)の製品名・日付、INDUSTRY_PATTERNS・SA_SYSDESIGN・SA_ADVISORY・ARCH_EXERCISE_STEPS の個別事実、ACAD_QUIZの全問は見ていない。 【追記】候補『古いと確かめた語』のうち Vertex AI・Kendra・Bedrock Agents・Amazon Q Business・Agentspace・Assistants API を出典（Google Cloud Blog、AWS Docs、Google Blog）で再確認し、SA_INTERVIEW_QA の各定義箇所の代表のみ置換案にした。各語の残り約40〜50か所（SA_QUIZ、DIAGRAMS、INDUSTRY_SCENARIOS、ARCH_SECTIONS、ACAD_QUIZ ほか）は精査していない。",
+   "unverified": 2,
+   "checked_ok": 10,
+   "blocked_hosts": [],
+   "coverage": "SA_INTERVIEW_QA だけ。cand の残り（Vertex AI・Kendra・Bedrock Agents・Amazon Q Business・Assistants API）に加え、定数内を grep し直して全該当行（Bedrock Agents 約30行、Kendra 約10行、Vertex 約8行）を1か所ずつ判断した。直した：Bedrock Agents→Bedrock Agents Classic（1問答につき日英1回ずつ注記、定義済みの1行は既に反映）、Vertex AI→Agent Platform（旧Vertex AI）、Vertex AI Search→Agent Search（旧Vertex AI Search）、Kendra を新規設計の選択肢として挙げた5問答に新規受付停止を添付、Q の『いつ選ぶか』にQuickを添付。そのまま：三社対応表の中の Kendra／Azure AI Search 対応（Kendra の名前を並べているだけの2行）、Azure AI Studio／Foundry の改称を正しく書いた問答、Azure OpenAI Service（Learn でも現役の呼称）、q の『// Phase1追加…GCP Vertex』のコード内コメント、Vertex の各機能名（Pipelines など。新しい機能名は確かめていないため基盤…",
    "last_checked": "2026-11-12",
-   "proxy_blocked": [
-    "docs.anthropic.com"
-   ]
+   "proxy_blocked": []
   },
   "toolbox-proposal": {
    "status": "checked",
@@ -584,6 +586,17 @@
    "partial": 0,
    "rejected": 0,
    "unverified": 7
+  },
+  {
+   "date": "2026-11-12",
+   "areas": [
+    "cloud-dojo",
+    "architect-sa"
+   ],
+   "fixed": 78,
+   "partial": 0,
+   "rejected": 0,
+   "unverified": 8
   }
  ]
 }
