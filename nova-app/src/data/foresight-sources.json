@@ -2323,8 +2323,8 @@
   "org": "Microsoft",
   "url": "https://www.microsoft.com/en-us/investor/default",
   "desc": [
-   "決算リリース・Webキャスト・年次報告書・SEC提出書類へのIR総合入口（次回 FY27 Q1 は 2026-10-28 と表示）",
-   "Main IR entry point for earnings releases, webcasts, annual reports, and SEC filings (next FY27 Q1 shown as 2026-10-28)."
+   "決算リリース・Webキャスト・年次報告書・SEC提出書類へのIR総合入口（最新は 2026-10-28 発表の FY27 Q1 決算。次回は未発表。2026年11月時点）",
+   "Main IR entry point for earnings releases, webcasts, annual reports, and SEC filings (latest: FY27 Q1 results announced 2026-10-28; next date not yet announced, as of Nov 2026)."
   ],
   "freq": [
    "四半期ごと",
@@ -2389,8 +2389,8 @@
   "org": "Microsoft",
   "url": "https://www.microsoft.com/en-us/microsoft-cloud/blog/",
   "desc": [
-   "ソブリンAI・金融向けエージェント等、Microsoft Cloud の戦略メッセージとAI導入トレンドを読めるブログ（最新 10/5）",
-   "Blog covering Microsoft Cloud's strategic messaging and AI adoption trends, such as sovereign AI and financial-services agents (latest post 10/5)."
+   "ソブリンAI・金融向けエージェント等、Microsoft Cloud の戦略メッセージとAI導入トレンドを読めるブログ（最新 2026-11-09、2026年11月時点）",
+   "Blog covering Microsoft Cloud's strategic messaging and AI adoption trends, such as sovereign AI and financial-services agents (latest post 2026-11-09, as of Nov 2026)."
   ],
   "freq": [
    "週次",
@@ -2455,8 +2455,8 @@
   "org": "Anthropic",
   "url": "https://www.anthropic.com/news",
   "desc": [
-   "製品・ポリシー・提携の公式発表（直近は 2026-10-08 の Usage Policy 更新など）",
-   "Official announcements on products, policy, and partnerships (most recent: Usage Policy update on 2026-10-08, etc.)."
+   "製品・ポリシー・提携の公式発表（直近は 2026-11-09 の Claude Fable 5.2 / Mythos 5.2 発表など（2026年11月時点））",
+   "Official announcements on products, policy, and partnerships (most recent: Claude Fable 5.2 / Mythos 5.2 announcement on 2026-11-09, etc., as of Nov 2026)."
   ],
   "freq": [
    "週次〜日次",
@@ -2488,8 +2488,8 @@
   "org": "Anthropic",
   "url": "https://www.anthropic.com/research",
   "desc": [
-   "安全性・評価・応用研究の公式一覧（直近は 2026-10-09）",
-   "Official list of research on safety, evaluation, and applications (most recent: 2026-10-09)."
+   "安全性・評価・応用研究の公式一覧（直近は 2026-11-09、2026年11月時点）",
+   "Official list of research on safety, evaluation, and applications (most recent: 2026-11-09, as of Nov 2026)."
   ],
   "freq": [
    "週次",
@@ -2521,8 +2521,8 @@
   "org": "Anthropic",
   "url": "https://www.anthropic.com/engineering",
   "desc": [
-   "Claude Code・エージェント設計など実装側の技術ブログ（取得時の最新表示は 2026-04 付）",
-   "Technical blog on implementation topics such as Claude Code and agent design (latest displayed post dated 2026-04 at time of fetch)."
+   "Claude Code・エージェント設計など実装側の技術ブログ（2026-11-06 時点の最新は 2026-11-06 付）",
+   "Technical blog on implementation topics such as Claude Code and agent design (latest post dated 2026-11-06 as of Nov 2026)."
   ],
   "freq": [
    "月次〜不定期",
@@ -3973,8 +3973,8 @@
   "org": "",
   "url": "https://www.accenture.com/en/insights/technology/technology-trends-2025",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "Accenture の年次技術トレンド調査 Technology Vision 2025（2025-01-07公開）。2026年11月時点で2026年版は確認できていない",
+   "Accenture annual technology trends study, Technology Vision 2025 (published 2025-01-07); no 2026 edition confirmed as of Nov 2026"
   ],
   "freq": [
    "",
@@ -4072,8 +4072,8 @@
   "org": "",
   "url": "https://menlovc.com/perspective/",
   "desc": [
-   "ENOTFOUND。ただし 2025 年版レポート URL は WebSearch 結果に出現（下記）",
-   "ENOTFOUND. However, the 2025 report URL appears in WebSearch results (below)"
+   "Menlo Ventures の調査記事一覧。2026-11-03 に「2026: The State of Enterprise AI」、2026-09-16 に「2026: The State of Consumer AI」を掲載（2026年11月時点）",
+   "Index of Menlo Ventures research articles; lists \"2026: The State of Enterprise AI\" (2026-11-03) and \"2026: The State of Consumer AI\" (2026-09-16) as of Nov 2026"
   ],
   "freq": [
    "",
@@ -4105,8 +4105,8 @@
   "org": "",
   "url": "https://menlovc.com/perspective/2025-the-state-of-generative-ai-in-the-enterprise/",
   "desc": [
-   "WebSearch 結果に出現するが fetch は不可（ENOTFOUND）。存在の傍証のみ",
-   "Appears in WebSearch results but cannot be fetched (ENOTFOUND). Indirect evidence of existence only"
+   "2025年版（2025-12-09付、2025年の生成AI支出 $37B）。最新データは 2026年版「The State of Enterprise AI」（2026-11-03、https://menlovc.com/perspective/2026-the-state-of-enterprise-ai/ ）",
+   "2025 edition (dated 2025-12-09; $37B GenAI spend in 2025). Newest data is in the 2026 edition \"The State of Enterprise AI\" (2026-11-03, https://menlovc.com/perspective/2026-the-state-of-enterprise-ai/ )"
   ],
   "freq": [
    "",
@@ -4798,8 +4798,8 @@
   "org": "デジタル庁",
   "url": "https://www.digital.go.jp/en/news/decb64eb-f26e-41cb-8d37-f3dd173108b8",
   "desc": [
-   "政府の生成AI調達・利活用ルール（DS-920。初版2025-05-27、改訂2.0版は検索要約では2026-06決定と記載 ― 要原文確認）",
-   "Government rules for procuring and using generative AI (DS-920; first edition 2025-05-27; revision 2.0 reportedly decided 2026-06 per search summary, original text needs confirmation)."
+   "政府の生成AI調達・利活用ルール（DS-920。初版2025-05-27、改訂2.0版は2026-06-12承認）",
+   "Government rules for procuring and using generative AI (DS-920; first edition 2025-05-27; revision 2.0 approved 2026-06-12)."
   ],
   "freq": [
    "不定期（初版→改訂約1年）",
@@ -5392,8 +5392,8 @@
   "org": "経産省／IPA",
   "url": "https://www.meti.go.jp/policy/it_policy/jinzai/skill_standard/main.html",
   "desc": [
-   "DXリテラシー標準・DX推進スキル標準（生成AI補記含む。ver.1.2は2024-07）",
-   "DX Literacy Standard and DX Promotion Skills Standard (including the generative AI supplement; ver. 1.2 is from 2024-07)."
+   "DXリテラシー標準・DX推進スキル標準（2026-04にバージョン2.0へ改訂、データマネジメントに関する改訂など。生成AI補記を含むver.1.2は2024-07）",
+   "DX Literacy Standard and DX Promotion Skills Standard (revised to version 2.0 in 2026-04, including revisions on data management; ver. 1.2 with the generative AI supplement dates from 2024-07)."
   ],
   "freq": [
    "不定期（改訂は1〜2年）",
@@ -6013,14 +6013,14 @@
    "Japan context"
   ],
   "name": [
-   "人工知能基本計画（2025年12月閣議決定）",
-   "AI Basic Plan (Cabinet Decision, December 2025)"
+   "人工知能基本計画（第2期・2026年7月14日閣議決定）",
+   "AI Basic Plan (2nd Term, Cabinet Decision of 14 July 2026)"
   ],
   "org": "内閣府（人工知能戦略本部）",
-  "url": "https://www8.cao.go.jp/cstp/ai/ai_plan/aiplan_20251223",
+  "url": "https://www8.cao.go.jp/cstp/ai/ai_plan/ai_plan.html",
   "desc": [
-   "AI法に基づく初の基本計画。目標・3原則・4基本方針。検索要約では2026-06〜07に改定（第2期）案の動きあり ― 最終決定は未確認",
-   "First basic plan under the AI Act: goals, three principles, and four basic policies. Per search summary, a revised (second-term) plan was in motion in 2026-06 to 07; final decision unconfirmed."
+   "AI法に基づく基本計画。初版は2025-12-23、第2期は2026-07-14に閣議決定。現行は2026-07-14版",
+   "Basic plan under the AI Act. The first plan was adopted by the Cabinet on 2025-12-23 and the second-term plan on 2026-07-14. The current version is the 2026-07-14 plan."
   ],
   "freq": [
    "年次改定の方針（首相指示・推定含む）",
@@ -6347,10 +6347,10 @@
    "IFTF Ten-Year Forecast (Archive)"
   ],
   "org": "Institute for the Future",
-  "url": "https://legacy.iftf.org/en/iftf-you/vantage/ten-year-forecast",
+  "url": "https://www.iftf.org/ten-year-forecast/",
   "desc": [
-   "1978年開始の年次10年予測。旧サイト(legacy)側ページで、現行 iftf.org 側の構成は未確認",
-   "Annual ten-year forecast started in 1978. Page on the legacy site; the structure on the current iftf.org site is unverified."
+   "1978年開始の年次10年予測。旧サイト(legacy)のURLは現行 iftf.org の同名ページへ転送される",
+   "Annual ten-year forecast started in 1978. The old legacy-site URL now redirects to the page of the same name on the current iftf.org."
   ],
   "freq": [
    "年次（2025–2035版は2025年3月18日NYで発表との第三者記述）",

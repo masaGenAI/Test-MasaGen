@@ -1177,5 +1177,158 @@
   "why": "meti.go.jp が403で開けない。",
   "first_seen": "2026-11-12",
   "last_tried": "2026-11-12"
+ },
+ {
+  "area": "dojo-quiz",
+  "tab": "dojo-quiz",
+  "current_text": "デジタル市場法(DMA)とAIの関係…現時点でAIシステム自体は中核的プラットフォームサービス(CPS)として指定されていない",
+  "concern": "2026年7月に欧州委員会が ChatGPT のゲートキーパー指定の可能性を評価中と報じられた。現時点の指定有無が変わっている可能性。",
+  "why": "二次報道のみ。欧州委員会の一次ページで確かめられず。今の本文は 2026-11 時点で指定報道が見当たらないため食い違いは未確定。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "dojo-quiz",
+  "tab": "dojo-quiz",
+  "current_text": "Googleが2024年末に示した『Project Mariner』は何のプロトタイプか（ブラウザを操作するエージェント）",
+  "concern": "Project Mariner は 2026-05-04 に終了との二次報道。",
+  "why": "deepmind.google は開けず、Google の一次情報で終了を確認できなかった。問題は2024年末の出来事として過去形で正しく、直す必要は薄い。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "dojo-quiz",
+  "tab": "dojo-quiz",
+  "current_text": "EU AI法の整合規格…CEN-CENELEC JTC 21 が開発を担っている（現在の位置づけ）",
+  "concern": "EN 18286:2026 が 2026-10-14 に官報で参照され最初の整合規格になったとの報道がある。正解は変わらないが「現在の位置づけ」に追記余地。",
+  "why": "ブログ等の二次情報のみ。EUR-Lex の官報を確認できていない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "dojo-quiz",
+  "tab": "dojo-quiz",
+  "current_text": "IPA DX動向2025／総務省 令和7年版／総務省2025 の統計問題（49.7%・26.7%・85.1% など）",
+  "concern": "新版が出ている（総務省 令和8年版：個人の生成AI利用経験 日本58.8%、IPA DX動向2026：2026-07-30 公開）。",
+  "why": "問題文が版（2025）を明記しているため現状でも正しい。新版の方針策定率 68.9%・DX人材量 85.5% は候補ファイルの記載で、白書PDFが10MB超で開けず、IPAは本文PDFを確認できなかった。版を差し替える場合は選択肢の組み直しが必要なので置換案は出さない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "foresight-library-a",
+  "tab": "fs_library",
+  "current_text": "IEA(9,10,11)/SEMI(43)/METI(46)/OECD AI and work(65)/Amazon IR(79)/Alphabet IR(89)/Salesforce IR(92)/Snowflake IR(94)/NVIDIA IR(98)/OpenAI(66,99)/Meta IR(101)/Gartner(110,111,112)/LMArena(31)",
+  "concern": "リンク生死と新版の有無",
+  "why": "curl が 403（ボット確認等）。回避せず未確認",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "foresight-library-a",
+  "tab": "fs_library",
+  "current_text": "McKinsey QuantumBlack / State of AI（s117, s118）",
+  "concern": "State of AI の新版",
+  "why": "HTTP/2 エラーで開けず",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "foresight-library-a",
+  "tab": "fs_library",
+  "current_text": "Google Cloud Next（s106）",
+  "concern": "リンク先が reg.googlecloudevents.com の next27 へ移転している可能性（Next '27 の案内）",
+  "why": "元ホストはプロキシ 403、転送先も取得不可",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "foresight-library-a",
+  "tab": "fs_library",
+  "current_text": "Bond Capital（s128）",
+  "concern": "Mary Meeker AI Trends の現行性",
+  "why": "ページ本文にレポート一覧が出ず確認不能",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "foresight-library-a",
+  "tab": "fs_library",
+  "current_text": "Accenture Technology Vision 2026 の有無",
+  "concern": "2026年版の有無",
+  "why": "検索で確認できず（ないとも断定できない）",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "foresight-library-b",
+  "tab": "fs_collection",
+  "current_text": "c358 間違いなく伸びる業界3選 https://youtube.com/shorts/yaMF5HTypf0?feature=share",
+  "concern": "リンク切れ（確認済み）：YouTube oEmbed が404、ページは「This video is unavailable」（2026-11-12）",
+  "why": "代わりのURLが分からず置換案を作れない。項目の削除またはURL空欄化は人の判断が必要",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "foresight-library-b",
+  "tab": "fs_sources",
+  "current_text": "s184 人工知能戦略本部 https://www.kantei.go.jp/jp/105/actions/202607/10jinkoutchinou.html",
+  "concern": "curl は404（ページ本体は「Page Not Found」）だが、WebFetch と検索では同URLが令和8年7月10日の記録として存在",
+  "why": "取得方法で結果が割れ、リンク切れと断定できない。再確認が必要。desc の「最新動静（2026-07-10）」も、2026-07-10以降の会合が出ていないか未確認",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "foresight-library-b",
+  "tab": "fs_sources",
+  "current_text": "s156 MRI DX推進状況調査結果【2025年度詳細版】 / s157 生成AIが再定義するDX人材戦略（提言）",
+  "concern": "www.mri.co.jp の両URLが404。サイトのトップ（/）も404で、こちらの環境からは同サイト全体が開けない",
+  "why": "サイト単位で拒否されている可能性が高く、リンク切れと断定できない。検索では詳細版が2025-06-04のプレスリリースとして存在（本文は未確認）",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "foresight-library-b",
+  "tab": "fs_sources",
+  "current_text": "s139 SEC IAC AI開示勧告 / s162 WEF Future of Jobs 2025 / s163 OECD AI and skills / s188 Good Judgment 2025 in review / s191 OECD Foresight toolkit / s211 OECD strategic foresight / s196 Gartner Hype Cycle / s206 Metaculus / s172 ISO 42001 / s178 Taylor Wessing / s179 IEA",
+  "concern": "開けるか・新版が出ていないか",
+  "why": "403（ボット確認等）で本文を取得できない。回避しない。s139はPDFで本文が読めなかった",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "foresight-library-b",
+  "tab": "fs_sources",
+  "current_text": "s144 2026年版ものづくり白書（2026-05-29閣議決定）/ s145 / s164のmetiリンク / s166 DX銘柄 / s167 DX推進指標 / s169 AI事業者ガイドライン 1.2版（2026-03-31）",
+  "concern": "記述の真偽",
+  "why": "meti.go.jp が403。s144（閣議決定2026-05-29）と s169（1.2版 2026-03-31）は検索結果の要約では一致したが、公式本文を開けていないため要再確認。s167の「2026年2月」も未確認",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "foresight-library-b",
+  "tab": "fs_sources",
+  "current_text": "s180 GHG Protocol Scope 2 ... 最終化は未確認",
+  "concern": "最終化の時期",
+  "why": "公式ページは意見募集 2025-10-20〜2026-01-31 までしか書かず、最終化の記載なし。検索（GHG Protocolブログ）では2027年末の見込みとあるが本文は未取得。2026-11時点で最終版は確認できず（現行記述は妥当）",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "foresight-library-b",
+  "tab": "fs_sources",
+  "current_text": "s159 MIT SMR AI and Business Strategy（直近: 2025-11-18）",
+  "concern": "2026年版の共同調査",
+  "why": "検索では2026年版は見つからず（2025-11-18が最新と思われる）が、ページ本体では確認していない",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "foresight-library-b",
+  "tab": "fs_collection",
+  "current_text": "c215 IBM / c287 gihyo / c308 gamma / c311 seplus / c312 courrier / c313 newsinlevels / c338 studyhacker / c344 rondely ほか Instagram・X(t.co)・LinkedIn・Notion・share.google・brainpad",
+  "concern": "リンクが開くか",
+  "why": "プロキシが拒否するか、ログイン・短縮URLで確認できない",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
  }
 ]

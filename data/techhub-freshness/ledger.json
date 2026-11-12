@@ -309,6 +309,83 @@
    ],
    "coverage": "確かめた範囲：自治体の生成AI導入率（総務省PDFで本文を確認、checkcore/checkax/industry系の旧値を置換案に）、Claude Cowork統合、Menlo Ventures 2025年版と2026年版、金融庁、AI推進法、EU AI Act罰則、NOTE_CORPORAの件数・期間と画面の出所注記のアプリ内照合。既に古いと確かめた語の残り：87.2%/29.9%（14か所を直し、他は149403の『前回調査』として正しいので残す。82.7%は81%へ置換）、26.7%（8か所すべて別の統計のため直さない。個人利用率として使っている箇所は見つからず）、Claude Cowork（NOTE_CORPORAの1か所を直す。NOTE_ARTICLES内の言及は記事要約なので直さない）。見ていない範囲：CHECK_*（約65万字）とCONV_DRILLS・HYPO_*は年・モデル名・数字を含む問題のうち代表だけで全量は見ていない（モデル名はほぼ無く、Gartner/McKinsey/IBM/S&P等の統計が中心）。NOTE_ARTICLES・NOTE_ART_ENは要約のため書き換えない前提で、期間表記の候補（過ぎた予定33件）は元記事の予測として正しく過去の言及なので触れていない。NOTE_GOVの一次ソースは金融庁のみ開けた。NOTE_GT_FIGS/PMAP/…",
    "last_checked": "2026-11-12"
+  },
+  "dojo-quiz": {
+   "status": "checked",
+   "last_attempt": "2026-11-12",
+   "fixed": 2,
+   "partial": 0,
+   "rejected": 0,
+   "unverified": 4,
+   "checked_ok": 10,
+   "blocked_hosts": [
+    "deepmind.google",
+    "openai.com"
+   ],
+   "coverage": "MCQS（約4,991問）から、現在形・「現在」「現時点」「最新」・年・モデル名・規制日付を含む問題文83問をスクリプトで洗い出し、候補ファイルの各語（Vertex AI、Project Mariner、49.7%、26.7%、85.1%、過ぎた予定）と合わせて照合。出典を開いて照合したのは約18件。見ていない範囲：問題文に年・語を含まない解説内の数値、料金・上限値の問題（Claude 3.5 Sonnet 入力単価、GPT-4 Turbo 128k など）は個別に出典を開いていない。候補の「最新と書く」314件は先頭80件のうち大半が『最新技術』『最新値』などの一般語・カテゴリ名「最新動向」で、時点依存の主張ではなかった。GPT-5（2025-08）の仕組みの問題は openai.com が403で未確認。",
+   "last_checked": "2026-11-12"
+  },
+  "foresight-library-a": {
+   "status": "checked",
+   "last_attempt": "2026-11-12",
+   "fixed": 8,
+   "partial": 0,
+   "rejected": 0,
+   "unverified": 5,
+   "checked_ok": 9,
+   "blocked_hosts": [
+    "www.iea.org",
+    "www.semi.org",
+    "www.meti.go.jp",
+    "www.oecd.org",
+    "openai.com",
+    "arena.ai",
+    "ir.aboutamazon.com",
+    "abc.xyz",
+    "investor.salesforce.com",
+    "investors.snowflake.com",
+    "investor.nvidia.com",
+    "investor.atmeta.com",
+    "www.gartner.com",
+    "www.gartner.co.jp",
+    "www.mckinsey.com",
+    "www.googlecloudevents.com",
+    "reg.googlecloudevents.com"
+   ],
+   "coverage": "層A・B（s001〜s132、132件）の全URLを curl で到達確認。内容照合は日付つきの desc（MS IR、Anthropic news/research/engineering、MS Cloud Blog、Work Trend Index、Economic Index、AISI、IAPP×2、AI Index、Pew、Ramp、State of AI、Menlo、Accenture）に絞った。層B の desc が『ENOTFOUND』のままの約50件は現在 200 で開くが、内容を開いて書き直してはいない（前回の到達結果の残骸で、直すには各ページの確認が必要）。Gartner・Census・JUAS 等の定点資料の新版は未照合。層C/D は担当外。",
+   "last_checked": "2026-11-12"
+  },
+  "foresight-library-b": {
+   "status": "checked",
+   "last_attempt": "2026-11-12",
+   "fixed": 4,
+   "partial": 0,
+   "rejected": 0,
+   "unverified": 8,
+   "checked_ok": 12,
+   "blocked_hosts": [
+    "www.mri.co.jp",
+    "www.meti.go.jp",
+    "www.sec.gov",
+    "www.weforum.org",
+    "www.oecd.org",
+    "www.iso.org",
+    "www.iea.org",
+    "goodjudgment.com",
+    "www.gartner.com",
+    "www.metaculus.com",
+    "www.taylorwessing.com",
+    "www.ibm.com",
+    "gihyo.jp",
+    "gamma.app",
+    "www.seplus.jp",
+    "courrier.jp",
+    "www.newsinlevels.com",
+    "studyhacker.net",
+    "rondely.com"
+   ],
+   "coverage": "層C（s133〜s187）・層D（s188〜s225）の88件全部を curl で到達確認（200: 76件、403: 約12件、404: 3件、転送: s195のみ）。内容照合は約17件（FSA、SSBJ、IPA、JUAS、NIST、gov.uk、EU AI Actタイムライン、GHG、DS-920、人工知能基本計画、デジタルスキル標準、IFTF、The Batch、NISTEP ほか）。fs_collection は既定227件のうち、YouTube108件の存在を oEmbed で確認、非SNSの外部リンク11件のうち到達確認できたのは3件。Instagram・X(t.co)・LinkedIn・Notion・share.google・Gmail は確認していない。メモ（要点・So What）や動画の中身の鮮度は見ていない。c335「クラウドサービス比較表(2023年7月)」は時点を明記した過去資料のため直さない。層A・Bは範囲外。候補の「最新」と書いた15件のうち、s149/s150（JUAS）、s159（MIT SMR）、s184（kantei）、s195（IFTF）は上記で照合、Microsoft・Anthropic・Meeker・Slack系は層A・B側の項目と思われ未確認。「既に古いと確かめた語の残り」は0件。",
+   "last_checked": "2026-11-12"
   }
  },
  "runs": [
@@ -365,6 +442,18 @@
    "partial": 0,
    "rejected": 1,
    "unverified": 36
+  },
+  {
+   "date": "2026-11-12",
+   "areas": [
+    "dojo-quiz",
+    "foresight-library-a",
+    "foresight-library-b"
+   ],
+   "fixed": 14,
+   "partial": 0,
+   "rejected": 0,
+   "unverified": 17
   }
  ]
 }
