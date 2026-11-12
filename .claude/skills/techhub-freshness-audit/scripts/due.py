@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import datetime as dt
 import os
+import re
+import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -33,6 +35,11 @@ def main() -> None:
             state = f"{over}日超過" if over >= 0 else f"あと{-over}日"
         n_carry = sum(1 for u in carried if u.get("area") == ar["key"])
         rows.append((over, ar, rec, state, n_carry))
+    # 古いと確かめた語の残り（residue.py）も並べる。期限前でも、残りが多い範囲は回す価値が高い
+    left: dict[str, int] = {}
+    r = subprocess.run([sys.executable, "-I", os.path.join(common.HERE, "residue.py")], capture_output=True, text=True)
+    for m in re.finditer(r"^([\w-]+): 計 (\d+)", r.stdout, re.M):
+        left[m.group(1)] = int(m.group(2))
     rows.sort(key=lambda r: -r[0])
     due = [r for r in rows if r[0] >= 0]
     print(f"今日 {today}。期限が来ている範囲 {len(due)} / 全 {len(rows)}")
@@ -40,10 +47,15 @@ def main() -> None:
         note = []
         if n_carry:
             note.append(f"持ち越しの未確認 {n_carry}件")
+        if left.get(ar["key"]):
+            note.append(f"古い語の残り {left[ar['key']]}か所")
         if rec.get("blocked_hosts"):
             note.append("届かなかったホスト: " + ", ".join(rec["blocked_hosts"][:6]))
         last = rec.get("last_checked") or rec.get("last_attempt") or "-"
         print(f"  {ar['key']:<22} {ar['cadence']:<9} 前回 {last:<10} {state:<8} {ar['title']}" + ("  ／ " + "；".join(note) if note else ""))
+    many = [f"{k}（{n}）" for k, n in sorted(left.items(), key=lambda kv: -kv[1]) if n >= 20 and k not in {r[1]["key"] for r in due}]
+    if many:
+        print("期限前だが、古い語の残りが多い範囲（回す候補）: " + "、".join(many))
     if due:
         keys = {r[1]["key"] for r in due}
         print("回す順（1回に1組。使用量の上限に当たらないよう組ごとに区切る）:")

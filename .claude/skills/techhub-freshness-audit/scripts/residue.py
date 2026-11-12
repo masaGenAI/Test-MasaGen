@@ -2,6 +2,7 @@
 
 usage: python3 -I residue.py                         … 範囲ごと・語ごとの残りの件数
        python3 -I residue.py --area KEY [--limit 12] … その範囲の残りの本文（語ごとに先頭 --limit 件）
+       （--quoted を付けると、記事・公開事例の要約の定数（areas.json の quoted_consts）も数える）
   references/superseded.json の各語について、原稿に残る箇所を数える。ok_near の語が前後 120 字にある箇所は
   手当て済み（「旧◯◯」と添えてある、新しい値と並べてある、など）として除く。
   残りが全部「直すべき箇所」とは限らない（当時の事例・歴史、別の統計の同じ数字）。文脈を読んで決める。
@@ -48,6 +49,7 @@ def main() -> None:
     decl_off = [off[line - first] for line, _, _ in rows]
     text = "\n".join(lines)
     found: dict[str, dict[str, list]] = {}
+    quoted = set(spec.get("quoted_consts", []))
 
     def add(owner: str, term: dict, where: str, snip: str) -> None:
         found.setdefault(owner, {}).setdefault(term["old"], []).append((where, snip))
@@ -56,6 +58,8 @@ def main() -> None:
         for at, snip in hits(text, term):
             i = bisect_right(decl_off, at) - 1
             line, name, _ = rows[i] if i >= 0 else (first, "?", 0)
+            if name in quoted and "--quoted" not in a:
+                continue
             for owner in (common.areas_of(name, spec) or ["(未割り当て)"]):
                 add(owner, term, f"{name}:{line}", snip)
     for ar in spec["areas"]:

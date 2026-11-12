@@ -1,5 +1,5 @@
 {
- "_note": "TechHub の鮮度点検の担当範囲。consts は定数名（末尾 * は前方一致）。複数の範囲が同じ定数を分担することがある。hosts は主な一次情報のホスト（reach.py が点検前に到達できるか確かめる）。新しいタブや定数を足したら、ここにも足す（consts_index.py --unassigned で漏れが分かる）。",
+ "_note": "TechHub の鮮度点検の担当範囲。consts は定数名（末尾 * は前方一致）。複数の範囲が同じ定数を分担することがある。hosts は主な一次情報のホスト（reach.py が点検前に到達できるか確かめる）。新しいタブや定数を足したら、ここにも足す（consts_index.py --unassigned で漏れが分かる）。 quoted_consts は、記事や公開事例から集計・要約した中身の定数（当時の記事が書いた製品名や数字なので書き換えない。residue.py は既定で数えない）。",
  "cadence_days": {
   "monthly": 30,
   "quarterly": 90
@@ -10,6 +10,14 @@
   "CAT_EN",
   "TABS",
   "NOVA_GUIDES"
+ ],
+ "quoted_consts": [
+  "FT_STAT",
+  "FT_TOOL",
+  "FT_ART",
+  "FT_ARCH",
+  "NOTE_ARTICLES",
+  "NOTE_ART_EN"
  ],
  "batches": [
   [
