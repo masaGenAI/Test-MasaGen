@@ -369,6 +369,30 @@
     "以前は"
    ],
    "how": "現行の規模として書いている箇所だけ"
+  },
+  {
+   "old": "TSR3.6倍",
+   "now": "BCG「Applied AI Index 2026」（2026-09-30）：future-built 企業（7.5%）は遅行企業に対し TSR 2.3倍・収益成長 2.4倍・EBITDA成長 2.8倍。1.7倍・3.6倍・1.6倍（EBITマージン）は前年版（2025年9月）の値",
+   "source": "https://www.bcg.com/press/30september2026-ai-starting-to-pay-off-companies-generate-value",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "前年版",
+    "2025年9月"
+   ],
+   "how": "提案・ケース演習・論点・理解度チェックが同じ数字を使う。クイズは選択肢と解説をまとめて直す（株価などの錯乱肢が正解と同じ数字にならないようにする）"
+  },
+  {
+   "old": "3.6x",
+   "now": "BCG Applied AI Index 2026: 2.3x TSR, 2.4x revenue growth, 2.8x EBITDA growth (the 1.7x / 3.6x / 1.6x figures are from the September 2025 edition)",
+   "source": "https://www.bcg.com/press/30september2026-ai-starting-to-pay-off-companies-generate-value",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "previous edition",
+    "September 2025",
+    "193.6x",
+    "throughput"
+   ],
+   "how": "BCG の先行企業の倍率として使っている箇所だけ（別の 3.6x は対象外）"
   }
  ]
 }

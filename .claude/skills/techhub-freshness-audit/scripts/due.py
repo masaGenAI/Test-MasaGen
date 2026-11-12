@@ -70,6 +70,21 @@ def main() -> None:
             print(f"  組{i // 4 + 1}: " + ",".join(plan[i:i + 4]))
         if held:
             print("  前回未了（prep.py で出典に届くと出たら組に足す。届かなければ見送る）: " + ", ".join(held))
+        # 前回は届かなかったホストに、今は届くか。届くなら、その範囲の持ち越しの未確認を確かめ直せる
+        import reach  # noqa: E402  （ネットワークを使うので --plan のときだけ読み込む）
+        seen: dict[str, bool] = {}
+        for _, ar, rec, _, n_carry in rows:
+            if not n_carry or ar["key"] in plan or ar["key"] in held:
+                continue
+            hosts = rec.get("proxy_blocked", [])
+            opened = []
+            for h in hosts[:8]:
+                if h not in seen:
+                    seen[h] = reach.probe(h)[0] == "ok"
+                if seen[h]:
+                    opened.append(h)
+            if opened:
+                print(f"  届くようになった出典がある（持ち越しの未確認 {n_carry}件を確かめ直す。組に足す）: {ar['key']} ← " + ", ".join(opened))
         left_out = (first + rest)[cap:]
         if left_out:
             print("  次回に回る: " + ", ".join(left_out))

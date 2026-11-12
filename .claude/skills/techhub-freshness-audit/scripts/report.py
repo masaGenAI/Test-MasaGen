@@ -13,6 +13,7 @@ from __future__ import annotations
 import datetime as dt
 import glob
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -120,6 +121,10 @@ def main() -> None:
         rec.update({"status": "blocked" if blocked else "checked", "last_attempt": date, "fixed": len(fixed), "partial": len(partial),
                     "rejected": len(rejected), "unverified": len(unv), "checked_ok": len(ok),
                     "blocked_hosts": d.get("blocked_hosts", []), "coverage": one_line(d.get("coverage"), 600)})
+        # 許可リストの外（プロキシが拒否）だったホストだけを別に控える。許可が足されたら due.py が気づける
+        import reach  # noqa: E402
+        names = [m.group(0) for h in d.get("blocked_hosts", []) if (m := re.match(r"[a-z0-9][a-z0-9.-]+\.[a-z]{2,}", str(h)))]
+        rec["proxy_blocked"] = [h for h in names[:12] if reach.probe(h)[0] == "proxy"]
         if not blocked:
             rec["last_checked"] = date
         ledger["areas"][key] = rec

@@ -199,7 +199,8 @@
     "factbook-b"
    ],
    "rhythm": "年次（11月ごろ）",
-   "as_of": "2026-11-12"
+   "as_of": "2026-11-12",
+   "note": "47% 対 25%（本番到達率）・76%（外部購入）・50製品/10製品（ARR）は2025年版にしか無い。次の版に同じ指標が出たら差し替える"
   },
   {
    "id": "stanford-ai-index",
@@ -385,6 +386,27 @@
    "rhythm": "年次（11〜12月）",
    "as_of": "2026-11-12",
    "note": "開催が終わったら「開催予定」を結果の要約に書き換える"
+  },
+  {
+   "id": "bcg-ai-value",
+   "what": "BCG の年次調査（AI先行企業と遅行企業の業績差）",
+   "urls": [
+    "https://www.bcg.com/press"
+   ],
+   "terms": [
+    "TSR2.3倍",
+    "Applied AI Index 2026"
+   ],
+   "areas": [
+    "factbook-a",
+    "strategy-xform",
+    "toolbox-proposal",
+    "checks-notes",
+    "postmortem-industry"
+   ],
+   "rhythm": "年次（9月ごろ）",
+   "as_of": "2026-11-12",
+   "note": "curl では 403 になる。WebFetch で開く。提案・ケース演習・理解度チェックが同じ数字を引いているので、版が替わったら全部を一緒に直す"
   }
  ]
 }
