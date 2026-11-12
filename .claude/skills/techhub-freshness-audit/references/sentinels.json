@@ -407,6 +407,39 @@
    "rhythm": "年次（9月ごろ）",
    "as_of": "2026-11-12",
    "note": "curl では 403 になる。WebFetch で開く。提案・ケース演習・理解度チェックが同じ数字を引いているので、版が替わったら全部を一緒に直す"
+  },
+  {
+   "id": "aigp-bok",
+   "what": "IAPP AIGP の BoK（版・発効日・ドメイン数と出題数の範囲）",
+   "terms": [
+    "BoK v2.1（2026年2月2日発効・4ドメイン）"
+   ],
+   "urls": [
+    "https://iapp.org/certify/aigp/",
+    "https://assets.contentstack.io/v3/assets/bltd4dd5b2d705252bc/blt0d33152fd20bc134/AIGP_Cert BOK.pdf"
+   ],
+   "areas": [
+    "dojo-certs"
+   ],
+   "rhythm": "年1回見直し（変更は出題の90日以上前に告知）",
+   "as_of": "2026-11-12",
+   "note": "版が上がったら AIGP_DOMAINS の構成・出題数の範囲と、確認クイズの dom を付け替える。Cert ハブの Station_AIGP は範囲外"
+  },
+  {
+   "id": "isc2-cc-outline",
+   "what": "ISC2 CC の試験アウトライン（発効日・5ドメインの名称と平均配点）",
+   "terms": [
+    "2026年9月1日発効のアウトライン（5ドメイン）"
+   ],
+   "urls": [
+    "https://www.isc2.org/certifications/cc/cc-certification-exam-outline"
+   ],
+   "areas": [
+    "dojo-certs"
+   ],
+   "rhythm": "数年に1回",
+   "as_of": "2026-11-12",
+   "note": "curl は -A \"Mozilla/5.0\" を付けると読める。CISSP は 2027-04-15 発効の新アウトラインが告知済み（中身は未確認）なので、発効前に CISSP_DOMAINS も見直す"
   }
  ]
 }

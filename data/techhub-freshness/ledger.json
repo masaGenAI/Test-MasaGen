@@ -118,39 +118,27 @@
   "dojo-certs": {
    "status": "checked",
    "last_attempt": "2026-11-12",
-   "fixed": 0,
+   "fixed": 1,
    "partial": 0,
    "rejected": 0,
-   "unverified": 9,
-   "checked_ok": 5,
+   "unverified": 7,
+   "checked_ok": 2,
    "blocked_hosts": [
-    "assets.contentstack.io",
-    "www.isc2.org",
-    "trainingcamp.com",
-    "www.privacybootcamp.com",
-    "www.python.org",
-    "peps.python.org",
     "docs.python.org",
-    "discuss.python.org",
-    "pydevtools.com",
+    "peps.python.org",
     "docs.cloud.google.com",
-    "www.iso.org(403)",
-    "www.oracle.com(403)",
-    "www.ilga.gov(503)"
+    "www.pecb.com",
+    "edge.sitecorecloud.io",
+    "www.gartner.com"
    ],
-   "coverage": "carry 4件は全て再試行（いずれも確定できず unverified）。範囲内の固有名詞・日付を grep し、Microsoft Learn・AWS Docs・PECB の出典を開いて4件+1件を照合、他は検索要約止まり。7ドメインの AIGP、CISSP、ISC2 CC は公式を開けず未確認。DEV_QUIZ（約140万字）・ARCH_QUIZ・DRILLS・VERSUS・CASE_DRILLS・L1〜L5・SIM_FACTORS・CISSP_QUIZ/CC_QUIZ/AIGP_QUIZ/ISO42001F_QUIZ の問題本文は日付語と製品名の抜き出しのみで、全問は読んでいない。受験料・試験形式（問題数・時間）は出典を開けず確認していない。『既に古いと確かめた語の残り』は0件。",
+   "coverage": "前回 carry の9件を処理：AIGP・CISSP・CC は公式文書で確認（AIGP は BoK PDF を pdftotext で全9ページ、CISSP と CC は ISC2 公式ページの本文）。EU オムニバスは EUR-Lex で確認し checked_ok。ISO42001F・Python GIL・Vertex AI・韓国AI基本法・Gartner は開けず unverified。AIGP の7→4ドメインと CC の新アウトラインはドメイン構成の作り直しになるため置換案は出さず、画面の注記に現行版との差を明記する置換（JA/EN各1か所）だけ出した。CISSP の2027年新アウトライン本体は PDF が403で未確認。候補ファイルの『最新』54件は Git の最新版などの一般語で、版や時点の依存ではないため直さず。範囲全体からの『最低15件の照合』は満たしておらず、DEV_QUIZ・ARCH_QUIZ・VERSUS・DRILLS・PLAYBOOK・CURRICULUM・SIM_FACTORS・CASE_DRILLS 内の製品名・料金・版は代表以外見ていない。担当範囲外の気づき：Station_AIGP（行209629付近）の配点目安が BoK 範囲と合わない。",
    "last_checked": "2026-11-12",
    "proxy_blocked": [
-    "assets.contentstack.io",
-    "discuss.python.org",
-    "docs.cloud.google.com",
     "docs.python.org",
     "peps.python.org",
-    "pydevtools.com",
-    "trainingcamp.com",
-    "www.isc2.org",
-    "www.privacybootcamp.com",
-    "www.python.org"
+    "docs.cloud.google.com",
+    "www.pecb.com",
+    "edge.sitecorecloud.io"
    ]
   },
   "strategy-xform": {
@@ -586,6 +574,16 @@
    "partial": 0,
    "rejected": 0,
    "unverified": 16
+  },
+  {
+   "date": "2026-11-12",
+   "areas": [
+    "dojo-certs"
+   ],
+   "fixed": 1,
+   "partial": 0,
+   "rejected": 0,
+   "unverified": 7
   }
  ]
 }
