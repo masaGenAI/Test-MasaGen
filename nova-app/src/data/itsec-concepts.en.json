@@ -168,7 +168,7 @@
   "defEn": "A mechanism that, when a user accesses a resource, gathers signals such as the user, location, device, app and risk, and decides whether to allow, to require additional requirements, or to deny. Policies are written in the form “if ..., then ...”.",
   "howEn": "For example, Microsoft Entra Conditional Access evaluates policies after first-factor authentication. The decision is either to block, or to grant access while requiring MFA, a compliant device, a password change or the like; typical examples are requiring MFA for administrator roles and blocking legacy authentication.",
   "diffEn": "MFA is a means of additional identity verification, while conditional access is the control that decides, according to the situation, whether to require it. Whereas authorization by role decides “who can do what”, conditional access narrows the entrance by circumstances such as device and location.",
-  "aiEn": "Microsoft Entra Conditional Access can also target the identities of AI agents (preview), extending Zero Trust principles to AI workloads. On the user side as well, conditions such as “allow only compliant devices” can be set."
+  "aiEn": "Microsoft Entra Conditional Access can also target the identities of AI agents (as of November 2026, Entra Agent ID is generally available, while targeting agent user accounts is still in preview), extending Zero Trust principles to AI workloads. On the user side as well, conditions such as “allow only compliant devices” can be set."
  },
  {
   "id": "pam",

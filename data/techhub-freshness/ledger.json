@@ -195,6 +195,120 @@
    ],
    "coverage": "compare.json の upcoming は最早が2026-12-02で、今日(2026-11-12)までに過ぎた予定は無い。画面の「未確認」点のうち、EU AI Omnibus日程・NIST・文科省・個情委・コロラド・韓国AI基本法・インド・米連邦先占を確認。韓国と米連邦先占は検索結果のみ(一次ページ未開封)。日本のAI基本計画・AI指針(内閣官房ページは404)、英国・シンガポール・中国、ISO、industries.json の各業界(EUR-Lex依存の未確認注記など)、GOVDOJO_BANK の個別問題は見ていない。10月31日以降に動いた確認済みの変更は見つからず、置換案は無し。",
    "last_checked": "2026-11-12"
+  },
+  "slalom-global": {
+   "status": "checked",
+   "last_attempt": "2026-11-12",
+   "fixed": 2,
+   "partial": 0,
+   "rejected": 0,
+   "unverified": 6,
+   "checked_ok": 10,
+   "blocked_hosts": [
+    "macaubusiness.com"
+   ],
+   "coverage": "見た範囲：SG_FACTS・SG_JPN・SG_TL・SL_FACTS（拠点・規模・経営陣・提携・日本法人・日本の体制）を公式ニュースルーム／リーダーシップ／日本ページ／AWSリリース／Garrison リリースで照合。SLALOM_BANK は『最新』等の一般語の候補のみで、事実に当たる問題（SL の Garrison 解説、AI事業者ガイドライン）は SL_FACTS と整合を目視したが、AI事業者ガイドラインの最新版は確認していない。見ていない範囲：SL_CASES・SL_SURVEY の出典照合、GF_*、SG_CASES（11,306字）、SG_NUM・SG_SRC・SG_MAP・SG_PAT、SLALOM_BANK 本体（81万字）の事実系問題。Oct 28・Nov 3・Sep 30 は見出しのみ確認で本文未取得。照合した事項は約19件（findings 2・checked_ok 10・unverified 6）で、最低15件の基準は満たすが、独立した出典ページを開いた数は約8ページ。",
+   "last_checked": "2026-11-12"
+  },
+  "postmortem-industry": {
+   "status": "checked",
+   "last_attempt": "2026-11-12",
+   "fixed": 2,
+   "partial": 0,
+   "rejected": 0,
+   "unverified": 11,
+   "checked_ok": 14,
+   "blocked_hosts": [
+    "themarkup.org",
+    "www.statescoop.com",
+    "www.route-fifty.com",
+    "www.vice.com",
+    "chat.nyc.gov",
+    "www.theregister.com",
+    "www.techradar.com",
+    "futurism.com",
+    "www.emarketer.com",
+    "atmarkit.itmedia.co.jp",
+    "www.pwc.com(403)",
+    "www.gartner.com(403)",
+    "www.dbs.com",
+    "www.klarna.com",
+    "dora.dev",
+    "newsroom.ibm.com",
+    "www.veracode.com",
+    "www.prosci.com",
+    "www.spglobal.com",
+    "www.ey.com",
+    "www.nri.co.jp",
+    "news.panasonic.com",
+    "www.mufg.jp",
+    "www.morganstanley.com",
+    "news.siemens.com",
+    "www.iea.org(403)",
+    "www.dewr.gov.au",
+    "www.abc.net.au"
+   ],
+   "coverage": "候補ファイルの『既に古いと確かめた語』6件（87.2%）は全件処理（原稿上は旧値が約23か所：置換案は7種、クイズは unverified）。『最新』系の候補23件は『直近』『最新版』という一般語で、日付つきの古い事実ではないため直していない。PM_CASES は10事例のうち Zillow・Air Canada・Avianca・Watson・A-level・Bard を確認、NYC・McDonald's・Deloitte は続報を検索で見つけたが原文は開けず unverified。IND_DATA/IND_DEEP/IND_DEEP2 は自治体・Menlo・Salesforce・FSA・Gartner(検索のみ)・企業発表数字を抜き取り、企業発表系の多くは出典ホストが開けず未確認。VALUE_TREE は Stanford・総務省白書・Menlo を確認、PwC・IPA・DORA・IBM・Veracode・Prosci・BCG・S&P・EY・NRI は未確認または一部のみ。SHELF_GROUPS・AX_* は製品名・日付・統計の固有表現がほぼなく、機械的な grep のみ（問題なし）。照合した出典は約20件、そのうち原文を開いたもの約14件。",
+   "last_checked": "2026-11-12"
+  },
+  "itsec": {
+   "status": "checked",
+   "last_attempt": "2026-11-12",
+   "fixed": 1,
+   "partial": 0,
+   "rejected": 0,
+   "unverified": 7,
+   "checked_ok": 13,
+   "blocked_hosts": [
+    "www.pcisecuritystandards.org（指示により未試行）",
+    "www.cisecurity.org",
+    "www.jpcert.or.jp（指示により未試行）",
+    "csrc.nist.gov",
+    "www.cao.go.jp",
+    "www.meti.go.jp（403）",
+    "www.iso.org（403）",
+    "www.idcf.jp",
+    "en.dkkaraoke.co.jp",
+    "internet.watch.impress.co.jp",
+    "scan.netsecurity.ne.jp",
+    "rocket-boys.co.jp",
+    "www.sbbit.jp",
+    "houkaisei.jp",
+    "www.jipdec.or.jp",
+    "www.kiwa.com",
+    "www.a-lign.com",
+    "www.isms.online",
+    "www.bsigroup.com"
+   ],
+   "coverage": "見た範囲：W/cand-itsec.md の候補全部（『最新』と書いた18件はいずれも一般語で、時点依存ではない。過ぎた予定・近い期限・古い時点・残りの語は0件）。ITSEC_FACTS（能動的サイバー防御法・NCO・SCS・経営ガイドライン・個人情報保護法改正・金融庁）、ITSEC_TOP10、ITSEC_CLOCKS の個人情報保護法の期限、用語解説のMicrosoft製品の記述（Entra Agent ID、Sentinel、MCSB v2）、規格の版（CSF、CIS、テレワークGL）。確かめた事実は照合15件超。見ていない範囲：ITSEC_BANK（約39万字）の問題文は規格の版・Microsoft製品の記述を中心に抜き出して見ただけで、全問は読んでいない。PCI DSS、政府統一基準の本文、ISMAP管理基準の改定（検索では2025年12月25日に改定案、2027年3月に関係規程類の公表予定とあるが、原稿に時点依存の記述は無く未照合）、ITSEC_INCIDENTS の2024年以前の事例の続報は見ていない。",
+   "last_checked": "2026-11-12"
+  },
+  "checks-notes": {
+   "status": "checked",
+   "last_attempt": "2026-11-12",
+   "fixed": 6,
+   "partial": 0,
+   "rejected": 1,
+   "unverified": 12,
+   "checked_ok": 8,
+   "blocked_hosts": [
+    "newsroom.ibm.com",
+    "darioamodei.com",
+    "www.axios.com",
+    "www.gov.ca.gov",
+    "www.spglobal.com",
+    "www.cao.go.jp",
+    "www.klarna.com",
+    "dora.dev",
+    "www.flexera.com",
+    "openai.com(403)",
+    "www.gartner.com(403)",
+    "www.mckinsey.com(503)",
+    "www.meti.go.jp(403)",
+    "www.pwc.com(403)"
+   ],
+   "coverage": "確かめた範囲：自治体の生成AI導入率（総務省PDFで本文を確認、checkcore/checkax/industry系の旧値を置換案に）、Claude Cowork統合、Menlo Ventures 2025年版と2026年版、金融庁、AI推進法、EU AI Act罰則、NOTE_CORPORAの件数・期間と画面の出所注記のアプリ内照合。既に古いと確かめた語の残り：87.2%/29.9%（14か所を直し、他は149403の『前回調査』として正しいので残す。82.7%は81%へ置換）、26.7%（8か所すべて別の統計のため直さない。個人利用率として使っている箇所は見つからず）、Claude Cowork（NOTE_CORPORAの1か所を直す。NOTE_ARTICLES内の言及は記事要約なので直さない）。見ていない範囲：CHECK_*（約65万字）とCONV_DRILLS・HYPO_*は年・モデル名・数字を含む問題のうち代表だけで全量は見ていない（モデル名はほぼ無く、Gartner/McKinsey/IBM/S&P等の統計が中心）。NOTE_ARTICLES・NOTE_ART_ENは要約のため書き換えない前提で、期間表記の候補（過ぎた予定33件）は元記事の予測として正しく過去の言及なので触れていない。NOTE_GOVの一次ソースは金融庁のみ開けた。NOTE_GT_FIGS/PMAP/…",
+   "last_checked": "2026-11-12"
   }
  },
  "runs": [
@@ -238,6 +352,19 @@
    "partial": 0,
    "rejected": 0,
    "unverified": 14
+  },
+  {
+   "date": "2026-11-12",
+   "areas": [
+    "slalom-global",
+    "postmortem-industry",
+    "itsec",
+    "checks-notes"
+   ],
+   "fixed": 11,
+   "partial": 0,
+   "rejected": 1,
+   "unverified": 36
   }
  ]
 }
