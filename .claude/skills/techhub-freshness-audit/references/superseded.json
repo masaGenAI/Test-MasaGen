@@ -1,0 +1,335 @@
+{
+ "_note": "点検で「古い」と確かめた語と、確かめた今の事実。residue.py が、この語が原稿のどの範囲に残っているかを数える（ok_near の語が近くにある箇所は手当て済みとして除く）。同じ事実は別の範囲にも書かれていることが多いので、点検で事実を直すたびにここへ足す。事実がさらに動いたら now・source・as_of を直す。",
+ "terms": [
+  {
+   "old": "Vertex AI",
+   "now": "Google Cloud は 2026-04-22 に Vertex AI を Gemini Enterprise Agent Platform へ発展・改称した",
+   "source": "https://cloud.google.com/blog/products/ai-machine-learning/introducing-gemini-enterprise-agent-platform",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "Gemini Enterprise Agent Platform",
+    "旧Vertex",
+    "formerly Vertex"
+   ],
+   "how": "比較表・早見表・定義・クイズの正解に関わる箇所は「Gemini Enterprise Agent Platform（旧Vertex AI）」に。ついでに触れているだけの箇所や当時の事例はそのまま"
+  },
+  {
+   "old": "Agentspace",
+   "now": "Google Agentspace は Gemini Enterprise に統合・改称された",
+   "source": "https://blog.google/feed/google-agentspace/",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "Gemini Enterprise",
+    "旧Agentspace",
+    "formerly Agentspace"
+   ],
+   "how": "現役の事実として書いている箇所だけ直す。当時の出来事・事例・歴史として書いた箇所はそのまま"
+  },
+  {
+   "old": "Kendra",
+   "now": "Amazon Kendra は 2026-06-30 に維持モード入りし、2026-07-30 から新規顧客の受付を停止した",
+   "source": "https://docs.aws.amazon.com/kendra/latest/dg/kendra-availability-change.html",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "維持モード",
+    "新規受付",
+    "新規顧客",
+    "maintenance mode",
+    "new customers"
+   ],
+   "how": "現役の推奨サービスとして書いている箇所に時点と状態を添える。後継の案内は出典のページに書かれている範囲で"
+  },
+  {
+   "old": "Bedrock Agents",
+   "now": "Amazon Bedrock Agents は Bedrock Agents Classic に改称され、2026-07-30 から新規顧客の受付を終了。AWS は AgentCore への移行を案内",
+   "source": "https://docs.aws.amazon.com/bedrock/latest/userguide/agents-classic-maintenance-mode.html",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "Classic",
+    "AgentCore",
+    "新規受付",
+    "new customers"
+   ],
+   "how": "現役の事実として書いている箇所だけ直す。当時の出来事・事例・歴史として書いた箇所はそのまま"
+  },
+  {
+   "old": "Amazon Q Business",
+   "now": "Amazon Q Business は新規顧客の受付を終了し、AWS は Amazon Quick への移行を案内している",
+   "source": "https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/qbusiness-availability-change.html",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "Amazon Quick",
+    "新規受付",
+    "new customers"
+   ],
+   "how": "現役の事実として書いている箇所だけ直す。当時の出来事・事例・歴史として書いた箇所はそのまま"
+  },
+  {
+   "old": "Fraud Detector",
+   "now": "Amazon Fraud Detector は 2025-11-07 から新規顧客の受付を終了した",
+   "source": "https://docs.aws.amazon.com/frauddetector/latest/ug/frauddetector-availability-change.html",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "新規受付",
+    "新規顧客",
+    "new customers"
+   ],
+   "how": "現役の事実として書いている箇所だけ直す。当時の出来事・事例・歴史として書いた箇所はそのまま"
+  },
+  {
+   "old": "Amazon Forecast",
+   "now": "Amazon Forecast は新規顧客が利用できない。AWS は SageMaker Canvas への移行を案内",
+   "source": "https://docs.aws.amazon.com/forecast/latest/dg/what-is-forecast.html",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "新規受付",
+    "新規顧客",
+    "new customers",
+    "SageMaker Canvas"
+   ],
+   "how": "現役の事実として書いている箇所だけ直す。当時の出来事・事例・歴史として書いた箇所はそのまま"
+  },
+  {
+   "old": "Migration Hub",
+   "now": "AWS Migration Hub は 2025-11-07 から新規顧客の受付を終了。後継は AWS Transform",
+   "source": "https://docs.aws.amazon.com/migrationhub/latest/ug/migrationhub-availability-change.html",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "新規受付",
+    "新規顧客",
+    "new customers",
+    "AWS Transform"
+   ],
+   "how": "現役の事実として書いている箇所だけ直す。当時の出来事・事例・歴史として書いた箇所はそのまま"
+  },
+  {
+   "old": "Cache for Redis",
+   "now": "Azure Cache for Redis は全 SKU の廃止が発表済みで、後継は Azure Managed Redis",
+   "source": "https://learn.microsoft.com/azure/azure-cache-for-redis/cache-whats-new",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "Managed Redis",
+    "廃止",
+    "retir"
+   ],
+   "how": "現役の事実として書いている箇所だけ直す。当時の出来事・事例・歴史として書いた箇所はそのまま"
+  },
+  {
+   "old": "Anomaly Detector",
+   "now": "Azure AI Anomaly Detector の提供終了日は 2026-10-01",
+   "source": "https://learn.microsoft.com/en-us/azure/ai-services/anomaly-detector/overview",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "提供終了",
+    "retire",
+    "2026年10月"
+   ],
+   "how": "現役の事実として書いている箇所だけ直す。当時の出来事・事例・歴史として書いた箇所はそのまま"
+  },
+  {
+   "old": "AD B2C",
+   "now": "Azure AD B2C は 2025-05-01 に新規顧客への販売を終了。後継は Microsoft Entra External ID",
+   "source": "https://learn.microsoft.com/azure/active-directory-b2c/faq",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "External ID",
+    "販売終了",
+    "新規顧客",
+    "new customers"
+   ],
+   "how": "現役の事実として書いている箇所だけ直す。当時の出来事・事例・歴史として書いた箇所はそのまま"
+  },
+  {
+   "old": "Assistants API",
+   "now": "OpenAI の Assistants API は非推奨になり、後継は Responses API と Agents SDK",
+   "source": "https://learn.microsoft.com/azure/foundry/how-to/navigate-from-classic",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "非推奨",
+    "Responses API",
+    "deprecated",
+    "後継"
+   ],
+   "how": "現役の事実として書いている箇所だけ直す。当時の出来事・事例・歴史として書いた箇所はそのまま"
+  },
+  {
+   "old": "Claude Cowork",
+   "now": "Claude Cowork は 2026-09-16 にチャットと統合され「Claude」に一本化された",
+   "source": "https://claude.com/resources/articles/cowork-is-now-claude",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "統合",
+    "一本化",
+    "旧Cowork",
+    "now Claude",
+    "merged"
+   ],
+   "how": "現役の事実として書いている箇所だけ直す。当時の出来事・事例・歴史として書いた箇所はそのまま"
+  },
+  {
+   "old": "Project Mariner",
+   "now": "Project Mariner は 2026-05-04 に提供終了とされる（二次情報。要再確認）",
+   "source": "https://en.wikipedia.org/wiki/Project_Mariner",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "提供終了",
+    "終了",
+    "discontinued",
+    "shut down"
+   ],
+   "how": "一次情報で確かめ直してから直す"
+  },
+  {
+   "old": "Fable 5.1",
+   "now": "Anthropic の最上位は 2026-11-09 公開の Claude Fable 5.2",
+   "source": "https://platform.claude.com/docs/en/about-claude/models/overview",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "Fable 5.2"
+   ],
+   "how": "「最新」「最上位」として Fable 5.1 を挙げている箇所だけ直す"
+  },
+  {
+   "old": "Gemini 3",
+   "now": "Google の主力は Gemini 4 世代（Argon は 2026-10-13、Carbon は 2026-11-10）",
+   "source": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "Gemini 4"
+   ],
+   "how": "「最新」「主力」として Gemini 3 系を挙げている箇所だけ直す。当時の比較・事例はそのまま"
+  },
+  {
+   "old": "DBRX",
+   "now": "Databricks の DBRX は提供終了済み",
+   "source": "https://learn.microsoft.com/azure/databricks/machine-learning/retired-models-policy",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "提供終了",
+    "retired",
+    "終了済"
+   ],
+   "how": "現役の事実として書いている箇所だけ直す。当時の出来事・事例・歴史として書いた箇所はそのまま"
+  },
+  {
+   "old": "Data Intelligence Platform",
+   "now": "Databricks の公式の呼称は「Data + AI Platform」に変わっている",
+   "source": "https://learn.microsoft.com/azure/databricks/resources/product-name-changes",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "Data + AI Platform"
+   ],
+   "how": "現役の事実として書いている箇所だけ直す。当時の出来事・事例・歴史として書いた箇所はそのまま"
+  },
+  {
+   "old": "Now Platform",
+   "now": "ServiceNow の基盤は 2025 年に「ServiceNow AI Platform」へ改称（二次情報。要再確認）",
+   "source": "https://www.itmedia.co.jp/enterprise/articles/2605/18/news006.html",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "ServiceNow AI Platform"
+   ],
+   "how": "一次情報で確かめ直してから直す"
+  },
+  {
+   "old": "1900以上",
+   "now": "Microsoft Foundry のモデルカタログは 1 万以上のモデルを含む（2026年11月時点）",
+   "source": "https://learn.microsoft.com/azure/foundry/concepts/foundry-models-overview",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "1万以上"
+   ]
+  },
+  {
+   "old": "成立と報道",
+   "now": "AI推進法（令和7年法律第53号）は 2025年6月に公布、9月に全面施行された",
+   "source": "https://www.soumu.go.jp/main_content/001099163.pdf",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "全面施行"
+   ]
+  },
+  {
+   "old": "49.7%",
+   "now": "生成AI活用方針を定めた日本企業は 68.9%（総務省 令和8年版情報通信白書、2025年度調査）。49.7% は令和7年版（2024年度調査）の値",
+   "source": "https://www.soumu.go.jp/johotsusintokei/whitepaper/ja/r08/pdf/n1210000.pdf",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "68.9%",
+    "令和7年版",
+    "2024年度"
+   ],
+   "how": "方針策定率として使っている箇所だけ。別の統計の 49.7% は対象外。旧版の値と時点を明記して残してある箇所はそのまま"
+  },
+  {
+   "old": "26.7%",
+   "now": "生成AIの個人利用経験は日本 58.8%（総務省 令和8年版情報通信白書、2025年度調査）。26.7% は令和7年版（2024年度調査）の値",
+   "source": "https://www.soumu.go.jp/johotsusintokei/whitepaper/ja/r08/html/nd111110.html",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "58.8%",
+    "令和7年版",
+    "2024年度"
+   ],
+   "how": "個人の利用経験率として使っている箇所だけ。別の統計の 26.7% は対象外"
+  },
+  {
+   "old": "85.1%",
+   "now": "DX人材の「量」が不足する企業は 85.5%（IPA DX動向2026、2025年度調査）。85.1% は DX動向2025（2024年度調査）の値",
+   "source": "https://www.ipa.go.jp/digital/chousa/dx-trend/dx-trend-2026.html",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "85.5%",
+    "DX動向2025",
+    "2024年度"
+   ],
+   "how": "記事の要約の中の引用（NOTE_ARTICLES）は書き換えない"
+  },
+  {
+   "old": "87.2%",
+   "now": "自治体の生成AI導入は都道府県・指定都市 100%、その他市区町村 45.6%（総務省 令和7年度調査、2025-10-31 時点）。87.2%・29.9% は 2024年末時点の値",
+   "source": "https://www.soumu.go.jp/main_content/001070295.pdf",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "45.6%",
+    "2024年12月",
+    "2024年末",
+    "前回調査",
+    "previous survey",
+    "December 31, 2024"
+   ],
+   "how": "自治体の導入率として使っている箇所だけ"
+  },
+  {
+   "old": "370億ドル",
+   "now": "Menlo Ventures の 2026年版（2026-11-03）は企業の生成AI支出を 2026年9月時点で 1,768億ドルと推計。370億ドルは 2025年版の値",
+   "source": "https://menlovc.com/perspective/2026-the-state-of-enterprise-ai/",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "1,768億ドル",
+    "2025年版",
+    "2025年通年"
+   ],
+   "how": "Menlo の推計として使っている箇所だけ"
+  },
+  {
+   "old": "6,320億ドル",
+   "now": "IDC は 2025-08-26 に 2029年までの新しい世界AI支出予測（1.3兆ドル）を出している。6,320億ドル（2028年）は 2024年8月の予測",
+   "source": "https://www.idc.com/resource-center/press-releases/",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "1.3兆ドル",
+    "2024年8月"
+   ]
+  },
+  {
+   "old": "SB24-205",
+   "now": "コロラド州の SB24-205 は 2026年5月に SB26-189 で廃止・再制定された",
+   "source": "https://leg.colorado.gov/bills/sb26-189",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "SB26-189"
+   ]
+  }
+ ]
+}

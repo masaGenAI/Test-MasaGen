@@ -17,12 +17,23 @@
 
 ## アプリの調べ方
 道具は `R/.claude/skills/techhub-freshness-audit/scripts/` にある（以下 `scripts/`）。Python は `python3 -I` で動かす。
-- 担当範囲の候補（機械的な洗い出し）：`W/cand-<範囲>.md`。過ぎた予定・近い期限・古い時点・「最新」と書いた箇所が並んでいる。**ここから始める**。ただし候補は機械的に拾っただけで、候補に無い箇所（モデル名・製品名・統計など）も自分で探す。
+- 担当範囲の候補：`W/cand-<範囲>.md`。**ここから始める**。2つの部分がある。
+  - 時点依存の候補（機械的な洗い出し）：過ぎた予定・近い期限・古い時点・「最新」と書いた箇所。
+  - **既に古いと確かめた語の残り**：ほかの範囲の点検で、事実と出典を確かめ済みの語（改称・提供終了・統計の新版など）が、この範囲にまだ残っている箇所。
+    語ごとに「今の事実」と出典が書いてあるので、出典を1回開いて今も同じか確かめたうえで、文脈を読んで決める。現役の事実として書いている箇所（定義・比較表・推奨・クイズの正解や解説）は置換案にする。
+    当時の事例・歴史として正しく書かれている箇所、別の統計の同じ数字、ついでに触れているだけの箇所は直さない。語ごとに「何か所を直し、何か所をなぜ残したか」を coverage に書く。
 - 定数の索引：`W/consts.txt`（「行番号: 名前 (文字数) [担当範囲]」）。原稿 `R/nova-app/src/ProjectNova.jsx` は約100MB あるので**丸ごと読まない**。1行が数万〜百万字の定数があるので、
   `grep -n -o ".\{80\}探す語.\{120\}" R/nova-app/src/ProjectNova.jsx | head` や `sed -n 'A,Bp' … | cut -c1-600` で切り出して読む。
 - 画面の文（折りたたみを開いた状態）：`node scripts/tabtext.mjs <タブid> --dist W/dist-snap [--click "ボタン名" ...] [--from N] [--len N]`（既定は先頭 12,000 字。`--from` で続き、`--click` で下位画面）。
 - 原稿が別ファイルの範囲がある：AIフォーサイトと ITセキュリティは `R/nova-app/src/data/*.json`、ガバナンス道場は `R/data/govdojo/*.json`（jsx の `GOVREG_*`・`GOVIND`・`GOVLC`・`GOVKIT`・`GOVTPL`・`GOVUC` は生成物なので、置換案は data 側に出す）。
-- 前回の点検で未確認だった点：`W/carry-<範囲>.json`（あれば）。**最初に確かめ直す**。
+- 前回の点検で未確認だった点：`W/carry-<範囲>.json`（あれば）。**最初に確かめ直す**。各項目は、今回の結果の findings（確かめて直せた）・checked_ok（確かめたら今も正しかった）・unverified（まだ確かめられない）の**どれかに必ず入れる**（`current_text` は carry の文字列をそのまま使う）。
+
+## 点検の深さ（最低限）
+- 候補と「残り」は全部に目を通す。
+- 候補に日付つきのものが少ない範囲でも、それで終わりにしない。担当範囲の定数から、固有名詞と数字（モデル名・製品名・サービス名・資格名・規格や指針の版・統計の出典と年・料金・上限値・人名と役職）を grep で洗い出し、
+  **少なくとも15件は出典を開いて照合する**（結果は findings・checked_ok・unverified のどれかに入る）。量の多い定数は、種類ごとに代表を選ぶ。
+- 開けないホストがあっても、ほかの記述（別の出典）の確認は続ける。`"blocked": true` を付けて早く終えてよいのは、別々のホストを8つ以上試して1つも開けなかったときだけ。
+- `W/out/check-<範囲>.json` が既にあるときは、前の担当者の続き。読んで、既にある findings の順番と中身は変えずに、その後ろに追記する（unverified・checked_ok・coverage は書き足してよい）。
 
 ## 確かめ方
 - Web 検索と取得を使う。道具に WebSearch / WebFetch が無ければ ToolSearch で `select:WebSearch,WebFetch` を読み込む。Microsoft の文書（learn.microsoft.com）は Microsoft Learn の MCP（`select:mcp__Microsoft_Learn__microsoft_docs_search,mcp__Microsoft_Learn__microsoft_docs_fetch`）で読める。

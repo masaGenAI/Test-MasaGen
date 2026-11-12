@@ -755,7 +755,7 @@
     "www.gov.uk",
     "www.cac.gov.cn"
    ],
-   "hint": "タブ govdojo。まず .claude/skills/govdojo-maintenance/SKILL.md を読み、その「A. 定期確認」の 2（data/govdojo/compare.json の upcoming で今日までに過ぎた予定）と 3（画面の「鮮度・要再確認」の未確認点）を行う。前回の全件照合（台帳 ledger.json の govdojo の日付）以降に動いた規制・指針（EU AI Act の適用時期や簡素化案、日本のAI法と指針、米国の州法、NIST・ISO など）を一次情報で確かめる。置換案は data/govdojo/*.json 側に出す（jsx の GOVREG_*・GOVIND・GOVLC・GOVKIT・GOVTPL・GOVUC は build.py の生成物なので直さない）。urlcheck.py の全件実行は不要。"
+   "hint": "タブ govdojo。まず .claude/skills/govdojo-maintenance/SKILL.md を読み、その「A. 定期確認」の 2（data/govdojo/compare.json の upcoming で今日までに過ぎた予定）と 3（画面の「鮮度・要再確認」の未確認点）を行う。前回の点検（data/techhub-freshness/ledger.json の govdojo の last_checked。記録が無ければ data/govdojo の各項目の最終確認日）以降に動いた規制・指針（EU AI Act の適用時期や簡素化案、日本のAI法と指針、米国の州法、NIST・ISO など）を一次情報で確かめる。置換案は data/govdojo/*.json 側に出す（jsx の GOVREG_*・GOVIND・GOVLC・GOVKIT・GOVTPL・GOVUC は build.py の生成物なので直さない）。urlcheck.py の全件実行は不要。"
   }
  ]
 }

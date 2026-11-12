@@ -123,7 +123,13 @@ def main() -> None:
         if not blocked:
             rec["last_checked"] = date
         ledger["areas"][key] = rec
-        carried = [u for u in carried if u.get("area") != key]
+        # 持ち越しのうち、今回の結果（直した・今も正しい・まだ未確認）のどこにも出てこない項目は消さずに残す
+        touched = " ".join(str(x.get(k) or "") for x in d.get("findings", []) + unv for k in ("current_text",))
+        touched += " ".join(str(x.get("claim") or "") for x in ok)
+        kept = [u for u in carried if u.get("area") == key and (u.get("current_text") or "")[:40] not in touched]
+        carried = [u for u in carried if u.get("area") != key] + kept
+        if kept:
+            md.append(f"\n前回からの未確認のうち、今回の担当者が触れなかった {len(kept)} 件は持ち越しに残した。")
         for u in unv:
             carried.append({"area": key, "tab": u.get("tab"), "current_text": u.get("current_text"), "concern": u.get("concern"),
                             "why": u.get("why"), "first_seen": first_seen.get((key, (u.get("current_text") or "")[:80])) or date, "last_tried": date})

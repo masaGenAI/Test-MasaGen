@@ -3,7 +3,7 @@
 usage: python3 -I prep.py <作業フォルダ> --areas a,b,...  [--today YYYY-MM-DD] [--no-reach]   … 点検の前
        python3 -I prep.py <作業フォルダ> --verify [--areas a,b,...] [--chunk 8]                … 担当者が終わったあと
   点検の前:  out/ を作り、定数の索引（consts.txt）、範囲ごとの候補（cand-<範囲>.md）、前回の未確認（carry-<範囲>.json）、
-            画面の写し（dist-snap/。nova-app/dist があれば）を置き、出典のホストに届くかを確かめて、担当者への依頼文を出す。
+            画面の写し（dist-snap/。nova-app/dist があれば）を置き（候補には、古いと確かめた語の残りも入る）、出典のホストに届くかを確かめて、担当者への依頼文を出す。
   --verify:  out/check-<範囲>.json の修正案を --chunk 件ずつに分け、検算者への依頼文を出す。
   依頼文はそのままサブエージェントの prompt に使う（文面をそろえるため、手で書き直さない）。
 """
@@ -83,7 +83,12 @@ def main() -> None:
     probed: dict[str, tuple[str, str]] = {}
     for key in keys:
         ar = by_key[key]
-        print(run("time_scan.py", "--today", today, "--area", key, "--out", os.path.join(work, f"cand-{key}.md")).strip())
+        cand = os.path.join(work, f"cand-{key}.md")
+        print(run("time_scan.py", "--today", today, "--area", key, "--out", cand).strip())
+        left = run("residue.py", "--area", key)
+        with open(cand, "a", encoding="utf-8") as f:
+            f.write(left)
+        print(f"{key}: 古いと確かめた語の残り " + (left.split("（")[1].split("件")[0] if "（" in left else "0") + " 件")
         mine = [u for u in carried if u.get("area") == key]
         if mine:
             common.save_json(os.path.join(work, f"carry-{key}.json"), mine)
@@ -100,10 +105,10 @@ def main() -> None:
               f"今日: {today}　リポジトリ R: {common.ROOT}　作業フォルダ W: {work}　道具: R/{scripts}/\n"
               f"担当範囲（{key}）: {ar['hint']}\n"
               + (f"この環境から開けないホスト（繰り返し試さず、別の一次情報が無ければ unverified へ）: {', '.join(blocked)}\n" if blocked else "")
-              + f"W/cand-{key}.md（機械的に洗い出した候補）"
+              + f"W/cand-{key}.md（機械的に洗い出した候補と、古いと確かめた語の残り）"
               + (f"と W/carry-{key}.json（前回の点検で未確認だった {len(mine)} 件。最初に確かめ直す）" if mine else "")
               + f"から始め、古い疑いが強いものから順に、出典のページを開いて確かめてください。確かめた事実に基づく修正案だけを findings に入れ、"
-              f"結果を W/out/check-{key}.json に書いて repl_check.py を全件合格にしてから、件数・開けなかったホスト・見ていない範囲だけ短く返してください。リポジトリは書き換えません。\n")
+              f"結果を W/out/check-{key}.json に書いて（既にあれば読んで、その続きに追記する）repl_check.py を全件合格にしてから、件数・開けなかったホスト・見ていない範囲だけ短く返してください。リポジトリは書き換えません。\n")
 
 
 if __name__ == "__main__":
