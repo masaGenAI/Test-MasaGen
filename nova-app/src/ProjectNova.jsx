@@ -153089,6 +153089,10 @@ function TabFrontier() {
     </div>
   );
 }
+// エージェント棚の各カードの「方式の目安」。棚では業務の一部をAIが担う仕組みを広く Agent と呼ぶが、実装の方式は別に決める。
+// wf＝手順を固定したワークフロー＋LLM、rag＝検索＋生成、ml＝予測・照合（従来の手法）＋LLMの説明。カードの説明文から付けた見立て
+const SHELF_METHOD_LABEL = { wf: ["手順固定のワークフロー＋LLM", "Fixed workflow + LLM"], rag: ["検索＋生成（RAG）", "Retrieval + generation (RAG)"], ml: ["予測・照合＋LLMの説明", "Prediction or matching + LLM explanation"] };
+const SHELF_METHOD = {"残高・入出金照会応答Agent": "wf", "口座開設・変更手続き案内Agent": "rag", "保険金請求受付サポートAgent": "wf", "稟議ドラフト作成Agent": "rag", "行内規程・ナレッジ検索Agent": "rag", "商談前準備Agent": "wf", "AML疑わしい取引調査支援Agent": "wf", "規制報告書ドラフトAgent": "wf", "経理突合・消込支援Agent": "ml", "製品仕様問い合わせ応答Agent": "rag", "見積り一次回答Agent": "rag", "保守・故障受付Agent": "wf", "図面レビュー下書き支援Agent": "wf", "作業手順書ドラフトAgent": "rag", "現場写真・進捗整理Agent": "ml", "発注仕様チェックAgent": "ml", "品質記録突合Agent": "ml", "検査報告書ドラフトAgent": "wf", "商品レコメンド接客Agent": "ml", "返品・交換受付Agent": "wf", "店舗在庫・取り置き案内Agent": "wf", "店舗発注量提案Agent": "ml", "棚割・品揃えドラフトAgent": "ml", "販促企画ドラフトAgent": "rag", "需給配分・発注最適化Agent": "ml", "棚卸差異検知Agent": "ml", "納期・欠品調整Agent": "wf", "オンボーディング支援Agent": "wf", "利用ヘルススコア監視Agent": "ml", "更新提案・アップセル支援Agent": "wf", "提案書・見積ドラフトAgent": "rag", "コードレビュー指摘ドラフトAgent": "wf", "障害調査補助Agent": "wf", "請求・契約整合チェックAgent": "ml", "稟議・発注申請ドラフトAgent": "rag", "オンコールシフト調整案Agent": "ml"};
 function TabAgentShelf() {
   const lang = useLang();
   const en = lang === "en";
@@ -153102,6 +153106,10 @@ function TabAgentShelf() {
       <SectionTitle jp="エージェント棚卸しマトリクス — 業種×レイヤーで指させる棚" en="Agent Shelf — point at the use case by sector and layer" />
       <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.7, marginBottom: 12 }}>
         {en ? "Thirty-six agent use cases on one shelf: four sector groups by three layers. Use it in reverse — diagnose with the industry value chains first, then point here to say 'yours is this one.' Every card carries the honest maturity flag and the smallest way in." : "36のエージェントユースケースを「4業種群×3レイヤー」の棚に並べた営業道具。使い方は逆引き — まず「業界別」のバリューチェーンで診断し、この棚で「御社ならこれ」と指さす。各カードに正直な成熟度と最小の入り方つき。"}
+      </div>
+      <div style={{ background: C.surface2, borderLeft: `3px solid ${C.gold}`, borderRadius: 8, padding: "9px 12px", fontSize: 12, color: C.muted, lineHeight: 1.7, marginBottom: 12 }}>
+        {en ? "On this shelf, \"Agent\" is used broadly for any setup where AI takes on part of a job. How it is built is a separate decision. On our reading, all thirty-six can be built as a fixed workflow with an LLM, as retrieval plus generation, or as prediction or matching with an LLM explanation. Use an agent that chooses its own steps only when you can show the steps cannot be fixed in advance (the same rule as the reference architectures in the Architect Academy). Open a card to see the suggested approach."
+          : "この棚では、AIが業務の一部を担う仕組みを広く「Agent」と呼んでいる。どう作るかは別に決める。36件はどれも、手順を固定したワークフロー＋LLM、検索＋生成、予測・照合＋LLMの説明のいずれかで作れる見立て。自分で手順を選ぶエージェントにするのは、手順を事前に決められないと示せるときだけ（AIアーキテクト道場の参照アーキテクチャと同じ基準）。カードを開くと方式の目安が出る。"}
       </div>
       <div style={{ display: "flex", gap: 7, flexWrap: "wrap", marginBottom: 14 }}>
         {SHELF_GROUPS.map((g) => (
@@ -153125,6 +153133,7 @@ function TabAgentShelf() {
                 {on ? (
                   <div style={{ marginTop: 6 }}>
                     <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.65, marginBottom: 5 }}>{c.does[en ? 1 : 0]}</div>
+                    {SHELF_METHOD[c.t[0]] ? <div style={{ fontSize: 11, color: C.fore, lineHeight: 1.6, marginBottom: 3 }}>🧩 {en ? "Suggested approach: " : "方式の目安："}{SHELF_METHOD_LABEL[SHELF_METHOD[c.t[0]]][en ? 1 : 0]}</div> : null}
                     <div style={{ fontSize: 11, color: C.dim, lineHeight: 1.6, marginBottom: 3 }}>🗄 {c.data[en ? 1 : 0]}</div>
                     <div style={{ fontSize: 11, color: C.teal, lineHeight: 1.6, marginBottom: 3 }}>💰 {c.eff[en ? 1 : 0]}</div>
                     <div style={{ fontSize: 11, color: C.gold, lineHeight: 1.6 }}>▶ {c.entry[en ? 1 : 0]}</div>
@@ -159154,6 +159163,10 @@ function BprGates({ en }) {
         {verdict(aOk,
           en ? "All three met. Try the cheapest tier first (existing Copilot or Gemini), name who checks what, and have people check every case for the first two weeks." : "3条件を満たす。追加費用0の既存ツールから試し、人が確認する範囲と責任者を決め、最初の2週間は全件チェックする。",
           en ? "Not yet — pick another process from the inventory. Only 20–30% of agents are still running six months later (speaker's impression)." : "まだ条件を満たさない。棚卸しから別の業務を選ぶ。半年後も回っているのは2〜3割（話者体感）。")}
+        <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.65, marginTop: 6 }}>
+          {en ? "Second step, once all three are met: can the steps be fixed in advance? If yes, a workflow coded step by step, with an LLM making the judgement at each step, is enough. Use an agent that chooses its own steps only when you can show they cannot be fixed (the rule in the Architect Academy's reference architectures)."
+            : "3条件を満たしたら2段目：手順を事前に固定できるか。固定できるなら、手順をコードで組み、各段の判断にLLMを使うワークフローで足りる。自分で手順を選ぶエージェントにするのは、固定できないと示せるときだけ（AIアーキテクト道場の参照アーキテクチャと同じ基準）。"}
+        </div>
         <div style={{ marginTop: 6 }}><BprRefs refs={[10]} en={en} /></div>
       </div>
       <div style={{ background: C.surface2, borderRadius: 10, padding: "11px 13px" }}>
