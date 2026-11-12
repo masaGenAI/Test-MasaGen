@@ -138688,7 +138688,11 @@ function TechHubRecords() {
       const wrote = Object.keys(cn).filter((k) => cn[k] && Object.values(cn[k]).some((x) => String(x || "").trim())).length;
       const scored = Object.keys(cr).filter((k) => cr[k] && Object.keys(cr[k]).length);
       const avg = scored.length ? scored.reduce((p, k) => p + Object.keys(cr[k]).length, 0) / scored.length : null;
-      out.push({ id: "casework", name: ["ケース演習（書く）", "Case Work (written)"], size: CASE_CARDS.length, seen: wrote, unit: ["件に記入", " written"], ans: null, acc: null, weak: null, note: avg != null ? (en ? `rubric avg ${avg.toFixed(1)} (${scored.length} scored)` : `自己採点 平均${avg.toFixed(1)}項目（${scored.length}件）`) : null, review: 0, reviewL: ["", ""], open: { tab: "casework" } });
+      const cp = (await get("axcase_pro_v1")) || {};
+      const proN = Object.keys(cp).filter((k) => cp[k] && Object.keys(cp[k]).length);
+      const proAvg = proN.length ? proN.reduce((p, k) => p + Object.keys(cp[k]).length, 0) / proN.length : null;
+      const cwNote = [avg != null ? (en ? `rubric avg ${avg.toFixed(1)} (${scored.length} scored)` : `自己採点 平均${avg.toFixed(1)}項目（${scored.length}件）`) : null, proAvg != null ? (en ? `top-tier check avg ${proAvg.toFixed(1)}/10` : `超一流の点検 平均${proAvg.toFixed(1)}/10`) : null].filter(Boolean).join(en ? "; " : "・");
+      out.push({ id: "casework", name: ["ケース演習（書く）", "Case Work (written)"], size: CASE_CARDS.length, seen: wrote, unit: ["件に記入", " written"], ans: null, acc: null, weak: null, note: cwNote || null, review: 0, reviewL: ["", ""], open: { tab: "casework" } });
       if (live) setRows(out);
     })();
     return () => { live = false; };
@@ -157645,11 +157649,26 @@ function TabSalesDojo() {
   );
 }
 
+// ケース演習の自己点検（全ケース共通の10項目）。案件の筋の良さを、戦略・数字・技術・統制・経営向けの伝え方で確かめる。
+// ケースごとのルーブリック（受注に向けた点検）とは別に保存する（axcase_pro_v1）
+const CASE_PRO_CHECK = [
+  { g: ["戦略", "Strategy"], c: "論点を1文で書き、それが決裁者の判断を変える問いになっている", cEn: "The issue is stated in one sentence, and it is a question whose answer changes the decision-maker's call" },
+  { g: ["戦略", "Strategy"], c: "見送った案に、見送る理由と、再び検討する条件を書いた", cEn: "For each option set aside, the reason and the condition for revisiting it are written" },
+  { g: ["戦略", "Strategy"], c: "「なぜ今か」を、この顧客に固有の事実2つ以上で書いた（統計は補助に1つまで）", cEn: "\"Why now\" rests on two or more facts specific to this client (at most one statistic in support)" },
+  { g: ["数字", "Numbers"], c: "効果に、実現する割合と、損益のどの科目に出るかを添えた", cEn: "Each benefit states the share that will be realised and the P&L line it lands on" },
+  { g: ["数字", "Numbers"], c: "やめる基準を数字で書いた（いつ・何が・いくつ未満なら止めるか）", cEn: "The stop criterion is a number (when, which measure, below what value)" },
+  { g: ["技術", "Technology"], c: "選んだ方式と、選ばなかった方式・その理由を書いた", cEn: "The chosen approach, the approaches rejected and why are written" },
+  { g: ["技術", "Technology"], c: "合格の基準と、評価に使うデータの中身（代表例・境界・例外）を書いた", cEn: "The pass criteria and what goes into the evaluation data (typical, boundary and exception cases) are written" },
+  { g: ["統制", "Governance"], c: "扱うデータ・権限・止める条件を書き、審査にかかる期間を計画に入れた", cEn: "The data, access rights and stop conditions are written, and the review lead time is in the plan" },
+  { g: ["経営向け", "For executives"], c: "経営会議向けの1枚が、結論 → 根拠3本 → 決めてほしいこと、の順になっている", cEn: "The one-pager runs conclusion, three grounds, then the decision being asked for" },
+  { g: ["経営向け", "For executives"], c: "最も強い反対意見と、その返しを書いた", cEn: "The strongest objection and the answer to it are written" },
+];
 function CaseWorkCard({ card, idx, onBack }) {
   const lang = useLang();
   const en = lang === "en";
-  const [notes, setNotes] = useState({ a: "", b: "" });
+  const [notes, setNotes] = useState({ a: "", b: "", c: "" });
   const [rub, setRub] = useState({});
+  const [pro, setPro] = useState({});
   const [showModel, setShowModel] = useState(false);
   const [showHints, setShowHints] = useState(false);
   const [aiGrade, setAiGrade] = useState("");
@@ -157659,8 +157678,11 @@ function CaseWorkCard({ card, idx, onBack }) {
     let live = true;
     (async () => { try { const r = await window.storage.get("axcase_notes_v1"); if (live && r && r.value) { const all = JSON.parse(r.value); if (all[idx]) setNotes(all[idx]); } } catch (e) {} })();
     (async () => { try { const r = await window.storage.get("axcase_rubric_v1"); if (live && r && r.value) { const all = JSON.parse(r.value); if (all[idx]) setRub(all[idx]); } } catch (e) {} })();
+    (async () => { try { const r = await window.storage.get("axcase_pro_v1"); if (live && r && r.value) { const all = JSON.parse(r.value); if (all[idx]) setPro(all[idx]); } } catch (e) {} })();
     return () => { live = false; };
   }, [idx]);
+  const togglePro = i => { const next = { ...pro }; if (next[i]) delete next[i]; else next[i] = true; setPro(next); (async () => { try { const r = await window.storage.get("axcase_pro_v1"); const all = r && r.value ? JSON.parse(r.value) : {}; all[idx] = next; window.storage.set("axcase_pro_v1", JSON.stringify(all)); } catch (e) {} })(); };
+  const nA = notes.a || "", nB = notes.b || "", nC = notes.c || "";
   const saveNotes = next => { setNotes(next); (async () => { try { const r = await window.storage.get("axcase_notes_v1"); const all = r && r.value ? JSON.parse(r.value) : {}; all[idx] = next; window.storage.set("axcase_notes_v1", JSON.stringify(all)); } catch (e) {} })(); };
   const toggleRub = i => { const next = { ...rub }; if (next[i]) delete next[i]; else next[i] = true; setRub(next); (async () => { try { const r = await window.storage.get("axcase_rubric_v1"); const all = r && r.value ? JSON.parse(r.value) : {}; all[idx] = next; window.storage.set("axcase_rubric_v1", JSON.stringify(all)); } catch (e) {} })(); };
   const ta = { width: "100%", minHeight: 110, background: C.surface2, border: `1px solid ${C.line}`, borderRadius: 9, padding: "10px 12px", color: C.text, fontSize: 13, lineHeight: 1.65, fontFamily: "inherit", resize: "vertical", boxSizing: "border-box" };
@@ -157692,23 +157714,29 @@ function CaseWorkCard({ card, idx, onBack }) {
         <div style={{ fontSize: 11.5, fontWeight: 800, color: C.teal, marginBottom: 4 }}>{en ? "2. PROPOSAL SKELETON (7 sections, one line each)" : "2. 提案骨子（7項目×各1行：①企業価値の問い②なぜ今か③絞り込み④効果と測定⑤段階投資とゲート⑥統制先回り⑦なぜ当社か）"}</div>
         <textarea style={{ ...ta, minHeight: 150 }} value={notes.b} onChange={e => saveNotes({ ...notes, b: e.target.value })} aria-label={en ? "① … ② … ③ …" : "① … ② … ③ …"} placeholder={en ? "① … ② … ③ …" : "① … ② … ③ …"} />
       </div>
+      <div style={{ marginBottom: 12 }}>
+        <div style={{ fontSize: 11.5, fontWeight: 800, color: C.teal, marginBottom: 4 }}>{en ? "3. ONE PAGE FOR THE BOARD (conclusion in one sentence / three grounds / the decision you ask for: what, up to how much, by when, who / what you will not do this time / the strongest objection and your answer)" : "3. 経営会議向けの1枚（結論1文／根拠3本／決めてほしいこと：何を・いくらまで・いつまでに・誰が／今回やらないこと／最も強い反対意見とその返し）"}</div>
+        <textarea style={{ ...ta, minHeight: 150 }} value={nC} onChange={e => saveNotes({ ...notes, c: e.target.value })} aria-label={en ? "Conclusion: … Grounds: 1) … 2) … 3) … Decision: …" : "結論：… 根拠：1) … 2) … 3) … 決めてほしいこと：…"} placeholder={en ? "Conclusion: … Grounds: 1) … 2) … 3) … Decision: …" : "結論：… 根拠：1) … 2) … 3) … 決めてほしいこと：…"} />
+      </div>
       <button className="gh-btn" onClick={() => setShowModel(m => !m)} style={{ borderColor: C.gold, color: C.gold, fontWeight: 700, marginBottom: 12 }}>{showModel ? (en ? "▲ Hide model answer" : "▲ 模範解答を閉じる") : (en ? "▼ Compare with the model answer" : "▼ 模範解答と照合する")}</button>
-      <button className="gh-btn" disabled={aiBusy || (!notes.a.trim() && !notes.b.trim())} onClick={async () => {
+      <button className="gh-btn" disabled={aiBusy || (!nA.trim() && !nB.trim() && !nC.trim())} onClick={async () => {
         setAiBusy(true); setAiErr(""); setAiGrade("");
         try {
           const sys = en
-            ? "You are a seasoned AX producer reviewing a junior consultant's case answer. Grade strictly against the rubric. Output in English, plain text: 1) Overall score X/10 with one-line verdict 2) Rubric check as numbered list with O / partial / X and a short reason ONLY for non-O items 3) The two highest-impact improvements 4) One thing done well 5) One concrete next action. Be specific to their text; never invent facts beyond the case."
-            : "あなたはAXプロデューサーの上司として、部下のケース答案を添削する。ルーブリックを唯一の基準に厳しめに採点する。出力は日本語のプレーンテキストで：1) 総合スコア X/10 と一言評価 2) ルーブリック項目別の判定（○/△/×。△と×のみ短い理由）3) 最重要の改善点2つ（答案の具体箇所を引用して）4) 良かった点1つ 5) 次にやる具体アクション1つ。ケースにない事実を創作しない。";
+            ? "You are a seasoned AX producer reviewing a junior consultant's case answer. Grade strictly against the rubric. Output in English, plain text: 1) Overall score X/10 with one-line verdict 2) Rubric check as numbered list with O / partial / X and a short reason ONLY for non-O items 3) The two highest-impact improvements 4) One thing done well 5) One concrete next action 6) Against the ADDITIONAL CHECKS, the single weakest point and how to fix it. Be specific to their text; never invent facts beyond the case."
+            : "あなたはAXプロデューサーの上司として、部下のケース答案を添削する。ルーブリックを唯一の基準に厳しめに採点する。出力は日本語のプレーンテキストで：1) 総合スコア X/10 と一言評価 2) ルーブリック項目別の判定（○/△/×。△と×のみ短い理由）3) 最重要の改善点2つ（答案の具体箇所を引用して）4) 良かった点1つ 5) 次にやる具体アクション1つ 6) 追加の観点に照らして最も弱い1点と、その直し方。ケースにない事実を創作しない。";
           const usr = (en ? "CASE:\n" : "ケース：\n") + (en ? card.briefEn : card.brief)
             + (en ? "\n\nMODEL ANSWER (one strong line):\n" : "\n\n模範解答（筋の良い一例）：\n") + (en ? card.model.focusEn + "\n" + card.model.skeletonEn + "\n" + card.model.kpiEn + "\n" + card.model.gateEn : card.model.focus + "\n" + card.model.skeleton + "\n" + card.model.kpi + "\n" + card.model.gate)
             + (en ? "\n\nRUBRIC:\n" : "\n\nルーブリック：\n") + card.rubric.map((r, i) => (i + 1) + ". " + (en ? r.cEn : r.c)).join("\n")
             + (en ? "\n\nSTUDENT ANSWER — shortlist & rationale:\n" : "\n\n受講者答案（絞り込みと根拠）：\n") + (notes.a || (en ? "(blank)" : "（未記入）"))
-            + (en ? "\n\nSTUDENT ANSWER — skeleton:\n" : "\n\n受講者答案（骨子）：\n") + (notes.b || (en ? "(blank)" : "（未記入）"));
+            + (en ? "\n\nADDITIONAL CHECKS (strategy, numbers, technology, governance, executive one-pager):\n" : "\n\n追加の観点（戦略・数字・技術・統制・経営向けの1枚）：\n") + CASE_PRO_CHECK.map((r, i) => (i + 1) + ". " + (en ? r.cEn : r.c)).join("\n")
+            + (en ? "\n\nSTUDENT ANSWER — skeleton:\n" : "\n\n受講者答案（骨子）：\n") + (notes.b || (en ? "(blank)" : "（未記入）"))
+            + (en ? "\n\nSTUDENT ANSWER — one page for the board:\n" : "\n\n受講者答案（経営会議向けの1枚）：\n") + (nC || (en ? "(blank)" : "（未記入）"));
           const g = await callClaude(sys, [{ role: "user", content: usr }]);
           setAiGrade(g);
         } catch (e) { setAiErr((en ? "Grading failed: " : "採点に失敗: ") + e.message); }
         setAiBusy(false);
-      }} style={{ borderColor: C.teal, color: C.teal, fontWeight: 700, marginBottom: 12, marginLeft: 8, opacity: aiBusy || (!notes.a.trim() && !notes.b.trim()) ? 0.5 : 1 }}>{aiBusy ? (en ? "Grading…" : "採点中…") : (en ? "🤖 Get AI feedback" : "🤖 AI採点を受ける")}</button>
+      }} style={{ borderColor: C.teal, color: C.teal, fontWeight: 700, marginBottom: 12, marginLeft: 8, opacity: aiBusy || (!nA.trim() && !nB.trim() && !nC.trim()) ? 0.5 : 1 }}>{aiBusy ? (en ? "Grading…" : "採点中…") : (en ? "🤖 Get AI feedback" : "🤖 AI採点を受ける")}</button>
       {aiErr ? <div style={{ fontSize: 12, color: "#E79AA7", marginBottom: 10 }}>{aiErr}</div> : null}
       {aiGrade ? (
         <Card style={{ borderColor: C.teal, marginBottom: 12 }}>
@@ -157737,6 +157765,19 @@ function CaseWorkCard({ card, idx, onBack }) {
               <div key={i} onClick={() => toggleRub(i)} style={{ display: "flex", gap: 9, alignItems: "flex-start", padding: "6px 4px", cursor: "pointer", borderRadius: 6 }}>
                 <span style={{ fontSize: 14, lineHeight: 1.3, color: rub[i] ? "#16A34A" : "#94a3b8", flexShrink: 0 }}>{rub[i] ? "☑" : "☐"}</span>
                 <span style={{ fontSize: 12.5, color: rub[i] ? C.text : C.muted, lineHeight: 1.6 }}>{en ? r.cEn : r.c}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 12, padding: 16, marginTop: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4, flexWrap: "wrap" }}>
+              <span style={{ fontSize: 11.5, fontWeight: 800, color: C.gold }}>{en ? "TOP-TIER SELF-CHECK (same ten items for every case)" : "超一流の自己点検（全ケース共通の10項目）"}</span>
+              <span style={{ fontSize: 12.5, color: Object.keys(pro).length >= 8 ? "#72BA88" : C.muted, fontVariantNumeric: "tabular-nums", fontWeight: 700 }}>{Object.keys(pro).length} / {CASE_PRO_CHECK.length}</span>
+            </div>
+            <div style={{ fontSize: 11.5, color: C.dim, lineHeight: 1.6, marginBottom: 6 }}>{en ? "The rubric above checks whether the deal is ready to win. This one checks whether the answer would stand up in front of the client: strategy, numbers, technology, governance and the executive page." : "上のルーブリックは受注に向けた点検。こちらは、答案が顧客の前で通用するかを、戦略・数字・技術・統制・経営向けの伝え方で確かめる。"}</div>
+            {CASE_PRO_CHECK.map((r, i) => (
+              <div key={i} onClick={() => togglePro(i)} style={{ display: "flex", gap: 9, alignItems: "flex-start", padding: "6px 4px", cursor: "pointer", borderRadius: 6 }}>
+                <span style={{ fontSize: 14, lineHeight: 1.3, color: pro[i] ? "#16A34A" : "#94a3b8", flexShrink: 0 }}>{pro[i] ? "☑" : "☐"}</span>
+                <span style={{ fontSize: 12.5, color: pro[i] ? C.text : C.muted, lineHeight: 1.6 }}><b style={{ color: C.gold, fontWeight: 700, marginRight: 6 }}>{r.g[en ? 1 : 0]}</b>{en ? r.cEn : r.c}</span>
               </div>
             ))}
           </div>
