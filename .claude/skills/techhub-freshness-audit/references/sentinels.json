@@ -423,7 +423,7 @@
    ],
    "rhythm": "年1回見直し（変更は出題の90日以上前に告知）",
    "as_of": "2026-11-12",
-   "note": "版が上がったら AIGP_DOMAINS の構成・出題数の範囲と、確認クイズの dom を付け替える。Cert ハブの Station_AIGP は範囲外"
+   "note": "版が上がったら AIGP_DOMAINS の構成・出題数の範囲と、確認クイズの dom を付け替える。範囲外だが Cert ハブの Station_AIGP（DOMAINS の range と模擬試験の EXAM_PLAN）も同じ範囲を使っているので一緒に直す"
   },
   {
    "id": "isc2-cc-outline",

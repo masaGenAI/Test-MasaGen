@@ -175174,11 +175174,12 @@ function novaBalanceAnswers(arr, key, fields) {
 //   onAnswer?: (d, correct)=>void
 //   onWrong?: (Q)=>void   誤答時（復習リスト用）
 //   onExit?, backRef?
-function MSExamShell({ sets, setKeys, domainSets, domains, lang, C, PASS, dName, labels, onAnswer, onWrong, backRef, saveKey, examId }) {
+function MSExamShell({ sets, setKeys, domainSets, domains, lang, C, PASS, dName, labels, onAnswer, onWrong, backRef, saveKey, examId, resumeKey }) {
   const mockDone = useDoneSet((saveKey || "ms") + ":mockdc");
   const en = lang === "en";
   const L2 = (o, k) => (en ? (o[k + "En"] || o[k]) : o[k]);
-  const slot = useQuizSlot(saveKey || "msexam_resume_default");
+  // resumeKey：セットの中身を組み替えた試験だけ渡す。途中保存の置き場を変え、古い並びの途中保存を新しいセットに当てはめないようにする
+  const slot = useQuizSlot(resumeKey || saveKey || "msexam_resume_default");
   const DOMS = domains || [];
   const domLabel = (id) => { const d = DOMS.find(x => x.id === id); if (d) return en ? (d.nameEn || d.name) : d.name; return dName ? dName(id) : id; };
   const T = Object.assign({
@@ -209606,12 +209607,13 @@ const SECGOV_REG = [];
 const Station_AIGP = (function(){
 
 const C = { primary:"#5B54C9", deep:"#3A348F", light:"#ECEBFA", mid:"#C7C3EE", ink:"#1E1B3A", ok:"#1F8A70", ng:"#C0392B", accent:"#7C74E0" };
-// IAPP AIGP Body of Knowledge v2.1（2026）の4ドメイン構成に準拠。
+// IAPP AIGP Body of Knowledge v2.1（2026年2月2日発効）の4ドメイン構成に準拠。
+// range は BoK が示す各ドメインの出題数の範囲（最小〜最大）。IAPP は百分率の配点を公表していないので、割合には直さない。
 const DOMAINS = [
-  { id:"D1", name:"AIガバナンスの基礎", nameEn:"Foundations of AI Governance", pct:18, range:"約18%", hue:"#3A348F" },
-  { id:"D2", name:"法・標準・枠組みの適用", nameEn:"Laws, Standards & Frameworks Applying to AI", pct:22, range:"約22%", hue:"#5B54C9" },
-  { id:"D3", name:"AI開発のガバナンス", nameEn:"Governing AI Development", pct:30, range:"約30%", hue:"#7C74E0" },
-  { id:"D4", name:"AI導入・利用のガバナンス", nameEn:"Governing AI Deployment & Use", pct:30, range:"約30%", hue:"#9A93EA" },
+  { id:"D1", name:"AIガバナンスの基礎", nameEn:"Foundations of AI Governance", range:"16〜20問", rangeEn:"16–20 questions", hue:"#3A348F" },
+  { id:"D2", name:"法・標準・枠組みの適用", nameEn:"Laws, Standards & Frameworks Applying to AI", range:"19〜23問", rangeEn:"19–23 questions", hue:"#5B54C9" },
+  { id:"D3", name:"AI開発のガバナンス", nameEn:"Governing AI Development", range:"21〜25問", rangeEn:"21–25 questions", hue:"#7C74E0" },
+  { id:"D4", name:"AI導入・利用のガバナンス", nameEn:"Governing AI Deployment & Use", range:"21〜25問", rangeEn:"21–25 questions", hue:"#9A93EA" },
 ];
 const DOM_HUE = Object.fromEntries(DOMAINS.map(d=>[d.id,d.hue]));
 const PASS = 70;
@@ -210402,8 +210404,14 @@ const AIGP_HARD = [{"d":"D1","q":"あるフィンテック企業のガバナン�
 {"d":"D4","q":"ある証券会社が、顧客への投資助言の下書きを生成するAIを導入します。金融規制により、顧客への助言は適合性の確認と説明の責任を会社が負います。最も適切な運用はどれですか。","o":["顧客に「AIによる助言です」と表示すれば説明責任を果たしたことになるので、担当者のレビューは顧客から質問があった場合にのみ行う","AIは下書き支援にとどめ、適合性の確認と最終的な助言は資格を持つ担当者が責任を持って行い、レビューの記録と監督を残す","AIの助言は客観的なので担当者のレビューを省略して顧客へ直接送り、規制上の責任はAIベンダーとの契約で負担させる","適合性の確認は、顧客の状況の聞き取りの代わりに、過去の平均的な顧客の傾向をAIに学習させて行い、担当者は送付前の誤字の確認のみを行う"],"a":1,"e":"金融規制では、顧客への助言の適合性の確認と説明の責任は会社が負います。AIは下書き支援にとどめ、適合性の確認と最終的な助言は資格を持つ担当者が責任を持って行い、レビューの記録と監督を残します。AIである旨の表示で責任は移らず、ベンダーに責任を負担させても会社の規制上の責任は残ります。平均的な傾向での判断は個々の顧客の適合性の確認になりません。","qEn":"A securities firm will introduce AI that drafts investment advice for customers. Under financial regulation the firm is responsible for suitability checks and explanation of advice to customers. What is the most appropriate operation?","oEn":["Displaying 'advice by AI' discharges the duty to explain, so staff review is done only when a customer asks","Limit AI to drafting support, with a qualified staff member responsible for the suitability check and the final advice, keeping review records and supervision","AI advice is objective, so skip staff review and send directly to customers, shifting regulatory responsibility to the AI vendor by contract","Check suitability by having the AI learn average past customer tendencies in place of interviewing the customer, with staff only checking typos before sending"],"eEn":"Under financial regulation the firm is responsible for suitability checks and explanations to customers. Limit AI to drafting support, have qualified staff check suitability and give final advice responsibly, and keep review records and supervision. Labeling it AI does not shift responsibility, vendor contracts do not remove the firm's regulatory responsibility, and average tendencies are not an individual suitability check."},
 {"d":"D4","q":"ある企業は、複数のAIエージェントが業務システムを操作できるようにしています。事故調査の際、どの利用者の依頼で、どのエージェントが、どの権限で操作したのかを追跡できませんでした。最も適切な是正はどれですか。","o":["エージェントごとの識別子と権限を割り当て、依頼者、操作内容、時刻、判断の根拠を改ざんしにくい形で記録して追跡できるようにする","操作の記録は出力の結果と実行時刻のみを保存し、操作を依頼した利用者や使用した権限の情報は記録しない","エージェントの操作は自動なので追跡は不要とし、問題が起きたら当該エージェントを停止して再設定する","全エージェントが同じ共有アカウントで操作するように統一し、操作の記録は、事故が発生した後に必要な範囲だけを担当者が手作業で作成する"],"a":0,"e":"エージェントごとの識別子と権限を割り当て、依頼者、操作内容、時刻、判断の根拠を改ざんしにくい形で記録して追跡できるようにします。依頼者や権限を残さない記録、追跡を不要とする運用、共有アカウントでの操作は、事故の原因究明と責任の所在の確認ができません。","qEn":"A company lets several AI agents operate its business systems. During an accident investigation, it could not trace which user's request led which agent to act with which permissions. What is the most appropriate remedy?","oEn":["Assign each agent an identifier and permissions, and record the requester, action, time and basis of decision in a tamper-resistant way so actions can be traced","Record only output results and execution times, and not the requesting user or the permission used","Because agent operations are automatic, tracing is unnecessary; if a problem occurs, stop and reconfigure that agent","Unify all agents to operate under the same shared account, and have staff create records after an accident manually and only to the extent needed"],"eEn":"Assign each agent an identifier and permissions, and record requester, action, time and basis for decisions in a tamper-resistant way so actions can be traced. Records omitting requester and permission, treating tracing as unnecessary, or using a shared account prevent root-cause analysis and attribution of responsibility."}
 ];
-  const EXAM_SETS = buildHardSets_AB(AIGP_HARD, { D1:8, D2:10, D3:14, D4:14 }, 5);
-const DOMAIN_SETS = Object.fromEntries(DOMAINS.map(d => [d.id, BANK.filter(q => q.d === d.id)]));
+// 模擬試験は1セット42問（D1:8 / D2:10 / D3:12 / D4:12）。BoK v2.1 の出題数の範囲に収まる 16・20・24・24問のちょうど半分の比率。
+// 以前の 8 / 10 / 14 / 14 は D3・D4 が多すぎ、範囲内のどの組み合わせとも比率が合わなかった。
+const EXAM_PLAN = { D1:8, D2:10, D3:12, D4:12 };
+const EXAM_SET_COUNT = 5;
+const EXAM_SETS = buildHardSets_AB(AIGP_HARD, EXAM_PLAN, EXAM_SET_COUNT);
+// セットに入りきらない応用問題（D3・D4 の各10問）は、分野別の末尾に足して解けるようにしておく。
+const EXAM_LEFT = (id) => AIGP_HARD.filter(q => q.d === id).slice((EXAM_PLAN[id] || 0) * EXAM_SET_COUNT);
+const DOMAIN_SETS = Object.fromEntries(DOMAINS.map(d => [d.id, BANK.filter(q => q.d === d.id).concat(EXAM_LEFT(d.id))]));
 
 const CONFUSE = [
   ["透明性 / 説明可能性", "透明性はAIを使っている事実や仕組み・データを『開示する』こと。説明可能性は個々の判断の『根拠を説明・再構成できる』こと。", "使っていることの開示が透明性、判断根拠の説明が説明可能性。", "Transparency / Explainability", "Transparency is disclosing that AI is used and how/what data. Explainability is being able to explain and reconstruct the basis of a specific decision.", "Disclosure of use = transparency; explaining the reason for a decision = explainability."],
@@ -210529,7 +210537,7 @@ function Home({ state, lang }) {
           <div style={{ fontSize:11, color:"#68648d" }}>{en?"days":"日"}</div>
         </div>
       </div>
-      <div style={{ fontSize:13, fontWeight:700, color:C.deep, marginBottom:10 }}>{en?"Mastery by domain (official weight)":"ドメイン別 習熟度（公式比率）"}</div>
+      <div style={{ fontSize:13, fontWeight:700, color:C.deep, marginBottom:10 }}>{en?"Mastery by domain (official question range)":"ドメイン別 習熟度（公式の出題数の範囲）"}</div>
       {DOMAINS.map(d => {
         const p = prog[d.id] || { correct:0, attempts:0 };
         const r = p.attempts ? Math.round((p.correct/p.attempts)*100) : 0;
@@ -210538,7 +210546,7 @@ function Home({ state, lang }) {
             <div style={{ display:"flex", alignItems:"center", gap:8 }}>
               <span style={{ background: d.hue, color: nvInk("#ffffff", d.hue), borderRadius:5, padding:"2px 7px", fontSize:11, fontWeight:800 }}>{d.id}</span>
               <span style={{ fontSize:12.5, color:C.ink }}>{en?d.nameEn:d.name}</span>
-              <span style={{ fontSize:11, color:"#68648d", marginLeft:"auto" }}>{d.range} ・ {p.attempts?`${r}%`:(en?"not started":"未着手")}</span>
+              <span style={{ fontSize:11, color:"#68648d", marginLeft:"auto" }}>{en?d.rangeEn:d.range} ・ {p.attempts?`${r}%`:(en?"not started":"未着手")}</span>
             </div>
             <div style={{ height:7, background:C.light, borderRadius:4, overflow:"hidden", marginTop:5 }}>
               <div style={{ width:`${r}%`, height:"100%", background:d.hue, borderRadius:4 }} />
@@ -210547,7 +210555,7 @@ function Home({ state, lang }) {
         );
       })}
       <div style={{ marginTop:14, fontSize:11.5, color:"#68648d", lineHeight:1.7 }}>
-        {en?"Unofficial study aid for IAPP AIGP. Not affiliated with or endorsed by IAPP. Verify the current exam blueprint on the official site.":"IAPP AIGP の非公式学習補助です。IAPPとの提携・公式認定ではありません。最新の試験ブループリントは公式で確認してください。"}
+        {en?"The question ranges are those of the IAPP AIGP Body of Knowledge v2.1 (effective 2 Feb 2026); mock sets use a domain mix within them (as of Nov 2026). Unofficial study aid for IAPP AIGP. Not affiliated with or endorsed by IAPP. Verify the current exam blueprint on the official site.":"出題数の範囲は IAPP AIGP の BoK v2.1（2026年2月2日発効）のもの。模擬試験の各セットはこの範囲に収まる比率で組んでいる（2026年11月時点）。IAPP AIGP の非公式学習補助です。IAPPとの提携・公式認定ではありません。最新の試験ブループリントは公式で確認してください。"}
       </div>
     </div>
   );
@@ -210906,7 +210914,7 @@ function App() {
       <div style={{ padding:16, maxWidth:820, margin:"0 auto" }}>
         {tab === "home" && <><CertCompletion state={state} storeKey={STORE_KEY} figsKey={STORE_KEY} figsTotal={(AIGP_FIGS||[]).length} bankLen={BANK.length} lang={lang} C={C} /><Home state={state} lang={lang} /></>}
         {tab === "quiz" && <Quiz onAnswer={record} onWrong={addReview} lang={lang} />}
-        {tab === "exam" && <MSExamShell sets={EXAM_SETS} setKeys={[1,2,3,4,5]} domainSets={DOMAIN_SETS} domains={DOMAINS} lang={lang} C={C} PASS={PASS} onAnswer={record} onWrong={addReview} backRef={backRef} examId="aigp" saveKey="aigp_hub_study_v1:msexam" />}
+        {tab === "exam" && <MSExamShell sets={EXAM_SETS} setKeys={[1,2,3,4,5]} domainSets={DOMAIN_SETS} domains={DOMAINS} lang={lang} C={C} PASS={PASS} onAnswer={record} onWrong={addReview} backRef={backRef} examId="aigp" saveKey="aigp_hub_study_v1:msexam" resumeKey="aigp_hub_study_v1:msexam:plan2" />}
         {tab === "review" && <Review state={state} onAnswer={record} onResolve={removeReview} onClear={clearReview} lang={lang} />}
         {tab === "diagram" && <Diagrams lang={lang} />}
         {tab === "compare" && <Compare lang={lang} />}
@@ -220372,7 +220380,7 @@ const CERT_CHECK = {
   ai200: ["ok", "改定・廃止の告知なし（出題範囲の日付はページに記載なし）。", "No change or retirement notice (no skills-measured date on the page)."],
   gh600: ["ok", "改定・廃止の告知なし（出題範囲の日付はページに記載なし）。", "No change or retirement notice (no skills-measured date on the page)."],
   adp: ["changed", "公式ページに「ブランド名の変更を反映して近く更新」とある（日付の記載なし）。", "The official page says the exam will soon be updated for recent branding changes (no date given)."],
-  aigp: ["ok", "公式ページを確認。試験の版・日付はページに記載なし。", "Official page checked; it gives no exam version or date."],
+  aigp: ["ok", "公式ページから BoK（PDF）を確認。現行は v2.1（2026年2月2日発効・4ドメイン）。出題数の範囲は D1 16〜20／D2 19〜23／D3 21〜25／D4 21〜25問。", "BoK (PDF) linked from the official page checked: v2.1, effective 2 Feb 2026, four domains; question ranges D1 16–20, D2 19–23, D3 21–25, D4 21–25.", "2026-11-12"],
   // 以下の10資格は 2026-11-02 に公式ページで確認（それまでは公式サイトに接続できず未確認だった）
   ccaf: ["ok", "公式の試験ガイド（Version 1.0・2026年7月から有効・試験コード CCAR-F）の5分野と比率は、このページと一致。60問・120分・合格はスケールスコア720（100〜1,000）。受験は Claude Partner Network の組織に限られる。", "Matches the official exam guide (Version 1.0, effective July 2026, exam code CCAR-F): five domains and weights. 60 items, 120 minutes, passing scaled score 720 (100–1,000). Available only to organizations in the Claude Partner Network.", "2026-11-02"],
   aicx: ["changed", "公式シラバスは2026年8月に Version 1.3 へ改訂（Section 3・20・27 の記述を整理）。シラバスは6章・32セクションで、分野ごとの出題比率は公表されていない。このページの6分野は公式の6章に対応する（名前を章名に合わせた）。改訂の中身がこのページに反映されているかは未確認。試験時間は第2回から90分（従来75分）。", "Official syllabus revised to Version 1.3 in August 2026 (Sections 3, 20 and 27). It has 6 chapters and 32 sections and publishes no weights per area. This station's six areas follow the six chapters (names aligned). Whether the revision is reflected here is not checked. Exam time is 90 minutes from the 2nd sitting (formerly 75).", "2026-11-02"],
