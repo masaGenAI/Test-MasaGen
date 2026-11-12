@@ -154,7 +154,7 @@
   },
   {
    "old": "Claude Cowork",
-   "now": "Claude Cowork は 2026-09-16 にチャットと統合され「Claude」に一本化された",
+   "now": "Claude Cowork とチャットは 2026-09-16 から「1つの Claude」に統合（プランごとに順次展開）。製品名としての Claude Cowork は残っている",
    "source": "https://claude.com/resources/articles/cowork-is-now-claude",
    "as_of": "2026-11-12",
    "ok_near": [
@@ -164,7 +164,7 @@
     "now Claude",
     "merged"
    ],
-   "how": "現役の事実として書いている箇所だけ直す。当時の出来事・事例・歴史として書いた箇所はそのまま"
+   "how": "独立した別の製品として説明している箇所に、統合の事実を添える。名称を消さない。記事・動画の要約の中の言及は書き換えない"
   },
   {
    "old": "Project Mariner",
@@ -330,6 +330,28 @@
    "ok_near": [
     "SB26-189"
    ]
+  },
+  {
+   "old": "2,523億ドル",
+   "now": "世界の企業AI投資は 2025年に 5,817億ドル（Stanford HAI AI Index 2026）。2,523億ドルは 2024年の値",
+   "source": "https://hai.stanford.edu/ai-index/2026-ai-index-report",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "5,817億ドル",
+    "2024年の"
+   ],
+   "how": "企業AI投資の最新値として使っている箇所だけ"
+  },
+  {
+   "old": "49オフィス",
+   "now": "Slalom の公式ボイラープレートは「54オフィス・12か国」（2026年8〜11月の発表）。人数とパートナー数の記載は無い",
+   "source": "https://www.slalom.com/us/en/who-we-are/newsroom",
+   "as_of": "2026-11-12",
+   "ok_near": [
+    "54オフィス",
+    "以前は"
+   ],
+   "how": "現行の規模として書いている箇所だけ"
   }
  ]
 }
