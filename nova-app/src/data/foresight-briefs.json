@@ -213,9 +213,9 @@
     "Include multi-region and multi-cloud options, and inference-efficiency measures such as small models and distillation, as options in the plan."
    ],
    "read": {
-    "ja": "Epochの公開データベース（2026年10月5日更新）は、掲載93拠点の合計をH100換算で1,440万基、IT電力13.8GWとし、世界の導入済みAI計算能力に対する網羅率を43%（90%信頼区間22〜81%）と推定している。TrendForceは2026年9月、AIサーバー需要によりHBMの供給制約が続き、2027年のHBM平均販売価格（混合）が前年比121%上昇する見通しと報告している。",
-    "en": "Epoch's public database (updated October 5, 2026) lists 93 sites totaling 14.4 million H100-equivalents of compute and 13.8 GW of IT power, and estimates its coverage of global deployed AI compute at 43% (90% CI: 22% to 81%). TrendForce reported in September 2026 that HBM supply constraints persist amid AI server demand, with the 2027 blended HBM average selling price forecast to rise 121% year on year.",
-    "asOf": "2026-10",
+    "ja": "Epochの公開データベース（2026年11月6日更新）は、掲載96拠点の合計をH100換算で1,580万基、IT電力15.1GWとし、世界の導入済みAI計算能力に対する網羅率を2026年11月12日時点で44%（90%信頼区間30〜78%）と推定している。TrendForceは2026年9月、AIサーバー需要によりHBMの供給制約が続き、2027年のHBM平均販売価格（混合）が前年比121%上昇する見通しと報告している。",
+    "en": "Epoch's public database (updated November 6, 2026) lists 96 sites totaling 15.8 million H100-equivalents of compute and 15.1 GW of IT power, and estimates its coverage of global deployed AI compute at 44% as of November 12, 2026 (90% CI: 30% to 78%). TrendForce reported in September 2026 that HBM supply constraints persist amid AI server demand, with the 2027 blended HBM average selling price forecast to rise 121% year on year.",
+    "asOf": "2026-11",
     "src": [
      "s013",
      "s042"
@@ -480,7 +480,16 @@
     "パートナーの次の重点領域（エージェント基盤、データ基盤など）を先取りした提案の切り口を準備する。",
     "Prepare proposal angles that anticipate partners' next priority areas, such as agent platforms and data foundations."
    ],
-   "read": null
+   "read": {
+    "ja": "Microsoft の2027年度第1四半期決算（2026年7〜9月期、10月28日発表）は、Microsoft Cloud の売上高を639億ドル（前年同期比30%増）、Azure の売上高を48%増、商用の残存履行義務（受注残）を73%増の6,770億ドルとしている。Alphabet の2026年第3四半期決算（10月28日発表）は、Google Cloud の売上高を103%増の307億ドル、同四半期の有形固定資産の取得額を約514億ドルとしている。Amazon の同四半期決算（10月29日発表）は、AWS の売上高を39%増の460億ドルとし、2026年の現金ベースの設備投資を約2,200億ドルと引き続き見込むとしている。",
+    "en": "Microsoft's results for the first quarter of fiscal 2027 (July to September 2026, announced October 28) report Microsoft Cloud revenue of $63.9 billion (up 30% year over year), Azure revenue up 48%, and commercial remaining performance obligation up 73% to $677 billion. Alphabet's third-quarter 2026 results (announced October 28) report Google Cloud revenues up 103% to $30.7 billion and purchases of property and equipment of about $51.4 billion in the quarter. Amazon's third-quarter results (announced October 29) report AWS segment sales up 39% to $46.0 billion and state that it continues to expect 2026 cash capital expenditures of approximately $220 billion.",
+    "asOf": "2026-10",
+    "src": [
+     "s088",
+     "s090",
+     "s080"
+    ]
+   }
   },
   {
    "id": "f09",
@@ -525,9 +534,9 @@
     "Build an abstraction layer that lets models be swapped, and an evaluation platform, into the initial design."
    ],
    "read": {
-    "ja": "Anthropic のニュースルームは、2026年9月22日に Opus 5.5、9月28日に Sonnet 5.5、10月7日に Haiku 5.5 の公開を掲載している。同社は、Opus 5.5 は Opus 5 より実行費用が40%低く、Sonnet 5.5 は Sonnet 5 より30%高速で、多くの用途で費用が最大30%低いとしている。",
-    "en": "Anthropic's newsroom lists the releases of Opus 5.5 (September 22, 2026), Sonnet 5.5 (September 28) and Haiku 5.5 (October 7). The company states that Opus 5.5 costs 40% less to run than Opus 5, and that Sonnet 5.5 runs 30% faster than Sonnet 5 and costs up to 30% less for most work.",
-    "asOf": "2026-10",
+    "ja": "Anthropic のニュースルームは、2026年9月22日に Opus 5.5、9月28日に Sonnet 5.5、10月7日に Haiku 5.5、11月9日に Claude Fable 5.2 と Claude Mythos 5.2 の公開を掲載している。同社は、Opus 5.5 は Opus 5 より実行費用が40%低く、Sonnet 5.5 は Sonnet 5 より30%高速で、多くの用途で費用が最大30%低いとしている。Fable 5.2 と Mythos 5.2 については、困難な技術的作業に向けた同社で最も高性能なモデルで、コーディング・金融・科学で新たな水準を示すとしている。",
+    "en": "Anthropic's newsroom lists the releases of Opus 5.5 (September 22, 2026), Sonnet 5.5 (September 28) and Haiku 5.5 (October 7), and Claude Fable 5.2 and Claude Mythos 5.2 (November 9). The company states that Opus 5.5 costs 40% less to run than Opus 5, and that Sonnet 5.5 runs 30% faster than Sonnet 5 and costs up to 30% less for most work. It describes Fable 5.2 and Mythos 5.2 as its most capable models for daunting technical work, setting a new bar in coding, finance and the sciences.",
+    "asOf": "2026-11",
     "src": [
      "s075"
     ]
@@ -579,9 +588,9 @@
     "Send customers a short briefing on the impact on each of them right after each event. Continuous contact creates openings for proposals."
    ],
    "read": {
-    "ja": "AWS re:Invent 2026 は2026年11月30日から12月4日にラスベガスで開催予定で、ページは1,200を超えるセッションが公開済みとしている。Microsoft Ignite は2026年11月17日から20日の開催と案内されている。",
-    "en": "AWS re:Invent 2026 is scheduled for November 30 to December 4 in Las Vegas, and its page states that more than 1,200 sessions are already live. Microsoft Ignite is listed for November 17 to 20, 2026.",
-    "asOf": "2026-10",
+    "ja": "AWS re:Invent 2026 は2026年11月30日から12月4日にラスベガスで開催予定で、ページは2,200を超えるセッション（うち70%が対話型）を案内している。Microsoft Ignite は2026年11月17日から20日の開催と案内されている。",
+    "en": "AWS re:Invent 2026 is scheduled for November 30 to December 4 in Las Vegas, and its page advertises over 2,200 sessions, 70% of them interactive. Microsoft Ignite is listed for November 17 to 20, 2026.",
+    "asOf": "2026-11",
     "src": [
      "s103",
      "s105"
@@ -632,9 +641,9 @@
     "Lay out both optimistic and skeptical research side by side to align on premises before the discussion begins. Not taking conventional wisdom at face value builds trust."
    ],
    "read": {
-    "ja": "IDC のプレスリリース一覧は、2026年9月17日付で、アジア太平洋のAI・生成AI支出が2030年までに5,552億ドルに達するとの予測を掲載している。見出しは、企業がパイロットを超えて展開を拡大することが背景だとする。同日付で、欧州のAI支出も2030年に4,700億ドルに達するとの予測が掲載されている。PoC から本番への移行率そのものは、このページに記載がない。",
-    "en": "IDC's press release list includes a September 17, 2026 forecast that Asia/Pacific AI and GenAI spending will reach $555.2 billion by 2030, with the headline attributing this to enterprises scaling AI beyond pilots. A release of the same date forecasts European AI spending at $470 billion by 2030. The page does not give a PoC-to-production transition rate.",
-    "asOf": "2026-09",
+    "ja": "IDC のプレスリリース一覧は、2026年10月27日付で、IDC FutureScape 2027 の予測として、業務プロセスの過半を AI ファーストで運営する企業が2026年の13%から2029年には60%になると掲載している。11月9日付では、日本と中国を除くアジア太平洋の AI インフラ支出が2030年までにほぼ倍増して320億ドルに達する（年平均成長率14.3%）との予測を掲載している。PoC から本番への移行率そのものは、このページに記載がない。",
+    "en": "IDC's press release list includes an October 27, 2026 release on IDC FutureScape 2027, predicting that 60% of enterprises will run a majority of their business processes AI-first by 2029, up from 13% in 2026. A November 9, 2026 release forecasts that AI infrastructure spending in Asia/Pacific excluding Japan and China will nearly double to US$32 billion by 2030, a 14.3% CAGR. The page does not give a PoC-to-production transition rate.",
+    "asOf": "2026-11",
     "src": [
      "s114"
     ]
@@ -682,11 +691,11 @@
     "Concentrate investment on layers where customers can still differentiate, and shift commoditizing layers toward procurement."
    ],
    "read": {
-    "ja": "Menlo Ventures は、2025年通年の企業による生成AI支出を370億ドル（前年比3.2倍）と推計し、うちアプリケーション層が190億ドルで過半を占めるとしている。この数値は、米国企業の意思決定者約500人への調査と市場モデルに基づく同社の推計である。同社は、AIソリューションの76%が内製ではなく購入されているとも報告している。",
-    "en": "Menlo Ventures estimates enterprise spending on generative AI in full-year 2025 at $37 billion (3.2x year over year), with the application layer accounting for $19 billion, more than half. The figures are the firm's estimates, based on a survey of about 500 U.S. enterprise decision-makers and a market model. It also reports that 76% of AI solutions are purchased rather than built in-house.",
-    "asOf": "2025-12",
+    "ja": "Menlo Ventures の2026年版（2026年11月3日公表）は、企業の生成AI導入支出を2026年9月時点で1,768億ドル（前年330億ドルの5.4倍）と推計し、うちアプリケーション層が773億ドル、インフラ層が995億ドルとしている。アプリケーション層は、コーディング（340億ドル）と企業向けチャットボット（250億ドル）の2分野で76%を占める。この数値は、米国企業の意思決定者約400人への調査（2026年9月実施）と市場モデルに基づく同社の推計である。同社は、Anthropic・OpenAI・Google の3社が導入支出の69%（前年50%）を占め、増加したAI支出の55%は既存のソフトウェア予算や人件費予算ではなく新規の予算から出ているとも報告している。",
+    "en": "Menlo Ventures' 2026 edition (published November 3, 2026) estimates enterprise generative AI deployment spending at $176.8 billion as of September 2026 (5.4x the $33 billion of a year earlier), of which the application layer accounts for $77.3 billion and infrastructure for $99.5 billion. Coding ($34.0 billion) and enterprise chatbots ($25.0 billion) make up 76% of the application layer. The figures are the firm's estimates, based on a survey of nearly 400 U.S. enterprise decision-makers fielded in September 2026 and a market model. It also reports that Anthropic, OpenAI and Google capture 69% of deployment spending (up from 50% a year earlier), and that new budgets funded 55% of the incremental AI spend, rather than existing software or labor budgets.",
+    "asOf": "2026-11",
     "src": [
-     "s125"
+     "s124"
     ]
    }
   },
@@ -1158,7 +1167,14 @@
     "ツール導入と同時に、業務再設計と人材育成の予算を一体で組んだ提案にする。",
     "Build proposals that budget for process redesign and talent development together with tool deployment."
    ],
-   "read": null
+   "read": {
+    "ja": "Stanford Digital Economy Lab の指標ページ（GDP-B: Surplus Observer）は、生成AIツールの急速で広範な普及にもかかわらず、その効果は GDP や生産性といった公式の経済統計にまだ十分に反映されていないとし、これを「ソロー・パラドックスの現代版」と呼んでいる。同ページは、2026年7月時点で米国の生成AI利用者1億2,700万人が得る消費者余剰を年1,830億ドル（過去1年で58%増）と推計している。",
+    "en": "The Stanford Digital Economy Lab's indicator page (GDP-B: Surplus Observer) states that, despite the rapid and widespread adoption of generative AI tools, their effects are not yet fully reflected in official economic statistics such as GDP and productivity, calling this a modern version of the Solow paradox. As of July 2026, it estimates the aggregate consumer surplus of 127 million US generative AI users at $183 billion per year, up 58% over the past year.",
+    "asOf": "2026-07",
+    "src": [
+     "s215"
+    ]
+   }
   },
   {
    "id": "f23",
@@ -1195,7 +1211,14 @@
     "普及の律速は技術ではなく補完要素にあることが多い。データ、制度、スキルの整備を提案の柱に置く。",
     "The binding constraint on diffusion is often complementary factors, not the technology itself. Make data, institutions and skills the pillars of the proposal."
    ],
-   "read": null
+   "read": {
+    "ja": "Our World in Data の「米国の世帯における技術の普及率」のデータ（対象期間1860〜2019年）では、世帯普及率が10%から50%以上に達するまでに、固定電話は1903年から1946年までの43年、電力は1908年から1925年までの17年、インターネットは1993年から2002年までの9年を要している（年数はページのデータから算出）。AI の普及率は、このデータに含まれていない。",
+    "en": "In Our World in Data's dataset on the share of US households using specific technologies (covering 1860 to 2019), moving from 10% to at least 50% of households took 43 years for the landline telephone (1903 to 1946), 17 years for electric power (1908 to 1925) and 9 years for the internet (1993 to 2002); the durations are computed from the page data. The dataset does not include an adoption rate for AI.",
+    "asOf": "2019",
+    "src": [
+     "s197"
+    ]
+   }
   },
   {
    "id": "f24",
@@ -1374,7 +1397,15 @@
     "顧客向けに、業界に絞った月次の AI ブリーフィングを提供する。継続的な情報提供が、信頼される相談相手への近道になる。",
     "Offer clients a monthly AI briefing tailored to their industry. Continuous information service is the shortest path to becoming a trusted advisor."
    ],
-   "read": null
+   "read": {
+    "ja": "Import AI の配信フィードでは、第476〜480号の5号が2026年10月12日から11月9日まで毎週月曜に配信されており、最新は11月9日付の第480号である。The Batch は、AI のニュースと洞察を毎週届け、主要な記事を選んで掲載するとしている。",
+    "en": "Import AI's feed shows issues 476 to 480 published every Monday from October 12 to November 9, 2026, with issue 480 dated November 9 the latest. The Batch states that it delivers weekly AI news and insights, with a curated selection of top stories.",
+    "asOf": "2026-11",
+    "src": [
+     "s200",
+     "s202"
+    ]
+   }
   }
  ],
  "meta": {
