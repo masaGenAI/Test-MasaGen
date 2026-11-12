@@ -146,6 +146,55 @@
    ],
    "coverage": "見た範囲: archcase タブの本文を通読し、ARCH_TOOLS（ツール早見表）の製品名を中心に、AWS、Azure、Google Cloud の改称・統合・提供終了を確かめた。Kendra、Bedrock Agents、Vertex AI、Azure OpenAI は一次情報を開いて確認した。見ていない範囲: 公開事例の出典リンク（findy-tools.io、AWS、Google Cloud の事例ブログ）の生死は未確認。ARCH_CASES、ARCH_AG、ARCH_OFC の個別事例の数値や構成は、当時の記述として扱い、原典との照合はしていない。ARCH_SPECS、ARCH_GUIDE、クイズ類は先頭の抽出のみ。Google Cloud の docs.cloud.google.com と learn.microsoft.com はこの環境の WebFetch では開けず、Microsoft Learn は MCP 経由で取得した。",
    "last_checked": "2026-11-12"
+  },
+  "architect-sa": {
+   "status": "checked",
+   "last_attempt": "2026-11-12",
+   "fixed": 5,
+   "partial": 0,
+   "rejected": 0,
+   "unverified": 8,
+   "checked_ok": 9,
+   "blocked_hosts": [
+    "docs.anthropic.com"
+   ],
+   "coverage": "候補75件は全て「最新」という語の一般用法（RAGの最新性、最新モデル至上主義批判など）で、過ぎた予定・古い時点の候補は0件。モデル名・料金・年号は DIAGRAMS／SA／ARCH 系定数を正規表現で洗い出し、Anthropic の世代名と料金の記述、Foundry カタログの規模のみ出典で照合。他社(Google/OpenAI/Meta/Apple/Databricks等)の製品名・日付、INDUSTRY_PATTERNS・SA_SYSDESIGN・SA_ADVISORY・ARCH_EXERCISE_STEPS の個別事実、ACAD_QUIZの全問は見ていない。 【追記】候補『古いと確かめた語』のうち Vertex AI・Kendra・Bedrock Agents・Amazon Q Business・Agentspace・Assistants API を出典（Google Cloud Blog、AWS Docs、Google Blog）で再確認し、SA_INTERVIEW_QA の各定義箇所の代表のみ置換案にした。各語の残り約40〜50か所（SA_QUIZ、DIAGRAMS、INDUSTRY_SCENARIOS、ARCH_SECTIONS、ACAD_QUIZ ほか）は精査していない。",
+   "last_checked": "2026-11-12"
+  },
+  "toolbox-proposal": {
+   "status": "checked",
+   "last_attempt": "2026-11-12",
+   "fixed": 3,
+   "partial": 0,
+   "rejected": 0,
+   "unverified": 3,
+   "checked_ok": 2,
+   "blocked_hosts": [
+    "businesslawyers.jp",
+    "fin.ai",
+    "www.cao.go.jp",
+    "www.fin.ai",
+    "www.intercom.com",
+    "www.meti.go.jp(403)",
+    "www8.cao.go.jp"
+   ],
+   "coverage": "候補ファイル21件は全て『今年・最新』等の一般語の誤検出で、過ぎた予定・期限・古い時点は0件。GOV_GATE_WORLD/LAW/VENDOR、FIN_GATE_MAP、PF3_PLANS、TBX_EVAL_OPS、TBX_CASES、PROP系の時点依存語をgrepで確認。EU AI Act(附属書III 2027-12-02)・Colorado SB26-189の記述はfacts.jsonの台帳と食い違わず、TBX_*(Evalsツール名)に特定製品名・価格は見当たらなかった。salesdojo/casework/livedojoは候補以外を網羅していない。出典ページは1件も開けず、findingsは0件。 今回の追記：総務省PDF2件を取得しpdftotextで原文確認、残りの語3件のうち当担当分（GOV_GATE_WORLD、CASE_CARDS、DISC_QS）を置換案化。87.2%/29.9%は他範囲の定数（IND_DEEP 152295/152304/152331、CHECK_AX_GEN2/CHECK_CORE_GEN3のクイズ157961/157962、MEGATECH_FACTBOOK）にも残るが担当外・クイズは選択肢整合のため置換案を出していない。Intercom/会計/DBS/MITは未確認のまま。照合した出典は15件に届いていない。",
+   "last_checked": "2026-11-12"
+  },
+  "govdojo": {
+   "status": "checked",
+   "last_attempt": "2026-11-12",
+   "fixed": 0,
+   "partial": 0,
+   "rejected": 0,
+   "unverified": 3,
+   "checked_ok": 5,
+   "blocked_hosts": [
+    "www.cas.go.jp (404)",
+    "eur-lex.europa.eu (未試行・既知のボット確認)"
+   ],
+   "coverage": "compare.json の upcoming は最早が2026-12-02で、今日(2026-11-12)までに過ぎた予定は無い。画面の「未確認」点のうち、EU AI Omnibus日程・NIST・文科省・個情委・コロラド・韓国AI基本法・インド・米連邦先占を確認。韓国と米連邦先占は検索結果のみ(一次ページ未開封)。日本のAI基本計画・AI指針(内閣官房ページは404)、英国・シンガポール・中国、ISO、industries.json の各業界(EUR-Lex依存の未確認注記など)、GOVDOJO_BANK の個別問題は見ていない。10月31日以降に動いた確認済みの変更は見つからず、置換案は無し。",
+   "last_checked": "2026-11-12"
   }
  },
  "runs": [
@@ -177,6 +226,18 @@
    "partial": 0,
    "rejected": 3,
    "unverified": 24
+  },
+  {
+   "date": "2026-11-12",
+   "areas": [
+    "architect-sa",
+    "toolbox-proposal",
+    "govdojo"
+   ],
+   "fixed": 8,
+   "partial": 0,
+   "rejected": 0,
+   "unverified": 14
   }
  ]
 }

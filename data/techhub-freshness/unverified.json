@@ -727,5 +727,131 @@
   "why": "Azure AI Document Intelligence の現行名は未確認。",
   "first_seen": "2026-11-12",
   "last_tried": "2026-11-12"
+ },
+ {
+  "area": "architect-sa",
+  "tab": "architect",
+  "current_text": "Azure OpenAI ServiceはGPT-4oやo3などOpenAIモデル（SA_INTERVIEW_QA）",
+  "concern": "サービス名が「Azure OpenAI in Microsoft Foundry Models」に改称されている。例示モデルもGPT-5系などが加わり古め。",
+  "why": "文書は旧名と新名が併記され、名称が誤りとまでは言えず、例示も「など」で事実誤りではない。表記の好みの範囲として置換案は出さない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "architect-sa",
+  "tab": "architect",
+  "current_text": "ARCH_SECTIONS・ACAD_QUIZ の例示「Haiku/GPT-4o-mini相当」「GPT-4クラス」",
+  "concern": "例示モデルが旧世代",
+  "why": "一般的な階層の例示で、事実の主張ではない。クイズ解説の長さ釣り合いにも触れるため変更しない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "architect-sa",
+  "tab": "architect",
+  "current_text": "ARCH_REF_FIGS／ACAD_QUIZ 内の企業事例（セゾンテクノロジーのClaude 3 Haiku＋Command R+ など）",
+  "concern": "記事の記述時点のモデル名",
+  "why": "元記事が言ったことの要約（歴史的事実）で書き換え対象外。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "architect-sa",
+  "tab": "architect",
+  "current_text": "DIAGRAMS COMPANIES のGoogle(Gemini 4系)・OpenAI(GPT-6.1系)・Meta・Apple・Databricks等の製品名・日付",
+  "concern": "数が多く、各社の最新状況は未再確認",
+  "why": "各社に2026年11月11日の確認済み印があり、今回は Anthropic 分のみ公式ページで照合した。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "architect-sa",
+  "tab": "architect",
+  "current_text": "Wells Fargo の事例 cloud: 'Google Agentspace + Apigee'（SA_ADVISORY）",
+  "concern": "Agentspace は Gemini Enterprise に統合されたが、事例当時の構成名",
+  "why": "事例（歴史的事実）として書かれており、現在の製品名に直すと当時の事実を変えるため置換案は出さない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "architect-sa",
+  "tab": "architect",
+  "current_text": "Amazon Q Business のコネクタ『40超』、Kendra のコネクタ数以外の各数字（SA_INTERVIEW_QA）",
+  "concern": "Q Business のコネクタ数は公式の現行値を確認していない",
+  "why": "Q Business のページに数値の記載が無く、確かめられなかった。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "architect-sa",
+  "tab": "architect",
+  "current_text": "ARCH_REF_FIGS 内『Assistants APIは2026年半ば終了予定』（記事要約）",
+  "concern": "終了予定日が過ぎている可能性",
+  "why": "元記事（2025年）が言ったことの要約で書き換え対象外。Learn の文書は『非推奨・後継 Responses』までで、終了日は確認できなかった。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "architect-sa",
+  "tab": "architect",
+  "current_text": "Vertex AI／Kendra／Bedrock Agents の残り各約40〜50か所（クイズ・図解・比較表・ARCH_SECTIONS・INDUSTRY_SCENARIOS など）",
+  "concern": "同じ改称・受付終了が他の箇所にも残る",
+  "why": "量が多く代表の定義箇所のみ置換案にした。残りは文脈ごとの判断が必要で未精査。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "toolbox-proposal",
+  "tab": "proposal",
+  "current_text": "PROP_BATTLE/営業用: 「Intercom Finの解決1件$0.99が公開参照例」",
+  "concern": "料金改定の有無",
+  "why": "fin.ai / www.fin.ai が名前解決不可。検索要約では$0.99だが本文未確認",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "toolbox-proposal",
+  "tab": "proposal",
+  "current_text": "FIN_GATE: 2025年Amazonがサーバー耐用年数を6年→5年へ、IFRIC 2021年アジェンダ決定、日本基準の自社利用ソフトウェア(5年以内)",
+  "concern": "会計基準の改正・新情報の有無",
+  "why": "時間配分上、出典を開けるホストが無く未着手",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "toolbox-proposal",
+  "tab": "proposal",
+  "current_text": "DBS S$10億(2025年)、MIT 完全内製の成功率約1/3",
+  "concern": "新しい年次版の有無",
+  "why": "出典ホストが開けず未確認",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "govdojo",
+  "tab": "govdojo",
+  "current_text": "2026年12月2日 同意のない性的画像・CSAM生成AIの禁止が適用（予定）／マーキング猶予の終了（2026年12月2日）",
+  "concern": "期限は未到来。欧州委員会ページは「2026年12月に適用」とのみ書き具体日は無い。12月2日の根拠はOJ本文(EUR-Lex)で、ボット確認のため本調査では読めていない",
+  "why": "EUR-Lex が取得不可。二次情報(法律事務所)のみ",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "govdojo",
+  "tab": "govdojo",
+  "current_text": "us-co-sb26-189 / X.AI v. Weiser の差止め状況",
+  "concern": "2026年10月下旬時点の二次報道(JD Supra, Jones Walker等)で、司法長官の規則は未確定・PI申立て未開始。11月以降の変化は確認できず",
+  "why": "州司法長官ページ・裁判所記録を開いていない(検索結果のみ)",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "govdojo",
+  "tab": "govdojo",
+  "current_text": "in-it-rules-synthetic-content-2026: 第二次改正案が確定したかは未確認",
+  "concern": "検索では2026年2月の改正のみ確認。第二次案の確定は見つからず",
+  "why": "MeitY/官報の一次ページを開いていない",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
  }
 ]
