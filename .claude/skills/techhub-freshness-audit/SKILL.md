@@ -1,0 +1,155 @@
+---
+name: techhub-freshness-audit
+description: TechHub（Project Nova の AIコンサルタント育成ハブ。nova-app/src/ProjectNova.jsx の MegaTechHubModule と nova-app/src/data の原稿）に古くなった情報が残っていないかを定期的に点検し、出典で確かめた事実だけで最新化するスキル。「TechHubの情報が古くないか点検して」「定期点検して」「鮮度チェック」「陳腐化していないか見て」「TechHubを最新の状態にして」「モデル名や製品名が古い」「統計の新しい版が出ていないか」「期限が過ぎた記述を直して」「前回の未確認を確かめ直して」などの依頼や、毎月の定期点検（スケジュール実行）では必ずこのスキルを使う。点検の期限を台帳で管理し、機械的な候補の洗い出し→担当者が出典を開いて確認→別の検算者が再確認→検査を通った置換だけ適用→報告と台帳の更新、までを決まった道具で行う。件数や名称の食い違いは nova-consistency-audit、ガバナンス道場の規制の中身は govdojo-maintenance が受け持つ（この点検からも呼ぶ）。
+---
+
+# TechHub の鮮度点検（定期）
+
+TechHub は、モデル名・製品名・統計・規制・資格の版など、時間がたつと誤りになる事実を大量に含む。
+顧客の前で古い事実を話すと信用を失うので、**定期的に、出典を開いて確かめた事実だけで**直す。
+記憶（学習データ）で「古い」「正しい」と決めない。確かめられなかった点は直さず、未確認として持ち越す。
+
+点検は2段で行う。毎回の**軽い点検**（道具だけ。数分）で動いた事実と期限の近い記述を拾い、
+**範囲点検**（サブエージェントが出典を開く。重い）は期限が来た範囲だけに絞る。全範囲を毎回回さない。
+
+道具は `.claude/skills/techhub-freshness-audit/scripts/`（以下 `scripts/`）。リポジトリのルートで、Python は `python3 -I` で動かす。
+
+## 0. 準備
+
+```bash
+cd nova-app && npm run build && cd ..          # 画面の文を読む道具が dist を使う
+W=<スクラッチパッド>/fresh-$(date +%Y%m%d)     # 作業フォルダ（リポジトリの外）
+```
+
+## 1. 軽い点検（毎回）
+
+```bash
+python3 -I scripts/due.py                 # 期限が来ている範囲・前回の未了・持ち越しの未確認
+python3 -I scripts/time_scan.py           # 範囲ごとの「過ぎた予定／近い期限／古い時点」の件数
+python3 -I scripts/sentinels.py           # 見張り番（よく動く事実 約20件）と、アプリが今書いている値
+python3 -I scripts/consts_index.py --unassigned --min-chars 300   # どの範囲にも入っていない定数（新しい教材の見落とし）
+```
+
+- **見張り番**（`references/sentinels.json`）は、各項目の「開く先」を自分で開き、「今の値」より新しい世代・版・数字が出ていないかを見る。
+  動いていた項目があれば、その項目の `areas` を今回の範囲点検に加える（期限前でも）。
+- `time_scan.py` の「過ぎた予定」「近い期限」が多い範囲も、期限前でも加える候補。中身は `--area <範囲>` で読める。
+- 未割り当ての大文字の定数（教材データ）が出たら、`references/areas.json` の該当範囲の `consts` に足す。
+
+## 2. 回す範囲を決める
+
+`due.py` が出す「回す順」の**1組（最大4範囲）ずつ**回す。組をまたいで一度に出さない（使用量の上限に当たる。下の「使用量」を参照）。
+
+```bash
+python3 -I scripts/prep.py $W --areas <範囲,範囲,...>
+```
+
+`prep.py` は作業フォルダに、定数の索引・範囲ごとの候補・前回の未確認・画面の写しを置き、出典のホストに届くかを確かめて、
+**担当者への依頼文**を出す。「主な出典の半分以上に届かない」と出た範囲は、担当者を出しても何も確かめられずに終わる（実際に2範囲がそうなった）。
+利用者がその場にいれば、届かないホストを環境の許可リストに足す提案を1回だけする（勝手に広げない。断られたら・不在なら見送る）。
+見送った範囲は、台帳に「未了」と残すために `$W/out/check-<範囲>.json` を
+`{"area": "<範囲>", "findings": [], "unverified": [], "checked_ok": [], "coverage": "出典に届かず未点検", "blocked": true, "blocked_hosts": [...]}` で置く。
+
+## 3. 担当者 → 検算者（サブエージェント）
+
+1. **担当者**：`prep.py` が出した依頼文をそのまま prompt にして、Agent ツール（`subagent_type: "general-purpose"`、`model: "sonnet"`）で範囲ごとに1体出す。
+   同時に動かすのは2〜3体まで。担当者は `references/checker-brief.md` に従い、結果を `$W/out/check-<範囲>.json` に書く。
+2. **検算者**：担当者が終わったら `python3 -I scripts/prep.py $W --verify` で依頼文を出し、同じく `model: "sonnet"` で出す（修正案8件ごとに1体）。
+   検算者は `references/verifier-brief.md` に従い、出典を自分で開き直して confirmed / revised / rejected を付け、`$W/out/verify-<範囲>-<n>.json` に書く。
+   担当者と検算者を同じエージェントに兼ねさせない（作った本人は自分の案を通しがち）。
+3. ガバナンス道場（`govdojo`）の担当者には、依頼文のとおり `govdojo-maintenance` の手順を読ませる。置換案は `data/govdojo/*.json` 側に出る。
+
+サブエージェントの返事は件数だけで足りる。中身はファイルにあるので、主の文脈に長い結果を流し込まない。
+利用者が「ワークフローで回して」と明示したときに限り、同じ依頼文を Workflow ツールの pipeline（担当者→検算者）に載せてよい。
+
+## 4. 当てる
+
+```bash
+python3 -I scripts/repl_check.py $W/out/verify-*.json     # 全件合格を確かめる
+python3 -I scripts/apply_verified.py $W --dry-run         # 置換・適用済み・不一致の件数だけ見る
+python3 -I scripts/apply_verified.py $W                   # 原稿に当てる（何度流しても同じ結果）
+```
+
+- 「不一致」は、別の修正と重なって `old` が変わったときに出る（同じ統計を2つの範囲が別々に直した、など）。原稿を開いて、
+  どちらの文面が残ったかを確かめ、足りない箇所を手で直す。「一部だけ」と出た案は、日本語だけ直って英語が古い、の疑いがある。
+- `data/govdojo/*.json` を直したら `python3 .claude/skills/govdojo-maintenance/scripts/build.py` で jsx の定数を作り直す（台帳 `facts.json` の更新も同スキルの手順で）。
+
+## 5. 確かめる
+
+```bash
+cd nova-app && npm run build && cd ..                                       # Hard errors: 0／クイズ検査 OK／道場の食い違い 0
+python3 .claude/skills/nova-consistency-audit/scripts/stale_scan.py         # MISMATCH 0
+node scripts/tabtext.mjs <直したタブ> --len 400000 | grep -c "<直した語>"     # 画面に出ているか（代表を数件）
+```
+
+タブ巡回のスモーク（`nova-consistency-audit` の `smoke.mjs`）も通す。ビルドが壊れた状態で push しない（`nova-app/**` の push は Pages に出る）。
+
+## 6. 報告・台帳・コミット
+
+```bash
+python3 -I scripts/report.py $W            # $W/report.md と、data/techhub-freshness/ の台帳・持ち越しを更新
+```
+
+- 見張り番の値を直した場合は `references/sentinels.json` の `terms` と `as_of` も直す。今回初めて動いた事実は項目を足す。
+- コミットは原稿の修正と台帳を一緒に（例: `Refresh cloud and foresight facts in TechHub`）。push 後、Pages の反映も確かめる。
+- 利用者への報告は短く、次の形で（`report.md` の先頭をもとに）：
+
+```
+鮮度点検（YYYY-MM-DD）　範囲：◯◯、◯◯
+- 直した：N件（主なもの3〜5件を1行ずつ。「何が→何に」と出典の発行元）
+- 未確認：N件（アプリは書き換えていない。主な理由：◯◯に届かない、など）
+- 検算で退けた：N件
+- 未了の範囲：◯◯（理由）
+- 次に期限が来る範囲：◯◯（日付）
+```
+
+「直した」と書けるのは、担当者が出典を開いて確かめ、検算者が開き直して通し、検査と適用を通った修正だけ。
+要再確認（二次情報だけ）の修正が混じるときは件数を分けて書く。
+
+## 決まり（嘘を入れないために）
+
+- **一次情報を開いて確かめた事実だけ**を直す。検索結果の要約文や記憶だけで直さない。確かめられなければ未確認に回す。
+- ログイン・ボット確認・ペイウォール・許可リストの外のホストは回避しない。開けないものは未確認。
+- 事実以外は書き換えない（言い回しの好みで直さない）。記事・動画の要約の中身（`NOTE_ARTICLES` など）は、元の記事が言ったことなので直さない。
+- 同じ事実は日本語・英語（`TH_EN`）・別タブ・クイズの解説の**全部**を一緒に直す。直した語で原稿を grep して残りを探す。
+- クイズは正解の番号と選択肢の長さの釣り合いを崩さない（`quiz-authoring` の規約）。崩れるなら直さず未確認に書く。
+- 生成物は直さない：`nova-app/dist`、ガバナンス道場の jsx 定数（`GOVREG_*`・`GOVIND`・`GOVLC`・`GOVKIT`・`GOVTPL`・`GOVUC`）。
+
+## 使用量（実測にもとづく目安）
+
+- 1範囲あたり、担当者1体＋検算者1〜3体。軽いモデルで5範囲を回して合計約135万トークン・約12分だった（うち2範囲は出典に届かず早く終わった）。
+- 全22範囲を一度に回すと利用上限に当たる（過去に5回当たった）。1回に1組、終わったら適用・確認・コミットまで済ませてから次の組へ。
+- 途中で止まっても、`$W/out/` にあるファイルから再開できる（終わった範囲の担当者を出し直さない）。
+
+## 落とし穴（実際に起きたこと）
+
+- **言い足し型の置換**（`new` が `old` を含む）は、当てたあとも `old` が見つかる。道具は `new` の部分を除いて数えるので二重には当たらないが、手で当てるときは注意。
+- **検算者が置換を別ファイルに書く**と適用の道具が拾えない。指示書どおり verify の JSON の中に書かせる。
+- **範囲をまたぐ同じ事実**（白書・AI Index・自治体調査の数字は企業研究・ファクトブック・クイズに出てくる）は不一致の元。先に当たった文面にそろえる。
+- 出典に届かない範囲に担当者を出すと、トークンだけ使って0件で終わる。`prep.py` の印を見て見送る。
+- `tabtext.mjs` は「すべて開く」と ▼ の見出しを開いて読む。全画面に切り替わる下位画面（クラウド道場など）は画面からは読めないので、原稿の定数を読む。
+
+## 道具と資料
+
+| ファイル | 役目 |
+|---|---|
+| `scripts/due.py` | 期限が来ている範囲と回す順（台帳と周期から） |
+| `scripts/time_scan.py` | 過ぎた予定・近い期限・古い時点・「最新」と書いた箇所の機械的な洗い出し |
+| `scripts/sentinels.py` | 見張り番の一覧と、アプリが今書いている値 |
+| `scripts/consts_index.py` | 定数の索引（行番号・大きさ・担当範囲）。`--unassigned` で担当漏れ |
+| `scripts/reach.py` | 出典のホストに届くかの確認（`prep.py` が呼ぶ） |
+| `scripts/prep.py` | 作業フォルダの用意と、担当者・検算者への依頼文 |
+| `scripts/tabtext.mjs` | タブの表示テキストを読む |
+| `scripts/repl_check.py` | 置換案の検査（原稿は書き換えない） |
+| `scripts/apply_verified.py` | 検算を通った置換の適用 |
+| `scripts/report.py` | 報告書と台帳・持ち越しの更新 |
+| `references/areas.json` | 担当範囲（タブ・定数・周期・主な出典のホスト・回す組） |
+| `references/sentinels.json` | 見張り番（よく動く事実） |
+| `references/checker-brief.md`・`verifier-brief.md` | 担当者・検算者への指示書 |
+| `data/techhub-freshness/ledger.json` | 範囲ごとの前回の点検日と結果 |
+| `data/techhub-freshness/unverified.json` | 未確認の持ち越し（次の点検で最初に確かめ直す） |
+
+## 育てる
+
+- タブや定数を足したら `references/areas.json` に足す（`consts_index.py --unassigned` が教える）。
+- 点検で「この事実はよく動く」と分かったら見張り番に足す。動かなくなった項目は外す。
+- 周期（`monthly` 30日／`quarterly` 90日）が合わない範囲は `areas.json` の `cadence` を直す。

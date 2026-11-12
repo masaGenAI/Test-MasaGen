@@ -37,6 +37,10 @@ Book-Summary の原稿は `nova-app/public/booksummaryhub.html` の1ファイル
 `.claude/skills/nova-consistency-audit/` の手順に従う（ポータルのタグ・Mastery Track・説明文・コメントに残る古い件数や名称を洗い出す）。
 `python3 .claude/skills/nova-consistency-audit/scripts/stale_scan.py` で MISMATCH が 0 になるまで直す。
 
+## TechHub の情報が古くなっていないか点検するとき（定期）
+`.claude/skills/techhub-freshness-audit/` の手順に従う（期限は `due.py`、候補は `time_scan.py` と見張り番、担当者と検算者が出典を開いて確かめた事実だけ直す）。
+置換は `repl_check.py` を通して `apply_verified.py` で当て、`report.py` で台帳（`data/techhub-freshness/`）を更新する。確かめられない点は直さず、未確認として持ち越す。
+
 ## ガバナンス道場の規制・業界・問題を更新するとき
 `.claude/skills/govdojo-maintenance/` の手順に従う（出典の本文で確かめた事実だけ、未確認は未確認と書く）。
 規制マップ・業界別チェック・ローコード・実務キットは `data/govdojo/` を直して `build.py` で生成する（jsx の定数を手で直さない）。

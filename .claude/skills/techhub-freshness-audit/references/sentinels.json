@@ -1,0 +1,390 @@
+{
+ "_note": "よく動く事実の見張り番。terms はアプリが今書いている値（原稿にある文字列）。urls を開いて、terms より新しい世代・版・数字が出ていないかを見る。点検で値を直したら terms と as_of も直す。動いた事実を見つけたら項目を足す。",
+ "sentinels": [
+  {
+   "id": "anthropic-models",
+   "what": "Anthropic の公開モデルの世代",
+   "urls": [
+    "https://www.anthropic.com/news",
+    "https://platform.claude.com/docs/en/about-claude/models/overview"
+   ],
+   "terms": [
+    "Fable 5.2",
+    "Opus 5.5"
+   ],
+   "areas": [
+    "companies-a",
+    "foresight-briefs",
+    "lexicon-frontier"
+   ],
+   "rhythm": "随時",
+   "as_of": "2026-11-12"
+  },
+  {
+   "id": "google-models",
+   "what": "Google の主力モデルの世代",
+   "urls": [
+    "https://blog.google/innovation-and-ai/models-and-research/gemini-models/"
+   ],
+   "terms": [
+    "Gemini 4"
+   ],
+   "areas": [
+    "companies-a",
+    "lexicon-frontier"
+   ],
+   "rhythm": "随時",
+   "as_of": "2026-11-12"
+  },
+  {
+   "id": "openai-models",
+   "what": "OpenAI の主力モデルの世代",
+   "urls": [
+    "https://github.com/openai/openai-python/blob/main/CHANGELOG.md"
+   ],
+   "terms": [
+    "GPT-6.1"
+   ],
+   "areas": [
+    "companies-a",
+    "lexicon-frontier"
+   ],
+   "rhythm": "随時",
+   "as_of": "2026-11-12",
+   "note": "openai.com は 403 を返すことが多い。SDK の変更履歴でモデル名と日付を確かめる"
+  },
+  {
+   "id": "meta-models",
+   "what": "Meta の主力モデルの世代",
+   "urls": [
+    "https://ai.meta.com/blog/"
+   ],
+   "terms": [
+    "Muse Spark 1.1"
+   ],
+   "areas": [
+    "companies-a"
+   ],
+   "rhythm": "随時",
+   "as_of": "2026-11-12"
+  },
+  {
+   "id": "google-cloud-names",
+   "what": "Google Cloud の AI 基盤の名称（旧 Vertex AI・旧 Agentspace）",
+   "urls": [
+    "https://cloud.google.com/blog/products/ai-machine-learning"
+   ],
+   "terms": [
+    "Gemini Enterprise Agent Platform"
+   ],
+   "areas": [
+    "companies-a",
+    "cloud-dojo",
+    "archcase"
+   ],
+   "rhythm": "随時",
+   "as_of": "2026-11-12"
+  },
+  {
+   "id": "aws-lifecycle",
+   "what": "AWS のサービスの新規受付終了・維持モード入り",
+   "urls": [
+    "https://aws.amazon.com/about-aws/whats-new/",
+    "https://docs.aws.amazon.com/bedrock/latest/userguide/agents-classic-maintenance-mode.html"
+   ],
+   "terms": [
+    "Bedrock Agents Classic",
+    "Amazon Quick"
+   ],
+   "areas": [
+    "cloud-dojo",
+    "archcase",
+    "companies-a"
+   ],
+   "rhythm": "随時",
+   "as_of": "2026-11-12"
+  },
+  {
+   "id": "azure-retirements",
+   "what": "Azure のサービスの廃止予定と後継",
+   "urls": [
+    "https://learn.microsoft.com/azure/azure-cache-for-redis/cache-whats-new"
+   ],
+   "terms": [
+    "Managed Redis"
+   ],
+   "areas": [
+    "cloud-dojo",
+    "archcase"
+   ],
+   "rhythm": "随時",
+   "as_of": "2026-11-12",
+   "note": "learn.microsoft.com は Microsoft Learn の MCP で読む"
+  },
+  {
+   "id": "databricks-names",
+   "what": "Databricks の製品名の改称",
+   "urls": [
+    "https://learn.microsoft.com/azure/databricks/resources/product-name-changes"
+   ],
+   "terms": [
+    "Mosaic AI"
+   ],
+   "areas": [
+    "companies-b"
+   ],
+   "rhythm": "随時",
+   "as_of": "2026-11-12",
+   "note": "learn.microsoft.com は Microsoft Learn の MCP で読む"
+  },
+  {
+   "id": "slalom-facts",
+   "what": "Slalom の公式の会社情報（拠点・人数・パートナー数）",
+   "urls": [
+    "https://www.slalom.com/us/en/who-we-are"
+   ],
+   "terms": [
+    "700以上"
+   ],
+   "areas": [
+    "companies-c",
+    "slalom-global"
+   ],
+   "rhythm": "随時",
+   "as_of": "2026-11-12"
+  },
+  {
+   "id": "epoch-datacenters",
+   "what": "Epoch のデータセンター・データベース（拠点数・計算能力・電力）",
+   "urls": [
+    "https://epoch.ai/data/ai-data-centers"
+   ],
+   "terms": [
+    "96拠点"
+   ],
+   "areas": [
+    "foresight-briefs"
+   ],
+   "rhythm": "月に数回更新",
+   "as_of": "2026-11-12"
+  },
+  {
+   "id": "idc-press",
+   "what": "IDC のプレスリリース一覧（AI 支出の予測）",
+   "urls": [
+    "https://www.idc.com/about/press-releases/"
+   ],
+   "terms": [
+    "FutureScape 2027"
+   ],
+   "areas": [
+    "foresight-briefs",
+    "factbook-a"
+   ],
+   "rhythm": "随時",
+   "as_of": "2026-11-12"
+  },
+  {
+   "id": "menlo-enterprise-ai",
+   "what": "Menlo Ventures の年次報告（企業の生成AI支出）",
+   "urls": [
+    "https://menlovc.com/perspective/"
+   ],
+   "terms": [
+    "1,768億ドル"
+   ],
+   "areas": [
+    "foresight-briefs",
+    "factbook-a",
+    "factbook-b"
+   ],
+   "rhythm": "年次（11月ごろ）",
+   "as_of": "2026-11-12"
+  },
+  {
+   "id": "stanford-ai-index",
+   "what": "Stanford HAI の AI Index Report",
+   "urls": [
+    "https://hai.stanford.edu/ai-index"
+   ],
+   "terms": [
+    "AI Index 2026"
+   ],
+   "areas": [
+    "factbook-a",
+    "companies-c"
+   ],
+   "rhythm": "年次（4月ごろ）",
+   "as_of": "2026-11-12"
+  },
+  {
+   "id": "soumu-whitepaper",
+   "what": "総務省 情報通信白書（生成AIの利用経験・方針策定率）",
+   "urls": [
+    "https://www.soumu.go.jp/johotsusintokei/whitepaper/"
+   ],
+   "terms": [
+    "令和8年版"
+   ],
+   "areas": [
+    "factbook-a",
+    "companies-c"
+   ],
+   "rhythm": "年次（7月ごろ）",
+   "as_of": "2026-11-12"
+  },
+  {
+   "id": "soumu-localgov",
+   "what": "総務省 自治体における生成AI導入状況",
+   "urls": [
+    "https://www.soumu.go.jp/main_content/001070295.pdf"
+   ],
+   "terms": [
+    "45.6%"
+   ],
+   "areas": [
+    "factbook-a",
+    "factbook-b",
+    "companies-c",
+    "foresight-briefs",
+    "postmortem-industry"
+   ],
+   "rhythm": "年次（4月ごろ）",
+   "as_of": "2026-11-12",
+   "note": "次の回の資料は別の番号の PDF になる。総務省のサイトで探す"
+  },
+  {
+   "id": "ipa-dx-trend",
+   "what": "IPA「DX動向」",
+   "urls": [
+    "https://www.ipa.go.jp/digital/chousa/dx-trend/"
+   ],
+   "terms": [
+    "DX動向2026"
+   ],
+   "areas": [
+    "factbook-a",
+    "factbook-b",
+    "companies-c"
+   ],
+   "rhythm": "年次（7月ごろ）",
+   "as_of": "2026-11-12"
+  },
+  {
+   "id": "juas-it-trend",
+   "what": "JUAS「企業IT動向調査報告書」",
+   "urls": [
+    "https://juas.or.jp/"
+   ],
+   "terms": [
+    "企業IT動向調査報告書2026"
+   ],
+   "areas": [
+    "factbook-b",
+    "companies-c"
+   ],
+   "rhythm": "年次（4月ごろ）",
+   "as_of": "2026-11-12"
+  },
+  {
+   "id": "pwc-japan-genai",
+   "what": "PwC Japan「生成AIに関する実態調査」",
+   "urls": [
+    "https://www.pwc.com/jp/ja/knowledge/thoughtleadership/"
+   ],
+   "terms": [
+    "生成AI実態調査2026春"
+   ],
+   "areas": [
+    "companies-c",
+    "factbook-a"
+   ],
+   "rhythm": "年に1〜2回",
+   "as_of": "2026-11-12"
+  },
+  {
+   "id": "eu-ai-act",
+   "what": "EU AI Act の適用時期（AIオムニバスによる延期を含む）",
+   "urls": [
+    "https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai"
+   ],
+   "terms": [
+    "AIオムニバス"
+   ],
+   "areas": [
+    "foresight-briefs",
+    "toolbox-proposal",
+    "govdojo"
+   ],
+   "rhythm": "随時",
+   "as_of": "2026-11-12",
+   "note": "道場の本体は govdojo-maintenance の台帳で管理している"
+  },
+  {
+   "id": "jp-ai-guideline",
+   "what": "日本の AI事業者ガイドラインの版",
+   "urls": [
+    "https://www.soumu.go.jp/main_content/001099163.pdf"
+   ],
+   "terms": [
+    "第1.2版"
+   ],
+   "areas": [
+    "foresight-briefs",
+    "toolbox-proposal",
+    "govdojo"
+   ],
+   "rhythm": "年に1回ほど改訂",
+   "as_of": "2026-11-12"
+  },
+  {
+   "id": "colorado-ai-act",
+   "what": "コロラド州の AI 法（SB24-205 の廃止・再制定）",
+   "urls": [
+    "https://leg.colorado.gov/bills/sb26-189"
+   ],
+   "terms": [
+    "SB26-189"
+   ],
+   "areas": [
+    "foresight-briefs",
+    "govdojo"
+   ],
+   "rhythm": "随時",
+   "as_of": "2026-11-12"
+  },
+  {
+   "id": "china-genai-filings",
+   "what": "中国 国家网信办の生成AIサービス登録の累計",
+   "urls": [
+    "https://www.cac.gov.cn/"
+   ],
+   "terms": [
+    "1,112款"
+   ],
+   "areas": [
+    "factbook-b",
+    "checks-notes"
+   ],
+   "rhythm": "隔月",
+   "as_of": "2026-11-12"
+  },
+  {
+   "id": "vendor-events",
+   "what": "AWS re:Invent・Microsoft Ignite の日程と「開催予定」の書き方",
+   "urls": [
+    "https://aws.amazon.com/jp/events/reinvent/",
+    "https://ignite.microsoft.com/"
+   ],
+   "terms": [
+    "re:Invent 2026"
+   ],
+   "areas": [
+    "foresight-briefs"
+   ],
+   "rhythm": "年次（11〜12月）",
+   "as_of": "2026-11-12",
+   "note": "開催が終わったら「開催予定」を結果の要約に書き換える"
+  }
+ ]
+}

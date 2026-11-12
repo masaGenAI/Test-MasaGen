@@ -1,0 +1,761 @@
+{
+ "_note": "TechHub の鮮度点検の担当範囲。consts は定数名（末尾 * は前方一致）。複数の範囲が同じ定数を分担することがある。hosts は主な一次情報のホスト（reach.py が点検前に到達できるか確かめる）。新しいタブや定数を足したら、ここにも足す（consts_index.py --unassigned で漏れが分かる）。",
+ "cadence_days": {
+  "monthly": 30,
+  "quarterly": 90
+ },
+ "shared_consts": [
+  "UI",
+  "TH_EN",
+  "CAT_EN",
+  "TABS",
+  "NOVA_GUIDES"
+ ],
+ "batches": [
+  [
+   "companies-a",
+   "companies-b",
+   "companies-c",
+   "lexicon-frontier"
+  ],
+  [
+   "foresight-briefs",
+   "cloud-dojo",
+   "archcase",
+   "toolbox-proposal"
+  ],
+  [
+   "govdojo",
+   "factbook-a",
+   "factbook-b",
+   "architect-sa"
+  ],
+  [
+   "dojo-certs",
+   "strategy-xform",
+   "slalom-global",
+   "postmortem-industry"
+  ],
+  [
+   "itsec",
+   "checks-notes",
+   "dojo-quiz-a",
+   "dojo-quiz-b"
+  ],
+  [
+   "foresight-library-a",
+   "foresight-library-b"
+  ]
+ ],
+ "areas": [
+  {
+   "key": "companies-a",
+   "title": "企業研究：ビッグテックとAIラボ",
+   "tabs": [
+    "companies"
+   ],
+   "cadence": "monthly",
+   "consts": [
+    "COMPANIES",
+    "SOURCES"
+   ],
+   "files": [],
+   "hosts": [
+    "www.anthropic.com",
+    "openai.com",
+    "blog.google",
+    "cloud.google.com",
+    "aws.amazon.com",
+    "press.aboutamazon.com",
+    "news.microsoft.com",
+    "ai.meta.com",
+    "investor.atmeta.com",
+    "nvidianews.nvidia.com",
+    "investor.nvidia.com",
+    "www.apple.com",
+    "www.sec.gov"
+   ],
+   "hint": "タブ companies（企業研究、定数 COMPANIES・CASES・COMPARE）のうち Google / Amazon / Meta / Apple / Microsoft / Anthropic / OpenAI / NVIDIA。主力モデル・製品名、経営陣、調達・評価額・時価総額、提携、組織の記述。下位画面「比較表」「実装事例」も見る。"
+  },
+  {
+   "key": "companies-b",
+   "title": "企業研究：エンタープライズSaaS・データ基盤",
+   "tabs": [
+    "companies"
+   ],
+   "cadence": "monthly",
+   "consts": [
+    "COMPANIES",
+    "CASES",
+    "COMPARE"
+   ],
+   "files": [],
+   "hosts": [
+    "www.oracle.com",
+    "www.palantir.com",
+    "www.salesforce.com",
+    "investor.salesforce.com",
+    "www.databricks.com",
+    "www.snowflake.com",
+    "investors.snowflake.com",
+    "www.servicenow.com",
+    "news.sap.com",
+    "www.ibm.com",
+    "newsroom.ibm.com"
+   ],
+   "hint": "タブ companies（定数 COMPANIES・CASES・COMPARE）のうち Oracle / Palantir / Salesforce / Databricks / Snowflake / ServiceNow / SAP / IBM。製品名（改称が多い）、経営陣、買収、業績・評価額の記述。"
+  },
+  {
+   "key": "companies-c",
+   "title": "企業研究：国内AI企業・日本市場・面接準備",
+   "tabs": [
+    "companies"
+   ],
+   "cadence": "monthly",
+   "consts": [
+    "COMPANIES",
+    "JP_MARKET",
+    "JPM_LENS",
+    "DELIVERY_MODELS",
+    "INTERVIEW_PLAYBOOK",
+    "REVERSE_Q",
+    "ROLES_GUIDE"
+   ],
+   "files": [],
+   "hosts": [
+    "www.slalom.com",
+    "www.pkshatech.com",
+    "laboro.ai",
+    "exawizards.com",
+    "www.abejainc.com",
+    "givery.co.jp",
+    "flux.jp",
+    "www.soumu.go.jp",
+    "www.meti.go.jp",
+    "www.ipa.go.jp"
+   ],
+   "hint": "タブ companies のうち Slalom / PKSHA Technology / Laboro.AI / エクサウィザーズ / ABEJA / ギブリー / FLUX と、下位画面「日本市場」（JP_MARKET・JPM_LENS）「提供モデル」（DELIVERY_MODELS）「職種別攻略」「面接準備」「逆質問」。上場・業績・経営陣・社名・サービス名の記述。"
+  },
+  {
+   "key": "factbook-a",
+   "title": "定量ファクトブック：市場・普及・ROI",
+   "tabs": [
+    "factbook"
+   ],
+   "cadence": "quarterly",
+   "consts": [
+    "MEGATECH_FACTBOOK",
+    "FACTBOOK_CATS_EN",
+    "FB_*"
+   ],
+   "files": [],
+   "hosts": [
+    "www.idc.com",
+    "www.gartner.com",
+    "www.mckinsey.com",
+    "www.bcg.com",
+    "hai.stanford.edu",
+    "www.oecd.org",
+    "www.soumu.go.jp",
+    "www.ipa.go.jp",
+    "www.pwc.com",
+    "www.deloitte.com",
+    "menlovc.com",
+    "www.statista.com"
+   ],
+   "hint": "タブ factbook（定数 MEGATECH_FACTBOOK は1行に十数万字）。ジャンル「市場・マクロ」「導入・普及」「成果・ROI」と「提案材料」（FB_PROPOSAL）。各統計に、同じ調査の新しい版が出ていないか、予測の対象年が過ぎていないかを確かめる。"
+  },
+  {
+   "key": "factbook-b",
+   "title": "定量ファクトブック：変革実行・BPRほか",
+   "tabs": [
+    "factbook"
+   ],
+   "cadence": "quarterly",
+   "consts": [
+    "MEGATECH_FACTBOOK"
+   ],
+   "files": [],
+   "hosts": [
+    "www.mckinsey.com",
+    "www.bcg.com",
+    "www.gartner.com",
+    "hbr.org",
+    "sloanreview.mit.edu",
+    "www.weforum.org",
+    "www.ilo.org",
+    "juas.or.jp",
+    "www.ipa.go.jp",
+    "www.meti.go.jp"
+   ],
+   "hint": "タブ factbook（定数 MEGATECH_FACTBOOK）のうち「市場・マクロ」「導入・普及」「成果・ROI」以外の全ジャンル。各統計に新しい版が出ていないか、予測の対象年が過ぎていないかを確かめる。"
+  },
+  {
+   "key": "foresight-briefs",
+   "title": "AIフォーサイト：ブリーフと近未来レーダー",
+   "tabs": [
+    "fs_macro",
+    "fs_market",
+    "fs_client",
+    "fs_craft",
+    "agi"
+   ],
+   "cadence": "monthly",
+   "consts": [
+    "RADAR_ITEMS",
+    "AGI_*",
+    "PHEN_ITEMS"
+   ],
+   "files": [
+    "nova-app/src/data/foresight-briefs.json"
+   ],
+   "hosts": [
+    "epoch.ai",
+    "www.anthropic.com",
+    "openai.com",
+    "www.idc.com",
+    "menlovc.com",
+    "www.trendforce.com",
+    "aws.amazon.com",
+    "ignite.microsoft.com",
+    "hai.stanford.edu",
+    "ourworldindata.org",
+    "www.meti.go.jp",
+    "www8.cao.go.jp",
+    "digital-strategy.ec.europa.eu",
+    "www.consultancy.uk",
+    "metr.org"
+   ],
+   "hint": "AIフォーサイトの4タブ fs_macro / fs_market / fs_client / fs_craft（ブリーフの原稿は nova-app/src/data/foresight-briefs.json。各ブリーフの「直近の読み」と数字、asOf）と agi タブ（RADAR_ITEMS、AGI_AXES・AGI_SCEN）。fs_refresh の「次回の点検」の日付が過ぎていないか。各ブリーフの直近の読みが、その情報源（fs_library に載っているもの）の最新の内容と合っているか、空欄のブリーフがないかを確かめ、情報源のページで確かめた内容だけで更新案を作る。"
+  },
+  {
+   "key": "lexicon-frontier",
+   "title": "用語辞典と先端メニュー",
+   "tabs": [
+    "lexicon",
+    "frontier"
+   ],
+   "cadence": "monthly",
+   "consts": [
+    "LEXICON",
+    "LEX_ALIASES",
+    "FRONTIER_DOMAINS",
+    "FT_*"
+   ],
+   "files": [],
+   "hosts": [
+    "www.anthropic.com",
+    "openai.com",
+    "blog.google",
+    "ai.meta.com",
+    "arxiv.org",
+    "lmarena.ai",
+    "artificialanalysis.ai",
+    "www.swebench.com",
+    "arcprize.org",
+    "huggingface.co",
+    "modelcontextprotocol.io",
+    "mlcommons.org"
+   ],
+   "hint": "タブ lexicon（用語辞典、定数 LEXICON・LEX_ALIASES）と frontier（先端メニュー、定数 FRONTIER_DOMAINS・FT_TOOL・FT_ART・FT_STAT・FT_ARCH）。「最新」「新興」「研究」とした技術の位置づけ、具体的なモデル名・製品名・ベンチマーク・料金・ライブラリ名で古くなったもの。"
+  },
+  {
+   "key": "cloud-dojo",
+   "title": "技術道場：クラウド比較・用語",
+   "tabs": [
+    "dojo"
+   ],
+   "cadence": "monthly",
+   "consts": [
+    "CLOUD_*",
+    "GLOSSARY",
+    "GLOSSARY_CLOUD_KW",
+    "SERVICE_GLOSSARY",
+    "BANK",
+    "DIFF_TOPICS"
+   ],
+   "files": [],
+   "hosts": [
+    "aws.amazon.com",
+    "docs.aws.amazon.com",
+    "azure.microsoft.com",
+    "learn.microsoft.com",
+    "cloud.google.com",
+    "docs.cloud.google.com",
+    "www.oracle.com",
+    "docs.oracle.com",
+    "blogs.oracle.com",
+    "www.srgresearch.com"
+   ],
+   "hint": "技術道場（タブ dojo）の中のクラウド比較・用語（定数 CLOUD_DATA・CLOUD_DOJO_EN・GLOSSARY・CLOUD_GLOSSARY_EN・CLOUD_QUIZ・BANK）。AWS / Azure / Google Cloud / OCI の生成AI・ML・データ分析サービスの名称（改称・統合・終了）と機能の記述。BANK は「時点」の注記が付いた問題から見る。Microsoft の文書は Microsoft Learn の MCP で読める。"
+  },
+  {
+   "key": "dojo-certs",
+   "title": "技術道場：資格対策と育成カリキュラム",
+   "tabs": [
+    "dojo"
+   ],
+   "cadence": "quarterly",
+   "consts": [
+    "AIGP_*",
+    "CISSP_*",
+    "CC_*",
+    "ISO42001F_*",
+    "CERTS",
+    "L1_CURRICULUM",
+    "L2_WEEKS",
+    "L3_WEEKS",
+    "L4_WEEKS",
+    "L5_WEEKS",
+    "CURRICULUM",
+    "PLAYBOOK",
+    "SIM_FACTORS",
+    "CASE_DRILLS",
+    "DEV_QUIZ",
+    "ARCH_QUIZ",
+    "VERSUS",
+    "DRILLS",
+    "GEN_*"
+   ],
+   "files": [],
+   "hosts": [
+    "iapp.org",
+    "assets.contentstack.io",
+    "www.isc2.org",
+    "www.iso.org",
+    "pecb.com",
+    "www.isaca.org",
+    "aws.amazon.com",
+    "learn.microsoft.com",
+    "cloud.google.com"
+   ],
+   "hint": "技術道場の資格対策と育成（定数 AIGP_DOMAINS・AIGP_QUIZ・CISSP_DOMAINS・CC_DOMAINS・ISO42001F_DOMAINS・CERTS・L1_CURRICULUM〜L5_WEEKS・CURRICULUM・PLAYBOOK・SIM_FACTORS・CASE_DRILLS）と、DEV_QUIZ・ARCH_QUIZ・VERSUS・DRILLS。資格の正式名称・出題範囲（BoK・シラバス）の版・試験形式・受験料、対応策プレイブックの製品名や規制の時点。"
+  },
+  {
+   "key": "strategy-xform",
+   "title": "学習ホーム・変革・コンサル基礎・暗黙知・BPR",
+   "tabs": [
+    "strategy",
+    "xform",
+    "consult",
+    "tacit",
+    "bpr"
+   ],
+   "cadence": "quarterly",
+   "consts": [
+    "COMP",
+    "COMP_LEVELS",
+    "ASSETS",
+    "ROADMAP_MEGATECH",
+    "XT_*",
+    "XF_*",
+    "CONSULT_*",
+    "TACIT_*",
+    "TDIF_*",
+    "BPR_*"
+   ],
+   "files": [],
+   "hosts": [
+    "www.jdla.org",
+    "guga.or.jp",
+    "www.toukei-kentei.jp",
+    "www.ipa.go.jp",
+    "www.meti.go.jp",
+    "www.mckinsey.com",
+    "www.bcg.com",
+    "hbr.org"
+   ],
+   "hint": "タブ strategy（COMP・ASSETS・ROADMAP_MEGATECH：資格名など）、xform（XT_CERTS：G検定・生成AIパスポート・統計検定2級の試験範囲や形式、XF_*）、consult（CONSULT_STATS・CONSULT_MAP の数字）、tacit（TACIT_WORLD の事例）、bpr。資格の名称・シラバス改定・試験形式・受験料、統計の版。"
+  },
+  {
+   "key": "archcase",
+   "title": "アーキテクチャ事例",
+   "tabs": [
+    "archcase"
+   ],
+   "cadence": "monthly",
+   "consts": [
+    "ARCH_TOOLS",
+    "ARCH_CASES",
+    "ARCH_AG",
+    "ARCH_OFC",
+    "ARCH_SPECS",
+    "ARCH_PATTERNS",
+    "ARCH_GUIDE",
+    "ARCH_FREQ",
+    "ARCH_LAYERS",
+    "SRC_LEGEND"
+   ],
+   "files": [],
+   "hosts": [
+    "aws.amazon.com",
+    "docs.aws.amazon.com",
+    "azure.microsoft.com",
+    "learn.microsoft.com",
+    "cloud.google.com",
+    "docs.cloud.google.com",
+    "findy-tools.io"
+   ],
+   "hint": "タブ archcase（定数 ARCH_TOOLS・ARCH_CASES・ARCH_AG・ARCH_OFC・ARCH_SPECS）。クラウドのサービス名の改称・統合・提供終了（AWS / Azure / Google Cloud）、ツール早見表の製品、公開事例の出典リンクが生きているか。"
+  },
+  {
+   "key": "architect-sa",
+   "title": "AIアーキテクト道場と面接対策",
+   "tabs": [
+    "architect",
+    "dojo"
+   ],
+   "cadence": "quarterly",
+   "consts": [
+    "DIAGRAMS",
+    "DIAGRAM_TITLE_EN",
+    "ARCH_SECTIONS",
+    "ARCH_EXERCISE_STEPS",
+    "ARCH_INDUSTRY_FIG",
+    "ARCH_REF_FIGS",
+    "ACAD_QUIZ",
+    "SA_*",
+    "INDUSTRY_SCENARIOS",
+    "INDUSTRY_PATTERNS",
+    "FT_DRILL"
+   ],
+   "files": [],
+   "hosts": [
+    "aws.amazon.com",
+    "docs.aws.amazon.com",
+    "learn.microsoft.com",
+    "cloud.google.com",
+    "www.anthropic.com",
+    "openai.com",
+    "www.databricks.com",
+    "www.snowflake.com"
+   ],
+   "hint": "タブ architect（AIアーキテクト道場：定数 ARCH_SECTIONS・ARCH_EXERCISE_STEPS・ARCH_REF_FIGS・ACAD_QUIZ、参照アーキテクチャ DIAGRAMS）と、技術道場の中の面接対策（SA_INTERVIEW_QA・SA_SYSDESIGN・SA_ADVISORY・INDUSTRY_SCENARIOS・INDUSTRY_PATTERNS）。サービス名・モデル名・資格名・料金や上限値の数字。量が多いので、年・モデル名・料金・上限値を含む箇所から見る。"
+  },
+  {
+   "key": "toolbox-proposal",
+   "title": "AX手法箱・提案・商談・ケース演習",
+   "tabs": [
+    "toolbox",
+    "proposal",
+    "salesdojo",
+    "casework",
+    "livedojo"
+   ],
+   "cadence": "monthly",
+   "consts": [
+    "TBX_*",
+    "WSX_*",
+    "PROP_*",
+    "FULL_PROPOSAL",
+    "FIN_GATE_*",
+    "GOV_GATE_*",
+    "PF3_*",
+    "LAB_*",
+    "LAYER_MAP",
+    "CONTRACT_FORMS",
+    "SALES_DRILLS",
+    "DISC_*",
+    "CASE_CARDS",
+    "CASE_PRO_CHECK",
+    "LIVE_PERSONAS",
+    "NOVA_GUIDES"
+   ],
+   "files": [],
+   "hosts": [
+    "www.anthropic.com",
+    "claude.com",
+    "openai.com",
+    "aws.amazon.com",
+    "azure.microsoft.com",
+    "cloud.google.com",
+    "www.nta.go.jp",
+    "www.meti.go.jp",
+    "www.ifrs.org",
+    "www.ssb-j.jp",
+    "www.ppc.go.jp",
+    "digital-strategy.ec.europa.eu"
+   ],
+   "hint": "タブ toolbox（TBX_* の Evals ツール名・データ基盤・事例 TBX_CASES）、proposal（PROP_*・FIN_GATE_*・PF3_PLANS・LAB_*・CONTRACT_FORMS：料金・単価・モデル価格・会計基準や税制の時点、GOV_GATE_LAW・GOV_GATE_WORLD・GOV_GATE_VENDOR の規制の記述）、salesdojo・casework・livedojo の中の時点に依存する記述。規制の記述は data/govdojo の台帳（facts.json）と食い違わないかも見る。"
+  },
+  {
+   "key": "dojo-quiz-a",
+   "title": "技術道場クイズ MCQS（前半）",
+   "tabs": [
+    "dojo"
+   ],
+   "cadence": "quarterly",
+   "consts": [
+    "MCQS"
+   ],
+   "files": [],
+   "hosts": [
+    "www.anthropic.com",
+    "openai.com",
+    "blog.google",
+    "aws.amazon.com",
+    "docs.aws.amazon.com",
+    "learn.microsoft.com",
+    "cloud.google.com",
+    "www.nist.gov",
+    "digital-strategy.ec.europa.eu"
+   ],
+   "hint": "技術道場のクイズ MCQS（全5,000問）の前半。行番号は consts_index.py で確かめ、MCQS の先頭から2,500問目までを担当する。全問は読まない。年（2023〜2026）・「最新」「現在」・モデル名（GPT / Claude / Gemini / Llama など）・料金・上限値・規制の日付を含む問題を grep で洗い出し、正解や解説が今の事実と食い違うものを探す。クイズなので置換案は is_quiz: true。"
+  },
+  {
+   "key": "dojo-quiz-b",
+   "title": "技術道場クイズ MCQS（後半）",
+   "tabs": [
+    "dojo"
+   ],
+   "cadence": "quarterly",
+   "consts": [
+    "MCQS",
+    "THR_CHECK"
+   ],
+   "files": [],
+   "hosts": [
+    "www.anthropic.com",
+    "openai.com",
+    "blog.google",
+    "aws.amazon.com",
+    "docs.aws.amazon.com",
+    "learn.microsoft.com",
+    "cloud.google.com",
+    "www.nist.gov",
+    "digital-strategy.ec.europa.eu"
+   ],
+   "hint": "技術道場のクイズ MCQS（全5,000問）の後半。行番号は consts_index.py で確かめ、2,501問目から最後までを担当する。全問は読まない。年（2023〜2026）・「最新」「現在」・モデル名・料金・上限値・規制の日付を含む問題を grep で洗い出し、正解や解説が今の事実と食い違うものを探す。クイズなので置換案は is_quiz: true。"
+  },
+  {
+   "key": "slalom-global",
+   "title": "グローバル事例・Slalom変革道場・グローバルファーム実務",
+   "tabs": [
+    "sglobal",
+    "slalom",
+    "gfirm"
+   ],
+   "cadence": "quarterly",
+   "consts": [
+    "SG_*",
+    "SL_*",
+    "SLALOM_*",
+    "GF_*"
+   ],
+   "files": [],
+   "hosts": [
+    "www.slalom.com",
+    "aws.amazon.com",
+    "news.microsoft.com",
+    "cloud.google.com",
+    "www.salesforce.com",
+    "www.databricks.com",
+    "www.snowflake.com",
+    "www.sourceglobalresearch.com",
+    "www.consultancy.uk"
+   ],
+   "hint": "タブ sglobal（SG_FACTS・SG_JPN・SG_CASES・SG_TL「直近12か月」）、slalom（SL_FACTS・SL_CASES・SL_SURVEY・SLALOM_BANK）、gfirm（GF_*）。Slalom 社の事実（拠点・人数・経営陣・提携・日本法人）、「直近12か月」の出来事の更新、事例の続報。"
+  },
+  {
+   "key": "postmortem-industry",
+   "title": "失敗学・業界別マップ・エージェント棚・価値・成熟度診断",
+   "tabs": [
+    "postmortem",
+    "industry",
+    "agentshelf",
+    "value",
+    "assess"
+   ],
+   "cadence": "quarterly",
+   "consts": [
+    "PM_*",
+    "IND_*",
+    "SHELF_*",
+    "VALUE_TREE",
+    "AX_*"
+   ],
+   "files": [],
+   "hosts": [
+    "www.sec.gov",
+    "www.ftc.gov",
+    "www.fsa.go.jp",
+    "www.mhlw.go.jp",
+    "www.meti.go.jp",
+    "www.mlit.go.jp",
+    "www.fda.gov",
+    "www.pmda.go.jp",
+    "incidentdatabase.ai",
+    "www.gov.uk"
+   ],
+   "hint": "タブ postmortem（PM_CASES の各事例のその後・判決・和解・サービス終了など続報）、industry（IND_DATA・IND_DEEP・IND_DEEP2 の数字と規制）、agentshelf（SHELF_GROUPS）、value（VALUE_TREE）、assess（AX_*）。"
+  },
+  {
+   "key": "itsec",
+   "title": "ITセキュリティ基盤",
+   "tabs": [
+    "itsec"
+   ],
+   "cadence": "quarterly",
+   "consts": [
+    "ITSEC_*"
+   ],
+   "files": [
+    "nova-app/src/data/itsec-concepts.json",
+    "nova-app/src/data/itsec-concepts.en.json",
+    "nova-app/src/data/itsec-practice.json",
+    "nova-app/src/data/itsec-scenarios.json",
+    "nova-app/src/data/itsec-taxonomy.json"
+   ],
+   "hosts": [
+    "www.ipa.go.jp",
+    "www.nisc.go.jp",
+    "www.cyber.go.jp",
+    "www.ppc.go.jp",
+    "www.nist.gov",
+    "www.iso.org",
+    "www.pcisecuritystandards.org",
+    "www.cisecurity.org",
+    "www.cisa.gov",
+    "www.npa.go.jp",
+    "www.jpcert.or.jp"
+   ],
+   "hint": "タブ itsec。規格・指針の版（ISO/IEC 27001・27002、NIST CSF、PCI DSS、CIS Controls、個人情報保護法・サイバー関連法の改正、政府統一基準、IPA の年次「10大脅威」など）と、国内インシデント事例（ITSEC_INCIDENTS）の続報、用語解説・比較・模試（ITSEC_BANK）の中の時点に依存する記述。用語・シナリオの原稿は nova-app/src/data/itsec-*.json。"
+  },
+  {
+   "key": "checks-notes",
+   "title": "理解度チェック・論点・実務論点マップ",
+   "tabs": [
+    "checkcore",
+    "checkax",
+    "issues",
+    "noteissues"
+   ],
+   "cadence": "quarterly",
+   "consts": [
+    "CHECK_*",
+    "ISSUE_*",
+    "HYPO_*",
+    "CONV_DRILLS",
+    "NOTE_*",
+    "NOTEISSUE_*"
+   ],
+   "files": [],
+   "hosts": [
+    "www.anthropic.com",
+    "openai.com",
+    "www.meti.go.jp",
+    "www.soumu.go.jp",
+    "www.ipa.go.jp",
+    "www.nist.gov",
+    "digital-strategy.ec.europa.eu",
+    "note.com"
+   ],
+   "hint": "タブ checkcore・checkax（理解度チェック。定数 CHECK_*。年・モデル名・数字を含む問題だけ洗い出す。置換案は is_quiz: true）、issues（ISSUE_TREE・CONV_DRILLS・HYPO_THEMES）、noteissues（実務論点マップ：NOTE_CORPORA の期間表記や件数の表示が現在のデータと合うか、NOTE_GOV の一次ソースの記述。NOTE_ARTICLES・NOTE_ART_EN は記事の要約なので、要約の中身は書き換えない）。"
+  },
+  {
+   "key": "foresight-library-a",
+   "title": "AIフォーサイト情報源ライブラリ（A・B層）",
+   "tabs": [
+    "fs_library"
+   ],
+   "cadence": "quarterly",
+   "consts": [],
+   "files": [
+    "nova-app/src/data/foresight-sources.json"
+   ],
+   "hosts": [
+    "epoch.ai",
+    "hai.stanford.edu",
+    "ourworldindata.org",
+    "www.iea.org",
+    "metr.org",
+    "www.stateof.ai",
+    "artificialanalysis.ai",
+    "lmarena.ai",
+    "menlovc.com",
+    "a16z.com",
+    "www.sequoiacap.com",
+    "www.idc.com",
+    "www.gartner.com"
+   ],
+   "hint": "AIフォーサイトの情報源ライブラリ（タブ fs_library。原稿は nova-app/src/data/foresight-sources.json）。層 A（マクロ・技術）と B（市場・エコシステム）の全リンクについて、(1) 開けるか・移転していないか（curl -sS -o /dev/null -w \"%{http_code} %{url_effective}\" -L --max-time 25 を1件ずつ。ボット確認や403は「未確認」に回し、回避しない）、(2) 年次レポート・白書・指標など定点資料に新しい版が出ていないか、を点検する。新版は公式ページで確かめたものだけ findings にする。"
+  },
+  {
+   "key": "foresight-library-b",
+   "title": "AIフォーサイト情報源ライブラリ（C層以降）とコレクション",
+   "tabs": [
+    "fs_library",
+    "fs_collection"
+   ],
+   "cadence": "quarterly",
+   "consts": [],
+   "files": [
+    "nova-app/src/data/foresight-sources.json",
+    "nova-app/src/data/foresight-collection.json",
+    "nova-app/src/data/foresight-collection-themes.json"
+   ],
+   "hosts": [
+    "www.mckinsey.com",
+    "www.bcg.com",
+    "www.accenture.com",
+    "www.deloitte.com",
+    "www.pwc.com",
+    "www.meti.go.jp",
+    "www.soumu.go.jp",
+    "www.ipa.go.jp",
+    "www.digital.go.jp",
+    "www.nri.com",
+    "www.mri.co.jp",
+    "www.jri.co.jp",
+    "www.weforum.org",
+    "www.oecd.org"
+   ],
+   "hint": "AIフォーサイトの情報源ライブラリ（原稿は nova-app/src/data/foresight-sources.json）のうち、層 A・B 以外の全層（C 以降）と、fs_collection（原稿は nova-app/src/data/foresight-collection.json・foresight-collection-themes.json）の既定の項目。全リンクについて、(1) 開けるか・移転していないか（curl -sS -o /dev/null -w \"%{http_code} %{url_effective}\" -L --max-time 25 を1件ずつ。ボット確認や403は「未確認」に回し、回避しない）、(2) 定点資料に新しい版が出ていないか、を点検する。新版は公式ページで確かめたものだけ findings にする。"
+  },
+  {
+   "key": "govdojo",
+   "title": "AIセキュリティ・ガバナンス道場",
+   "tabs": [
+    "govdojo"
+   ],
+   "cadence": "monthly",
+   "consts": [
+    "GOVDOJO_*",
+    "GOVREG_*",
+    "GOVIND*",
+    "GOVLC*",
+    "GOVKIT",
+    "GOVUC",
+    "GOVTPL",
+    "GOVR_*",
+    "GTX_*",
+    "GOVINC_CAT",
+    "GOVTRI_LEGS",
+    "GOVDEF_GATES",
+    "GOVIR_STEPS",
+    "GOVLAYER_ROWS",
+    "GOV_INC_KIT",
+    "GOVWS_PROMPTS"
+   ],
+   "files": [
+    "data/govdojo/"
+   ],
+   "hosts": [
+    "digital-strategy.ec.europa.eu",
+    "eur-lex.europa.eu",
+    "artificialintelligenceact.eu",
+    "www.meti.go.jp",
+    "www8.cao.go.jp",
+    "www.ppc.go.jp",
+    "www.fsa.go.jp",
+    "www.nist.gov",
+    "www.iso.org",
+    "leg.colorado.gov",
+    "leginfo.legislature.ca.gov",
+    "www.gov.uk",
+    "www.cac.gov.cn"
+   ],
+   "hint": "タブ govdojo。まず .claude/skills/govdojo-maintenance/SKILL.md を読み、その「A. 定期確認」の 2（data/govdojo/compare.json の upcoming で今日までに過ぎた予定）と 3（画面の「鮮度・要再確認」の未確認点）を行う。前回の全件照合（台帳 ledger.json の govdojo の日付）以降に動いた規制・指針（EU AI Act の適用時期や簡素化案、日本のAI法と指針、米国の州法、NIST・ISO など）を一次情報で確かめる。置換案は data/govdojo/*.json 側に出す（jsx の GOVREG_*・GOVIND・GOVLC・GOVKIT・GOVTPL・GOVUC は build.py の生成物なので直さない）。urlcheck.py の全件実行は不要。"
+  }
+ ]
+}
