@@ -1,8 +1,8 @@
 {
- "_note": "TechHub の鮮度点検の担当範囲。consts は定数名（末尾 * は前方一致）。複数の範囲が同じ定数を分担することがある。hosts は主な一次情報のホスト（reach.py が点検前に到達できるか確かめる）。新しいタブや定数を足したら、ここにも足す（consts_index.py --unassigned で漏れが分かる）。 quoted_consts は、記事や公開事例から集計・要約した中身の定数（当時の記事が書いた製品名や数字なので書き換えない。residue.py は既定で数えない）。",
+ "_note": "TechHub の鮮度点検の担当範囲。consts は定数名（末尾 * は前方一致）。複数の範囲が同じ定数を分担することがある。hosts は主な一次情報のホスト（reach.py が点検前に到達できるか確かめる）。新しいタブや定数を足したら、ここにも足す（consts_index.py --unassigned で漏れが分かる）。 quoted_consts は、記事や公開事例から集計・要約した中身の定数（当時の記事が書いた製品名や数字なので書き換えない。residue.py は既定で数えない）。 周期は、月1回の定期実行（暦の同じ日）で必ず期限が来るよう、月次27日・四半期85日にしている（30日・90日だと2月の次の月に1回飛ぶ）。",
  "cadence_days": {
-  "monthly": 30,
-  "quarterly": 90
+  "monthly": 27,
+  "quarterly": 85
  },
  "shared_consts": [
   "UI",
@@ -207,7 +207,7 @@
     "fs_craft",
     "agi"
    ],
-   "cadence": "monthly",
+   "cadence": "quarterly",
    "consts": [
     "RADAR_ITEMS",
     "AGI_*",
@@ -233,7 +233,7 @@
     "www.consultancy.uk",
     "metr.org"
    ],
-   "hint": "AIフォーサイトの4タブ fs_macro / fs_market / fs_client / fs_craft（ブリーフの原稿は nova-app/src/data/foresight-briefs.json。各ブリーフの「直近の読み」と数字、asOf）と agi タブ（RADAR_ITEMS、AGI_AXES・AGI_SCEN）。fs_refresh の「次回の点検」の日付が過ぎていないか。各ブリーフの直近の読みが、その情報源（fs_library に載っているもの）の最新の内容と合っているか、空欄のブリーフがないかを確かめ、情報源のページで確かめた内容だけで更新案を作る。"
+   "hint": "AIフォーサイトの4タブ fs_macro / fs_market / fs_client / fs_craft（ブリーフの原稿は nova-app/src/data/foresight-briefs.json。各ブリーフの「直近の読み」と数字、asOf）と agi タブ（RADAR_ITEMS、AGI_AXES・AGI_SCEN）。fs_refresh の「次回の点検」の日付が過ぎていないか。各ブリーフの直近の読みが、その情報源（fs_library に載っているもの）の最新の内容と合っているか、空欄のブリーフがないかを確かめ、情報源のページで確かめた内容だけで更新案を作る。 ブリーフの「直近の読み」と情報源のリンクは、毎月1日の別の定期タスク（AIフォーサイト 月次メンテナンス）が更新している。この点検では agi タブ（RADAR_ITEMS・AGI_*）と、ブリーフの数字がほかのタブと食い違っていないかを中心に見る。"
   },
   {
    "key": "lexicon-frontier",

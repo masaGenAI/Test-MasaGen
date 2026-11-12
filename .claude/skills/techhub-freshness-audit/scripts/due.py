@@ -1,7 +1,9 @@
 """どの担当範囲が点検の時期に来ているかを出す（台帳 data/techhub-freshness/ledger.json と areas.json の周期から）。
 
-usage: python3 -I due.py [--today YYYY-MM-DD] [--all]
+usage: python3 -I due.py [--today YYYY-MM-DD] [--all] [--plan N]
   既定は「期限が来ている範囲」だけ。--all で全範囲。
+  --plan N は、今回回す範囲を最大 N 個選んで4つずつの組にして出す（定期実行用。月次の範囲を先に、
+  残りの枠に四半期の範囲を期限の古い順に入れる。入り切らなかった範囲は次回に回る）。
   前回、出典のホストに届かず確かめられなかった範囲は「未了」として先頭に出す。
 """
 from __future__ import annotations
@@ -56,6 +58,22 @@ def main() -> None:
     many = [f"{k}（{n}）" for k, n in sorted(left.items(), key=lambda kv: -kv[1]) if n >= 20 and k not in {r[1]["key"] for r in due}]
     if many:
         print("期限前だが、古い語の残りが多い範囲（回す候補）: " + "、".join(many))
+    if "--plan" in a:
+        cap = int(a[a.index("--plan") + 1])
+        # 前回、出典に届かず未了だった範囲は枠に数えない（届かないままなら見送るだけなので）
+        held = [r[1]["key"] for r in due if r[2].get("status") == "blocked"]
+        first = [r[1]["key"] for r in due if r[1]["cadence"] == "monthly" and r[1]["key"] not in held]
+        rest = [r[1]["key"] for r in due if r[1]["cadence"] != "monthly" and r[1]["key"] not in held]
+        plan = (first + rest)[:cap]
+        print(f"今回回す範囲（最大 {cap}。月次を先に、四半期は期限の古い順）: {len(plan)} 範囲")
+        for i in range(0, len(plan), 4):
+            print(f"  組{i // 4 + 1}: " + ",".join(plan[i:i + 4]))
+        if held:
+            print("  前回未了（prep.py で出典に届くと出たら組に足す。届かなければ見送る）: " + ", ".join(held))
+        left_out = (first + rest)[cap:]
+        if left_out:
+            print("  次回に回る: " + ", ".join(left_out))
+        return
     if due:
         keys = {r[1]["key"] for r in due}
         print("回す順（1回に1組。使用量の上限に当たらないよう組ごとに区切る）:")
