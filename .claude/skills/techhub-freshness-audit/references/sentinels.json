@@ -90,11 +90,12 @@
    "what": "AWS のサービスの新規受付終了・維持モード入り",
    "urls": [
     "https://aws.amazon.com/about-aws/whats-new/",
+    "https://aws.amazon.com/about-aws/whats-new/2026/11/amazon-quick-aws-quick/",
     "https://docs.aws.amazon.com/bedrock/latest/userguide/agents-classic-maintenance-mode.html"
    ],
    "terms": [
     "Bedrock Agents Classic",
-    "Amazon Quick"
+    "AWS Quick"
    ],
    "areas": [
     "cloud-dojo",
@@ -102,7 +103,7 @@
     "companies-a"
    ],
    "rhythm": "随時",
-   "as_of": "2026-11-12"
+   "as_of": "2026-11-13"
   },
   {
    "id": "azure-retirements",

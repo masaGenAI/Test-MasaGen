@@ -279,7 +279,8 @@
     "GLOSSARY_CLOUD_KW",
     "SERVICE_GLOSSARY",
     "BANK",
-    "DIFF_TOPICS"
+    "DIFF_TOPICS",
+    "Diag*"
    ],
    "files": [],
    "hosts": [
