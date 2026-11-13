@@ -573,7 +573,7 @@
   "defEn": "A platform that integrates multiple cloud security functions and protects applications in the cloud across the whole lifecycle from development to operation. It brings CSPM, CWPP and others together into a single experience.",
   "howEn": "Defender for Cloud places CSPM, DevSecOps and CWPP at its core. It links misconfigurations and exposed secrets at the code stage with the state of the cloud in order to prioritise remediation. Google explains that integration with security operations is advancing.",
   "diffEn": "Introducing CSPM and CWPP separately as single-function products increases the number of products. CNAPP is moving towards reducing the number of point products by integrating them.",
-  "aiEn": "Defender for Cloud provides posture management and threat protection for generative AI workloads. Google's SCC Enterprise also lists preventive and detective controls for AI workloads."
+  "aiEn": "Defender for Cloud provides posture management and threat protection for generative AI workloads. Google's SCC Enterprise tier (deprecated as of November 2026; it shuts down on May 21, 2027, with organizations moving to the Premium tier by default) also lists preventive and detective controls for AI workloads."
  },
  {
   "id": "ciem",

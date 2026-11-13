@@ -1855,7 +1855,7 @@
   "full": "Cloud-Native Application Protection Platform（クラウドネイティブアプリケーション保護プラットフォーム）",
   "how": "Defender for Cloud は CSPM、DevSecOps、CWPP の三つを中核に置く。コード段階の誤設定や露出した秘密情報を、クラウドの状況と結び付けて修復の優先順位を付ける。Google はセキュリティ運用との統合が進むと説明する。",
   "diff": "CSPM や CWPP を単機能で個別に導入すると製品が増える。CNAPP はそれらの統合でポイント製品の数を減らす方向にある。",
-  "ai": "Defender for Cloud は生成AIワークロード向けの態勢管理と脅威保護を備える。Google の SCC Enterprise も AI ワークロード向けの予防・検出制御を挙げる。",
+  "ai": "Defender for Cloud は生成AIワークロード向けの態勢管理と脅威保護を備える。Google の SCC Enterprise 階層（2026年11月時点で廃止予定。2027年5月21日に終了し、既定では Premium 階層へ移行）も AI ワークロード向けの予防・検出制御を挙げる。",
   "related": [
    "cspm",
    "cwpp",

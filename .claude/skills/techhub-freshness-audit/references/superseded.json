@@ -460,6 +460,55 @@
     "終了"
    ],
    "how": "現役の推奨として書く箇所に終了時期を添える"
+  },
+  {
+   "old": "GitHub Copilot ハーネス",
+   "now": "Copilot Studio のハーネスは今「Microsoft Copilot harness」と呼ばれる（旧名は SDK に legacy として残る）",
+   "source": "https://learn.microsoft.com/microsoft-copilot-studio/harnesses-overview",
+   "as_of": "2026-11-13",
+   "ok_near": [
+    "旧 GitHub Copilot",
+    "旧GitHub Copilot",
+    "Microsoft Copilot ハーネス"
+   ],
+   "how": "今のサービスとして書く箇所は「Microsoft Copilot ハーネス（旧 GitHub Copilot ハーネス）」に。データが GitHub Copilot サービスへ送られるか、のような別の事実の記述は直さない"
+  },
+  {
+   "old": "GitHub Copilot harness",
+   "now": "Copilot Studio's harness is now called the Microsoft Copilot harness",
+   "source": "https://learn.microsoft.com/microsoft-copilot-studio/harnesses-overview",
+   "as_of": "2026-11-13",
+   "ok_near": [
+    "formerly GitHub Copilot",
+    "formerly the GitHub Copilot",
+    "Microsoft Copilot harness"
+   ],
+   "how": "英語側も同じ。URL のスラッグ（github-copilot-harness）は直さない"
+  },
+  {
+   "old": "LMArena",
+   "now": "LMArena は 2026-01-28 に Arena へ改称（arena.ai）",
+   "source": "https://arena.ai/blog/lmarena-is-now-arena",
+   "as_of": "2026-11-13",
+   "ok_near": [
+    "旧LMArena",
+    "formerly LMArena",
+    "Arena（"
+   ],
+   "how": "今の名前として書く箇所は「Arena（旧LMArena）」に。当時の順位・記事の要約はそのまま"
+  },
+  {
+   "old": "SCC Enterprise",
+   "now": "Security Command Center の Enterprise 階層は 2026-05-21 に廃止が告知され、2027-05-21 に終了（既定では Premium へ移行）",
+   "source": "https://docs.cloud.google.com/security-command-center/docs/release-notes",
+   "as_of": "2026-11-13",
+   "ok_near": [
+    "廃止予定",
+    "2027",
+    "Premium",
+    "deprecated"
+   ],
+   "how": "現役の推奨として書く箇所に終了時期と移行先を添える（出典は curl では開けず WebFetch で読める）"
   }
  ]
 }
