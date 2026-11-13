@@ -1438,5 +1438,14 @@
   "why": "今回は製品名・名称に絞った点検でリンク生死・統計・新版は対象外のため持ち越し。プロキシが拒否するか、ログイン・短縮URLで確認できない",
   "first_seen": "2026-11-12",
   "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-b",
+  "tab": "companies（企業研究 COMPANIES の Snowflake と英訳辞書 TH_EN）",
+  "current_text": "Snowflake CoWork（旧Snowflake Intelligence）",
+  "concern": "Snowflake CoWork は2026年9月の10-Q・決算発表にある公式名だが、Snowflake Intelligence の改称だと明記した一次情報が無い（5月の決算発表は Snowflake Intelligence、9月は CoWork と書く）。",
+  "why": "www.snowflake.com はサイト側で 403、docs.snowflake.com は許可リストの外、investors.snowflake.com のニュース一覧は JavaScript 読み込みで取れない。SEC の提出書類には対応の記述が無い。",
+  "first_seen": "2026-11-13",
+  "last_tried": "2026-11-13"
  }
 ]
