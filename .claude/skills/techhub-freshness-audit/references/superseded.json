@@ -525,6 +525,19 @@
     "acquisition of Fin"
    ],
    "how": "今の事実として書く箇所は「Fin（旧 Intercom）」と「1アウトカム0.99ドル」に。投入当時の出来事（解決1件0.99ドルで投入）は当時のまま残し、時点つきの注記を1回だけ添える。出典：fin.ai/about・fin.ai/pricing・fin.ai/blog/salesforce-completes-acquisition-of-fin"
+  },
+  {
+   "old": "Snowflake Intelligence",
+   "now": "Snowflake の製品名は Snowflake CoWork に変わった（旧URL /user-guide/snowflake-cortex/snowflake-intelligence は /snowflake-cowork へ 308 転送。2025-08-01 の Snowflake Intelligence プレビューのリリースノートも今は Snowflake CoWork と表示）。改称の日付を明記した一次情報は無い。ビュー名 SNOWFLAKE_INTELLIGENCE_USAGE_HISTORY は残る",
+   "source": "https://docs.snowflake.com/en/user-guide/snowflake-cortex/snowflake-cowork",
+   "as_of": "2026-11-13",
+   "ok_near": [
+    "旧Snowflake Intelligence",
+    "旧 Snowflake Intelligence",
+    "formerly Snowflake Intelligence",
+    "USAGE_HISTORY"
+   ],
+   "how": "今の製品として書く箇所は「Snowflake CoWork（旧Snowflake Intelligence）」に。当時の出来事は当時の名前のまま。Cortex Code は今も公式に使われる名前なので旧名として扱わない（今の主な表記は Snowflake CoCo）"
   }
  ]
 }
