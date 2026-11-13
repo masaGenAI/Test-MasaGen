@@ -1,284 +1,5 @@
 [
  {
-  "area": "companies-a",
-  "tab": "companies",
-  "current_text": "AgentKit（Agent Builder/Evalsは2026年11月30日に提供終了予定）",
-  "concern": "終了予定日まで19日。11月30日を過ぎると「予定」のままでは古くなる。日付そのものも一次情報で確かめられていない。",
-  "why": "openai.com は 403、platform.openai.com・developers.openai.com・community.openai.com はこの環境の許可外で開けなかった。検索結果の要約では 11月30日終了（Evals は10月31日から読み取り専用）で一致しているが、ページ本文は開けていない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-a",
-  "tab": "companies",
-  "current_text": "…ChatGPT Enterpriseの業務統合、Secure MCP Tunnel、評価とファインチューニング。",
-  "concern": "「Secure MCP Tunnel」という名称と現在の提供状況が未確認。",
-  "why": "OpenAI 公式ページを開けず、公式 SDK の更新履歴にも該当語が無かった。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-a",
-  "tab": "companies",
-  "current_text": "Apple Intelligence（Siri AI・iOS 27で2026年9月に英語ベータ開始）・オンデバイスML・Private Cloud Compute",
-  "concern": "記述は二次情報と一致するが、現在もベータ・英語のみかは未確認。iOS 27.3 のベータが11月3日に出ており、対応範囲が近く変わる可能性がある。",
-  "why": "apple.com・support.apple.com・machinelearning.apple.com はこの環境の許可外。Wikipedia では iOS 27 が 2026-09-14 公開、Siri AI はベータ、最新版は 27.2.1（11月9日）、EU と中国は開始時に対象外と確認できた。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-a",
-  "tab": "companies",
-  "current_text": "Apple｜AIML (Apple Intelligence)",
-  "concern": "組織名「AIML」が現状と合わない可能性。2025年12月1日に Giannandrea 氏の退任と、AI 組織の Federighi 氏（Subramanya 氏）・Khan 氏・Cue 氏への再編が発表されたとされる。",
-  "why": "Apple ニュースルームと配信元（businesswire）を開けず、検索結果の要約しか見られていない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-a",
-  "tab": "companies",
-  "current_text": "Gemini Enterprise（旧Agentspace）",
-  "concern": "Google Cloud の製品ページ（cloud.google.com/gemini-enterprise）の題が「Gemini for business: The universal work agent」になっている。製品名が変わったのか、売り出し方の表記だけなのか不明。",
-  "why": "同じページに「Gemini Enterprise Plus edition」の語が残り、2026-10-08 の公式ブログも Gemini Enterprise の名を使っている。改称の発表文は見つからず、docs.cloud.google.com のリリースノートは許可外で開けなかった。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-a",
-  "tab": "companies",
-  "current_text": "CUDA・NIM・NeMo・Dynamo-Triton（旧Triton Inference Server）・DGX Cloud",
-  "concern": "DGX Cloud を顧客向け製品として並べているが、NVIDIA の公式ページは「DGX Cloud is NVIDIA's internal cloud environment for building and operating AI at scale to support NVIDIA's most demanding internal AI use cases.」と自社内向けの環境として説明している。",
-  "why": "同じページに「NVIDIA DGX Cloud with AWS／Google Cloud／Microsoft Azure／OCI」の提供案内も残っており、外販をやめたとは断定できない。縮小の報道は検索結果の要約しか見られていない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-a",
-  "tab": "companies",
-  "current_text": "Amazon Q（Q Businessは2026年7月31日以降は新規顧客の受付終了、…）",
-  "concern": "新規受付の終了と移行先（Amazon Quick）は公式ドキュメントで確認できたが、「2026年7月31日」という日付は開いたページの本文に無かった。",
-  "why": "検索結果の要約は AWS ドキュメントの文として 7月31日を挙げているが、開いた3ページ（what-is／availability-change／tiers）には日付の記載が無かった。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-a",
-  "tab": "companies",
-  "current_text": "Muse Spark（2026年4月・Superintelligence Labs初のモデル）／2026年4月公開のMuse Sparkはウェイト非公開でMeta AIに搭載",
-  "concern": "「Superintelligence Labs 初のモデル」「ウェイト非公開」と、Muse Wonder の公開日（2026-10-12 と報道）・位置づけを一次情報で確かめられていない。",
-  "why": "about.fb.com と research.meta.ai は許可外。ai.meta.com では Muse Spark（2026-04-08）と Muse Spark 1.1（2026-07-09）の記事、および研究ページの説明文にある「the new Muse Wonder series」までしか確認できなかった。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-a",
-  "tab": "companies",
-  "current_text": "…ADK v1.0とA2A本番、managed MCPサーバ…",
-  "concern": "「A2A本番」「managed MCPサーバ」の現在の提供状況は確かめていない。",
-  "why": "docs.cloud.google.com が許可外で、Google Cloud の製品文書を開けなかった（ADK の版数だけ GitHub で確認）。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-b",
-  "tab": "companies",
-  "current_text": "Oracle カード：OCI Generative AI・OCI Enterprise AI・Autonomous AI Database（旧Autonomous Database）・Fusion AI ／ 比較表 Oracle 行：OCI Gen AI｜Fusion AI",
-  "concern": "カードの最終確認（2026-10-25）の翌日から Oracle AI World 2026 が開かれており、検索結果では Fusion Agentic Applications・Fusion Claw・Oracle AI Workspace（OpenAI との協業）などが出ている。「Fusion AI」は正式な製品名ではなく、エージェント基盤の正式名は Oracle AI Agent Studio for Fusion Applications とみられる。",
-  "why": "www.oracle.com が 403 を返し、公式ページを開けなかった。Google Cloud のブログ（2026-11-06）で「Oracle Autonomous AI Database」「Oracle Fusion AI Agent Studio、Fusion Claw」の表記だけは確認した。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-b",
-  "tab": "companies",
-  "current_text": "ServiceNow カード：Now Assist（生成AIアシスト）、AI Agents（自律ワークフロー）、Now LLM/連携モデル… ／ 逆質問例「Now Assist導入で…」／ 比較表：Now LLM｜AI Agents / Now Assist",
-  "concern": "検索結果の要約では、製品内のラベルや文書で Now Assist・Moveworks・AI Experience の表記が ServiceNow Otto に改められたとある。Now Assist の名称が今も製品名として残っているかは不明。",
-  "why": "servicenow.com（newsroom・docs・store）がこのセッションのネットワーク許可外で開けない。開けた ITmedia の記事は「統合」としか書いていない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-b",
-  "tab": "companies",
-  "current_text": "Salesforce カード：Einstein Trust Layer（ガードレール/マスキング）",
-  "concern": "公式の Trusted AI ページは見出しと本文で「Salesforce Trust Layer」を使い、「Einstein Trust Layer」は FAQ に1回だけ残る。改称された可能性がある。",
-  "why": "公式ページに改称の明記が無く、両方の表記が併存している（https://www.salesforce.com/artificial-intelligence/trusted-ai/）。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-b",
-  "tab": "companies",
-  "current_text": "日本市場：漏洩組織の20%がシャドーAI関連、63%はAIガバナンス方針が未整備または策定中（IBM Cost of a Data Breach 2025）。",
-  "concern": "2026年版が出ている（アプリの別の箇所は 2026-07-29 のプレスリリースを既に引用している）。二次情報では、シャドーAI関与は43%、AIガバナンスの欠如は68%に更新されている。担当の定数（COMPANIES・CASES・COMPARE）の外だが、同じタブ内にある。",
-  "why": "www.ibm.com がネットワーク許可外で原典を開けない。数字は二次情報（検索結果の要約）だけ。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-b",
-  "tab": "companies",
-  "current_text": "実装事例 › 業界横断調査（Databricks / Gartner）：エージェント搭載エンタープライズアプリは5%未満→40%へ急拡大予測。9割超の企業がAIスプロールを懸念。",
-  "concern": "Gartner の予測は「2025年の5%未満→2026年末までに40%」で、対象年が目前だが文中に年が無い。「9割超がAIスプロールを懸念」は Databricks・Gartner のどちらの調査か特定できなかった。",
-  "why": "gartner.com が 403 で開けない。AIスプロールの出典は探し切れていない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-b",
-  "tab": "companies",
-  "current_text": "実装事例 › 各社エージェント基盤の競争：Amazon AgentCore、Google Agentspace/Vertex、Microsoft Agent Service、Salesforce Agentforce等 ／ 比較表 Google 行：Agentspace / Vertex",
-  "concern": "同じタブの Google カードは「Gemini Enterprise（旧Agentspace）」「Gemini Enterprise Agent Platform（旧Vertex AI）」と書いており、タブ内で名称が食い違う。",
-  "why": "Google は companies-a の担当範囲。置換が衝突しないよう、こちらからは置換案を出していない。Google Cloud のブログ（2026-05-13）で「Gemini Enterprise Agent Platform」の表記は見た。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-b",
-  "tab": "companies",
-  "current_text": "比較表 Snowflake 行：Arctic / Cortex",
-  "concern": "Arctic（2024年公開の自社モデル）を今も主力モデルと呼べるか。公式トップページの製品紹介には CoCo・CoWork・Cortex が並び、Arctic は出てこない。",
-  "why": "docs.snowflake.com がネットワーク許可外で、モデルの提供状況を確かめられない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-c",
-  "tab": "companies",
-  "current_text": "PKSHA Technology：対話AI（PKSHA ChatAgent〔旧PKSHA Chatbot・2025年8月改称〕・PKSHA VoiceAgent / AIヘルプデスク）",
-  "concern": "製品名・改称時期・経営陣に変更がないか。検索結果の要約では ChatAgent の名称は継続、2026年に PKSHA Dialogue の本格提供、PKSHA Voice AI の API 提供（8月）、VideoTouch の子会社化（6月）があり、代表は上野山勝也氏のまま。アプリの記述と矛盾する情報は見当たらなかった。",
-  "why": "pkshatech.com・prtimes.jp・it.impress.co.jp がこのセッションの通信許可の外で、本文を開けなかった（検索要約のみ）。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-c",
-  "tab": "companies",
-  "current_text": "エクサウィザーズ：法人向け生成AI「exaBase AI」〔旧exaBase 生成AI・2026年7月1日改称〕",
-  "concern": "改称の日付（7月1日）と提供会社。検索要約では「2026年7月より exaBase AI に名称変更」、提供は Exa Enterprise AI、親会社の代表取締役社長CEOは春田真氏で、アプリと矛盾しない。",
-  "why": "exawizards.com が通信許可の外で開けなかった。日付（1日）までは要約で確認できていない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-c",
-  "tab": "companies",
-  "current_text": "ABEJA：エンタープライズプラットフォーム事業（旧デジタルプラットフォーム事業・2026年4月に名称変更）",
-  "concern": "名称変更の時期。検索要約では 2026-04-14 に変更を発表しており、アプリと一致する見込み。2026年8月期の通期決算は確認できていない。",
-  "why": "abejainc.com・TDnet の開示PDF（jpx.co.jp、finboard）が通信許可の外で開けなかった。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-c",
-  "tab": "companies",
-  "current_text": "Laboro.AI：カスタムAIソリューション／ソリューションデザイナ、機械学習エンジニア、AXプロデューサー",
-  "concern": "経営陣・事業名の変更。検索要約では代表取締役CEO 椎橋徹夫氏・COO兼CTO 藤原弘将氏のままで、社名変更やTOBの情報は無い。「AGT-X」立ち上げという見出しがあり、事業の柱の説明が変わっている可能性がある。",
-  "why": "laboro.ai と決算説明の本文を開けなかった（通信許可の外）。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-c",
-  "tab": "companies",
-  "current_text": "ギブリー：Track（Track Test・Track Talent Assessmentなど）・法人向け生成AI研修/導入支援・DX人材事業",
-  "concern": "主力の生成AI製品名。検索要約では 2026年の発表は「MANA Studio」「MANA Buddy」「Givery AIスキル標準 /2026」が中心で、アプリの製品欄に MANA Studio が無い。Track Test の名称が現行かも確認できていない。",
-  "why": "givery の公式サイト・prtimes.jp・webtan.impress.co.jp が通信許可の外で開けなかった。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-c",
-  "tab": "companies",
-  "current_text": "FLUX：9ドメイン/27オファリング体制（…提供営業資料ベース）／確認日「未再確認（記載は2026年7〜9月の作成時点のもの）」",
-  "concern": "体制の記述は営業資料が根拠で、公開情報では確かめられない。検索要約ではシリーズCで総額60億円の調達、2026-08-26 に JAPAN & AI SUMMIT 2026 を開催、代表は永井元治氏。",
-  "why": "公開の一次情報に「9ドメイン/27オファリング」の記載が見つからず、公式サイトも通信許可の外。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-c",
-  "tab": "companies",
-  "current_text": "Slalom：日本法人は2019年設立・2021年本格始動、港区愛宕。",
-  "concern": "Slalom 日本語サイトの Who we are は「2020 日本で設立されました」と表示しており、アプリの「2019年設立」（JETRO の2021年の告知が根拠）と1年ずれる。所在地（愛宕グリーンヒルズMORIタワー7F）は公式サイトで確認できた。",
-  "why": "JETRO のページ（jetro.go.jp）が通信許可の外で開けず、登記上の設立年月を確かめられなかった。どちらが正しいか決められない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-c",
-  "tab": "companies",
-  "current_text": "Slalom：規模は資料により差（全社 約1万〜1.3万人／売上 約30億ドル）。",
-  "concern": "公式の人数・売上が出ていないか。公式サイトのリリース定型文（2026-08-06）は「54 offices in 12 countries」とだけ書き、人数・売上は載せていない。日本語サイトは「11カ国、45拠点」と古い数字のまま。",
-  "why": "公式の人数・売上の記載が見つからなかった。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-c",
-  "tab": "companies",
-  "current_text": "シャドーAI起因の情報漏洩コスト +67万ドル／漏洩組織の20%がシャドーAI関連、63%はAIガバナンス方針が未整備または策定中（IBM Cost of a Data Breach 2025）",
-  "concern": "2026年版が出ている模様。検索要約（二次記事）では世界平均 499万ドル、シャドーAI関与は 43%（前年20%）、AIガバナンス未整備 68%（前年63%）。+67万ドルに当たる新しい差額は要約では不明。",
-  "why": "ibm.com・newsroom.ibm.com と二次記事（techrepublic.com、bakerdonelson.com）がいずれも通信許可の外で、本文を開けなかった。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-c",
-  "tab": "companies",
-  "current_text": "世界のAI利用企業／エージェント本格化 88%／エージェント型AIは23%がスケール中・39%が実験中（McKinsey State of AI 2025）",
-  "concern": "McKinsey「The state of AI in 2026: On the road to ROI」が出ている模様。検索要約ではAI利用は引き続き約9割、エージェントをスケール中は全体で約2割・大企業で40%。",
-  "why": "mckinsey.com が HTTP 503 を返し本文を取得できなかった（回避はしていない）。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-c",
-  "tab": "companies",
-  "current_text": "AIのROIを完全達成した企業 28%／57%が『期待値が高すぎた』と回答。投資規律とROI設計が課題（Gartner 2026）",
-  "concern": "検索要約によると、出典は Gartner の 2026-04-07 のリリースで、28% は「インフラ・運用（I&O）部門のAIユースケースのうち、完全に成功しROI期待を満たした割合」（I&Oリーダー782人の調査）。アプリの「企業」という主語と対象範囲が合わない疑いがある。57% の定義も要約では2通りあり確定できない。",
-  "why": "gartner.com が HTTP 403 を返し本文を開けなかった。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-c",
-  "tab": "companies",
-  "current_text": "エージェントAIの中止見込み（2027末）40%超／実体あるエージェントベンダーは約130社のみ（Gartner 2025）",
-  "concern": "2027年末までの予測なので期限は過ぎていないが、Gartner が更新した予測を出していないかは未確認。",
-  "why": "gartner.com が 403 で開けなかった。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-c",
-  "tab": "companies",
-  "current_text": "国内 生成AI市場規模 1,016億→8,028億円／2024→2028、CAGR84.4%。JEITAは2030年に1兆7,774億円と別予測（IDC Japan）",
-  "concern": "IDC Japan の 2024年11月発表の予測。検索要約では CAGR 84.4% の期間は 2023〜2028年とされ、アプリの「2024→2028」と期間の書き方がずれる可能性がある。IDC の 2026-03-18 の発表は国内AI市場全体（2025年 2兆3,725億円→2029年 6兆8,897億円、CAGR 36.0%）で、生成AI単独の新しい予測は見つからなかった。",
-  "why": "生成AI単独の後継予測と、2024年11月の原発表の本文を開けていない（it.impress.co.jp は通信許可の外）。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-c",
-  "tab": "companies",
-  "current_text": "生成AIを導入済みの企業 57.7%（野村総研 IT活用実態調査2025）",
-  "concern": "2025-11-25 公表の値として正しいことは NRI のリリースで確認した。例年11月下旬に次の回が出るため、2026年版が近く公表される可能性がある。",
-  "why": "2026-11-11 時点で 2026年版のリリースは検索で見つからず、NRI のニュース一覧ページは一覧が表示されなかった。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "companies-c",
-  "tab": "companies",
-  "current_text": "面接準備（INTERVIEW_PLAYBOOK）：「LP16項目に案件をマッピング」",
-  "concern": "Amazon の Leadership Principles の数（16）が今も同じか。古い疑いは弱い。",
-  "why": "amazon.jobs・aboutamazon.com が通信許可の外で開けなかった。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
   "area": "factbook-a",
   "tab": "factbook",
   "current_text": "AIを定常利用する組織 78%（2024年）→88%（2025年）／EBIT貢献を示す「AI高パフォーマー」109社＝約5.5%／AIを全社スケールできた企業 約1/3 ほか — McKinsey「State of AI 2025」",
@@ -558,42 +279,6 @@
   "last_tried": "2026-11-12"
  },
  {
-  "area": "archcase",
-  "tab": "archcase",
-  "current_text": "gc: [\"Vertex AI Search\", \"Cloud Storage\"]（データ・RAG層）",
-  "concern": "検索結果では Vertex AI Search が「Agent Search」に改称（2026-04-22）とされる。",
-  "why": "Google Cloud のドキュメント（docs.cloud.google.com）がこの環境のネットワークで開けず、製品ページも本文が取れなかった。検索結果の題名と要約のみで、原文は未確認。コンソールやAPIでは旧名が残るとの報告もある。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "archcase",
-  "tab": "archcase",
-  "current_text": "gc: [\"Vertex AI Agent Builder\", \"ADK\"]（アプリ・オーケストレーション層）",
-  "concern": "Agent Builder は Gemini Enterprise Agent Platform に統合され、一部機能（Agent Engine→Agent Runtime 等）が改称されたとの報告がある。",
-  "why": "公式ブログ本文には Agent Builder の記載がなく、改称表（docs.cloud.google.com）は開けなかった。二次情報のみ。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "archcase",
-  "tab": "archcase",
-  "current_text": "ARCH_AG の構成図（Orchestrator Claude Sonnet 4.5、Nova 2 Lite など）",
-  "concern": "事例の公開時点のモデル名で、歴史的記述として正しい可能性が高い。",
-  "why": "原典（findy-tools）を開いて確認していない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "archcase",
-  "tab": "archcase",
-  "current_text": "事例中の Azure OpenAI Service 表記（ARCH_AG・ARCH_OFC の個別事例、Azure AI Document Intelligence など）",
-  "concern": "当時の構成の記述なので現行名への書き換えは不要と判断。",
-  "why": "Azure AI Document Intelligence の現行名は未確認。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
   "area": "toolbox-proposal",
   "tab": "proposal",
   "current_text": "PROP_BATTLE/営業用: 「Intercom Finの解決1件$0.99が公開参照例」",
@@ -617,33 +302,6 @@
   "current_text": "DBS S$10億(2025年)、MIT 完全内製の成功率約1/3",
   "concern": "新しい年次版の有無",
   "why": "出典ホストが開けず未確認",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "govdojo",
-  "tab": "govdojo",
-  "current_text": "2026年12月2日 同意のない性的画像・CSAM生成AIの禁止が適用（予定）／マーキング猶予の終了（2026年12月2日）",
-  "concern": "期限は未到来。欧州委員会ページは「2026年12月に適用」とのみ書き具体日は無い。12月2日の根拠はOJ本文(EUR-Lex)で、ボット確認のため本調査では読めていない",
-  "why": "EUR-Lex が取得不可。二次情報(法律事務所)のみ",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "govdojo",
-  "tab": "govdojo",
-  "current_text": "us-co-sb26-189 / X.AI v. Weiser の差止め状況",
-  "concern": "2026年10月下旬時点の二次報道(JD Supra, Jones Walker等)で、司法長官の規則は未確定・PI申立て未開始。11月以降の変化は確認できず",
-  "why": "州司法長官ページ・裁判所記録を開いていない(検索結果のみ)",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "govdojo",
-  "tab": "govdojo",
-  "current_text": "in-it-rules-synthetic-content-2026: 第二次改正案が確定したかは未確認",
-  "concern": "検索では2026年2月の改正のみ確認。第二次案の確定は見つからず",
-  "why": "MeitY/官報の一次ページを開いていない",
   "first_seen": "2026-11-12",
   "last_tried": "2026-11-12"
  },
@@ -698,105 +356,6 @@
   "current_text": "GF_*（採用・昇進・面接の定数）",
   "concern": "採用条件・年収などの時点依存",
   "why": "今回は見ていない",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "postmortem-industry",
-  "tab": "postmortem",
-  "current_text": "ニューヨーク市 事業者向けチャットボット：「市はその後改善対応を行ったと報じられている。」",
-  "concern": "検索結果の要約では、2026年1月末にMamdani市長が MyCity チャットボットの終了を表明し、2026年2月4日時点で停止（「beta test has ended」）と報じられている。続報として追記すべき可能性が高い。",
-  "why": "The Markup・StateScoop・Route Fifty・Vice・The Register・chat.nyc.gov など開ける出典のホストがすべて名前解決できず、原文を開けなかった（検索要約のみ）。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "postmortem-industry",
-  "tab": "value",
-  "current_text": "AIスキルの賃金プレミアムは56%（PwC）／賃金プレミアム56%（人材流出）ほか（VALUE_TREE 数か所・クイズ含む）",
-  "concern": "検索要約では PwC 2026 Global AI Jobs Barometer が平均賃金プレミアム62%（前年57%）と報じる。ただし MEGATECH_FACTBOOK は『2025年版：56%（前年25%）』と版を明記している。",
-  "why": "pwc.com の各ページが403で原文を開けなかった。置換には2025年版/2026年版の数字の整合（前年比の記述）も要るため未確認。クイズ（選択肢に56%を含む）にも及ぶ。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "postmortem-industry",
-  "tab": "assess",
-  "current_text": "日本企業の生成AI導入は57.7%（NRI）だがDX成果実感は58%（米89%、IPA）",
-  "concern": "IPA は2026年7月16日に DX動向2026 の要点を公表し、日本は『6割の企業が成果が出ている』と記す（前2回と大差なし）。『米89%』は DX動向2024 の値で、2025年版では米独とも8割超。米国の最新値と日本の正確な%は未確認。",
-  "why": "2026年版の詳細（データ集）は7月下旬公開予定でプレス資料には%と米国値がなく、DX動向2025/2026 の本編は開けなかった。クイズ（157941行付近）にも同じ数字がある。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "postmortem-industry",
-  "tab": "industry",
-  "current_text": "（クイズ）都道府県87.2%・指定都市90.0%・市区町村29.9%、ガイドライン策定82.7% ほか（157952・157961・157962 行付近のクイズ選択肢と解説）",
-  "concern": "自治体の導入率は2025年10月時点で都道府県・指定都市100%、その他市区町村45.6%に更新。クイズの選択肢・正解・解説（『指定都市90.0%が最も低い』『市区町村87.2%』などの誤答肢）が旧値を前提にしている。",
-  "why": "選択肢の長さの釣り合いと正解の論理（階層ごとの数字の取り違えを問う）が崩れるため置換案は出さない。『ガイドライン策定82.7%』は新調査の本文で確認できず（導入済団体の策定率は81%）、問題の作り直しが必要。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "postmortem-industry",
-  "tab": "industry",
-  "current_text": "Klarna：応対2/3自律化・$40M改善見込み（IND_DATA）／Klarnaは応対の3分の2を自律化し年間4,000万ドル規模の改善を見込むと公表（IND_DEEP2）",
-  "concern": "2024年2月の自社発表の数字を『実用段階』の根拠として現在形に近い形で使っている。検索要約では、Klarnaは2025年に品質低下を理由に人間の窓口を再び採用し始めたと報じられる（VALUE_TREE には既に『2025年に品質面から人の再雇用へ一部揺り戻し』の記載があり、タブ間で温度差がある）。",
-  "why": "Klarna・eMarketer・Fortune 等のホストを開けず（プロキシ/名前解決）、一次の原文を確認できなかった。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "postmortem-industry",
-  "tab": "industry",
-  "current_text": "顧客サービス案件の80%が2029年までにAI自律解決の予測（Gartner）",
-  "concern": "記述自体は Gartner 2025-03-05 のプレスリリース（'By 2029, agentic AI will autonomously resolve 80% of common customer service issues without human intervention'）と検索結果上は一致。",
-  "why": "gartner.com は403で原文を開けず、検索結果の要約のみ。更新の有無は未確認のため checked_ok には入れない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "postmortem-industry",
-  "tab": "industry",
-  "current_text": "DBS：2025年にS$10億到達を公表／パナソニック コネクト：年18.6万→45万時間／三菱UFJ：月22万時間／Morgan Stanley採用率98%／中国製造業AI適用率19.9%→25.9%／Siemens Industrial Copilot／IEA 945TWh／セブン-イレブン9割短縮／IKEA 8,500人／Walmart My Assistant／Wells Fargo 年2億回",
-  "concern": "企業発表ベースの数字で、新しい決算・発表で更新されている可能性がある。",
-  "why": "dbs.com・news.panasonic.com・mufg.jp・morganstanley.com・news.siemens.com・7andi.com・ikea.com・corporate.walmart.com は許可リスト外、iea.org は403で、原文を開けなかった。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "postmortem-industry",
-  "tab": "value",
-  "current_text": "開発者の90%が業務でAI利用（DORA）。一方ガードなし導入は安定性-7.2%（DORA）",
-  "concern": "90%は DORA 2025（Google Cloud の発表）の値だが、-7.2% は DORA 2024 の値と思われ、年版が混在している可能性。",
-  "why": "dora.dev は許可リスト外。cloud.google.com の2025年版発表は検索要約でしか確認できず、-7.2% の出所の版を確かめられなかった。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "postmortem-industry",
-  "tab": "value",
-  "current_text": "AI関連侵害の97%が統制欠如（IBM）／AI生成コードの45%に脆弱性（Veracode）／Prosci 88%vs13%・79%vs27%／AI先行企業TSR 3.6倍（BCG）／PoCの46%放棄（S&P）／EY +34%",
-  "concern": "年次調査の新版が出ている可能性。",
-  "why": "newsroom.ibm.com・veracode.com・prosci.com・spglobal.com・ey.com は許可リスト外で開けなかった。bcg.com は時間の都合で確認に至らず。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "postmortem-industry",
-  "tab": "postmortem",
-  "current_text": "Deloitte Australia：『同社は一部返金に応じたと報じられている』",
-  "concern": "検索要約では、2025年10月に報告書（A$440,000規模）の最終回の支払分を返金すると報じられており、記述と整合。Deloitte のカナダ（Newfoundland）報告書の件など続報の有無は未確認。",
-  "why": "Deloitte・DEWR・ABC など一次または報道の原文のホストが許可リスト外で、原文を開けなかった（Wikipedia の Deloitte ページには該当記述なし）。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "postmortem-industry",
-  "tab": "postmortem",
-  "current_text": "McDonald's AIドライブスルー：2024年にパイロットを終了すると発表",
-  "concern": "検索要約では IBM との試験は2024年7月26日までに終了、同社は年末までに今後の音声注文の方針を決めるとした。その後の続報（後継の音声注文の導入有無）は未確認。",
-  "why": "nrn.com・abcnews 等の原文を開いておらず、続報の一次情報も見つけられなかった。",
   "first_seen": "2026-11-12",
   "last_tried": "2026-11-12"
  },
@@ -860,150 +419,6 @@
   "current_text": "NIST SP 800-88（データ消去）",
   "concern": "SP 800-88 は2025年9月に Rev.2 が最終版になったと検索結果が伝える。原稿は版を書いていないので誤りではないが、手順表の記述がある場合は影響しうる。",
   "why": "csrc.nist.gov は名前解決できず開けない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "checks-notes",
-  "tab": "checkcore",
-  "current_text": "McKinsey State of AI の数値（定常利用88%、スケール報告約1/3、フルスケール7%、高パフォーマー5.5%、HITL 65%対23%、変革成功率約30%）",
-  "concern": "McKinsey「The state of AI in 2026: On the road to ROI」（調査期間2026-05-04〜06-08）が出ている。検索結果の要約では大企業の40%がエージェントを拡大（前年27%）、EBIT寄与37%、高パフォーマー約6%とあり、問題の数値は旧版の可能性が高い。",
-  "why": "www.mckinsey.com が503で本文を開けず、原文の引用が取れない。問題の正解・選択肢の釣り合いに関わるため、版の確認後に作り直しが必要。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "checks-notes",
-  "tab": "checkcore",
-  "current_text": "K3 PoCの放棄状況（S&P Global：PoC全体の46%、企業の42%）",
-  "concern": "2025-10-27のS&P研究ページがこの2つの数字の出所と思われる（検索結果の要約）。新版の有無は不明。",
-  "why": "www.spglobal.com が名前解決できず開けない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "checks-notes",
-  "tab": "checkcore",
-  "current_text": "Gartner：エージェント型AI案件の40%超が2027年末までに中止／顧客サービス80%が2029年までに自律解決（問題多数・ISSUE_TREEにも）",
-  "concern": "2025-06-25と2025-03-05の発表。その後の更新・撤回の有無を一次情報で確認したい。",
-  "why": "gartner.com が403で開けない。報道は複数あるが一次情報の本文を引用できない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "checks-notes",
-  "tab": "checkcore",
-  "current_text": "企業のAI支出は2025年に$37B／LLMシェア Anthropic約40%・OpenAI約27%・Google約21%／ヘルスケア$1.5B・43%／ARR$100M超50製品・$1B超10製品／商談の本番到達率47%対SaaS25%（Menlo Ventures、K3 数問）",
-  "concern": "Menlo 2026年版（2026-11-03）では2025年の基線が$33B、シェアが55/31/9に変わっている。『分散している』が正解の理由になっている問題は、数字を新版に替えると正解の根拠が崩れるため出題の作り直しが必要。",
-  "why": "選択肢・正解の理屈に関わる変更で、長さの釣り合いや正解番号を保つ置換案を作れない（2025年版の値自体は2025-12-09ページで確認済み）。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "checks-notes",
-  "tab": "checkcore",
-  "current_text": "K3 地方自治体の導入状況（総務省）の『ガイドライン策定率82.7%』",
-  "concern": "令和7年度資料には82.7%に当たる値が見つからない。置換案では『導入済団体の81%が策定済』（資料p.11）に替えたが、元の82.7%が何の指標だったか（令和6年度の別集計か）は未確認。",
-  "why": "令和6年度の資料を開いて突き合わせていない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "checks-notes",
-  "tab": "checkcore",
-  "current_text": "ISO/IEC 42001の認証組織は『350超』",
-  "concern": "検索結果では2026年半ばで約350、2026年初頭で500未満と出所により異なり、公式の集計がない。",
-  "why": "公式の集計ページがなく、検索要約しか根拠が無い。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "checks-notes",
-  "tab": "checkcore",
-  "current_text": "IBM Cost of a Data Breach 2025（97%・16%・平均$4.44M・米$10.22M）／ISSUE_TREE『データ侵害の世界平均コストは444万ドル』",
-  "concern": "NOTE_GOV の出典欄に IBM 2026年版（2026-07-29、全体平均$4.99M、悪意ある侵害の1/4がAI起点）がある。『IBM 2025』と年は明記されているが、『now』と現在形の英文がある。",
-  "why": "newsroom.ibm.com が名前解決できず、2026年版の本文を確認できない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "checks-notes",
-  "tab": "issues",
-  "current_text": "実際のAI利用は拡張が主流（拡張57%対自動化43%、Anthropic Economic Index）",
-  "concern": "Anthropic Economic Index は更新が続く（ページの最終更新 2026-06-26）。57%/43%が最新版の値か不明。",
-  "why": "anthropic.com/economic-index の数値部分は『Loading data』で本文に出ず、確認できない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "checks-notes",
-  "tab": "issues",
-  "current_text": "AIスキル保有者の賃金プレミアム56%（PwC Global AI Jobs Barometer 2025）／AI導入でスループット-1.5%・変更安定性-7.2%（Google DORA 2024）／クラウド支出の27〜29%が無駄（Flexera）",
-  "concern": "いずれも年次調査で、2026年版・DORA 2025が出ている可能性が高い。年次は明記されているため誤りとは断定できない。",
-  "why": "pwc.com が403、dora.dev と flexera.com は名前解決できず開けない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "checks-notes",
-  "tab": "noteissues",
-  "current_text": "NOTE_GOV の出典欄：IBM 2026年版プレスリリース、Dario Amodei『We Must Pace the Frontier』、Axios（OpenAI 6件開示）、OpenAI Hugging Face 事案報告、California EO N-9-26、Anthropic×Accenture",
-  "concern": "一次ソースの記述（数字・日付）が原文と合っているか。",
-  "why": "newsroom.ibm.com、darioamodei.com、www.axios.com、www.gov.ca.gov は名前解決できず、openai.com は403。金融庁の公表日（2026-09-15）だけ確認できた。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "checks-notes",
-  "tab": "noteissues",
-  "current_text": "NOTE_CORPORA の期間表記：follow『2026-07-01〜09-22』（記事の最初は07-02）、bpr/hayatasu『〜2026-10-13』（記事の最後は10-12／10-10）",
-  "concern": "期間が収集期間なのか記事の日付範囲なのかが画面から分からず、1〜3日のずれがある。",
-  "why": "記事データの内部事情で、外部の出典では確かめられない。誤りとは断定できないため置換案は出さない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "checks-notes",
-  "tab": "checkax",
-  "current_text": "AI導入率『約88%がAI導入に向けて取り組んでいる』は149403で新値を確認済みだが、AX系の問題で『多数派』『導入29.9%の市区町村』と書く表現",
-  "concern": "置換後も論旨は変わらない。ほか、METI『DXレポート』の12兆円・21年超・79万人（K3）が最新の版か。",
-  "why": "meti.go.jp が403で開けない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "dojo-quiz",
-  "tab": "dojo-quiz",
-  "current_text": "デジタル市場法(DMA)とAIの関係…現時点でAIシステム自体は中核的プラットフォームサービス(CPS)として指定されていない",
-  "concern": "2026年7月に欧州委員会が ChatGPT のゲートキーパー指定の可能性を評価中と報じられた。現時点の指定有無が変わっている可能性。",
-  "why": "二次報道のみ。欧州委員会の一次ページで確かめられず。今の本文は 2026-11 時点で指定報道が見当たらないため食い違いは未確定。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "dojo-quiz",
-  "tab": "dojo-quiz",
-  "current_text": "Googleが2024年末に示した『Project Mariner』は何のプロトタイプか（ブラウザを操作するエージェント）",
-  "concern": "Project Mariner は 2026-05-04 に終了との二次報道。",
-  "why": "deepmind.google は開けず、Google の一次情報で終了を確認できなかった。問題は2024年末の出来事として過去形で正しく、直す必要は薄い。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "dojo-quiz",
-  "tab": "dojo-quiz",
-  "current_text": "EU AI法の整合規格…CEN-CENELEC JTC 21 が開発を担っている（現在の位置づけ）",
-  "concern": "EN 18286:2026 が 2026-10-14 に官報で参照され最初の整合規格になったとの報道がある。正解は変わらないが「現在の位置づけ」に追記余地。",
-  "why": "ブログ等の二次情報のみ。EUR-Lex の官報を確認できていない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "dojo-quiz",
-  "tab": "dojo-quiz",
-  "current_text": "IPA DX動向2025／総務省 令和7年版／総務省2025 の統計問題（49.7%・26.7%・85.1% など）",
-  "concern": "新版が出ている（総務省 令和8年版：個人の生成AI利用経験 日本58.8%、IPA DX動向2026：2026-07-30 公開）。",
-  "why": "問題文が版（2025）を明記しているため現状でも正しい。新版の方針策定率 68.9%・DX人材量 85.5% は候補ファイルの記載で、白書PDFが10MB超で開けず、IPAは本文PDFを確認できなかった。版を差し替える場合は選択肢の組み直しが必要なので置換案は出さない。",
   "first_seen": "2026-11-12",
   "last_tried": "2026-11-12"
  },
@@ -1121,69 +536,6 @@
   "current_text": "c215 IBM / c287 gihyo / c308 gamma / c311 seplus / c312 courrier / c313 newsinlevels / c338 studyhacker / c344 rondely ほか Instagram・X(t.co)・LinkedIn・Notion・share.google・brainpad",
   "concern": "リンクが開くか",
   "why": "プロキシが拒否するか、ログイン・短縮URLで確認できない",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "strategy-xform",
-  "tab": "xform",
-  "current_text": "G検定：145問前後／100分・13,200円（学生5,500円）、累計合格15万人超、合格率8割前後",
-  "concern": "受験料・問題数・累計合格者数・シラバス改定。検索要約に『2026年からオンライン100分・145問に加え会場試験120分・145問が年3回新設』『シラバスは2024年11月改訂版』とあり、会場試験の追加で『100分』の書き方が不完全になる可能性",
-  "why": "JDLA公式は開けず、二次情報（TAC資料・ai-souken・craftai）はホスト解決できず本文を開けなかった。開けたページが無く、検索結果の要約だけでは根拠にしない規則のため未確認。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "strategy-xform",
-  "tab": "xform",
-  "current_text": "生成AIパスポート：60問／60分・42問正解（70%）で合格・11,000円、自宅受験（IBT）",
-  "concern": "受験料・合格基準。検索要約に『学生は5,500円』『合格基準は非公開とする記事もある』とあり、『42問正解（70%）で合格』と『学生料金の有無』が食い違う可能性",
-  "why": "guga.or.jp は開けず、LEC・atsoho・agaroot・uravation も本文を開けなかった。開けたページが無く、検索結果の要約だけでは根拠にしない規則のため未確認。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "strategy-xform",
-  "tab": "xform",
-  "current_text": "統計検定2級：CBT 35問前後／90分・60点以上で合格、受験料7,000円（学生5,000円）、一般電卓1台",
-  "concern": "受験料・出題範囲・電卓規定。検索要約では7,000円（学生5,000円）・90分・35問前後・60点と一致したが二次情報のみ",
-  "why": "toukei-kentei.jp / sikaku.gr.jp は開けず、LEC も開けなかった。開けたページが無く、検索結果の要約だけでは根拠にしない規則のため未確認。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "strategy-xform",
-  "tab": "strategy",
-  "current_text": "ROADMAP・RADAR・ASSETS（資格名など）",
-  "concern": "ROADMAP_MEGATECH・COMP・ASSETS の資格名",
-  "why": "原稿の洗い出しは実施: 候補は『最新手法』の2件のみで時点依存ではない。ASSETS の『Azure保有＋AWS/GCP学習中』は本人の状況で外部事実ではない。ROADMAP_MEGATECH の『AWS ML系資格』は名称が特定されず、出典で照合できる固有の資格名が無い。COMP の資格名は出典を開けず照合していない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "strategy-xform",
-  "tab": "consult",
-  "current_text": "CONSULT_STATS・CONSULT_MAP・TACIT_WORLD・BPR_*",
-  "concern": "CONSULT_STATS: McKinsey『88%→5.5%』『21%』、S&P Global『46%』、Prosci『88% vs 13%』が新しい版に置き換わっていないか。検索結果に McKinsey『The state of AI in 2026: On the road to ROI』があり、二次情報はEBIT貢献37%・高成果6%と報じる。原稿の5.5%とは別の版・別の指標の可能性",
-  "why": "mckinsey.com は 503、spglobal.com・prosci.com は名前解決失敗で開けず。二次情報は本文を開けていない。tacit（TACIT_WORLD）・bpr は出典付きの統計が無く事例の時点も照合できなかった。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "strategy-xform",
-  "tab": "consult",
-  "current_text": "DXで成果を実感する企業は日本58%に対し米国89%（IPA DX白書）",
-  "concern": "どの年の調査か書かれていない。IPA「DX動向2025」のディスカッション・ペーパーは別の指標（効率化と成長の両方で成果：日本26.8%・米国80.9%・ドイツ77.6%）を示しており、ファクトブックは「日本約6割 vs 米独8割超」と書いている。58%・89% の出典の版を確かめて時点を明記する必要がある。",
-  "why": "58%・89% が載っている DX白書の本文を開いて確かめていない（ディスカッション・ペーパーには無い）。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-12"
- },
- {
-  "area": "strategy-xform",
-  "tab": "consult",
-  "current_text": "AI定常利用は88%に達する一方、EBIT貢献を実証できる企業は約5.5%（McKinsey）／ワークフロー再設計は実施21%（McKinsey）／AI PoCの46%が本番前に放棄（S&P Global）／ISO/IEC 42001認証は既に350組織超",
-  "concern": "McKinsey は2026年版の State of AI を出しているとの二次情報があり、数字が変わっている可能性がある。S&P と ISO 42001 の件数も新しい値がある可能性。",
-  "why": "www.mckinsey.com は 503、www.spglobal.com は許可リスト外で開けない。",
   "first_seen": "2026-11-12",
   "last_tried": "2026-11-12"
  },
@@ -1427,6 +779,654 @@
   "current_text": "DIAGRAMS の外部モデルAPIノードのラベル en: \"Bedrock/Vertex/Azure\"",
   "concern": "Vertex は改称済み",
   "why": "図のノード幅に収まる長さが分からず、ラベルだけ伸ばすと崩れる恐れ。説明文は直した。表記上の短縮であり事実誤りとまでは言えないため置換案を出さない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "companies-a",
+  "tab": "companies",
+  "current_text": "AgentKit（Agent Builder/Evalsは2026年11月30日に提供終了予定）",
+  "concern": "終了予定日まで19日。11月30日を過ぎると「予定」のままでは古くなる。日付そのものも一次情報で確かめられていない。",
+  "why": "再試行：OpenAI Python SDK の変更履歴（v3.50.0・2026-11-12 まで）に Agent Builder／AgentKit の語は無く、openai.com 系は開けない。11月30日の終了予定は未確認のまま（期限は未到来）。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-a",
+  "tab": "companies",
+  "current_text": "…ChatGPT Enterpriseの業務統合、Secure MCP Tunnel、評価とファインチューニング。",
+  "concern": "「Secure MCP Tunnel」という名称と現在の提供状況が未確認。",
+  "why": "OpenAI 公式ページを開けず、公式 SDK の更新履歴にも該当語が無かった。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-a",
+  "tab": "companies",
+  "current_text": "Apple Intelligence（Siri AI・iOS 27で2026年9月に英語ベータ開始）・オンデバイスML・Private Cloud Compute",
+  "concern": "記述は二次情報と一致するが、現在もベータ・英語のみかは未確認。iOS 27.3 のベータが11月3日に出ており、対応範囲が近く変わる可能性がある。",
+  "why": "apple.com・support.apple.com・machinelearning.apple.com はこの環境の許可外。Wikipedia では iOS 27 が 2026-09-14 公開、Siri AI はベータ、最新版は 27.2.1（11月9日）、EU と中国は開始時に対象外と確認できた。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-a",
+  "tab": "companies",
+  "current_text": "Apple｜AIML (Apple Intelligence)",
+  "concern": "組織名「AIML」が現状と合わない可能性。2025年12月1日に Giannandrea 氏の退任と、AI 組織の Federighi 氏（Subramanya 氏）・Khan 氏・Cue 氏への再編が発表されたとされる。",
+  "why": "Apple ニュースルームと配信元（businesswire）を開けず、検索結果の要約しか見られていない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-a",
+  "tab": "companies",
+  "current_text": "Gemini Enterprise（旧Agentspace）",
+  "concern": "Google Cloud の製品ページ（cloud.google.com/gemini-enterprise）の題が「Gemini for business: The universal work agent」になっている。製品名が変わったのか、売り出し方の表記だけなのか不明。",
+  "why": "Google の docs 検索結果の要約は「2025-10-09 に Agentspace は Gemini Enterprise の一部になった」と一致するが、公式ページ本文で改称の文は開けなかった（Gemini Enterprise のリリースノートは先頭10万字に該当文なし、残りは未読）。名称は変更の兆候なし。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-a",
+  "tab": "companies",
+  "current_text": "CUDA・NIM・NeMo・Dynamo-Triton（旧Triton Inference Server）・DGX Cloud",
+  "concern": "DGX Cloud を顧客向け製品として並べているが、NVIDIA の公式ページは「DGX Cloud is NVIDIA's internal cloud environment for building and operating AI at scale to support NVIDIA's most demanding internal AI use cases.」と自社内向けの環境として説明している。",
+  "why": "同じページに「NVIDIA DGX Cloud with AWS／Google Cloud／Microsoft Azure／OCI」の提供案内も残っており、外販をやめたとは断定できない。縮小の報道は検索結果の要約しか見られていない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-a",
+  "tab": "companies",
+  "current_text": "Amazon Q（Q Businessは2026年7月31日以降は新規顧客の受付終了、…）",
+  "concern": "新規受付の終了と移行先（Amazon Quick）は公式ドキュメントで確認できたが、「2026年7月31日」という日付は開いたページの本文に無かった。",
+  "why": "再確認：Q Business の availability-change ページ（新規顧客の受付終了・Quick への移行）は開けたが、本文に「2026年7月31日」の日付は無い。日付だけ未確認。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-a",
+  "tab": "companies",
+  "current_text": "Muse Spark（2026年4月・Superintelligence Labs初のモデル）／2026年4月公開のMuse Sparkはウェイト非公開でMeta AIに搭載",
+  "concern": "「Superintelligence Labs 初のモデル」「ウェイト非公開」と、Muse Wonder の公開日（2026-10-12 と報道）・位置づけを一次情報で確かめられていない。",
+  "why": "about.fb.com と research.meta.ai は許可外。ai.meta.com では Muse Spark（2026-04-08）と Muse Spark 1.1（2026-07-09）の記事、および研究ページの説明文にある「the new Muse Wonder series」までしか確認できなかった。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-a",
+  "tab": "companies",
+  "current_text": "…ADK v1.0とA2A本番、managed MCPサーバ…",
+  "concern": "「A2A本番」「managed MCPサーバ」の現在の提供状況は未確認（アプリの文は今は「ADK 2.0（Python版は2026年5月にGA）」に直っている）。",
+  "why": "docs.cloud.google.com の関連ページは本文を確かめきれず、ADK 2.0 の GA 日は GitHub のリリース一覧（v2.14.1＝11月12日が最新、2.x が現行）では確認できなかった。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-b",
+  "tab": "companies",
+  "current_text": "実装事例 › 各社エージェント基盤の競争：Amazon AgentCore、Google Agentspace/Vertex、Microsoft Agent Service、Salesforce Agentforce等 ／ 比較表 Google 行：Agentspace / Vertex",
+  "concern": "同じタブの Google カードは「Gemini Enterprise（旧Agentspace）」「Gemini Enterprise Agent Platform（旧Vertex AI）」と書いており、タブ内で名称が食い違う。",
+  "why": "Google は companies-a の担当範囲。置換が衝突しないよう、こちらからは置換案を出していない。Google Cloud のブログ（2026-05-13）で「Gemini Enterprise Agent Platform」の表記は見た。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "companies-b",
+  "tab": "companies",
+  "current_text": "Oracle カード：OCI Generative AI・OCI Enterprise AI・Autonomous AI Database（旧Autonomous Database）・Fusion AI ／ 比較表 Oracle 行：OCI Gen AI｜Fusion AI",
+  "concern": "カードの最終確認（2026-10-25）の翌日から Oracle AI World 2026 が開かれており、検索結果では Fusion Agentic Applications・Fusion Claw・Oracle AI Workspace（OpenAI との協業）などが出ている。「Fusion AI」は正式な製品名ではなく、エージェント基盤の正式名は Oracle AI Agent Studio for Fusion Applications とみられる。",
+  "why": "再試行：oracle.com は403、Google Cloud ブログ（2026-11-06）で「Oracle Autonomous AI Database」「Fusion AI Agent Studio」の表記を前回見たのみ。Oracle 公式ページの本文は開けない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-b",
+  "tab": "companies",
+  "current_text": "ServiceNow カード：Now Assist（生成AIアシスト）、AI Agents（自律ワークフロー）、Now LLM/連携モデル… ／ 逆質問例「Now Assist導入で…」／ 比較表：Now LLM｜AI Agents / Now Assist",
+  "concern": "検索結果の要約では、製品内のラベルや文書で Now Assist・Moveworks・AI Experience の表記が ServiceNow Otto に改められたとある。Now Assist の名称が今も製品名として残っているかは不明。",
+  "why": "servicenow.com は名前解決できず開けない。検索結果の要約では、Otto が Now Assist・Moveworks・AI Experience を『reimagined as ServiceNow Otto』と統合し、Now Assist の公式ページは『Otto は Now Assist の改称ではない』と書くとある。Now Assist が現役の製品名かを本文で確かめられない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-b",
+  "tab": "companies",
+  "current_text": "Salesforce カード：Einstein Trust Layer（ガードレール/マスキング）",
+  "concern": "公式の Trusted AI ページは見出しと本文で「Salesforce Trust Layer」を使い、「Einstein Trust Layer」は FAQ に1回だけ残る。改称された可能性がある。",
+  "why": "検索結果の要約では、Salesforce の金融向けページが「Agentforce Trust Layer（formerly Einstein Trust Layer）」、Trailhead に「Meet the Agentforce Trust Layer」があるが、help.salesforce.com の主な記事は今も Einstein Trust Layer。両表記が併存し、改称の発表日を確定できない（ページ本文は開けていない）。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-b",
+  "tab": "companies",
+  "current_text": "日本市場：漏洩組織の20%がシャドーAI関連、63%はAIガバナンス方針が未整備または策定中（IBM Cost of a Data Breach 2025）。",
+  "concern": "2026年版が出ている（アプリの別の箇所は 2026-07-29 のプレスリリースを既に引用している）。二次情報では、シャドーAI関与は43%、AIガバナンスの欠如は68%に更新されている。担当の定数（COMPANIES・CASES・COMPARE）の外だが、同じタブ内にある。",
+  "why": "www.ibm.com がネットワーク許可外で原典を開けない。数字は二次情報（検索結果の要約）だけ。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-b",
+  "tab": "companies",
+  "current_text": "実装事例 › 業界横断調査（Databricks / Gartner）：エージェント搭載エンタープライズアプリは5%未満→40%へ急拡大予測。9割超の企業がAIスプロールを懸念。",
+  "concern": "Gartner の予測は「2025年の5%未満→2026年末までに40%」で、対象年が目前だが文中に年が無い。「9割超がAIスプロールを懸念」は Databricks・Gartner のどちらの調査か特定できなかった。",
+  "why": "gartner.com が 403 で開けない。AIスプロールの出典は探し切れていない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-b",
+  "tab": "companies",
+  "current_text": "比較表 Snowflake 行：Arctic / Cortex",
+  "concern": "Arctic（2024年公開の自社モデル）を今も主力モデルと呼べるか。公式トップページの製品紹介には CoCo・CoWork・Cortex が並び、Arctic は出てこない。",
+  "why": "docs.snowflake.com がネットワーク許可外で、モデルの提供状況を確かめられない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-c",
+  "tab": "companies",
+  "current_text": "PKSHA Technology：対話AI（PKSHA ChatAgent〔旧PKSHA Chatbot・2025年8月改称〕・PKSHA VoiceAgent / AIヘルプデスク）",
+  "concern": "製品名・改称時期・経営陣に変更がないか。検索結果の要約では ChatAgent の名称は継続、2026年に PKSHA Dialogue の本格提供、PKSHA Voice AI の API 提供（8月）、VideoTouch の子会社化（6月）があり、代表は上野山勝也氏のまま。アプリの記述と矛盾する情報は見当たらなかった。",
+  "why": "2026-11-13 に再試行。pkshatech.com・prtimes.jp・it.impress.co.jp がこのセッションの通信許可の外で、本文を開けなかった（検索要約のみ）。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-c",
+  "tab": "companies",
+  "current_text": "エクサウィザーズ：法人向け生成AI「exaBase AI」〔旧exaBase 生成AI・2026年7月1日改称〕",
+  "concern": "改称の日付（7月1日）と提供会社。検索要約では「2026年7月より exaBase AI に名称変更」、提供は Exa Enterprise AI、親会社の代表取締役社長CEOは春田真氏で、アプリと矛盾しない。",
+  "why": "2026-11-13 に再試行。exawizards.com が通信許可の外で開けなかった。日付（1日）までは要約で確認できていない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-c",
+  "tab": "companies",
+  "current_text": "ABEJA：エンタープライズプラットフォーム事業（旧デジタルプラットフォーム事業・2026年4月に名称変更）",
+  "concern": "名称変更の時期。検索要約では 2026-04-14 に変更を発表しており、アプリと一致する見込み。2026年8月期の通期決算は確認できていない。",
+  "why": "2026-11-13 に再試行。abejainc.com・TDnet の開示PDF（jpx.co.jp、finboard）が通信許可の外で開けなかった。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-c",
+  "tab": "companies",
+  "current_text": "Laboro.AI：カスタムAIソリューション／ソリューションデザイナ、機械学習エンジニア、AXプロデューサー",
+  "concern": "経営陣・事業名の変更。検索要約では代表取締役CEO 椎橋徹夫氏・COO兼CTO 藤原弘将氏のままで、社名変更やTOBの情報は無い。「AGT-X」立ち上げという見出しがあり、事業の柱の説明が変わっている可能性がある。",
+  "why": "2026-11-13 に再試行。laboro.ai と決算説明の本文を開けなかった（通信許可の外）。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-c",
+  "tab": "companies",
+  "current_text": "ギブリー：Track（Track Test・Track Talent Assessmentなど）・法人向け生成AI研修/導入支援・DX人材事業",
+  "concern": "主力の生成AI製品名。検索要約では 2026年の発表は「MANA Studio」「MANA Buddy」「Givery AIスキル標準 /2026」が中心で、アプリの製品欄に MANA Studio が無い。Track Test の名称が現行かも確認できていない。",
+  "why": "2026-11-13 に再試行。givery の公式サイト・prtimes.jp・webtan.impress.co.jp が通信許可の外で開けなかった。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-c",
+  "tab": "companies",
+  "current_text": "FLUX：9ドメイン/27オファリング体制（…提供営業資料ベース）／確認日「未再確認（記載は2026年7〜9月の作成時点のもの）」",
+  "concern": "体制の記述は営業資料が根拠で、公開情報では確かめられない。検索要約ではシリーズCで総額60億円の調達、2026-08-26 に JAPAN & AI SUMMIT 2026 を開催、代表は永井元治氏。",
+  "why": "2026-11-13 に再試行。公開の一次情報に「9ドメイン/27オファリング」の記載が見つからず、公式サイトも通信許可の外。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-c",
+  "tab": "companies",
+  "current_text": "Slalom：日本法人は2019年設立・2021年本格始動、港区愛宕。",
+  "concern": "Slalom 日本語サイトの Who we are は「2020 日本で設立されました」と表示しており、アプリの「2019年設立」（JETRO の2021年の告知が根拠）と1年ずれる。所在地（愛宕グリーンヒルズMORIタワー7F）は公式サイトで確認できた。",
+  "why": "2026-11-13 に再試行。JETRO のページ（jetro.go.jp）が通信許可の外で開けず、登記上の設立年月を確かめられなかった。どちらが正しいか決められない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-c",
+  "tab": "companies",
+  "current_text": "Slalom：規模は資料により差（全社 約1万〜1.3万人／売上 約30億ドル）。",
+  "concern": "公式の人数・売上が出ていないか。公式サイトのリリース定型文（2026-08-06）は「54 offices in 12 countries」とだけ書き、人数・売上は載せていない。日本語サイトは「11カ国、45拠点」と古い数字のまま。",
+  "why": "2026-11-13 に再試行。公式の人数・売上の記載が見つからなかった。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-c",
+  "tab": "companies",
+  "current_text": "シャドーAI起因の情報漏洩コスト +67万ドル／漏洩組織の20%がシャドーAI関連、63%はAIガバナンス方針が未整備または策定中（IBM Cost of a Data Breach 2025）",
+  "concern": "2026年版が出ている模様。検索要約（二次記事）では世界平均 499万ドル、シャドーAI関与は 43%（前年20%）、AIガバナンス未整備 68%（前年63%）。+67万ドルに当たる新しい差額は要約では不明。",
+  "why": "2026-11-13 に再試行。ibm.com・newsroom.ibm.com と二次記事（techrepublic.com、bakerdonelson.com）がいずれも通信許可の外で、本文を開けなかった。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-c",
+  "tab": "companies",
+  "current_text": "世界のAI利用企業／エージェント本格化 88%／エージェント型AIは23%がスケール中・39%が実験中（McKinsey State of AI 2025）",
+  "concern": "McKinsey「The state of AI in 2026: On the road to ROI」が出ている模様。検索要約ではAI利用は引き続き約9割、エージェントをスケール中は全体で約2割・大企業で40%。",
+  "why": "2026-11-13 に再試行。mckinsey.com が HTTP 503 を返し本文を取得できなかった（回避はしていない）。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-c",
+  "tab": "companies",
+  "current_text": "AIのROIを完全達成した企業 28%／57%が『期待値が高すぎた』と回答。投資規律とROI設計が課題（Gartner 2026）",
+  "concern": "検索要約によると、出典は Gartner の 2026-04-07 のリリースで、28% は「インフラ・運用（I&O）部門のAIユースケースのうち、完全に成功しROI期待を満たした割合」（I&Oリーダー782人の調査）。アプリの「企業」という主語と対象範囲が合わない疑いがある。57% の定義も要約では2通りあり確定できない。",
+  "why": "2026-11-13 に再試行。gartner.com が HTTP 403 を返し本文を開けなかった。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-c",
+  "tab": "companies",
+  "current_text": "エージェントAIの中止見込み（2027末）40%超／実体あるエージェントベンダーは約130社のみ（Gartner 2025）",
+  "concern": "2027年末までの予測なので期限は過ぎていないが、Gartner が更新した予測を出していないかは未確認。",
+  "why": "2026-11-13 に再試行。gartner.com が 403 で開けなかった。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-c",
+  "tab": "companies",
+  "current_text": "国内 生成AI市場規模 1,016億→8,028億円／2024→2028、CAGR84.4%。JEITAは2030年に1兆7,774億円と別予測（IDC Japan）",
+  "concern": "IDC Japan の 2024年11月発表の予測。検索要約では CAGR 84.4% の期間は 2023〜2028年とされ、アプリの「2024→2028」と期間の書き方がずれる可能性がある。IDC の 2026-03-18 の発表は国内AI市場全体（2025年 2兆3,725億円→2029年 6兆8,897億円、CAGR 36.0%）で、生成AI単独の新しい予測は見つからなかった。",
+  "why": "2026-11-13 に再試行。生成AI単独の後継予測と、2024年11月の原発表の本文を開けていない（it.impress.co.jp は通信許可の外）。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-c",
+  "tab": "companies",
+  "current_text": "生成AIを導入済みの企業 57.7%（野村総研 IT活用実態調査2025）",
+  "concern": "2025-11-25 公表の値として正しいことは NRI のリリースで確認した。例年11月下旬に次の回が出るため、2026年版が近く公表される可能性がある。",
+  "why": "2026-11-13 に再試行。2026-11-11 時点で 2026年版のリリースは検索で見つからず、NRI のニュース一覧ページは一覧が表示されなかった。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "companies-c",
+  "tab": "companies",
+  "current_text": "面接準備（INTERVIEW_PLAYBOOK）：「LP16項目に案件をマッピング」",
+  "concern": "Amazon の Leadership Principles の数（16）が今も同じか。古い疑いは弱い。",
+  "why": "2026-11-13 に再試行。amazon.jobs・aboutamazon.com が通信許可の外で開けなかった。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "dojo-quiz",
+  "tab": "dojo-quiz",
+  "current_text": "デジタル市場法(DMA)とAIの関係…現時点でAIシステム自体は中核的プラットフォームサービス(CPS)として指定されていない",
+  "concern": "2026年7月に欧州委員会が ChatGPT のゲートキーパー指定の可能性を評価中と報じられた。現時点の指定有無が変わっている可能性。",
+  "why": "2026-07-30にCommission報道官がChatGPT等がDMA閾値超と述べた段階で、正式指定は見当たらない（二次報道）。ChatGPT検索は2026-08-31頃にDSAのVLOSEに指定（DMAではない）。Commission一次ページは開けず、現状の正解文は崩れていないので直さない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "dojo-quiz",
+  "tab": "dojo-quiz",
+  "current_text": "Googleが2024年末に示した『Project Mariner』は何のプロトタイプか（ブラウザを操作するエージェント）",
+  "concern": "Project Mariner は 2026-05-04 に終了との二次報道。",
+  "why": "deepmind.google・projectmariner.google は名前解決できず一次情報を開けなかった。複数の報道は2026-05-04終了とするが二次情報。設問は『2024年末に示した』と過去形で正しいので置換案は出さない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "dojo-quiz",
+  "tab": "dojo-quiz",
+  "current_text": "IPA DX動向2025／総務省 令和7年版／総務省2025 の統計問題（49.7%・26.7%・85.1% など）",
+  "concern": "新版が出ている（総務省 令和8年版：個人の生成AI利用経験 日本58.8%、IPA DX動向2026：2026-07-30 公開）。",
+  "why": "新版の本文を開けず（総務省白書・IPA本文）。問題文が版（2025）を明記しているため現状でも正しい。版差し替えは選択肢の組み直しが必要なので置換案を出さない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "dojo-quiz",
+  "tab": "dojo-quiz",
+  "current_text": "OpenAIが Assistants API の後継として打ち出したエージェント向けAPI（Responses API）",
+  "concern": "Assistants API の廃止日（2026年中と案内）が過ぎている可能性。",
+  "why": "platform.openai.com が開けず、openai-python の変更履歴にも記載なし。解説は『段階的廃止を告知した』と過去形で、現状でも誤りではない。",
+  "first_seen": "2026-11-13",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "govdojo",
+  "tab": "govdojo",
+  "current_text": "2026年12月2日 同意のない性的画像・CSAM生成AIの禁止が適用（予定）／マーキング猶予の終了（2026年12月2日）",
+  "concern": "期限は未到来。欧州委員会ページは「2026年12月に適用」とのみ書き具体日は無い。12月2日の根拠はOJ本文(EUR-Lex)で、ボット確認のため本調査では読めていない",
+  "why": "今回は製品名・サービス名の改称・終了だけが焦点で、規制の中身・期限は見ていない（前回から変化なし）。EUR-Lex が取得不可。二次情報(法律事務所)のみ",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "govdojo",
+  "tab": "govdojo",
+  "current_text": "us-co-sb26-189 / X.AI v. Weiser の差止め状況",
+  "concern": "2026年10月下旬時点の二次報道(JD Supra, Jones Walker等)で、司法長官の規則は未確定・PI申立て未開始。11月以降の変化は確認できず",
+  "why": "今回は製品名・サービス名の改称・終了だけが焦点で、規制の中身・期限は見ていない（前回から変化なし）。州司法長官ページ・裁判所記録を開いていない(検索結果のみ)",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "govdojo",
+  "tab": "govdojo",
+  "current_text": "in-it-rules-synthetic-content-2026: 第二次改正案が確定したかは未確認",
+  "concern": "検索では2026年2月の改正のみ確認。第二次案の確定は見つからず",
+  "why": "今回は製品名・サービス名の改称・終了だけが焦点で、規制の中身・期限は見ていない（前回から変化なし）。MeitY/官報の一次ページを開いていない",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "govdojo",
+  "tab": "govdojo",
+  "current_text": "Copilot Studio のコンテンツモデレーションは定義済みの有害カテゴリが対象で、Microsoft 365 Copilot のガバナンス・安全制御には…（lowcode.json、出典 security-and-governance）",
+  "concern": "Microsoft Learn の licensing ページは製品を「Microsoft Copilot」と呼んでおり、「Microsoft 365 Copilot」の呼称が整理中の可能性。",
+  "why": "出典ページ該当文での呼称を開いて確かめていない。Purview DLP の「Microsoft 365 Copilot location」は Learn に現存するため直さない。",
+  "first_seen": "2026-11-13",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "strategy-xform",
+  "tab": "xform",
+  "current_text": "G検定：145問前後／100分・13,200円（学生5,500円）、累計合格15万人超、合格率8割前後",
+  "concern": "受験料・問題数・累計合格者数・シラバス改定。検索要約に『2026年からオンライン100分・145問に加え会場試験120分・145問が年3回新設』『シラバスは2024年11月改訂版』とあり、会場試験の追加で『100分』の書き方が不完全になる可能性",
+  "why": "JDLA公式は開けず、二次情報（TAC資料・ai-souken・craftai）はホスト解決できず本文を開けなかった。開けたページが無く、検索結果の要約だけでは根拠にしない規則のため未確認。（今回は製品名・モデル名の焦点外のため再確認していない）",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "strategy-xform",
+  "tab": "xform",
+  "current_text": "生成AIパスポート：60問／60分・42問正解（70%）で合格・11,000円、自宅受験（IBT）",
+  "concern": "受験料・合格基準。検索要約に『学生は5,500円』『合格基準は非公開とする記事もある』とあり、『42問正解（70%）で合格』と『学生料金の有無』が食い違う可能性",
+  "why": "guga.or.jp は開けず、LEC・atsoho・agaroot・uravation も本文を開けなかった。開けたページが無く、検索結果の要約だけでは根拠にしない規則のため未確認。（今回は製品名・モデル名の焦点外のため再確認していない）",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "strategy-xform",
+  "tab": "xform",
+  "current_text": "統計検定2級：CBT 35問前後／90分・60点以上で合格、受験料7,000円（学生5,000円）、一般電卓1台",
+  "concern": "受験料・出題範囲・電卓規定。検索要約では7,000円（学生5,000円）・90分・35問前後・60点と一致したが二次情報のみ",
+  "why": "toukei-kentei.jp / sikaku.gr.jp は開けず、LEC も開けなかった。開けたページが無く、検索結果の要約だけでは根拠にしない規則のため未確認。（今回は製品名・モデル名の焦点外のため再確認していない）",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "strategy-xform",
+  "tab": "strategy",
+  "current_text": "ROADMAP・RADAR・ASSETS（資格名など）",
+  "concern": "ROADMAP_MEGATECH・COMP・ASSETS の資格名",
+  "why": "原稿の洗い出しは実施: 候補は『最新手法』の2件のみで時点依存ではない。ASSETS の『Azure保有＋AWS/GCP学習中』は本人の状況で外部事実ではない。ROADMAP_MEGATECH の『AWS ML系資格』は名称が特定されず、出典で照合できる固有の資格名が無い。COMP の資格名は出典を開けず照合していない。（今回は製品名・モデル名の焦点外のため再確認していない）",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "strategy-xform",
+  "tab": "consult",
+  "current_text": "CONSULT_STATS・CONSULT_MAP・TACIT_WORLD・BPR_*",
+  "concern": "CONSULT_STATS: McKinsey『88%→5.5%』『21%』、S&P Global『46%』、Prosci『88% vs 13%』が新しい版に置き換わっていないか。検索結果に McKinsey『The state of AI in 2026: On the road to ROI』があり、二次情報はEBIT貢献37%・高成果6%と報じる。原稿の5.5%とは別の版・別の指標の可能性",
+  "why": "mckinsey.com は 503、spglobal.com・prosci.com は名前解決失敗で開けず。二次情報は本文を開けていない。tacit（TACIT_WORLD）・bpr は出典付きの統計が無く事例の時点も照合できなかった。（今回は製品名・モデル名の焦点外のため再確認していない）",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "strategy-xform",
+  "tab": "consult",
+  "current_text": "DXで成果を実感する企業は日本58%に対し米国89%（IPA DX白書）",
+  "concern": "どの年の調査か書かれていない。IPA「DX動向2025」のディスカッション・ペーパーは別の指標（効率化と成長の両方で成果：日本26.8%・米国80.9%・ドイツ77.6%）を示しており、ファクトブックは「日本約6割 vs 米独8割超」と書いている。58%・89% の出典の版を確かめて時点を明記する必要がある。",
+  "why": "58%・89% が載っている DX白書の本文を開いて確かめていない（ディスカッション・ペーパーには無い）。（今回は製品名・モデル名の焦点外のため再確認していない）",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "strategy-xform",
+  "tab": "consult",
+  "current_text": "AI定常利用は88%に達する一方、EBIT貢献を実証できる企業は約5.5%（McKinsey）／ワークフロー再設計は実施21%（McKinsey）／AI PoCの46%が本番前に放棄（S&P Global）／ISO/IEC 42001認証は既に350組織超",
+  "concern": "McKinsey は2026年版の State of AI を出しているとの二次情報があり、数字が変わっている可能性がある。S&P と ISO 42001 の件数も新しい値がある可能性。",
+  "why": "www.mckinsey.com は 503、www.spglobal.com は許可リスト外で開けない。（今回は製品名・モデル名の焦点外のため再確認していない）",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "archcase",
+  "tab": "archcase",
+  "current_text": "事例中の Azure OpenAI Service 表記（ARCH_AG・ARCH_OFC の個別事例、Azure AI Document Intelligence など）",
+  "concern": "当時の構成の記述なので現行名への書き換えは不要と判断。",
+  "why": "Azure AI Document Intelligence の現行名は未確認。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "archcase",
+  "tab": "archcase",
+  "current_text": "ARCH_AG の構成図（Orchestrator Claude Sonnet 4.5、Nova 2 Lite など）",
+  "concern": "事例の公開時点のモデル名で、歴史的記述として正しい可能性が高い。",
+  "why": "原典（findy-tools.io）はこの環境から開けない。当時の名前のまま残す方針（focus.md）に従い変更しない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "archcase",
+  "tab": "archcase",
+  "current_text": "AgentKit（Agent Builder/Evalsは2026年11月30日に提供終了予定）（TH_EN の会社紹介文）",
+  "concern": "提供終了日 2026-11-30 は今日（2026-11-13）より後でまだ有効。",
+  "why": "WebSearch の要約では OpenAI の deprecations ページに 2026-11-30 とあるが、developers.openai.com が名前解決できず原文を開けなかった。",
+  "first_seen": "2026-11-13",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "postmortem-industry",
+  "tab": "postmortem",
+  "current_text": "ニューヨーク市 事業者向けチャットボット：「市はその後改善対応を行ったと報じられている。」",
+  "concern": "検索結果の要約では、2026年1月末にMamdani市長が MyCity チャットボットの終了を表明し、2026年2月4日時点で停止（「beta test has ended」）と報じられている。続報として追記すべき可能性が高い。",
+  "why": "The Markup・StateScoop・Route Fifty・Vice・The Register・chat.nyc.gov など開ける出典のホストがすべて名前解決できず、原文を開けなかった（検索要約のみ）。（今回は製品名・モデル名の焦点外のため再確認していない）",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "postmortem-industry",
+  "tab": "value",
+  "current_text": "AIスキルの賃金プレミアムは56%（PwC）／賃金プレミアム56%（人材流出）ほか（VALUE_TREE 数か所・クイズ含む）",
+  "concern": "検索要約では PwC 2026 Global AI Jobs Barometer が平均賃金プレミアム62%（前年57%）と報じる。ただし MEGATECH_FACTBOOK は『2025年版：56%（前年25%）』と版を明記している。",
+  "why": "pwc.com の各ページが403で原文を開けなかった。置換には2025年版/2026年版の数字の整合（前年比の記述）も要るため未確認。クイズ（選択肢に56%を含む）にも及ぶ。（今回は製品名・モデル名の焦点外のため再確認していない）",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "postmortem-industry",
+  "tab": "assess",
+  "current_text": "日本企業の生成AI導入は57.7%（NRI）だがDX成果実感は58%（米89%、IPA）",
+  "concern": "IPA は2026年7月16日に DX動向2026 の要点を公表し、日本は『6割の企業が成果が出ている』と記す（前2回と大差なし）。『米89%』は DX動向2024 の値で、2025年版では米独とも8割超。米国の最新値と日本の正確な%は未確認。",
+  "why": "2026年版の詳細（データ集）は7月下旬公開予定でプレス資料には%と米国値がなく、DX動向2025/2026 の本編は開けなかった。クイズ（157941行付近）にも同じ数字がある。（今回は製品名・モデル名の焦点外のため再確認していない）",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "postmortem-industry",
+  "tab": "industry",
+  "current_text": "（クイズ）都道府県87.2%・指定都市90.0%・市区町村29.9%、ガイドライン策定82.7% ほか（157952・157961・157962 行付近のクイズ選択肢と解説）",
+  "concern": "自治体の導入率は2025年10月時点で都道府県・指定都市100%、その他市区町村45.6%に更新。クイズの選択肢・正解・解説（『指定都市90.0%が最も低い』『市区町村87.2%』などの誤答肢）が旧値を前提にしている。",
+  "why": "選択肢の長さの釣り合いと正解の論理（階層ごとの数字の取り違えを問う）が崩れるため置換案は出さない。『ガイドライン策定82.7%』は新調査の本文で確認できず（導入済団体の策定率は81%）、問題の作り直しが必要。（今回は製品名・モデル名の焦点外のため再確認していない）",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "postmortem-industry",
+  "tab": "industry",
+  "current_text": "Klarna：応対2/3自律化・$40M改善見込み（IND_DATA）／Klarnaは応対の3分の2を自律化し年間4,000万ドル規模の改善を見込むと公表（IND_DEEP2）",
+  "concern": "2024年2月の自社発表の数字を『実用段階』の根拠として現在形に近い形で使っている。検索要約では、Klarnaは2025年に品質低下を理由に人間の窓口を再び採用し始めたと報じられる（VALUE_TREE には既に『2025年に品質面から人の再雇用へ一部揺り戻し』の記載があり、タブ間で温度差がある）。",
+  "why": "Klarna・eMarketer・Fortune 等のホストを開けず（プロキシ/名前解決）、一次の原文を確認できなかった。（今回は製品名・モデル名の焦点外のため再確認していない）",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "postmortem-industry",
+  "tab": "industry",
+  "current_text": "顧客サービス案件の80%が2029年までにAI自律解決の予測（Gartner）",
+  "concern": "記述自体は Gartner 2025-03-05 のプレスリリース（'By 2029, agentic AI will autonomously resolve 80% of common customer service issues without human intervention'）と検索結果上は一致。",
+  "why": "gartner.com は403で原文を開けず、検索結果の要約のみ。更新の有無は未確認のため checked_ok には入れない。（今回は製品名・モデル名の焦点外のため再確認していない）",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "postmortem-industry",
+  "tab": "industry",
+  "current_text": "DBS：2025年にS$10億到達を公表／パナソニック コネクト：年18.6万→45万時間／三菱UFJ：月22万時間／Morgan Stanley採用率98%／中国製造業AI適用率19.9%→25.9%／Siemens Industrial Copilot／IEA 945TWh／セブン-イレブン9割短縮／IKEA 8,500人／Walmart My Assistant／Wells Fargo 年2億回",
+  "concern": "企業発表ベースの数字で、新しい決算・発表で更新されている可能性がある。",
+  "why": "dbs.com・news.panasonic.com・mufg.jp・morganstanley.com・news.siemens.com・7andi.com・ikea.com・corporate.walmart.com は許可リスト外、iea.org は403で、原文を開けなかった。（今回は製品名・モデル名の焦点外のため再確認していない）",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "postmortem-industry",
+  "tab": "value",
+  "current_text": "開発者の90%が業務でAI利用（DORA）。一方ガードなし導入は安定性-7.2%（DORA）",
+  "concern": "90%は DORA 2025（Google Cloud の発表）の値だが、-7.2% は DORA 2024 の値と思われ、年版が混在している可能性。",
+  "why": "dora.dev は許可リスト外。cloud.google.com の2025年版発表は検索要約でしか確認できず、-7.2% の出所の版を確かめられなかった。（今回は製品名・モデル名の焦点外のため再確認していない）",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "postmortem-industry",
+  "tab": "value",
+  "current_text": "AI関連侵害の97%が統制欠如（IBM）／AI生成コードの45%に脆弱性（Veracode）／Prosci 88%vs13%・79%vs27%／AI先行企業TSR 3.6倍（BCG）／PoCの46%放棄（S&P）／EY +34%",
+  "concern": "年次調査の新版が出ている可能性。",
+  "why": "newsroom.ibm.com・veracode.com・prosci.com・spglobal.com・ey.com は許可リスト外で開けなかった。bcg.com は時間の都合で確認に至らず。（今回は製品名・モデル名の焦点外のため再確認していない）",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "postmortem-industry",
+  "tab": "postmortem",
+  "current_text": "Deloitte Australia：『同社は一部返金に応じたと報じられている』",
+  "concern": "検索要約では、2025年10月に報告書（A$440,000規模）の最終回の支払分を返金すると報じられており、記述と整合。Deloitte のカナダ（Newfoundland）報告書の件など続報の有無は未確認。",
+  "why": "Deloitte・DEWR・ABC など一次または報道の原文のホストが許可リスト外で、原文を開けなかった（Wikipedia の Deloitte ページには該当記述なし）。（今回は製品名・モデル名の焦点外のため再確認していない）",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "postmortem-industry",
+  "tab": "postmortem",
+  "current_text": "McDonald's AIドライブスルー：2024年にパイロットを終了すると発表",
+  "concern": "検索要約では IBM との試験は2024年7月26日までに終了、同社は年末までに今後の音声注文の方針を決めるとした。その後の続報（後継の音声注文の導入有無）は未確認。",
+  "why": "nrn.com・abcnews 等の原文を開いておらず、続報の一次情報も見つけられなかった。（今回は製品名・モデル名の焦点外のため再確認していない）",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-13"
+ },
+ {
+  "area": "checks-notes",
+  "tab": "checkcore",
+  "current_text": "McKinsey State of AI の数値（定常利用88%、スケール報告約1/3、フルスケール7%、高パフォーマー5.5%、HITL 65%対23%、変革成功率約30%）",
+  "concern": "McKinsey「The state of AI in 2026: On the road to ROI」（調査期間2026-05-04〜06-08）が出ている。検索結果の要約では大企業の40%がエージェントを拡大（前年27%）、EBIT寄与37%、高パフォーマー約6%とあり、問題の数値は旧版の可能性が高い。",
+  "why": "www.mckinsey.com が503で本文を開けず、原文の引用が取れない。問題の正解・選択肢の釣り合いに関わるため、版の確認後に作り直しが必要。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "checks-notes",
+  "tab": "checkcore",
+  "current_text": "K3 PoCの放棄状況（S&P Global：PoC全体の46%、企業の42%）",
+  "concern": "2025-10-27のS&P研究ページがこの2つの数字の出所と思われる（検索結果の要約）。新版の有無は不明。",
+  "why": "www.spglobal.com が名前解決できず開けない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "checks-notes",
+  "tab": "checkcore",
+  "current_text": "Gartner：エージェント型AI案件の40%超が2027年末までに中止／顧客サービス80%が2029年までに自律解決（問題多数・ISSUE_TREEにも）",
+  "concern": "2025-06-25と2025-03-05の発表。その後の更新・撤回の有無を一次情報で確認したい。",
+  "why": "gartner.com が403で開けない。報道は複数あるが一次情報の本文を引用できない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "checks-notes",
+  "tab": "checkcore",
+  "current_text": "企業のAI支出は2025年に$37B／LLMシェア Anthropic約40%・OpenAI約27%・Google約21%／ヘルスケア$1.5B・43%／ARR$100M超50製品・$1B超10製品／商談の本番到達率47%対SaaS25%（Menlo Ventures、K3 数問）",
+  "concern": "Menlo 2026年版（2026-11-03）では2025年の基線が$33B、シェアが55/31/9に変わっている。『分散している』が正解の理由になっている問題は、数字を新版に替えると正解の根拠が崩れるため出題の作り直しが必要。",
+  "why": "選択肢・正解の理屈に関わる変更で、長さの釣り合いや正解番号を保つ置換案を作れない（2025年版の値自体は2025-12-09ページで確認済み）。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "checks-notes",
+  "tab": "checkcore",
+  "current_text": "K3 地方自治体の導入状況（総務省）の『ガイドライン策定率82.7%』",
+  "concern": "令和7年度資料には82.7%に当たる値が見つからない。置換案では『導入済団体の81%が策定済』（資料p.11）に替えたが、元の82.7%が何の指標だったか（令和6年度の別集計か）は未確認。",
+  "why": "令和6年度の資料を開いて突き合わせていない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "checks-notes",
+  "tab": "checkcore",
+  "current_text": "ISO/IEC 42001の認証組織は『350超』",
+  "concern": "検索結果では2026年半ばで約350、2026年初頭で500未満と出所により異なり、公式の集計がない。",
+  "why": "公式の集計ページがなく、検索要約しか根拠が無い。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "checks-notes",
+  "tab": "checkcore",
+  "current_text": "IBM Cost of a Data Breach 2025（97%・16%・平均$4.44M・米$10.22M）／ISSUE_TREE『データ侵害の世界平均コストは444万ドル』",
+  "concern": "NOTE_GOV の出典欄に IBM 2026年版（2026-07-29、全体平均$4.99M、悪意ある侵害の1/4がAI起点）がある。『IBM 2025』と年は明記されているが、『now』と現在形の英文がある。",
+  "why": "newsroom.ibm.com が名前解決できず、2026年版の本文を確認できない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "checks-notes",
+  "tab": "issues",
+  "current_text": "実際のAI利用は拡張が主流（拡張57%対自動化43%、Anthropic Economic Index）",
+  "concern": "Anthropic Economic Index は更新が続く（ページの最終更新 2026-06-26）。57%/43%が最新版の値か不明。",
+  "why": "anthropic.com/economic-index の数値部分は『Loading data』で本文に出ず、確認できない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "checks-notes",
+  "tab": "issues",
+  "current_text": "AIスキル保有者の賃金プレミアム56%（PwC Global AI Jobs Barometer 2025）／AI導入でスループット-1.5%・変更安定性-7.2%（Google DORA 2024）／クラウド支出の27〜29%が無駄（Flexera）",
+  "concern": "いずれも年次調査で、2026年版・DORA 2025が出ている可能性が高い。年次は明記されているため誤りとは断定できない。",
+  "why": "pwc.com が403、dora.dev と flexera.com は名前解決できず開けない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "checks-notes",
+  "tab": "noteissues",
+  "current_text": "NOTE_GOV の出典欄：IBM 2026年版プレスリリース、Dario Amodei『We Must Pace the Frontier』、Axios（OpenAI 6件開示）、OpenAI Hugging Face 事案報告、California EO N-9-26、Anthropic×Accenture",
+  "concern": "一次ソースの記述（数字・日付）が原文と合っているか。",
+  "why": "newsroom.ibm.com、darioamodei.com、www.axios.com、www.gov.ca.gov は名前解決できず、openai.com は403。金融庁の公表日（2026-09-15）だけ確認できた。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "checks-notes",
+  "tab": "noteissues",
+  "current_text": "NOTE_CORPORA の期間表記：follow『2026-07-01〜09-22』（記事の最初は07-02）、bpr/hayatasu『〜2026-10-13』（記事の最後は10-12／10-10）",
+  "concern": "期間が収集期間なのか記事の日付範囲なのかが画面から分からず、1〜3日のずれがある。",
+  "why": "記事データの内部事情で、外部の出典では確かめられない。誤りとは断定できないため置換案は出さない。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-12"
+ },
+ {
+  "area": "checks-notes",
+  "tab": "checkax",
+  "current_text": "AI導入率『約88%がAI導入に向けて取り組んでいる』は149403で新値を確認済みだが、AX系の問題で『多数派』『導入29.9%の市区町村』と書く表現",
+  "concern": "置換後も論旨は変わらない。ほか、METI『DXレポート』の12兆円・21年超・79万人（K3）が最新の版か。",
+  "why": "meti.go.jp が403で開けない。",
   "first_seen": "2026-11-12",
   "last_tried": "2026-11-12"
  }

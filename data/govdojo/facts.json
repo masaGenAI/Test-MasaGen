@@ -89,6 +89,18 @@
     "約14万字"
    ],
    "unless": []
+  },
+  {
+   "id": "copilot-studio-harness-name",
+   "desc": "Copilot Studio のハーネスの今の名前は Microsoft Copilot harness（Learn の harnesses-overview、2026-11-13 確認）。旧名の GitHub Copilot harness だけを書かない（「旧」と併記するのはよい）",
+   "source": "https://learn.microsoft.com/microsoft-copilot-studio/harnesses-overview",
+   "forbid": [
+    "GitHub Copilot ?ハーネス",
+    "GitHub Copilot harness"
+   ],
+   "unless": [
+    "旧 ?GitHub Copilot|formerly (the )?GitHub Copilot"
+   ]
   }
  ]
 }

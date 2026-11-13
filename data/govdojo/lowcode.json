@@ -68,11 +68,11 @@
   },
   {
    "t": [
-    "費用の膨張：GitHub Copilot ハーネスのエージェントは、公開前の作成・プレビュー・評価の段階から Copilot クレジットを消費し、本番公開しない探索用の環境でも消費が生じ得る。このため公式ガイドは、公開済みエージェントだけでなく環境を単位に初日から統制するよう勧める（環境の容量統制は Copilot Studio の全ワークロードに及ぶ）。",
-    "Cost growth: agents powered by the GitHub Copilot harness consume Copilot Credits while makers build, preview and evaluate them, and an exploration environment can incur consumption even if nothing is published. The guidance therefore says to govern at the environment level from day one, not just the published agent (environment capacity controls apply to all Copilot Studio workloads)."
+    "費用の膨張：Microsoft Copilot ハーネス（旧 GitHub Copilot ハーネス）のエージェントは、公開前の作成・プレビュー・評価の段階から Copilot クレジットを消費し、本番公開しない探索用の環境でも消費が生じ得る。このため公式ガイドは、公開済みエージェントだけでなく環境を単位に初日から統制するよう勧める（環境の容量統制は Copilot Studio の全ワークロードに及ぶ）。",
+    "Cost growth: agents powered by the Microsoft Copilot harness (formerly the GitHub Copilot harness) consume Copilot Credits while makers build, preview and evaluate them, and an exploration environment can incur consumption even if nothing is published. The guidance therefore says to govern at the environment level from day one, not just the published agent (environment capacity controls apply to all Copilot Studio workloads)."
    ],
    "src": {
-    "title": "Govern Copilot Credit consumption for agents powered by the GitHub Copilot harness",
+    "title": "Govern Copilot Credit consumption for agents powered by the Microsoft Copilot harness",
     "url": "https://learn.microsoft.com/microsoft-copilot-studio/guidance/govern-credit-consumption",
     "quote": "Consumption starts at design time, before an agent is published."
    }
@@ -448,15 +448,15 @@
     "Copilot Credit governance (environment capacity, agent limits, process)"
    ],
    "what": [
-    "4層で統制する：テナント（購入済み容量と、割当できる人）、環境（前払いの割当・テナントの未割当容量からの引き出し・従量課金）、エージェント（月次上限・通知閾値・使用量によるハードストップ・明示的な停止）、運用（費用責任者・アラート対応・例外承認・所有者への通知）。エージェント上限は前払い／従量課金のどちらでも設定できるが環境全体の消費は抑えないため、前払い分を封じ込めるには割当量を決めてテナント容量からの引き出しをオフにする。PPAC にはテナント全体の既定のエージェント上限がないので、標準の上限は定期・自動の処理で個々に適用する。Azure の予算とアラートは通知だけで消費を止めない。割当の権限を環境管理者に与えるとテナントの全環境に及ぶため、テナント管理者に限るのが推奨。運用の型：発見→分類（探索・試作／テスト・検証／本番）→統制の確認→上限の適用→繰り返しと自動化（インベントリ API で新しい環境・エージェントを検出）。出典は GitHub Copilot ハーネスのエージェント向けガイドだが、容量統制は Copilot Studio の全ワークロードに及ぶ。",
-    "Four layers: tenant (purchased capacity, who can allocate), environment (prepaid allocation, draw from tenant capacity, pay-as-you-go), agent (monthly limit, notification threshold, usage-based hard stop, explicit stop) and process (cost owner, alert triage, exceptions, owner notification). Agent limits work with prepaid or pay-as-you-go but don't cap environment totals, so contain prepaid use by allocating a fixed amount and turning off tenant draw. PPAC has no tenant-wide default agent limit, so apply standard limits by a recurring or automated process. Azure budgets alert but don't stop consumption. Allowing environment admins to allocate grants tenant-wide allocation, so keep it with tenant admins. Process: discover, classify, review controls, apply limits, repeat and automate with the inventory API. The guide targets GitHub Copilot harness agents, but capacity controls apply to all Copilot Studio workloads."
+    "4層で統制する：テナント（購入済み容量と、割当できる人）、環境（前払いの割当・テナントの未割当容量からの引き出し・従量課金）、エージェント（月次上限・通知閾値・使用量によるハードストップ・明示的な停止）、運用（費用責任者・アラート対応・例外承認・所有者への通知）。エージェント上限は前払い／従量課金のどちらでも設定できるが環境全体の消費は抑えないため、前払い分を封じ込めるには割当量を決めてテナント容量からの引き出しをオフにする。PPAC にはテナント全体の既定のエージェント上限がないので、標準の上限は定期・自動の処理で個々に適用する。Azure の予算とアラートは通知だけで消費を止めない。割当の権限を環境管理者に与えるとテナントの全環境に及ぶため、テナント管理者に限るのが推奨。運用の型：発見→分類（探索・試作／テスト・検証／本番）→統制の確認→上限の適用→繰り返しと自動化（インベントリ API で新しい環境・エージェントを検出）。出典は Microsoft Copilot ハーネス（旧 GitHub Copilot ハーネス）のエージェント向けガイドだが、容量統制は Copilot Studio の全ワークロードに及ぶ。",
+    "Four layers: tenant (purchased capacity, who can allocate), environment (prepaid allocation, draw from tenant capacity, pay-as-you-go), agent (monthly limit, notification threshold, usage-based hard stop, explicit stop) and process (cost owner, alert triage, exceptions, owner notification). Agent limits work with prepaid or pay-as-you-go but don't cap environment totals, so contain prepaid use by allocating a fixed amount and turning off tenant draw. PPAC has no tenant-wide default agent limit, so apply standard limits by a recurring or automated process. Azure budgets alert but don't stop consumption. Allowing environment admins to allocate grants tenant-wide allocation, so keep it with tenant admins. Process: discover, classify, review controls, apply limits, repeat and automate with the inventory API. The guide targets Microsoft Copilot harness (formerly GitHub Copilot harness) agents, but capacity controls apply to all Copilot Studio workloads."
    ],
    "where": [
     "PPAC（ライセンスの容量割当、Manage Agents、消費レポートのダウンロード）、Power Platform インベントリ API、Power Platform API（allocationsV2）",
     "PPAC (capacity allocation, Manage Agents, consumption report download), Power Platform inventory API, Power Platform API (allocationsV2)"
    ],
    "src": {
-    "title": "Govern Copilot Credit consumption for agents powered by the GitHub Copilot harness",
+    "title": "Govern Copilot Credit consumption for agents powered by the Microsoft Copilot harness",
     "url": "https://learn.microsoft.com/microsoft-copilot-studio/guidance/govern-credit-consumption",
     "quote": "Power Platform admin center doesn't provide a tenant-wide default agent limit. If your organization defines a standard limit for new agents, use a recurring or automated process to apply it to individual agents."
    }

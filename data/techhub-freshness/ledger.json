@@ -2,42 +2,80 @@
  "areas": {
   "companies-a": {
    "status": "checked",
-   "last_attempt": "2026-11-12",
-   "fixed": 11,
+   "last_attempt": "2026-11-13",
+   "fixed": 3,
    "partial": 0,
-   "rejected": 2,
+   "rejected": 0,
    "unverified": 9,
-   "checked_ok": 15,
-   "blocked_hosts": [],
-   "coverage": "【見た範囲】companies タブの定数 COMPANIES のうち担当8社（Google／Amazon／Meta／Apple／Microsoft／Anthropic／OpenAI／NVIDIA）の全項目、COMPARE（比較表）の該当8行、CASES（実装事例）19件の本文、職種別攻略のうち担当企業の製品名が出る行。逆質問・日本市場・提供モデル・面接準備は目を通したが、担当企業の時点依存の記述は無く、出典確認はしていない（日本市場の統計は担当外）。 【確かめ方】置換案13件・47置換は、指示書の検査コマンドで全件合格（最終実行 2026-11-11 14:58 UTC、検査ファイルは /tmp/claude-0/-home-user-Test-MasaGen/75876541-d666-5824-a83c-5ca9cdbe8f9b/scratchpad/fresh/out/companies-a.json）。全置換を順に当てた結果をメモリ上で試し、JS として読めること、製品欄の日本語と英訳辞書 TH_EN のキーが8社とも一致することを確かめた（リポジトリは書き換えていない）。製品欄は COMPANIES と TH_EN のキーの2か所に同じ文字列があるため count 2 にしてある。 【開けなかった一次情報】この環境の通信制限で次は開けなかった：openai.com（40…",
-   "last_checked": "2026-11-12",
-   "proxy_blocked": []
+   "checked_ok": 12,
+   "blocked_hosts": [
+    "www.servicenow.com",
+    "news.sap.com",
+    "www.snowflake.com(403)",
+    "www.oracle.com(403)",
+    "apple.com",
+    "pkshatech.com",
+    "exawizards.com",
+    "www.abejainc.com"
+   ],
+   "coverage": "cand-companies-a の残り（Vertex AI×1=SOURCES、Gemini 3×2=COMPANIES）と近い期限・「最新」を全部見た。COMPANIES の製品欄・アーキテクト観点・よく聞かれる問いから製品名・モデル名を grep し、Google・Amazon・Microsoft・Anthropic・OpenAI・Meta・Databricks を一次情報で照合（Q Business／Amazon Quick／Foundry／Agentspace／Agent Builder／Project Mariner／Claude Cowork／GPT-5 系は既に旧名注記や時点つきで手当て済みのため直さない）。SOURCES は製品名の入る項目（vertex・azureai・aoai・bedrock）を照合。Snowflake CoWork／CoCo・NVIDIA Dynamo-Triton は検索結果の要約のみ（Snowflake のページは403）で、ページ本文は開けておらず checked_ok にも入れていない。ServiceNow・SAP・Salesforce・Oracle・Apple・IBM・NVIDIA の製品名は本文を開けていない。料金・統計・人名は焦点外で未確認。",
+   "last_checked": "2026-11-13",
+   "proxy_blocked": [
+    "www.servicenow.com",
+    "news.sap.com",
+    "apple.com",
+    "pkshatech.com",
+    "exawizards.com",
+    "www.abejainc.com"
+   ]
   },
   "companies-b": {
    "status": "checked",
-   "last_attempt": "2026-11-12",
-   "fixed": 6,
+   "last_attempt": "2026-11-13",
+   "fixed": 0,
    "partial": 0,
    "rejected": 0,
-   "unverified": 7,
-   "checked_ok": 14,
-   "blocked_hosts": [],
-   "coverage": "見た範囲：定数 COMPANIES のうち Oracle・Palantir・Salesforce・Databricks・Snowflake・ServiceNow・SAP・IBM の8枚（org・prod・arch・asks・ask_them・checked を全文）、CASES のうち8社に関わる3件（Reddit × Agentforce、業界横断調査、各社エージェント基盤の競争）、COMPARE の8社の行。タブ内の残り7画面は8社の名前で検索しただけ。 置換案12件は repl_check.py で全件合格（/tmp/claude-0/-home-user-Test-MasaGen/75876541-d666-5824-a83c-5ca9cdbe8f9b/scratchpad/fresh/out/companies-b.json）。企業カードの prod は TH_EN の訳語表のキーにも同じ日本語があるため count 2 で出し、英語の訳語は別の置換にした。作業中に ProjectNova.jsx が別の作業で書き換わり行番号が約117行ずれたので、行番号ではなく文字列で特定している。カードの「最終確認」の日付は触っていない。 確かめ切れなかった範囲（ネットワーク制限）：このセッションから開けた公式サイトは salesforce.com、databricks.com、sn…",
-   "last_checked": "2026-11-12",
-   "proxy_blocked": []
+   "unverified": 6,
+   "checked_ok": 2,
+   "blocked_hosts": [
+    "www.servicenow.com",
+    "www.oracle.com(403)",
+    "docs.snowflake.com",
+    "www.ibm.com",
+    "www.gartner.com(403)"
+   ],
+   "coverage": "CASES・COMPARE の製品名・モデル名を grep で全て洗い出した（GPT-/Claude 世代名・Bard・PaLM・CodeWhisperer・Cognitive Services・Vertex・Q Business・Bedrock Agents などの旧名は残っていない）。Google・Amazon・Microsoft の名称は一次情報で照合。cand-companies-b の Gemini 3×2 は COMPANIES（companies-a の受け持ち、置換案は check-companies-a.json）。ServiceNow・Salesforce・Oracle・Snowflake の製品名は本文を開けず unverified。事例中の数字・IBM 調査の新版・Gartner の予測は焦点外で未確認のまま持ち越し。",
+   "last_checked": "2026-11-13",
+   "proxy_blocked": [
+    "www.servicenow.com",
+    "docs.snowflake.com",
+    "www.ibm.com"
+   ]
   },
   "companies-c": {
    "status": "checked",
-   "last_attempt": "2026-11-12",
-   "fixed": 17,
+   "last_attempt": "2026-11-13",
+   "fixed": 0,
    "partial": 0,
-   "rejected": 1,
+   "rejected": 0,
    "unverified": 15,
-   "checked_ok": 11,
-   "blocked_hosts": [],
-   "coverage": "【見た範囲】原稿の COMPANIES のうち Slalom / PKSHA Technology / Laboro.AI / エクサウィザーズ / ABEJA / ギブリー / FLUX の全項目、JP_MARKET（23項目すべて）と JPM_LENS・注記（jm_intro / jm_note）、DELIVERY_MODELS（4型）、ROLES_GUIDE（職種別攻略 14職種）、INTERVIEW_PLAYBOOK（面接準備）、REVERSE_Q（逆質問）を原稿で通読した。提供モデル・面接準備・逆質問には時点に依存する記述がほぼ無く、指摘は職種別攻略の製品名1件だけ。 【確かめ方】一次情報の本文を開いて確認できたのは slalom.com、総務省（令和8年版情報通信白書の概要・第Ⅰ部第1章と第2章・第Ⅱ部、自治体の生成AI導入状況 令和7年度、AI事業者ガイドラインのアンケート2回分）、Stanford HAI AI Index 2026（第1・3・4章のPDF）、IPA DX動向2026／2025、JUAS 企業IT動向調査報告書2026、PwC Japan、NRI、Google Cloud 公式ブログ、Microsoft 公式ブログ（IDC調査）。 【見られなかった範囲】日本のAI企業6社（PKSHA・Laboro.AI・エクサウィザーズ・ABEJA・ギブリー・FLU…",
-   "last_checked": "2026-11-12",
-   "proxy_blocked": []
+   "checked_ok": 3,
+   "blocked_hosts": [
+    "www.pkshatech.com",
+    "exawizards.com",
+    "www.abejainc.com",
+    "www.ibm.com",
+    "www.gartner.com",
+    "www.mckinsey.com"
+   ],
+   "coverage": "cand-companies-c の『最新』7件と 26.7% を見た。INTERVIEW_PLAYBOOK・ROLES_GUIDE・REVERSE_Q・DELIVERY_MODELS・JP_MARKET の製品名・モデル名を grep し、旧世代名・旧名の現役記述は無いのを確認（Gemini Enterprise Agent Platform〈旧Vertex AI〉などは既に手当て済み）。日本企業の製品名（PKSHA・exaBase・ABEJA・Laboro・ギブリー・FLUX・Slalom）の出典ホストは全て名前解決できず開けなかった（pkshatech.com・exawizards.com・abejainc.com を再試行）ため、前回の未確認を全て持ち越した。IBM／Gartner／McKinsey／IDC／NRI の統計の新版は焦点外で未確認。",
+   "last_checked": "2026-11-13",
+   "proxy_blocked": [
+    "www.pkshatech.com",
+    "exawizards.com",
+    "www.abejainc.com",
+    "www.ibm.com"
+   ]
   },
   "factbook-a": {
    "status": "checked",
@@ -149,61 +187,34 @@
   },
   "strategy-xform": {
    "status": "checked",
-   "last_attempt": "2026-11-12",
-   "fixed": 2,
+   "last_attempt": "2026-11-13",
+   "fixed": 0,
    "partial": 0,
    "rejected": 0,
    "unverified": 7,
-   "checked_ok": 1,
-   "blocked_hosts": [
-    "www.jdla.org",
-    "guga.or.jp",
-    "www.toukei-kentei.jp",
-    "www.sikaku.gr.jp",
-    "www.mckinsey.com(503)",
-    "www.lec-jp.com",
-    "bookstore.tac-school.co.jp",
-    "www.itpro.com",
-    "www.ai-souken.com",
-    "uravation.com",
-    "www.prosci.com",
-    "www.spglobal.com",
-    "atsoho.com",
-    "craftai.jp",
-    "www.agaroot.jp"
-   ],
-   "coverage": "carry 5件はすべて未確認のまま持ち越し。出典を開けたページは0件（WebSearch は動くが、検索要約のみで根拠にしない）。原稿は XT_CERTS・CONSULT_STATS・ASSETS・ROADMAP_MEGATECH・roadmapPlan の本文を読み、候補2件（『最新手法』）は時点依存でないと判断。COMP・CONSULT_MAP本体（13万字）・TACIT_WORLD・BPR_*・XF_* は内容を読んでおらず、固有名詞・数字の15件照合は未達。『既に古いと確かめた語の残り』は0件。 ／【追記・主の点検】CONSULT_STATS と CONSULT_MAP の出典つき統計（BCG・Menlo・IPA・McKinsey・Prosci・S&P・JUAS・MIT NANDA）を洗い出し、BCG と Menlo は出典のページを開いて照合した。同じ BCG の数字を引く提案・ケース演習・論点・価値・理解度チェックの箇所も一緒に置換案に入れた。XT_CERTS（G検定・生成AIパスポート・統計検定）は公式サイトが許可リスト外のままで未点検。TACIT_WORLD・BPR_*・XF_* は出典つきの統計がほぼ無く、個別の事例は照合していない。",
-   "last_checked": "2026-11-12",
-   "proxy_blocked": [
-    "www.jdla.org",
-    "guga.or.jp",
-    "www.toukei-kentei.jp",
-    "www.sikaku.gr.jp",
-    "www.lec-jp.com",
-    "bookstore.tac-school.co.jp",
-    "www.itpro.com",
-    "www.ai-souken.com",
-    "uravation.com",
-    "www.prosci.com",
-    "www.spglobal.com"
-   ]
+   "checked_ok": 0,
+   "blocked_hosts": [],
+   "coverage": "製品名・モデル名で COMP・CONSULT_*・XT_*・XF_* を grep。GPT-4 は CONSULT_MAP 150453 の Morgan Stanley の OpenAI 公表事例（当時の事例、歴史的記述）1件のみでそのまま。そのほか ChatGPT・GPTs・Copilot・Agentforce は現役名。『最新手法』2件は一般論。出典を開いて照合した製品名は無し（本範囲に改称の疑いのある語が無かったため）。carry（資格・統計）は焦点外で未確認のまま引き継ぐ。",
+   "last_checked": "2026-11-13",
+   "proxy_blocked": []
   },
   "archcase": {
    "status": "checked",
-   "last_attempt": "2026-11-12",
-   "fixed": 3,
+   "last_attempt": "2026-11-13",
+   "fixed": 4,
    "partial": 0,
    "rejected": 1,
-   "unverified": 4,
-   "checked_ok": 3,
+   "unverified": 2,
+   "checked_ok": 9,
    "blocked_hosts": [
-    "docs.cloud.google.com",
-    "learn.microsoft.com"
+    "developers.openai.com",
+    "findy-tools.io"
    ],
-   "coverage": "見た範囲: archcase タブの本文を通読し、ARCH_TOOLS（ツール早見表）の製品名を中心に、AWS、Azure、Google Cloud の改称・統合・提供終了を確かめた。Kendra、Bedrock Agents、Vertex AI、Azure OpenAI は一次情報を開いて確認した。見ていない範囲: 公開事例の出典リンク（findy-tools.io、AWS、Google Cloud の事例ブログ）の生死は未確認。ARCH_CASES、ARCH_AG、ARCH_OFC の個別事例の数値や構成は、当時の記述として扱い、原典との照合はしていない。ARCH_SPECS、ARCH_GUIDE、クイズ類は先頭の抽出のみ。Google Cloud の docs.cloud.google.com と learn.microsoft.com はこの環境の WebFetch では開けず、Microsoft Learn は MCP 経由で取得した。",
-   "last_checked": "2026-11-12",
+   "coverage": "見た範囲：cand-archcase の『古いと確かめた語の残り』Vertex AI 9件を全て（ARCH_GUIDE・ARCH_TOOLS・ARCH_CASES・ARCH_FREQ・ARCH_AG）と、近い期限2件・『最新』2件。ARCH_GUIDE/TOOLS/FREQ/CASES/AG/OFC と TH_EN（154782行）を製品名・モデル名の語で grep（Vertex AI・Agent Builder・Agentspace・Q Developer/Business・Bedrock Agents・Kendra・Claude 2/3・GPT-3/4/5・Gemini・Copilot Studio・Azure OpenAI・Document Intelligence 等）。直した語：Vertex AI（ARCH_GUIDE 2か所+英訳、ARCH_FREQ 1か所+注記2か所）、Vertex AI Agent Builder、Vertex AI Search（ARCH_TOOLS・ARCH_FREQ）、Semantic Kernel（後継併記）。直さず残した語：ARCH_CASES の Vertex AI／Vertex AI Vector Search（findy-tools の事例）、ARCH_AG の図の Vertex AI Search・Claude／Vertex AI…",
+   "last_checked": "2026-11-13",
    "proxy_blocked": [
-    "docs.cloud.google.com"
+    "developers.openai.com",
+    "findy-tools.io"
    ]
   },
   "architect-sa": {
@@ -248,18 +259,15 @@
   },
   "govdojo": {
    "status": "checked",
-   "last_attempt": "2026-11-12",
-   "fixed": 0,
+   "last_attempt": "2026-11-13",
+   "fixed": 2,
    "partial": 0,
    "rejected": 0,
-   "unverified": 3,
-   "checked_ok": 5,
-   "blocked_hosts": [
-    "www.cas.go.jp (404)",
-    "eur-lex.europa.eu (未試行・既知のボット確認)"
-   ],
-   "coverage": "compare.json の upcoming は最早が2026-12-02で、今日(2026-11-12)までに過ぎた予定は無い。画面の「未確認」点のうち、EU AI Omnibus日程・NIST・文科省・個情委・コロラド・韓国AI基本法・インド・米連邦先占を確認。韓国と米連邦先占は検索結果のみ(一次ページ未開封)。日本のAI基本計画・AI指針(内閣官房ページは404)、英国・シンガポール・中国、ISO、industries.json の各業界(EUR-Lex依存の未確認注記など)、GOVDOJO_BANK の個別問題は見ていない。10月31日以降に動いた確認済みの変更は見つからず、置換案は無し。",
-   "last_checked": "2026-11-12",
+   "unverified": 4,
+   "checked_ok": 11,
+   "blocked_hosts": [],
+   "coverage": "data/govdojo の lowcode.json・kit.json・usecases.json の Microsoft 製品名（Copilot Studio・Agent Builder・Agent 365・Foundry・Entra Agent ID・Purview・Sentinel・Dataverse・Copilot Agent Kit 等）を Microsoft Learn で照合（11件の checked_ok＋改称1件）。regs/industries/compare/templates/kit の中には Vertex・Bedrock・Q Developer・GPT-5 の語は無く、AWS・Google・Salesforce の製品名は道場データに無い（Q Developer・GPT-5 は jsx の他範囲の定数にあり、Q Developer は既に2027年4月30日サポート終了と書かれていた）。industries.json の ChatGPT／Bing は事例の記述で対象外。見ていない箇所：jsx の GOVDOJO_BANK（判定演習）に『GitHub Copilot ハーネス』が約20か所残っている（行 165347・186219・197916・197934・197948・197954 付近。dojo-quiz 範囲の仕事。クイズの選択肢や、『GitHub…",
+   "last_checked": "2026-11-13",
    "proxy_blocked": []
   },
   "slalom-global": {
@@ -281,56 +289,16 @@
   },
   "postmortem-industry": {
    "status": "checked",
-   "last_attempt": "2026-11-12",
-   "fixed": 2,
+   "last_attempt": "2026-11-13",
+   "fixed": 0,
    "partial": 0,
    "rejected": 0,
    "unverified": 11,
-   "checked_ok": 14,
-   "blocked_hosts": [
-    "themarkup.org",
-    "www.statescoop.com",
-    "www.route-fifty.com",
-    "www.vice.com",
-    "chat.nyc.gov",
-    "www.theregister.com",
-    "www.techradar.com",
-    "futurism.com",
-    "www.emarketer.com",
-    "atmarkit.itmedia.co.jp",
-    "www.pwc.com(403)",
-    "www.gartner.com(403)",
-    "www.dbs.com",
-    "www.klarna.com",
-    "dora.dev",
-    "newsroom.ibm.com",
-    "www.veracode.com",
-    "www.prosci.com",
-    "www.spglobal.com",
-    "www.ey.com",
-    "www.nri.co.jp",
-    "news.panasonic.com",
-    "www.mufg.jp",
-    "www.morganstanley.com",
-    "news.siemens.com",
-    "www.iea.org(403)",
-    "www.dewr.gov.au",
-    "www.abc.net.au"
-   ],
-   "coverage": "候補ファイルの『既に古いと確かめた語』6件（87.2%）は全件処理（原稿上は旧値が約23か所：置換案は7種、クイズは unverified）。『最新』系の候補23件は『直近』『最新版』という一般語で、日付つきの古い事実ではないため直していない。PM_CASES は10事例のうち Zillow・Air Canada・Avianca・Watson・A-level・Bard を確認、NYC・McDonald's・Deloitte は続報を検索で見つけたが原文は開けず unverified。IND_DATA/IND_DEEP/IND_DEEP2 は自治体・Menlo・Salesforce・FSA・Gartner(検索のみ)・企業発表数字を抜き取り、企業発表系の多くは出典ホストが開けず未確認。VALUE_TREE は Stanford・総務省白書・Menlo を確認、PwC・IPA・DORA・IBM・Veracode・Prosci・BCG・S&P・EY・NRI は未確認または一部のみ。SHELF_GROUPS・AX_* は製品名・日付・統計の固有表現がほぼなく、機械的な grep のみ（問題なし）。照合した出典は約20件、そのうち原文を開いたもの約14件。",
-   "last_checked": "2026-11-12",
-   "proxy_blocked": [
-    "themarkup.org",
-    "www.statescoop.com",
-    "www.route-fifty.com",
-    "www.vice.com",
-    "chat.nyc.gov",
-    "www.theregister.com",
-    "www.techradar.com",
-    "futurism.com",
-    "www.emarketer.com",
-    "atmarkit.itmedia.co.jp"
-   ]
+   "checked_ok": 1,
+   "blocked_hosts": [],
+   "coverage": "製品名・モデル名で PM_CASES・PM_LANES・IND_*・SHELF_*・VALUE_TREE・AX_* を grep。Bard（PM_CASES 152938行、4件・2023年の発表デモの失敗）は当時の出来事なのでそのまま。ChatGPT・GPTs・Agentforce・Copilot（GitHub／Siemens Industrial Copilot）・Watson は現役名または歴史的事例で改称の疑いなし（Agentforce・Copilot・Watson は個別に出典を開いていない）。モデル世代を『最新』と書いた箇所は無し（『最新』は『最新版／最新モデルへ差し替え』の一般論）。carry は統計・企業発表の古さが中心で今回の焦点外のため未確認のまま引き継ぐ。",
+   "last_checked": "2026-11-13",
+   "proxy_blocked": []
   },
   "itsec": {
    "status": "checked",
@@ -378,58 +346,38 @@
   },
   "checks-notes": {
    "status": "checked",
-   "last_attempt": "2026-11-12",
-   "fixed": 6,
+   "last_attempt": "2026-11-13",
+   "fixed": 0,
    "partial": 0,
-   "rejected": 1,
-   "unverified": 12,
-   "checked_ok": 8,
-   "blocked_hosts": [
-    "newsroom.ibm.com",
-    "darioamodei.com",
-    "www.axios.com",
-    "www.gov.ca.gov",
-    "www.spglobal.com",
-    "www.cao.go.jp",
-    "www.klarna.com",
-    "dora.dev",
-    "www.flexera.com",
-    "openai.com(403)",
-    "www.gartner.com(403)",
-    "www.mckinsey.com(503)",
-    "www.meti.go.jp(403)",
-    "www.pwc.com(403)"
-   ],
-   "coverage": "確かめた範囲：自治体の生成AI導入率（総務省PDFで本文を確認、checkcore/checkax/industry系の旧値を置換案に）、Claude Cowork統合、Menlo Ventures 2025年版と2026年版、金融庁、AI推進法、EU AI Act罰則、NOTE_CORPORAの件数・期間と画面の出所注記のアプリ内照合。既に古いと確かめた語の残り：87.2%/29.9%（14か所を直し、他は149403の『前回調査』として正しいので残す。82.7%は81%へ置換）、26.7%（8か所すべて別の統計のため直さない。個人利用率として使っている箇所は見つからず）、Claude Cowork（NOTE_CORPORAの1か所を直す。NOTE_ARTICLES内の言及は記事要約なので直さない）。見ていない範囲：CHECK_*（約65万字）とCONV_DRILLS・HYPO_*は年・モデル名・数字を含む問題のうち代表だけで全量は見ていない（モデル名はほぼ無く、Gartner/McKinsey/IBM/S&P等の統計が中心）。NOTE_ARTICLES・NOTE_ART_ENは要約のため書き換えない前提で、期間表記の候補（過ぎた予定33件）は元記事の予測として正しく過去の言及なので触れていない。NOTE_GOVの一次ソースは金融庁のみ開けた。NOTE_GT_FIGS/PMAP/…",
-   "last_checked": "2026-11-12",
-   "proxy_blocked": [
-    "newsroom.ibm.com",
-    "darioamodei.com",
-    "www.axios.com",
-    "www.gov.ca.gov",
-    "www.spglobal.com",
-    "www.cao.go.jp",
-    "www.klarna.com",
-    "dora.dev",
-    "www.flexera.com"
-   ]
+   "rejected": 0,
+   "unverified": 0,
+   "checked_ok": 4,
+   "blocked_hosts": [],
+   "coverage": "担当定数（ISSUE_*・HYPO_*・CONV_DRILLS・CHECK_*_SEED/GEN/GEN2/GEN3/GEN4・NOTE_CORPORA・NOTE_GOV・NOTE_GT_*・NOTEISSUE_*）を、GPT・o系・Gemini・Claude各製品・Vertex AI・Agentspace・Chronicle・Bedrock Agents・Kendra・Q Business・QuickSight・Azure AI Studio/Foundry・Azure Cache・Copilot Studio・Assistants API・AutoGen・Semantic Kernel など約100語で grep した。該当は NOTE_CORPORA/NOTE_GOV の根拠欄（記事の題名・当時の事例）と、CHECK_*GEN* の Copilot（GitHub Copilot・Lumen・Siemens の事例、統計）・ChatGPT（顧客の質問文）・Agentforce だけで、改称・提供終了・世代交代の古い名前を現行として書いた箇所は見つからなかったため findings は0件。NOTE_ARTICLES・NOTE_ART_EN は対象外。Q Developer／o3 の候補は担当定数内に実在せず（NOTE_ARTICLES 側）。carry-checks-notes…",
+   "last_checked": "2026-11-13",
+   "proxy_blocked": []
   },
   "dojo-quiz": {
    "status": "checked",
-   "last_attempt": "2026-11-12",
+   "last_attempt": "2026-11-13",
    "fixed": 2,
    "partial": 0,
-   "rejected": 0,
+   "rejected": 1,
    "unverified": 4,
-   "checked_ok": 10,
+   "checked_ok": 7,
    "blocked_hosts": [
     "deepmind.google",
-    "openai.com"
+    "projectmariner.google",
+    "platform.openai.com",
+    "www.dwt.com"
    ],
-   "coverage": "MCQS（約4,991問）から、現在形・「現在」「現時点」「最新」・年・モデル名・規制日付を含む問題文83問をスクリプトで洗い出し、候補ファイルの各語（Vertex AI、Project Mariner、49.7%、26.7%、85.1%、過ぎた予定）と合わせて照合。出典を開いて照合したのは約18件。見ていない範囲：問題文に年・語を含まない解説内の数値、料金・上限値の問題（Claude 3.5 Sonnet 入力単価、GPT-4 Turbo 128k など）は個別に出典を開いていない。候補の「最新と書く」314件は先頭80件のうち大半が『最新技術』『最新値』などの一般語・カテゴリ名「最新動向」で、時点依存の主張ではなかった。GPT-5（2025-08）の仕組みの問題は openai.com が403で未確認。",
-   "last_checked": "2026-11-12",
+   "coverage": "MCQS（126926-137835行）を全文走査：古いと確かめた語（Vertex AI・Agentspace・Chronicle・Bedrock Agents・Kendra・Q Business・Quick・Azure Cache for Redis・AI Studio/Foundry）は Vertex AI の3問（反映済み）以外に無し。『最新/主力/現行/現在/flagship/current』と製品名が近接する箇所は8件で全て年付きの歴史。Mariner 3か所は過去形で正しく据置。照合は約12項目（Agent Platform、Azure OpenAI、Colorado、EN 18286、DMA、Mariner、SK/AutoGen、Assistants API、Swarm、SageMaker、Nova/Titan）。Titan（AWS）の提供終了日、Amazon Nova の縮小報道（設問は2024年の発表で歴史）は未確認。『Azure OpenAI Service』は他の定数（140378・155061・155640・160919・161458・188950・193196・197916 付近など）にも多数あるが、担当外（事例・試験名・集計）なので触れていない。Q&Aの『現時点で』を含む他の問題（EU AI法の施行日など政策系）は先頭から全部は照合していない。",
+   "last_checked": "2026-11-13",
    "proxy_blocked": [
-    "deepmind.google"
+    "deepmind.google",
+    "projectmariner.google",
+    "platform.openai.com",
+    "www.dwt.com"
    ]
   },
   "foresight-library-a": {
@@ -597,6 +545,33 @@
    "partial": 0,
    "rejected": 0,
    "unverified": 8
+  },
+  {
+   "date": "2026-11-13",
+   "areas": [
+    "companies-a",
+    "companies-b",
+    "companies-c",
+    "dojo-quiz",
+    "govdojo"
+   ],
+   "fixed": 7,
+   "partial": 0,
+   "rejected": 1,
+   "unverified": 38
+  },
+  {
+   "date": "2026-11-13",
+   "areas": [
+    "strategy-xform",
+    "archcase",
+    "postmortem-industry",
+    "checks-notes"
+   ],
+   "fixed": 4,
+   "partial": 0,
+   "rejected": 1,
+   "unverified": 20
   }
  ]
 }
