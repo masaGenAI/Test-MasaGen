@@ -509,6 +509,22 @@
     "deprecated"
    ],
    "how": "現役の推奨として書く箇所に終了時期と移行先を添える（出典は curl では開けず WebFetch で読める）"
+  },
+  {
+   "old": "Intercom Fin",
+   "now": "Intercom は2026年に社名を Fin に変更（ヘルプデスク製品の名前として Intercom は残る）。2026-09-10 に Salesforce が Fin の買収を完了。Fin AI Agent の料金は今は1アウトカム0.99ドル（解決のほか手続きの引き継ぎなども対象、Qualification は9.99ドル）",
+   "source": "https://fin.ai/about",
+   "as_of": "2026-11-13",
+   "ok_near": [
+    "旧 Intercom",
+    "旧Intercom",
+    "formerly Intercom",
+    "当時の社名",
+    "Salesforce が買収",
+    "Salesforceが買収",
+    "acquisition of Fin"
+   ],
+   "how": "今の事実として書く箇所は「Fin（旧 Intercom）」と「1アウトカム0.99ドル」に。投入当時の出来事（解決1件0.99ドルで投入）は当時のまま残し、時点つきの注記を1回だけ添える。出典：fin.ai/about・fin.ai/pricing・fin.ai/blog/salesforce-completes-acquisition-of-fin"
   }
  ]
 }
