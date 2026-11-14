@@ -2584,11 +2584,11 @@
    "Amazon プレスセンター",
    "Amazon Press Center"
   ],
-  "org": "",
+  "org": "Amazon",
   "url": "https://press.aboutamazon.com/",
   "desc": [
-   "ENOTFOUND（2回）",
-   "ENOTFOUND (twice)"
+   "Amazon のプレスリリースと報道向け資料（画像・動画、投資家向け情報など）への公式入口",
+   "Official entry point to Amazon's press releases and media resources, including images, videos and investor relations links."
   ],
   "freq": [
    "",
@@ -2617,11 +2617,11 @@
    "Amazon IR",
    "Amazon IR"
   ],
-  "org": "",
+  "org": "Amazon",
   "url": "https://ir.aboutamazon.com/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "Amazon の投資家向け情報（IR）サイトへの入口（本文はサイト側の制限で未確認、2026年11月時点）",
+   "Entry point to Amazon's investor relations site (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
    "",
@@ -2650,11 +2650,11 @@
    "AWS News Blog",
    "AWS News Blog"
   ],
-  "org": "",
+  "org": "Amazon Web Services",
   "url": "https://aws.amazon.com/jp/blogs/aws/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "AWS の新サービス・機能発表を載せる公式ニュースブログ（週次ラウンドアップを含む）",
+   "Official AWS news blog carrying new service and feature posts, including weekly roundups."
   ],
   "freq": [
    "",
@@ -2683,11 +2683,11 @@
    "AWS What's New",
    "AWS What's New"
   ],
-  "org": "",
+  "org": "Amazon Web Services",
   "url": "https://aws.amazon.com/jp/new/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "AWSの発表・サービス提供開始・ニュースを日本語で読める「AWSの最新情報」ページ",
+   "Japanese-language AWS What's New page listing AWS announcements, launches, news and innovations."
   ],
   "freq": [
    "",
@@ -2749,11 +2749,11 @@
    "Microsoft Source",
    "Microsoft Source"
   ],
-  "org": "",
+  "org": "Microsoft",
   "url": "https://news.microsoft.com/source/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "Microsoft の公式ニュースサイト「Source」への入口（本文はサイト側の制限で未確認、2026年11月時点）",
+   "Entry point to Microsoft Source, Microsoft's official news site (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
    "",
@@ -2782,11 +2782,11 @@
    "Microsoft Source Asia 日本",
    "Microsoft Source Asia Japan"
   ],
-  "org": "",
+  "org": "Microsoft",
   "url": "https://news.microsoft.com/source/asia/region/japan-ja/?lang=ja",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "Microsoft の日本向けニュース（Source Asia 日本）への入口（本文はサイト側の制限で未確認、2026年11月時点）",
+   "Entry point to Microsoft's Japan news site, Source Asia Japan (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
    "",
@@ -2815,11 +2815,11 @@
    "Official Microsoft Blog",
    "Official Microsoft Blog"
   ],
-  "org": "",
+  "org": "Microsoft",
   "url": "https://blogs.microsoft.com/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "Microsoft の公式ブログへの入口（本文はサイト側の制限で未確認、2026年11月時点）",
+   "Entry point to the Official Microsoft Blog (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
    "",
@@ -2848,11 +2848,11 @@
    "Azure Blog",
    "Azure Blog"
   ],
-  "org": "",
+  "org": "Microsoft",
   "url": "https://azure.microsoft.com/en-us/blog/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "Azureの最新ニュース・アップデート・発表を専門家が伝える公式ブログ",
+   "Official Microsoft Azure Blog with news, updates and announcements from Azure experts."
   ],
   "freq": [
    "",
@@ -2914,11 +2914,11 @@
    "Google AI ブログ",
    "Google AI Blog"
   ],
-  "org": "",
+  "org": "Google",
   "url": "https://blog.google/innovation-and-ai/technology/ai/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "Google が AI・機械学習で進めている取り組みを載せる Google 公式ブログの AI セクション",
+   "AI section of the official Google Blog, covering the company's work in AI and machine learning."
   ],
   "freq": [
    "",
@@ -2947,11 +2947,11 @@
    "Alphabet IR",
    "Alphabet IR"
   ],
-  "org": "",
+  "org": "Alphabet",
   "url": "https://abc.xyz/investor/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "Alphabet の投資家向け情報（IR）への入口（本文はサイト側の制限で未確認、2026年11月時点）",
+   "Entry point to Alphabet's investor relations information (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
    "",
@@ -2980,11 +2980,11 @@
    "Google Cloud プレスコーナー",
    "Google Cloud Press Corner"
   ],
-  "org": "",
+  "org": "Google Cloud",
   "url": "https://www.googlecloudpresscorner.com/press-releases",
   "desc": [
-   "旧 URL からの 301 先。ENOTFOUND",
-   "301 target of the old URL. ENOTFOUND"
+   "Google Cloud のプレスコーナーにあるプレスリリース一覧（年・カテゴリ別に絞り込める）",
+   "Press release list in the Google Cloud Press Corner, filterable by year and category."
   ],
   "freq": [
    "",
@@ -3013,11 +3013,11 @@
    "Salesforce Newsroom",
    "Salesforce Newsroom"
   ],
-  "org": "",
+  "org": "Salesforce",
   "url": "https://www.salesforce.com/news/?bc=OTH",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "最新ニュース、顧客成功事例、調査、メディア向け資料を掲載するSalesforce公式ニュースルーム",
+   "Official Salesforce Newsroom with latest news and insights, customer success stories, research and media resources."
   ],
   "freq": [
    "",
@@ -3046,11 +3046,11 @@
    "Salesforce IR",
    "Salesforce IR"
   ],
-  "org": "",
+  "org": "Salesforce",
   "url": "https://investor.salesforce.com/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "Salesforce の投資家向け情報（IR）サイトへの入口（本文はサイト側の制限で未確認、2026年11月時点）",
+   "Entry point to Salesforce's investor relations site (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
    "",
@@ -3079,11 +3079,11 @@
    "Snowflake ブログ",
    "Snowflake Blog"
   ],
-  "org": "",
+  "org": "Snowflake",
   "url": "https://www.snowflake.com/en/blog/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "Snowflake の公式ブログへの入口（本文はサイト側の制限で未確認、2026年11月時点）",
+   "Entry point to Snowflake's official blog (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
    "",
@@ -3112,11 +3112,11 @@
    "Snowflake IR",
    "Snowflake IR"
   ],
-  "org": "",
+  "org": "Snowflake",
   "url": "https://investors.snowflake.com/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "Snowflake の投資家向け情報（IR）サイトへの入口（本文はサイト側の制限で未確認、2026年11月時点）",
+   "Entry point to Snowflake's investor relations site (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
    "",
@@ -3145,11 +3145,11 @@
    "Databricks ブログ",
    "Databricks Blog"
   ],
-  "org": "",
+  "org": "Databricks",
   "url": "https://www.databricks.com/blog",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "Databricksの公式ブログ（全カテゴリ）への入口",
+   "Entry point to the official Databricks Blog, covering all categories."
   ],
   "freq": [
    "",
@@ -3178,11 +3178,11 @@
    "Databricks ニュースルーム",
    "Databricks Newsroom"
   ],
-  "org": "",
+  "org": "Databricks",
   "url": "https://www.databricks.com/company/newsroom",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "Databricks のニュースと注目のプレスリリース、報道関係者向け資料（プレスキット）を載せる公式ニュースルーム",
+   "Official Databricks newsroom with news, featured press releases and a press kit."
   ],
   "freq": [
    "",
@@ -3211,11 +3211,11 @@
    "NVIDIA Newsroom",
    "NVIDIA Newsroom"
   ],
-  "org": "",
+  "org": "NVIDIA",
   "url": "https://nvidianews.nvidia.com/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "最新ニュース・過去記事の検索・マルチメディア・役員略歴・広報連絡先を載せる NVIDIA の公式ニュースルーム",
+   "NVIDIA's official newsroom, with the latest news, an archive search, multimedia, executive bios, and media contacts."
   ],
   "freq": [
    "",
@@ -3244,11 +3244,11 @@
    "NVIDIA IR",
    "NVIDIA IR"
   ],
-  "org": "",
+  "org": "NVIDIA",
   "url": "https://investor.nvidia.com/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "NVIDIA の投資家向け情報（IR）サイトへの入口（本文はサイト側の制限で未確認、2026年11月時点）",
+   "Entry point to NVIDIA's investor relations site (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
    "",
@@ -3277,11 +3277,11 @@
    "OpenAI News",
    "OpenAI News"
   ],
-  "org": "",
+  "org": "OpenAI",
   "url": "https://openai.com/news/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "OpenAIの公式ニュースへの入口（本文はサイト側の制限で未確認、2026年11月時点）",
+   "OpenAI's official news page (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
    "",
@@ -3310,11 +3310,11 @@
    "Meta AI ブログ",
    "Meta AI Blog"
   ],
-  "org": "",
+  "org": "Meta",
   "url": "https://ai.meta.com/blog/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "Meta の人工知能に関する最新ニュースを載せる公式ブログ（AI at Meta）",
+   "Official AI at Meta blog with the latest artificial intelligence news from Meta."
   ],
   "freq": [
    "",
@@ -3343,11 +3343,11 @@
    "Meta IR",
    "Meta IR"
   ],
-  "org": "",
+  "org": "Meta",
   "url": "https://investor.atmeta.com/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "Meta の投資家向け情報（IR）への入口（本文はサイト側の制限で未確認、2026年11月時点）",
+   "Entry point to Meta's investor relations information (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
    "",
@@ -3376,11 +3376,11 @@
    "AWS re:Invent",
    "AWS re:Invent"
   ],
-  "org": "",
+  "org": "Amazon Web Services",
   "url": "https://aws.amazon.com/jp/events/reinvent/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "AWS の年次カンファレンス re:Invent の公式ページ（2026年は11月30日〜12月4日、ラスベガス開催と掲載、2026年11月時点）",
+   "Official page for AWS's annual re:Invent conference (listed for Nov 30-Dec 4, 2026, in Las Vegas, as of Nov 2026)."
   ],
   "freq": [
    "",
@@ -3409,11 +3409,11 @@
    "Microsoft Build",
    "Microsoft Build"
   ],
-  "org": "",
+  "org": "Microsoft",
   "url": "https://build.microsoft.com/en-US/home",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "Microsoft の開発者向けイベント Build の公式サイト",
+   "Official site of Microsoft Build, Microsoft's event designed for developers."
   ],
   "freq": [
    "",
@@ -3442,11 +3442,11 @@
    "Microsoft Ignite",
    "Microsoft Ignite"
   ],
-  "org": "",
+  "org": "Microsoft",
   "url": "https://ignite.microsoft.com/en-US/home",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "Microsoft Ignite の公式サイトで、セッション・ラボ・登壇者の情報と参加登録への入口（2026年11月17〜20日にサンフランシスコ開催と掲載、2026年11月時点）",
+   "Official Microsoft Ignite site for registration and information on sessions, labs and speakers (listed for November 17-20, 2026 in San Francisco, as of Nov 2026)."
   ],
   "freq": [
    "",
@@ -3475,11 +3475,11 @@
    "Google Cloud Next",
    "Google Cloud Next"
   ],
-  "org": "",
+  "org": "Google Cloud",
   "url": "https://www.googlecloudevents.com/next-vegas",
   "desc": [
-   "301 先。ENOTFOUND",
-   "301 target. ENOTFOUND"
+   "Google Cloud の年次イベント「Google Cloud Next」の公式イベントサイトへの入口（本文はこの環境から開けず未確認、2026年11月時点）",
+   "Entry point to the official site of Google Cloud's annual event, Google Cloud Next (page body not checked: not reachable from this environment, as of Nov 2026)."
   ],
   "freq": [
    "",
@@ -3508,11 +3508,11 @@
    "Dreamforce",
    "Dreamforce"
   ],
-  "org": "",
+  "org": "Salesforce",
   "url": "https://www.salesforce.com/dreamforce/?bc=OTH",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "Salesforce の年次イベント Dreamforce の公式ページ（2026年分のオンデマンド視聴と2027年の案内）",
+   "Official page for Salesforce's Dreamforce event, with on-demand 2026 sessions and a notice for Dreamforce 2027."
   ],
   "freq": [
    "",
@@ -3541,11 +3541,11 @@
    "Snowflake Summit",
    "Snowflake Summit"
   ],
-  "org": "",
+  "org": "Snowflake",
   "url": "https://www.snowflake.com/en/summit/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "Snowflakeの年次イベントSnowflake Summitの公式ページ（本文はサイト側の制限で未確認、2026年11月時点）",
+   "Official page for Snowflake Summit, Snowflake's annual event (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
    "",
@@ -3574,11 +3574,11 @@
    "Data + AI Summit",
    "Data + AI Summit"
   ],
-  "org": "",
+  "org": "Databricks",
   "url": "https://www.databricks.com/dataaisummit",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "Databricks 主催 Data + AI Summit の公式サイトで、登壇者とセッションを掲載（次回は2027年6月21〜24日、サンフランシスコと掲載、2026年11月時点）",
+   "Official site of Databricks' Data + AI Summit, listing featured speakers and sessions (next edition shown as June 21-24, 2027 in San Francisco, as of Nov 2026)."
   ],
   "freq": [
    "",
@@ -3607,11 +3607,11 @@
    "NVIDIA GTC",
    "NVIDIA GTC"
   ],
-  "org": "",
+  "org": "NVIDIA",
   "url": "https://www.nvidia.com/gtc/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "NVIDIA の AI カンファレンス GTC の公式ページで、GTC 2027（サンノゼ、3月15〜18日）の案内と GTC 2026 のセッション動画を掲載（2026年11月時点）",
+   "Official page of NVIDIA's AI conference GTC, with GTC 2027 (San Jose, March 15-18) details and GTC 2026 session replays (as of Nov 2026)."
   ],
   "freq": [
    "",
@@ -3640,11 +3640,11 @@
    "Gartner Newsroom",
    "Gartner Newsroom"
   ],
-  "org": "",
+  "org": "Gartner",
   "url": "https://www.gartner.com/en/newsroom",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "Gartner のニュースルームへの入口（本文はサイト側の制限で未確認、2026年11月時点）",
+   "Entry point to Gartner's newsroom (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
    "",
@@ -3673,11 +3673,11 @@
    "Gartner Hype Cycle（AI）",
    "Gartner Hype Cycle (AI)"
   ],
-  "org": "",
+  "org": "Gartner",
   "url": "https://www.gartner.com/en/articles/hype-cycle-for-artificial-intelligence",
   "desc": [
-   "ENOTFOUND（URL 自体も記憶ベースで不確実）",
-   "ENOTFOUND (the URL itself is from memory and uncertain)"
+   "Gartner の AI 分野のハイプ・サイクルに関するページ（サイト側の制限で、URL が今も有効かと本文は未確認、2026年11月時点）",
+   "Gartner's page on the Hype Cycle for AI (blocked by the site; whether the URL is still valid and the page body are unchecked, as of Nov 2026)."
   ],
   "freq": [
    "",
@@ -3706,11 +3706,11 @@
    "ガートナージャパン ニュースルーム",
    "Gartner Japan Newsroom"
   ],
-  "org": "",
+  "org": "Gartner",
   "url": "https://www.gartner.co.jp/ja/newsroom",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "ガートナージャパンのニュースルームへの入口（本文はサイト側の制限で未確認、2026年11月時点）",
+   "Entry point to Gartner Japan's newsroom (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
    "",
@@ -3739,11 +3739,11 @@
    "IDC プレス",
    "IDC Press"
   ],
-  "org": "",
+  "org": "IDC",
   "url": "https://www.idc.com/about/press-releases/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "IDC のプレスリリース一覧で、AI インフラ支出などの調査発表を掲載",
+   "IDC's press release list, with research announcements such as AI infrastructure spending."
   ],
   "freq": [
    "",
@@ -3772,11 +3772,11 @@
    "IDC Japan",
    "IDC Japan"
   ],
-  "org": "",
+  "org": "IDC Japan",
   "url": "https://www.idc.com/jp/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "IT専門調査会社 IDC Japan の公式サイト（調査レポート・イベント・セミナー・コンサルティングの案内）",
+   "Official site of IT research firm IDC Japan, covering research reports, events, seminars and consulting."
   ],
   "freq": [
    "",
@@ -3805,11 +3805,11 @@
    "Forrester Blogs",
    "Forrester Blogs"
   ],
-  "org": "",
+  "org": "Forrester",
   "url": "https://www.forrester.com/blogs/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "Forresterのアナリストによる注目ブログ記事（Predictions 2027等）の一覧",
+   "Listing of featured blog posts by Forrester analysts, including Predictions 2027."
   ],
   "freq": [
    "",
@@ -3838,11 +3838,11 @@
    "McKinsey QuantumBlack Insights",
    "McKinsey QuantumBlack Insights"
   ],
-  "org": "",
+  "org": "McKinsey & Company",
   "url": "https://www.mckinsey.com/capabilities/quantumblack/our-insights",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "McKinsey の QuantumBlack に関する知見・記事（Insights）への入口（本文はこの環境から開けず未確認、2026年11月時点）",
+   "Entry point to insights from McKinsey's QuantumBlack (page body not checked: not reachable from this environment, as of Nov 2026)."
   ],
   "freq": [
    "",
@@ -3871,11 +3871,11 @@
    "McKinsey State of AI",
    "McKinsey State of AI"
   ],
-  "org": "",
+  "org": "McKinsey & Company",
   "url": "https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai",
   "desc": [
-   "ENOTFOUND（未試行・ドメイン遮断のため。URL は記憶ベース）",
-   "ENOTFOUND (not attempted because the domain is blocked; URL is from memory)"
+   "McKinsey の「The State of AI」のページ（この環境から開けず、URL が今も有効かと本文は未確認、2026年11月時点）",
+   "Page named 'The State of AI' on McKinsey's site (not reachable from this environment; whether the URL is still valid and the page body are unchecked, as of Nov 2026)."
   ],
   "freq": [
    "",
@@ -3904,11 +3904,11 @@
    "BCG AI Insights",
    "BCG AI Insights"
   ],
-  "org": "",
+  "org": "Boston Consulting Group",
   "url": "https://www.bcg.com/capabilities/artificial-intelligence/insights",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "BCG の AI 領域のインサイトへの入口（本文はサイト側の制限で未確認、2026年11月時点）",
+   "Entry point to BCG's artificial intelligence insights (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
    "",
@@ -3937,11 +3937,11 @@
    "Deloitte Applied AI",
    "Deloitte Applied AI"
   ],
-  "org": "",
+  "org": "Deloitte",
   "url": "https://www.deloitte.com/us/en/what-we-do/capabilities/applied-artificial-intelligence.html",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "Deloitte 米国サイトの「Applied Artificial Intelligence」ページ",
+   "Deloitte US 'Applied Artificial Intelligence' page."
   ],
   "freq": [
    "",
@@ -4003,11 +4003,11 @@
    "PwC AI",
    "PwC AI"
   ],
-  "org": "",
+  "org": "PwC",
   "url": "https://www.pwc.com/gx/en/issues/artificial-intelligence.html",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "PwC のグローバルサイトにある人工知能（AI）テーマのページ（本文はサイト側の制限で未確認、2026年11月時点）",
+   "PwC global site page on the artificial intelligence topic (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
    "",
@@ -4036,11 +4036,11 @@
    "Slalom Insights",
    "Slalom Insights"
   ],
-  "org": "",
+  "org": "Slalom",
   "url": "https://www.slalom.com/us/en/insights",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "技術・AI・ビジネスの動向に関する Slalom の見解記事（インサイト）の一覧",
+   "Slalom's list of insight articles with its perspectives on developments in technology, AI, and business."
   ],
   "freq": [
    "",
@@ -4135,11 +4135,11 @@
    "Sequoia Stories",
    "Sequoia Stories"
   ],
-  "org": "",
+  "org": "Sequoia Capital",
   "url": "https://sequoiacap.com/stories/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "Sequoia Capital の Stories（創業者の長編紹介、市場・技術の見方、投資先のニュース）",
+   "Sequoia Capital's Stories section: long-form founder profiles, market and technology perspectives, and portfolio news."
   ],
   "freq": [
    "",
@@ -4168,11 +4168,11 @@
    "a16z AI",
    "a16z AI"
   ],
-  "org": "",
+  "org": "Andreessen Horowitz (a16z)",
   "url": "https://a16z.com/ai/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "a16zのAI分野のページ。最新記事、AI Canon、オープンソース・開発プロジェクトへの入口",
+   "a16z's AI hub with latest articles, the AI Canon and open source and dev projects."
   ],
   "freq": [
    "",
@@ -4201,11 +4201,11 @@
    "Bond Capital",
    "Bond Capital"
   ],
-  "org": "",
+  "org": "BOND (Bond Capital)",
   "url": "https://www.bondcap.com/",
   "desc": [
-   "ENOTFOUND（Mary Meeker の AI Trends レポートが現行で公開中かも未確認）",
-   "ENOTFOUND (also unconfirmed whether Mary Meeker's AI Trends report is currently published)"
+   "起業家を支援するグローバルなテクノロジー投資会社と自己紹介する BOND（Bond Capital）の公式サイト",
+   "Official site of BOND, which describes itself as a global technology investment firm supporting founders."
   ],
   "freq": [
    "",
@@ -4234,11 +4234,11 @@
    "Source Global Research",
    "Source Global Research"
   ],
-  "org": "",
+  "org": "Source Global Research",
   "url": "https://sourceglobalresearch.com/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "プロフェッショナルサービス業界向けの調査データとインサイトを提供する Source Global Research の公式サイト",
+   "Official site of Source Global Research, which provides insights and data for the professional services industry."
   ],
   "freq": [
    "",
@@ -4267,11 +4267,11 @@
    "Consultancy.uk",
    "Consultancy.uk"
   ],
-  "org": "",
+  "org": "Consultancy.uk",
   "url": "https://www.consultancy.uk/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "英国のコンサルティング業界向けプラットフォーム（ニュース、コンサル企業、求人、イベントを掲載）",
+   "Online platform for the UK consulting industry with news, consulting firms, jobs and events."
   ],
   "freq": [
    "",
@@ -4300,11 +4300,11 @@
    "ITmedia エンタープライズ",
    "ITmedia Enterprise"
   ],
-  "org": "",
+  "org": "アイティメディア",
   "url": "https://www.itmedia.co.jp/enterprise/",
   "desc": [
-   "ENOTFOUND",
-   "ENOTFOUND"
+   "IT部門向けの実践情報を載せるITmedia エンタープライズのトップページ",
+   "Top page of ITmedia Enterprise, a practical information site for IT departments."
   ],
   "freq": [
    "",

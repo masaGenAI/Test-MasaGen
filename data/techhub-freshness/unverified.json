@@ -1359,6 +1359,15 @@
   "last_tried": "2026-11-13"
  },
  {
+  "area": "foresight-library-a",
+  "tab": "fs_library",
+  "current_text": "Gartner Hype Cycle（AI）（s112）のURL https://www.gartner.com/en/articles/hype-cycle-for-artificial-intelligence",
+  "concern": "作成時の作業メモに「URL 自体も記憶ベースで不確実」とあった。公式の Hype Cycle for AI の解説ページに着くかを確かめたい（説明欄には「URL が今も有効かと本文は未確認」と書いた）。",
+  "why": "2026-11-14：www.gartner.com はサイト側の 403（Cloudflare のボット確認）で、回避していない。",
+  "first_seen": "2026-11-14",
+  "last_tried": "2026-11-14"
+ },
+ {
   "area": "foresight-library-b",
   "tab": "fs_collection",
   "current_text": "c358 間違いなく伸びる業界3選 https://youtube.com/shorts/yaMF5HTypf0?feature=share",
