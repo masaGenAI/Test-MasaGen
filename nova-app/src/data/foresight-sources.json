@@ -1531,8 +1531,8 @@
   "org": "経済産業省",
   "url": "https://www.meti.go.jp/policy/mono_info_service/joho/index.html",
   "desc": [
-   "経済産業省の情報産業（半導体・データセンター政策）の入口ページ（URLは「ページが存在しません」の画面を返し、本文は未確認、2026年11月時点）",
-   "METI's information industry (semiconductor and data center policy) page (the URL returned a 'page not found' screen, so the body was not checked, as of Nov 2026)."
+   "経済産業省の情報産業（半導体・データセンター政策）の入口ページ（本文はサイト側の制限で未確認、2026年11月時点）",
+   "METI's information industry (semiconductor and data center policy) page (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
    "要確認",
@@ -1954,8 +1954,8 @@
    "Rules"
   ],
   "name": [
-   "US CAISI (NIST)",
-   "US CAISI (NIST)"
+   "US CAISSI（旧CAISI、NIST）",
+   "US CAISSI (formerly CAISI, NIST)"
   ],
   "org": "NIST（米国国立標準技術研究所）",
   "url": "https://www.nist.gov/caissi",
@@ -2090,7 +2090,7 @@
    "OECD AI Incidents Monitor"
   ],
   "org": "OECD.AI（OECD）",
-  "url": "https://oecd.ai/en/incidents?search_terms=%5B%5D&and_condition=false&from_date=1900-10-12&to_date=2026-10-12&properties_config=%7B%22principles%22:%5B%5D,%22industries%22:%5B%5D,%22harm_types%22:%5B%5D,%22harm_levels%22:%5B%5D,%22harmed_entities%22:%5B%5D,%22business_functions%22:%5B%5D,%22ai_tasks%22:%5B%5D,%22autonomy_levels%22:%5B%5D,%22languages%22:%5B%5D%7D&order_by=date&num_results=20",
+  "url": "https://oecd.ai/en/incidents",
   "desc": [
    "AIによる被害事例（AIインシデント）を記録し、政策立案の根拠を提供するOECD.AIのモニター",
    "OECD.AI monitor documenting AI incidents to give policymakers an evidence base for safer AI."
@@ -2884,8 +2884,8 @@
   "org": "Microsoft",
   "url": "https://www.microsoft.com/en-us/investor/earnings/default",
   "desc": [
-   "Microsoft の投資家向け情報（IR）サイトの決算メニューページ（決算の一覧は本文になく、メニューとリンクのみ、2026年11月時点）",
-   "Menu page of Microsoft's investor relations site for earnings; no earnings list in the body, only menus and links (as of Nov 2026)."
+   "Microsoft の投資家向け情報（IR）サイトの決算ページ（以前に読めた本文はメニューと最新決算へのリンクのみで、決算の一覧は未確認、2026年11月時点）",
+   "Earnings page of Microsoft's investor relations site (the body read earlier showed only menus and a link to the latest results; the earnings list is unchecked, as of Nov 2026)."
   ],
   "freq": [
    "四半期ごと",

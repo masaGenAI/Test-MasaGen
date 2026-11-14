@@ -1443,26 +1443,8 @@
   "area": "foresight-library-b",
   "tab": "fs_library",
   "current_text": "s047 経産省 情報産業（半導体・DC政策）のリンク https://www.meti.go.jp/policy/mono_info_service/joho/index.html",
-  "concern": "2026-11-14 にこの URL は経産省の「ページが存在しません」の画面（HTTP 403）を返した。移転先の公式ページが分からないので、リンクは直していない。",
-  "why": "経産省サイト内で移転先を確かめられなかった（推測の URL は書かない）。",
-  "first_seen": "2026-11-14",
-  "last_tried": "2026-11-14"
- },
- {
-  "area": "foresight-library-a",
-  "tab": "fs_library",
-  "current_text": "s064 OECD AI Incidents Monitor のリンク（URL に to_date=2026-10-12 が入っている）",
-  "concern": "URL の絞り込みに終了日 2026-10-12 が入っており、一覧はその日までの事例しか出ない。日付の条件を外した公式 URL にするか決めたい。",
-  "why": "条件を外した URL が同じ一覧を返すかを、まだ確かめていない。",
-  "first_seen": "2026-11-14",
-  "last_tried": "2026-11-14"
- },
- {
-  "area": "foresight-library-a",
-  "tab": "fs_library",
-  "current_text": "s060 情報源名「US CAISI (NIST)」",
-  "concern": "2026-11-14 に https://www.nist.gov/caissi の表題は「Center for Advancing Innovation and Standards for Super Intelligence (CAISSI)」で、ページ内のニュースには CAISI（Center for AI Standards and Innovation）の表記も残る。情報源名を直すか決めたい。",
-  "why": "改称の公式発表を確かめていない。",
+  "concern": "このURLのページが今もあるかを確かめたい。2026-11-14 には経産省のトップページを含むサイト全体が、この環境に同じ「ページが存在しません」の画面（HTTP 403、5045バイト）を返したため、移転の証拠にはならない。",
+  "why": "経産省サイト全体がこの環境からのアクセスを拒否している（回避しない）。",
   "first_seen": "2026-11-14",
   "last_tried": "2026-11-14"
  },
@@ -1471,7 +1453,7 @@
   "tab": "fs_library",
   "current_text": "s088 Microsoft IR 決算一覧のリンク https://www.microsoft.com/en-us/investor/earnings/default",
   "concern": "ページはメニューとリンクだけで決算の一覧が本文に無い（最新決算へのリンクは aka.ms 経由）。一覧の載る公式ページへ差し替えるか決めたい。",
-  "why": "aka.ms はこの環境のネットワーク許可リストの外で、リンク先を確かめられない。親ページ /en-us/investor は 502。",
+  "why": "2026-11-14 は「We are currently experiencing high demand」の 403（サイト側、再試行・回避なし）。以前 WebFetch で読めた本文はメニューと aka.ms 経由の最新決算リンクのみ（aka.ms は許可リスト外）。",
   "first_seen": "2026-11-14",
   "last_tried": "2026-11-14"
  }
