@@ -1033,23 +1033,23 @@
    "Arena（旧LMArena）",
    "Arena (formerly LMArena)"
   ],
-  "org": "",
+  "org": "Arena",
   "url": "https://arena.ai/leaderboard",
   "desc": [
-   "P（lmarena.ai拒否）。検索要約でドメイン稼働の言及のみ",
-   "P (lmarena.ai refused the fetch). Search summaries only mention that the domain is live"
+   "Arena（旧LMArena）のリーダーボードの公式ページ（本文はサイト側の制限で未確認、2026年11月時点）",
+   "Official leaderboard page of Arena (formerly LMArena) (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "ok",
@@ -1066,23 +1066,23 @@
    "METR Time Horizons",
    "METR Time Horizons"
   ],
-  "org": "",
+  "org": "METR",
   "url": "https://metr.org/time-horizons/",
   "desc": [
-   "N, S",
-   "N, S"
+   "最先端AIモデルのタスク完了時間地平（time horizon）の測定結果を載せる METR の公式ページ（現在は更新停止、最終更新2026年9月8日）",
+   "METR's official page with its measurements of task-completion time horizons for frontier AI models (no longer actively updated; last updated Sept 8, 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "更新停止（最終更新2026年9月8日）",
+   "No longer updated (last updated Sept 8, 2026)"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -1099,23 +1099,23 @@
    "ARC Prize Leaderboard",
    "ARC Prize Leaderboard"
   ],
-  "org": "",
+  "org": "ARC Prize",
   "url": "https://arcprize.org/leaderboard",
   "desc": [
-   "N, S",
-   "N, S"
+   "ARC-AGI-1〜3 のスコアとタスクあたりのコストでAIモデルを比較できるARC Prizeの公式リーダーボード",
+   "Official ARC Prize leaderboard comparing AI models on ARC-AGI-1 to 3 scores and cost per task."
   ],
   "freq": [
-   "",
-   ""
+   "随時（新モデルの評価ごと）",
+   "As needed (with each new model evaluation)"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -1132,23 +1132,23 @@
    "SWE-bench",
    "SWE-bench"
   ],
-  "org": "",
+  "org": "SWE-bench team",
   "url": "https://www.swebench.com/",
   "desc": [
-   "N。GitHub MCPも対象リポジトリ未許可",
-   "N. GitHub MCP access to the repository was not permitted either"
+   "ソフトウェア修正ベンチマーク SWE-bench の公式リーダーボードと、各ベンチマーク（Verified・Lite など）の解説を読めるサイト",
+   "Official SWE-bench leaderboards, with descriptions of each benchmark variant such as Verified and Lite."
   ],
   "freq": [
-   "",
-   ""
+   "随時",
+   "As needed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -1165,23 +1165,23 @@
    "Humanity's Last Exam",
    "Humanity's Last Exam"
   ],
-  "org": "",
+  "org": "Center for AI Safety・Scale AI",
   "url": "https://lastexam.ai/",
   "desc": [
-   "N, S",
-   "N, S"
+   "AI の難問ベンチマーク Humanity's Last Exam の論文・データセット・提出ダッシュボードと最新ニュースを載せる公式ページ",
+   "Official page of the Humanity's Last Exam benchmark, with its paper, dataset, submission dashboard, and latest news."
   ],
   "freq": [
-   "",
-   ""
+   "随時",
+   "As needed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -1198,23 +1198,23 @@
    "Scale SEAL Leaderboards",
    "Scale SEAL Leaderboards"
   ],
-  "org": "",
+  "org": "Scale AI",
   "url": "https://labs.scale.com/leaderboard",
   "desc": [
-   "N, S",
-   "N, S"
+   "Scale Labsの公式リーダーボード入口で、LLMのエージェント・推論・安全性などのベンチマーク順位を読める",
+   "Official Scale Labs leaderboards entry, with LLM benchmark rankings across agentic, reasoning and safety capabilities."
   ],
   "freq": [
-   "",
-   ""
+   "随時",
+   "As needed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -1231,23 +1231,23 @@
    "Epoch AI Benchmarking Hub",
    "Epoch AI Benchmarking Hub"
   ],
-  "org": "",
+  "org": "Epoch AI",
   "url": "https://epoch.ai/benchmarks",
   "desc": [
-   "N（epoch.ai/data は検索で存在確認済み）",
-   "N (epoch.ai/data confirmed to exist via search)"
+   "主要AIモデルの難問ベンチマーク結果を集めたEpoch AIの公式ハブで、時系列・ベンチマーク別・モデル別に比較できる",
+   "Epoch AI's official hub of benchmark results for leading AI models, explorable over time, by benchmark or by model."
   ],
   "freq": [
-   "",
-   ""
+   "随時",
+   "As needed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -1264,23 +1264,23 @@
    "OpenRouter Rankings",
    "OpenRouter Rankings"
   ],
-  "org": "",
+  "org": "OpenRouter",
   "url": "https://openrouter.ai/rankings",
   "desc": [
-   "N, S",
-   "N, S"
+   "OpenRouter API で処理されたトークン数に基づき、実利用でのLLMモデル順位を示す公式ランキングページ",
+   "Official OpenRouter page ranking LLMs by real-world usage, measured in tokens processed through the OpenRouter API."
   ],
   "freq": [
-   "",
-   ""
+   "日次",
+   "Daily"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料（閲覧）",
+   "Free to view"
   ],
   "jp": false,
   "status": "ok",
@@ -1297,23 +1297,23 @@
    "MLCommons MLPerf Inference",
    "MLCommons MLPerf Inference"
   ],
-  "org": "",
+  "org": "MLCommons",
   "url": "https://mlcommons.org/benchmarks/inference-datacenter/",
   "desc": [
-   "N, S",
-   "N, S"
+   "MLCommons が公開するデータセンター向け MLPerf Inference ベンチマークのページへの入口（本文はサイト側の制限で未確認、2026年11月時点）",
+   "Entry point to MLCommons' MLPerf Inference datacenter benchmark page (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "ok",
@@ -1330,23 +1330,23 @@
    "Epoch データインサイト（LLM推論価格推移）",
    "Epoch Data Insights (LLM Inference Price Trends)"
   ],
-  "org": "",
+  "org": "Epoch AI",
   "url": "https://epoch.ai/data-insights/llm-inference-price-trends",
   "desc": [
-   "N",
-   "N"
+   "LLM推論価格が下落した速さをベンチマーク別に分析した Epoch AI のデータインサイト（2025年3月12日付）",
+   "Epoch AI data insight analysing how fast LLM inference prices have fallen across benchmarks (dated Mar. 12, 2025)."
   ],
   "freq": [
-   "",
-   ""
+   "単発（データは2025-11-20更新）",
+   "One-off (data updated 2025-11-20)"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -1363,23 +1363,23 @@
    "TrendForce（HBM/DRAM/GPU市況）",
    "TrendForce (HBM/DRAM/GPU Market Conditions)"
   ],
-  "org": "",
+  "org": "TrendForce",
   "url": "https://www.trendforce.com/presscenter/news",
   "desc": [
-   "N, S",
-   "N, S"
+   "メモリ・AIサーバー・ディスプレイ等の市況分析の発表を一覧できる TrendForce のプレスセンター",
+   "Press center of TrendForce, listing its market-analysis releases on memory, AI servers, displays, and more."
   ],
   "freq": [
-   "",
-   ""
+   "週次",
+   "Weekly"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "一部有料（調査レポート・会員の案内あり）",
+   "Partly paid (research reports and membership are offered)"
   ],
   "jp": false,
   "status": "ok",
@@ -1396,23 +1396,23 @@
    "SIA 半導体売上/WSTS",
    "SIA Semiconductor Sales / WSTS"
   ],
-  "org": "",
+  "org": "WSTS (World Semiconductor Trade Statistics)",
   "url": "https://www.wsts.org/",
   "desc": [
-   "N, S",
-   "N, S"
+   "世界半導体市場統計（WSTS）の公式サイトで、地域別の月次半導体売上統計や予測会議の案内を読める",
+   "Official WSTS site, with monthly regional semiconductor billings statistics and forecast conference information."
   ],
   "freq": [
-   "",
-   ""
+   "月次",
+   "Monthly"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料＋有料（会員専用部分は有料）",
+   "Free + paid (members-only section is paid)"
   ],
   "jp": false,
   "status": "ok",
@@ -1429,23 +1429,23 @@
    "SEMI 市場データ",
    "SEMI Market Data"
   ],
-  "org": "",
+  "org": "SEMI",
   "url": "https://www.semi.org/en/products-services/market-data",
   "desc": [
-   "N, S",
-   "N, S"
+   "半導体・エレクトロニクス製造業界団体SEMIの市場データ案内ページ（本文はサイト側の制限で未確認、2026年11月時点）",
+   "SEMI's market data page for the semiconductor and electronics manufacturing industry association (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "reachable",
@@ -1462,23 +1462,23 @@
    "電力広域的運営推進機関(OCCTO) 需給見通し",
    "OCCTO Supply-Demand Outlook (Organization for Cross-regional Coordination of Transmission Operators)"
   ],
-  "org": "",
+  "org": "電力広域的運営推進機関（OCCTO）",
   "url": "https://www.occto.or.jp/",
   "desc": [
-   "N, S",
-   "N, S"
+   "電力広域的運営推進機関の公式サイトで、電力需給検証報告書・供給計画・委員会資料などの情報提供を掲載",
+   "Official site of OCCTO, publishing the supply-demand verification report, supply plans, committee materials, and other information."
   ],
   "freq": [
-   "",
-   ""
+   "随時",
+   "As needed"
   ],
   "region": [
-   "",
-   ""
+   "日本",
+   "Japan"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": true,
   "status": "ok",
@@ -1495,23 +1495,23 @@
    "日本データセンター協会(JDCC)",
    "Japan Data Center Council (JDCC)"
   ],
-  "org": "",
+  "org": "日本データセンター協会（JDCC）",
   "url": "https://www.jdcc.or.jp/",
   "desc": [
-   "N, S",
-   "N, S"
+   "日本データセンター協会の公式サイトで、協会概要・ニュース・イベント・研修・会員の案内を読める",
+   "Official site of the Japan Data Center Council, with association profile, news, events, training and membership information."
   ],
   "freq": [
-   "",
-   ""
+   "随時",
+   "As needed"
   ],
   "region": [
-   "",
-   ""
+   "日本",
+   "Japan"
   ],
   "fee": [
-   "",
-   ""
+   "無料（会員専用ページあり）",
+   "Free (member-only area exists)"
   ],
   "jp": true,
   "status": "ok",
@@ -1528,23 +1528,23 @@
    "経産省 情報産業（半導体・DC政策）",
    "METI: Information Industry (Semiconductor and Data Center Policy)"
   ],
-  "org": "",
+  "org": "経済産業省",
   "url": "https://www.meti.go.jp/policy/mono_info_service/joho/index.html",
   "desc": [
-   "P",
-   "P"
+   "経済産業省の情報産業（半導体・データセンター政策）の入口ページ（URLは「ページが存在しません」の画面を返し、本文は未確認、2026年11月時点）",
+   "METI's information industry (semiconductor and data center policy) page (the URL returned a 'page not found' screen, so the body was not checked, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "日本",
+   "Japan"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": true,
   "status": "ok",
@@ -1561,23 +1561,23 @@
    "State of AI Report",
    "State of AI Report"
   ],
-  "org": "",
+  "org": "Air Street Capital（Nathan Benaich）",
   "url": "https://www.stateof.ai/",
   "desc": [
-   "N, S",
-   "N, S"
+   "Nathan Benaich と Air Street Capital による年次レポート State of AI Report（2026年版）の公式ページで、AIの研究・産業・地政学・安全を読める",
+   "Official page of the annual State of AI Report (2026 edition) by Nathan Benaich and Air Street Capital, covering AI research, industry, geopolitics, and safety."
   ],
   "freq": [
-   "",
-   ""
+   "年次",
+   "Annual"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -1594,23 +1594,23 @@
    "OECD.AI データ(VC投資ほか)",
    "OECD.AI Data (VC Investment, etc.)"
   ],
-  "org": "",
+  "org": "OECD.AI (OECD)",
   "url": "https://oecd.ai/en/data",
   "desc": [
-   "N, S",
-   "N, S"
+   "OECD.AIのライブデータ入口で、AIの研究・開発・利用の動向を示すデータを読める",
+   "OECD.AI live data section, showing timely data on trends in AI research, development and use."
   ],
   "freq": [
-   "",
-   ""
+   "随時",
+   "As needed"
   ],
   "region": [
-   "",
-   ""
+   "国際",
+   "International"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -1627,23 +1627,23 @@
    "日銀短観",
    "BOJ Tankan"
   ],
-  "org": "",
+  "org": "日本銀行",
   "url": "https://www.boj.or.jp/statistics/tk/index.htm",
   "desc": [
-   "N, S",
-   "N, S"
+   "日本銀行の短観（全国企業短期経済観測調査）の公表データ・時系列データ・解説への入口",
+   "Bank of Japan's Tankan (Short-Term Economic Survey of Enterprises) page with published data, time series and explanatory material."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "日本",
+   "Japan"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": true,
   "status": "ok",
@@ -1660,23 +1660,23 @@
    "Our World in Data AI",
    "Our World in Data: AI"
   ],
-  "org": "",
+  "org": "Our World in Data",
   "url": "https://ourworldindata.org/artificial-intelligence",
   "desc": [
-   "N（grapher URLのみB確認）",
-   "N (only the grapher URL checked at level B)"
+   "AI関連の指標チャート・解説記事・主要な知見をまとめた Our World in Data の人工知能トピックページ",
+   "Our World in Data's artificial intelligence topic page, gathering charts of AI-related metrics, articles, and key insights."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -1693,23 +1693,23 @@
    "Ramp AI Index",
    "Ramp AI Index"
   ],
-  "org": "",
+  "org": "Ramp",
   "url": "https://ramp.com/data/ai-index",
   "desc": [
-   "N, S",
-   "N, S"
+   "Ramp の取引データ（8.5万社超）から米国企業のAI導入率・支出を毎月測るRamp AI Index",
+   "Ramp AI Index, a monthly measure of US business AI adoption and spend from Ramp transaction data on 85,000+ firms."
   ],
   "freq": [
-   "",
-   ""
+   "月次",
+   "Monthly"
   ],
   "region": [
-   "",
-   ""
+   "米国",
+   "US"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -1726,23 +1726,23 @@
    "US Census BTOS 本体",
    "US Census BTOS (Main Page)"
   ],
-  "org": "",
+  "org": "米国国勢調査局（U.S. Census Bureau）",
   "url": "https://www.census.gov/hfp/btos/",
   "desc": [
-   "N（関連記事のみB確認）",
-   "N (only related articles checked at level B)"
+   "米国国勢調査局の Business Trends and Outlook Survey（BTOS）の本体ページ（本文はJavaScript必須で読めず未確認、2026年11月時点）",
+   "Main page of the U.S. Census Bureau's Business Trends and Outlook Survey (BTOS) (page body not checked: requires JavaScript, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "米国",
+   "US"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "ok",
@@ -1759,23 +1759,23 @@
    "IPA DX動向（調査一覧）",
    "IPA DX Trends (Survey List)"
   ],
-  "org": "",
+  "org": "IPA（情報処理推進機構）",
   "url": "https://www.ipa.go.jp/digital/chousa/dx-trend/index.html",
   "desc": [
-   "N, S",
-   "N, S"
+   "IPA の「DX動向」（企業等のDX推進状況調査分析）の入口で、DX動向2024〜2026 の調査結果を読めるページ",
+   "Entry page of IPA's DX Trends survey analysis, linking to the DX Trends 2024 to 2026 results."
   ],
   "freq": [
-   "",
-   ""
+   "年次",
+   "Annual"
   ],
   "region": [
-   "",
-   ""
+   "日本",
+   "Japan"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": true,
   "status": "ok",
@@ -1792,23 +1792,23 @@
    "EU AI Act（artificialintelligenceact.eu）",
    "EU AI Act (artificialintelligenceact.eu)"
   ],
-  "org": "",
+  "org": "Future of Life Institute",
   "url": "https://artificialintelligenceact.eu/",
   "desc": [
-   "N, S",
-   "N, S"
+   "EU AI法の条文・解説・実施状況を載せる、Future of Life Institute 運営のサイト（最新記事は2026年8月）",
+   "Site run by the Future of Life Institute with the text, analyses and implementation updates of the EU AI Act (latest article Aug 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "随時",
+   "As needed"
   ],
   "region": [
-   "",
-   ""
+   "EU",
+   "EU"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -1825,23 +1825,23 @@
    "EU AI Act 公式（欧州委員会）",
    "EU AI Act Official (European Commission)"
   ],
-  "org": "",
+  "org": "欧州委員会",
   "url": "https://digital-strategy.ec.europa.eu/en/policies/european-approach-artificial-intelligence",
   "desc": [
-   "P",
-   "P"
+   "EUのAI政策（AI大陸行動計画・Apply AI戦略・AI法など）と主要な経過日程をまとめた欧州委員会の公式ページ",
+   "European Commission's official page on the EU approach to AI, covering the AI Continent Action Plan, Apply AI Strategy, AI Act and key milestones."
   ],
   "freq": [
-   "",
-   ""
+   "随時",
+   "As needed"
   ],
   "region": [
-   "",
-   ""
+   "EU",
+   "EU"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -1858,23 +1858,23 @@
    "CSET",
    "CSET"
   ],
-  "org": "",
+  "org": "CSET (Center for Security and Emerging Technology)",
   "url": "https://cset.georgetown.edu/",
   "desc": [
-   "N, S",
-   "N, S"
+   "ジョージタウン大学の政策研究機関 CSET の公式サイトで、新興技術の安全保障面の報告書・ブログ・データを掲載",
+   "Official site of CSET, a Georgetown University policy research organization, with reports, blog posts, and data on the security implications of emerging technologies."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -1891,23 +1891,23 @@
    "International AI Safety Report",
    "International AI Safety Report"
   ],
-  "org": "",
+  "org": "International AI Safety Report",
   "url": "https://internationalaisafetyreport.org/",
   "desc": [
-   "N, S",
-   "N, S"
+   "汎用AIの能力とリスクに関する科学的知見をまとめた国際AI安全性報告書の公式サイト（2026年2月に第2版を公表）",
+   "Official site of the International AI Safety Report, a scientific review of general-purpose AI capabilities and risks (second edition published February 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "年次",
+   "Annual"
   ],
   "region": [
-   "",
-   ""
+   "国際",
+   "International"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -1924,23 +1924,23 @@
    "UK AI Security Institute",
    "UK AI Security Institute"
   ],
-  "org": "",
+  "org": "AI Security Institute（英国 DSIT）",
   "url": "https://www.aisi.gov.uk/",
   "desc": [
-   "N, S",
-   "N, S"
+   "英国 DSIT 傘下の AI Security Institute の公式サイトで、先端AIのリスク研究・評価、助成、ブログを読める",
+   "Official site of the UK AI Security Institute, a DSIT directorate, with research on advanced AI risks, grants and a blog."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "英国",
+   "UK"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -1957,23 +1957,23 @@
    "US CAISI (NIST)",
    "US CAISI (NIST)"
   ],
-  "org": "",
+  "org": "NIST（米国国立標準技術研究所）",
   "url": "https://www.nist.gov/caissi",
   "desc": [
-   "P",
-   "P"
+   "NIST の CAISSI（Center for Advancing Innovation and Standards for Super Intelligence）の公式ページで、目的、評価活動、研究ブログ、ニュースを読める",
+   "Official NIST page of CAISSI (Center for Advancing Innovation and Standards for Super Intelligence), covering its purpose, evaluations, research blog, and news."
   ],
   "freq": [
-   "",
-   ""
+   "随時",
+   "As needed"
   ],
   "region": [
-   "",
-   ""
+   "米国",
+   "US"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -1990,23 +1990,23 @@
    "BIS 輸出管理",
    "BIS Export Controls"
   ],
-  "org": "",
+  "org": "米国商務省産業安全保障局（BIS）",
   "url": "https://www.bis.gov/",
   "desc": [
-   "N, S",
-   "N, S"
+   "米国商務省BISの公式サイトで、輸出管理規則・ライセンス・執行の発表を読める",
+   "Official site of the US Commerce Department's BIS, with export control regulations, licensing and enforcement announcements."
   ],
   "freq": [
-   "",
-   ""
+   "随時",
+   "As needed"
   ],
   "region": [
-   "",
-   ""
+   "米国",
+   "US"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -2023,23 +2023,23 @@
    "内閣府 AI戦略",
    "Cabinet Office AI Strategy"
   ],
-  "org": "",
+  "org": "内閣府",
   "url": "https://www8.cao.go.jp/cstp/ai/index.html",
   "desc": [
-   "N, S",
-   "N, S"
+   "内閣府のAI戦略ページで、最近のトピックス・主要政策・会議資料・AI関連予算を掲載",
+   "Cabinet Office's AI strategy page, listing recent topics, key policies, meeting materials and AI-related budgets."
   ],
   "freq": [
-   "",
-   ""
+   "随時",
+   "As needed"
   ],
   "region": [
-   "",
-   ""
+   "日本",
+   "Japan"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": true,
   "status": "ok",
@@ -2056,23 +2056,23 @@
    "AI Incident Database",
    "AI Incident Database"
   ],
-  "org": "",
+  "org": "Responsible AI Collaborative",
   "url": "https://incidentdatabase.ai/",
   "desc": [
-   "N。検索でも結果に出ず",
-   "N. Not found by search either"
+   "AIによる事故・被害事例を番号付きで収録し、検索・分類表示ができる AI Incident Database の公式サイト",
+   "Official site of the AI Incident Database, a searchable collection of numbered reports of AI-related incidents and harms."
   ],
   "freq": [
-   "",
-   ""
+   "週次",
+   "Weekly"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -2089,23 +2089,23 @@
    "OECD AI Incidents Monitor",
    "OECD AI Incidents Monitor"
   ],
-  "org": "",
+  "org": "OECD.AI（OECD）",
   "url": "https://oecd.ai/en/incidents?search_terms=%5B%5D&and_condition=false&from_date=1900-10-12&to_date=2026-10-12&properties_config=%7B%22principles%22:%5B%5D,%22industries%22:%5B%5D,%22harm_types%22:%5B%5D,%22harm_levels%22:%5B%5D,%22harmed_entities%22:%5B%5D,%22business_functions%22:%5B%5D,%22ai_tasks%22:%5B%5D,%22autonomy_levels%22:%5B%5D,%22languages%22:%5B%5D%7D&order_by=date&num_results=20",
   "desc": [
-   "N, S",
-   "N, S"
+   "AIによる被害事例（AIインシデント）を記録し、政策立案の根拠を提供するOECD.AIのモニター",
+   "OECD.AI monitor documenting AI incidents to give policymakers an evidence base for safer AI."
   ],
   "freq": [
-   "",
-   ""
+   "随時",
+   "As needed"
   ],
   "region": [
-   "",
-   ""
+   "国際",
+   "International"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -2122,23 +2122,23 @@
    "ILO 生成AIと雇用",
    "ILO: Generative AI and Employment"
   ],
-  "org": "",
+  "org": "ILO（国際労働機関）",
   "url": "https://www.ilo.org/topics-and-sectors/artificial-intelligence",
   "desc": [
-   "N, S",
-   "N, S"
+   "ILO の人工知能トピックページで、AIと仕事に関する記事・刊行物・イベントを読める",
+   "ILO topic page on artificial intelligence, with news, publications and events on AI and work."
   ],
   "freq": [
-   "",
-   ""
+   "週次",
+   "Weekly"
   ],
   "region": [
-   "",
-   ""
+   "国際",
+   "International"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -2155,23 +2155,23 @@
    "OECD AI and work",
    "OECD: AI and Work"
   ],
-  "org": "",
+  "org": "OECD",
   "url": "https://www.oecd.org/en/topics/ai-and-work.html",
   "desc": [
-   "N, S",
-   "N, S"
+   "OECD の「AIと仕事」トピックページへの入口（本文はサイト側の制限で未確認、2026年11月時点）",
+   "Entry point to OECD's AI and work topic page (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "国際",
+   "International"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "reachable",
@@ -2188,23 +2188,23 @@
    "OpenAI 利用実態 (How people use ChatGPT)",
    "OpenAI Usage Study (How People Use ChatGPT)"
   ],
-  "org": "",
+  "org": "OpenAI",
   "url": "https://openai.com/index/how-people-are-using-chatgpt/",
   "desc": [
-   "N",
-   "N"
+   "OpenAIのサイト上にある、ChatGPTの利用実態に関する公式ページ（本文はサイト側の制限で未確認、2026年11月時点）",
+   "Official OpenAI page on how people use ChatGPT (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "reachable",
@@ -2591,16 +2591,16 @@
    "Official entry point to Amazon's press releases and media resources, including images, videos and investor relations links."
   ],
   "freq": [
-   "",
-   ""
+   "週次",
+   "Weekly"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -2624,16 +2624,16 @@
    "Entry point to Amazon's investor relations site (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "reachable",
@@ -2657,16 +2657,16 @@
    "Official AWS news blog carrying new service and feature posts, including weekly roundups."
   ],
   "freq": [
-   "",
-   ""
+   "週次",
+   "Weekly"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -2684,22 +2684,22 @@
    "AWS What's New"
   ],
   "org": "Amazon Web Services",
-  "url": "https://aws.amazon.com/jp/new/",
+  "url": "https://aws.amazon.com/new/",
   "desc": [
-   "AWSの発表・サービス提供開始・ニュースを日本語で読める「AWSの最新情報」ページ",
-   "Japanese-language AWS What's New page listing AWS announcements, launches, news and innovations."
+   "AWS の発表・サービス提供開始・ニュースを英語で読める、グローバル版の「What's New at AWS」ページ",
+   "Global English-language AWS What's New page listing AWS announcements, launches, news and innovations."
   ],
   "freq": [
-   "",
-   ""
+   "随時",
+   "As needed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -2716,23 +2716,23 @@
    "AWS What's New（日本）",
    "AWS What's New (Japan)"
   ],
-  "org": "",
+  "org": "Amazon Web Services",
   "url": "https://aws.amazon.com/jp/new/",
   "desc": [
-   "未試行（同ドメイン遮断のため）",
-   "Not attempted (same domain blocked)"
+   "AWS の発表・サービス提供開始・ニュースを日本語で読める「AWSの最新情報」ページ",
+   "Japanese-language AWS What's New page listing AWS announcements, launches, news and innovations."
   ],
   "freq": [
-   "",
-   ""
+   "随時",
+   "As needed"
   ],
   "region": [
-   "",
-   ""
+   "日本",
+   "Japan"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -2756,16 +2756,16 @@
    "Entry point to Microsoft Source, Microsoft's official news site (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "ok",
@@ -2789,16 +2789,16 @@
    "Entry point to Microsoft's Japan news site, Source Asia Japan (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "日本",
+   "Japan"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "ok",
@@ -2822,16 +2822,16 @@
    "Entry point to the Official Microsoft Blog (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "ok",
@@ -2855,16 +2855,16 @@
    "Official Microsoft Azure Blog with news, updates and announcements from Azure experts."
   ],
   "freq": [
-   "",
-   ""
+   "週次",
+   "Weekly"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -2881,23 +2881,23 @@
    "Microsoft IR 決算一覧",
    "Microsoft IR Earnings List"
   ],
-  "org": "",
+  "org": "Microsoft",
   "url": "https://www.microsoft.com/en-us/investor/earnings/default",
   "desc": [
-   "ロードしたがエラー様の画面（Trace Id のみ）で内容不一致",
-   "Loaded, but showed an error-like screen (Trace Id only); content did not match"
+   "Microsoft の投資家向け情報（IR）サイトの決算メニューページ（決算の一覧は本文になく、メニューとリンクのみ、2026年11月時点）",
+   "Menu page of Microsoft's investor relations site for earnings; no earnings list in the body, only menus and links (as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "四半期ごと",
+   "Quarterly"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -2921,16 +2921,16 @@
    "AI section of the official Google Blog, covering the company's work in AI and machine learning."
   ],
   "freq": [
-   "",
-   ""
+   "週次",
+   "Weekly"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -2954,16 +2954,16 @@
    "Entry point to Alphabet's investor relations information (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "reachable",
@@ -2987,16 +2987,16 @@
    "Press release list in the Google Cloud Press Corner, filterable by year and category."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -3020,16 +3020,16 @@
    "Official Salesforce Newsroom with latest news and insights, customer success stories, research and media resources."
   ],
   "freq": [
-   "",
-   ""
+   "週次",
+   "Weekly"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -3053,16 +3053,16 @@
    "Entry point to Salesforce's investor relations site (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "reachable",
@@ -3086,16 +3086,16 @@
    "Entry point to Snowflake's official blog (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "ok",
@@ -3119,16 +3119,16 @@
    "Entry point to Snowflake's investor relations site (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "reachable",
@@ -3152,16 +3152,16 @@
    "Entry point to the official Databricks Blog, covering all categories."
   ],
   "freq": [
-   "",
-   ""
+   "日次",
+   "Daily"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -3185,16 +3185,16 @@
    "Official Databricks newsroom with news, featured press releases and a press kit."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -3218,16 +3218,16 @@
    "NVIDIA's official newsroom, with the latest news, an archive search, multimedia, executive bios, and media contacts."
   ],
   "freq": [
-   "",
-   ""
+   "日次",
+   "Daily"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -3251,16 +3251,16 @@
    "Entry point to NVIDIA's investor relations site (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "reachable",
@@ -3284,16 +3284,16 @@
    "OpenAI's official news page (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "reachable",
@@ -3317,16 +3317,16 @@
    "Official AI at Meta blog with the latest artificial intelligence news from Meta."
   ],
   "freq": [
-   "",
-   ""
+   "随時",
+   "As needed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "reachable",
@@ -3350,16 +3350,16 @@
    "Entry point to Meta's investor relations information (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "reachable",
@@ -3383,16 +3383,16 @@
    "Official page for AWS's annual re:Invent conference (listed for Nov 30-Dec 4, 2026, in Las Vegas, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "年次（毎年11〜12月ごろ）",
+   "Annual (around Nov-Dec each year)"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "閲覧無料（参加は有料）",
+   "Free to view (attendance is paid)"
   ],
   "jp": false,
   "status": "ok",
@@ -3416,16 +3416,16 @@
    "Official site of Microsoft Build, Microsoft's event designed for developers."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "閲覧無料（参加は有料）",
+   "Free to view (attendance is paid)"
   ],
   "jp": false,
   "status": "ok",
@@ -3449,16 +3449,16 @@
    "Official Microsoft Ignite site for registration and information on sessions, labs and speakers (listed for November 17-20, 2026 in San Francisco, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "年次",
+   "Annual"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "閲覧無料（参加は有料）",
+   "Free to view (attendance is paid)"
   ],
   "jp": false,
   "status": "ok",
@@ -3482,16 +3482,16 @@
    "Entry point to the official site of Google Cloud's annual event, Google Cloud Next (page body not checked: not reachable from this environment, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "ok",
@@ -3515,16 +3515,16 @@
    "Official page for Salesforce's Dreamforce event, with on-demand 2026 sessions and a notice for Dreamforce 2027."
   ],
   "freq": [
-   "",
-   ""
+   "年次",
+   "Annual"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "閲覧無料（参加は有料）",
+   "Free to view (attendance is paid)"
   ],
   "jp": false,
   "status": "ok",
@@ -3548,16 +3548,16 @@
    "Official page for Snowflake Summit, Snowflake's annual event (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "ok",
@@ -3581,16 +3581,16 @@
    "Official site of Databricks' Data + AI Summit, listing featured speakers and sessions (next edition shown as June 21-24, 2027 in San Francisco, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "年次（毎年6月ごろ）",
+   "Annual (around June each year)"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料（参加費は要確認）",
+   "Free (attendance fee to be confirmed)"
   ],
   "jp": false,
   "status": "ok",
@@ -3614,16 +3614,16 @@
    "Official page of NVIDIA's AI conference GTC, with GTC 2027 (San Jose, March 15-18) details and GTC 2026 session replays (as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "年次（毎年3月ごろ）",
+   "Annual (around March each year)"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料（参加費は要確認）",
+   "Free (attendance fee to be confirmed)"
   ],
   "jp": false,
   "status": "ok",
@@ -3647,16 +3647,16 @@
    "Entry point to Gartner's newsroom (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "reachable",
@@ -3680,16 +3680,16 @@
    "Gartner's page on the Hype Cycle for AI (blocked by the site; whether the URL is still valid and the page body are unchecked, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "reachable",
@@ -3713,16 +3713,16 @@
    "Entry point to Gartner Japan's newsroom (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "日本",
+   "Japan"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": true,
   "status": "reachable",
@@ -3746,16 +3746,16 @@
    "IDC's press release list, with research announcements such as AI infrastructure spending."
   ],
   "freq": [
-   "",
-   ""
+   "週次",
+   "Weekly"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -3779,16 +3779,16 @@
    "Official site of IT research firm IDC Japan, covering research reports, events, seminars and consulting."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "日本",
+   "Japan"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -3812,16 +3812,16 @@
    "Listing of featured blog posts by Forrester analysts, including Predictions 2027."
   ],
   "freq": [
-   "",
-   ""
+   "日次",
+   "Daily"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -3845,16 +3845,16 @@
    "Entry point to insights from McKinsey's QuantumBlack (page body not checked: not reachable from this environment, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "unverified",
@@ -3878,16 +3878,16 @@
    "Page named 'The State of AI' on McKinsey's site (not reachable from this environment; whether the URL is still valid and the page body are unchecked, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "unverified",
@@ -3911,16 +3911,16 @@
    "Entry point to BCG's artificial intelligence insights (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "reachable",
@@ -3944,16 +3944,16 @@
    "Deloitte US 'Applied Artificial Intelligence' page."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "米国",
+   "US"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -3970,23 +3970,23 @@
    "Accenture Technology Vision 2025",
    "Accenture Technology Vision 2025"
   ],
-  "org": "",
+  "org": "Accenture",
   "url": "https://www.accenture.com/en/insights/technology/technology-trends-2025",
   "desc": [
    "Accenture の年次技術トレンド調査 Technology Vision 2025（2025-01-07公開）。2026年11月時点で2026年版は確認できていない",
    "Accenture annual technology trends study, Technology Vision 2025 (published 2025-01-07); no 2026 edition confirmed as of Nov 2026"
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -4010,16 +4010,16 @@
    "PwC global site page on the artificial intelligence topic (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "reachable",
@@ -4043,16 +4043,16 @@
    "Slalom's list of insight articles with its perspectives on developments in technology, AI, and business."
   ],
   "freq": [
-   "",
-   ""
+   "週次",
+   "Weekly"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -4069,23 +4069,23 @@
    "Menlo Ventures Perspective",
    "Menlo Ventures Perspective"
   ],
-  "org": "",
+  "org": "Menlo Ventures",
   "url": "https://menlovc.com/perspective/",
   "desc": [
    "Menlo Ventures の調査記事一覧。2026-11-03 に「2026: The State of Enterprise AI」、2026-09-16 に「2026: The State of Consumer AI」を掲載（2026年11月時点）",
    "Index of Menlo Ventures research articles; lists \"2026: The State of Enterprise AI\" (2026-11-03) and \"2026: The State of Consumer AI\" (2026-09-16) as of Nov 2026"
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "ok",
@@ -4102,23 +4102,23 @@
    "Menlo「2025 State of GenAI in the Enterprise」",
    "Menlo Ventures \"2025 State of GenAI in the Enterprise\""
   ],
-  "org": "",
+  "org": "Menlo Ventures",
   "url": "https://menlovc.com/perspective/2025-the-state-of-generative-ai-in-the-enterprise/",
   "desc": [
    "2025年版（2025-12-09付、2025年の生成AI支出 $37B）。最新データは 2026年版「The State of Enterprise AI」（2026-11-03、https://menlovc.com/perspective/2026-the-state-of-enterprise-ai/ ）",
    "2025 edition (dated 2025-12-09; $37B GenAI spend in 2025). Newest data is in the 2026 edition \"The State of Enterprise AI\" (2026-11-03, https://menlovc.com/perspective/2026-the-state-of-enterprise-ai/ )"
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "ok",
@@ -4142,16 +4142,16 @@
    "Sequoia Capital's Stories section: long-form founder profiles, market and technology perspectives, and portfolio news."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -4175,16 +4175,16 @@
    "a16z's AI hub with latest articles, the AI Canon and open source and dev projects."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -4208,16 +4208,16 @@
    "Official site of BOND, which describes itself as a global technology investment firm supporting founders."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "jp": false,
   "status": "ok",
@@ -4241,16 +4241,16 @@
    "Official site of Source Global Research, which provides insights and data for the professional services industry."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "一部有料（レポートは購入制、インサイトは無料）",
+   "Partly paid (reports are purchased; insights are free)"
   ],
   "jp": false,
   "status": "reachable",
@@ -4274,16 +4274,16 @@
    "Online platform for the UK consulting industry with news, consulting firms, jobs and events."
   ],
   "freq": [
-   "",
-   ""
+   "日次",
+   "Daily"
   ],
   "region": [
-   "",
-   ""
+   "英国",
+   "UK"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -4307,16 +4307,16 @@
    "Top page of ITmedia Enterprise, a practical information site for IT departments."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "日本",
+   "Japan"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": true,
   "status": "ok",
@@ -4333,23 +4333,23 @@
    "Claude 顧客事例",
    "Claude Customer Stories"
   ],
-  "org": "",
+  "org": "Anthropic",
   "url": "https://claude.com/ja/customers",
   "desc": [
-   "308 先。未取得",
-   "308 target. Not fetched"
+   "Claudeを活用する企業の導入事例を業種・製品別に探せるAnthropic公式の日本語ページ",
+   "Anthropic's official Japanese-language page of customer stories, filterable by industry and product."
   ],
   "freq": [
-   "",
-   ""
+   "要確認",
+   "To be confirmed"
   ],
   "region": [
-   "",
-   ""
+   "グローバル",
+   "Global"
   ],
   "fee": [
-   "",
-   ""
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -6679,8 +6679,8 @@
   "org": "Manifold Markets",
   "url": "https://manifold.markets/",
   "desc": [
-   "検索未実施",
-   "Search not run"
+   "ニュース・政治・テック・AIなどの出来事にプレイマネーで賭けられ、自分の予測市場も作れる予測サイト",
+   "Prediction site where users bet play money on news, politics, tech and AI, or create their own prediction markets."
   ],
   "freq": [
    "常時",
@@ -6745,8 +6745,8 @@
   "org": "Shell",
   "url": "https://www.shell.com/news-and-insights/scenarios.html",
   "desc": [
-   "ブログのみ S",
-   "Blog only: S"
+   "Shell の長期シナリオ（2026年エネルギー安全保障シナリオ）と過去シナリオのアーカイブを案内する公式ページ（2026年11月時点）",
+   "Official Shell page introducing its long-term scenarios, including the 2026 Energy Security Scenarios, and an archive of past scenarios (as of Nov 2026)."
   ],
   "freq": [
    "版ごと",
@@ -6778,8 +6778,8 @@
   "org": "OECD",
   "url": "https://www.oecd.org/en/topics/policy-issues/strategic-foresight.html",
   "desc": [
-   "刊行物ページのみ S",
-   "Publications page only: S"
+   "OECD の戦略的先見（Strategic Foresight）に関する政策トピックページへの入口（本文はサイト側の制限で未確認、2026年11月時点）",
+   "Entry point to the OECD policy topic page on strategic foresight (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
    "随時",
@@ -6811,8 +6811,8 @@
   "org": "IFTF",
   "url": "https://www.iftf.org/",
   "desc": [
-   "legacy のみ S",
-   "Legacy only: S"
+   "10年予測（Ten-Year Forecast 2036）・インサイト記事・研修案内を載せる Institute for the Future の現行公式サイト",
+   "Current official site of the Institute for the Future, with the Ten-Year Forecast 2036, insight articles and training listings."
   ],
   "freq": [
    "随時",
@@ -6976,8 +6976,8 @@
   "org": "Ben Thompson",
   "url": "https://stratechery.com/",
   "desc": [
-   "検索未実施",
-   "Search not run"
+   "Ben Thompson による、テクノロジーの事業・戦略・影響を論じる Stratechery のトップページ",
+   "Top page of Stratechery by Ben Thompson, on the business, strategy, and impact of technology."
   ],
   "freq": [
    "平日更新（要確認）",
@@ -7042,8 +7042,8 @@
   "org": "Ben Tossell",
   "url": "https://www.bensbites.com/",
   "desc": [
-   "検索未実施",
-   "Search not run"
+   "AI を独自の視点で扱う Substack のニュースレター（購読者11.8万人超と掲載、最新記事の日付は本文で確認できず、2026年11月時点）",
+   "Substack newsletter exploring taste in AI (listed as over 118,000 subscribers; latest post date not visible on the page, as of Nov 2026)."
   ],
   "freq": [
    "要確認",
@@ -7108,8 +7108,8 @@
   "org": "アイティメディア",
   "url": "https://www.itmedia.co.jp/aiplus/",
   "desc": [
-   "記事URLのみ S",
-   "Article URLs only: S"
+   "生成AIを中心とするAIのビジネス活用（応用事例・活用方法・機能比較・ルール整備）を扱うITmedia AI＋のトップページ",
+   "Top page of ITmedia AI+, covering business use of AI centered on generative AI: use cases, methods, feature comparisons and rule-making."
   ],
   "freq": [
    "日次",
@@ -7141,8 +7141,8 @@
   "org": "ディップ株式会社",
   "url": "https://ainow.ai/",
   "desc": [
-   "現行性不明",
-   "Whether it is current is unknown"
+   "AI関連のニュース・インタビュー・イベントレポート・コラムを掲載する日本のAI専門メディア（最新記事は2026年11月14日、2026年11月時点）",
+   "Japanese AI-focused media site with news, interviews, event reports, and columns (latest article Nov 14, 2026, as of Nov 2026)."
   ],
   "freq": [
    "要確認",
@@ -7174,8 +7174,8 @@
   "org": "株式会社レッジ",
   "url": "https://ledge.ai/",
   "desc": [
-   "現行性不明",
-   "Whether it is current is unknown"
+   "AI関連のニュース・インタビュー・イベントレポートを載せる日本のAI特化メディア（最新記事 2026年11月14日、2026年11月時点）",
+   "Japanese AI-focused news media with news, interviews and event reports (latest article 2026-11-14, as of Nov 2026)."
   ],
   "freq": [
    "要確認",
@@ -7207,8 +7207,8 @@
   "org": "株式会社松尾研究所",
   "url": "https://matsuo-institute.com/",
   "desc": [
-   "検索未実施。URL自体、記憶に基づく",
-   "Search not run. The URL itself is from memory"
+   "東京大学 松尾・岩澤研究室とビジョンを共有する松尾研究所の、事業・実績・ニュースを載せる公式サイト",
+   "Official site of Matsuo Institute, which shares its vision with the University of Tokyo's Matsuo-Iwasawa Lab, with services, works and news."
   ],
   "freq": [
    "要確認",
