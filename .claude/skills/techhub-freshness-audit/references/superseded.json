@@ -538,6 +538,20 @@
     "USAGE_HISTORY"
    ],
    "how": "今の製品として書く箇所は「Snowflake CoWork（旧Snowflake Intelligence）」に。当時の出来事は当時の名前のまま。Cortex Code は今も公式に使われる名前なので旧名として扱わない（今の主な表記は Snowflake CoCo）"
+  },
+  {
+   "old": "Snowflake Arctic",
+   "now": "Snowflake の自社LLM Snowflake Arctic は 2026-04-28 に提供終了（以後その名前の呼び出しは失敗）。Arctic Embed 系（snowflake-arctic-embed-*）は一般提供、AI_EXTRACT のモデルは arctic-extract",
+   "source": "https://docs.snowflake.com/en/release-notes/bcr-bundles/un-bundled/bcr-april-model-deprecations",
+   "as_of": "2026-11-14",
+   "ok_near": [
+    "提供終了",
+    "retired",
+    "Arctic Embed",
+    "arctic-embed",
+    "arctic-extract"
+   ],
+   "how": "今の主力モデルとして書く箇所は Cortex AI（マルチモデル）や Arctic Embed に。LLM の Arctic を挙げるなら終了日を1回だけ添える。2024年の公開など当時の出来事はそのまま"
   }
  ]
 }

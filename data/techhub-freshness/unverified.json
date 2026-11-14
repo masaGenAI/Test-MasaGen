@@ -279,15 +279,6 @@
   "last_tried": "2026-11-13"
  },
  {
-  "area": "companies-b",
-  "tab": "companies",
-  "current_text": "比較表 Snowflake 行：Arctic / Cortex",
-  "concern": "Arctic（2024年公開の自社モデル）を今も主力モデルと呼べるか。公式トップページの製品紹介には CoCo・CoWork・Cortex が並び、Arctic は出てこない。",
-  "why": "docs.snowflake.com がネットワーク許可外で、モデルの提供状況を確かめられない。",
-  "first_seen": "2026-11-12",
-  "last_tried": "2026-11-13"
- },
- {
   "area": "companies-c",
   "tab": "companies",
   "current_text": "PKSHA Technology：対話AI（PKSHA ChatAgent〔旧PKSHA Chatbot・2025年8月改称〕・PKSHA VoiceAgent / AIヘルプデスク）",
