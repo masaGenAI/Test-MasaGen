@@ -1741,8 +1741,8 @@
    "US"
   ],
   "fee": [
-   "要確認",
-   "To be confirmed"
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
@@ -2632,8 +2632,8 @@
    "Global"
   ],
   "fee": [
-   "要確認",
-   "To be confirmed"
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "reachable",
@@ -2962,8 +2962,8 @@
    "Global"
   ],
   "fee": [
-   "要確認",
-   "To be confirmed"
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "reachable",
@@ -3061,8 +3061,8 @@
    "Global"
   ],
   "fee": [
-   "要確認",
-   "To be confirmed"
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "reachable",
@@ -3127,8 +3127,8 @@
    "Global"
   ],
   "fee": [
-   "要確認",
-   "To be confirmed"
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "reachable",
@@ -3259,8 +3259,8 @@
    "Global"
   ],
   "fee": [
-   "要確認",
-   "To be confirmed"
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "reachable",
@@ -3358,8 +3358,8 @@
    "Global"
   ],
   "fee": [
-   "要確認",
-   "To be confirmed"
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "reachable",
@@ -4402,8 +4402,8 @@
   "org": "金融庁",
   "url": "https://www.fsa.go.jp/singi/ai_forum/gijiyoshi/20250618.html",
   "desc": [
-   "2025年6〜12月開催の官民対話。事例・議論の議事要旨と資料（親ページ index は未確認）",
-   "Public-private dialogue held June to December 2025; minutes and materials with cases and discussion (parent index page unverified)."
+   "金融庁 AI官民フォーラム第1回（2025年6月18日、オンライン）の議事要旨で、事務局説明・業界団体の発言と、12月まで月1回程度の開催予定を掲載",
+   "Minutes of the 1st FSA AI Public-Private Forum (online, 18 June 2025), covering the secretariat briefing and industry-association remarks, with roughly monthly meetings planned through December."
   ],
   "freq": [
    "会合ごと（2025-06〜12）",
@@ -4831,8 +4831,8 @@
   "org": "デジタル庁",
   "url": "https://www.digital.go.jp/en/councils/ai-advisory-board/80174015-f73b-4d98-811e-c601c26c0ba5",
   "desc": [
-   "ガイドライン改訂・AIエージェント論点の審議資料（親index未確認）",
-   "Deliberation materials on revising the guidelines and AI agent issues (parent index unverified)."
+   "2026年3月10日の第3回会合のページで、各府省の生成AIシステム定期報告の概要・国内外の生成AI動向・行政の生成AI調達・利活用ガイドライン改訂案を議題として掲載",
+   "Page for the 3rd meeting held 10 March 2026, with agenda items on ministries' generative AI periodic reports, domestic and international generative AI trends, and proposed revisions to the public-administration generative AI guidelines."
   ],
   "freq": [
    "会合ごと",
@@ -5920,8 +5920,8 @@
   "org": "GHG Protocol",
   "url": "https://ghgprotocol.org/scope-2-guidance",
   "desc": [
-   "Scope 2 改訂（ロケーション/マーケット基準、時間単位マッチング）。意見募集 2025-10-20〜2026-01-31、最終化は未確認",
-   "Scope 2 revision (location-based/market-based methods, hourly matching). Public consultation 2025-10-20 to 2026-01-31; finalization unconfirmed."
+   "購入した電力・蒸気・熱・冷熱の排出量を算定する GHG Protocol の Scope 2 Guidance（2015年版）のページ（2025-10-20〜2026-01-31に意見募集、最終化は未確認）",
+   "GHG Protocol Scope 2 Guidance (2015), on how corporations measure emissions from purchased or acquired electricity, steam, heat and cooling (public consultation 2025-10-20 to 2026-01-31; finalization unconfirmed)."
   ],
   "freq": [
    "改訂サイクル（数年）",
@@ -6947,8 +6947,8 @@
    "Search results were noisy and no primary page appeared. The latest podcast listing is from late 2024"
   ],
   "freq": [
-   "週1〜2回程度（要確認）",
-   "About once or twice a week (to be confirmed)"
+   "週1〜2回程度",
+   "About once or twice a week"
   ],
   "region": [
    "米国/英語",
@@ -7054,8 +7054,8 @@
    "UK / English"
   ],
   "fee": [
-   "要確認",
-   "To be confirmed"
+   "無料",
+   "Free"
   ],
   "jp": false,
   "status": "ok",
