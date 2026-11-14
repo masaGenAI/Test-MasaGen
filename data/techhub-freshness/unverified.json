@@ -1001,11 +1001,20 @@
  {
   "area": "foresight-briefs",
   "tab": "fs_library",
-  "current_text": "s106 Google Cloud Next、s108 Snowflake Summit、s195 IFTF Ten-Year Forecast のリンク",
-  "concern": "リンク点検でページが移転と判定された（Google Cloud Next は https://reg.googlecloudevents.com/flow/googlecloud/next27/vegas/page/home へ、Snowflake は /en/events/summit/ へ、IFTF は /ten-year-forecast/ へ）。s032 LMArena と s206 Metaculus は HTTP 403（ボット対策）。",
+  "current_text": "s106 Google Cloud Next、s195 IFTF Ten-Year Forecast のリンク",
+  "concern": "リンク点検でページが移転と判定された（Google Cloud Next は https://reg.googlecloudevents.com/flow/googlecloud/next27/vegas/page/home へ、IFTF は /ten-year-forecast/ へ）。s032 LMArena と s206 Metaculus は HTTP 403（ボット対策）。",
   "why": "Google Cloud Next の移転先は接続できず（HTTP 0）、移転先が正しい公式ページか確かめられなかった。403 のものは回避せず未確認とした。（今回は製品名・モデル名に絞ったため再確認していない。前回の理由のまま持ち越し）",
   "first_seen": "2026-11-12",
   "last_tried": "2026-11-13"
+ },
+ {
+  "area": "foresight-briefs",
+  "tab": "fs_library",
+  "current_text": "s108 Snowflake Summit のリンク（https://www.snowflake.com/en/summit/）",
+  "concern": "2026-11-12 のリンク点検（nova-app/scripts/foresight_linkcheck.py、書き換えなしの実行）で https://www.snowflake.com/en/events/summit/ への移転（HTTP 200）と記録された。移転先に書き換えるべきか、移転先が今も Summit の公式ページかを確かめたい。",
+  "why": "2026-11-14：/en/summit/ も /en/events/summit/ も、robots.txt まで Cloudflare のサイト側 403（回避しない）。investors.snowflake.com も 403、developers・quickstarts・community.snowflake.com はネットワーク許可外。docs.snowflake.com の Summit 発表のリリースノート（2023〜2025年）と SEC の提出書類（2026年5月・9月の決算発表、10-Q）には Summit のURLが無い。",
+  "first_seen": "2026-11-12",
+  "last_tried": "2026-11-14"
  },
  {
   "area": "foresight-briefs",
