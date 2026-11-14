@@ -1634,8 +1634,8 @@
    "Bank of Japan's Tankan (Short-Term Economic Survey of Enterprises) page with published data, time series and explanatory material."
   ],
   "freq": [
-   "要確認",
-   "To be confirmed"
+   "四半期ごと",
+   "Quarterly"
   ],
   "region": [
    "日本",
@@ -1667,8 +1667,8 @@
    "Our World in Data's artificial intelligence topic page, gathering charts of AI-related metrics, articles, and key insights."
   ],
   "freq": [
-   "要確認",
-   "To be confirmed"
+   "随時",
+   "As needed"
   ],
   "region": [
    "グローバル",
@@ -1733,8 +1733,8 @@
    "Main page of the U.S. Census Bureau's Business Trends and Outlook Survey (BTOS) (page body not checked: requires JavaScript, as of Nov 2026)."
   ],
   "freq": [
-   "要確認",
-   "To be confirmed"
+   "隔週（2週間ごとに公表）",
+   "Biweekly (released every two weeks)"
   ],
   "region": [
    "米国",
@@ -1865,8 +1865,8 @@
    "Official site of CSET, a Georgetown University policy research organization, with reports, blog posts, and data on the security implications of emerging technologies."
   ],
   "freq": [
-   "要確認",
-   "To be confirmed"
+   "週次",
+   "Weekly"
   ],
   "region": [
    "グローバル",
@@ -1931,8 +1931,8 @@
    "Official site of the UK AI Security Institute, a DSIT directorate, with research on advanced AI risks, grants and a blog."
   ],
   "freq": [
-   "要確認",
-   "To be confirmed"
+   "月次",
+   "Monthly"
   ],
   "region": [
    "英国",
@@ -2624,8 +2624,8 @@
    "Entry point to Amazon's investor relations site (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "要確認",
-   "To be confirmed"
+   "四半期ごと",
+   "Quarterly"
   ],
   "region": [
    "グローバル",
@@ -2954,8 +2954,8 @@
    "Entry point to Alphabet's investor relations information (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "要確認",
-   "To be confirmed"
+   "四半期ごと",
+   "Quarterly"
   ],
   "region": [
    "グローバル",
@@ -2987,8 +2987,8 @@
    "Press release list in the Google Cloud Press Corner, filterable by year and category."
   ],
   "freq": [
-   "要確認",
-   "To be confirmed"
+   "週次",
+   "Weekly"
   ],
   "region": [
    "グローバル",
@@ -3053,8 +3053,8 @@
    "Entry point to Salesforce's investor relations site (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "要確認",
-   "To be confirmed"
+   "四半期ごと",
+   "Quarterly"
   ],
   "region": [
    "グローバル",
@@ -3119,8 +3119,8 @@
    "Entry point to Snowflake's investor relations site (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "要確認",
-   "To be confirmed"
+   "四半期ごと",
+   "Quarterly"
   ],
   "region": [
    "グローバル",
@@ -3251,8 +3251,8 @@
    "Entry point to NVIDIA's investor relations site (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "要確認",
-   "To be confirmed"
+   "四半期ごと",
+   "Quarterly"
   ],
   "region": [
    "グローバル",
@@ -3350,8 +3350,8 @@
    "Entry point to Meta's investor relations information (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "要確認",
-   "To be confirmed"
+   "四半期ごと",
+   "Quarterly"
   ],
   "region": [
    "グローバル",
@@ -3482,8 +3482,8 @@
    "Entry point to the official site of Google Cloud's annual event, Google Cloud Next (page body not checked: not reachable from this environment, as of Nov 2026)."
   ],
   "freq": [
-   "要確認",
-   "To be confirmed"
+   "年次（毎年4月ごろ）",
+   "Annual (around April each year)"
   ],
   "region": [
    "グローバル",
@@ -3548,8 +3548,8 @@
    "Official page for Snowflake Summit, Snowflake's annual event (page body not checked: blocked by the site, as of Nov 2026)."
   ],
   "freq": [
-   "要確認",
-   "To be confirmed"
+   "年次（毎年6月ごろ）",
+   "Annual (around June each year)"
   ],
   "region": [
    "グローバル",
@@ -3779,8 +3779,8 @@
    "Official site of IT research firm IDC Japan, covering research reports, events, seminars and consulting."
   ],
   "freq": [
-   "要確認",
-   "To be confirmed"
+   "月次",
+   "Monthly"
   ],
   "region": [
    "日本",
@@ -3977,8 +3977,8 @@
    "Accenture annual technology trends study, Technology Vision 2025 (published 2025-01-07); no 2026 edition confirmed as of Nov 2026"
   ],
   "freq": [
-   "要確認",
-   "To be confirmed"
+   "年次（2024・2025年版は1月公開）",
+   "Annual (2024 and 2025 editions published in January)"
   ],
   "region": [
    "グローバル",
@@ -4109,8 +4109,8 @@
    "2025 edition (dated 2025-12-09; $37B GenAI spend in 2025). Newest data is in the 2026 edition \"The State of Enterprise AI\" (2026-11-03, https://menlovc.com/perspective/2026-the-state-of-enterprise-ai/ )"
   ],
   "freq": [
-   "要確認",
-   "To be confirmed"
+   "年次（2025年版は12月、2026年版は11月公開）",
+   "Annual (2025 edition in December, 2026 edition in November)"
   ],
   "region": [
    "グローバル",
@@ -4241,8 +4241,8 @@
    "Official site of Source Global Research, which provides insights and data for the professional services industry."
   ],
   "freq": [
-   "要確認",
-   "To be confirmed"
+   "週次",
+   "Weekly"
   ],
   "region": [
    "グローバル",
@@ -4307,8 +4307,8 @@
    "Top page of ITmedia Enterprise, a practical information site for IT departments."
   ],
   "freq": [
-   "要確認",
-   "To be confirmed"
+   "日次",
+   "Daily"
   ],
   "region": [
    "日本",
@@ -4340,8 +4340,8 @@
    "Anthropic's official Japanese-language page of customer stories, filterable by industry and product."
   ],
   "freq": [
-   "要確認",
-   "To be confirmed"
+   "随時",
+   "As needed"
   ],
   "region": [
    "グローバル",
@@ -7042,12 +7042,12 @@
   "org": "Ben Tossell",
   "url": "https://www.bensbites.com/",
   "desc": [
-   "AI を独自の視点で扱う Substack のニュースレター（購読者11.8万人超と掲載、最新記事の日付は本文で確認できず、2026年11月時点）",
-   "Substack newsletter exploring taste in AI (listed as over 118,000 subscribers; latest post date not visible on the page, as of Nov 2026)."
+   "AI を独自の視点で扱う Substack のニュースレター（購読者11.8万人超と掲載、2026年11月時点）",
+   "Substack newsletter exploring taste in AI (listed as over 118,000 subscribers, as of Nov 2026)."
   ],
   "freq": [
-   "要確認",
-   "To be confirmed"
+   "週次",
+   "Weekly"
   ],
   "region": [
    "英国/英語",
@@ -7145,8 +7145,8 @@
    "Japanese AI-focused media site with news, interviews, event reports, and columns (latest article Nov 14, 2026, as of Nov 2026)."
   ],
   "freq": [
-   "要確認",
-   "To be confirmed"
+   "週次",
+   "Weekly"
   ],
   "region": [
    "日本/日本語",
@@ -7178,8 +7178,8 @@
    "Japanese AI-focused news media with news, interviews and event reports (latest article 2026-11-14, as of Nov 2026)."
   ],
   "freq": [
-   "要確認",
-   "To be confirmed"
+   "日次",
+   "Daily"
   ],
   "region": [
    "日本/日本語",
@@ -7211,8 +7211,8 @@
    "Official site of Matsuo Institute, which shares its vision with the University of Tokyo's Matsuo-Iwasawa Lab, with services, works and news."
   ],
   "freq": [
-   "要確認",
-   "To be confirmed"
+   "月次",
+   "Monthly"
   ],
   "region": [
    "日本/日本語",
