@@ -1461,7 +1461,7 @@
   "area": "foresight-library-a",
   "tab": "fs_library",
   "current_text": "情報源ライブラリの更新頻度「要確認」25件（s032 s040 s044 s047 s066 s067 s084 s085 s086 s094 s097 s100 s104 s111 s112 s113 s117 s118 s119 s120 s122 s124 s126 s127 s128）",
-  "concern": "2026-11-14 に確かめられず「要確認」のまま。20件はサイト側の拒否・接続不可（Arena・MLCommons・SEMI・経産省・OECD・OpenAI×2・Microsoft×3・Snowflake ブログ・Gartner×3・McKinsey×2・BCG・PwC、Microsoft Build は Book of News が 403、Menlo Perspective は取得が許可の確認で拒否）、5件は開けたが日付の根拠が無い（Databricks ニュースルームは JavaScript 描画、Deloitte は日付の無いサービスページ、Sequoia・a16z・BOND は一覧に日付が出ない）。",
+  "concern": "2026-11-14 に確かめられず「要確認」のまま。20件はサイト側の拒否・接続不可（Arena・MLCommons・SEMI・経産省・OECD・OpenAI×2・Microsoft×3・Snowflake ブログ・Gartner×3・McKinsey×2・BCG・PwC、Microsoft Build は Book of News が 403、Menlo Perspective は利用者の許可を得て取得したが Cloudflare のサイト側 403「Sorry, you have been blocked」）、5件は開けたが日付の根拠が無い（Databricks ニュースルームは JavaScript 描画、Deloitte は日付の無いサービスページ、Sequoia・a16z・BOND は一覧に日付が出ない）。",
   "why": "拒否されたサイトは回避していない。別の公式の根拠（自社の別ドメイン、SEC）が無いものは推測で埋めない。",
   "first_seen": "2026-11-14",
   "last_tried": "2026-11-14"
