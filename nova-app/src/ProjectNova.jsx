@@ -235453,10 +235453,10 @@ const BOOTCAMP_MONTHS = [
     exit: ["資格と Consulting の残タスクを完了。", "Certs and Consulting leftovers done."],
     load: ["週10h目安（余力は復習へ）", "~10h/wk"] },
 ];
-// 計画の週数。バッジ・目盛り・「現在 W○/○」はすべてここから取る（手書きの「16週」が計画の19週とずれていた）。
+// 計画の週数。目盛りと「現在 W○」の範囲はここから取る（週数は画面に書かない）。
 const BOOTCAMP_WEEKS = Math.max(...BOOTCAMP_MONTHS.map((m) => m.e));
 const BOOTCAMP_DAILY = {
-  summary: [`平日2.5h × 5日 ＋ 休日5h × 2日 ＝ 週22.5h ／ ${BOOTCAMP_WEEKS}週で約${Math.round(22.5 * BOOTCAMP_WEEKS / 10) * 10}h（Finance除外）`, `2.5h×5 + 5h×2 = 22.5h/wk / ${BOOTCAMP_WEEKS} wks ≈ ${Math.round(22.5 * BOOTCAMP_WEEKS / 10) * 10}h`],
+  summary: [`平日2.5h × 5日 ＋ 休日5h × 2日 ＝ 週22.5h ／ 計画全体で約${Math.round(22.5 * BOOTCAMP_WEEKS / 10) * 10}h（Finance除外）`, `2.5h×5 + 5h×2 = 22.5h/wk · whole plan ≈ ${Math.round(22.5 * BOOTCAMP_WEEKS / 10) * 10}h`],
   weekday: { h: ["平日 2.5時間", "Weekday · 2.5h"], rows: [["資格学習", "75分", "当該週の資格：講座・問題演習・ハンズオン"], ["TechHub 道場", "45分", "弱点ドメイン優先で ~25問"], ["Consulting", "30分", "~20問"]] },
   weekend: { h: ["休日 5時間", "Weekend · 5h"], rows: [["資格（模試・ハンズオン）", "2.5時間", "模試を高速回転・弱点補強"], ["Consulting", "90分", "60問前後をまとめて"], ["TechHub 復習・弱点直し", "60分", "間違い回収＋要点整理"]] },
 };
@@ -235477,7 +235477,7 @@ const BOOTCAMP_MILE_CAP = [
 const BOOTCAMP_HUBS = [
   { id: "HUB-MEGATECH", isHub: true, hub: "megatech", s: 1, e: 19, label: ["TechHub", "TechHub"], sub: ["クイズ＋実務コンテンツ＋用語辞典（辞書）。問題数は Mastery Track の行が各バンクから数える", "quiz banks + practice + glossary; counts come from the banks via the Mastery Track rows"],
     note: ["TechHub のタブの並び（基礎 → AX実務 → 道場・リサーチ → AIフォーサイト → PLAYBOOK）で進める。クイズは理解度チェック・各道場のバンク・技術道場の14テーマなど、実務はタブごとの読み物。", "Work in TechHub\u2019s tab order (Core \u2192 AX practice \u2192 Dojo & research \u2192 AI foresight \u2192 Playbook): quizzes are the comprehension checks, dojo banks and the 14 technical themes; practice is each tab\u2019s reading."],
-    pace: ["クイズ＋実務コンテンツ（用語辞典は辞書として別枠）。問題数・項目数は Mastery Track の各行が各バンクから数え、日付は19週の計画とは別の暦で1日のペースから割り当てる。", "Quizzes + practice content (the glossary stays a reference). Counts come from the banks via the Mastery Track rows; dates come from a daily pace on a calendar separate from the 19-week plan."],
+    pace: ["クイズ＋実務コンテンツ（用語辞典は辞書として別枠）。問題数・項目数は Mastery Track の各行が各バンクから数え、日付は資格・Consulting の計画とは別の暦で1日のペースから割り当てる。", "Quizzes + practice content (the glossary stays a reference). Counts come from the banks via the Mastery Track rows; dates come from a daily pace on a calendar separate from the certs and Consulting plan."],
     mile: [{ k: "c1", label: ["基礎", "Core"] }, { k: "c2", label: ["AX実務", "AX practice"] }, { k: "c3", label: ["道場・リサーチ", "Dojo & research"] }, { k: "c4", label: ["AIフォーサイト・PLAYBOOK", "AI foresight & Playbook"] }],
     plan: [["基礎", "戦略・論点・全体像・暗黙知の形式知化・定量データ＋理解度チェック 基礎", "Strategy, issues, service map, tacit knowledge, factbook + core comprehension checks"], ["AX実務", "価値ドライバー〜エージェント棚・AGI・ASI（Slalom変革道場のスキルクイズを含む）＋理解度チェック AX実務", "Value drivers through the agent shelf and AGI/ASI (incl. the Slalom skill quiz) + AX comprehension checks"], ["道場・リサーチ", "技術道場（14テーマ・Key Numbers・開発・クラウド・アーキテクチャ演習・SA面接ほか）・AIアーキテクト道場・先端メニュー・セキュリティ・ガバナンス道場・ITセキュリティ基盤・失敗学・企業研究・実務論点マップ", "Technical dojo (14 themes, Key Numbers, dev, cloud, architecture drills, SA interview, others), architect academy, frontier menu, security & governance dojo, IT security, postmortems, companies, issue map"], ["AIフォーサイト・PLAYBOOK", "AIフォーサイトの7タブ＋PLAYBOOK 8本", "AI foresight (7 tabs) + 8 playbooks"]],
     udemy: ["○未: Amazon Bedrock 生成AIウェブアプリ構築（RAG編/エージェント編）", "○未: Google Cloud Vertex AI ML/MLOps入門"], books: ["○未: LangChain/LangGraphによるRAG・AIエージェント実践入門", "○未: 世界一やさしいRAG構築入門（Azure OpenAI）", "○未: AIエージェントの教科書"] },
@@ -235674,12 +235674,12 @@ const migrateQuestRows = (tasks) => {
 };
 const BOOTCAMP_QDAILY = {
   summary: (() => {
-    // TechHub は19週の計画に入れず、別の暦（タブの並びの順・1日のペースで日付）で進める。19週の計画は資格と Consulting。
+    // TechHub は週の計画に入れず、別の暦（タブの並びの順・1日のペースで日付）で進める。週の計画は資格と Consulting。
     const sum = (rows) => rows.reduce((a, r) => a + r.qn, 0), f = (n) => n.toLocaleString();
     const cq = sum(BOOTCAMP_QUEST.cons), ce = Math.max(...BOOTCAMP_QUEST.cons.map((r) => r.e));
     const mq = sum(BOOTCAMP_QUEST.mega), pu = sum(BOOTCAMP_QUEST.practice);
-    return [`週の計画は資格と Consulting（クイズ${f(cq)}問をW1〜W${ce}）。TechHub のクイズ${f(mq)}問と実務コンテンツ${pu}項目は別の暦で、タブの並び（基礎 → AX実務 → 道場・リサーチ → AIフォーサイト → PLAYBOOK）の順に1行ずつ、1日のペース（既定はクイズ95問・実務3項目）から日付を割り当てる。用語辞典${f(MQ_GLOSSARY)}問は辞書として随時参照・別枠。`,
-      `The week plan covers certs and Consulting (${f(cq)} quiz items in W1-${ce}). TechHub's ${f(mq)} quiz items and ${pu} practice items run on their own calendar: one row at a time in TechHub's tab order (Core → AX practice → Dojo & research → AI foresight → Playbook), dated from a daily pace (default 95 Q and 3 practice items). The ${f(MQ_GLOSSARY)}-item glossary stays off-timeline.`];
+    return [`週の計画は資格と Consulting（クイズ${f(cq)}問）。TechHub のクイズ${f(mq)}問と実務コンテンツ${pu}項目は別の暦で、タブの並び（基礎 → AX実務 → 道場・リサーチ → AIフォーサイト → PLAYBOOK）の順に1行ずつ、1日のペース（既定はクイズ95問・実務3項目）から日付を割り当てる。用語辞典${f(MQ_GLOSSARY)}問は辞書として随時参照・別枠。`,
+      `The week plan covers certs and Consulting (${f(cq)} quiz items). TechHub's ${f(mq)} quiz items and ${pu} practice items run on their own calendar: one row at a time in TechHub's tab order (Core → AX practice → Dojo & research → AI foresight → Playbook), dated from a daily pace (default 95 Q and 3 practice items). The ${f(MQ_GLOSSARY)}-item glossary stays off-timeline.`];
   })(),
   weekday: { h: ["平日 3時間（~95問）", "Weekday · 3h"], rows: [["当該バンクを消化", "120分", "~95問（大バンクは分割して数日）"], ["誤答の復習", "30分", "間違いだけ即日で回収"], ["資格", "30分", "当該週の資格を進める"]] },
   weekend: { h: ["休日 4時間（~145問）", "Weekend · 4h"], rows: [["まとめ消化", "180分", "~145問（平日の積み残し＋大バンク）"], ["弱点反復", "40分", "正答率の低い範囲を再挑戦"], ["資格の模試", "20分", "受験週の模試を回す"]] },
@@ -235913,7 +235913,7 @@ function PortalBootcamp({ lang, onResume }) {
   const [grpOpen, setGrpOpen] = useState({ mega: false, cons: false, cert: false, opt: false }); // グループ（ハブ）単位の開閉（デフォルトは閉じる）
   const [tl, setTl] = useState("week");            // ガント目盛りの単位: week=週表示 / day=日表示
   // TechHub の暦：Mastery Track の TechHub 行をタブの並びの順に1行ずつ並べ、1日のペース（クイズ何問・実務何項目）から日付を割り当てる。
-  // 19週の計画（資格・Consulting）とは別の暦。既定のクイズ95問／日は「1日の時間割」の「当該バンクを消化 120分・~95問」から、実務3項目／日は目安。
+  // 週の計画（資格・Consulting）とは別の暦。既定のクイズ95問／日は「1日の時間割」の「当該バンクを消化 120分・~95問」から、実務3項目／日は目安。
   const [mqPace, setMqPace] = useState({ q: 95, p: 3 });
   useEffect(() => { (async () => { try { const r = await window.storage.get("nova_mq_pace_v1"); if (r && r.value) { const o = JSON.parse(r.value) || {}; setMqPace((p) => ({ q: +o.q > 0 ? +o.q : p.q, p: +o.p > 0 ? +o.p : p.p })); } } catch (e) {} })(); }, []);
   const onPace = (k, v) => setMqPace((p) => { const n = { ...p, [k]: Math.max(k === "q" ? 1 : 0.5, +v || 0) }; try { window.storage.set("nova_mq_pace_v1", JSON.stringify(n)); } catch (e) {} return n; });
@@ -236311,7 +236311,7 @@ function PortalBootcamp({ lang, onResume }) {
           <label style={{ fontSize: 11.5, color: NOVA.sub, display: "inline-flex", alignItems: "center", gap: 6 }}>{en ? "Start" : "開始日"}
             <input type="date" value={start} onChange={(e) => onStart(e.target.value)} style={{ border: `1px solid ${NOVA.line}`, borderRadius: 6, padding: "3px 7px", fontSize: 11.5, color: NOVA.ink }} />
           </label>
-          {curWeek ? <span style={{ fontSize: 11, fontWeight: 700, color: "#C0392B" }}>{en ? `Now W${curWeek}/${GRID}${isDay ? ` · D${curDay}/${WEEKS_DAYS}` : ""}` : `現在 W${curWeek}/${GRID}${isDay ? `・${curDay}日目/${WEEKS_DAYS}` : ""}`}</span> : <span style={{ fontSize: 11, color: NOVA.faint }}>{en ? "set start for today-line" : "開始日で今日線が出ます"}</span>}
+          {curWeek ? <span style={{ fontSize: 11, fontWeight: 700, color: "#C0392B" }}>{en ? `Now W${curWeek}${isDay ? ` · D${curDay}` : ""}` : `現在 W${curWeek}${isDay ? `・${curDay}日目` : ""}`}</span> : <span style={{ fontSize: 11, color: NOVA.faint }}>{en ? "set start for today-line" : "開始日で今日線が出ます"}</span>}
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
           <button onClick={() => setShowPhases((v) => !v)} style={toggleBtn(showPhases)}>{en ? "Overview" : "計画サマリー"}</button>
@@ -236380,11 +236380,11 @@ function PortalBootcamp({ lang, onResume }) {
           {/* 各ハブ（TechHub / Consulting / Certificate）ごとに独立した横スクロール＋目盛りヘッダーを持たせる */}
           {grpHeader("mega", en ? `TECHHUB — QUIZ ${mega.tq.toLocaleString()} + PRACTICE ${practiceUnits}` : `TechHub — クイズ${mega.tq.toLocaleString()}問＋実務コンテンツ${practiceUnits}項目`, `${mega.dq.toLocaleString()} / ${mega.tq.toLocaleString()}${en ? " Q" : "問"}`)}
           {grpOpen.mega ? (<div>
-            <div style={{ fontSize: 10.5, color: NOVA.sub, lineHeight: 1.6, padding: "2px 0 6px" }}>{en ? "TechHub has its own calendar, separate from the 19-week plan: rows run one after another in TechHub\u2019s tab order (Core \u2192 AX practice \u2192 Dojo & research \u2192 AI foresight \u2192 Playbook), each sized by the daily pace below." : "TechHub は19週の計画とは別の暦。タブの並び（基礎 → AX実務 → 道場・リサーチ → AIフォーサイト → PLAYBOOK）の順に1行ずつ進め、各行の日数は下の1日のペースで決まる。"}</div>
+            <div style={{ fontSize: 10.5, color: NOVA.sub, lineHeight: 1.6, padding: "2px 0 6px" }}>{en ? "TechHub has its own calendar, separate from the certs and Consulting plan: rows run one after another in TechHub\u2019s tab order (Core \u2192 AX practice \u2192 Dojo & research \u2192 AI foresight \u2192 Playbook), each sized by the daily pace below." : "TechHub は資格・Consulting の計画とは別の暦。タブの並び（基礎 → AX実務 → 道場・リサーチ → AIフォーサイト → PLAYBOOK）の順に1行ずつ進め、各行の日数は下の1日のペースで決まる。"}</div>
             <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10, fontSize: 11, color: NOVA.sub, marginBottom: 8 }}>
               <label htmlFor="mq-pace-q" style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>{en ? "Quiz questions per day" : "1日に解くクイズ"}<input id="mq-pace-q" type="number" min="1" step="5" value={mqPace.q} onChange={(e) => onPace("q", e.target.value)} style={{ width: 58, border: `1px solid ${NOVA.line}`, borderRadius: 6, padding: "2px 6px", fontSize: 11, color: NOVA.ink }} />{en ? "Q" : "問"}</label>
               <label htmlFor="mq-pace-p" style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>{en ? "Practice items per day" : "1日に進める実務コンテンツ"}<input id="mq-pace-p" type="number" min="0.5" step="0.5" value={mqPace.p} onChange={(e) => onPace("p", e.target.value)} style={{ width: 52, border: `1px solid ${NOVA.line}`, borderRadius: 6, padding: "2px 6px", fontSize: 11, color: NOVA.ink }} />{en ? "items" : "項目"}</label>
-              <span style={{ fontWeight: 700, color: NOVA.ink }}>{en ? `${techCal.days} days (~${techCal.weeks} wk)` : `全${techCal.days}日（約${techCal.weeks}週）`}{techCal.end ? (en ? ` · ends ${techCal.end.getFullYear()}/${techCal.end.getMonth() + 1}/${techCal.end.getDate()}` : `・終了予定 ${techCal.end.getFullYear()}/${techCal.end.getMonth() + 1}/${techCal.end.getDate()}`) : (en ? " · set the start date to see dates" : "・開始日を入れると日付が出る")}</span>
+              <span style={{ fontWeight: 700, color: NOVA.ink }}>{en ? `${techCal.days} days` : `全${techCal.days}日`}{techCal.end ? (en ? ` · ends ${techCal.end.getFullYear()}/${techCal.end.getMonth() + 1}/${techCal.end.getDate()}` : `・終了予定 ${techCal.end.getFullYear()}/${techCal.end.getMonth() + 1}/${techCal.end.getDate()}`) : (en ? " · set the start date to see dates" : "・開始日を入れると日付が出る")}</span>
             </div>
             {(() => { const pr = BOOTCAMP_QUEST.practice, ex = pr.find((r) => r.id === "Q-P3"); return (
               <div style={{ fontSize: 10.5, color: NOVA.faint, lineHeight: 1.6, margin: "-4px 0 8px" }}>{en
@@ -236436,7 +236436,6 @@ function PortalBootcamp({ lang, onResume }) {
         <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.2 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ fontFamily: NOVA_SERIF, fontSize: 15.5, fontWeight: 700, color: NOVA.ink, letterSpacing: 0.2 }}>Mastery Track</span>
-            <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: 1.2, color: "#fff", background: NOVA.megatech, borderRadius: 999, padding: "2px 8px" }}>{en ? `${BOOTCAMP_WEEKS}W` : `${BOOTCAMP_WEEKS}週`}</span>
           </div>
         </div>
         <span style={{ flex: 1 }} />
