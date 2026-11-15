@@ -235425,31 +235425,31 @@ const BOOTCAMP_MONTHS = [
   { m: 1, s: 1, e: 4, title: ["M1 基礎固め", "M1 Foundations"],
     goal: ["クラウド/データ/セキュリティ/開発の共通言語を固める。所有教材の消化が中心で軽い立ち上がり。", "Lock in shared vocabulary; mostly finishing owned materials."],
     certs: "CLF-C02 · DP-900 · SC-900 · GH-900 · GH-300",
-    hubFocus: ["TechHub はタブの順に（週の割り当てなし）。Consulting 用語辞典とロジカル〜DXの6ドメイン。", "TechHub in tab order (no week plan); Consulting glossary + 6 domains (Logical to DX)."],
+    hubFocus: ["TechHub は別の暦でタブの順に。Consulting 用語辞典とロジカル〜DXの6ドメイン。", "TechHub on its own calendar in tab order; Consulting glossary + 6 domains (Logical to DX)."],
     exit: ["Fundamentals系5資格を取得。", "5 fundamentals."],
     load: ["週22h（平日2.5h＋休日5h）", "22h/wk"] },
   { m: 2, s: 5, e: 8, title: ["M2 応用・エージェント", "M2 Associate & agents"],
     goal: ["SAAで設計力、AB-620/GH-600でエージェント力。Consultingを本格化。", "Design via SAA; agents via AB-620/GH-600; ramp Consulting."],
     certs: "SAA-C03（2週）· AB-620 · GH-600",
-    hubFocus: ["TechHub はタブの順に。Consulting AI・論点思考・仮説思考と紛らわしい・ケース。", "TechHub in tab order; Consulting AI, issue & hypothesis thinking, confusables & cases."],
+    hubFocus: ["TechHub は別の暦でタブの順に。Consulting AI・論点思考・仮説思考と紛らわしい・ケース。", "TechHub on its own calendar in tab order; Consulting AI, issue & hypothesis thinking, confusables & cases."],
     exit: ["SAA＋エージェント2資格。Consulting 9ドメインを1巡。", "SAA + 2 agent certs; Consulting all 9 domains once."],
     load: ["週24h（SAAが重い）", "24h/wk"] },
   { m: 3, s: 9, e: 12, title: ["M3 運用・データ・Claude", "M3 Ops, data & Claude"],
     goal: ["運用(SC-500)・データ(ADP)・Claude(CCA-F)を締める。ライブラリの講座が豊富で軽快に。", "Close ops/data/Claude — well covered by owned courses."],
     certs: "SC-500 · ADP · CCA-F · ISO42001F · AIGP · CCSK",
-    hubFocus: ["TechHub はタブの順に。Consulting 誤答の復習。", "TechHub in tab order; Consulting review of misses."],
+    hubFocus: ["TechHub は別の暦でタブの順に。Consulting 誤答の復習。", "TechHub on its own calendar in tab order; Consulting review of misses."],
     exit: ["14資格すべて取得。Consulting 復習1巡。", "All 14 certs; Consulting review done once."],
     load: ["週22h（予備週で調整）", "22h/wk"] },
   { m: 4, s: 13, e: 16, title: ["M4 完走・総仕上げ", "M4 Finish & capstone"],
     goal: ["Consultingを完走し、学びを提案・ロジックに統合。弱点総ざらいで仕上げる。", "Finish Consulting; integrate the learning into proposals and logic; sweep weak spots."],
     certs: "（取りこぼし再受験のみ）",
-    hubFocus: ["TechHub はタブの順に。Consulting 総復習と提案への統合。", "TechHub in tab order; Consulting full review and integration."],
+    hubFocus: ["TechHub は別の暦でタブの順に。Consulting 総復習と提案への統合。", "TechHub on its own calendar in tab order; Consulting full review and integration."],
     exit: ["Consulting 完走＋総仕上げ（弱点総ざらい・提案統合）。", "Consulting done + capstone."],
     load: ["週20h（仕上げ）", "20h/wk"] },
   { m: 5, s: 17, e: 19, title: ["M5 バッファ", "M5 Buffer"],
-    goal: ["資格と Consulting の残りを片付ける予備の期間。TechHub はタブの順に続ける。", "Buffer to clear what is left of the certs and Consulting; TechHub continues in tab order."],
+    goal: ["資格と Consulting の残りを片付ける予備の期間。TechHub は別の暦で続ける。", "Buffer to clear what is left of the certs and Consulting; TechHub continues on its own calendar."],
     certs: "残タスクのバッファ",
-    hubFocus: ["TechHub はタブの順に。", "TechHub in tab order."],
+    hubFocus: ["TechHub は別の暦でタブの順に。", "TechHub on its own calendar in tab order."],
     exit: ["資格と Consulting の残タスクを完了。", "Certs and Consulting leftovers done."],
     load: ["週10h目安（余力は復習へ）", "~10h/wk"] },
 ];
@@ -235476,10 +235476,10 @@ const BOOTCAMP_MILE_CAP = [
 // 2ハブ 並行トラック（Finance除外）。
 const BOOTCAMP_HUBS = [
   { id: "HUB-MEGATECH", isHub: true, hub: "megatech", s: 1, e: 19, label: ["TechHub", "TechHub"], sub: ["クイズ＋実務コンテンツ＋用語辞典（辞書）。問題数は Mastery Track の行が各バンクから数える", "quiz banks + practice + glossary; counts come from the banks via the Mastery Track rows"],
-    note: ["AI/クラウド14テーマ＋理解度チェック2本（基礎・AX実務）。資格学習と重複が大きく、実質の追加負荷は小。", "14 AI/cloud themes + 2 comprehension checks; overlaps the certs, so low marginal load."],
-    pace: ["テーマ別クイズ＋理解度チェック＋用語辞典。問題数は Mastery Track の各行が各バンクから数える。資格学習と重複し実質の追加は小。", "Theme quizzes + comprehension checks + glossary; counts come from the banks via the Mastery Track rows."],
-    mile: [{ k: "c1", label: ["M1: テーマ1–4", "M1: Themes 1–4"] }, { k: "c2", label: ["M2: テーマ5–8", "M2: Themes 5–8"] }, { k: "c3", label: ["M3: テーマ9–11", "M3: Themes 9–11"] }, { k: "c4", label: ["M4: テーマ12–14＋Key", "M4: 12–14+Key"] }],
-    plan: [["M1 (W1–4)", "アルゴリズム基礎 / アルゴリズム / 学習 / 推論（約720問）＋理解度チェック基礎（W4〜5・300問）", "Algorithm basics / Algorithms / Training / Inference (~720 Q) + core comprehension checks (W4–5, 300 Q)"], ["M2 (W5–8)", "RAG / エージェント / アーキテクチャ / 基盤（約745問）＋理解度チェックAX実務（W6〜7・300問）", "RAG / Agents / Architecture / Platforms (~745 Q) + AX practice checks (W6–7, 300 Q)"], ["M3 (W9–12)", "AI駆動開発 / セキュリティ / ガバナンス（約380問）", "AI-driven development / Security / Governance (~380 Q)"], ["M4 (W13–15)", "AI導入戦略 / Expertise / 最新動向（＋Key numbers）", "AI adoption strategy / Expertise / Latest trends (+ Key numbers)"]],
+    note: ["TechHub のタブの並び（基礎 → AX実務 → 道場・リサーチ → AIフォーサイト → PLAYBOOK）で進める。クイズは理解度チェック・各道場のバンク・技術道場の14テーマなど、実務はタブごとの読み物。", "Work in TechHub\u2019s tab order (Core \u2192 AX practice \u2192 Dojo & research \u2192 AI foresight \u2192 Playbook): quizzes are the comprehension checks, dojo banks and the 14 technical themes; practice is each tab\u2019s reading."],
+    pace: ["クイズ＋実務コンテンツ（用語辞典は辞書として別枠）。問題数・項目数は Mastery Track の各行が各バンクから数え、日付は19週の計画とは別の暦で1日のペースから割り当てる。", "Quizzes + practice content (the glossary stays a reference). Counts come from the banks via the Mastery Track rows; dates come from a daily pace on a calendar separate from the 19-week plan."],
+    mile: [{ k: "c1", label: ["基礎", "Core"] }, { k: "c2", label: ["AX実務", "AX practice"] }, { k: "c3", label: ["道場・リサーチ", "Dojo & research"] }, { k: "c4", label: ["AIフォーサイト・PLAYBOOK", "AI foresight & Playbook"] }],
+    plan: [["基礎", "戦略・論点・全体像・暗黙知の形式知化・定量データ＋理解度チェック 基礎", "Strategy, issues, service map, tacit knowledge, factbook + core comprehension checks"], ["AX実務", "価値ドライバー〜エージェント棚・AGI・ASI（Slalom変革道場のスキルクイズを含む）＋理解度チェック AX実務", "Value drivers through the agent shelf and AGI/ASI (incl. the Slalom skill quiz) + AX comprehension checks"], ["道場・リサーチ", "技術道場（14テーマ・Key Numbers・開発・クラウド・アーキテクチャ演習・SA面接ほか）・AIアーキテクト道場・先端メニュー・セキュリティ・ガバナンス道場・ITセキュリティ基盤・失敗学・企業研究・実務論点マップ", "Technical dojo (14 themes, Key Numbers, dev, cloud, architecture drills, SA interview, others), architect academy, frontier menu, security & governance dojo, IT security, postmortems, companies, issue map"], ["AIフォーサイト・PLAYBOOK", "AIフォーサイトの7タブ＋PLAYBOOK 8本", "AI foresight (7 tabs) + 8 playbooks"]],
     udemy: ["○未: Amazon Bedrock 生成AIウェブアプリ構築（RAG編/エージェント編）", "○未: Google Cloud Vertex AI ML/MLOps入門"], books: ["○未: LangChain/LangGraphによるRAG・AIエージェント実践入門", "○未: 世界一やさしいRAG構築入門（Azure OpenAI）", "○未: AIエージェントの教科書"] },
   { id: "HUB-CONSULTING", isHub: true, hub: "consulting", s: 1, e: 7, label: ["Consulting Hub", "Consulting Hub"], sub: ["9ドメイン＋用語・ケース", "9 domains + glossary & cases"],
     note: ["9つの思考ドメイン（論点思考・仮説思考を含む）。資格と別ドメイン＝実質の追加負荷。毎日20問ずつ積む。", "9 thinking domains incl. issue and hypothesis thinking — the real added load; ~20 Q/day."],
@@ -235667,12 +235667,12 @@ const migrateQuestRows = (tasks) => {
 };
 const BOOTCAMP_QDAILY = {
   summary: (() => {
-    // TechHub は週を割り当てない（Mastery Track でタブの並びの順に進める）。週の計画は資格と Consulting だけ。
+    // TechHub は19週の計画に入れず、別の暦（タブの並びの順・1日のペースで日付）で進める。19週の計画は資格と Consulting。
     const sum = (rows) => rows.reduce((a, r) => a + r.qn, 0), f = (n) => n.toLocaleString();
     const cq = sum(BOOTCAMP_QUEST.cons), ce = Math.max(...BOOTCAMP_QUEST.cons.map((r) => r.e));
     const mq = sum(BOOTCAMP_QUEST.mega), pu = sum(BOOTCAMP_QUEST.practice);
-    return [`週の計画は資格と Consulting（クイズ${f(cq)}問をW1〜W${ce}）。TechHub のクイズ${f(mq)}問と実務コンテンツ${pu}項目は週を決めず、タブの並び（基礎 → AX実務 → 道場・リサーチ → AIフォーサイト → PLAYBOOK）の順で進める。用語辞典${f(MQ_GLOSSARY)}問は辞書として随時参照・別枠。`,
-      `The week plan covers certs and Consulting (${f(cq)} quiz items in W1-${ce}). TechHub's ${f(mq)} quiz items and ${pu} practice items have no week plan: work through them in TechHub's tab order (Core → AX practice → Dojo & research → AI foresight → Playbook). The ${f(MQ_GLOSSARY)}-item glossary stays off-timeline.`];
+    return [`週の計画は資格と Consulting（クイズ${f(cq)}問をW1〜W${ce}）。TechHub のクイズ${f(mq)}問と実務コンテンツ${pu}項目は別の暦で、タブの並び（基礎 → AX実務 → 道場・リサーチ → AIフォーサイト → PLAYBOOK）の順に1行ずつ、1日のペース（既定はクイズ95問・実務3項目）から日付を割り当てる。用語辞典${f(MQ_GLOSSARY)}問は辞書として随時参照・別枠。`,
+      `The week plan covers certs and Consulting (${f(cq)} quiz items in W1-${ce}). TechHub's ${f(mq)} quiz items and ${pu} practice items run on their own calendar: one row at a time in TechHub's tab order (Core → AX practice → Dojo & research → AI foresight → Playbook), dated from a daily pace (default 95 Q and 3 practice items). The ${f(MQ_GLOSSARY)}-item glossary stays off-timeline.`];
   })(),
   weekday: { h: ["平日 3時間（~95問）", "Weekday · 3h"], rows: [["当該バンクを消化", "120分", "~95問（大バンクは分割して数日）"], ["誤答の復習", "30分", "間違いだけ即日で回収"], ["資格", "30分", "当該週の資格を進める"]] },
   weekend: { h: ["休日 4時間（~145問）", "Weekend · 4h"], rows: [["まとめ消化", "180分", "~145問（平日の積み残し＋大バンク）"], ["弱点反復", "40分", "正答率の低い範囲を再挑戦"], ["資格の模試", "20分", "受験週の模試を回す"]] },
@@ -235905,6 +235905,11 @@ function PortalBootcamp({ lang, onResume }) {
   const [showPhases, setShowPhases] = useState(false);
   const [grpOpen, setGrpOpen] = useState({ mega: false, cons: false, cert: false, opt: false }); // グループ（ハブ）単位の開閉（デフォルトは閉じる）
   const [tl, setTl] = useState("week");            // ガント目盛りの単位: week=週表示 / day=日表示
+  // TechHub の暦：Mastery Track の TechHub 行をタブの並びの順に1行ずつ並べ、1日のペース（クイズ何問・実務何項目）から日付を割り当てる。
+  // 19週の計画（資格・Consulting）とは別の暦。既定のクイズ95問／日は「1日の時間割」の「当該バンクを消化 120分・~95問」から、実務3項目／日は目安。
+  const [mqPace, setMqPace] = useState({ q: 95, p: 3 });
+  useEffect(() => { (async () => { try { const r = await window.storage.get("nova_mq_pace_v1"); if (r && r.value) { const o = JSON.parse(r.value) || {}; setMqPace((p) => ({ q: +o.q > 0 ? +o.q : p.q, p: +o.p > 0 ? +o.p : p.p })); } } catch (e) {} })(); }, []);
+  const onPace = (k, v) => setMqPace((p) => { const n = { ...p, [k]: Math.max(k === "q" ? 1 : 0.5, +v || 0) }; try { window.storage.set("nova_mq_pace_v1", JSON.stringify(n)); } catch (e) {} return n; });
   const [optOpen, setOptOpen] = useState({});      // 任意学習のサブカテゴリ開閉（row.id#groupIdx）
   const [res, setRes] = useState({});          // 関連教材のチェック状態（title→bool）
   const [themeOpen, setThemeOpen] = useState({}); // MegaTechテーマ展開
@@ -235973,6 +235978,25 @@ function PortalBootcamp({ lang, onResume }) {
     const sd = new Date(start + "T00:00:00");
     if (!isNaN(sd.getTime())) { const days = (new Date().getTime() - sd.getTime()) / 86400000; todayPct = (Math.max(0, Math.min(WEEKS_DAYS, days)) / WEEKS_DAYS) * 100; curWeek = Math.max(1, Math.min(GRID, Math.floor(days / 7) + 1)); curDay = Math.max(1, Math.min(WEEKS_DAYS, Math.floor(days) + 1)); }
   }
+  // TechHub の暦（行ごとの開始日・終了日。日数は開始日からの通し日）
+  const techCal = (() => {
+    let d = 0;
+    const groups = MQ_TECH_GROUPS.map((gr) => ({ g: gr.g, rows: gr.rows.map((row) => {
+      const per = row.unit ? mqPace.p : mqPace.q, len = Math.max(1, Math.ceil(row.qn / Math.max(0.5, per)));
+      const o = { row, d0: d, d1: d + len }; d += len; return o;
+    }) }));
+    const weeks = Math.max(1, Math.ceil(d / 7));
+    const sd = start ? new Date(start + "T00:00:00") : null, ok = sd && !isNaN(sd.getTime());
+    const at = (k) => { const x = new Date(sd.getTime()); x.setDate(x.getDate() + k); return x; };
+    const md = (k) => { if (!ok) return null; const x = at(k); return `${x.getMonth() + 1}/${x.getDate()}`; };
+    let today = null;
+    if (ok) { const n = (new Date().getTime() - sd.getTime()) / 86400000; if (n >= 0 && n <= weeks * 7) today = (n / (weeks * 7)) * 100; }
+    const months = [];
+    if (ok) for (let k = 0; k < weeks * 7; k++) { const x = at(k), key = x.getFullYear() * 12 + x.getMonth(); if (!months.length || months[months.length - 1].key !== key) months.push({ key, y: x.getFullYear(), m: x.getMonth() + 1, n: 0 }); months[months.length - 1].n++; }
+    return { groups, days: d, weeks, D: weeks * 7, ok, md, today, months, end: ok ? at(Math.max(0, d - 1)) : null };
+  })();
+  const techBG = `repeating-linear-gradient(90deg, ${NOVA.panelSoft}, ${NOVA.panelSoft} 1px, transparent 1px, transparent calc(100% / ${techCal.weeks}))`;
+  const calRange = (c) => { const a = techCal.md(c.d0), b = techCal.md(c.d1 - 1), n = c.d1 - c.d0; return a ? `${a}${n > 1 ? "–" + b : ""}（${n}${en ? "d" : "日"}）` : (en ? `day ${c.d0 + 1}${n > 1 ? "–" + c.d1 : ""}` : `${c.d0 + 1}${n > 1 ? "〜" + c.d1 : ""}日目`); };
   // 週nの開始日を M/D で（開始日未設定なら null）
   const wkDate = (n) => { if (!start) return null; const d = new Date(start + "T00:00:00"); if (isNaN(d.getTime())) return null; d.setDate(d.getDate() + (n - 1) * 7); return (d.getMonth() + 1) + "/" + d.getDate(); };
   // バー位置は常に週基準（データの s/e は週番号）。表示単位が変わっても比率は同じ。
@@ -236146,9 +236170,9 @@ function PortalBootcamp({ lang, onResume }) {
     ) : null}
   </>);
   // 全問制覇：テーマ/ドメイン1行（問数ラベル＋バー＋¼刻みチェック）
-  // free=true は TechHub の行：週に割り当てず全幅のバーで進み具合だけを示す（.map から呼ぶ Consulting は第2引数が添字なので === true で判定）
-  const renderQRow = (row, free) => {
-    const anytime = free === true;
+  // cal は TechHub の行の暦（{ d0, d1 }＝開始日からの通し日）。.map から呼ぶ Consulting は第2引数が添字なので、オブジェクトのときだけ暦として使う
+  const renderQRow = (row, calArg) => {
+    const cal = calArg && typeof calArg === "object" ? calArg : null;
     const p = pctOf(row); const done = p === 100; const col = done ? "#158F6B" : (p === 0 ? NOVA.faint : (NOVA[row.hub] || NOVA.megatech)); const exp = expanded === row.id;
     return (
       <div key={row.id} style={{ borderBottom: `1px solid ${NOVA.line}` }}>
@@ -236159,18 +236183,18 @@ function PortalBootcamp({ lang, onResume }) {
             <span style={{ flex: 1, minWidth: 0, fontSize: 10, fontWeight: 800, color: done ? "#158F6B" : NOVA.ink, lineHeight: 1.25, wordBreak: "keep-all", overflowWrap: "break-word" }}>{row.name[en ? 1 : 0]}</span>
             <span style={{ fontSize: 9, color: NOVA.faint, flexShrink: 0 }}>{row.qn}</span>
           </div>
-          <div style={{ flex: 1, position: "relative", height: 20, background: anytime ? "none" : gridBG }}>
-            <div style={{ position: "absolute", left: (anytime ? 0 : barLeft(row)) + "%", width: (anytime ? 100 : barWidth(row)) + "%", top: 3, height: 14, background: NOVA.panelSoft, border: `1px solid ${done ? "#158F6B" : p === 0 ? NOVA.line : (NOVA[row.hub] || NOVA.megatech)}`, borderRadius: 5, overflow: "hidden", boxSizing: "border-box" }}>
+          <div style={{ flex: 1, position: "relative", height: 20, background: cal ? techBG : gridBG }}>
+            <div style={{ position: "absolute", left: (cal ? (cal.d0 / techCal.D) * 100 : barLeft(row)) + "%", width: (cal ? ((cal.d1 - cal.d0) / techCal.D) * 100 : barWidth(row)) + "%", minWidth: cal ? 30 : 0, top: 3, height: 14, background: NOVA.panelSoft, border: `1px solid ${done ? "#158F6B" : p === 0 ? NOVA.line : (NOVA[row.hub] || NOVA.megatech)}`, borderRadius: 5, overflow: "hidden", boxSizing: "border-box" }}>
               <div style={{ width: p + "%", height: "100%", background: col, opacity: done ? 1 : 0.85 }} />
               <span style={{ position: "absolute", left: 4, top: 0, bottom: 0, display: "flex", alignItems: "center", fontSize: 8.5, fontWeight: 800, color: p > 45 ? "#fff" : NOVA.sub }}>{done ? "✓" : p + "%"}</span>
             </div>
-            {todayPct !== null && !anytime ? <div style={{ position: "absolute", left: todayPct + "%", top: -2, bottom: -2, width: 2, background: "#C0392B", opacity: 0.8 }} /> : null}
+            {(cal ? techCal.today : todayPct) !== null ? <div style={{ position: "absolute", left: (cal ? techCal.today : todayPct) + "%", top: -2, bottom: -2, width: 2, background: "#C0392B", opacity: 0.8 }} /> : null}
           </div>
         </div>
         {exp ? (
           <div style={{ padding: "3px 0 9px", paddingLeft: LABELW }}>
             <div style={{ fontSize: 11, color: NOVA.sub, marginBottom: 6 }}>
-              {row.name[en ? 1 : 0]}・{row.qn}{row.unit ? (en ? " items" : "項目") : (en ? " Q" : "問")}
+              {row.name[en ? 1 : 0]}・{row.qn}{row.unit ? (en ? " items" : "項目") : (en ? " Q" : "問")}{cal ? `　${calRange(cal)}` : ""}
               {row.cats ? (en ? " — tick each section as you finish it" : " — 区分ごとに終えたらチェック") : (en ? " — check each quarter" : " — ¼ごとにチェック")}
             </div>
             {row.cats ? (
@@ -236345,11 +236369,26 @@ function PortalBootcamp({ lang, onResume }) {
           {/* 各ハブ（TechHub / Consulting / Certificate）ごとに独立した横スクロール＋目盛りヘッダーを持たせる */}
           {grpHeader("mega", en ? `TECHHUB — QUIZ ${mega.tq.toLocaleString()} + PRACTICE ${practiceUnits}` : `TechHub — クイズ${mega.tq.toLocaleString()}問＋実務${practiceUnits}項目`, `${mega.dq.toLocaleString()} / ${mega.tq.toLocaleString()}${en ? " Q" : "問"}`)}
           {grpOpen.mega ? (<div>
-            <div style={{ fontSize: 10.5, color: NOVA.sub, lineHeight: 1.6, padding: "2px 0 6px" }}>{en ? "No week plan: work top to bottom in TechHub\u2019s tab order (Core \u2192 AX practice \u2192 Dojo & research \u2192 AI foresight \u2192 Playbook)." : "週の割り当てはなし。TechHub のタブの並び（基礎 → AX実務 → 道場・リサーチ → AIフォーサイト → PLAYBOOK）で上から順に進める。"}</div>
-            {MQ_TECH_GROUPS.map((gr) => (<div key={gr.g[1]}>
-              <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: 1.2, color: NOVA.megatech, padding: "10px 0 4px", borderBottom: `1px solid ${NOVA.line}` }}>{gr.g[en ? 1 : 0]}<span style={{ color: NOVA.faint, fontWeight: 600, letterSpacing: 0, marginLeft: 8 }}>{gr.rows.length}{en ? " rows" : "行"}</span></div>
-              {gr.rows.map((row) => renderQRow(row, true))}
-            </div>))}
+            <div style={{ fontSize: 10.5, color: NOVA.sub, lineHeight: 1.6, padding: "2px 0 6px" }}>{en ? "TechHub has its own calendar, separate from the 19-week plan: rows run one after another in TechHub\u2019s tab order (Core \u2192 AX practice \u2192 Dojo & research \u2192 AI foresight \u2192 Playbook), each sized by the daily pace below." : "TechHub は19週の計画とは別の暦。タブの並び（基礎 → AX実務 → 道場・リサーチ → AIフォーサイト → PLAYBOOK）の順に1行ずつ進め、各行の日数は下の1日のペースで決まる。"}</div>
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10, fontSize: 11, color: NOVA.sub, marginBottom: 8 }}>
+              <label htmlFor="mq-pace-q" style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>{en ? "Quiz / day" : "1日のクイズ"}<input id="mq-pace-q" type="number" min="1" step="5" value={mqPace.q} onChange={(e) => onPace("q", e.target.value)} style={{ width: 58, border: `1px solid ${NOVA.line}`, borderRadius: 6, padding: "2px 6px", fontSize: 11, color: NOVA.ink }} />{en ? "Q" : "問"}</label>
+              <label htmlFor="mq-pace-p" style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>{en ? "Practice / day" : "1日の実務"}<input id="mq-pace-p" type="number" min="0.5" step="0.5" value={mqPace.p} onChange={(e) => onPace("p", e.target.value)} style={{ width: 52, border: `1px solid ${NOVA.line}`, borderRadius: 6, padding: "2px 6px", fontSize: 11, color: NOVA.ink }} />{en ? "items" : "項目"}</label>
+              <span style={{ fontWeight: 700, color: NOVA.ink }}>{en ? `${techCal.days} days (~${techCal.weeks} wk)` : `全${techCal.days}日（約${techCal.weeks}週）`}{techCal.end ? (en ? ` · ends ${techCal.end.getFullYear()}/${techCal.end.getMonth() + 1}/${techCal.end.getDate()}` : `・終了予定 ${techCal.end.getFullYear()}/${techCal.end.getMonth() + 1}/${techCal.end.getDate()}`) : (en ? " · set the start date to see dates" : "・開始日を入れると日付が出る")}</span>
+            </div>
+            <div style={{ overflowX: "auto" }}><div style={{ minWidth: Math.max(800, LABELW + techCal.weeks * 30), position: "relative" }}>
+              {techCal.ok ? (
+                <div style={{ display: "flex", marginLeft: LABELW, borderBottom: `1px solid ${NOVA.line}` }}>
+                  {techCal.months.map((mo) => (<div key={mo.key} style={{ width: (mo.n / techCal.D) * 100 + "%", padding: "0 0 3px 3px", borderLeft: `1px solid ${NOVA.line}`, boxSizing: "border-box", fontSize: 10.5, fontWeight: 800, color: NOVA.ink, whiteSpace: "nowrap", overflow: "hidden" }}>{en ? `${mo.y}/${mo.m}` : (mo.m === 1 || mo === techCal.months[0] ? `${mo.y}年${mo.m}月` : `${mo.m}月`)}</div>))}
+                </div>
+              ) : null}
+              <div style={{ display: "flex", marginLeft: LABELW, borderBottom: `1px solid ${NOVA.line}` }}>
+                {Array.from({ length: techCal.weeks }, (_, k) => (<div key={k} style={{ width: 100 / techCal.weeks + "%", textAlign: "center", fontSize: 8.5, color: NOVA.faint, fontWeight: 600, padding: "2px 0", borderLeft: `1px solid ${NOVA.line}`, boxSizing: "border-box", whiteSpace: "nowrap", overflow: "hidden" }}>{techCal.ok ? techCal.md(k * 7) : `W${k + 1}`}</div>))}
+              </div>
+              {techCal.groups.map((gr) => (<div key={gr.g[1]}>
+                <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: 1.2, color: NOVA.megatech, padding: "10px 0 4px", borderBottom: `1px solid ${NOVA.line}` }}>{gr.g[en ? 1 : 0]}<span style={{ color: NOVA.faint, fontWeight: 600, letterSpacing: 0, marginLeft: 8 }}>{gr.rows.length}{en ? " rows" : "行"}{gr.rows.length ? `・${calRange({ d0: gr.rows[0].d0, d1: gr.rows[gr.rows.length - 1].d1 })}` : ""}</span></div>
+                {gr.rows.map((o) => renderQRow(o.row, { d0: o.d0, d1: o.d1 }))}
+              </div>))}
+            </div></div>
           </div>) : null}
           {grpHeader("cons", en ? `CONSULTING HUB — ALL BANKS (${cons.tq.toLocaleString()} Q)` : `Consulting Hub — 全バンク（${cons.tq.toLocaleString()}問）`, `${cons.dq.toLocaleString()} / ${cons.tq.toLocaleString()}${en ? " Q" : "問"}`)}
           {grpOpen.cons ? <div style={{ overflowX: "auto" }}><div style={{ minWidth: canvasMin, position: "relative" }}>{gridHeader()}{BOOTCAMP_QUEST.cons.map(renderQRow)}</div></div> : null}
