@@ -236378,14 +236378,19 @@ function PortalBootcamp({ lang, onResume }) {
         </div>
         <div>
           {/* 各ハブ（TechHub / Consulting / Certificate）ごとに独立した横スクロール＋目盛りヘッダーを持たせる */}
-          {grpHeader("mega", en ? `TECHHUB — QUIZ ${mega.tq.toLocaleString()} + PRACTICE ${practiceUnits}` : `TechHub — クイズ${mega.tq.toLocaleString()}問＋実務${practiceUnits}項目`, `${mega.dq.toLocaleString()} / ${mega.tq.toLocaleString()}${en ? " Q" : "問"}`)}
+          {grpHeader("mega", en ? `TECHHUB — QUIZ ${mega.tq.toLocaleString()} + PRACTICE ${practiceUnits}` : `TechHub — クイズ${mega.tq.toLocaleString()}問＋実務コンテンツ${practiceUnits}項目`, `${mega.dq.toLocaleString()} / ${mega.tq.toLocaleString()}${en ? " Q" : "問"}`)}
           {grpOpen.mega ? (<div>
             <div style={{ fontSize: 10.5, color: NOVA.sub, lineHeight: 1.6, padding: "2px 0 6px" }}>{en ? "TechHub has its own calendar, separate from the 19-week plan: rows run one after another in TechHub\u2019s tab order (Core \u2192 AX practice \u2192 Dojo & research \u2192 AI foresight \u2192 Playbook), each sized by the daily pace below." : "TechHub は19週の計画とは別の暦。タブの並び（基礎 → AX実務 → 道場・リサーチ → AIフォーサイト → PLAYBOOK）の順に1行ずつ進め、各行の日数は下の1日のペースで決まる。"}</div>
             <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10, fontSize: 11, color: NOVA.sub, marginBottom: 8 }}>
-              <label htmlFor="mq-pace-q" style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>{en ? "Quiz / day" : "1日のクイズ"}<input id="mq-pace-q" type="number" min="1" step="5" value={mqPace.q} onChange={(e) => onPace("q", e.target.value)} style={{ width: 58, border: `1px solid ${NOVA.line}`, borderRadius: 6, padding: "2px 6px", fontSize: 11, color: NOVA.ink }} />{en ? "Q" : "問"}</label>
-              <label htmlFor="mq-pace-p" style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>{en ? "Practice / day" : "1日の実務"}<input id="mq-pace-p" type="number" min="0.5" step="0.5" value={mqPace.p} onChange={(e) => onPace("p", e.target.value)} style={{ width: 52, border: `1px solid ${NOVA.line}`, borderRadius: 6, padding: "2px 6px", fontSize: 11, color: NOVA.ink }} />{en ? "items" : "項目"}</label>
+              <label htmlFor="mq-pace-q" style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>{en ? "Quiz questions per day" : "1日に解くクイズ"}<input id="mq-pace-q" type="number" min="1" step="5" value={mqPace.q} onChange={(e) => onPace("q", e.target.value)} style={{ width: 58, border: `1px solid ${NOVA.line}`, borderRadius: 6, padding: "2px 6px", fontSize: 11, color: NOVA.ink }} />{en ? "Q" : "問"}</label>
+              <label htmlFor="mq-pace-p" style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>{en ? "Practice items per day" : "1日に進める実務コンテンツ"}<input id="mq-pace-p" type="number" min="0.5" step="0.5" value={mqPace.p} onChange={(e) => onPace("p", e.target.value)} style={{ width: 52, border: `1px solid ${NOVA.line}`, borderRadius: 6, padding: "2px 6px", fontSize: 11, color: NOVA.ink }} />{en ? "items" : "項目"}</label>
               <span style={{ fontWeight: 700, color: NOVA.ink }}>{en ? `${techCal.days} days (~${techCal.weeks} wk)` : `全${techCal.days}日（約${techCal.weeks}週）`}{techCal.end ? (en ? ` · ends ${techCal.end.getFullYear()}/${techCal.end.getMonth() + 1}/${techCal.end.getDate()}` : `・終了予定 ${techCal.end.getFullYear()}/${techCal.end.getMonth() + 1}/${techCal.end.getDate()}`) : (en ? " · set the start date to see dates" : "・開始日を入れると日付が出る")}</span>
             </div>
+            {(() => { const pr = BOOTCAMP_QUEST.practice, ex = pr.find((r) => r.id === "Q-P3"); return (
+              <div style={{ fontSize: 10.5, color: NOVA.faint, lineHeight: 1.6, margin: "-4px 0 8px" }}>{en
+                ? `Practice content = the non-quiz rows you work through by reading TechHub\u2019s tabs (${pr.length} rows, ${practiceUnits} items). An item is one section of a row; open a row to tick each one${ex ? ` (e.g. \u201c${ex.name[1]}\u201d has ${ex.qn})` : ""}.`
+                : `実務コンテンツ＝クイズ以外の、TechHub のタブを読んで進める行（全${pr.length}行・${practiceUnits}項目）。1項目は行の中の区分1つで、行を開くと項目ごとのチェックが並ぶ${ex ? `（例：「${ex.name[0]}」は${ex.qn}項目）` : ""}。`}</div>
+            ); })()}
             <div style={{ overflowX: "auto" }}><div style={{ minWidth: Math.max(800, LABELW + techCal.weeks * 30), position: "relative" }}>
               {techCal.ok ? (
                 <div style={{ display: "flex", marginLeft: LABELW, borderBottom: `1px solid ${NOVA.line}` }}>
