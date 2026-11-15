@@ -235654,6 +235654,13 @@ const MQ_TECH_GROUPS = (() => {
   if (rest.length) gs[gs.length - 1].rows = gs[gs.length - 1].rows.concat(rest);
   return gs;
 })();
+// 2ハブの目印（BOOTCAMP_HUBS の c1〜c4）は、Mastery Track の対応する行の進み具合から自動で付ける（目印ごとに行を同じ重みで平均）。
+// 目印にはチェックの場所がないため、手で付ける値は使わない。TechHub はタブのグループ（AIフォーサイトと PLAYBOOK は1つの目印）、Consulting は各目印の見出しにある分野。
+const MQ_ROW_BY_ID = (() => { const m = {}; BOOTCAMP_QUEST.mega.concat(BOOTCAMP_QUEST.practice, BOOTCAMP_QUEST.cons).forEach((r) => { m[r.id] = r; }); return m; })();
+const HUB_MILE_ROWS = {
+  "HUB-MEGATECH": [MQ_TECH_GROUPS[0], MQ_TECH_GROUPS[1], MQ_TECH_GROUPS[2]].map((g) => g.rows.map((r) => r.id)).concat([MQ_TECH_GROUPS.slice(3).reduce((a, g) => a.concat(g.rows.map((r) => r.id)), [])]),
+  "HUB-CONSULTING": [["Q-CG", "Q-C0", "Q-C1", "Q-C2"], ["Q-C3", "Q-C4", "Q-C5"], ["Q-C6", "Q-CX"], ["Q-C7", "Q-C8"]],
+};
 // 旧「リサーチ」行（Q-P9）の区分 c3「AGI・ASI仮説トレ」と c4「PLAYBOOK 5ガイド」を、新しい AGI・ASI（Q-P20）と PLAYBOOK（Q-P21）の行へ一度だけ移す。
 // PLAYBOOK の5ガイドは当時の FIRST CALL〜DAILY LOOP（新しい行の c0〜c4）。c3・c4 を消すので、二度目以降は何もしない。
 const migrateQuestRows = (tasks) => {
@@ -235939,12 +235946,16 @@ function PortalBootcamp({ lang, onResume }) {
   // 資格行も分野チェックリスト（CERT_CATS）で進捗管理し、ハブ行と粒度を揃える。
   const catsOf = (t) => t.cats || (t.cert ? (CERT_MULTIQUIZ[t.cert] ? CERT_CATS : CERT_CATS_1Q) : null);
   const pctOf = (t) => {
+    const hf = hubMileFrac(t);
+    if (hf) return Math.round((hf.reduce((a, x) => a + x, 0) / hf.length) * 100);
     const cats = catsOf(t);
     if (cats) { const s = state[t.id] || {}; let dn = 0, tot = 0; cats.forEach((c, i) => { const w = c.q || 1; tot += w; if (s["c" + i]) dn += w; }); return tot ? Math.round((dn / tot) * 100) : 0; }
     if (t.qmile) { const D = qDays(t); if (!D) return 0; const s = state[t.id] || {}; let n = 0; for (let i = 0; i < D; i++) if (s["d" + i]) n++; return Math.round((n / D) * 100); }
     if (t.opt) { const L = optLeaves(t).length; if (!L) return 0; const s = state[t.id] || {}; let n = 0; for (let i = 0; i < L; i++) if (s["t" + i]) n++; return Math.round((n / L) * 100); }
     const ms = milesOf(t); const s = state[t.id] || {}; const n = ms.filter((m) => s[m.k]).length; return Math.round((n / ms.length) * 100);
   };
+  // ハブの目印ごとの進み具合（0〜1）。対応する Mastery Track の行の進み具合の平均
+  const hubMileFrac = (t) => { const g = HUB_MILE_ROWS[t.id]; if (!g) return null; return g.map((ids) => { const rs = ids.map((id) => MQ_ROW_BY_ID[id]).filter(Boolean); return rs.length ? rs.reduce((a, r) => a + pctOf(r), 0) / rs.length / 100 : 0; }); };
   const isDone = (t) => { const s = state[t.id] || {}; if (t.qmile || t.isHub || t.opt || catsOf(t)) return pctOf(t) === 100; return t.id === "CAPSTONE" ? pctOf(t) === 100 : !!s.passed; };
   const pickPattern = (v) => { setPattern(v); try { window.storage.set("nova_bootcamp_pattern_v1", String(v)); } catch (e) {} };
   const toggleMile = (t, k) => setState((prev) => { const cur = { ...(prev[t.id] || {}) }; cur[k] = !cur[k]; const next = { ...prev, [t.id]: cur }; persist(next, start); return next; });
@@ -235963,7 +235974,7 @@ function PortalBootcamp({ lang, onResume }) {
   const certsDone = BOOTCAMP_TASKS.filter((t) => t.cert && isDone(t)).length;
   const certTotal = BOOTCAMP_TASKS.filter((t) => t.cert).length;
   const hubPct = Math.round(BOOTCAMP_HUBS.reduce((a, h) => a + pctOf(h), 0) / BOOTCAMP_HUBS.length);
-  let doneU = 0, totU = 0; [...BOOTCAMP_HUBS, ...BOOTCAMP_TASKS].forEach((t) => { const s = state[t.id] || {}; const cats = catsOf(t); if (cats) { totU += cats.length; doneU += cats.filter((c, i) => s["c" + i]).length; } else { const ms = milesOf(t); totU += ms.length; doneU += ms.filter((m) => s[m.k]).length; } });
+  let doneU = 0, totU = 0; [...BOOTCAMP_HUBS, ...BOOTCAMP_TASKS].forEach((t) => { const hf = hubMileFrac(t); if (hf) { totU += hf.length; doneU += hf.reduce((a, x) => a + x, 0); return; } const s = state[t.id] || {}; const cats = catsOf(t); if (cats) { totU += cats.length; doneU += cats.filter((c, i) => s["c" + i]).length; } else { const ms = milesOf(t); totU += ms.length; doneU += ms.filter((m) => s[m.k]).length; } });
   const overall = totU ? Math.round((doneU / totU) * 100) : 0;
 
   const GRID = BOOTCAMP_WEEKS, WEEKS_DAYS = GRID * 7, LABELW = 164;
