@@ -30,7 +30,10 @@ function hubStats() {
   return {
     books: cnt(h, '"oneLiner":'), yt: cnt(h, '{"id":"yt_'), note: cnt(h, '{"id":"note_'),
     flier: (flierPart.match(/"oneLiner":/g) || []).length, listOnly: cnt(h, '"listOnly":true'),
-    la: { people: (la.match(/"born":\d+/g) || []).length, inst: (la.match(/"people":\[/g) || []).length, trivia: (la.match(/"f":"/g) || []).length, domains: (la.match(/"ready":(true|false)/g) || []).length },
+    la: { people: (la.match(/"born":\d+/g) || []).length, inst: (la.match(/"people":\[/g) || []).length, trivia: (la.match(/"f":"/g) || []).length, domains: (la.match(/"ready":(true|false)/g) || []).length,
+      // Mastery Track の自由選択トラック（OPT-LA）用：領域 [id, ja, en, group] とグループ [id, ja]
+      doms: [...la.matchAll(/\{"id":"([a-z_]+)","ja":"([^"]+)","en":"([^"]+)","group":"([a-z]+)","ready":(?:true|false)/g)].map((m) => [m[1], m[2], m[3], m[4]]),
+      groups: [...la.matchAll(/\{"id":"([a-z]+)","ja":"([^"]+)","note":"/g)].map((m) => [m[1], m[2]]) },
   };
 }
 

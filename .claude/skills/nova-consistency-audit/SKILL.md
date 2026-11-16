@@ -66,6 +66,10 @@ python3 .claude/skills/nova-consistency-audit/scripts/stale_scan.py --review   #
 | 技術道場（MCQS）の問題の追加・削除 | 技術道場のタイトル・テーマの問題数（自動）、Mastery Track の各テーマ行と難易度内訳（`mqRow` で自動）、ポータルの TechHub タグ（自動）、復習スケジュール `gafa_srs_v1`（添字で保存。削除・並べ替えをするなら添字の付け替えが要る）。問題を作る・直すときは quiz-authoring スキルに従う |
 | 道場系バンク（実務論点マップ・Slalom・ガバナンス道場・理解度チェック）の追加・削除 | Mastery Track の行（`mqDoms` で自動）、弱点レーダーの `WEAK_SOURCES` の領域名、`CheckEngine` の復習キュー（添字で保存。削除したら `removedIdx` を渡して詰め直す）、領域あたりの問題数と出題範囲の区切り（`partSize`） |
 | TechHub にタブを追加 | `TABS`＋ラベル辞書 `tab_xxx`＋描画分岐＋ナビのグループ、Mastery Track の実務行（`BOOTCAMP_QUEST.practice`）とクイズ行（`mega`）、弱点レーダー、ポータルのタブ数（自動） |
+| TechHub のタブに区分（I〜XIV、小タブ、FoldSection）を追加・削除 | Mastery Track の実務行（`BOOTCAMP_QUEST.practice`）の `cats`。チェックは「行ID＋何番目か（c0, c1, …）」で保存されるので、末尾以外に足す・消す・行の間で移すときは `MQ_LAYOUT_MOVES` に旧→新の位置を足し、`MQ_LAYOUT` を1つ上げる。タブの区分は FoldSection の見出しと小タブの配列（`views`・`modes`）で数える |
+| クイズ行の問題数 | `mega` の `qn` は `MQC`（`GafaHub.MASTERY_COUNTS`）から数える。手書きの `qn` が残っているのは「その他ドリル・演習・資格クイズ」（236問）だけで、内訳の記録がない |
+| 資格の模試セット数 | Certification Hub の各資格の「模擬試験」に並ぶセット数と、Mastery Track の `CERT_MOCK_SETS`（書いていない資格は5セット）。変えたら `MQ_LAYOUT_MOVES` も |
+| 自由選択トラック | Finance（`SECTIONS` の分野）、Linguistics（`CATEGORIES`）、Book-Summary（flier の書名）は手書きの一覧なので、ハブ側を変えたら一覧も直す。Language（`LanguageHubModule.MQ_PLAN`）と Liberal Arts（`__NOVA_HUB_STATS__.la`）は自動 |
 | Book-Summary の出典・件数 | `booksummaryhub.html` の `SOURCES` と取り込みデータ、件数の単位（`unitFor`：本は冊、動画・記事は件）、ハブの説明文、ポータルのタグと自由選択トラックの説明（`BOOK_SUMMARY_HTML` から自動で数える）、関連タブとの相互参照（例：TechHub の実務論点マップ） |
 | 企業研究の企業 | `COMPANIES`、比較表、「主要N社」「N社の組織」の見出し、Mastery Track の「企業研究N社」（自動） |
 | 実在の人物・組織の事実（社長交代など） | その名前・肩書を全ファイルで grep し、企業研究カード・道場の基本情報・グローバル事例・クイズの問題と解説を**同時に**直す。事実は evidence-research の考え方で裏付け、確認の程度（本文を取得できたか、検索結果の一致だけか）と時点を明記する。推測で埋めない |
