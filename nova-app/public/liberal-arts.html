@@ -1186,7 +1186,9 @@ function drawFind(){
     var md = (D.data||{})[dm.id]; if(!md) return;
     (md.people||[]).forEach(function(p){ if(hit([p.name, p.full, p.en, p.tagline].concat((p.works||[]).map(function(w){ return w.t; })))) res.push({d:dm, k:'p', id:p.id, name:p.name, sub:p.tagline||'', reg:p.region||'海外'}); });
     (md.items||[]).forEach(function(x){ if(hit([x.name, x.full, x.en, x.tagline])) res.push({d:dm, k:'i', id:x.id, name:x.name, sub:x.tagline||'', reg:x.region||'海外'}); });
-    (md.glossary||[]).forEach(function(g){ if(hit([g.t, g.en, g.d])) res.push({d:dm, k:'g', id:g.t, name:g.t, sub:g.d||''}); });
+    /* 人物カード・項目カードと同じ名前の用語は、カードの方だけを出す（同じ名前が2行並ばないように） */
+    var cardNames = {}; (md.people||[]).concat(md.items||[]).forEach(function(c){ cardNames[c.name] = 1; });
+    (md.glossary||[]).forEach(function(g){ if(!cardNames[g.t] && hit([g.t, g.en, g.d])) res.push({d:dm, k:'g', id:g.t, name:g.t, sub:g.d||''}); });
   });
   if(D.prizes && DOMS.lit){ var Zf = pzInit(); ['aku','nao'].forEach(function(k){ Zf.P[k].rows.forEach(function(r){ if(!pzNone(r) && hit([r.name, r.title])) res.push({d:DOMS.lit, k:'z', id:k+r.no+r.name, name:r.name+'『'+r.title+'』', sub:Zf.P[k].ja+' 第'+r.no+'回（'+r.year+'年'+r.half+'半期）', year:r.year, q:r.name}); }); });
     ((D.prizes.honya||{}).rows||[]).forEach(function(r){ if(hit([r[2], r[3]])) res.push({d:DOMS.lit, k:'z', id:'hon'+r[1], name:r[3]+'『'+r[2]+'』', sub:'本屋大賞 '+r[1]+'年の大賞', q:r[3], anchor:'pzhonya'}); }); }
