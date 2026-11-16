@@ -41,10 +41,10 @@ await page.getByText('Mastery Track', { exact: true }).first().click(); await pa
 await page.getByText('学習量の試算', { exact: true }).first().click().catch(() => {}); await page.waitForTimeout(400);
 t = await text();
 console.log('■ Mastery Track');
-console.log('  ' + pick(t, /TechHub — クイズ[\d,]+問＋実務\d+項目/));
+console.log('  ' + pick(t, /TechHub — クイズ[\d,]+問＋実務コンテンツ\d+項目/));
 console.log('  ' + pick(t, /Consulting Hub — 全バンク（[\d,]+問）/));
 console.log('  ' + pick(t, /問題は合計[^。]+。/));
-console.log('  ' + pick(t, /前倒し圧縮版：[^\n]{0,120}/));
+console.log('  ' + pick(t, /\d+\/\d+資格/));
 
 // 2. 各ハブを開く（開けること・実行時エラーがないこと）
 const hubs = ['Consulting Hub', 'TechHub', 'Finance Hub', 'Certification Hub', 'Language Hub', 'Linguistics Hub', 'Book-Summary', 'Learning Tracker', 'Anything Memo', 'Training Hub', 'Side Work Hub'];
