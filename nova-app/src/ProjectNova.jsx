@@ -138018,6 +138018,100 @@ const ATLAS_GRADE_COLOR = { S: C.green, A: C.dx, B: C.gold, C: C.amber, D: C.red
 const ATLAS_LORDER = ["L", "S", "F"];
 const ATLAS_GORDER = ["S", "A", "B", "C", "D"];
 
+// @atlas-quiz-begin
+// 体系図クイズの問題生成（純粋関数・決定的）。scripts/validate-atlas.mjs がこの区間を取り出して全問を検査する。
+// 形式: def=説明→名称 / cat=名称→カテゴリ / ask=コンサルの問い→名称 / ai=AI読み替え→名称 / by=名称→提唱者
+function atlasBuildQuiz(JA, EN) {
+  const hash = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h >>> 0; };
+  // 32bit整数演算の乱数（mulberry32）。浮動小数の桁落ちで並びが偏らないようにする
+  const rng = (seed) => { let x = seed >>> 0; return () => { x = (x + 0x6D2B79F5) >>> 0; let t = Math.imul(x ^ (x >>> 15), 1 | x); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; };
+  const perm = (seed, n) => { const r = rng(seed), a = [...Array(n).keys()]; for (let i = n - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const ja = {}, en = {};
+  JA.items.forEach((it) => { ja[it.id] = it; });
+  EN.items.forEach((it) => { en[it.id] = it; });
+  const ids = JA.items.map((it) => it.id);
+  const cat = (id) => id.slice(0, 2), layer = (id) => id[0];
+  // 名称の要素（括弧・スラッシュで分割）。本文に含まれていたら「答えの漏洩」とみなす
+  const parts = (name) => name.split(/[（）()／/]/).map((x) => x.trim()).filter((x) => x.length >= 2);
+  const leaks = (stem, name) => { const s = stem.toLowerCase(); return parts(name).some((p) => s.includes(p.toLowerCase())); };
+  const surnames = (by) => { const out = new Set(); for (const m of by.matchAll(/[A-Z]\.(?:[-A-Z.]*\.)?([ァ-ヴー・]{2,})/g)) m[1].split("・").forEach((x) => x.length >= 2 && out.add(x)); return out; };
+  const person = (id) => /^[A-Z]\.(?:[-A-Z.]*\.)?[ァ-ヴ]/.test(ja[id].by);
+  // 選択肢では年の注記を外して形式を揃える（年の有無が正解の手掛かりにならないように）
+  const noYearJ = (s) => s.replace(/（[^）]*\d[^）]*）/g, "").trim();
+  const noYearE = (s) => s.replace(/\s*\([^)]*\d[^)]*\)/g, "").trim();
+  const pick = (seedKey, cands, ok, k) => {
+    const order = perm(hash(seedKey), cands.length).map((i) => cands[i]);
+    const got = [];
+    for (const c of order) { if (got.length >= k) break; if (ok(c, got)) got.push(c); }
+    return got;
+  };
+  const nameOpts = (qid, id, stemJ, stemE) => {
+    const okName = (c, got) => !leaks(stemJ, ja[c].n) && !leaks(stemE, en[c].n) && !got.some((g) => ja[g].n === ja[c].n);
+    const same = ids.filter((c) => c !== id && cat(c) === cat(id));
+    let d = pick(qid + "#c", same, okName, 3);
+    if (d.length < 3) d = d.concat(pick(qid + "#l", ids.filter((c) => c !== id && layer(c) === layer(id) && !d.includes(c)), (c, got) => okName(c, d.concat(got)), 3 - d.length));
+    return d.length === 3 ? [id, ...d] : null;
+  };
+  const expl = (id) => ({
+    ja: `正解：${ja[id].n}（${id}）。${ja[id].d}`,
+    en: `Answer: ${en[id].n} (${id}). ${en[id].d}`,
+  });
+  const Q = [];
+  for (const id of ids) {
+    const J = ja[id], E = en[id];
+    // def / ask / ai：本文から項目名を当てる
+    for (const [t, fj, fe, pj, pe] of [
+      ["def", J.d, E.d, "次の説明に当てはまるのはどれか？", "Which entry matches this description?"],
+      ["ask", J.ask, E.ask, "このコンサルの問いは、どの項目から立てたものか？", "Which entry does this consultant's question come from?"],
+      ["ai", J.ai, E.ai, "この「生成AI時代の読み替え」は、どの項目のものか？", "Which entry does this generative-AI reading belong to?"],
+    ]) {
+      const qid = `${t}:${id}`;
+      if (leaks(fj, J.n) || leaks(fe, E.n)) continue;
+      const opts = nameOpts(qid, id, fj, fe);
+      if (!opts) continue;
+      Q.push({ id: qid, t, item: id, p: { ja: pj, en: pe }, stem: { ja: fj, en: fe },
+        o: opts.map((c) => ({ ja: ja[c].n, en: en[c].n, ref: c })), a: 0, x: expl(id) });
+    }
+    // cat：項目名からカテゴリを当てる（同じ層の別カテゴリを誤答に使う）
+    {
+      const qid = `cat:${id}`;
+      const others = Object.keys(JA.cats).filter((c) => JA.cats[c].layer === layer(id) && c !== cat(id));
+      const d = pick(qid, others, () => true, 3);
+      if (d.length === 3) {
+        const cj = JA.cats[cat(id)], ce = EN.cats[cat(id)], lj = JA.layers[layer(id)], le = EN.layers[layer(id)];
+        Q.push({ id: qid, t: "cat", item: id, p: { ja: `「${J.n}」が属するカテゴリはどれか？`, en: `Which category does “${E.n}” belong to?` }, stem: null,
+          o: [cat(id), ...d].map((c) => ({ ja: JA.cats[c].name, en: EN.cats[c].name, ref: c })), a: 0,
+          x: { ja: `正解：${cj.name}（${cat(id)}）。${lj.name}の分類軸は「${lj.axis}」。${cj.name}は「${cj.desc}」。`,
+            en: `Answer: ${ce.name} (${cat(id)}). The ${le.name} axis is “${le.axis}”; ${ce.name} covers “${ce.desc}”.` } });
+      }
+    }
+    // by：項目名から提唱者を当てる（人名が特定できる項目だけ。同じ人物を含む誤答は除外）
+    if (person(id)) {
+      const qid = `by:${id}`;
+      const mine = surnames(J.by);
+      const cands = ids.filter((c) => c !== id && layer(c) === layer(id) && person(c));
+      const d = pick(qid, cands, (c, got) => {
+        const s = surnames(ja[c].by);
+        if ([...s].some((x) => mine.has(x))) return false;
+        if (noYearJ(ja[c].by) === noYearJ(J.by) || noYearE(en[c].by) === noYearE(E.by)) return false;
+        return !got.some((g) => noYearJ(ja[g].by) === noYearJ(ja[c].by) || [...surnames(ja[g].by)].some((x) => s.has(x)));
+      }, 3);
+      if (d.length === 3) {
+        Q.push({ id: qid, t: "by", item: id, p: { ja: `「${J.n}」の提唱者・出典として正しいのはどれか？`, en: `Who is the origin of “${E.n}”?` }, stem: null,
+          o: [id, ...d].map((c) => ({ ja: noYearJ(ja[c].by), en: noYearE(en[c].by), ref: c })), a: 0,
+          x: { ja: `正解：${J.by}（${J.y}）。${J.d}`, en: `Answer: ${E.by} (${E.y}). ${E.d}` } });
+      }
+    }
+  }
+  Q.forEach((q) => { q.perm = perm(hash(q.id) + 7, 4); });
+  return Q;
+}
+// @atlas-quiz-end
+const ATLAS_Q = atlasBuildQuiz(ATLAS_JA, ATLAS_EN);
+const ATLAS_QBY = Object.fromEntries(ATLAS_Q.map((q) => [q.id, q]));
+const ATLAS_QKEY = "consulting_atlas_quiz_v1";
+const ATLAS_SRKEY = "consulting_atlas_sr_v1";
+
 function atlasIndex(A) {
   const BY = {};
   A.items.forEach((it) => { BY[it.id] = { ...it, layer: it.id[0], cat: it.id.slice(0, 2) }; });
@@ -138097,7 +138191,20 @@ function AtlasTab({ lang, tt }) {
   const [fInd, setFInd] = useState("");
   const [fLens, setFLens] = useState("");
   const [fDisc, setFDisc] = useState("");
-  const __opBack = useLocalHistory([[view, setView], [open, setOpen], [genre, setGenre], [fCat, setFCat]]);
+  const [qs, setQs] = useState(null); // クイズのセッション {ids, pos, picked, score, mode}
+  const [qLayer, setQLayer] = useState("all");
+  const [qType, setQType] = useState("all");
+  const [qStats, setQStats] = useState({});
+  const [qCards, setQCards] = useState({});
+  useEffect(() => {
+    let ok = true;
+    (async () => {
+      try { const r = await window.storage.get(ATLAS_QKEY); if (ok && r && r.value) setQStats(JSON.parse(r.value)); } catch (e) {}
+      try { const r = await window.storage.get(ATLAS_SRKEY); if (ok && r && r.value) setQCards(JSON.parse(r.value)); } catch (e) {}
+    })();
+    return () => { ok = false; };
+  }, []);
+  const __opBack = useLocalHistory([[view, setView], [open, setOpen], [genre, setGenre], [fCat, setFCat], [qs, setQs]]);
   useRegisterBack(__opBack.back, __opBack.canBack);
   const done = useDoneSet("consulting_atlas_done_v1");
   const toTop = () => { if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); };
@@ -138127,7 +138234,7 @@ function AtlasTab({ lang, tt }) {
   const views = [
     ["summary", tt("サマリー", "Summary")], ["map", tt("体系マップ", "Map")], ["catalog", tt("カタログ", "Catalog")],
     ["genre", tt("ジャンル別", "By genre")], ["insights", tt("深掘り", "Deep dives")], ["council", tt("専門家カウンシル", "Expert council")],
-    ["guide", tt("問い別ガイド", "Question guide")],
+    ["guide", tt("問い別ガイド", "Question guide")], ["quiz", tt("クイズ", "Quiz")],
   ];
   const nav = (
     <div style={{ display: "flex", gap: 7, flexWrap: "wrap", marginBottom: 16 }}>
@@ -138264,7 +138371,7 @@ function AtlasTab({ lang, tt }) {
           <h2 style={{ fontFamily: serif, fontSize: 22, margin: 0, color: "#fff" }}>{tt("法則・戦略・フレームワーク体系図", "Atlas of Laws, Strategies & Frameworks")}</h2>
           <p style={{ margin: "6px 0 14px", color: "#93A5C4", fontSize: 13, lineHeight: 1.75 }}>{tt("世の中の法則、勝ち方の型、思考の道具を3層・18カテゴリにMECEで整理し、業界・専門家レンズ・学問の出自の3つのジャンル軸を重ねた。全項目に「生成AI時代の読み替え」と「コンサルの問い」付き。", "Laws of the world, patterns for winning and tools for thinking, organized MECE into 3 layers and 18 categories, overlaid with three genre axes: industry, expert lens and discipline. Every entry carries a generative-AI reading and a consultant's question.")}</p>
           <div style={{ display: "flex", gap: "8px 22px", flexWrap: "wrap" }}>
-            {[[X.vals.total, tt("項目", "entries")], [3, tt("層", "layers")], [X.vals.nCat, tt("カテゴリ", "categories")], [Object.keys(A.meta).length, tt("メタ原理", "meta-principles")], [A.industries.length, tt("業界", "industries")], [A.lenses.length, tt("専門家レンズ", "expert lenses")], [Object.keys(A.disc).length, tt("学問領域", "disciplines")]].map(([n, l]) => (
+            {[[X.vals.total, tt("項目", "entries")], [3, tt("層", "layers")], [X.vals.nCat, tt("カテゴリ", "categories")], [Object.keys(A.meta).length, tt("メタ原理", "meta-principles")], [A.industries.length, tt("業界", "industries")], [A.lenses.length, tt("専門家レンズ", "expert lenses")], [Object.keys(A.disc).length, tt("学問領域", "disciplines")], [ATLAS_Q.length.toLocaleString(), tt("問", "questions")]].map(([n, l]) => (
               <span key={l} style={{ fontSize: 12.5, color: "#93A5C4" }}><b style={{ fontFamily: serif, fontSize: 20, color: C.gold, marginRight: 4 }}>{n}</b>{l}</span>
             ))}
           </div>
@@ -138619,6 +138726,123 @@ function AtlasTab({ lang, tt }) {
         </div>
       </div>
     );
+  } else if (view === "quiz") {
+    const TYPE = { def: tt("説明→名称", "Description → entry"), cat: tt("名称→カテゴリ", "Entry → category"), ask: tt("問い→名称", "Question → entry"), ai: tt("AI読み替え→名称", "AI reading → entry"), by: tt("名称→提唱者", "Entry → origin") };
+    const now = Date.now();
+    const pool = ATLAS_Q.filter((q) => (qLayer === "all" || q.item[0] === qLayer) && (qType === "all" || q.t === qType));
+    const dueIds = dueCards(qCards, now).map((c) => c.id).filter((id) => ATLAS_QBY[id]);
+    const ansIds = Object.keys(qStats).filter((id) => ATLAS_QBY[id]);
+    const okN = ansIds.filter((id) => qStats[id].ok).length;
+    const shuffle = (a) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+    const startPractice = () => {
+      const wrong = pool.filter((q) => qStats[q.id] && !qStats[q.id].ok), fresh = pool.filter((q) => !qStats[q.id]), rest = pool.filter((q) => qStats[q.id] && qStats[q.id].ok);
+      const ids = [...shuffle(wrong), ...shuffle(fresh), ...shuffle(rest)].slice(0, 10).map((q) => q.id);
+      if (ids.length) setQs({ ids, pos: 0, picked: null, score: 0, mode: "practice" });
+    };
+    const startReview = () => { if (dueIds.length) setQs({ ids: dueIds.slice(0, 20), pos: 0, picked: null, score: 0, mode: "review" }); };
+    const answer = (q, pos) => {
+      if (qs.picked != null) return;
+      const ok = q.perm[pos] === q.a, t0 = Date.now();
+      const ns = { ...qStats, [q.id]: { ok, t: t0 } };
+      const nc = { ...qCards, [q.id]: schedule(qCards[q.id] || newCard(q.id, t0), ok ? 2 : 0, t0) };
+      setQStats(ns); setQCards(nc);
+      try { window.storage.set(ATLAS_QKEY, JSON.stringify(ns)); window.storage.set(ATLAS_SRKEY, JSON.stringify(nc)); } catch (e) {}
+      setQs({ ...qs, picked: pos, score: qs.score + (ok ? 1 : 0) });
+    };
+    const btn = (bg, fg, bd) => ({ background: bg, color: fg, border: bd ? `1.5px solid ${C.line}` : "none", borderRadius: 8, padding: "10px 24px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: sans });
+    if (!qs) {
+      body = (
+        <div style={{ display: "grid", gap: 16 }}>
+          <AtlasH sub={tt("226項目から自動生成した4択。答えた問題は忘却曲線（SM-2）で復習の時期を管理し、体系図の各項目に戻って確認できる。", "Four-option questions generated from the 226 entries. Answers feed an SM-2 forgetting-curve schedule, and every answer links back to its entry.")}>{tt("体系図クイズ", "Atlas quiz")}</AtlasH>
+          <Card style={{ display: "grid", gap: 12 }}>
+            <div style={{ display: "flex", gap: "8px 22px", flexWrap: "wrap" }}>
+              {[[ATLAS_Q.length.toLocaleString(), tt("問", "questions")], [ansIds.length, tt("回答済み", "answered")], [ansIds.length ? Math.round((okN / ansIds.length) * 100) + "%" : "—", tt("正答率", "accuracy")], [dueIds.length, tt("復習待ち", "due for review")]].map(([n, l]) => (
+                <span key={l} style={{ fontSize: 12.5, color: C.sub }}><b style={{ fontFamily: serif, fontSize: 20, color: C.ink, marginRight: 4 }}>{n}</b>{l}</span>
+              ))}
+            </div>
+            <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
+              <AtlasPill active={qLayer === "all"} onClick={() => setQLayer("all")}>◎ {tt("すべての層", "All layers")}</AtlasPill>
+              {ATLAS_LORDER.map((l) => <AtlasPill key={l} color={ATLAS_LAYER[l].color} active={qLayer === l} onClick={() => setQLayer(l)}><span>{ATLAS_LAYER[l].mark}</span>{A.layers[l].name}</AtlasPill>)}
+            </div>
+            <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
+              <AtlasPill active={qType === "all"} onClick={() => setQType("all")}>{tt("すべての形式", "All formats")}</AtlasPill>
+              {Object.entries(TYPE).map(([k, v]) => <AtlasPill key={k} active={qType === k} onClick={() => setQType(k)}>{v}</AtlasPill>)}
+            </div>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+              <button onClick={startPractice} disabled={!pool.length} style={btn(C.blue, "#fff")}>{tt("10問に挑戦", "Start 10 questions")} →</button>
+              <button onClick={startReview} disabled={!dueIds.length} style={{ ...btn("#fff", dueIds.length ? C.ink : C.line, true) }}>{tt("復習する", "Review")}（{dueIds.length}）</button>
+              <span style={{ fontSize: 12, color: C.sub }}>{tt(`対象 ${pool.length} 問。間違えた問題と未回答の問題を優先して出題する。`, `${pool.length} in scope. Wrong and unanswered questions come first.`)}</span>
+            </div>
+          </Card>
+          <Card style={{ display: "grid", gap: 8 }}>
+            <p style={atlasLabel}>{tt("形式別の到達度", "Progress by format")}</p>
+            {Object.entries(TYPE).map(([k, v]) => {
+              const all = ATLAS_Q.filter((q) => q.t === k), a = all.filter((q) => qStats[q.id]), c = a.filter((q) => qStats[q.id].ok);
+              return (
+                <div key={k} style={{ display: "grid", gridTemplateColumns: "minmax(9em, 12em) 1fr 6.5em", gap: 10, alignItems: "center", fontSize: 12.5 }}>
+                  <span>{v}</span>
+                  <span style={{ height: 8, borderRadius: 4, background: C.line, overflow: "hidden", display: "flex" }}><span style={{ width: `${(c.length / all.length) * 100}%`, background: C.green }} /><span style={{ width: `${((a.length - c.length) / all.length) * 100}%`, background: C.red }} /></span>
+                  <span style={{ textAlign: "right", color: C.sub, fontVariantNumeric: "tabular-nums" }}>{c.length}/{all.length}</span>
+                </div>
+              );
+            })}
+          </Card>
+        </div>
+      );
+    } else if (qs.pos >= qs.ids.length) {
+      const wrongItems = [...new Set(qs.ids.filter((id) => qStats[id] && !qStats[id].ok).map((id) => ATLAS_QBY[id].item))];
+      body = (
+        <Card style={{ display: "grid", gap: 14, textAlign: "center" }}>
+          <b style={{ fontFamily: serif, fontSize: 20 }}>{tt("結果", "Result")}</b>
+          <span style={{ fontFamily: serif, fontSize: 40, color: C.ink }}>{qs.score} / {qs.ids.length}</span>
+          {wrongItems.length ? <div style={{ textAlign: "left" }}><p style={atlasLabel}>{tt("間違えた項目（復習キューに入った）", "Missed entries (added to the review queue)")}</p><Chips ids={wrongItems} /></div> : <span style={{ color: C.green, fontWeight: 800 }}>{tt("全問正解", "All correct")}</span>}
+          <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+            <button onClick={() => { setQs(null); setTimeout(startPractice, 0); }} style={btn(C.blue, "#fff")}>{tt("次の10問", "Next 10")} →</button>
+            <button onClick={() => setQs(null)} style={btn("#fff", C.ink, true)}>{tt("終了", "Finish")}</button>
+          </div>
+        </Card>
+      );
+    } else {
+      const q = ATLAS_QBY[qs.ids[qs.pos]];
+      const it = X.BY[q.item], lay = ATLAS_LAYER[it.layer];
+      const done_ = qs.picked != null, ok = done_ && q.perm[qs.picked] === q.a;
+      body = (
+        <Card>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, gap: 10, flexWrap: "wrap" }}>
+            <span style={{ color: lay.color, fontSize: 12, fontWeight: 800 }}>{lay.mark} {A.layers[it.layer].name} · {TYPE[q.t]}{qs.mode === "review" ? tt(" · 復習", " · review") : ""}</span>
+            <span style={{ color: C.sub, fontSize: 12 }}>{tt("問", "Q")} {qs.pos + 1} / {qs.ids.length}</span>
+          </div>
+          <h2 style={{ fontFamily: serif, fontSize: 18, margin: "0 0 14px", lineHeight: 1.55 }}>{tt(q.p.ja, q.p.en)}</h2>
+          {q.stem ? <div style={{ background: C.paper, borderRadius: 8, padding: "12px 14px", fontSize: 14, lineHeight: 1.75, marginBottom: 16 }}>{tt(q.stem.ja, q.stem.en)}</div> : null}
+          <div style={{ display: "grid", gap: 10 }}>
+            {q.perm.map((oi, pos) => {
+              const isPicked = qs.picked === pos, isAns = oi === q.a;
+              let border = C.line, bg = "#fff";
+              if (done_ && isAns) { border = C.green; bg = "#EBFAF1"; }
+              else if (done_ && isPicked && !isAns) { border = C.red; bg = "#FEECEB"; }
+              return (
+                <button key={pos} onClick={() => answer(q, pos)} style={{ textAlign: "left", padding: "12px 14px", borderRadius: 9, border: `1.8px solid ${border}`, background: bg, fontSize: 14, cursor: done_ ? "default" : "pointer", color: C.txt, lineHeight: 1.5, fontFamily: sans }}>
+                  <b style={{ color: C.sub, marginRight: 8 }}>{String.fromCharCode(65 + pos)}</b>{tt(q.o[oi].ja, q.o[oi].en)}
+                </button>
+              );
+            })}
+          </div>
+          <div style={{ marginTop: 18, display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+            <button onClick={() => setQs(null)} style={btn("#fff", C.ink, true)}>{tt("中断", "Quit")}</button>
+            {done_ ? <span style={{ fontWeight: 800, color: ok ? C.green : C.red }}>{ok ? tt("正解", "Correct") : tt("不正解", "Incorrect")}</span> : null}
+            <span style={{ flex: 1 }} />
+            <button onClick={() => done_ && setQs({ ...qs, pos: qs.pos + 1, picked: null })} disabled={!done_} style={{ ...btn(done_ ? C.blue : C.line, "#fff"), cursor: done_ ? "pointer" : "default" }}>{qs.pos + 1 < qs.ids.length ? tt("次へ", "Next") : tt("結果を見る", "See result")} →</button>
+          </div>
+          {done_ ? (
+            <div style={{ marginTop: 16, background: C.paper, borderLeft: `4px solid ${lay.color}`, borderRadius: 8, padding: "13px 16px" }}>
+              <b style={{ fontSize: 12, color: lay.color }}>{tt("解説", "Explanation")}</b>
+              <p style={{ margin: "6px 0 10px", fontSize: 13.5, lineHeight: 1.7 }}>{tt(q.x.ja, q.x.en)}</p>
+              <button onClick={() => go(q.item)} style={{ background: "#fff", color: C.ink, border: `1.5px solid ${C.line}`, borderRadius: 8, padding: "7px 14px", fontSize: 12.5, fontWeight: 700, cursor: "pointer", fontFamily: sans }}>{tt("体系図で開く", "Open in atlas")}（{q.item}）→</button>
+            </div>
+          ) : null}
+        </Card>
+      );
+    }
   }
 
   return (

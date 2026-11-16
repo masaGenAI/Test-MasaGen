@@ -101,9 +101,53 @@ const nEN = checkLang(EN, 'EN', '?');
 })(JA, EN, '');
 EN.items.forEach((it, i) => { if (it.n !== JA.items[i].en) errs.push(`英語版の名称が英名と不一致 ${it.id}`); });
 
+// 体系図クイズ：生成関数を取り出して全問を検査する
+const qa = text.indexOf('// @atlas-quiz-begin'), qb = text.indexOf('// @atlas-quiz-end');
+let nQ = 0;
+if (qa < 0 || qb < 0) errs.push('クイズ生成区間（@atlas-quiz-begin/end）が見つからない');
+else {
+  const build = new Function(text.slice(qa, qb) + '\nreturn atlasBuildQuiz;')();
+  const Q = build(JA, EN);
+  nQ = Q.length;
+  const seen = new Set();
+  const byJA = Object.fromEntries(JA.items.map((i) => [i.id, i]));
+  const byEN = Object.fromEntries(EN.items.map((i) => [i.id, i]));
+  const leak = (stem, name) => name.split(/[（）()／/]/).map((x) => x.trim()).filter((x) => x.length >= 2).some((p) => stem.toLowerCase().includes(p.toLowerCase()));
+  for (const q of Q) {
+    const w = `クイズ ${q.id}`;
+    if (seen.has(q.id)) errs.push(`${w}: ID重複`);
+    seen.add(q.id);
+    if (!byJA[q.item]) { errs.push(`${w}: 項目が存在しない`); continue; }
+    if (!['def', 'cat', 'ask', 'ai', 'by'].includes(q.t)) errs.push(`${w}: 形式不正`);
+    if (!Array.isArray(q.o) || q.o.length !== 4) { errs.push(`${w}: 選択肢が4つでない`); continue; }
+    if (q.a !== 0 || q.o[0].ref !== (q.t === 'cat' ? q.item.slice(0, 2) : q.item)) errs.push(`${w}: 正解の参照が項目と一致しない`);
+    for (const lg of ['ja', 'en']) {
+      const texts = q.o.map((o) => o[lg]);
+      if (texts.some((x) => !x || !x.trim())) errs.push(`${w}: 空の選択肢（${lg}）`);
+      if (new Set(texts).size !== 4) errs.push(`${w}: 選択肢の重複（${lg}）`);
+      if (!q.p[lg] || !q.x[lg]) errs.push(`${w}: 設問または解説が空（${lg}）`);
+      if (q.stem && !q.stem[lg]) errs.push(`${w}: 本文が空（${lg}）`);
+    }
+    if (JP.test([q.p.en, q.x.en, q.stem ? q.stem.en : '', ...q.o.map((o) => o.en)].join(' '))) errs.push(`${w}: 英語版に日本語が残存`);
+    if (new Set(q.o.map((o) => o.ref)).size !== 4) errs.push(`${w}: 同じ項目が複数の選択肢に出ている`);
+    if (q.stem) {
+      if (leak(q.stem.ja, byJA[q.item].n) || leak(q.stem.en, byEN[q.item].n)) errs.push(`${w}: 本文に正解の名称が含まれる`);
+      q.o.slice(1).forEach((o) => { if (leak(q.stem.ja, byJA[o.ref].n)) errs.push(`${w}: 本文に誤答の名称が含まれる`); });
+    }
+    if (q.t === 'cat' && q.o.some((o) => !JA.cats[o.ref] || JA.cats[o.ref].layer !== q.item[0])) errs.push(`${w}: 別の層のカテゴリが混入`);
+    if (!Array.isArray(q.perm) || [...q.perm].sort().join() !== '0,1,2,3') errs.push(`${w}: 並べ替えが不正`);
+  }
+  if (nQ < 800) errs.push(`クイズの問題数が少なすぎる: ${nQ}`);
+  // 正解の表示位置（A〜D）が偏っていないか：各位置が全体の18〜32%に収まること
+  const pos = [0, 0, 0, 0];
+  Q.forEach((q) => { pos[q.perm.indexOf(q.a)]++; });
+  pos.forEach((n, i) => { const r = n / nQ; if (r < 0.18 || r > 0.32) errs.push(`クイズの正解位置が偏っている: ${'ABCD'[i]}=${(r * 100).toFixed(1)}%`); });
+  console.log(`[validate-atlas] クイズの正解位置 A/B/C/D = ${pos.join('/')}`);
+}
+
 if (errs.length) {
   console.error(`[validate-atlas] NG: ${errs.length}件`);
   errs.slice(0, 50).forEach((e) => console.error('  ' + e));
   process.exit(1);
 }
-console.log(`[validate-atlas] OK: 体系図 ${nJA}項目（JA）/ ${nEN}項目（EN）、エラー0件`);
+console.log(`[validate-atlas] OK: 体系図 ${nJA}項目（JA）/ ${nEN}項目（EN）、クイズ ${nQ}問、エラー0件`);
