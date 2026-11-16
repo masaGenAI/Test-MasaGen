@@ -143,6 +143,19 @@ else {
   Q.forEach((q) => { pos[q.perm.indexOf(q.a)]++; });
   pos.forEach((n, i) => { const r = n / nQ; if (r < 0.18 || r > 0.32) errs.push(`クイズの正解位置が偏っている: ${'ABCD'[i]}=${(r * 100).toFixed(1)}%`); });
   console.log(`[validate-atlas] クイズの正解位置 A/B/C/D = ${pos.join('/')}`);
+  // 長さの手掛かり（quiz-authoring 規約）：表示順で「最長を選ぶ（同点は先頭）」が正解を引く問題は0件、
+  // 正解が最長（同点を含む）の割合は偶然（25%）の 1/3〜1.6倍に収める（日英とも）
+  for (const lg of ['ja', 'en']) {
+    let longest = 0;
+    for (const q of Q) {
+      const L = q.perm.map((i) => [...q.o[i][lg]].length), at = q.perm.indexOf(q.a), mx = Math.max(...L);
+      if (L.indexOf(mx) === at) errs.push(`クイズ ${q.id}: 最長の選択肢を選ぶと正解になる（${lg}: ${L.join('/')}）`);
+      if (L[at] === mx) longest++;
+    }
+    const r = longest / nQ;
+    if (r < 0.25 / 3 || r > 0.25 * 1.6) errs.push(`クイズの「正解が最長」の割合が偶然から外れている（${lg}: ${(r * 100).toFixed(1)}%）`);
+    console.log(`[validate-atlas] 正解が最長（同点を含む）の割合 ${lg} = ${(r * 100).toFixed(1)}%`);
+  }
 }
 
 if (errs.length) {

@@ -175171,36 +175171,69 @@ const ATLAS_GORDER = ["S", "A", "B", "C", "D"];
 // @atlas-quiz-begin
 // 体系図クイズの問題生成（純粋関数・決定的）。scripts/validate-atlas.mjs がこの区間を取り出して全問を検査する。
 // 形式: def=説明→名称 / cat=名称→カテゴリ / ask=コンサルの問い→名称 / ai=AI読み替え→名称 / by=名称→提唱者
+// 長さの手掛かり対策（quiz-authoring 規約）：日英とも「最長を選ぶ（同点は先頭）」で正解を引けない並びにし、
+// 約1/4の問題は正解を最長の同点にして（同じ長さの誤答を先に置く）「最長を消す」消去法も効かないようにする。
 function atlasBuildQuiz(JA, EN) {
   const hash = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h >>> 0; };
   // 32bit整数演算の乱数（mulberry32）。浮動小数の桁落ちで並びが偏らないようにする
   const rng = (seed) => { let x = seed >>> 0; return () => { x = (x + 0x6D2B79F5) >>> 0; let t = Math.imul(x ^ (x >>> 15), 1 | x); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; };
   const perm = (seed, n) => { const r = rng(seed), a = [...Array(n).keys()]; for (let i = n - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const LEN = new Map();
+  const len = (s) => { let v = LEN.get(s); if (v === undefined) { v = [...s].length; LEN.set(s, v); } return v; };
   const ja = {}, en = {};
   JA.items.forEach((it) => { ja[it.id] = it; });
   EN.items.forEach((it) => { en[it.id] = it; });
   const ids = JA.items.map((it) => it.id);
   const cat = (id) => id.slice(0, 2), layer = (id) => id[0];
   // 名称の要素（括弧・スラッシュで分割）。本文に含まれていたら「答えの漏洩」とみなす
-  const parts = (name) => name.split(/[（）()／/]/).map((x) => x.trim()).filter((x) => x.length >= 2);
-  const leaks = (stem, name) => { const s = stem.toLowerCase(); return parts(name).some((p) => s.includes(p.toLowerCase())); };
-  const surnames = (by) => { const out = new Set(); for (const m of by.matchAll(/[A-Z]\.(?:[-A-Z.]*\.)?([ァ-ヴー・]{2,})/g)) m[1].split("・").forEach((x) => x.length >= 2 && out.add(x)); return out; };
+  const PARTS = new Map();
+  const parts = (name) => { let v = PARTS.get(name); if (!v) { v = name.split(/[（）()／/]/).map((x) => x.trim().toLowerCase()).filter((x) => x.length >= 2); PARTS.set(name, v); } return v; };
+  const leaks = (stem, name) => { const s = stem.toLowerCase(); return parts(name).some((p) => s.includes(p)); };
+  const SN = new Map();
+  const surnames = (by) => { if (SN.has(by)) return SN.get(by); const out = new Set(); SN.set(by, out); for (const m of by.matchAll(/[A-Z]\.(?:[-A-Z.]*\.)?([ァ-ヴー・]{2,})/g)) m[1].split("・").forEach((x) => x.length >= 2 && out.add(x)); return out; };
   const person = (id) => /^[A-Z]\.(?:[-A-Z.]*\.)?[ァ-ヴ]/.test(ja[id].by);
   // 選択肢では年の注記を外して形式を揃える（年の有無が正解の手掛かりにならないように）
   const noYearJ = (s) => s.replace(/（[^）]*\d[^）]*）/g, "").trim();
   const noYearE = (s) => s.replace(/\s*\([^)]*\d[^)]*\)/g, "").trim();
-  const pick = (seedKey, cands, ok, k) => {
-    const order = perm(hash(seedKey), cands.length).map((i) => cands[i]);
+  const BYJ = {}, BYE = {}, BYS = {};
+  ids.forEach((id) => { BYJ[id] = noYearJ(ja[id].by); BYE[id] = noYearE(en[id].by); BYS[id] = surnames(ja[id].by); });
+  const shuffled = (key, xs) => perm(hash(key), xs.length).map((i) => xs[i]);
+  // 誤答3つを選ぶ。order は優先順に並べた候補（同じカテゴリ→同じ層）。txt(c) は選択肢の日英テキスト。
+  // 言語ごとの型：tie=誤答の最長が正解と同じ長さ／under=誤答の最長が正解以上。まず素直に選び、
+  // 型に合わなければ1つだけ入れ替えて合わせる。tie が作れなければ under に落とし、それも無理なら出題しない。
+  const choose = (seedKey, order, ok, txt, ans) => {
     const got = [];
-    for (const c of order) { if (got.length >= k) break; if (ok(c, got)) got.push(c); }
-    return got;
+    for (const c of order) { if (got.length >= 3) break; if (ok(c, got)) got.push(c); }
+    if (got.length < 3) return null;
+    const aJ = len(ans.ja), aE = len(ans.en), LJ = new Map(), LE = new Map();
+    order.forEach((c) => { const t = txt(c); LJ.set(c, len(t.ja)); LE.set(c, len(t.en)); });
+    const fit1 = (m, a, mode) => (mode === "tie" ? m === a : m >= a);
+    const fits = (ds, mode) => fit1(Math.max(LJ.get(ds[0]), LJ.get(ds[1]), LJ.get(ds[2])), aJ, mode.ja) && fit1(Math.max(LE.get(ds[0]), LE.get(ds[1]), LE.get(ds[2])), aE, mode.en);
+    const tryMode = (mode) => {
+      if (fits(got, mode)) return got;
+      for (let j = 2; j >= 0; j--) {
+        const rest = got.filter((_, k) => k !== j);
+        for (const c of order) {
+          if (got.includes(c)) continue;
+          const ds = got.slice(); ds[j] = c;
+          if (fits(ds, mode) && ok(c, rest)) return ds;
+        }
+      }
+      return null;
+    };
+    const want = { ja: hash(seedKey + "#tj") % 3 === 0 ? "tie" : "under", en: hash(seedKey + "#te") % 3 === 0 ? "tie" : "under" };
+    return tryMode(want) || tryMode({ ja: want.ja, en: "under" }) || tryMode({ ja: "under", en: want.en }) || tryMode({ ja: "under", en: "under" });
   };
+  const nameTxt = (c) => ({ ja: ja[c].n, en: en[c].n });
   const nameOpts = (qid, id, stemJ, stemE) => {
-    const okName = (c, got) => !leaks(stemJ, ja[c].n) && !leaks(stemE, en[c].n) && !got.some((g) => ja[g].n === ja[c].n);
+    const CL = new Map();
+    const clean = (c) => { let v = CL.get(c); if (v === undefined) { v = !leaks(stemJ, ja[c].n) && !leaks(stemE, en[c].n); CL.set(c, v); } return v; };
+    const okName = (c, got) => clean(c) && !got.some((g) => ja[g].n === ja[c].n || en[g].n === en[c].n);
     const same = ids.filter((c) => c !== id && cat(c) === cat(id));
-    let d = pick(qid + "#c", same, okName, 3);
-    if (d.length < 3) d = d.concat(pick(qid + "#l", ids.filter((c) => c !== id && layer(c) === layer(id) && !d.includes(c)), (c, got) => okName(c, d.concat(got)), 3 - d.length));
-    return d.length === 3 ? [id, ...d] : null;
+    const wide = ids.filter((c) => c !== id && layer(c) === layer(id) && cat(c) !== cat(id));
+    // 同じカテゴリを優先し、足りない・長さが合わないときだけ同じ層の別カテゴリから補う
+    const d = choose(qid, shuffled(qid + "#c", same).concat(shuffled(qid + "#l", wide)), okName, nameTxt, nameTxt(id));
+    return d ? [id, ...d] : null;
   };
   const expl = (id) => ({
     ja: `正解：${ja[id].n}（${id}）。${ja[id].d}`,
@@ -175226,8 +175259,9 @@ function atlasBuildQuiz(JA, EN) {
     {
       const qid = `cat:${id}`;
       const others = Object.keys(JA.cats).filter((c) => JA.cats[c].layer === layer(id) && c !== cat(id));
-      const d = pick(qid, others, () => true, 3);
-      if (d.length === 3) {
+      const ctxt = (c) => ({ ja: JA.cats[c].name, en: EN.cats[c].name });
+      const d = choose(qid, shuffled(qid, others), () => true, ctxt, ctxt(cat(id)));
+      if (d) {
         const cj = JA.cats[cat(id)], ce = EN.cats[cat(id)], lj = JA.layers[layer(id)], le = EN.layers[layer(id)];
         Q.push({ id: qid, t: "cat", item: id, p: { ja: `「${J.n}」が属するカテゴリはどれか？`, en: `Which category does “${E.n}” belong to?` }, stem: null,
           o: [cat(id), ...d].map((c) => ({ ja: JA.cats[c].name, en: EN.cats[c].name, ref: c })), a: 0,
@@ -175238,27 +175272,46 @@ function atlasBuildQuiz(JA, EN) {
     // by：項目名から提唱者を当てる（人名が特定できる項目だけ。同じ人物を含む誤答は除外）
     if (person(id)) {
       const qid = `by:${id}`;
-      const mine = surnames(J.by);
+      const mine = BYS[id];
       const cands = ids.filter((c) => c !== id && layer(c) === layer(id) && person(c));
-      const d = pick(qid, cands, (c, got) => {
-        const s = surnames(ja[c].by);
+      const btxt = (c) => ({ ja: BYJ[c], en: BYE[c] });
+      const d = choose(qid, shuffled(qid, cands), (c, got) => {
+        const s = BYS[c];
         if ([...s].some((x) => mine.has(x))) return false;
-        if (noYearJ(ja[c].by) === noYearJ(J.by) || noYearE(en[c].by) === noYearE(E.by)) return false;
-        return !got.some((g) => noYearJ(ja[g].by) === noYearJ(ja[c].by) || [...surnames(ja[g].by)].some((x) => s.has(x)));
-      }, 3);
-      if (d.length === 3) {
+        if (BYJ[c] === BYJ[id] || BYE[c] === BYE[id]) return false;
+        return !got.some((g) => BYJ[g] === BYJ[c] || BYE[g] === BYE[c] || [...BYS[g]].some((x) => s.has(x)));
+      }, btxt, btxt(id));
+      if (d) {
         Q.push({ id: qid, t: "by", item: id, p: { ja: `「${J.n}」の提唱者・出典として正しいのはどれか？`, en: `Who is the origin of “${E.n}”?` }, stem: null,
-          o: [id, ...d].map((c) => ({ ja: noYearJ(ja[c].by), en: noYearE(en[c].by), ref: c })), a: 0,
+          o: [id, ...d].map((c) => ({ ja: BYJ[c], en: BYE[c], ref: c })), a: 0,
           x: { ja: `正解：${J.by}（${J.y}）。${J.d}`, en: `Answer: ${E.by} (${E.y}). ${E.d}` } });
       }
     }
   }
-  Q.forEach((q) => { q.perm = perm(hash(q.id) + 7, 4); });
-  return Q;
+  // 並び：24通りのうち日英とも「最長を選ぶ（同点は先頭）」で正解を引かないものだけを候補にし、
+  // 正解の表示位置が A〜D に均等に散るよう重みを付けて選ぶ（同点型は A に置けないので、その分を他で補う）
+  const ALL = []; (function gen(a, rest) { if (!rest.length) { ALL.push(a); return; } rest.forEach((x, i) => gen(a.concat(x), rest.filter((_, k) => k !== i))); })([], [0, 1, 2, 3]);
+  const hit = (L, p) => { let b = p[0]; for (const i of p) if (L[i] > L[b]) b = i; return b === 0; };
+  const valid = Q.map((q) => { const LJ = q.o.map((o) => len(o.ja)), LE = q.o.map((o) => len(o.en)); return ALL.filter((p) => !hit(LJ, p) && !hit(LE, p)); });
+  const open = valid.map((v) => [0, 1, 2, 3].filter((k) => v.some((p) => p.indexOf(0) === k)));
+  const share = [0, 0, 0, 0];
+  open.forEach((ks) => ks.forEach((k) => { share[k] += 1 / ks.length; }));
+  const w = share.map((s) => (s > 0 ? Q.length / 4 / s : 1));
+  Q.forEach((q, i) => {
+    const ks = open[i];
+    if (!ks.length) { q.perm = null; return; }
+    const r = rng(hash(q.id) + 7)(), tot = ks.reduce((s, k) => s + w[k], 0);
+    let acc = 0, k = ks[ks.length - 1];
+    for (const c of ks) { acc += w[c] / tot; if (r < acc) { k = c; break; } }
+    const ps = valid[i].filter((p) => p.indexOf(0) === k);
+    q.perm = ps[hash(q.id + "#p") % ps.length];
+  });
+  return Q.filter((q) => q.perm);
 }
 // @atlas-quiz-end
-const ATLAS_Q = atlasBuildQuiz(ATLAS_JA, ATLAS_EN);
-const ATLAS_QBY = Object.fromEntries(ATLAS_Q.map((q) => [q.id, q]));
+// 体系図クイズは初めて開いたときに一度だけ作る（ハブを開くたびに約1,000問を組み立てない）
+let __atlasQ = null;
+const atlasQuiz = () => { if (!__atlasQ) { const list = atlasBuildQuiz(ATLAS_JA, ATLAS_EN); __atlasQ = { list, by: Object.fromEntries(list.map((q) => [q.id, q])) }; } return __atlasQ; };
 const ATLAS_QKEY = "consulting_atlas_quiz_v1";
 const ATLAS_SRKEY = "consulting_atlas_sr_v1";
 
@@ -175521,7 +175574,7 @@ function AtlasTab({ lang, tt }) {
           <h2 style={{ fontFamily: serif, fontSize: 22, margin: 0, color: "#fff" }}>{tt("法則・戦略・フレームワーク体系図", "Atlas of Laws, Strategies & Frameworks")}</h2>
           <p style={{ margin: "6px 0 14px", color: "#93A5C4", fontSize: 13, lineHeight: 1.75 }}>{tt("世の中の法則、勝ち方の型、思考の道具を3層・18カテゴリにMECEで整理し、業界・専門家レンズ・学問の出自の3つのジャンル軸を重ねた。全項目に「生成AI時代の読み替え」と「コンサルの問い」付き。", "Laws of the world, patterns for winning and tools for thinking, organized MECE into 3 layers and 18 categories, overlaid with three genre axes: industry, expert lens and discipline. Every entry carries a generative-AI reading and a consultant's question.")}</p>
           <div style={{ display: "flex", gap: "8px 22px", flexWrap: "wrap" }}>
-            {[[X.vals.total, tt("項目", "entries")], [3, tt("層", "layers")], [X.vals.nCat, tt("カテゴリ", "categories")], [Object.keys(A.meta).length, tt("メタ原理", "meta-principles")], [A.industries.length, tt("業界", "industries")], [A.lenses.length, tt("専門家レンズ", "expert lenses")], [Object.keys(A.disc).length, tt("学問領域", "disciplines")], [ATLAS_Q.length.toLocaleString(), tt("問", "questions")]].map(([n, l]) => (
+            {[[X.vals.total, tt("項目", "entries")], [3, tt("層", "layers")], [X.vals.nCat, tt("カテゴリ", "categories")], [Object.keys(A.meta).length, tt("メタ原理", "meta-principles")], [A.industries.length, tt("業界", "industries")], [A.lenses.length, tt("専門家レンズ", "expert lenses")], [Object.keys(A.disc).length, tt("学問領域", "disciplines")], [atlasQuiz().list.length.toLocaleString(), tt("問", "questions")]].map(([n, l]) => (
               <span key={l} style={{ fontSize: 12.5, color: "#93A5C4" }}><b style={{ fontFamily: serif, fontSize: 20, color: C.gold, marginRight: 4 }}>{n}</b>{l}</span>
             ))}
           </div>
@@ -175877,6 +175930,7 @@ function AtlasTab({ lang, tt }) {
       </div>
     );
   } else if (view === "quiz") {
+    const { list: ATLAS_Q, by: ATLAS_QBY } = atlasQuiz();
     const TYPE = { def: tt("説明→名称", "Description → entry"), cat: tt("名称→カテゴリ", "Entry → category"), ask: tt("問い→名称", "Question → entry"), ai: tt("AI読み替え→名称", "AI reading → entry"), by: tt("名称→提唱者", "Entry → origin") };
     const now = Date.now();
     const pool = ATLAS_Q.filter((q) => (qLayer === "all" || q.item[0] === qLayer) && (qType === "all" || q.t === qType));
