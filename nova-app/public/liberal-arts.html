@@ -1559,8 +1559,9 @@ function workMarks(p){
   var end = p.died||2026, inLife = function(y){ return y>=p.born && y<=end; };
   /* 年表用の作品（tlw：辞典で発表年を確かめた作品）を先に、カードの代表作から読み取った年を後に。同じ題の発表年は1つにまとめる */
   var tw = (p.tlw||[]).filter(function(w){ return inLife(w.y); }).map(function(w){ return {y:w.y, k:'w', ap:false, t:w.t, n:w.n||''}; });
-  var have = {}; tw.forEach(function(w){ have[w.t] = 1; });
-  var ws = (p.works||[]).map(function(w){ var r = workYear(w.n); return r && inLife(r.y) && !(r.k==='w' && have[w.t]) ? {y:r.y, k:r.k, ap:r.ap, t:w.t, n:w.n} : null; }).filter(Boolean);
+  var key = function(t){ return String(t).normalize('NFKC'); };
+  var have = {}; tw.forEach(function(w){ have[key(w.t)] = 1; });
+  var ws = (p.works||[]).map(function(w){ var r = workYear(w.n); return r && inLife(r.y) && !(r.k==='w' && have[key(w.t)]) ? {y:r.y, k:r.k, ap:r.ap, t:w.t, n:w.n} : null; }).filter(Boolean);
   return tw.concat(ws);
 }
 function drawTimeline(){
