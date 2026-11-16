@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "validate": "node scripts/validate-quiz.mjs",
-    "prebuild": "node scripts/validate-quiz.mjs && node scripts/validate-govdojo.mjs",
+    "validate": "node scripts/validate-quiz.mjs && node scripts/validate-atlas.mjs",
+    "prebuild": "node scripts/validate-quiz.mjs && node scripts/validate-govdojo.mjs && node scripts/validate-atlas.mjs",
     "build": "vite build",
     "preview": "vite preview"
   },
