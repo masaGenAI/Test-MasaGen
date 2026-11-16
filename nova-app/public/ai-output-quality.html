@@ -534,9 +534,9 @@ ol.actions.acc li .ans { padding: 0 14px 12px 50px; font-size: 13px; }
 </div></div><div class="tabpanel" data-label="追補3 出典照合"><div class="addendum">
 <h3>追補3（2026年11月16日）：他の成果物への展開と、本報告自体の出典照合</h3>
 <ul>
-<li><strong>指紋はスライド以外にも残る。</strong>論点・構成案、リサーチメモ、Excel、Word、メール・議事録、口頭説明を加え、7成果物・6層の68項目に整理した（<a href="https://claude.ai/artifact/GWaehzGdt8N427GuXy5RTV">ダッシュボード</a>）。機械で見つけられるのは26項目で、残る42項目は目視か、一次情報や本人への照合が要る。</li>
+<li><strong>指紋はスライド以外にも残る。</strong>論点・構成案、リサーチメモ、Excel、Word、メール・議事録、口頭説明を加え、7成果物・6層の68項目に整理した（点検カタログ。本ページには含めていない）。機械で見つけられるのは26項目で、残る42項目は目視か、一次情報や本人への照合が要る。</li>
 <li><strong>本報告の本文の出典109件を1件ずつ開いて照合した。</strong>72件は裏付けあり、37件は一部相違などがあった。22件は本文を修正し、8件は同じ文の別の出典で裏付けを確認し、7件は照合する主張のない表のラベルだった。</li>
-<li><strong>相違の多くは、出典にない修飾の付け足し、論文の古い版の数値、別の出典の内容の混入だった。</strong>出典にまったくない数値を作った例は見つからなかった。AIを使って書いた本報告にも、12章とダッシュボードで挙げた指紋（数値や記述の作り替え、古い情報）が残っていた。出典を開いて確かめる工程は、AIの精度が上がっても省けない。</li>
+<li><strong>相違の多くは、出典にない修飾の付け足し、論文の古い版の数値、別の出典の内容の混入だった。</strong>出典にまったくない数値を作った例は見つからなかった。AIを使って書いた本報告にも、12章と点検カタログで挙げた指紋（数値や記述の作り替え、古い情報）が残っていた。出典を開いて確かめる工程は、AIの精度が上がっても省けない。</li>
 </ul>
 <div aria-label="出典照合の結果" class="hcbar">
 <div class="row"><span>出典109件</span><div class="seg"><span style="flex:72;background:var(--navy)">裏付けあり 72</span><span style="flex:34;background:var(--blue)">一部相違 34</span><span style="flex:2;background:#9A6A12" title="裏付けなし 2"></span><span style="flex:1;background:#8A99B4" title="確認不可 1"></span></div></div>
@@ -1191,7 +1191,7 @@ ol.actions.acc li .ans { padding: 0 14px 12px 50px; font-size: 13px; }
 <div class="law"><p class="no">FINDING 1</p><h4>指紋の多くは「器」に付く</h4><p>赤い波線、書体の混在、文字の縮小、ファイル情報は、生成に使われたライブラリの既定値がそのまま残った結果である。python-pptx の既定テンプレートは、言語が英語（米国）、比率が4:3、作成日が2013年、最終更新者が開発者名になっている（本報告で確認）。さらにAIは描画結果を見ずに座標と文字数で配置するため、和文の幅と高さを読み違え、重なりとはみ出しを起こす。</p></div>
 <div class="law"><p class="no">FINDING 2</p><h4>経路が違えば指紋も違う</h4><p>コードで生成した資料には既定値の指紋、スライド生成サービスには型とデザインの指紋、チャット画面からのコピペには記号と痕跡文字列の指紋が付く。作られた経路が分かれば、点検する場所も絞れる。</p></div>
 <div class="law"><p class="no">FINDING 3</p><h4>作成者の画面では見えない指紋がある</h4><p>赤い波線はPPTXを編集画面で開いたときに出る校正表示で、作成者がPDFやスライドショーで確認しても見つからない。書体の置き換わりと縮小の度合いも、受け手のソフトとフォント環境で変わる。確認は、受け手と同じ形式・同じソフトで開いて行う。</p></div>
-</div><div class="viz" id="ba-viz"><p class="viz-title">AIっぽいスライドと修正版<small>つまみを動かして比較。番号を押すと指紋の説明</small></p><div class="cmp"></div><input aria-label="比較の位置（左へ動かすと修正版）" class="cmp-range" max="100" min="0" type="range" value="100"/><div aria-live="polite" class="panel"></div><a class="cta" href="https://claude.ai/artifact/GWaehzGdt8N427GuXy5RTV">他の成果物を含む68項目をダッシュボードで絞り込む →</a></div>
+</div><div class="viz" id="ba-viz"><p class="viz-title">AIっぽいスライドと修正版<small>つまみを動かして比較。番号を押すと指紋の説明</small></p><div class="cmp"></div><input aria-label="比較の位置（左へ動かすと修正版）" class="cmp-range" max="100" min="0" type="range" value="100"/><div aria-live="polite" class="panel"></div></div>
 
 
 
@@ -1307,7 +1307,7 @@ ol.actions.acc li .ans { padding: 0 14px 12px 50px; font-size: 13px; }
 <tr><td class="num">29</td><td>「As an AI language model」「以下にまとめました」「いかがでしたか」</td><td>応答の前置きと締めの消し残し</td><td>コピペ</td><td>文字列を検索する</td><td>削除する</td><td><span class="sev sev-1">致命</span></td><td><span class="ev-tag ev-d">事例（3章）</span></td></tr>
 </tbody>
 </table>
-</div><p class="caveat">根拠の区分。検証済：本報告の検証環境（python-pptx 1.0.2、python-docx、openpyxl 3.1.5、matplotlib 3.11.2、LibreOffice）でファイルの中身か描画を確認した項目。ただし赤い波線と書体の置き換わりの見え方は PowerPoint 実機では確認しておらず、ファイル内の属性と Microsoft の説明に基づく。文書・調査・報道：リンク先の記述。経験則：実務上の観察で、出現頻度は検証していない。深刻度は本報告の判断で、28は公的機関向けの成果物では重大に上げる。</p><p class="caveat">スライド以外の成果物（論点・構成案、リサーチメモ、Excel、Word、メール・議事録、口頭説明）を含む68項目は、中身の層「L6 事実・出典」を加えて<a href="https://claude.ai/artifact/GWaehzGdt8N427GuXy5RTV">ダッシュボード</a>に整理した。成果物、層、深刻度、根拠、見つけ方で絞り込める。</p><h3>提出前の3段階チェック</h3><div class="decide">
+</div><p class="caveat">根拠の区分。検証済：本報告の検証環境（python-pptx 1.0.2、python-docx、openpyxl 3.1.5、matplotlib 3.11.2、LibreOffice）でファイルの中身か描画を確認した項目。ただし赤い波線と書体の置き換わりの見え方は PowerPoint 実機では確認しておらず、ファイル内の属性と Microsoft の説明に基づく。文書・調査・報道：リンク先の記述。経験則：実務上の観察で、出現頻度は検証していない。深刻度は本報告の判断で、28は公的機関向けの成果物では重大に上げる。</p><p class="caveat">スライド以外の成果物（論点・構成案、リサーチメモ、Excel、Word、メール・議事録、口頭説明）を含む68項目は、中身の層「L6 事実・出典」を加えて、成果物・層・深刻度・根拠・見つけ方で絞り込める点検カタログに別途整理した（本ページには含めていない）。</p><h3>提出前の3段階チェック</h3><div class="decide">
 <div class="d1"><b class="big">1</b><span><strong>機械点検（保存直後、1分）。</strong>点検スクリプトで18種類の指紋を探す。言語属性、和文書体、縮小設定、重なり、はみ出し、タイトル枠、痕跡文字列、Markdown 記号、ファイル情報など。</span></div>
 <div class="d2"><b class="big">2</b><span><strong>相手の環境で開く（5分）。</strong>PPTXを受け手と同じソフトの編集画面で開き、赤い波線、フォント欄、選択ウィンドウでの重なりを見る。</span></div>
 <div class="d3"><b class="big">3</b><span><strong>紙の距離で読む（10分）。</strong>印刷かPDFで、タイトルだけを順に読んで話が通るか、注記まで読めるかを確かめる。</span></div>
@@ -1564,7 +1564,6 @@ $ python ai_tell_linter.py after.pptx
 <div>
 <h3>成果物の指紋（追補2）</h3>
 <ol>
-<li>本報告のダッシュボード（2026年11月16日）. AIの指紋ダッシュボード：コンサル成果物の点検カタログと出典照合の結果. <a href="https://claude.ai/artifact/GWaehzGdt8N427GuXy5RTV">https://claude.ai/artifact/GWaehzGdt8N427GuXy5RTV</a></li>
 <li>python-pptx documentation. Text - Auto-fit text to shape（自動調整の分析ノート）. <a href="https://python-pptx.readthedocs.io/en/latest/dev/analysis/txt-autofit-text.html">https://python-pptx.readthedocs.io/en/latest/dev/analysis/txt-autofit-text.html</a></li>
 <li>python-pptx documentation. Text - Fit text to shape（PowerPoint は整数ptで縮小する）. <a href="https://python-pptx.readthedocs.io/en/latest/dev/analysis/txt-fit-text.html">https://python-pptx.readthedocs.io/en/latest/dev/analysis/txt-fit-text.html</a></li>
 <li>python-pptx documentation. Font typeface（欧文・東アジア書体の扱い）. <a href="https://python-pptx.readthedocs.io/en/latest/dev/analysis/txt-font-typeface.html">https://python-pptx.readthedocs.io/en/latest/dev/analysis/txt-font-typeface.html</a></li>
