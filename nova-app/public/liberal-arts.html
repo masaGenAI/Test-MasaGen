@@ -243,6 +243,16 @@
   }
   @media (max-width:420px){ .pz-stats{grid-template-columns:minmax(0,1fr);} }
   @media (max-width:560px){ #main .seg2{display:flex;flex-wrap:wrap;border-radius:14px;} }
+.tl-era{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 8px;font-size:12px}
+.tl-era span{color:var(--muted);margin-right:2px}
+.tl-era button{border:1px solid var(--line);background:var(--paper);color:var(--muted);border-radius:100px;padding:3px 10px;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:5px}
+.tl-era button i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.tl-era button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.tl-wrap .wm{fill:#fff;stroke:rgba(0,0,0,.6);stroke-width:1;pointer-events:all}
+.tl-wrap .wm.wa{fill:#F6C343}
+.tl-wrap .bar:hover .wm{stroke:#000;stroke-width:1.4}
+.wm-key{display:inline-block;width:8px;height:8px;border-radius:50%;background:#fff;border:1px solid rgba(0,0,0,.6);vertical-align:middle;margin:0 2px}
+.wm-key.wa{border-radius:1px;transform:rotate(45deg);background:#F6C343;width:7px;height:7px}
 </style>
 </head>
 <body>
@@ -303,7 +313,7 @@ function loadDomain(id){
   setRegion(S.region);
 }
 function setRegion(r){
-  S.region = r;
+  S.region = r; S.tlEra = null;
   people = ALLP.filter(function(p){return p.region===r;}).sort(function(a,b){ return a.born-b.born || (a.died||9999)-(b.died||9999); });
   INST = ALLI.filter(function(x){return x.region===r;});
   var er = (((D.eras||{})[S.domain])||{})[r] || [];
@@ -1491,7 +1501,7 @@ function renderExplore(){
     m.innerHTML = seg+'<div class="grid"><div><div class="panel"><h2>'+esc(DM.ils)+'の一覧</h2><div id="ilist"></div></div></div><div><div class="panel card" id="card"></div></div></div>';
     bindSeg(m); drawIList(); drawICard(); return;
   }
-  m.innerHTML = seg+'<div class="grid"><div><div class="panel"><h2>年表（生没年の棒をタップ）</h2><div class="tl-wrap" id="tl"></div><div class="hint" style="margin-top:6px">色は時代区分。棒が重なっているのは、同じ時代に生きていた人です。</div></div>'+
+  m.innerHTML = seg+'<div class="grid"><div><div class="panel"><h2>年表（生没年の棒をタップ）</h2><div class="tl-era" id="tlera"></div><div class="tl-wrap" id="tl"></div><div class="hint" style="margin-top:6px">色は時代区分。棒が重なっているのは、同じ時代に生きていた人です。'+(people.some(function(p){ return workMarks(p).length; }) ? '<br>棒の上の<span class="wm-key"></span>は作品（説明に書かれた発表・刊行・完成などの年）、<span class="wm-key wa"></span>は賞を受けた年。点にカーソルを当てると作品名が出ます。' : '')+'</div></div>'+
     '<div class="panel" style="margin-top:12px"><h2>時代ごとの一覧</h2><div id="list"></div></div></div><div><div class="panel card" id="card"></div></div></div>';
   bindSeg(m);
   drawTimeline(); drawList(); drawCard();
@@ -1514,10 +1524,50 @@ function drawList(){
   el('list').querySelectorAll('[data-p]').forEach(function(b){ b.onclick=function(){ showPerson(b.dataset.p, true); }; });
 }
 function tickStep(span){ return span>1800?500 : span>800?200 : span>380?100 : span>160?50 : 25; }
+/* 作品の説明（works[].n）に書かれた年から、年表に打つ点を決める。
+   説明の文が「その年に何をしたか」をはっきり言っているときだけ点にする（推測で年を作らない）。
+   k:'w' 発表・刊行・完成など作品そのものの年 / k:'a' 賞を受けた年 */
+function workYear(n){
+  n = String(n||'');
+  var re = /(?<![\d約〜～])(紀元)?(前)?(\d{1,4})(?:年)?(?:(?:〜|～|から)(?:前)?\d{1,4})?年(ごろ|頃|ころ)?(?!代|ほど|間|余|近く|以上|後|目|来|にわた|をかけ)/g, m;
+  var AWARD = /賞(を|も)?受け|受賞/;
+  var SKIP = /映画化|ドラマ化|アニメ化|舞台化|邦訳|翻訳され|解散|公認|没し|死去|亡くな|卒業|留学|入学|就任|なった|となり|移り|移っ|再版|復刊|改訂/;
+  var VERB = /刊行|刊|発表|出版|初演|上演|公開|完成|完結|書き?下ろ|書い|書か|著し|著さ|著した|作曲|作っ|作ら|作り|制作|製作|描い|描か|創刊|設立|創設|開設|開い|開か|発見|発明|発掘|提唱|唱え|命名|観測|捉え|到達|成し遂げ|出し|出た|編ん|編ま|まとめ|示し|加え|始め|建て|建立|築い|残し|記し|行っ|行わ/;
+  var TAIL = /^(刊|発表|初演|作|製作|制作|完成|の(長編|短編|中編|作品|作|小説|詩集|戯曲|映画|論文|著書|主著|著作|著|書|大作|歌集|句集|評論|随筆|交響曲|オペラ|曲|絵|画)|に(初めて)?(刊行|発表|出版|初演|上演|公開|完成|完結|出し|出た|書|著|作|描|創刊|設立|創設|開設|開い|発見|発明|提唱|命名|まとめ|編))/;
+  while((m = re.exec(n))){
+    var y = parseInt(m[3],10) * (m[2]?-1:1), ap = !!m[4] || /ごろ|頃|ころ/.test(n.slice(m.index-3, m.index));
+    var after = n.slice(re.lastIndex), sent = after.split('。')[0], clause = after.split(/[、。]/)[0];
+    var atStart = m.index===0 || /^[（(]?$/.test(n.slice(0,m.index));
+    if(atStart){
+      if(SKIP.test(sent)) return null;
+      if(after.charAt(0)==='。' || TAIL.test(after)) return {y:y, k:'w', ap:ap};
+      if(AWARD.test(sent)) return {y:y, k:'a', ap:ap};
+      if(VERB.test(sent)) return {y:y, k:'w', ap:ap};
+      return null;
+    }
+    if(SKIP.test(clause)) continue;
+    if(/^に/.test(after) && AWARD.test(clause)) return {y:y, k:'a', ap:ap};
+    if(TAIL.test(after)) return {y:y, k:'w', ap:ap};
+  }
+  return null;
+}
+function workMarks(p){
+  var end = p.died||2026;
+  return (p.works||[]).map(function(w){ var r = workYear(w.n); return r && r.y>=p.born && r.y<=end ? {y:r.y, k:r.k, ap:r.ap, t:w.t, n:w.n} : null; }).filter(Boolean);
+}
 function drawTimeline(){
-  var ys = people.map(function(p){return p.born;}), ye = people.map(function(p){return p.died||2026;});
+  /* 時代で絞ると、その時代の人だけで目盛りを取り直す（現代の作品の点が詰まらないように） */
+  var eras = eraOrder().filter(function(e){ return people.some(function(p){ return p.era===e; }); });
+  if(S.tlEra && eras.indexOf(S.tlEra)<0) S.tlEra = null;
+  var ps = S.tlEra ? people.filter(function(p){ return p.era===S.tlEra; }) : people;
+  var eb = el('tlera');
+  if(eb){
+    eb.innerHTML = eras.length>1 ? '<span>表示する時代</span>'+[''].concat(eras).map(function(e){ return '<button data-e="'+esc(e)+'" class="'+((S.tlEra||'')===e?'on':'')+'">'+(e?'<i style="background:'+eraColor(e)+'"></i>'+esc(e):'すべて')+'</button>'; }).join('') : '';
+    eb.querySelectorAll('[data-e]').forEach(function(b){ b.onclick = function(){ S.tlEra = b.dataset.e || null; drawTimeline(); }; });
+  }
+  var ys = ps.map(function(p){return p.born;}), ye = ps.map(function(p){return p.died||2026;});
   var wrap = el('tl'), lo = Math.min.apply(null,ys), hi = Math.max.apply(null,ye), span0 = hi-lo, pad = Math.max(8, Math.round(span0*0.04));
-  var y0 = Math.floor((lo-pad)/10)*10, y1 = Math.ceil((hi+pad)/10)*10, W = Math.max(440, Math.floor(wrap.clientWidth || 640) - 2), L = 6, rowH = 22, top = 34, n = people.length, H = top + n*rowH + 14;
+  var y0 = Math.floor((lo-pad)/10)*10, y1 = Math.ceil((hi+pad)/10)*10, W = Math.max(440, Math.floor(wrap.clientWidth || 640) - 2), L = 6, rowH = 22, top = 34, n = ps.length, H = top + n*rowH + 14;
   var X = function(y){ return L + (y-y0)/(y1-y0)*(W-L-8); };
   var s = '<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="生没年の年表">';
   (BANDS||[]).forEach(function(b,i){
@@ -1529,13 +1579,19 @@ function drawTimeline(){
   s += '<g class="axis">';
   for(var y=Math.ceil(y0/step)*step;y<=y1;y+=step){ s += '<line x1="'+X(y).toFixed(1)+'" y1="20" x2="'+X(y).toFixed(1)+'" y2="'+H+'"/><text x="'+(X(y)+3).toFixed(1)+'" y="30">'+yr(y)+'</text>'; }
   s += '</g>';
-  people.forEach(function(p,i){
+  ps.forEach(function(p,i){
     var yy = top + i*rowH, dd = p.died||2026, x0 = X(p.born), x1 = X(dd), sel = S.sel===p.id;
     var labelRight = x1 + 6, anchor = 'start';
     if(labelRight + 170 > W){ labelRight = x0 - 6; anchor = 'end'; }
     s += '<g class="bar'+(sel?' sel':'')+'" data-p="'+p.id+'" tabindex="0" role="button" aria-label="'+esc(p.name)+' '+life(p)+'">'+
       '<rect x="0" y="'+(yy-2)+'" width="'+W+'" height="'+rowH+'" fill="transparent"/>'+
       '<rect class="life" x="'+x0.toFixed(1)+'" y="'+(yy+3)+'" width="'+Math.max(4,x1-x0).toFixed(1)+'" height="12" rx="6" fill="'+eraColor(p.era)+'"/>'+
+      workMarks(p).map(function(w){
+        var cx = X(w.y), cy = yy+9, tip = '<title>'+esc(w.t)+'（'+yr(w.y)+'年'+(w.ap?'ごろ':'')+'）\n'+esc(w.n)+'</title>';
+        return w.k==='a'
+          ? '<polygon class="wm wa" points="'+cx.toFixed(1)+','+(cy-4.6)+' '+(cx+4.6).toFixed(1)+','+cy+' '+cx.toFixed(1)+','+(cy+4.6)+' '+(cx-4.6).toFixed(1)+','+cy+'">'+tip+'</polygon>'
+          : '<circle class="wm" cx="'+cx.toFixed(1)+'" cy="'+cy+'" r="3.2">'+tip+'</circle>';
+      }).join('')+
       '<text x="'+labelRight.toFixed(1)+'" y="'+(yy+13)+'" text-anchor="'+anchor+'">'+esc(p.name)+' <tspan fill="var(--muted)" font-size="10">'+yr(p.born)+'–'+(p.died?yr(p.died):'')+'</tspan></text></g>';
   });
   s += '</svg>';
