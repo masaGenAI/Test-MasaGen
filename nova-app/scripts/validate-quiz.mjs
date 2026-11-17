@@ -53,7 +53,7 @@ const STATIONS = [
   { name: 'Station_DP900', arrays: [['BANK','obj']] },
   { name: 'Station_SC900', arrays: [['BANK','obj']] },
   { name: 'Station_ADP', arrays: [['CORE','rowDQOAE']] },
-  { name: 'Station_AGWA', arrays: [['AGWA_HARD','obj']] },
+  { name: 'Station_AGWA', arrays: [['AGWA_BANK','obj'],['AGWA_HARD','obj']] },
 ];
 
 // 各行を {q, opts:[...], correct:<idx|number[]|null>} に正規化
