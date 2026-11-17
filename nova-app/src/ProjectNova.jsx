@@ -175378,7 +175378,21 @@ function AtlasH({ children, sub }) {
   );
 }
 const atlasLabel = { fontSize: 11.5, fontWeight: 800, color: C.sub, letterSpacing: 0.3, margin: "0 0 5px" };
-const atlasGrid = (min) => ({ display: "grid", gap: 12, gridTemplateColumns: `repeat(auto-fit, minmax(${min}px, 1fr))` });
+// 開閉カードを並べても、閉じたカードが隣の開いたカードの高さまで伸びないよう上揃えにする
+const atlasGrid = (min) => ({ display: "grid", gap: 12, gridTemplateColumns: `repeat(auto-fit, minmax(${min}px, 1fr))`, alignItems: "start" });
+// 開閉できるカード。見出しは常に表示し、押すと中身が開く（初期状態は閉じている）
+function AtlasFold({ open, onToggle, head, meta, accent, gap, style, children }) {
+  return (
+    <Card style={{ padding: 0, overflow: "hidden", ...(accent ? { borderLeft: `4px solid ${accent}` } : null), ...style }}>
+      <button type="button" onClick={onToggle} aria-expanded={!!open} style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", background: "#fff", border: "none", cursor: "pointer", textAlign: "left", fontFamily: sans, color: C.txt }}>
+        <span style={{ flex: 1, minWidth: 0 }}>{head}</span>
+        {meta != null ? <span style={{ flex: "none", fontSize: 11.5, color: C.sub }}>{meta}</span> : null}
+        <span aria-hidden="true" style={{ flex: "none", width: 14, textAlign: "center", fontSize: 10.5, color: C.sub, transform: open ? "rotate(90deg)" : "none", transition: "transform .15s" }}>▶</span>
+      </button>
+      {open ? <div style={{ display: "grid", gap: gap != null ? gap : 10, padding: "12px 16px 16px", borderTop: `1px solid ${C.line}` }}>{children}</div> : null}
+    </Card>
+  );
+}
 
 function AtlasTab({ lang, tt }) {
   const A = lang === "en" ? ATLAS_EN : ATLAS_JA;
@@ -175399,6 +175413,17 @@ function AtlasTab({ lang, tt }) {
   const [qType, setQType] = useState("all");
   const [qStats, setQStats] = useState({});
   const [qCards, setQCards] = useState({});
+  const [folds, setFolds] = useState({}); // 開閉カードの状態（キー→開いているか）。最初はすべて閉じている
+  const fo = (k) => !!folds[k];
+  const ft = (k) => setFolds((f) => ({ ...f, [k]: !f[k] }));
+  const foldAll = (keys) => {
+    const all = keys.length > 0 && keys.every((k) => folds[k]);
+    return (
+      <div style={{ display: "flex", justifyContent: "flex-end", margin: "0 0 10px" }}>
+        <AtlasPill onClick={() => setFolds((f) => { const n = { ...f }; keys.forEach((k) => { n[k] = !all; }); return n; })}>{all ? tt("▴ すべて閉じる", "▴ Collapse all") : tt("▾ すべて開く", "▾ Expand all")}</AtlasPill>
+      </div>
+    );
+  };
   useEffect(() => {
     let ok = true;
     (async () => {
@@ -175585,19 +175610,18 @@ function AtlasTab({ lang, tt }) {
         </Card>
         <div>
           <AtlasH sub={tt(`${X.vals.total}の知見を構造化し、層・業界・専門家のレンズをまたいで掘り下げた結論。`, `Conclusions from structuring ${X.vals.total} entries and digging across layers, industries and expert lenses.`)}>{tt("要旨", "Key messages")}</AtlasH>
+          {foldAll(A.summary.map((_, i) => "sum" + i))}
           <div style={{ display: "grid", gap: 10 }}>
             {A.summary.map((k, i) => (
-              <Card key={i} style={{ padding: "14px 18px", display: "grid", gridTemplateColumns: "28px 1fr", gap: "2px 10px" }}>
-                <span style={{ fontFamily: serif, fontSize: 18, fontWeight: 700, color: C.gold, gridRow: "span 2" }}>{i + 1}</span>
-                <b style={{ fontSize: 14.5, lineHeight: 1.5 }}>{fill(k.h)}</b>
-                <span style={{ fontSize: 13, color: C.sub, lineHeight: 1.75 }}>{fill(k.b)}</span>
-              </Card>
+              <AtlasFold key={i} open={fo("sum" + i)} onToggle={() => ft("sum" + i)} head={<span style={{ display: "grid", gridTemplateColumns: "28px 1fr", gap: 10, alignItems: "baseline" }}><span style={{ fontFamily: serif, fontSize: 18, fontWeight: 700, color: C.gold }}>{i + 1}</span><b style={{ fontSize: 14.5, lineHeight: 1.5 }}>{fill(k.h)}</b></span>}>
+                <span style={{ fontSize: 13, color: C.sub, lineHeight: 1.75, paddingLeft: 38 }}>{fill(k.b)}</span>
+              </AtlasFold>
             ))}
           </div>
         </div>
         <div>
           <AtlasH sub={tt("名称ではなく「文の主語」と「文の形」で層を分けた。カテゴリを押すと一覧が開く。", "Layers are split by the subject and the form of the statement, not by name. Tap a category to open its list.")}>{tt("3層の構造", "Three layers")}</AtlasH>
-          <div style={atlasGrid(250)}>{ATLAS_LORDER.map(layerCard)}</div>
+          <div style={{ ...atlasGrid(250), alignItems: "stretch" }}>{ATLAS_LORDER.map(layerCard)}</div>
         </div>
         <div>
           <AtlasH sub={tt(`数学の定理と現場の経験則を同列に並べないよう、法則${X.vals.nL}件を5段階で評価した（本体系図による評価）。`, `To keep theorems and rules of thumb apart, the ${X.vals.nL} laws are graded on five levels (this atlas's own assessment).`)}>{tt("法則の根拠グレード", "Evidence grades of the laws")}</AtlasH>
@@ -175614,14 +175638,16 @@ function AtlasTab({ lang, tt }) {
   } else if (view === "map") {
     body = (
       <div style={{ display: "grid", gap: 22 }}>
-        <AtlasH sub={tt("カテゴリは層ごとに一つの軸で切り、各項目はどれか一つにだけ属する。点の色は法則の根拠グレード、☑は読了。", "Each layer is cut along a single axis and every entry belongs to exactly one category. Dots show evidence grades of laws; ☑ marks entries you have read.")}>{tt("体系マップ", "Map")}</AtlasH>
+        <div>
+          <AtlasH sub={tt("カテゴリは層ごとに一つの軸で切り、各項目はどれか一つにだけ属する。点の色は法則の根拠グレード、☑は読了。", "Each layer is cut along a single axis and every entry belongs to exactly one category. Dots show evidence grades of laws; ☑ marks entries you have read.")}>{tt("体系マップ", "Map")}</AtlasH>
+          {foldAll([...Object.keys(A.cats).map((c) => "cat" + c), "rules"])}
+        </div>
         {ATLAS_LORDER.map((l) => (
           <div key={l}>
             <AtlasHead color={ATLAS_LAYER[l].color} mark={ATLAS_LAYER[l].mark} label={A.layers[l].name} count={X.ALL.filter((i) => i.layer === l).length} sub={A.layers[l].axis} />
             <div style={atlasGrid(220)}>
               {Object.keys(A.cats).filter((c) => A.cats[c].layer === l).map((c) => (
-                <Card key={c} style={{ padding: 14 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}><b style={{ fontSize: 13.5 }}>{A.cats[c].name}</b><span style={{ fontSize: 11.5, fontWeight: 800, color: ATLAS_LAYER[l].color }}>{c}</span></div>
+                <AtlasFold key={c} open={fo("cat" + c)} onToggle={() => ft("cat" + c)} head={<span style={{ display: "flex", justifyContent: "space-between", gap: 8 }}><b style={{ fontSize: 13.5 }}>{A.cats[c].name}</b><span style={{ fontSize: 11.5, fontWeight: 800, color: ATLAS_LAYER[l].color }}>{c}</span></span>} meta={tt(`${X.ALL.filter((i) => i.cat === c).length}項目`, `${X.ALL.filter((i) => i.cat === c).length} entries`)} accent={ATLAS_LAYER[l].color}>
                   <p style={{ margin: "2px 0 10px", fontSize: 11.5, color: C.sub }}>{A.cats[c].desc}</p>
                   <div style={{ display: "grid", gap: 4 }}>
                     {X.ALL.filter((i) => i.cat === c).map((i) => (
@@ -175633,21 +175659,21 @@ function AtlasTab({ lang, tt }) {
                       </button>
                     ))}
                   </div>
-                </Card>
+                </AtlasFold>
               ))}
             </div>
           </div>
         ))}
         <div>
           <AtlasH sub={tt("MECEを担保するための定義と、境界で迷う項目の判定ルール。", "Definitions that keep the taxonomy MECE, and rules for borderline entries.")}>{tt("分類の基準", "Classification rules")}</AtlasH>
-          <Card style={{ display: "grid", gap: 12 }}>
+          <AtlasFold open={fo("rules")} onToggle={() => ft("rules")} head={<b style={{ fontSize: 13.5 }}>{tt("判定ルール", "Rules")}</b>} meta={A.rules.length} gap={12}>
             {A.rules.map((r, i) => (
               <div key={i} style={{ display: "grid", gridTemplateColumns: "24px 1fr", gap: "2px 8px" }}>
                 <span style={{ fontFamily: serif, fontWeight: 700, color: C.gold, gridRow: "span 2" }}>{i + 1}</span>
                 <b style={{ fontSize: 13.5 }}>{r.t}</b><span style={{ fontSize: 12.5, color: C.sub, lineHeight: 1.7 }}>{r.d}</span>
               </div>
             ))}
-          </Card>
+          </AtlasFold>
         </div>
       </div>
     );
@@ -175658,6 +175684,7 @@ function AtlasTab({ lang, tt }) {
       (!fGrade || i.g === fGrade) && (!fInd || (X.indOf[i.id] || []).includes(fInd)) && (!fLens || (X.lensOf[i.id] || []).includes(fLens)) &&
       (!fDisc || X.discOf[i.id] === fDisc) &&
       (!ql || [i.id, i.n, i.en, i.by, i.y, i.d, i.s, i.c, i.ai, i.ask].join(" ").toLowerCase().includes(ql)));
+    const nAct = [fMeta, fGrade, fInd, fLens, fDisc].filter(Boolean).length;
     const sel = (value, set, opts, label) => (
       <label style={{ display: "grid", gap: 3, fontSize: 11.5, color: C.sub, fontWeight: 700 }}>{label}
         <select value={value} onChange={(e) => set(e.target.value)} style={{ padding: "8px 10px", borderRadius: 8, border: `1.5px solid ${C.line}`, fontSize: 13, background: "#fff", color: C.txt, fontFamily: sans }}>
@@ -175675,13 +175702,16 @@ function AtlasTab({ lang, tt }) {
         </div>
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={tt("例：ポーター、ネットワーク、損失、エージェント", "e.g. Porter, network, loss, agent")}
           style={{ width: "100%", boxSizing: "border-box", padding: "11px 15px", borderRadius: 9, border: `1.5px solid ${C.line}`, fontSize: 14, marginBottom: 12, fontFamily: sans }} />
-        <div style={{ ...atlasGrid(160), marginBottom: 14 }}>
+        <AtlasFold open={fo("filters")} onToggle={() => ft("filters")} head={<b style={{ fontSize: 13 }}>{tt("詳細な絞り込み", "More filters")}</b>} meta={nAct ? tt(`${nAct}件を適用中`, `${nAct} active`) : null} style={{ marginBottom: 14 }}>
+        <div style={atlasGrid(160)}>
           {sel(fMeta, setFMeta, Object.entries(A.meta).map(([k, v]) => [k, v.name]), tt("メタ原理", "Meta-principle"))}
           {sel(fGrade, setFGrade, ATLAS_GORDER.map((g) => [g, `${g} ${A.grades[g].name}`]), tt("根拠グレード", "Evidence grade"))}
           {sel(fInd, setFInd, A.industries.map((x) => [x.id, x.n]), tt("業界", "Industry"))}
           {sel(fLens, setFLens, A.lenses.map((x) => [x.id, x.n]), tt("専門家レンズ", "Expert lens"))}
           {sel(fDisc, setFDisc, Object.entries(A.disc).map(([k, v]) => [k, v.n]), tt("学問の出自", "Discipline"))}
         </div>
+        {nAct ? <div><AtlasPill onClick={() => { setFMeta(""); setFGrade(""); setFInd(""); setFLens(""); setFDisc(""); }}>× {tt("絞り込みを解除", "Clear filters")}</AtlasPill></div> : null}
+        </AtlasFold>
         <p style={{ color: C.sub, fontSize: 12.5, margin: "0 0 10px" }}>{res.length} {tt("件", "entries")}</p>
         <div style={{ display: "grid", gap: 10 }}>
           {res.map((i) => (
@@ -175707,11 +175737,7 @@ function AtlasTab({ lang, tt }) {
         <div style={{ display: "grid", gap: 14 }}>
           <p style={{ color: C.sub, fontSize: 12.5, margin: 0, lineHeight: 1.7 }}>{tt("GICSの11セクターを基礎に、日本企業の経営論点で重要な単位に再編した12業界（公共・教育はGICS外）。", "12 industries regrouped from the 11 GICS sectors around the issues that matter for Japanese corporates (public sector and education sit outside GICS).")}</p>
           {A.industries.map((x) => (
-            <Card key={x.id} style={{ display: "grid", gap: 12 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-                <div><span style={{ fontSize: 11, fontWeight: 800, color: C.sub }}>{x.id}</span><h3 style={{ fontFamily: serif, fontSize: 18, margin: "2px 0 0" }}>{x.n}</h3><span style={{ fontSize: 12, color: C.sub }}>{x.sub}</span></div>
-                <span style={{ alignSelf: "flex-start", fontSize: 11.5, border: `1px solid ${C.line}`, borderRadius: 12, padding: "2px 10px", color: C.sub }}>{x.gics}</span>
-              </div>
+            <AtlasFold key={x.id} open={fo("ind" + x.id)} onToggle={() => ft("ind" + x.id)} head={<span style={{ display: "grid", gap: 2 }}><span style={{ fontSize: 11, fontWeight: 800, color: C.sub }}>{x.id} · {x.gics}</span><b style={{ fontFamily: serif, fontSize: 17 }}>{x.n}</b><span style={{ fontSize: 12, color: C.sub }}>{x.sub}</span></span>} gap={12}>
               <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.75 }}>{x.econ}</p>
               <div style={atlasGrid(220)}>
                 {[["L", x.L, tt("支配的な法則", "Dominant laws")], ["S", x.S, tt("勝ち筋の戦略", "Winning strategies")], ["F", x.F, tt("使うフレームワーク", "Frameworks to use")]].map(([l, ids, h]) => (
@@ -175730,7 +175756,7 @@ function AtlasTab({ lang, tt }) {
               </div>
               <div><p style={atlasLabel}>{tt("コンサルの典型論点", "Typical consulting agenda")}</p><List items={x.agenda} /></div>
               <p style={{ margin: 0, fontSize: 12.5, color: C.sub, lineHeight: 1.7 }}><b style={{ color: C.crimson, marginRight: 8 }}>{tt("規制・ガバナンス", "Regulation & governance")}</b>{x.risk}</p>
-            </Card>
+            </AtlasFold>
           ))}
         </div>
       );
@@ -175738,15 +175764,14 @@ function AtlasTab({ lang, tt }) {
       inner = (
         <div style={atlasGrid(300)}>
           {A.lenses.map((x) => (
-            <Card key={x.id} style={{ display: "grid", gap: 10, alignContent: "start" }}>
-              <div style={{ display: "flex", justifyContent: "space-between" }}><h3 style={{ fontFamily: serif, fontSize: 17, margin: 0 }}>{x.n}</h3><span style={{ fontSize: 11, fontWeight: 800, color: C.sub }}>{x.id}</span></div>
+            <AtlasFold key={x.id} open={fo("lens" + x.id)} onToggle={() => ft("lens" + x.id)} head={<span style={{ display: "flex", justifyContent: "space-between", gap: 8 }}><b style={{ fontFamily: serif, fontSize: 17 }}>{x.n}</b><span style={{ fontSize: 11, fontWeight: 800, color: C.sub }}>{x.id}</span></span>}>
               <p style={{ margin: 0, fontSize: 13, lineHeight: 1.7 }}>{x.role}</p>
               <div><p style={atlasLabel}>{tt("判断基準", "Criteria")}</p><List items={x.crit} /></div>
               <div><p style={atlasLabel}>{tt("中核の項目", "Core entries")}</p><Chips ids={x.core} /></div>
               <div><p style={atlasLabel}>{tt("必ず問うこと", "Always ask")}</p><List items={x.ask} /></div>
               <div><p style={atlasLabel}>{tt("典型的な落とし穴", "Typical traps")}</p><List items={x.trap} /></div>
               <div><p style={atlasLabel}>{tt("検証を依頼する相手", "Cross-checks")}</p><List items={x.check} /></div>
-            </Card>
+            </AtlasFold>
           ))}
         </div>
       );
@@ -175763,10 +175788,9 @@ function AtlasTab({ lang, tt }) {
           </Card>
           <div style={atlasGrid(300)}>
             {Object.entries(A.disc).map(([d, v]) => (
-              <Card key={d} style={{ display: "grid", gap: 10, alignContent: "start" }}>
-                <div style={{ display: "flex", justifyContent: "space-between" }}><b style={{ fontFamily: serif, fontSize: 16 }}>{v.n}</b><span style={{ fontSize: 11.5, color: C.sub }}>{v.ids.length}</span></div>
+              <AtlasFold key={d} open={fo("disc" + d)} onToggle={() => ft("disc" + d)} head={<span style={{ display: "flex", justifyContent: "space-between" }}><b style={{ fontFamily: serif, fontSize: 16 }}>{v.n}</b><span style={{ fontSize: 11.5, color: C.sub }}>{v.ids.length}</span></span>}>
                 {ATLAS_LORDER.map((l) => { const ids = v.ids.filter((i) => i[0] === l); return ids.length ? <div key={l}><p style={{ ...atlasLabel, color: ATLAS_LAYER[l].color }}>{A.layers[l].name}</p><Chips ids={ids} /></div> : null; })}
-              </Card>
+              </AtlasFold>
             ))}
           </div>
         </div>
@@ -175776,6 +175800,7 @@ function AtlasTab({ lang, tt }) {
       <div>
         <AtlasH>{tt("ジャンル別", "By genre")}</AtlasH>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>{tabs.map(([k, l]) => <AtlasPill key={k} active={genre === k} onClick={() => setGenre(k)}>{l}</AtlasPill>)}</div>
+        {foldAll(genre === "ind" ? A.industries.map((x) => "ind" + x.id) : genre === "lens" ? A.lenses.map((x) => "lens" + x.id) : Object.keys(A.disc).map((d) => "disc" + d))}
         {inner}
       </div>
     );
@@ -175783,17 +175808,17 @@ function AtlasTab({ lang, tt }) {
     body = (
       <div style={{ display: "grid", gap: 26 }}>
         <div>
+          {foldAll([...Object.keys(A.meta).map((m) => "meta" + m), ...A.chains.map((_, i) => "chain" + i), ...A.tensions.map((_, i) => "ten" + i), ...A.misuse.map((_, i) => "mis" + i), ...A.aiLens.map((_, i) => "ail" + i)])}
           <AtlasH sub={tt("全項目に背後で働く原理のタグ（重複あり）を付けて束ねた。", "Every entry is tagged with the principles at work behind it (tags may overlap).")}>01 {tt("8つのメタ原理", "Eight meta-principles")}</AtlasH>
           <div style={atlasGrid(280)}>
             {Object.entries(A.meta).map(([m, v]) => {
               const ids = X.ALL.filter((i) => i.m.includes(m)).map((i) => i.id);
               return (
-                <Card key={m} style={{ display: "grid", gap: 8, alignContent: "start" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}><b style={{ fontFamily: serif, fontSize: 16 }}>{v.name}</b><span style={{ fontSize: 11.5, color: C.sub }}>{m} · {ids.length}</span></div>
+                <AtlasFold key={m} open={fo("meta" + m)} onToggle={() => ft("meta" + m)} head={<span style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}><b style={{ fontFamily: serif, fontSize: 16 }}>{v.name}</b><span style={{ fontSize: 11.5, color: C.sub }}>{m} · {ids.length}</span></span>} gap={8}>
                   <p style={{ margin: 0, fontSize: 13, lineHeight: 1.7 }}>{v.def}</p>
                   <p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, borderLeft: `3px solid ${C.gold}`, paddingLeft: 10 }}>{v.imp}</p>
                   <details><summary style={{ cursor: "pointer", fontSize: 12.5, color: C.sub }}>{tt(`該当する${ids.length}項目`, `${ids.length} entries`)}</summary><div style={{ marginTop: 8 }}><Chips ids={ids} /></div></details>
-                </Card>
+                </AtlasFold>
               );
             })}
           </div>
@@ -175802,14 +175827,13 @@ function AtlasTab({ lang, tt }) {
           <AtlasH sub={tt("勝ち筋の背後には法則があり、それを確かめる道具がある。", "Behind every winning move is a law, and a tool to check it.")}>02 {tt("法則 → 戦略 → フレームワークの連鎖", "Chains: law → strategy → framework")}</AtlasH>
           <div style={{ display: "grid", gap: 10 }}>
             {A.chains.map((c, i) => (
-              <Card key={i} style={{ display: "grid", gap: 10 }}>
-                <b style={{ fontFamily: serif, fontSize: 16 }}>{c.t}</b>
+              <AtlasFold key={i} open={fo("chain" + i)} onToggle={() => ft("chain" + i)} head={<b style={{ fontFamily: serif, fontSize: 16 }}>{c.t}</b>}>
                 <div style={atlasGrid(220)}>
                   {[["L", c.L, tt("法則：なぜ効くか", "Law: why it works"), c.mech[0]], ["S", c.S, tt("戦略：どう勝つか", "Strategy: how to win"), c.mech[1]], ["F", c.F, tt("FW：何で確かめるか", "Framework: how to check"), c.mech[2]]].map(([l, ids, h, m]) => (
                     <div key={l} style={{ display: "grid", gap: 6, alignContent: "start" }}><p style={{ ...atlasLabel, color: ATLAS_LAYER[l].color, margin: 0 }}>{h}</p><span style={{ fontSize: 12.5, color: C.sub, lineHeight: 1.6 }}>{m}</span><Chips ids={ids} /></div>
                   ))}
                 </div>
-              </Card>
+              </AtlasFold>
             ))}
           </div>
         </div>
@@ -175817,8 +175841,7 @@ function AtlasTab({ lang, tt }) {
           <AtlasH sub={tt(`${X.vals.nT}つのうち${X.vals.nT3}つは「${A.axes.dist}」「${A.axes.unc}」「${A.axes.rev}」の3軸で決まる。`, `${X.vals.nT3} of the ${X.vals.nT} tensions resolve on three axes: ${A.axes.dist}, ${A.axes.unc}, ${A.axes.rev}.`)}>03 {tt("戦略の二律背反", "Strategic tensions")}</AtlasH>
           <div style={atlasGrid(300)}>
             {A.tensions.map((t, i) => (
-              <Card key={i} style={{ display: "grid", gap: 10, alignContent: "start" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}><b style={{ fontFamily: serif, fontSize: 16 }}>{t.t}</b><span style={{ fontSize: 11.5, border: `1px solid ${t.axis === "other" ? C.line : C.ink}`, borderRadius: 12, padding: "1px 9px", color: t.axis === "other" ? C.sub : C.ink }}>{A.axes[t.axis]}</span></div>
+              <AtlasFold key={i} open={fo("ten" + i)} onToggle={() => ft("ten" + i)} head={<span style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}><b style={{ fontFamily: serif, fontSize: 16 }}>{t.t}</b><span style={{ fontSize: 11.5, border: `1px solid ${t.axis === "other" ? C.line : C.ink}`, borderRadius: 12, padding: "1px 9px", color: t.axis === "other" ? C.sub : C.ink }}>{A.axes[t.axis]}</span></span>}>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 8, alignItems: "start" }}>
                   <div><p style={{ ...atlasLabel, color: C.ink }}>{t.a.l}</p><Chips ids={t.a.ids} /></div>
                   <span style={{ color: C.crimson, fontWeight: 800, paddingTop: 18 }}>vs</span>
@@ -175826,7 +175849,7 @@ function AtlasTab({ lang, tt }) {
                 </div>
                 {t.rel.length ? <div><p style={atlasLabel}>{tt("両立・判断に使う", "Use to decide")}</p><Chips ids={t.rel} /></div> : null}
                 <div style={{ background: C.paper, borderRadius: 8, padding: "10px 12px", fontSize: 13, lineHeight: 1.7 }}>{t.rule}</div>
-              </Card>
+              </AtlasFold>
             ))}
           </div>
         </div>
@@ -175834,12 +175857,11 @@ function AtlasTab({ lang, tt }) {
           <AtlasH sub={tt("失敗の多くは道具の欠陥ではなく使い方の誤りから生まれる。", "Most failures come from misuse, not from the tool.")}>04 {tt("誤用のパターン", "Misuse patterns")}</AtlasH>
           <div style={atlasGrid(280)}>
             {A.misuse.map((p, i) => (
-              <Card key={i} style={{ display: "grid", gap: 8, alignContent: "start" }}>
-                <b style={{ fontFamily: serif, fontSize: 16 }}>{p.t}</b>
+              <AtlasFold key={i} open={fo("mis" + i)} onToggle={() => ft("mis" + i)} head={<b style={{ fontFamily: serif, fontSize: 16 }}>{p.t}</b>} gap={8}>
                 <div><p style={{ ...atlasLabel, color: C.crimson }}>{tt("症状", "Symptom")}</p><span style={{ fontSize: 13, lineHeight: 1.7 }}>{p.sym}</span></div>
                 <div><p style={{ ...atlasLabel, color: C.green }}>{tt("処方", "Fix")}</p><span style={{ fontSize: 13, lineHeight: 1.7 }}>{p.fix}</span></div>
                 <Chips ids={p.ids} />
-              </Card>
+              </AtlasFold>
             ))}
           </div>
         </div>
@@ -175847,11 +175869,10 @@ function AtlasTab({ lang, tt }) {
           <AtlasH sub={tt("生成AIの普及で重みが増す法則と、経営判断への含意。", "Laws that gain weight as generative AI spreads, and what they mean for decisions.")}>05 {tt("生成AI時代のレンズ", "The generative-AI lens")}</AtlasH>
           <div style={atlasGrid(280)}>
             {A.aiLens.map((a, i) => (
-              <Card key={i} style={{ display: "grid", gap: 8, alignContent: "start" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}><b style={{ fontSize: 14 }}>{a.t}</b><span style={{ fontSize: 11.5, color: C.sub }}>{String(i + 1).padStart(2, "0")}</span></div>
+              <AtlasFold key={i} open={fo("ail" + i)} onToggle={() => ft("ail" + i)} head={<span style={{ display: "flex", justifyContent: "space-between", gap: 8 }}><b style={{ fontSize: 14 }}>{a.t}</b><span style={{ fontSize: 11.5, color: C.sub }}>{String(i + 1).padStart(2, "0")}</span></span>} gap={8}>
                 <span style={{ fontSize: 13, color: C.sub, lineHeight: 1.7 }}>{a.b}</span>
                 <Chips ids={a.ids} />
-              </Card>
+              </AtlasFold>
             ))}
           </div>
         </div>
@@ -175871,15 +175892,14 @@ function AtlasTab({ lang, tt }) {
           </Card>
         </div>
         <div>
+          {foldAll([...C2.lenses.map((x) => "cl" + x.k), ...C2.conflicts.map((_, i) => "cf" + i), "cn0", "cn1", "cn2"])}
           <AtlasHead color={C.ink} label={tt("レンズ別分析", "Analysis by lens")} count={C2.lenses.length} />
           <div style={atlasGrid(290)}>
             {C2.lenses.map((x) => (
-              <Card key={x.k} style={{ display: "grid", gap: 8, alignContent: "start" }}>
-                <div style={{ display: "flex", justifyContent: "space-between" }}><b style={{ fontFamily: serif, fontSize: 16 }}>{ln(x.k)}</b><span style={{ fontSize: 11, color: C.sub, fontWeight: 800 }}>{x.k}</span></div>
-                <b style={{ fontSize: 13.5, lineHeight: 1.6 }}>{x.c}</b>
+              <AtlasFold key={x.k} open={fo("cl" + x.k)} onToggle={() => ft("cl" + x.k)} head={<span style={{ display: "grid", gap: 4 }}><span style={{ display: "flex", justifyContent: "space-between" }}><b style={{ fontFamily: serif, fontSize: 16 }}>{ln(x.k)}</b><span style={{ fontSize: 11, color: C.sub, fontWeight: 800 }}>{x.k}</span></span><span style={{ fontSize: 13.5, fontWeight: 700, lineHeight: 1.6 }}>{x.c}</span></span>} gap={8}>
                 {[[tt("根拠", "Rationale"), x.why], [tt("最大の懸念", "Biggest concern"), x.worry], [tt("前提の確認事項", "Assumption to confirm"), x.conf]].map(([a, b]) => <div key={a}><p style={atlasLabel}>{a}</p><span style={{ fontSize: 12.5, lineHeight: 1.7 }}>{b}</span></div>)}
                 <Chips ids={x.ids} />
-              </Card>
+              </AtlasFold>
             ))}
           </div>
         </div>
@@ -175887,16 +175907,10 @@ function AtlasTab({ lang, tt }) {
           <AtlasHead color={C.crimson} label={tt("対立点とトレードオフ", "Conflicts and trade-offs")} count={C2.conflicts.length} />
           <div style={atlasGrid(290)}>
             {C2.conflicts.map((x, i) => (
-              <Card key={i} style={{ display: "grid", gap: 8, alignContent: "start" }}>
-                <div style={{ display: "flex", gap: 10, alignItems: "baseline", flexWrap: "wrap" }}>
-                  <span style={{ background: C.ink, color: "#fff", borderRadius: 6, padding: "3px 10px", fontSize: 12.5, fontWeight: 800 }}>{ln(x.a)}</span>
-                  <span style={{ color: C.crimson, fontWeight: 800 }}>vs</span>
-                  <span style={{ background: C.gold, color: "#fff", borderRadius: 6, padding: "3px 10px", fontSize: 12.5, fontWeight: 800 }}>{ln(x.b)}</span>
-                </div>
-                <b style={{ fontSize: 14 }}>{x.t}</b>
+              <AtlasFold key={i} open={fo("cf" + i)} onToggle={() => ft("cf" + i)} head={<span style={{ display: "grid", gap: 6 }}><span style={{ display: "flex", gap: 10, alignItems: "baseline", flexWrap: "wrap" }}><span style={{ background: C.ink, color: "#fff", borderRadius: 6, padding: "3px 10px", fontSize: 12.5, fontWeight: 800 }}>{ln(x.a)}</span><span style={{ color: C.crimson, fontWeight: 800 }}>vs</span><span style={{ background: C.gold, color: "#fff", borderRadius: 6, padding: "3px 10px", fontSize: 12.5, fontWeight: 800 }}>{ln(x.b)}</span></span><span style={{ fontSize: 14, fontWeight: 700 }}>{x.t}</span></span>} gap={8}>
                 <span style={{ fontSize: 12.5, color: C.sub, lineHeight: 1.7 }}>{x.d}</span>
                 <div style={{ background: C.paper, borderRadius: 8, padding: "10px 12px", fontSize: 13, lineHeight: 1.7 }}><b style={{ color: C.green, marginRight: 8 }}>{tt("統合の仕方", "Resolution")}</b>{x.r}</div>
-              </Card>
+              </AtlasFold>
             ))}
           </div>
         </div>
@@ -175905,8 +175919,8 @@ function AtlasTab({ lang, tt }) {
           <ol style={{ margin: "8px 0 0", paddingLeft: "1.3em", display: "grid", gap: 6, fontSize: 13, lineHeight: 1.75 }}>{C2.synthesis.map((x, i) => <li key={i}>{x}</li>)}</ol>
         </Card>
         <div style={atlasGrid(260)}>
-          {[[tt("仮定一覧", "Assumptions"), C2.assumptions], [tt("反証条件", "Falsification conditions"), C2.falsify], [tt("次のアクション", "Next actions"), C2.next]].map(([h, items]) => (
-            <Card key={h} style={{ display: "grid", gap: 8, alignContent: "start" }}><b style={{ fontFamily: serif, fontSize: 15 }}>{h}</b><List items={items} /></Card>
+          {[[tt("仮定一覧", "Assumptions"), C2.assumptions], [tt("反証条件", "Falsification conditions"), C2.falsify], [tt("次のアクション", "Next actions"), C2.next]].map(([h, items], ci) => (
+            <AtlasFold key={h} open={fo("cn" + ci)} onToggle={() => ft("cn" + ci)} head={<b style={{ fontFamily: serif, fontSize: 15 }}>{h}</b>} meta={items.length} gap={8}><List items={items} /></AtlasFold>
           ))}
         </div>
       </div>
@@ -175915,16 +175929,16 @@ function AtlasTab({ lang, tt }) {
     body = (
       <div>
         <AtlasH sub={tt("経営の問いを5W2H＋AIで分け、確認すべき法則・検討する戦略・使うフレームワークを対応させた。", "Management questions split by 5W2H plus AI, each mapped to the laws to check, strategies to consider and frameworks to use.")}>{tt("問い別ガイド", "Question guide")}</AtlasH>
+        {foldAll(A.guide.map((g) => "gd" + g.w))}
         <div style={{ display: "grid", gap: 10 }}>
           {A.guide.map((g) => (
-            <Card key={g.w} style={{ display: "grid", gap: 12 }}>
-              <div><span style={{ fontSize: 11.5, fontWeight: 800, color: C.gold, letterSpacing: 0.5 }}>{g.w}</span><b style={{ display: "block", fontFamily: serif, fontSize: 16 }}>{g.q}</b></div>
+            <AtlasFold key={g.w} open={fo("gd" + g.w)} onToggle={() => ft("gd" + g.w)} head={<span><span style={{ fontSize: 11.5, fontWeight: 800, color: C.gold, letterSpacing: 0.5 }}>{g.w}</span><b style={{ display: "block", fontFamily: serif, fontSize: 16 }}>{g.q}</b></span>} gap={12}>
               <div style={atlasGrid(220)}>
                 {[["L", g.L, tt("確認すべき法則", "Laws to check")], ["S", g.S, tt("検討する戦略", "Strategies to consider")], ["F", g.F, tt("使うフレームワーク", "Frameworks to use")]].map(([l, ids, h]) => (
                   <div key={l}><p style={{ ...atlasLabel, color: ATLAS_LAYER[l].color }}>{h}</p>{ids.length ? <Chips ids={ids} /> : <span style={{ color: C.sub, fontSize: 12.5 }}>{tt("— まず原因を特定する", "— diagnose the cause first")}</span>}</div>
                 ))}
               </div>
-            </Card>
+            </AtlasFold>
           ))}
         </div>
       </div>
