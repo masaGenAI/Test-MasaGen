@@ -14,6 +14,9 @@ import json, os, sys
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
 DATA = os.path.join(ROOT, "data", "govdojo")
 JSX = os.path.join(ROOT, "nova-app", "src", "ProjectNova.jsx")
+# ProjectNova.jsx は nova-app/src/parts をつないだ作業用の写し。読む前と書いたあとにそろえる
+sys.path.insert(0, os.path.join(ROOT, "nova-app", "scripts"))
+from nova_src import sync_nova  # noqa: E402
 J = lambda n: json.load(open(os.path.join(DATA, n), encoding="utf-8"))
 dump = lambda x: json.dumps(x, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
 
@@ -179,6 +182,7 @@ def constants(jsx=""):
 
 
 def main():
+    sync_nova()
     s = open(JSX, encoding="utf-8").read()
     t = s
     C = constants(s)
@@ -200,6 +204,7 @@ def main():
         return 1
     if t != s:
         open(JSX, "w", encoding="utf-8").write(t)
+        sync_nova()  # 書き換えた写しを部品（src/parts）へ書き戻す
         print("書き換えた")
     else:
         print("変更なし")

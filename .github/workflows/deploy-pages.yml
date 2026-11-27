@@ -3,6 +3,7 @@ name: Deploy nova-app to GitHub Pages
 # nova-app（Vite + vite-plugin-singlefile）をビルドし、生成物 dist/ を
 # GitHub Pages に公開する。これにより PC・他端末の各ブラウザから
 # 同一の固定 URL でアプリにアクセスできる。
+# 公開するのは「公開版」（npm run build:public）。Book-Summary の中身は入れない（理由と切り替え方は docs/publication-scope.md）。
 # 注意: 学習進捗はブラウザの localStorage に保存されるため端末間では同期しない
 # （アプリ内の「バックアップ（書き出し/読み込み）」で手動移行は可能）。
 
@@ -45,8 +46,23 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build (single-file)
-        run: npm run build
+      - name: Build (public edition, without Book-Summary content)
+        run: npm run build:public
+
+      # 全ハブを実際に開いて、実行時エラーが無いかを見る。まず様子を見る段階なので、失敗しても公開は続ける
+      # （結果はこのステップのログと、実行結果の一覧の警告に出る）。
+      - name: Smoke test (open every hub; does not block the deploy)
+        continue-on-error: true
+        timeout-minutes: 10
+        run: |
+          CHROME="$(command -v google-chrome || command -v chromium-browser || command -v chromium || true)"
+          if [ -z "$CHROME" ]; then echo "::warning::Chrome が見つからないので、画面の確認を飛ばしました"; exit 0; fi
+          npm install --no-save --no-audit --no-fund playwright-core
+          cd ..
+          if ! CHROMIUM_PATH="$CHROME" node .claude/skills/nova-consistency-audit/scripts/smoke.mjs; then
+            echo "::warning::画面の確認で実行時エラーが見つかりました（このステップのログを見てください）"
+            exit 1
+          fi
 
       - name: Configure Pages (auto-enable if needed)
         uses: actions/configure-pages@v5

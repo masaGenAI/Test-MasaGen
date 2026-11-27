@@ -177,3 +177,13 @@ python3 -I $K/report.py $W            # $W/report.md と、data/techhub-freshnes
 - タブや定数を足したら `references/areas.json` に足す（`consts_index.py --unassigned` が教える）。
 - 点検で「この事実はよく動く」と分かったら見張り番に足す。動かなくなった項目は外す。
 - 周期（`monthly` 27日／`quarterly` 85日。月1回の定期実行で必ず期限が来る長さ）が合わない範囲は `areas.json` の `cadence` を直す。
+
+## 原稿の置き場（2026-11 から）
+
+`nova-app/src/ProjectNova.jsx` は、git に入っている部品（`nova-app/src/parts/` 以下の約80ファイル）をつないだ**作業用の写し**で、git には入らない。
+このスキルの道具は、最初に写しと部品を自動でそろえてから、これまでどおり写しを読む（行番号も写しのもの）。
+
+- 写しが無い・古いとき：`cd nova-app && npm run nova:sync`
+- 写しを直したら、**コミットの前に必ず** `npm run nova:sync`（部品へ書き戻す。`npm run build`・`npm run validate` の前にも自動で走る）
+- 写しの N 行目がどの部品か：`node nova-app/scripts/nova-src.mjs locate N`
+- 各部品の1行目 `// @@nova-part …` は消さない・書き換えない

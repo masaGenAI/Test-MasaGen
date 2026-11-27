@@ -5,7 +5,7 @@ description: Project Nova（nova-app の ProjectNova.jsx と public/*.html）全
 
 # Project Nova 整合性点検
 
-Project Nova は 60MB を超える単一ファイル（`nova-app/src/ProjectNova.jsx`）に10のハブを抱えている。
+Project Nova は 100MB 近い1本の原稿（`nova-app/src/ProjectNova.jsx`。git には `nova-app/src/parts/` 以下に分けて入っている）に12のハブを抱えている。
 同じ事実（問題数、出典の種類、企業数、人物の肩書など）が、ポータルのタグ・Mastery Track・タブの説明文・
 コメント・画面に出ない計画データに**別々に書き写されている**ため、どこか1か所を更新すると他が古いまま残る。
 実際にこの点検で見つかったもの：
@@ -150,3 +150,13 @@ Project Nova全体を点検し、〇〇と食い違っていた箇所を直し�
 
 スキャンの規則（`stale_scan.py` の `RULES`）は、新しい種類の記載が食い違ったのを見つけたら追加していく。
 規則を足したら、その記載が古かった頃の版に対して実行し、実際に MISMATCH になることを確かめる。
+
+## 原稿の置き場（2026-11 から）
+
+`nova-app/src/ProjectNova.jsx` は、git に入っている部品（`nova-app/src/parts/` 以下の約80ファイル）をつないだ**作業用の写し**で、git には入らない。
+このスキルの道具は、最初に写しと部品を自動でそろえてから、これまでどおり写しを読む（行番号も写しのもの）。
+
+- 写しが無い・古いとき：`cd nova-app && npm run nova:sync`
+- 写しを直したら、**コミットの前に必ず** `npm run nova:sync`（部品へ書き戻す。`npm run build`・`npm run validate` の前にも自動で走る）
+- 写しの N 行目がどの部品か：`node nova-app/scripts/nova-src.mjs locate N`
+- 各部品の1行目 `// @@nova-part …` は消さない・書き換えない

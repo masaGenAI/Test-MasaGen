@@ -22,13 +22,40 @@ npm run preview      # ビルド結果をローカル確認
 ```
 
 > ビルド時にメモリ不足になる場合は `NODE_OPTIONS=--max-old-space-size=4096 npm run build` を使ってください
-> （`ProjectNova.jsx` は 15 万行超の巨大ファイルのため）。
+> （`ProjectNova.jsx` は 24 万行超の巨大ファイルのため）。
 
 ## 構成
-- `src/ProjectNova.jsx` — アップロードされたコンポーネント本体（無改変）
+- `src/parts/` — アプリ本体の原稿（git に入るのはこちら）。1本の `ProjectNova.jsx` を、ハブ・資格・大きいデータごとに文の境界で分けたもの
+- `src/ProjectNova.jsx` — `src/parts/` をパスの辞書順につないだ**作業用の写し**（git には入らない）。ビルド・検査・スキルの道具はこの1本を読む
+- `scripts/nova-src.mjs` — 写しと部品をそろえる道具（下の「原稿の分け方」）
 - `src/main.jsx` — エントリポイント。`ProjectNova` を描画する
 - `index.html` — マウント先の `#root` を持つ HTML
 - `vite.config.js` — Vite 設定
+
+## 公開版とローカル版
+- `npm run build` … 全部入り（ローカル版）。自分の PC で開く用。
+- `npm run build:public` … 公開版。GitHub Pages に出すのはこちらで、Book-Summary の中身
+  （`booksummaryhub.html`・`booksummary-*.js`・`kindle-figs/`・横断検索の書名索引）を入れない。
+  Book-Summary を開くと「公開版には入れていません」と出る。
+- 理由・戻し方・リポジトリの公開設定など本人にしかできない作業は [`docs/publication-scope.md`](../docs/publication-scope.md)。
+- 全部入りの版は、ログインが要る置き場所（Cloudflare Pages ＋ Access）にも置ける。タブレットや PC のブラウザから自分だけが開ける。
+  準備は [`docs/private-site-setup.md`](../docs/private-site-setup.md)。ワークフローは、ログインが要る状態だと確かめられたときだけ中身を置く。
+- `node scripts/check-dist.mjs` … `dist/` が置き場所の上限（1ファイル 25MiB・20,000 ファイル）に収まっているかを点検する。
+
+## 原稿の分け方（`src/parts/` と `src/ProjectNova.jsx`）
+GitHub は 100MiB を超えるファイルを受け付けません。`ProjectNova.jsx` は 2026年11月に 97MiB まで来たので、
+原稿を `src/parts/` 以下の約80ファイルに分けて保存しています（いちばん大きい部品で約7MiB）。
+
+- `npm run nova:sync` が、部品と写しをそろえます。部品が新しければ写しを作り直し、写しを直したのなら部品へ書き戻します。
+  `npm run dev`・`npm run build`・`npm run validate` の前と、スキルの道具の最初にも自動で走ります。
+- **直すのはどちらでも構いません**（写しを直す＝これまでどおり／部品を直す＝小さいファイルで済む）。
+  ただし**コミットの前に必ず `npm run nova:sync`**。写しは git に入らないので、写しだけ直してコミットすると変更が残りません。
+- 写しと部品の両方を別々に直してしまうと sync が止まります。どちらを採るかを `--prefer parts` か `--prefer view` で指定します。
+- 各部品の1行目 `// @@nova-part <パス>` は消さない・書き換えない（写しの中でも同じ）。
+  写しの中の文と文の間にこの行を1行足して sync すると、そこから新しい部品に分かれます（名前は辞書順で前後の間になるように）。
+- 部品が 20MiB を超えると `npm run nova:check` が警告し、45MiB を超えるとビルドが止まります。
+- 写しの行番号がどの部品の何行目かは `node scripts/nova-src.mjs locate <行番号>`、
+  ある文字列がどの部品にあるかは `node scripts/nova-src.mjs where "const MCQS ="` で分かります。
 
 ## 重要: `window.storage` について
 `ProjectNova.jsx` は進捗・SRS・翻訳キャッシュの永続化に、Claude.ai 実行環境が提供する
@@ -48,9 +75,9 @@ npm run build
 |---|---|---|
 | `index.html` | ポータル・Language・Training・Learning Tracker・Anything Memo | 最初に開いたとき |
 | `nova-hub-finance-<hash>.js` | Finance Hub（約8MB） | Finance Hub を開いたとき |
-| `nova-hub-megatech-<hash>.js` | TechHub（約25MB） | TechHub を開いたとき |
+| `nova-hub-megatech-<hash>.p1.js`, `.p2.js` | TechHub（約28MiB。20MiB を超えるので小分け） | TechHub を開いたとき |
 | `nova-hub-consulting-<hash>.js` | Consulting Hub（約4MB） | Consulting Hub を開いたとき |
-| `nova-hub-certification-<hash>.js` | Certification Hub（約38MB） | Certification Hub を開いたとき（弱点レーダーで CLF の記録を数えるときも） |
+| `nova-hub-certification-<hash>.p1.js` 〜 `.p3.js` | Certification Hub（約42MiB。20MiB を超えるので小分け） | Certification Hub を開いたとき（弱点レーダーで CLF の記録を数えるときも） |
 | `nova-hub-linguisticshub-<hash>.js` | Linguistics Hub（約4MB） | Linguistics Hub を開いたとき（弱点レーダーで Linguistics の記録を数えるときも） |
 | `nova-hub-sidework-<hash>.js` | Side Work Hub（約5MB） | Side Work Hub を開いたとき |
 | `booksummaryhub.html` | Book-Summary の最初の画面（出典の一覧・件数・進捗・検索の書名一致。約2MB、gzip で約0.4MB） | Book-Summary を開いたとき |
@@ -63,7 +90,7 @@ npm run build
 同じフォルダに `nova-hub-*.js` があれば開けます（Book-Summary とリベラルアーツはポータルの中からは file:// で開けず、案内が出ます。
 `booksummaryhub.html` を直接ダブルクリックすれば、同じフォルダの `booksummary-*.js` を読み込んで開けます）。
 
-これらのハブの原稿は `src/ProjectNova.jsx` の中のまま（検査スクリプトやスキルが直接読むため）で、
+これらのハブは、1本につないだ `src/ProjectNova.jsx` の中のまま読み（検査スクリプトやスキルが直接読むため）、
 ビルドのときにだけ `scripts/lazy-hubs.mjs`（Vite プラグイン）が切り出します。ポータルが最初の描画で使う値
 （TechHub のタブ数・Linguistics の分野数・Mastery Track の問題数・横断検索の項目・弱点レーダーが読む Finance の保存キー）は
 ビルド時に計算して本体に埋め込みます。切り出すハブの一覧と、ハブの外からその中身を読む箇所を増やすときの決まりは、

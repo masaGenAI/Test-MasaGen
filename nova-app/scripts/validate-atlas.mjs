@@ -7,7 +7,10 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import { syncNova } from './nova-src.mjs';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+syncNova({ quiet: true }); // 原稿の部品（src/parts）と写し（src/ProjectNova.jsx）をそろえてから読む
 const text = fs.readFileSync(path.resolve(__dirname, '..', 'src', 'ProjectNova.jsx'), 'utf8');
 
 // `const NAME = { ... }` を波括弧対応で切り出して JSON として読む

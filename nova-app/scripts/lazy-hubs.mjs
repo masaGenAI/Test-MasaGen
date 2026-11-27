@@ -2,12 +2,14 @@
 // Linguistics Hub・Side Work Hub）を切り出して別ファイルにする Vite プラグイン。
 //
 // なぜ：index.html（vite-plugin-singlefile で全部入り）は 88MB あり、ポータルを開くだけでこれらのハブも毎回ダウンロード・解析していた。
-// ProjectNova.jsx は多くの検査スクリプトやスキルが直接読む「唯一の原稿」なので、ファイルは分けず、ビルドのときにだけ切り出す。
+// ProjectNova.jsx は多くの検査スクリプトやスキルが直接読む1本の原稿なので、読む側の形は変えず、ビルドのときにだけ切り出す。
+// （git に入れる原稿は src/parts/ 以下に分けてあり、ProjectNova.jsx はそれをつないだ作業用の写し。scripts/nova-src.mjs）
 //
 // 何をするか（ProjectNova.jsx を読み込むとき）：
 //   1. Rollup のパーサー（vite が再公開している parseAstAsync）で構文木を作り、`const <decl> = (function () { ... })();` の宣言を探す。
 //   2. その中身が参照するトップレベルの名前（React のフック・StarButton などの共通部品・JSON の import など）を構文木から集める。
 //   3. 中身を「共通部品を引数で受け取る関数」に包み、esbuild で JSX 変換・圧縮して、別ファイル nova-hub-<key>-<hash>.js にする。
+//      20MiB を超えるハブは、さらに nova-hub-<key>-<hash>.p1.js, .p2.js … に小分けする（splitIntoPieces）。
 //      ファイルは通常の <script>（module ではない）で読み込み、window.__NOVA_HUB_CHUNKS__[key] に関数を登録する。
 //      → 共通部品・React は本体と同じものを使い、ハブの中身は読み込んだときに1回だけ評価される。
 //   4. 本体では、その宣言を novaLazyHub({...})（ProjectNova.jsx で定義）に置き換える。これは読み込み中の表示・失敗時の案内を出し、
@@ -144,9 +146,42 @@ function startProbe({ root, entry, code, hubs, define }) {
  *            values=ビルド時に計算して埋め込む静的プロパティ、byLang=(en: boolean) => 値 の関数で、日英両方の結果を埋め込むもの
  *   loader : 置き換えに使う、entry のトップレベル関数の名前（既定 novaLazyHub）
  */
+// 大きすぎるハブのファイルを、上限に収まる複数のファイルに分ける。
+// JavaScript は文の途中でファイルを分けられないので、中身（コード）を文字列として小分けにし、各ファイルは
+//   window.__NOVA_HUB_PIECES__["<id>"][n] = "…コードの一部…";
+// とだけ書く。読み込む側（novaLoadHubScript）が全部そろったら順につないで1本のスクリプトとして実行する。
+// 上限に収まるなら null を返す（これまでどおり1ファイルで出す）。
+export function splitIntoPieces(code, id, file, maxBytes) {
+  if (Buffer.byteLength(code) <= maxBytes) return null;
+  const head = (n) => `(window.__NOVA_HUB_PIECES__=window.__NOVA_HUB_PIECES__||{})[${JSON.stringify(id)}]=window.__NOVA_HUB_PIECES__[${JSON.stringify(id)}]||[];window.__NOVA_HUB_PIECES__[${JSON.stringify(id)}][${n}]=`;
+  // JSON.stringify は JS の文字列リテラルとしてそのまま使える（行区切り文字 U+2028/2029 だけ念のため \u にする）
+  const lit = (s) => JSON.stringify(s).replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
+  const ratio = Buffer.byteLength(lit(code)) / code.length; // 1文字あたりのバイト数（エスケープ込み）
+  const files = [];
+  let at = 0;
+  while (at < code.length) {
+    let len = Math.min(code.length - at, Math.floor((maxBytes - 400) / ratio));
+    let src = "";
+    for (;;) {
+      let end = at + len;
+      // サロゲートペア（絵文字など）の途中では切らない
+      if (end < code.length && code.charCodeAt(end - 1) >= 0xd800 && code.charCodeAt(end - 1) <= 0xdbff) end -= 1;
+      src = head(files.length) + lit(code.slice(at, end)) + ";\n";
+      if (Buffer.byteLength(src) <= maxBytes) { at = end; break; }
+      len = Math.floor(len * 0.95);
+      if (len < 1024) throw new Error(`${file} を ${maxBytes} バイト以下に分けられません`);
+    }
+    files.push({ file: file.replace(/\.js$/, `.p${files.length + 1}.js`), source: src });
+  }
+  return { id, files };
+}
+
 export function novaLazyHubs(opts) {
   const { entry, hubs } = opts;
   const loader = opts.loader || "novaLazyHub";
+  // 1ファイルの上限。これを超えるハブは、中身を文字列のまま複数のファイル（…p1.js, …p2.js）に分けて出す。
+  // 置き場所によっては1ファイルの大きさに上限がある（Cloudflare Pages は 25MiB）ので、余裕を見て 20MiB で切る。
+  const maxFileBytes = opts.maxFileBytes || 20 * 1024 * 1024;
   let root = process.cwd(), target = "es2020", define = {}, entryPath = null, logger = null;
   const chunks = [];
   return {
@@ -176,7 +211,10 @@ export function novaLazyHubs(opts) {
       }
     },
     generateBundle() {
-      for (const c of chunks) this.emitFile({ type: "asset", fileName: c.file, source: c.code });
+      for (const c of chunks) {
+        if (c.pieces) for (const p of c.pieces.files) this.emitFile({ type: "asset", fileName: p.file, source: p.source });
+        else this.emitFile({ type: "asset", fileName: c.file, source: c.code });
+      }
     },
   };
 
@@ -235,7 +273,8 @@ export function novaLazyHubs(opts) {
         define: { ...define, "process.env.NODE_ENV": '"production"' },
       });
       const hash = crypto.createHash("sha256").update(out.code).digest("hex").slice(0, 10);
-      chunks.push({ decl: h.decl, file: `nova-hub-${h.key}-${hash}.js`, code: out.code, deps: deps.length });
+      const file = `nova-hub-${h.key}-${hash}.js`;
+      chunks.push({ decl: h.decl, file, code: out.code, deps: deps.length, pieces: splitIntoPieces(out.code, `${h.key}-${hash}`, file, maxFileBytes) });
     }));
 
     chunks.sort((a, b) => hubs.findIndex((h) => h.decl === a.decl) - hubs.findIndex((h) => h.decl === b.decl));
@@ -251,14 +290,15 @@ export function novaLazyHubs(opts) {
       const deps = depsOf.get(h.decl).filter(isIdentifier);
       const chunk = chunks.find((c) => c.decl === h.decl);
       const repl =
-        `const ${h.decl} = ${loader}({ key: ${JSON.stringify(h.key)}, name: ${JSON.stringify(h.name)}, file: ${JSON.stringify(chunk.file)}, ` +
+        `const ${h.decl} = ${loader}({ key: ${JSON.stringify(h.key)}, name: ${JSON.stringify(h.name)}, file: ${JSON.stringify(chunk.pieces ? chunk.pieces.files[0].file : chunk.file)}, ` +
+        (chunk.pieces ? `pieces: ${JSON.stringify({ id: chunk.pieces.id, files: chunk.pieces.files.map((p) => p.file) })}, ` : "") +
         `deps: () => ({ __nvH: __novaLazyH, __nvF: __novaLazyF, ${deps.join(", ")} }), ` +
         `statics: ${JSON.stringify(statics)}, byLang: ${JSON.stringify(byLang)} });`;
       main = main.slice(0, node.start) + repl + main.slice(node.end);
     }
     main = `import { createElement as __novaLazyH, Fragment as __novaLazyF } from "react";\n` + main;
     const kb = (n) => (n / 1024 / 1024).toFixed(1) + " MB";
-    logger?.info(`[nova-lazy-hubs] split ${chunks.map((c) => `${c.decl} → ${c.file} (${kb(Buffer.byteLength(c.code))}, ${c.deps} deps)`).join(", ")} in ${((Date.now() - t0) / 1000).toFixed(1)}s`);
+    logger?.info(`[nova-lazy-hubs] split ${chunks.map((c) => `${c.decl} → ${c.file} (${kb(Buffer.byteLength(c.code))}${c.pieces ? `, ${c.pieces.files.length} pieces` : ""}, ${c.deps} deps)`).join(", ")} in ${((Date.now() - t0) / 1000).toFixed(1)}s`);
     return { code: main, map: null };
   }
 }

@@ -12,6 +12,10 @@ usage: python3 .claude/skills/quiz-authoring/sales-drill-check.py
 """
 import json, re, sys, os
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+# 原稿の部品（nova-app/src/parts）と作業用の写し（ProjectNova.jsx）をそろえる
+sys.path.insert(0, os.path.join(ROOT, "nova-app", "scripts"))
+from nova_src import sync_nova  # noqa: E402
+sync_nova()
 src = None
 with open(os.path.join(ROOT, "nova-app/src/ProjectNova.jsx"), encoding="utf-8") as f:
     for line in f:

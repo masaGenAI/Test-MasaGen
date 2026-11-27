@@ -6,7 +6,7 @@ description: Project Nova（このリポジトリ）に入れた更新を期間�
 # 更新一覧（何が・どこに・反映済みか）
 
 コミット履歴から「画面のどこが変わったか」を人に伝わる形でまとめる。
-`nova-app/src/ProjectNova.jsx` は全ハブが入った 1 ファイル（約 23 万行・100MB）なので、ファイル名だけでは場所が分からない。
+`nova-app/src/ProjectNova.jsx`（全ハブが入った 1 本の原稿。約 24 万行・100MB。2026-11 からは `nova-app/src/parts/` 以下に分けて git に入っている）は、ファイル名だけでは場所が分からない。
 差分の行番号とファイル内の目印からハブ・タブ・資格を割り出すスクリプトを使う。
 
 ## 1. 期間を決めて道具を回す
@@ -95,3 +95,13 @@ python3 .claude/skills/update-digest/scripts/changes.py --since 2026-10-29 --unt
    - `file_path` は作った HTML、`icon` は `"list"`（初回だけ）、`description` は期間と中身を言う一文。ページの名前は JSON の `title`（例「Project Nova 週間更新」「Project Nova 更新一覧」）。
    - 同じ一覧を直すときは同じファイルパスで公開し直す（URL が変わらない）。期間の違う一覧は別のファイル・別の名前にして、別のアーティファクトにする。
 5. **報告する**：URL、載せた中身（期間・コミット数・公開状況）、非公開であること（ほかの人に見せるにはページの共有メニューから共有が要る）、元の HTML の場所。
+
+## 原稿の置き場（2026-11 から）
+
+`nova-app/src/ProjectNova.jsx` は、git に入っている部品（`nova-app/src/parts/` 以下の約80ファイル）をつないだ**作業用の写し**で、git には入らない。
+このスキルの道具は、最初に写しと部品を自動でそろえてから、これまでどおり写しを読む（行番号も写しのもの）。
+
+- 写しが無い・古いとき：`cd nova-app && npm run nova:sync`
+- 写しを直したら、**コミットの前に必ず** `npm run nova:sync`（部品へ書き戻す。`npm run build`・`npm run validate` の前にも自動で走る）
+- 写しの N 行目がどの部品か：`node nova-app/scripts/nova-src.mjs locate N`
+- 各部品の1行目 `// @@nova-part …` は消さない・書き換えない

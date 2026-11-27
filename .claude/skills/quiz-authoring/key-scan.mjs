@@ -1,17 +1,23 @@
 // 全バンクの {q, opts, a, e, oe} を取り出し、正解の添字と解説の食い違いを機械的に洗い出す
 // 使い方: node .claude/skills/quiz-authoring/key-scan.mjs nova-app/src/ProjectNova.jsx /tmp/.../flags.json
+//   （リポジトリのルートで。ProjectNova.jsx は nova-app/src/parts をつないだ作業用の写し。今の原稿を見るときは先にそろえる）
 //   強い信号（解説の「正解はX」や選択肢ごとの解説 oe と a が矛盾）は、ほぼ確実に誤り。
 //   弱い信号（解説の冒頭の文が別の選択肢の語句ばかり含む）は候補。1問ずつ読んで確かめる（2026-11 の実績：
 //   弱い信号291件から誤り12件、信号なしの無作為185問からは0件）。同じ OUT の隣に all_rows.json も書く。
 import fs from 'fs';
 const SRC = process.argv[2], OUT = process.argv[3];
+if (/(^|[\\/])nova-app[\\/]src[\\/]ProjectNova\.jsx$/.test(SRC || '')) {
+  const path = await import('path');
+  (await import(path.resolve(path.dirname(SRC), '..', 'scripts', 'nova-src.mjs'))).syncNova({ quiet: true });
+}
 const text = fs.readFileSync(SRC, 'utf8');
 const lineOf = (() => { const nl = []; for (let i = 0; i < text.length; i++) if (text.charCodeAt(i) === 10) nl.push(i); return (pos) => { let lo = 0, hi = nl.length; while (lo < hi) { const m = (lo + hi) >> 1; if (nl[m] < pos) lo = m + 1; else hi = m; } return lo + 1; }; })();
 const mods = [...text.matchAll(/^const ([A-Za-z]+Module) = \(/gm)].map((m) => [m.index, m[1]]);
 const modOf = (pos) => { let n = 'TOP'; for (const [a, name] of mods) if (a <= pos) n = name; return n; };
 const matchClose = (start) => { const open = text[start], close = open === '[' ? ']' : '}'; let d = 0, s = false, q = null, esc = false; for (let i = start; i < text.length; i++) { const c = text[i]; if (s) { if (esc) { esc = false; continue; } if (c === '\\') { esc = true; continue; } if (c === q) s = false; continue; } if (c === '"' || c === "'" || c === '`') { s = true; q = c; continue; } if (c === open) d++; else if (c === close) { d--; if (d === 0) return i; } } return -1; };
 const OPT_KEYS = ['opts', 'choices', 'o', 'options', 'oJa'], ANS_KEYS = ['a', 'ans', 'answer', 'correct'], EXP_KEYS = ['e', 'exp', 'explanation', 'eJa', 'ex', 'why'];
-const str = (o) => (typeof o === 'string' ? o : (o && (o.ja || o.text || o.t || o.label)) || '');
+// 文字列・{ ja, … }・[日本語, 英語] のどれでも、日本語の文字列にする
+const str = (o) => (typeof o === 'string' ? o : Array.isArray(o) ? str(o[0]) : (o && (o.ja || o.text || o.t || o.label)) || '');
 const banks = []; const seenStart = new Set();
 function take(name, start, v) {
   if (!Array.isArray(v) || v.length < 5) return;
@@ -22,10 +28,11 @@ function take(name, start, v) {
     const opts = ok === 'ch' ? r.ch.ja : ok ? r[ok] : null;
     const ak = ANS_KEYS.find((k) => typeof r[k] === 'number');
     if (!opts || ak === undefined) return;
-    const ek = EXP_KEYS.find((k) => r[k] != null);
+    // Consulting の Q は { j: 問題文, e: 英語の問題文, o: [[日, 英]…], x: [解説の日, 英] }。e は解説ではないので x を使う
+    const ek = r.j != null ? (r.x != null ? 'x' : undefined) : EXP_KEYS.find((k) => r[k] != null);
     const e = ek ? str(r[ek]) : '';
     const oe = Array.isArray(r.oe) ? r.oe.map(str) : null;
-    rows.push({ i, id: r.id, q: str(r.q || r.qJa || r.question), opts: opts.map(str), a: r[ak], e, oe });
+    rows.push({ i, id: r.id, q: str(r.q || r.qJa || r.question || r.j || r.sc), opts: opts.map(str), a: r[ak], e, oe });
   });
   if (rows.length >= 5) banks.push({ name, mod: modOf(start), line: lineOf(start), rows });
 }

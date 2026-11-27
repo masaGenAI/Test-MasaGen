@@ -128,6 +128,22 @@
     {
       "prefix": "tests/",
       "offapp": "todoapp（学習用の題材。Nova とは別）"
+    },
+    {
+      "prefix": "nova-app/.gitignore",
+      "hub": null
+    },
+    {
+      "prefix": ".gitignore",
+      "hub": null
+    },
+    {
+      "prefix": "pyproject.toml",
+      "hub": null
+    },
+    {
+      "prefix": "data/quiz-key-audit/",
+      "hub": null
     }
   ],
   "names": {

@@ -96,3 +96,13 @@ description: TechHub「セキュリティ・ガバナンス道場」の規制マ
 - 業界1〜2つの調査（Sonnet）：約40万〜55万トークン。別の目の検算（Opus）：1回 約25万〜50万トークン。
 - 問題100問（作成3本＋検算3本）：約160万トークン。
 - 照合・生成・偏りの検査はスクリプトで行い、モデルを使わない。
+
+## 原稿の置き場（2026-11 から）
+
+`nova-app/src/ProjectNova.jsx` は、git に入っている部品（`nova-app/src/parts/` 以下の約80ファイル）をつないだ**作業用の写し**で、git には入らない。
+このスキルの道具は、最初に写しと部品を自動でそろえてから、これまでどおり写しを読む（行番号も写しのもの）。
+
+- 写しが無い・古いとき：`cd nova-app && npm run nova:sync`
+- 写しを直したら、**コミットの前に必ず** `npm run nova:sync`（部品へ書き戻す。`npm run build`・`npm run validate` の前にも自動で走る）
+- 写しの N 行目がどの部品か：`node nova-app/scripts/nova-src.mjs locate N`
+- 各部品の1行目 `// @@nova-part …` は消さない・書き換えない

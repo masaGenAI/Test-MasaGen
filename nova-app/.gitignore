@@ -5,3 +5,7 @@ dist/
 
 # 単一ファイルビルドの生成物（`npm run build` で再生成可能）
 ProjectNova.html
+
+# 原稿の作業用の写し（src/parts をつないだもの。`npm run nova:sync` が作る。git に入れるのは src/parts のほう）
+src/ProjectNova.jsx
+src/.nova-sync.json

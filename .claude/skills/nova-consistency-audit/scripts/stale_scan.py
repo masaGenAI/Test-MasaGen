@@ -34,6 +34,11 @@ def arg(name, default):
 
 
 JSX = Path(arg("--jsx", ROOT / "nova-app/src/ProjectNova.jsx"))
+if "--jsx" not in sys.argv:
+    # 原稿の部品（nova-app/src/parts）と作業用の写し（ProjectNova.jsx）をそろえる（今の原稿を見るときだけ）
+    sys.path.insert(0, str(ROOT / "nova-app/scripts"))
+    from nova_src import sync_nova
+    sync_nova()
 HTML = [ROOT / "nova-app/public/booksummaryhub.html",
         ROOT / "nova-app/public/learning-tracker.html",
         ROOT / "nova-app/public/anything-memo.html"]

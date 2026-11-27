@@ -1,0 +1,92 @@
+name: Deploy the full edition to the login-protected site (Cloudflare Pages)
+
+# 全部入りの版（Book-Summary を含む。npm run build）を、ログインが要る置き場所（Cloudflare Pages ＋ Cloudflare Access）に置く。
+# Android タブレットや PC のブラウザから、本人だけが開けるようにするためのもの（誰でも見られる公開サイトは deploy-pages.yml）。
+#
+# 安全のための決まり：
+#   - リポジトリの secrets（CLOUDFLARE_API_TOKEN・CLOUDFLARE_ACCOUNT_ID）が無ければ、何もしない。
+#   - 置く前に毎回、置き場所が「ログインなしでは開けない」ことを確かめる（nova-app/scripts/private-site.mjs）。
+#     確かめられないときは全部入りの版を置かず、「準備中」のページだけを置く。
+# 準備の手順は docs/private-site-setup.md。
+
+on:
+  push:
+    branches: ["claude/app-usage-question-1rkdar"]
+    paths:
+      - "nova-app/**"
+      - ".github/workflows/deploy-private.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# 同時実行を1本に制限（進行中の配置はキャンセルしない）
+concurrency:
+  group: "private-site"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      # 置き場所のプロジェクト名。変えるときは、リポジトリの Settings › Secrets and variables › Actions › Variables に CLOUDFLARE_PAGES_PROJECT を足す
+      PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT || 'project-nova' }}
+    defaults:
+      run:
+        working-directory: nova-app
+    steps:
+      - name: Check that the Cloudflare secrets are set
+        id: gate
+        working-directory: .
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::notice::CLOUDFLARE_API_TOKEN と CLOUDFLARE_ACCOUNT_ID が未設定なので、何もしません（準備の手順は docs/private-site-setup.md）"
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: steps.gate.outputs.ready == 'true'
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        if: steps.gate.outputs.ready == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: nova-app/package-lock.json
+
+      # プロジェクトが無ければ作り、2つの入口（本番・配置ごと）がログイン画面へ飛ばされることを確かめる
+      - name: Check that the site requires login
+        id: site
+        if: steps.gate.outputs.ready == 'true'
+        run: node scripts/private-site.mjs
+
+      - name: Install dependencies
+        if: steps.site.outputs.protected == 'true'
+        run: npm ci
+
+      - name: Build (full edition, with Book-Summary)
+        if: steps.site.outputs.protected == 'true'
+        run: npm run build
+
+      - name: Check file sizes against the hosting limits
+        if: steps.site.outputs.protected == 'true'
+        run: node scripts/check-dist.mjs
+
+      - name: Deploy the full edition
+        if: steps.site.outputs.protected == 'true'
+        run: npx --yes wrangler@4 pages deploy dist --project-name="$PAGES_PROJECT" --branch=main
+
+      # ログインの設定を確かめられないあいだは、中身を置かない。Access の設定には配置が1つ要るので、「準備中」のページだけを置く
+      - name: Deploy a placeholder page (login not confirmed yet)
+        if: steps.gate.outputs.ready == 'true' && steps.site.outputs.protected != 'true'
+        run: |
+          mkdir -p /tmp/nova-placeholder
+          cp scripts/private-site-placeholder.html /tmp/nova-placeholder/index.html
+          npx --yes wrangler@4 pages deploy /tmp/nova-placeholder --project-name="$PAGES_PROJECT" --branch=main
+          echo "::warning::ログインの設定を確かめられなかったので、全部入りの版は置いていません。docs/private-site-setup.md の「3. ログインを必須にする」を済ませてから、もう一度実行してください"
