@@ -1178,7 +1178,10 @@ function McqView() {
   const [diff, setDiff] = useState(0); // 0=すべて,1,2,3
   const [part, setPart] = useState(0); // パート分割インデックス（0..N-1）／"all"=分割なし
   const [order, setOrder] = useState(null);
-  const [orderMode, setOrderMode] = useState("fixed"); // "fixed" | "random"（既定は固定順）
+  // 出題順（"fixed" | "random"。既定は固定順）。選んだ値は端末に残す。学習ホームの「今日の復習」や用語からのジャンプは
+  // この画面を開き直すので、残しておかないと毎回既定に戻ってしまう。最初の描画から使えるよう、初期値は localStorage から同期的に読む
+  const [orderMode, setOrderModeState] = useState(() => { try { return window.localStorage.getItem("gafa_quiz_order_v1") === "random" ? "random" : "fixed"; } catch (e) { return "fixed"; } });
+  const setOrderMode = (m) => { setOrderModeState(m); try { window.storage.set("gafa_quiz_order_v1", m).catch(() => {}); } catch (e) {} };
   const [pos, setPos] = useState(0);
   const [answers, setAnswers] = useState({}); // pos -> 選んだ表示インデックス
   const [showResult, setShowResult] = useState(false);
@@ -1357,6 +1360,7 @@ function McqView() {
   }, [curQi, lang, showOrig]);
 
   // orderMode: "fixed"なら出現順のまま、"random"なら決定的シャッフル
+  // クイズを始めるすべての経路（テーマ選択・学習ホームの「今日の復習」・用語からのジャンプ・検索）がこれを通る
   const applyOrder = (indices) => (orderMode === "fixed" ? indices.slice() : seededShuffle(indices, Date.now() % 100000));
   // 指定条件で即開始（ボタン押下で発火）
   // 大きなプールを「パート」に分割して1回の出題量を減らす（例：500問→約125問×4）
@@ -1417,7 +1421,7 @@ function McqView() {
       const idx = Object.keys(srs).map(Number).filter((qi) => srs[qi] && srs[qi].due <= now && qi < MCQS.length);
       if (idx.length > 0) {
         setCat(ALL); setDiff(0); setTermFilter(null);
-        setOrder(seededShuffle(idx, Date.now() % 100000));
+        setOrder(applyOrder(idx));
         setPos(0); setAnswers({}); setShowResult(false);
       }
       return;
@@ -1431,7 +1435,7 @@ function McqView() {
       });
       if (idx.length > 0) {
         setCat(ALL); setDiff(0); setTermFilter(jump.quizQuery);
-        setOrder(seededShuffle(idx, Date.now() % 100000));
+        setOrder(applyOrder(idx));
         setPos(0); setAnswers({}); setShowResult(false);
       }
     }
@@ -1449,7 +1453,7 @@ function McqView() {
     });
     if (idx.length > 0) {
       setCat(ALL); setDiff(0); setTermFilter(q);
-      setOrder(seededShuffle(idx, Date.now() % 100000));
+      setOrder(applyOrder(idx));
       setPos(0); setAnswers({}); setShowResult(false);
     } else {
       setTermFilter("__none__:" + q); // ヒット0件を示すフラグ（開始はしない）

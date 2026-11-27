@@ -34,7 +34,7 @@ Book-Summary には、有料・会員制のサービスや市販の本をもと�
 | 選び方 | できること | 必要なもの |
 |---|---|---|
 | A. GitHub Pages を続ける | 公開版（Book-Summary 抜き）を今の URL で使い続ける。Book-Summary は PC のローカル版で読む | 非公開リポジトリで Pages を使うには有料プラン（Pro など）が要る。サイト自体は誰でも見られるままなので、公開版のビルドを使う |
-| B. ログインが要るホスティングへ移す | 全部入りの版を、スマホからも自分だけが開ける | 例：Cloudflare Pages ＋ Cloudflare Access。1ファイル 25MiB までの上限があり、今は Certification Hub の読み込みファイル（約28MiB）が超えるので、先に分割が要る |
+| B. ログインが要るホスティングへ移す | 全部入りの版を、スマホからも自分だけが開ける | 例：Cloudflare Pages ＋ Cloudflare Access。1ファイル 25MiB までの上限があり、今は Certification Hub（約42MiB）と TechHub（約28MiB）の読み込みファイルが超えるので、先に分割が要る |
 | C. 何もしない | 今のまま | 上の「なぜ」の心配が残る |
 
 出典：
