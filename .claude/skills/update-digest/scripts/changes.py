@@ -13,6 +13,9 @@
   - TechHub の中は、差分の見出し（git が付ける直前の関数・定数名）を、今の版のタブ割り当て
     （`tab === "id" && <Comp` から参照をたどったもの）でタブ名に直す。
   - そのほかのファイルは references/places.json の対応表で決める。
+  - 2026-11 の分割以降、原稿は nova-app/src/parts/ 以下の部品に分けて git に入っている（ProjectNova.jsx はそれをつないだ
+    作業用の写しで、git には入らない）。分割後のコミットは、部品ごとの差分を同じ目印の決まりで場所に直す
+    （目印は、部品をパスの辞書順に並べたときの直前のもの）。分割そのもののコミットは中身の変更として数えない。
   - ProjectNova.jsx は 100MB 近くあり 1 コミットの差分に数秒かかるので、結果を .git/update-digest-cache.json に残す。
 """
 from __future__ import annotations
@@ -29,6 +32,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 PLACES = json.load(open(os.path.join(HERE, "..", "references", "places.json"), encoding="utf-8"))
 JSX = "nova-app/src/ProjectNova.jsx"
+PARTS = "nova-app/src/parts/"
 LANDMARK = r"^(const [A-Za-z0-9_]+Module = \(function|const Station_[A-Za-z0-9]+ *=|// Project-Nova : Portal Shell)"
 CACHE_VERSION = 2
 
@@ -63,7 +67,42 @@ def analyse_commit(h: str) -> dict:
         a, d, path = line.split("\t", 2)
         numstat.append([path, None if a == "-" else int(a), None if d == "-" else int(d)])
     jsx = []
-    if parents and any(p == JSX for p, _, _ in numstat):
+    parts = [p for p, _, _ in numstat if p.startswith(PARTS) and p.endswith(".jsx")]
+    # 原稿を部品に分けたコミット（ProjectNova.jsx が消えて部品が現れる）は、中身の変更として数えない
+    split_commit = bool(parts) and any(p == JSX for p, _, _ in numstat)
+    if parents and parts and not split_commit:
+        marks = []
+        for line in git("grep", "-n", "-E", LANDMARK, h, "--", PARTS, check=False).splitlines():
+            # 形式: <commit>:<path>:<line>:<text>
+            _, path, n, text = line.split(":", 3)
+            marks.append((path, int(n), landmark_name(text)))
+        marks.sort()
+        agg = collections.defaultdict(lambda: [0, 0])
+        cur = None
+        for line in git("diff", "-U0", parents[0], h, "--", *parts).splitlines():
+            if line.startswith("--- a/"):
+                cur = line[6:]
+                continue
+            if line.startswith("+++ b/"):
+                cur = line[6:]
+                continue
+            m = re.match(r"^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@ ?(.*)$", line)
+            if not m or cur is None:
+                continue
+            dels = int(m.group(2)) if m.group(2) is not None else 1
+            start = int(m.group(3))
+            adds = int(m.group(4)) if m.group(4) is not None else 1
+            lm = "COMMON"
+            for path, n, name in marks:
+                if (path, n) <= (cur, max(start, 1)):
+                    lm = name
+                else:
+                    break
+            k = (lm, ctx_name(m.group(5) or ""))
+            agg[k][0] += adds
+            agg[k][1] += dels
+        jsx = [[lm, c, a, d] for (lm, c), (a, d) in agg.items()]
+    elif parents and not split_commit and any(p == JSX for p, _, _ in numstat):
         marks = []
         for line in git("grep", "-n", "-E", LANDMARK, h, "--", JSX, check=False).splitlines():
             # 形式: <commit>:<path>:<line>:<text>
@@ -94,6 +133,10 @@ def analyse_commit(h: str) -> dict:
 
 # ---------- 今の版から、名前・タブの対応を作る ----------
 def head_maps() -> dict:
+    # ProjectNova.jsx は nova-app/src/parts をつないだ作業用の写し。読む前にそろえる
+    sys.path.insert(0, os.path.join(ROOT, "nova-app", "scripts"))
+    from nova_src import sync_nova
+    sync_nova()
     src = open(os.path.join(ROOT, JSX), encoding="utf-8", errors="replace").read().split("\n")
     marks = [(i, landmark_name(t)) for i, t in enumerate(src) if re.match(LANDMARK, t)]
     # ハブ名（ポータルの一覧）
@@ -277,7 +320,7 @@ def main() -> None:
                 x["names"].add(ctx)
         unknown = []
         for path, ad, de in c["files"]:
-            if path == JSX:
+            if path == JSX or (path.startswith(PARTS) and path.endswith(".jsx")):
                 continue
             p = place_of_path(path, M)
             if p is None:

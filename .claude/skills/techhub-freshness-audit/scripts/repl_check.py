@@ -31,6 +31,8 @@ _cache: dict[str, str] = {}
 def source(rel: str) -> str:
     """原稿を読む（同じファイルは1回だけ）。"""
     if rel not in _cache:
+        if rel == common.JSX:
+            common.sync_src()
         with open(os.path.join(common.ROOT, rel), encoding="utf-8") as f:
             _cache[rel] = f.read()
     return _cache[rel]

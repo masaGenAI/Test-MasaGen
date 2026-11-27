@@ -2,7 +2,8 @@
 // Linguistics Hub・Side Work Hub）を切り出して別ファイルにする Vite プラグイン。
 //
 // なぜ：index.html（vite-plugin-singlefile で全部入り）は 88MB あり、ポータルを開くだけでこれらのハブも毎回ダウンロード・解析していた。
-// ProjectNova.jsx は多くの検査スクリプトやスキルが直接読む「唯一の原稿」なので、ファイルは分けず、ビルドのときにだけ切り出す。
+// ProjectNova.jsx は多くの検査スクリプトやスキルが直接読む1本の原稿なので、読む側の形は変えず、ビルドのときにだけ切り出す。
+// （git に入れる原稿は src/parts/ 以下に分けてあり、ProjectNova.jsx はそれをつないだ作業用の写し。scripts/nova-src.mjs）
 //
 // 何をするか（ProjectNova.jsx を読み込むとき）：
 //   1. Rollup のパーサー（vite が再公開している parseAstAsync）で構文木を作り、`const <decl> = (function () { ... })();` の宣言を探す。

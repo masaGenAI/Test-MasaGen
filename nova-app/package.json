@@ -4,9 +4,12 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "nova:sync": "node scripts/nova-src.mjs sync",
+    "nova:check": "node scripts/nova-src.mjs sync && node scripts/nova-src.mjs check",
+    "predev": "node scripts/nova-src.mjs sync",
     "dev": "vite",
-    "validate": "node scripts/validate-quiz.mjs && node scripts/validate-atlas.mjs",
-    "prebuild": "node scripts/validate-quiz.mjs && node scripts/validate-govdojo.mjs && node scripts/validate-atlas.mjs",
+    "validate": "node scripts/nova-src.mjs sync && node scripts/validate-quiz.mjs && node scripts/validate-atlas.mjs",
+    "prebuild": "node scripts/nova-src.mjs sync && node scripts/nova-src.mjs check && node scripts/validate-quiz.mjs && node scripts/validate-govdojo.mjs && node scripts/validate-atlas.mjs",
     "build": "vite build",
     "preview": "vite preview"
   },

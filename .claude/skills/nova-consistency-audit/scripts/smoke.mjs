@@ -57,6 +57,9 @@ for (const h of hubs) {
 }
 
 // 3. TechHub の全タブを順に開く。タブ名は ProjectNova.jsx の TABS（{ id, k }）とラベル辞書（tab_xxx: ["日本語", ...]）から読む。
+// 原稿の部品（nova-app/src/parts）と写し（ProjectNova.jsx）をそろえてから読む
+const { syncNova } = await import(path.join(ROOT, 'nova-app/scripts/nova-src.mjs'));
+syncNova({ quiet: true });
 const src = fs.readFileSync(path.join(ROOT, 'nova-app/src/ProjectNova.jsx'), 'utf8');
 const mt = src.slice(src.indexOf('const MegaTechHubModule'), src.indexOf('\n// ================= ', src.indexOf('const MegaTechHubModule')));
 const tabKeys = [...mt.matchAll(/\{ id: "([a-z0-9_]+)", k: "(tab_[a-z0-9_]+)" \}/g)].map((m) => m[2]);

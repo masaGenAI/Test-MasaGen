@@ -12,6 +12,8 @@ import re
 HERE = os.path.dirname(os.path.abspath(__file__))
 SKILL = os.path.dirname(HERE)
 ROOT = os.path.abspath(os.path.join(SKILL, "..", "..", ".."))
+# ProjectNova.jsx は nova-app/src/parts をつないだ作業用の写し（git には入らない）。道具はこの1本を読み書きし、
+# 読む前と書いたあとに sync_src() で部品とそろえる（nova-app/scripts/nova-src.mjs）。
 JSX = "nova-app/src/ProjectNova.jsx"
 START_MARK = "// ================= MegaTechHubModule"
 NEXT_MODULE = re.compile(r"^// ================= \w+Module")
@@ -22,6 +24,16 @@ LEDGER = os.path.join(DATA_DIR, "ledger.json")
 UNVERIFIED = os.path.join(DATA_DIR, "unverified.json")
 AREAS = os.path.join(SKILL, "references", "areas.json")
 DECL = re.compile(r"^(?:const|let|var|function|class)\s+([A-Za-z_$][\w$]*)")
+
+
+def sync_src() -> None:
+    """原稿の部品（nova-app/src/parts）と作業用の写し（ProjectNova.jsx）をそろえる。"""
+    import sys
+    p = os.path.join(ROOT, "nova-app", "scripts")
+    if p not in sys.path:
+        sys.path.insert(0, p)
+    from nova_src import sync_nova
+    sync_nova()
 
 
 def load_json(path: str, default=None):
@@ -50,6 +62,7 @@ def techhub_lines() -> tuple[int, list[str]]:
 
     行番号は固定で持たない（原稿は日々伸びる）。前後のモジュールの目印コメントから毎回求める。
     """
+    sync_src()
     with open(os.path.join(ROOT, JSX), encoding="utf-8") as f:
         lines = f.read().split("\n")
     start = next((i for i, s in enumerate(lines) if s.startswith(START_MARK)), None)

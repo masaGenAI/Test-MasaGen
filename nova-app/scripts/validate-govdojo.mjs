@@ -6,7 +6,10 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import { syncNova } from './nova-src.mjs';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+syncNova({ quiet: true }); // 原稿の部品（src/parts）と写し（src/ProjectNova.jsx）をそろえてから読む
 const SRC = path.resolve(__dirname, '..', 'src', 'ProjectNova.jsx');
 const FACTS = path.resolve(__dirname, '..', '..', 'data', 'govdojo', 'facts.json');
 const text = fs.readFileSync(SRC, 'utf8');

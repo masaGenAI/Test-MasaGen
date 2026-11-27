@@ -78,6 +78,8 @@ rows.forEach((r, i) => {
 
 // 既存バンクとの重複
 if (bankArg && qk) {
+  // 原稿の部品（nova-app/src/parts）と写し（ProjectNova.jsx）をそろえてから読む
+  try { (await import(path.resolve('nova-app/scripts/nova-src.mjs'))).syncNova({ quiet: true }); } catch (e) { console.error('nova-src sync: ' + e.message); process.exit(1); }
   const src = path.resolve('nova-app/src/ProjectNova.jsx');
   if (fs.existsSync(src)) {
     const text = fs.readFileSync(src, 'utf8');

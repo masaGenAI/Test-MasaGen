@@ -30,6 +30,7 @@ def main() -> None:
     dry = "--dry-run" in a
     out = os.path.join(work, "out")
     text: dict[str, str] = {}
+    common.sync_src()  # 原稿の部品と写し（ProjectNova.jsx）をそろえてから読む
 
     def get(rel: str) -> str:
         if rel not in text:
@@ -83,6 +84,7 @@ def main() -> None:
         for f, t in text.items():
             with open(os.path.join(common.ROOT, f), "w", encoding="utf-8") as fh:
                 fh.write(t)
+        common.sync_src()  # 書き換えた写しを部品（nova-app/src/parts）へ書き戻す
         prev = common.load_json(os.path.join(out, "applied.json"), [])
         keep = [x for x in prev if not any(x["area"] == y["area"] and x["index"] == y["index"] and x["file"] == y["file"] and x["old"] == y["old"] for y in log)]
         common.save_json(os.path.join(out, "applied.json"), keep + log)

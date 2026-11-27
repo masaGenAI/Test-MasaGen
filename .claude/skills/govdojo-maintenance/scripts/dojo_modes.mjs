@@ -7,6 +7,9 @@ import fs from 'fs';
 const ROOT = process.cwd();
 const req = createRequire(path.join(ROOT, 'nova-app/package.json'));
 const { chromium } = req('playwright-core');
+// 原稿の部品（nova-app/src/parts）と写し（ProjectNova.jsx）をそろえてから読む
+const { syncNova } = await import(path.join(ROOT, 'nova-app/scripts/nova-src.mjs'));
+syncNova({ quiet: true });
 const src = fs.readFileSync(path.join(ROOT, 'nova-app/src/ProjectNova.jsx'), 'utf8');
 const m = src.match(/const GOV_MODES = (\[[^\]]*\]);/);
 if (!m) { console.error('GOV_MODES が見つからない'); process.exit(2); }

@@ -112,6 +112,10 @@ def module_range(s, name):
 
 
 def main():
+    # 原稿の部品（nova-app/src/parts）と作業用の写し（ProjectNova.jsx）をそろえる
+    sys.path.insert(0, str(ROOT / "nova-app/scripts"))
+    from nova_src import sync_nova
+    sync_nova()
     s = JSX.read_text(encoding="utf-8")
     f = OrderedDict()
 

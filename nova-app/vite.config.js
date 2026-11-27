@@ -2,10 +2,12 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { viteSingleFile } from "vite-plugin-singlefile";
 import fs from "node:fs";
+import { novaSync } from "./scripts/nova-src.mjs";
 import { novaLazyHubs } from "./scripts/lazy-hubs.mjs";
 import { novaBookSummarySplit } from "./scripts/booksummary-split.mjs";
 
-// ProjectNova.jsx は 15 万行超の巨大な単一コンポーネント。
+// ProjectNova.jsx は 24 万行超の巨大な単一コンポーネント。git には src/parts/ 以下に分けて入れてあり、
+// src/ProjectNova.jsx はそれをつないだ作業用の写し（novaSync がビルド・開発サーバーの最初にそろえる。scripts/nova-src.mjs）。
 // esbuild の変換上限に触れないよう、また .jsx を JSX として扱えるよう明示設定する。
 // viteSingleFile: アプリ本体を 1 つの index.html に埋め込む。
 //
@@ -18,7 +20,7 @@ import { novaBookSummarySplit } from "./scripts/booksummary-split.mjs";
 //
 // 大きい React のハブ（下の hubs：TechHub・Certification Hub・Finance Hub・Consulting Hub・Linguistics Hub・Side Work Hub。
 // 合わせて ProjectNova.jsx の 98% ほど）も本体に埋め込まない。
-// 原稿は ProjectNova.jsx のまま（検査スクリプトやスキルが直接読むため）で、ビルドのときにだけ novaLazyHubs が
+// 読むのは1本につないだ ProjectNova.jsx のまま（検査スクリプトやスキルが直接読むため）で、ビルドのときにだけ novaLazyHubs が
 // 各ハブを別ファイル dist/nova-hub-<key>-<hash>.js に切り出し、ハブを開いたときに <script> で読み込む（scripts/lazy-hubs.mjs）。
 // ポータルが最初の描画で使う値（下の values / byLang）は、ビルド時に計算して本体に埋め込む。
 function hubStats() {
@@ -59,6 +61,8 @@ function bookIndex() {
 
 export default defineConfig({
   plugins: [
+    // 原稿の部品（src/parts）と作業用の写し（src/ProjectNova.jsx）をそろえる。ほかのプラグインより先に
+    novaSync(),
     novaLazyHubs({
       entry: "src/ProjectNova.jsx",
       hubs: [

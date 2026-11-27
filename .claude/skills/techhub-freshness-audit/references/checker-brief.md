@@ -22,7 +22,7 @@
   - **既に古いと確かめた語の残り**：ほかの範囲の点検で、事実と出典を確かめ済みの語（改称・提供終了・統計の新版など）が、この範囲にまだ残っている箇所。
     語ごとに「今の事実」と出典が書いてあるので、出典を1回開いて今も同じか確かめたうえで、文脈を読んで決める。現役の事実として書いている箇所（定義・比較表・推奨・クイズの正解や解説）は置換案にする。
     当時の事例・歴史として正しく書かれている箇所、別の統計の同じ数字、ついでに触れているだけの箇所は直さない。語ごとに「何か所を直し、何か所をなぜ残したか」を coverage に書く。
-- 定数の索引：`W/consts.txt`（「行番号: 名前 (文字数) [担当範囲]」）。原稿 `R/nova-app/src/ProjectNova.jsx` は約100MB あるので**丸ごと読まない**。1行が数万〜百万字の定数があるので、
+- 定数の索引：`W/consts.txt`（「行番号: 名前 (文字数) [担当範囲]」）。原稿 `R/nova-app/src/ProjectNova.jsx` は約100MB あるので**丸ごと読まない**。（このファイルは `R/nova-app/src/parts/` をつないだ作業用の写し。無ければ `cd R/nova-app && npm run nova:sync` で作る。**読むだけ**にして、直す案は replacements で返す）1行が数万〜百万字の定数があるので、
   `grep -n -o ".\{80\}探す語.\{120\}" R/nova-app/src/ProjectNova.jsx | head` や `sed -n 'A,Bp' … | cut -c1-600` で切り出して読む。
 - 画面の文（折りたたみを開いた状態）：`node scripts/tabtext.mjs <タブid> --dist W/dist-snap [--click "ボタン名" ...] [--from N] [--len N]`（既定は先頭 12,000 字。`--from` で続き、`--click` で下位画面）。
 - 原稿が別ファイルの範囲がある：AIフォーサイトと ITセキュリティは `R/nova-app/src/data/*.json`、ガバナンス道場は `R/data/govdojo/*.json`（jsx の `GOVREG_*`・`GOVIND`・`GOVLC`・`GOVKIT`・`GOVTPL`・`GOVUC` は生成物なので、置換案は data 側に出す）。
