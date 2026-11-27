@@ -2,6 +2,7 @@
 
 学習ダッシュボード（ハブ）を1つのポータルにまとめた個人用の Web アプリ。
 GitHub Pages に公開している（`.github/workflows/deploy-pages.yml`。公開するのは Book-Summary の中身を除いた「公開版」）。
+全部入りの版は、ログインが要る置き場所にも置く（`.github/workflows/deploy-private.yml`。準備と決まりは `docs/private-site-setup.md`）。
 
 ## 構成
 - `nova-app/` — アプリ本体（Vite + React）。詳しくは `nova-app/README.md`
@@ -28,6 +29,7 @@ GitHub Pages に公開している（`.github/workflows/deploy-pages.yml`。公�
 - `npm run validate` — 問題バンクと体系図の検査
 - `npm run build` — 全部入りの版（ローカル用）。検査してからビルドする
 - `npm run build:public` — 公開版（Book-Summary の中身を入れない。`docs/publication-scope.md`）
+- `node scripts/check-dist.mjs` — `dist/` が置き場所の上限（1ファイル 25MiB・20,000 ファイル）に収まっているかの点検
 - 画面の確認：ビルドのあと、リポジトリのルートで `node .claude/skills/nova-consistency-audit/scripts/smoke.mjs`
 
 ## 確認の基準
@@ -74,6 +76,7 @@ Book-Summary の原稿は `nova-app/public/booksummaryhub.html` の1ファイル
 - 生成物（`nova-app/dist/`、`nova-app/src/ProjectNova.jsx`）をコミットしない。
 - 100MiB を超えるファイルを作らない（GitHub が受け付けない）。原稿の部品は 45MiB でビルドが止まるので、大きくなったら文の間に印の行を足して分ける。
 - Book-Summary の中身を公開版に入れない（`docs/publication-scope.md`）。
+- 全部入りの版を、ログインなしで開ける場所に置かない。`deploy-private.yml` の「ログインが要ることを確かめてから置く」手順を外さない。
 - 出典で確かめていない事実を「確認済み」と書かない。
 - 新しい依存ライブラリの追加は事前に相談する。
 

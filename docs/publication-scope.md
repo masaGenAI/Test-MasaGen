@@ -31,10 +31,13 @@ Book-Summary には、有料・会員制のサービスや市販の本をもと�
 1. **リポジトリを非公開にする**：GitHub のリポジトリ画面 → Settings → General → いちばん下の Danger Zone → Change repository visibility → Make private。履歴ごと非公開になる。
 2. **公開サイトをどうするか選ぶ**（下の表）。
 
+**2026-11-27 に B を選んだ**（スマホは不要だが、Android タブレットと PC のブラウザでは Book-Summary を開きたい、という希望による）。
+準備の手順は [`private-site-setup.md`](private-site-setup.md)。公開サイト（A）は公開版のまま並行して残る。
+
 | 選び方 | できること | 必要なもの |
 |---|---|---|
 | A. GitHub Pages を続ける | 公開版（Book-Summary 抜き）を今の URL で使い続ける。Book-Summary は PC のローカル版で読む | 非公開リポジトリで Pages を使うには有料プラン（Pro など）が要る。サイト自体は誰でも見られるままなので、公開版のビルドを使う |
-| B. ログインが要るホスティングへ移す | 全部入りの版を、スマホからも自分だけが開ける | 例：Cloudflare Pages ＋ Cloudflare Access。1ファイル 25MiB までの上限があり、今は Certification Hub（約42MiB）と TechHub（約28MiB）の読み込みファイルが超えるので、先に分割が要る |
+| **B. ログインが要るホスティングへ置く（採用）** | 全部入りの版を、タブレット・PC のブラウザから自分だけが開ける | Cloudflare Pages ＋ Cloudflare Access（無料プラン）。1ファイル 25MiB までの上限には、ビルドが大きいハブを 20MiB 以下に小分けして収めてある |
 | C. 何もしない | 今のまま | 上の「なぜ」の心配が残る |
 
 出典：

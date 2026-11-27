@@ -38,6 +38,9 @@ npm run preview      # ビルド結果をローカル確認
   （`booksummaryhub.html`・`booksummary-*.js`・`kindle-figs/`・横断検索の書名索引）を入れない。
   Book-Summary を開くと「公開版には入れていません」と出る。
 - 理由・戻し方・リポジトリの公開設定など本人にしかできない作業は [`docs/publication-scope.md`](../docs/publication-scope.md)。
+- 全部入りの版は、ログインが要る置き場所（Cloudflare Pages ＋ Access）にも置ける。タブレットや PC のブラウザから自分だけが開ける。
+  準備は [`docs/private-site-setup.md`](../docs/private-site-setup.md)。ワークフローは、ログインが要る状態だと確かめられたときだけ中身を置く。
+- `node scripts/check-dist.mjs` … `dist/` が置き場所の上限（1ファイル 25MiB・20,000 ファイル）に収まっているかを点検する。
 
 ## 原稿の分け方（`src/parts/` と `src/ProjectNova.jsx`）
 GitHub は 100MiB を超えるファイルを受け付けません。`ProjectNova.jsx` は 2026年11月に 97MiB まで来たので、
@@ -72,9 +75,9 @@ npm run build
 |---|---|---|
 | `index.html` | ポータル・Language・Training・Learning Tracker・Anything Memo | 最初に開いたとき |
 | `nova-hub-finance-<hash>.js` | Finance Hub（約8MB） | Finance Hub を開いたとき |
-| `nova-hub-megatech-<hash>.js` | TechHub（約25MB） | TechHub を開いたとき |
+| `nova-hub-megatech-<hash>.p1.js`, `.p2.js` | TechHub（約28MiB。20MiB を超えるので小分け） | TechHub を開いたとき |
 | `nova-hub-consulting-<hash>.js` | Consulting Hub（約4MB） | Consulting Hub を開いたとき |
-| `nova-hub-certification-<hash>.js` | Certification Hub（約38MB） | Certification Hub を開いたとき（弱点レーダーで CLF の記録を数えるときも） |
+| `nova-hub-certification-<hash>.p1.js` 〜 `.p3.js` | Certification Hub（約42MiB。20MiB を超えるので小分け） | Certification Hub を開いたとき（弱点レーダーで CLF の記録を数えるときも） |
 | `nova-hub-linguisticshub-<hash>.js` | Linguistics Hub（約4MB） | Linguistics Hub を開いたとき（弱点レーダーで Linguistics の記録を数えるときも） |
 | `nova-hub-sidework-<hash>.js` | Side Work Hub（約5MB） | Side Work Hub を開いたとき |
 | `booksummaryhub.html` | Book-Summary の最初の画面（出典の一覧・件数・進捗・検索の書名一致。約2MB、gzip で約0.4MB） | Book-Summary を開いたとき |
