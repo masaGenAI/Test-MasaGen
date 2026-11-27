@@ -9,10 +9,40 @@
 // ビルド時に計算して埋め込むので読み込みを待たない。
 // それ以外の中身（関数など）がポータル側で要るときは novaHubReady(…) で読み込みを待つ（弱点レーダーの CLF・Linguistics）。
 // 読み込みは <script>（module ではない）で行うので、index.html をファイルとして直接開いても、別ファイルが同じフォルダにあれば開ける。
+// 20MiB を超えるハブ（Certification・TechHub）は、中身を文字列のまま複数のファイル（…p1.js, …p2.js）に小分けしてある
+// （1ファイルの大きさに上限がある置き場所に置けるようにするため）。その場合は全部を読み込んでから、順につないで1本のスクリプトとして実行する。
 const __novaHubScripts = {};
-function novaLoadHubScript(key, file) {
+function novaLoadScriptFile(file) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = new URL(file, document.baseURI).href;
+    s.async = true;
+    s.charset = "utf-8";
+    s.onload = () => { s.remove(); resolve(); };
+    s.onerror = () => { s.remove(); reject(new Error(file + " を読み込めませんでした")); };
+    document.head.appendChild(s);
+  });
+}
+function novaLoadHubPieces(key, pieces) {
+  const reg = (window.__NOVA_HUB_CHUNKS__ = window.__NOVA_HUB_CHUNKS__ || {});
+  if (reg[key]) return Promise.resolve(reg[key]);
+  return Promise.all(pieces.files.map(novaLoadScriptFile)).then(() => {
+    const store = window.__NOVA_HUB_PIECES__ || {};
+    const parts = store[pieces.id];
+    const ok = Array.isArray(parts) && parts.length === pieces.files.length && pieces.files.every((f, i) => typeof parts[i] === "string");
+    if (!ok) throw new Error(pieces.files[0] + " ほかの分割ファイルがそろっていません");
+    const s = document.createElement("script");
+    s.text = parts.join("");
+    delete store[pieces.id]; // つないだあとは小分けの文字列を持ち続けない
+    document.head.appendChild(s);
+    s.remove();
+    if (!reg[key]) throw Object.assign(new Error(pieces.files[0] + " ほかを実行できませんでした"), { novaEval: true });
+    return reg[key];
+  });
+}
+function novaLoadHubScript(key, file, pieces) {
   if (!__novaHubScripts[key]) {
-    const pr = new Promise((resolve, reject) => {
+    const pr = pieces && pieces.files && pieces.files.length ? novaLoadHubPieces(key, pieces) : new Promise((resolve, reject) => {
       const reg = (window.__NOVA_HUB_CHUNKS__ = window.__NOVA_HUB_CHUNKS__ || {});
       if (reg[key]) { resolve(reg[key]); return; }
       const s = document.createElement("script");
@@ -28,13 +58,13 @@ function novaLoadHubScript(key, file) {
   }
   return __novaHubScripts[key];
 }
-// cfg: { key, name, file, deps: () => ({ 共通部品 }), statics: { 名前: 値 }, byLang: { 名前: [日本語版の値, 英語版の値] } }
+// cfg: { key, name, file, pieces?: { id, files: [小分けのファイル名…] }, deps: () => ({ 共通部品 }), statics: { 名前: 値 }, byLang: { 名前: [日本語版の値, 英語版の値] } }
 function novaLazyHub(cfg) {
   let mod = null, pending = null;
   const load = () => {
     if (mod) return Promise.resolve(mod);
     if (!pending) {
-      pending = novaLoadHubScript(cfg.key, cfg.file).then((factory) => {
+      pending = novaLoadHubScript(cfg.key, cfg.file, cfg.pieces).then((factory) => {
         if (!mod) { try { mod = factory(cfg.deps()); } catch (e) { throw Object.assign(e instanceof Error ? e : new Error(String(e)), { novaEval: true }); } }
         return mod;
       });
