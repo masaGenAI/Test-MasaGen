@@ -32,6 +32,13 @@ npm run preview      # ビルド結果をローカル確認
 - `index.html` — マウント先の `#root` を持つ HTML
 - `vite.config.js` — Vite 設定
 
+## 公開版とローカル版
+- `npm run build` … 全部入り（ローカル版）。自分の PC で開く用。
+- `npm run build:public` … 公開版。GitHub Pages に出すのはこちらで、Book-Summary の中身
+  （`booksummaryhub.html`・`booksummary-*.js`・`kindle-figs/`・横断検索の書名索引）を入れない。
+  Book-Summary を開くと「公開版には入れていません」と出る。
+- 理由・戻し方・リポジトリの公開設定など本人にしかできない作業は [`docs/publication-scope.md`](../docs/publication-scope.md)。
+
 ## 原稿の分け方（`src/parts/` と `src/ProjectNova.jsx`）
 GitHub は 100MiB を超えるファイルを受け付けません。`ProjectNova.jsx` は 2026年11月に 97MiB まで来たので、
 原稿を `src/parts/` 以下の約80ファイルに分けて保存しています（いちばん大きい部品で約7MiB）。

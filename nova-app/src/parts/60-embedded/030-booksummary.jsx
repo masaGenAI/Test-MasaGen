@@ -7,6 +7,10 @@ const BookSummaryModule = (function () {
   // Book-Summary の進捗を親（本体）の localStorage に橋渡しして永続化するためのキー。
   const BSH_STORE_KEY = "bsh:store:v1";
 
+  // 公開版には中身を入れていないので、読み込まずに案内だけ出す（ビルドごとに決まる定数なので、フックの順序は変わらない）
+  function BookSummaryPublicNotice() { return <NovaLocalOnly name="Book-Summary" />; }
+  if (NOVA_PUBLIC_BUILD) return BookSummaryPublicNotice;
+
   function BookSummaryModule() {
     // 完成版 Book-Summary ハブ（flier・Kindle・YouTube・note・Instagram の要約、検索・クイズ・メモ・ダークモード・履歴ナビ）を、
     // 実行時に Blob URL 化して iframe で読み込む。これにより単一HTMLファイルのままでも

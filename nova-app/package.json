@@ -11,6 +11,8 @@
     "validate": "node scripts/nova-src.mjs sync && node scripts/validate-quiz.mjs && node scripts/validate-atlas.mjs",
     "prebuild": "node scripts/nova-src.mjs sync && node scripts/nova-src.mjs check && node scripts/validate-quiz.mjs && node scripts/validate-govdojo.mjs && node scripts/validate-atlas.mjs",
     "build": "vite build",
+    "prebuild:public": "npm run prebuild",
+    "build:public": "vite build --mode public",
     "preview": "vite preview"
   },
   "dependencies": {

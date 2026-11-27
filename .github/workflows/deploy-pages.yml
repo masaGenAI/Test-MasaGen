@@ -3,6 +3,7 @@ name: Deploy nova-app to GitHub Pages
 # nova-app（Vite + vite-plugin-singlefile）をビルドし、生成物 dist/ を
 # GitHub Pages に公開する。これにより PC・他端末の各ブラウザから
 # 同一の固定 URL でアプリにアクセスできる。
+# 公開するのは「公開版」（npm run build:public）。Book-Summary の中身は入れない（理由と切り替え方は docs/publication-scope.md）。
 # 注意: 学習進捗はブラウザの localStorage に保存されるため端末間では同期しない
 # （アプリ内の「バックアップ（書き出し/読み込み）」で手動移行は可能）。
 
@@ -45,8 +46,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build (single-file)
-        run: npm run build
+      - name: Build (public edition, without Book-Summary content)
+        run: npm run build:public
 
       - name: Configure Pages (auto-enable if needed)
         uses: actions/configure-pages@v5

@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { viteSingleFile } from "vite-plugin-singlefile";
 import fs from "node:fs";
+import path from "node:path";
 import { novaSync } from "./scripts/nova-src.mjs";
 import { novaLazyHubs } from "./scripts/lazy-hubs.mjs";
 import { novaBookSummarySplit } from "./scripts/booksummary-split.mjs";
@@ -59,7 +60,31 @@ function bookIndex() {
   return out;
 }
 
-export default defineConfig({
+// 公開版（npm run build:public＝vite build --mode public。GitHub Pages に出すビルド）には、Book-Summary の中身を入れない：
+//   - dist から booksummaryhub.html・booksummary-*.js・kindle-figs/ を外す
+//   - ポータルの横断検索に出す書名の索引（__NOVA_BOOK_INDEX__）を空にする
+//   - アプリ側は __NOVA_PUBLIC__ を見て、Book-Summary を開いたときに「ローカル版のみ」の案内を出す
+// 理由と、全部入りの版（npm run build）の使い方は docs/publication-scope.md。
+const PUBLIC_DROP = ["booksummaryhub.html", "kindle-figs"];
+function novaPublicStrip() {
+  let outDir = "dist", logger = null;
+  return {
+    name: "nova-public-strip",
+    apply: "build",
+    configResolved(config) { outDir = path.resolve(config.root, config.build.outDir); logger = config.logger; },
+    closeBundle() {
+      const gone = [];
+      for (const name of fs.readdirSync(outDir)) {
+        if (PUBLIC_DROP.includes(name) || /^booksummary-.*\.js$/.test(name)) { fs.rmSync(path.join(outDir, name), { recursive: true, force: true }); gone.push(name); }
+      }
+      logger?.info(`[nova-public-strip] 公開版：Book-Summary の中身を dist から外しました（${gone.length} 件）`);
+    },
+  };
+}
+
+export default defineConfig(({ mode }) => {
+  const PUBLIC = mode === "public";
+  return {
   plugins: [
     // 原稿の部品（src/parts）と作業用の写し（src/ProjectNova.jsx）をそろえる。ほかのプラグインより先に
     novaSync(),
@@ -79,13 +104,15 @@ export default defineConfig({
       ],
     }),
     // public/booksummaryhub.html（原稿）を、dist では小さい HTML と booksummary-*.js に分けて置き換える
-    novaBookSummarySplit({ src: "public/booksummaryhub.html", file: "booksummaryhub.html" }),
+    // 公開版では分けずに、あとで dist から外す
+    PUBLIC ? novaPublicStrip() : novaBookSummarySplit({ src: "public/booksummaryhub.html", file: "booksummaryhub.html" }),
     react(),
     viteSingleFile(),
   ],
   define: {
     __NOVA_HUB_STATS__: JSON.stringify(hubStats()),
-    __NOVA_BOOK_INDEX__: JSON.stringify(bookIndex()),
+    __NOVA_BOOK_INDEX__: JSON.stringify(PUBLIC ? [] : bookIndex()),
+    __NOVA_PUBLIC__: JSON.stringify(PUBLIC),
   },
   esbuild: {
     legalComments: "none",
@@ -94,4 +121,5 @@ export default defineConfig({
     host: true,
     port: 5173,
   },
+  };
 });

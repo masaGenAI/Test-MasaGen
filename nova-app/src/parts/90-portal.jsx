@@ -136,8 +136,9 @@ const NOVA_STATIONS = [
     Icon: IconBook,
     ja: "Book-Summary",
     en: "Book-Summary",
-    get tagJa() { return `flier・Kindle・YouTube・note・Instagram 要約${nf(novaStats().books)}件`; },
-    get tagEn() { return `flier · Kindle · YouTube · note · Instagram · ${nf(novaStats().books)} summaries`; },
+    // 公開版には中身を入れていない（docs/publication-scope.md）
+    get tagJa() { return NOVA_PUBLIC_BUILD ? "ローカル版のみ" : `flier・Kindle・YouTube・note・Instagram 要約${nf(novaStats().books)}件`; },
+    get tagEn() { return NOVA_PUBLIC_BUILD ? "Local build only" : `flier · Kindle · YouTube · note · Instagram · ${nf(novaStats().books)} summaries`; },
   },
   {
     id: "tracker",
@@ -2865,7 +2866,7 @@ function ProjectNova() {
             </div>
           </div>
         </div>
-        {lang === "en" && NOVA_JA_ONLY[active] && (
+        {lang === "en" && NOVA_JA_ONLY[active] && !(NOVA_PUBLIC_BUILD && active === "booksummary") && (
           <div role="note" style={{ background: "#FFF7E6", borderBottom: `1px solid ${NOVA.line}`, color: "#7A4B00", fontSize: 12.5, padding: "7px 18px", fontFamily: NOVA_SANS }}>
             {NOVA_JA_ONLY[active]}
           </div>
