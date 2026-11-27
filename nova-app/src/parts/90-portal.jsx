@@ -2958,6 +2958,8 @@ function ProjectNova() {
 
           <NovaSearch lang={lang} />
 
+          <NovaToday lang={lang} />
+
           <PortalDaily lang={lang} onResume={(id) => setActive(id)} />
 
           <PortalBootcamp lang={lang} onResume={(id) => setActive(id)} />
